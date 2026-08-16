@@ -23,7 +23,19 @@ from typing import Any, Mapping
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from simulator.regeneration_guard import regeneration_guard
+
 EXTRACTS = ROOT / "data" / "literature" / "extracts"
+
+# Unlink-and-replace targets in EXTRACTS. janaf-4th.yaml is tracked and is
+# rewritten by migrate_p_carriers; deleting it without a rewrite is the
+# b-200 silent-shrink shape. richter-et-al-2011.yaml is an untracked stale
+# name removed on purpose (explicit retirement).
+_REWRITE_JANAF = "janaf-4th.yaml"
+_STALE_RICHTER = "richter-et-al-2011.yaml"
 
 # Prefer sibling main checkout for gitignored research drafts.
 _CANDIDATE_MAINS = [
@@ -1671,41 +1683,49 @@ def annotate_all_extracts_fidelity() -> int:
 
 def main() -> int:
     EXTRACTS.mkdir(parents=True, exist_ok=True)
-    # Clean rewrite targets that must not inherit shattered prior species keys.
-    for stale_name in ("janaf-4th.yaml", "richter-et-al-2011.yaml"):
-        stale = EXTRACTS / stale_name
-        if stale.is_file() and stale_name == "janaf-4th.yaml":
-            # Will be rewritten by migrate_p_carriers; remove pseudo-key pollution first.
-            stale.unlink()
-            print(f"cleared {stale.name} for clean rewrite")
-        elif stale.is_file():
-            stale.unlink()
-            print(f"removed stale {stale.name}")
-    written: list[Path] = []
-    for fn in (
-        migrate_cea,
-        migrate_lh84_from_dominant_missing,
-        migrate_p_carriers,
-        migrate_chloride_datz,
-        migrate_alpha_kinetics,
-        migrate_phase_properties,
-        migrate_validation_anchors_sample,
+    planned = [_REWRITE_JANAF] if (EXTRACTS / _REWRITE_JANAF).is_file() else []
+    retired = [_STALE_RICHTER] if (EXTRACTS / _STALE_RICHTER).is_file() else []
+    with regeneration_guard(
+        EXTRACTS,
+        planned,
+        managed=(_REWRITE_JANAF, _STALE_RICHTER),
+        retired=retired,
     ):
-        result = fn()
-        if result is None:
-            continue
-        if isinstance(result, list):
-            written.extend(result)
-        else:
-            written.append(result)
-    n_fid = annotate_all_extracts_fidelity()
-    print(f"fidelity annotate pass touched {n_fid} file(s)")
-    # Unique paths
-    uniq = sorted({p.resolve() for p in written})
-    print(f"pilot extracts: {len(uniq)}")
-    for p in uniq:
-        print(f"  {p.relative_to(ROOT)}")
-    return 0 if uniq else 1
+        # Clean rewrite targets that must not inherit shattered prior species keys.
+        for stale_name in (_REWRITE_JANAF, _STALE_RICHTER):
+            stale = EXTRACTS / stale_name
+            if stale.is_file() and stale_name == _REWRITE_JANAF:
+                # Will be rewritten by migrate_p_carriers; remove pseudo-key pollution first.
+                stale.unlink()
+                print(f"cleared {stale.name} for clean rewrite")
+            elif stale.is_file():
+                stale.unlink()
+                print(f"removed stale {stale.name}")
+        written: list[Path] = []
+        for fn in (
+            migrate_cea,
+            migrate_lh84_from_dominant_missing,
+            migrate_p_carriers,
+            migrate_chloride_datz,
+            migrate_alpha_kinetics,
+            migrate_phase_properties,
+            migrate_validation_anchors_sample,
+        ):
+            result = fn()
+            if result is None:
+                continue
+            if isinstance(result, list):
+                written.extend(result)
+            else:
+                written.append(result)
+        n_fid = annotate_all_extracts_fidelity()
+        print(f"fidelity annotate pass touched {n_fid} file(s)")
+        # Unique paths
+        uniq = sorted({p.resolve() for p in written})
+        print(f"pilot extracts: {len(uniq)}")
+        for p in uniq:
+            print(f"  {p.relative_to(ROOT)}")
+        return 0 if uniq else 1
 
 
 if __name__ == "__main__":

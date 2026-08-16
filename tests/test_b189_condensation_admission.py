@@ -12,12 +12,16 @@ import yaml
 
 from engines.builtin.foulant_disposition import chi_escape_salt
 from simulator.condensation import (
+    CONDENSATION_ADMISSION_REFUSAL_NO_DATA,
+    CONDENSATION_FLUX_DORMANT_REFUSAL,
     CondensationModel,
     WallSaturationPressureRefusal,
     _antoine_psat_pa,
     _condensation_admission_refusal,
+    _promote_non_debiting_carrier_status,
     _species_has_antoine_data,
     _species_has_compiled_or_legacy_pressure,
+    _species_is_flux_dormant,
     _species_vapor_data,
     _try_antoine_psat_pa,
     _wall_deposition_driving_pressure_pa,
@@ -120,16 +124,19 @@ def test_previously_possible_bypass_is_now_refused(payload) -> None:
         "Pb" not in species_mass
         for species_mass in result.condensed_by_stage_species.values()
     )
-    assert result.condensation_refusals_by_species["Pb"] == {
-        "status": "refused",
-        "reason": REFUSAL_INAPPLICABLE_PREDICATE,
-        "output_status": "status_bearing",
-    }
+    refusal = result.condensation_refusals_by_species["Pb"]
+    assert refusal["status"] == "refused"
+    assert refusal["reason"] == REFUSAL_INAPPLICABLE_PREDICATE
+    assert refusal["output_status"] == "refused"
+    assert refusal["mass_disposition"] == "retained_in_source_pending_authority"
     assert "Pb" not in result.wall_deposit_fraction_by_species
-    assert result.remaining_by_species["Pb"] == pytest.approx(1.0)
-    assert sum(result.remaining_by_species.values()) == pytest.approx(
-        flux.total_kg_hr
-    )
+    assert result.remaining_by_species["Pb"] == pytest.approx(0.0)
+    assert result.retained_in_source_by_species["Pb"] == pytest.approx(1.0)
+    assert result.condensation_authority_by_species["Pb"]["status"] == "refused"
+    assert (
+        result.remaining_by_species["Pb"]
+        + result.retained_in_source_by_species["Pb"]
+    ) == pytest.approx(flux.total_kg_hr)
 
 
 def test_unknown_applicability_predicate_fails_closed(payload) -> None:
@@ -142,13 +149,36 @@ def test_unknown_applicability_predicate_fails_closed(payload) -> None:
 
 
 def test_applicable_rows_are_unchanged(payload) -> None:
+    """Every hot-train-applicable row still has a hot-train evaluator.
+
+    b-189 (014c2000) pinned ``len(active) == 35`` as a *before/after
+    neutrality* snapshot of the admission change (35 admitted before,
+    35 after, DIVERGENCES 0). That is not a claim the catalog census
+    is eternally 35. t-622 (3a36e9bb) then landed MnO_gas and CoO_gas
+    with ``hot_train_applicability: applicable`` plus
+    ``flux_dormant: true`` — the same declaration t-609 used for
+    NiO_gas / FeO_association_gas: keep the analytical pressure
+    channel so the row stays observable; never inventory-debit.
+    Applicable ≠ authorized.
+
+    Census algebra at this tip: 37 = 35 + {MnO_gas, CoO_gas}. The
+    next properly-declared applicable species must not require a
+    rebaseline; the property below is the invariant. The two t-622
+    members are named so a silent flip back to not_applicable cannot
+    hide as "census returned to 35, still green."
+    """
+
     catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
     active = {
         species_id
         for species_id, row in catalog.species.items()
         if row.code_metadata.hot_train_applicability in {"applicable", "always"}
     }
-    assert len(active) == 35
+    assert {"MnO_gas", "CoO_gas"} <= active
+    for species_id in ("MnO_gas", "CoO_gas"):
+        assert _species_is_flux_dormant(
+            species_id, vapor_pressure_data=payload
+        )
     for species_id in active:
         assert catalog.evaluator_for_hot_train(species_id) is catalog.species[
             species_id
@@ -243,10 +273,35 @@ def test_predicate_readers_cannot_diverge() -> None:
 
 
 def test_every_flux_bearing_species_is_hot_train_applicable_or_refused(payload) -> None:
+    """Every flux-reachable species is hot-train applicable or refused.
+
+    ``flux_species`` is the catalog's legacy metals ∪ oxide_vapors
+    projection — every name the flux path can emit. b-189 pinned
+    ``len == 41`` as the neutrality snapshot, not an eternal census.
+    t-622 (3a36e9bb) added MnO_gas and CoO_gas to oxide_vapors:
+
+        43 = 41 + {MnO_gas, CoO_gas}
+
+    Both are ``applicable`` (pressure-observable) and ``flux_dormant``
+    (never debit), so they take the applicable branch. The six stage-0
+    P-carriers remain flux-reachable but not hot-train applicable and
+    take the refused branch (43 = 37 applicable + 6 refused). A later
+    species addition updates this derived set automatically; the test
+    fails only when a flux-bearing name is neither applicable nor
+    refused — an admission hole.
+    """
+
     catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
     legacy = vapor_pressure_legacy_view(payload)
-    flux_species = set(legacy.get("metals", {})) | set(legacy.get("oxide_vapors", {}))
-    assert len(flux_species) == 41
+    metals = set(legacy.get("metals", {}))
+    oxide_vapors = set(legacy.get("oxide_vapors", {}))
+    flux_species = metals | oxide_vapors
+    # Derived identity, not a magic integer: the census is the union.
+    # An overlap would have made b-189's pinned 41 under-count a
+    # colliding name; keep the partitions disjoint.
+    assert not metals & oxide_vapors
+    assert flux_species <= set(catalog.species)
+    assert {"MnO_gas", "CoO_gas"} <= oxide_vapors
     for species_id in flux_species:
         token = catalog.species[species_id].code_metadata.hot_train_applicability
         assert token in {"applicable", "always"} or (
@@ -306,6 +361,61 @@ def test_stage0_only_refusal_is_phase_dependent(payload) -> None:
         assert not _species_has_compiled_or_legacy_pressure(
             species_id, vapor_pressure_data=payload
         )
+
+
+def test_admission_and_flux_dormant_promote_onto_refused_debit_status(
+    payload,
+) -> None:
+    """Producer authority must land on a status the debit reader withholds."""
+
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+        VAPOUR_CARRIER_AUTHORITY_MISSING,
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+        VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+    )
+
+    assert _species_is_flux_dormant("MnO_gas", vapor_pressure_data=payload)
+    assert not _species_is_flux_dormant("Fe", vapor_pressure_data=payload)
+    assert _condensation_admission_refusal(
+        "Pb", vapor_pressure_data=payload
+    ) == REFUSAL_INAPPLICABLE_PREDICATE
+
+    for incoming in (
+        VAPOUR_CARRIER_AUTHORITY_MISSING,
+        VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+        VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+    ):
+        status, reason = _promote_non_debiting_carrier_status(
+            "Pb", incoming, vapor_pressure_data=payload
+        )
+        assert status == VAPOUR_CARRIER_AUTHORITY_REFUSED
+        assert reason == REFUSAL_INAPPLICABLE_PREDICATE
+
+        status, reason = _promote_non_debiting_carrier_status(
+            "MnO_gas", incoming, vapor_pressure_data=payload
+        )
+        assert status == VAPOUR_CARRIER_AUTHORITY_REFUSED
+        assert reason == CONDENSATION_FLUX_DORMANT_REFUSAL
+
+        status, reason = _promote_non_debiting_carrier_status(
+            "Fe", incoming, vapor_pressure_data=payload
+        )
+        assert status == incoming
+        assert reason is None
+
+    for incoming in (
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+    ):
+        status, reason = _promote_non_debiting_carrier_status(
+            "MnO_gas", incoming, vapor_pressure_data=payload
+        )
+        assert status == incoming
+        assert reason is None
+
+    assert CONDENSATION_ADMISSION_REFUSAL_NO_DATA == "antoine_data_unavailable"
 
 
 @pytest.mark.parametrize("species_id", ("BaO", "Pb", "WO3", "NaF", "MoO3"))

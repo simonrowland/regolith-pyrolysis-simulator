@@ -29,6 +29,15 @@ EXT4 = Path(
 _MISSING = object()
 
 
+def _ext4() -> Path:
+    """EXT4 is gitignored research working set; skip rather than FileNotFoundError."""
+    if not EXT4.is_dir():
+        pytest.skip(
+            "gitignored IMCC ext4 working set is absent from this checkout"
+        )
+    return EXT4
+
+
 def _write_ext_pack(tmp_path: Path, **row_overrides: object) -> Path:
     data = json.loads(BASE_DATAPACK.read_text())
     row = {
@@ -71,7 +80,7 @@ def _write_ext_pack(tmp_path: Path, **row_overrides: object) -> Path:
 
 
 def _write_migrated_delivered_ext_pack(tmp_path: Path) -> Path:
-    data = json.loads((EXT4 / "ext-pack.json").read_text())
+    data = json.loads((_ext4() / "ext-pack.json").read_text())
     for row in data["sp_extension"]["rows"]:
         row["provenance_class"] = "extension-compound-thermo"
     path = tmp_path / "delivered-ext-pack.json"
@@ -253,7 +262,7 @@ def test_delivered_ext_pack_executes_through_flagged_adapter(tmp_path: Path) -> 
 def test_delivered_fits_have_three_independent_spots_per_species(
     filename: str, expected_rows: int
 ) -> None:
-    rows = list(csv.DictReader((EXT4 / filename).open()))
+    rows = list(csv.DictReader((_ext4() / filename).open()))
     assert len(rows) == expected_rows
     by_species: dict[str, list[dict[str, str]]] = {}
     for row in rows:
@@ -274,7 +283,7 @@ def test_delivered_fits_have_three_independent_spots_per_species(
 
 
 def test_delivered_fit_sources_are_phase_verified_against_local_mirror() -> None:
-    compounds = json.loads((EXT4 / "compound-fits.json").read_text())
+    compounds = json.loads((_ext4() / "compound-fits.json").read_text())
     for row in compounds:
         source_lines = Path(row["local_mirror_path"]).read_text().splitlines()
         assert source_lines[0].split("\t")[-1].endswith("(l)")
@@ -286,7 +295,7 @@ def test_delivered_fit_sources_are_phase_verified_against_local_mirror() -> None
             for line in transition_lines
         )
 
-    gases = json.loads((EXT4 / "gas-channels.json").read_text())
+    gases = json.loads((_ext4() / "gas-channels.json").read_text())
     for row in gases:
         source_lines = Path(row["local_mirror_path"]).read_text().splitlines()
         assert source_lines[0].split("\t")[-1].endswith("(g)")
@@ -294,7 +303,7 @@ def test_delivered_fit_sources_are_phase_verified_against_local_mirror() -> None
 
 
 def test_delivered_gas_set_and_so2_s2_hand_anchor() -> None:
-    channels = json.loads((EXT4 / "gas-channels.json").read_text())
+    channels = json.loads((_ext4() / "gas-channels.json").read_text())
     assert {row["species"] for row in channels} == {
         "S2",
         "SO",
@@ -310,7 +319,7 @@ def test_delivered_gas_set_and_so2_s2_hand_anchor() -> None:
         "Na2SO4(g)",
         "K2SO4(g)",
     }
-    anchors = json.loads((EXT4 / "anchors.json").read_text())
+    anchors = json.loads((_ext4() / "anchors.json").read_text())
     # S2 + 2 O2 -> 2 SO2 at 1300 K. JANAF ΔrG° = -533.612 kJ/mol,
     # so log10(Kp) = 533612/(R*1300*ln(10)).
     hand_log10_kp = 533_612 / (8.31446261815324 * 1300 * math.log(10))
@@ -328,7 +337,7 @@ def test_delivered_gas_set_and_so2_s2_hand_anchor() -> None:
 
 
 def test_fes_anchor_reports_delta_without_retune() -> None:
-    anchors = json.loads((EXT4 / "anchors.json").read_text())["FeS"]
+    anchors = json.loads((_ext4() / "anchors.json").read_text())["FeS"]
     janaf_mu0_kj_mol = -68.811 - 1300 * 132.203 / 1000
     assert anchors["JANAF_Fe_024_mu0_1300K_kJ_mol"] == pytest.approx(
         janaf_mu0_kj_mol
@@ -342,7 +351,7 @@ def test_fes_anchor_reports_delta_without_retune() -> None:
 
 
 def test_screening_surface_is_complete_and_explicitly_non_authoritative() -> None:
-    rows = list(csv.DictReader((EXT4 / "screening-surface.csv").open()))
+    rows = list(csv.DictReader((_ext4() / "screening-surface.csv").open()))
     assert len(rows) == 24
     assert {row["feedstock_id"] for row in rows} == {
         "lunar_mare_low_ti",

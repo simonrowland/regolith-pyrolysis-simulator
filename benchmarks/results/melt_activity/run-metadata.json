@@ -1,4 +1,19 @@
 {
+  "artifact_guard": {
+    "planned": [
+      "bench-set.yaml",
+      "benchmark-results.csv",
+      "composition-probes.csv",
+      "coverage-map.csv",
+      "live-vaporock-check.csv",
+      "paired-decisions.csv",
+      "reference-anchor-results.csv",
+      "report.md",
+      "run-metadata.json"
+    ],
+    "retired": [],
+    "retired_removed": []
+  },
   "bench_set": "data/melt_activity/basalt-bench-set-v1.yaml",
   "bench_set_sha256": "ea34345206776088334cbf321e6de97f864ca58b0270dcf4663983089196e496",
   "coverage_row_count": 168,
@@ -129,6 +144,7 @@
     "ok": 19,
     "unavailable": 10
   },
+  "produced_at_git_head": "72e6d3a85df7589f3a21bb28ccab94ea65aac619",
   "reference_anchor": {
     "controller_anchor_reproduced": true,
     "controller_pool_count": 216,
@@ -223,5 +239,28 @@
       "neither_count": 0
     }
   ],
-  "schema_version": "melt-activity-benchmark-run.v1"
+  "schema_version": "melt-activity-benchmark-run.v1",
+  "thermoengine_adapter_latch": {
+    "detected": true,
+    "isolated_restarts": 16,
+    "isolated_status_counts": {
+      "observable_unavailable": 30,
+      "ok": 20,
+      "refused": 28
+    },
+    "isolated_total": 78,
+    "isolated_usable": 20,
+    "isolated_yamaguchi_total": 70,
+    "isolated_yamaguchi_usable": 20,
+    "latch_after_point_id": "tsaplin2000_a_na2o_x0477_1373",
+    "latch_after_reason": "RuntimeError: ThermoEngine equilibrium failed: ThermoEngine equilibrium failed: ThermoEngine Liquid GibbsFreeEnergy is not finite: nan Traceback (most recent call last): File \"/Users/simonrowland/Repos/rps-msmelt/simulator/engine_pool.py\", line 125, in _run_engine_worker result = handler(resource, request, errlog) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/Users/simonrowland/Repos/rps-msmelt/engines/alphamelts/thermoengine.py\", line 163, in _handle_thermoengine_request return transport._equilibrate_in_process(**kwargs) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/Users/simonrowland/Repos/rps-msmelt/engines/alphamelts/thermoengine.py\", line 539, in _equilibrate_in_process return self._equilibrate_isolated( ^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/Users/simonrowland/Repos/rps-msmelt/engines/a",
+    "latch_after_status": "refused",
+    "latch_first_point_id": "tsaplin2000_a_sio2_x0430_1473",
+    "latched_count": 78,
+    "sequential_total": 110,
+    "sequential_usable": 12,
+    "true_total": 110,
+    "true_usable": 32,
+    "yamaguchi_latched_count": 70
+  }
 }

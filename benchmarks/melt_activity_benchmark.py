@@ -37,6 +37,7 @@ import json
 import math
 import os
 import shutil
+import subprocess
 import sys
 import warnings
 from collections import Counter, defaultdict
@@ -1558,6 +1559,210 @@ def summarize_rump_coverage(
     return summary
 
 
+_ADAPTER_UNAVAILABLE_TOKEN = "adapter not available"
+
+
+def _short_latch_reason(text: str) -> str:
+    compact = " ".join(str(text or "").split())
+    head = compact.split("Traceback")[0].strip(" :")
+    if len(head) > 220:
+        head = head[:217] + "..."
+    return head or compact[:220]
+
+
+def _git_head() -> str | None:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=REPO_ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def detect_thermoengine_adapter_latch(
+    point_rows: Sequence[Mapping[str, Any]],
+) -> dict[str, Any] | None:
+    """Detect a one-process adapter death that poisons later ThermoEngine rows.
+
+    After a mid-rail RuntimeError the in-process ThermoEngine transport stays
+    down, so every later row inherits ``unavailable`` / "adapter not available".
+    That sequential count is latch-true and physics-false: a fresh adapter can
+    still be asked the later points. Returns None when no such latch is present.
+    """
+
+    te_rows = [row for row in point_rows if row.get("engine") == "thermoengine"]
+    if not te_rows:
+        return None
+    latch_at: int | None = None
+    for index, row in enumerate(te_rows):
+        reason = str(row.get("reason") or "").lower()
+        if row.get("status") == "unavailable" and _ADAPTER_UNAVAILABLE_TOKEN in reason:
+            latch_at = index
+            break
+    if latch_at is None:
+        return None
+    previous = te_rows[latch_at - 1] if latch_at else None
+    latched = te_rows[latch_at:]
+    sequential_usable = sum(
+        row.get("status") == "ok" and row.get("prediction") is not None for row in te_rows
+    )
+    yamaguchi_latched = [
+        row
+        for row in latched
+        if "yamaguchi" in str(row.get("point_id") or "").lower()
+    ]
+    return {
+        "detected": True,
+        "latch_after_point_id": (
+            str(previous["point_id"]) if previous is not None else None
+        ),
+        "latch_after_status": (
+            str(previous.get("status") or "") if previous is not None else ""
+        ),
+        "latch_after_reason": (
+            str(previous.get("reason") or "") if previous is not None else ""
+        ),
+        "latch_first_point_id": str(latched[0]["point_id"]),
+        "sequential_usable": sequential_usable,
+        "sequential_total": len(te_rows),
+        "latched_count": len(latched),
+        "latched_point_ids": [str(row["point_id"]) for row in latched],
+        "yamaguchi_latched_count": len(yamaguchi_latched),
+    }
+
+
+def _adapter_unavailable_result(result: EngineResult) -> bool:
+    return (
+        result.status == "unavailable"
+        and _ADAPTER_UNAVAILABLE_TOKEN in result.reason.lower()
+    )
+
+
+def _adapter_killed_this_call(result: EngineResult) -> bool:
+    text = result.reason.lower()
+    return result.status in {"refused", "crash"} and (
+        "equilibrium failed" in text or "transport unavailable" in text
+    )
+
+
+def _thermoengine_point_prediction_row(
+    point: Mapping[str, Any],
+    composition: Mapping[str, float],
+    result: EngineResult,
+) -> dict[str, Any]:
+    enriched = {**point, "composition_wt_pct": composition}
+    if (
+        not bool(point.get("score", True))
+        and point.get("dropped_reason")
+        and result.status == "ok"
+    ):
+        result = EngineResult(
+            status="refused",
+            reason=str(point["dropped_reason"]),
+            details={**result.details, "evaluation_status": "ok"},
+        )
+    prediction, prediction_reason = _prediction_for_point(enriched, result)
+    point_status = (
+        "observable_unavailable"
+        if result.status == "ok" and prediction is None
+        else result.status
+    )
+    measured = float(point["measured"])
+    residual = (
+        math.log10(prediction / measured)
+        if prediction is not None and measured > 0.0 and bool(point.get("score", True))
+        else None
+    )
+    return {
+        "point_id": point["id"],
+        "population": point["population"],
+        "composition_id": str(point["composition_id"]),
+        "temperature_K": float(point["temperature_K"]),
+        "species": point["species"],
+        "observable": point["observable"],
+        "engine": "thermoengine",
+        "status": point_status,
+        "prediction": prediction,
+        "residual_dex": residual,
+        "reason": prediction_reason or result.reason,
+    }
+
+
+def measure_isolated_thermoengine_points(
+    fixture: Mapping[str, Any],
+    point_ids: Sequence[str],
+    *,
+    timeout_s: float = 30.0,
+    engine_factory: Any | None = None,
+) -> dict[str, Any]:
+    """Re-evaluate ThermoEngine points with a fresh adapter after each death.
+
+    This is a separate measurement from the sequential one-process CSV. It does
+    not rewrite sequential rows. ``engine_factory`` is a test seam.
+    """
+
+    wanted = set(point_ids)
+    points = [point for point in fixture["points"] if point["id"] in wanted]
+    compositions = dict(fixture["compositions"])
+    factory = engine_factory or (
+        lambda: ThermoEngineMeltActivityEngine(timeout_s=timeout_s)
+    )
+    engine = factory()
+    cache: dict[tuple[str, float, float | None], EngineResult] = {}
+    rows: list[dict[str, Any]] = []
+    restarts = 0
+    for point in points:
+        composition_id = str(point["composition_id"])
+        composition = _normalize_wt(
+            compositions[composition_id]["composition_wt_pct"]
+        )
+        temperature_K = float(point["temperature_K"])
+        activity_observable = str(point["observable"]) in {
+            "activity",
+            "activity_coefficient",
+        }
+        fO2_bar = (
+            None
+            if activity_observable or point.get("fO2_bar") is None
+            else float(point["fO2_bar"])
+        )
+        key = (composition_id, temperature_K, fO2_bar)
+        if key not in cache:
+            result = execute_engine(engine, composition, temperature_K, fO2_bar)
+            if _adapter_unavailable_result(result):
+                engine = factory()
+                restarts += 1
+                result = execute_engine(engine, composition, temperature_K, fO2_bar)
+            if _adapter_killed_this_call(result):
+                engine = factory()
+                restarts += 1
+            cache[key] = result
+        rows.append(
+            _thermoengine_point_prediction_row(point, composition, cache[key])
+        )
+    usable = sum(
+        row["status"] == "ok" and row["prediction"] is not None for row in rows
+    )
+    yamaguchi = [
+        row for row in rows if "yamaguchi" in str(row["point_id"]).lower()
+    ]
+    yamaguchi_usable = sum(
+        row["status"] == "ok" and row["prediction"] is not None for row in yamaguchi
+    )
+    return {
+        "usable": usable,
+        "total": len(rows),
+        "yamaguchi_usable": yamaguchi_usable,
+        "yamaguchi_total": len(yamaguchi),
+        "status_counts": dict(sorted(Counter(row["status"] for row in rows).items())),
+        "restarts": restarts,
+        "rows": rows,
+    }
+
+
 def _fmt(value: Any, digits: int = 4) -> str:
     if value is None or value == "":
         return "—"
@@ -1573,6 +1778,7 @@ def generate_report(
     coverage_rows: Sequence[Mapping[str, Any]],
     reference_rows: Sequence[Mapping[str, Any]] = (),
     live_vaporock_rows: Sequence[Mapping[str, Any]] = (),
+    thermoengine_latch: Mapping[str, Any] | None = None,
 ) -> str:
     metrics = summarize_metrics(point_rows)
     paired_decisions = summarize_paired_decisions(point_rows)
@@ -1789,13 +1995,67 @@ def generate_report(
             row.get("status") == "ok" and row.get("prediction") is not None
             for row in thermoengine_rows
         )
-        lines.extend([
-            "",
-            f"ThermoEngine produced {thermoengine_usable}/{len(thermoengine_rows)} "
-            "usable benchmark predictions; converged results without the "
-            "requested canonical observable remain typed "
-            "`observable_unavailable`.",
-        ])
+        latch = thermoengine_latch or detect_thermoengine_adapter_latch(point_rows)
+        lines.append("")
+        if latch:
+            after_id = latch.get("latch_after_point_id") or "an earlier point"
+            after_reason = _short_latch_reason(
+                str(latch.get("latch_after_reason") or "adapter death")
+            )
+            yam_latched = int(latch.get("yamaguchi_latched_count") or 0)
+            isolated_total = latch.get("isolated_total")
+            isolated_usable = latch.get("isolated_usable")
+            isolated_measured = isolated_total is not None and isolated_usable is not None
+            lines.append(
+                f"ThermoEngine sequential one-process yield: "
+                f"{thermoengine_usable}/{len(thermoengine_rows)} usable "
+                "benchmark predictions. This figure is a post-latch artifact: "
+                f"after `{after_id}` the in-process adapter died "
+                f"({after_reason}), and the remaining "
+                f"{latch['latched_count']} ThermoEngine rows"
+                + (
+                    f" — including all {yam_latched} Yamaguchi 1983 points —"
+                    if yam_latched
+                    else " —"
+                )
+                + " inherited `unavailable` (\"adapter not available\"). "
+                "Do not read the sequential count as ThermoEngine being "
+                "unable to score those later points."
+            )
+            if isolated_measured:
+                yam_iso_u = latch.get("isolated_yamaguchi_usable")
+                yam_iso_t = latch.get("isolated_yamaguchi_total")
+                true_usable = latch.get("true_usable")
+                true_total = latch.get("true_total") or len(thermoengine_rows)
+                yam_clause = ""
+                if yam_iso_u is not None and yam_iso_t is not None:
+                    yam_clause = f" (Yamaguchi: {yam_iso_u}/{yam_iso_t})"
+                lines.append(
+                    "Isolated ThermoEngine re-evaluation of the latched points "
+                    "(fresh adapter after each adapter-death; not taken from "
+                    f"the latched CSV) produced {isolated_usable}/{isolated_total} "
+                    f"usable predictions{yam_clause}. Combined coverage of the "
+                    f"{true_total}-point set is therefore "
+                    f"{true_usable}/{true_total}: sequential pre-latch usable "
+                    "plus isolated latched-point usable."
+                )
+            else:
+                lines.append(
+                    "Isolated ThermoEngine re-evaluation of the latched points "
+                    "was not performed in this run; the un-latched coverage is "
+                    "therefore not asserted here."
+                )
+            lines.append(
+                "Converged results without the requested canonical observable "
+                "remain typed `observable_unavailable`."
+            )
+        else:
+            lines.append(
+                f"ThermoEngine produced {thermoengine_usable}/{len(thermoengine_rows)} "
+                "usable benchmark predictions; converged results without the "
+                "requested canonical observable remain typed "
+                "`observable_unavailable`."
+            )
     lines.extend(["", "## Stripping-trajectory coverage", ""])
     for engine in sorted(coverage_engines):
         accepted = sum(row.get(f"{engine}_status") == "ok" for row in coverage_rows)
@@ -2015,6 +2275,29 @@ def run_benchmark(
         coverage_rows = run_coverage_map(fixture, engines, coverage_steps)
         _write_csv(output_dir / "coverage-map.csv", coverage_rows)
     shutil.copyfile(bench_set_path, output_dir / "bench-set.yaml")
+    latch = detect_thermoengine_adapter_latch(point_rows)
+    if latch:
+        isolated = measure_isolated_thermoengine_points(
+            fixture,
+            latch["latched_point_ids"],
+            timeout_s=alphamelts_timeout_s,
+        )
+        latch = {
+            **latch,
+            "isolated_usable": isolated["usable"],
+            "isolated_total": isolated["total"],
+            "isolated_yamaguchi_usable": isolated["yamaguchi_usable"],
+            "isolated_yamaguchi_total": isolated["yamaguchi_total"],
+            "isolated_status_counts": isolated["status_counts"],
+            "isolated_restarts": isolated["restarts"],
+            "true_usable": latch["sequential_usable"] + isolated["usable"],
+            "true_total": latch["sequential_total"],
+        }
+        # Isolated row details stay out of the sequential CSV. Status
+        # counts are enough for the published claim; dropping per-point
+        # isolated rows keeps run-metadata.json a run record, not a
+        # second results table.
+        latch.pop("latched_point_ids", None)
     metadata = {
         "schema_version": "melt-activity-benchmark-run.v1",
         "bench_set": (
@@ -2023,6 +2306,7 @@ def run_benchmark(
             else str(bench_set_path)
         ),
         "bench_set_sha256": _sha256(bench_set_path),
+        "produced_at_git_head": _git_head(),
         "engines": list(engine_names),
         "mode": mode,
         "point_status_counts": dict(sorted(Counter(row["status"] for row in point_rows).items())),
@@ -2042,6 +2326,7 @@ def run_benchmark(
                 sorted(Counter(row["status"] for row in live_vaporock_rows).items())
             ),
         },
+        "thermoengine_adapter_latch": latch,
         "artifact_guard": {
             "planned": sorted(guard.planned),
             "retired": sorted(str(name) for name in retired_artifacts),
@@ -2060,6 +2345,7 @@ def run_benchmark(
                 coverage_rows,
                 reference_rows,
                 live_vaporock_rows,
+                thermoengine_latch=latch,
             ),
             encoding="utf-8",
         )
