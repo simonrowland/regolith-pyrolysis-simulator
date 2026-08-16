@@ -2604,6 +2604,24 @@ class CondensationModel:
             carrier_authority_status_by_species.setdefault(
                 str(species), VAPOUR_CARRIER_AUTHORITY_MISSING
             )
+        non_debiting_carrier_statuses = {
+            VAPOUR_CARRIER_AUTHORITY_REFUSED,
+            VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+        }
+        # One chokepoint: type admission-refusal and flux_dormant as the
+        # refused status the evaporation debit reader already withholds on.
+        non_debiting_reason_by_species: dict[str, str] = {}
+        for species in evap_flux.species_kg_hr:
+            promoted, reason = _promote_non_debiting_carrier_status(
+                species,
+                carrier_authority_status_by_species.get(
+                    species, VAPOUR_CARRIER_AUTHORITY_MISSING
+                ),
+                vapor_pressure_data=self.vapor_pressure_data,
+            )
+            carrier_authority_status_by_species[species] = promoted
+            if reason is not None:
+                non_debiting_reason_by_species[species] = reason
         condensation_authority_by_species: dict[str, dict[str, Any]] = {
             species: {
                 'status': status,
@@ -2617,10 +2635,6 @@ class CondensationModel:
             for species, status in sorted(
                 carrier_authority_status_by_species.items()
             )
-        }
-        non_debiting_carrier_statuses = {
-            VAPOUR_CARRIER_AUTHORITY_REFUSED,
-            VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
         }
         # VR-11 / B3: stage-local efficiency zeros mint typed pass-through
         # outcomes (no longer silent return 0.0 without a consumer channel).
@@ -2814,11 +2828,13 @@ class CondensationModel:
                 retained_source_mass = max(0.0, float(rate_kg_hr))
                 remaining_by_species[species] = 0.0
                 retained_in_source_by_species[species] = retained_source_mass
-                reason = (
-                    'upstream_vapour_carrier_refused'
-                    if carrier_status == VAPOUR_CARRIER_AUTHORITY_REFUSED
-                    else 'positive_mass_conflicts_with_upstream_proven_zero'
-                )
+                reason = non_debiting_reason_by_species.get(species)
+                if reason is None:
+                    reason = (
+                        'upstream_vapour_carrier_refused'
+                        if carrier_status == VAPOUR_CARRIER_AUTHORITY_REFUSED
+                        else 'positive_mass_conflicts_with_upstream_proven_zero'
+                    )
                 condensation_refusals_by_species[species] = {
                     'status': 'refused',
                     'reason': reason,
@@ -2837,19 +2853,6 @@ class CondensationModel:
                     'carrier_authority': copy.deepcopy(
                         carrier_authority_by_species.get(species, {})
                     ),
-                }
-                continue
-
-            admission_refusal = _condensation_admission_refusal(
-                species,
-                vapor_pressure_data=self.vapor_pressure_data,
-            )
-            if admission_refusal is not None:
-                remaining_by_species[species] = max(0.0, rate_kg_hr)
-                condensation_refusals_by_species[species] = {
-                    'status': 'refused',
-                    'reason': admission_refusal,
-                    'output_status': 'status_bearing',
                 }
                 continue
 
@@ -4268,6 +4271,7 @@ def _missing_required_antoine_keys(block: Any) -> tuple[str, ...]:
 
 
 CONDENSATION_ADMISSION_REFUSAL_NO_DATA = "antoine_data_unavailable"
+CONDENSATION_FLUX_DORMANT_REFUSAL = "flux_dormant_never_inventory_debit"
 
 
 def _assert_condensation_applicable(
@@ -4314,6 +4318,58 @@ def _condensation_admission_refusal(
     ):
         return None
     return CONDENSATION_ADMISSION_REFUSAL_NO_DATA
+
+
+def _species_is_flux_dormant(
+    species: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> bool:
+    """True when the catalog row forbids an inventory debit."""
+
+    return _species_vapor_data(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    ).get("flux_dormant") is True
+
+
+def _promote_non_debiting_carrier_status(
+    species: str,
+    current_status: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> tuple[str, str | None]:
+    """Map admission-refusal and flux_dormant onto the refused debit status.
+
+    The evaporation debit reader only withholds for refused / proven_zero
+    (or retained_in_source). Inapplicable / no-data is category-1 missing
+    input: refuse the debit. flux_dormant is the same: never inventory-debit,
+    even when a bypass emits species_kg_hr > 0. Already-refused and
+    proven-zero statuses are left unchanged so their distinct reasons survive.
+    """
+
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+    )
+
+    if current_status in {
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+    }:
+        return current_status, None
+    admission_refusal = _condensation_admission_refusal(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    if admission_refusal is not None:
+        return VAPOUR_CARRIER_AUTHORITY_REFUSED, admission_refusal
+    if _species_is_flux_dormant(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    ):
+        return VAPOUR_CARRIER_AUTHORITY_REFUSED, CONDENSATION_FLUX_DORMANT_REFUSAL
+    return current_status, None
 
 
 def _species_has_compiled_or_legacy_pressure(
