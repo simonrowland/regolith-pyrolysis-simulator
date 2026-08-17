@@ -26,6 +26,16 @@ from typing import Any, Callable, Optional
 ENGINE_WORKER_CANCEL_POLL_S = 0.05
 ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S = 3.0
 ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S = 5.0
+# _stop_pair on the start() handshake-timeout path (diagnostic=False):
+# killpg + join(0.1) + kill + join(1.0). These joins sit AFTER the
+# handshake wall and BEFORE _start_and_consume's ready.put.
+ENGINE_WORKER_STOP_PAIR_JOIN_S = 0.1 + 1.0
+# process.start() has no timeout API. One close-join quantum covers a
+# healthy spawn-context Process.start() (OS create + pickle + exec) so a
+# handshake timeout after a slow-but-finite start() can still land as
+# the typed start() error. A wedged start() is not covered by this slack
+# — that is the publish-before-start path.
+ENGINE_WORKER_SPAWN_SLACK_S = 1.0
 
 # Env-gated lifecycle trace (2026-07-24): the recursive-spawn churn class
 # was invisible because every failure path was silently absorbed into
@@ -106,27 +116,51 @@ def _worker_startup_timeout_s(worker: Any) -> float:
     return timeout_s
 
 
+def _process_pid(process: Any) -> int | None:
+    pid = getattr(process, 'pid', None)
+    if pid is None:
+        return None
+    return int(pid)
+
+
 def _pool_ready_wait_s(workers: list[Any] | tuple[Any, ...]) -> float:
-    # Premise: N daemon threads start concurrently. Each start() already
-    # has a handshake wall of worker.startup_timeout_s. The constructor
-    # then performs N ready.get() calls. A thread that never puts does
-    # not consume its handshake wall, so the constructor cannot wait
-    # "until the slowest start returns" — it needs a scheduled deadline.
-    # Arithmetic: handshake wall is max(startup_i) because starts are
-    # concurrent (a serial sum would over-wait and is not the physical
-    # bound). Add one cancel-poll quantum per worker so N queue hops
-    # can land after the last handshake without a false refusal.
-    #   ready_wait_s = max(startup_i) + N * ENGINE_WORKER_CANCEL_POLL_S
-    # Bounds: the main-thread ready.get() loop (the proven CI wedge).
-    # Does not change the per-worker handshake. process.start() is not
-    # separately wrapped: it has no timeout API, already runs on these
-    # daemon threads, and a wedged spawn is the same missing ready.put
-    # this deadline covers.
+    # Premise: constructor first-start on each slot thread, concurrent.
+    # start() order before _start_and_consume can ready.put:
+    #   1. self.close() — first-start process is None and _pending_reap
+    #      is empty, so this is 0 s. (A later cold restart is after the
+    #      constructor wait is already over.)
+    #   2. Pipe() + Process() — in-process, negligible.
+    #   3. process.start() — no timeout API. A wedged start() never puts
+    #      (missing-slot path; the Process is published first so
+    #      request_disable can reap). A healthy start() is finite; cover
+    #      it with one close-join quantum so a handshake timeout that
+    #      follows a slow-but-finite spawn still lands as the typed error.
+    #   4. handshake poll — startup_timeout_s (already in the budget).
+    #   5. on handshake TimeoutError: _discard_current → _stop_pair
+    #      (diagnostic=False, so no watchdog sleep):
+    #        join(0.1) + join(1.0) = ENGINE_WORKER_STOP_PAIR_JOIN_S
+    #      THEN _start_and_consume ready.put((index, exc)).
+    #   6. constructor: N timed ready.get hops after the last put.
+    # Algebra (starts are concurrent, so max not sum of startup_i):
+    #   ready_wait_s = max(startup_i)
+    #                + ENGINE_WORKER_SPAWN_SLACK_S
+    #                + ENGINE_WORKER_STOP_PAIR_JOIN_S
+    #                + N * ENGINE_WORKER_CANCEL_POLL_S
+    # Unit check: every term is seconds; result is seconds.
+    # Sanity (N=1, startup=30): 30 + 1.0 + 1.1 + 0.05 = 32.15 s.
+    #   Old formula was 30.05 s; T_discard - N*0.05 ≈ 1.05 s short at
+    #   default size=1. This budget covers that 1.1 s plus 1.0 s spawn.
+    #   N=1, startup=1 (silent pin): 1 + 1.0 + 1.1 + 0.05 = 3.15 s.
     n = len(workers)
     if n < 1:
         raise ValueError('engine worker pool requires at least one worker')
     budgets = [_worker_startup_timeout_s(worker) for worker in workers]
-    ready_wait_s = max(budgets) + n * ENGINE_WORKER_CANCEL_POLL_S
+    ready_wait_s = (
+        max(budgets)
+        + ENGINE_WORKER_SPAWN_SLACK_S
+        + ENGINE_WORKER_STOP_PAIR_JOIN_S
+        + n * ENGINE_WORKER_CANCEL_POLL_S
+    )
     if not math.isfinite(ready_wait_s) or ready_wait_s <= 0.0:
         raise ValueError(
             f'pool ready wait must be finite and positive, got {ready_wait_s!r}'
@@ -274,21 +308,53 @@ class WarmEngineWorker:
             ),
             daemon=self.daemon,
         )
+        # Publish before Process.start() so request_disable / ctor-failure
+        # close can reap a child whose start() has not returned. pid is
+        # None until the OS create assigns _popen; request_disable then
+        # records the Process on _pending_reap and close() kills once
+        # pid exists. Chose publish-on-the-worker (self.process +
+        # _pending_reap) over a spawn helper thread or a pool-wide
+        # child-pid scan: request_disable already kills self.process,
+        # and _pending_reap is what ctor-failure close already joins.
+        with self._state_lock:
+            if self.disabled:
+                child.close()
+                parent.close()
+                raise RuntimeError(f'{self.name} worker is disabled')
+            self.process = process
+            self.connection = parent
+            self.ready_payload = None
+            if process not in self._pending_reap:
+                self._pending_reap.append(process)
+        with self._state_lock:
+            still_ours = (
+                not self.disabled
+                and self.process is process
+            )
+        if not still_ours:
+            child.close()
+            parent.close()
+            raise RuntimeError(f'{self.name} worker is disabled')
         try:
             process.start()
         except BaseException:
             child.close()
             parent.close()
+            with self._state_lock:
+                if self.process is process:
+                    self.process = None
+                    self.connection = None
             raise
         child.close()
         with self._state_lock:
-            if self.disabled:
+            if self.disabled or self.process is not process:
                 cancelled = True
             else:
-                self.process = process
-                self.connection = parent
-                self.ready_payload = None
                 cancelled = False
+                try:
+                    self._pending_reap.remove(process)
+                except ValueError:
+                    pass
         if cancelled:
             self._stop_pair(
                 process,
@@ -550,21 +616,24 @@ class WarmEngineWorker:
         cleanup_group: bool = False,
     ) -> None:
         try:
-            if cleanup_group and process is not None and not process.is_alive():
+            pid = _process_pid(process)
+            if pid is None:
+                pass
+            elif cleanup_group and process is not None and not process.is_alive():
                 try:
-                    os.killpg(process.pid, signal.SIGKILL)
+                    os.killpg(pid, signal.SIGKILL)
                 except (AttributeError, OSError):
                     pass
-            if process is not None and process.is_alive():
+            elif process is not None and process.is_alive():
                 if diagnostic:
                     try:
-                        os.kill(process.pid, self.diagnostic_signal)
+                        os.kill(pid, self.diagnostic_signal)
                     except OSError:
                         pass
                     time.sleep(self.watchdog_grace_s)
                 if process.is_alive():
                     try:
-                        os.killpg(process.pid, signal.SIGKILL)
+                        os.killpg(pid, signal.SIGKILL)
                         process.join(timeout=0.1)
                     except (AttributeError, OSError):
                         pass
@@ -576,7 +645,10 @@ class WarmEngineWorker:
                 process.join(timeout=1.0)
         finally:
             if connection is not None:
-                connection.close()
+                try:
+                    connection.close()
+                except OSError:
+                    pass
 
     def close(self) -> None:
         """Idempotently stop the worker and release its pipe."""
@@ -588,33 +660,36 @@ class WarmEngineWorker:
         try:
             if connection is not None:
                 try:
-                    if process is not None and process.is_alive():
+                    if (
+                        process is not None
+                        and _process_pid(process) is not None
+                        and process.is_alive()
+                    ):
                         connection.send(None)
                 except (BrokenPipeError, EOFError, OSError):
                     pass
                 finally:
                     connection.close()
         finally:
-            if process is not None:
-                process_pid = getattr(process, 'pid', None)
+            process_pid = _process_pid(process)
+            if process is not None and process_pid is not None:
                 process.join(timeout=1.0)
                 if process.is_alive():
                     try:
-                        os.killpg(process.pid, signal.SIGTERM)
+                        os.killpg(process_pid, signal.SIGTERM)
                     except (AttributeError, OSError):
                         process.terminate()
                     process.join(timeout=1.0)
                 if process.is_alive():
                     try:
-                        os.killpg(process.pid, signal.SIGKILL)
+                        os.killpg(process_pid, signal.SIGKILL)
                     except (AttributeError, OSError):
                         process.kill()
                     process.join(timeout=1.0)
-                if process_pid is not None:
-                    try:
-                        os.killpg(process_pid, signal.SIGKILL)
-                    except (AttributeError, OSError):
-                        pass
+                try:
+                    os.killpg(process_pid, signal.SIGKILL)
+                except (AttributeError, OSError):
+                    pass
         self._reap_pending(timeout_s=1.0)
 
     def request_disable(self) -> None:
@@ -625,33 +700,42 @@ class WarmEngineWorker:
             self.process = None
             self.connection = None
             self.ready_payload = None
-            if process is not None:
+            if process is not None and process not in self._pending_reap:
                 self._pending_reap.append(process)
         if connection is not None:
-            connection.close()
+            try:
+                connection.close()
+            except OSError:
+                pass
         if process is None:
             return
+        pid = _process_pid(process)
+        if pid is None:
+            return
         try:
-            os.killpg(process.pid, signal.SIGKILL)
-        except (AttributeError, OSError):
+            os.killpg(pid, signal.SIGKILL)
+        except (AttributeError, OSError, ProcessLookupError):
             try:
                 process.kill()
-            except OSError:
+            except (AttributeError, OSError, ProcessLookupError):
                 pass
 
     def _reap_pending(self, *, timeout_s: float) -> bool:
         deadline = time.monotonic() + max(0.0, float(timeout_s))
         with self._state_lock:
-            processes = tuple(self._pending_reap)
+            processes = tuple(dict.fromkeys(self._pending_reap))
             self._pending_reap.clear()
         remaining_processes = []
         for process in processes:
+            if _process_pid(process) is None:
+                remaining_processes.append(process)
+                continue
             remaining = max(0.0, deadline - time.monotonic())
             process.join(timeout=remaining)
             if process.is_alive():
                 try:
                     process.kill()
-                except OSError:
+                except (AttributeError, OSError):
                     pass
                 process.join(timeout=max(0.0, deadline - time.monotonic()))
             if process.is_alive():
@@ -710,6 +794,15 @@ class EngineWorkerPool:
             except queue.Empty:
                 break
             reported[index] = error
+        # P2-1: a report already queued when remaining hits 0 must still
+        # be taken. The early break would otherwise classify a successful
+        # or typed-error put as missing.
+        while True:
+            try:
+                index, error = ready.get_nowait()
+            except queue.Empty:
+                break
+            reported[index] = error
         missing = [
             index
             for index in range(len(self._workers))
@@ -726,19 +819,22 @@ class EngineWorkerPool:
                 self.close(cancel_pending=True)
             except BaseException as exc:
                 close_error = exc
-            if missing:
-                refusal = EngineWorkerTimeout(
-                    f'engine worker pool slots {missing}',
-                    ready_wait_s,
-                    phase='initialization',
-                    failed_slots=missing,
-                )
+            # Prefer a slot's own typed error over the generic missing-slot
+            # refusal. Losing start()'s worker_name is the defect: a
+            # consumer discarding what the producer typed.
+            if errors:
                 if close_error is not None:
-                    raise refusal from close_error
-                raise refusal
+                    raise errors[0][1] from close_error
+                raise errors[0][1]
+            refusal = EngineWorkerTimeout(
+                f'engine worker pool slots {missing}',
+                ready_wait_s,
+                phase='initialization',
+                failed_slots=missing,
+            )
             if close_error is not None:
-                raise errors[0][1] from close_error
-            raise errors[0][1]
+                raise refusal from close_error
+            raise refusal
 
     @property
     def workers(self) -> tuple[WarmEngineWorker, ...]:

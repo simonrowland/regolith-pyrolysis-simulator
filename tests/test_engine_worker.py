@@ -1,8 +1,11 @@
 import json
 import math
 import multiprocessing
+import multiprocessing.process
 import os
 import signal
+import subprocess
+import sys
 import threading
 import time
 
@@ -11,6 +14,8 @@ import pytest
 from simulator.engine_pool import (
     ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S,
     ENGINE_WORKER_CANCEL_POLL_S,
+    ENGINE_WORKER_SPAWN_SLACK_S,
+    ENGINE_WORKER_STOP_PAIR_JOIN_S,
     EngineWorkerRemoteError,
     EngineWorkerPool,
     EngineWorkerTimeout,
@@ -302,7 +307,10 @@ def test_constructor_refuses_when_worker_thread_never_reports_ready():
     ready_wait_s = _pool_ready_wait_s([factory(0)])
     assert math.isfinite(ready_wait_s)
     assert ready_wait_s == pytest.approx(
-        startup_timeout_s + size * ENGINE_WORKER_CANCEL_POLL_S
+        startup_timeout_s
+        + ENGINE_WORKER_SPAWN_SLACK_S
+        + ENGINE_WORKER_STOP_PAIR_JOIN_S
+        + size * ENGINE_WORKER_CANCEL_POLL_S
     )
     with pytest.raises(ValueError, match='finite and positive'):
         class InfiniteStartup:
@@ -311,7 +319,10 @@ def test_constructor_refuses_when_worker_thread_never_reports_ready():
     class MissingStartup:
         pass
     assert _pool_ready_wait_s([MissingStartup()]) == pytest.approx(
-        30.0 + ENGINE_WORKER_CANCEL_POLL_S
+        30.0
+        + ENGINE_WORKER_SPAWN_SLACK_S
+        + ENGINE_WORKER_STOP_PAIR_JOIN_S
+        + ENGINE_WORKER_CANCEL_POLL_S
     )
 
     # Join bound = handshake wait + automatic close budget + slack.
@@ -359,3 +370,218 @@ def test_constructor_refuses_when_worker_thread_never_reports_ready():
     for pid in spawned_pids:
         with pytest.raises(ProcessLookupError):
             os.kill(pid, 0)
+
+
+def _noop_disable_and_reap(worker):
+    """Minimal close/disable surface for constructor-failure teardown."""
+    def request_disable():
+        process = worker.process
+        worker.process = None
+        if process is not None:
+            worker._pending_reap.append(process)
+            if getattr(process, 'pid', None) is not None and process.is_alive():
+                try:
+                    process.kill()
+                except OSError:
+                    pass
+
+    def _reap_pending(*, timeout_s):
+        deadline = time.monotonic() + max(0.0, float(timeout_s))
+        remaining = []
+        for process in worker._pending_reap:
+            if getattr(process, 'pid', None) is None:
+                continue
+            process.join(timeout=max(0.0, deadline - time.monotonic()))
+            if process.is_alive():
+                try:
+                    process.kill()
+                except OSError:
+                    pass
+                process.join(timeout=max(0.0, deadline - time.monotonic()))
+            if process.is_alive():
+                remaining.append(process)
+        worker._pending_reap = remaining
+        return not remaining
+
+    def close():
+        request_disable()
+        _reap_pending(timeout_s=1.0)
+
+    worker.request_disable = request_disable
+    worker._reap_pending = _reap_pending
+    worker.close = close
+
+
+@pytest.mark.timeout(20)
+def test_constructor_preserves_typed_handshake_timeout_identity():
+    """A genuine start() handshake timeout must keep that worker identity.
+
+    Models WarmEngineWorker.start() on the timeout path: handshake wall,
+    then _discard_current → _stop_pair join(0.1)+join(1.0) *before*
+    ready.put. The constructor wait used to expire during that discard
+    and rewrite the typed EngineWorkerTimeout as a generic missing-slot
+    refusal ('engine worker pool slots [0]').
+    """
+    startup_timeout_s = 0.4
+    # Same join wall as WarmEngineWorker._stop_pair (diagnostic=False).
+    discard_join_s = 0.1 + 1.0
+
+    class LateTypedTimeoutWorker:
+        def __init__(self, index):
+            self.name = f'typed-handshake slot {index}'
+            self.startup_timeout_s = startup_timeout_s
+            self.process = None
+            self._pending_reap = []
+            _noop_disable_and_reap(self)
+
+        def start(self, *, timeout_s=None):
+            time.sleep(self.startup_timeout_s)
+            exc = EngineWorkerTimeout(
+                self.name,
+                self.startup_timeout_s,
+                phase='initialization',
+            )
+            time.sleep(discard_join_s)
+            raise exc
+
+    def factory(index):
+        return LateTypedTimeoutWorker(index)
+
+    with pytest.raises(EngineWorkerTimeout) as exc_info:
+        EngineWorkerPool(factory, size=1)
+    exc = exc_info.value
+    assert exc.phase == 'initialization'
+    assert exc.worker_name == 'typed-handshake slot 0'
+    assert 'engine worker pool slots' not in exc.worker_name
+    assert exc.timeout_s == pytest.approx(startup_timeout_s)
+    assert tuple(getattr(exc, 'failed_slots', ())) == ()
+
+
+@pytest.mark.timeout(20)
+def test_constructor_reaps_child_when_process_start_blocks_before_publish():
+    """Pin: process.start() hang before self.process is assigned must still reap.
+
+    SilentReadyWorker publishes the child, then parks — request_disable can
+    see it. That is not this bug. Here start() creates the OS child and
+    then blocks *inside* Process.start(), which is how WarmEngineWorker
+    used to leave self.process as None.
+    """
+    spawned_pids = []
+    original_start = multiprocessing.process.BaseProcess.start
+
+    def blocking_start(self):
+        original_start(self)
+        pid = self.pid
+        if pid is not None:
+            spawned_pids.append(pid)
+        time.sleep(3600)
+
+    multiprocessing.process.BaseProcess.start = blocking_start
+    try:
+        def factory(index):
+            return WarmEngineWorker(
+                name=f'unpublished-spawn slot {index}',
+                bootstrap=_bootstrap_test_worker,
+                handler=_handle_test_request,
+                startup_timeout_s=0.5,
+                call_timeout_s=1.0,
+                daemon=False,
+            )
+
+        with pytest.raises(EngineWorkerTimeout) as exc_info:
+            EngineWorkerPool(factory, size=1)
+        assert exc_info.value.phase == 'initialization'
+        assert spawned_pids, 'process.start() never created a child'
+        for pid in spawned_pids:
+            with pytest.raises(ProcessLookupError):
+                os.kill(pid, 0)
+    finally:
+        multiprocessing.process.BaseProcess.start = original_start
+        for pid in spawned_pids:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except OSError:
+                pass
+
+
+@pytest.mark.timeout(25)
+def test_unpublished_daemon_false_spawn_does_not_block_interpreter_exit(
+    tmp_path,
+):
+    """A daemon=False child left unpublished must not pin interpreter shutdown."""
+    script = tmp_path / 'unpublished_spawn_exit_pin.py'
+    script.write_text(
+        '''
+import multiprocessing.process
+import sys
+import time
+
+from simulator.engine_pool import (
+    EngineWorkerPool,
+    EngineWorkerTimeout,
+    WarmEngineWorker,
+)
+
+def bootstrap():
+    time.sleep(3600)
+    return None, "ready"
+
+def handler(_resource, request, _errlog):
+    return request
+
+def factory(index):
+    return WarmEngineWorker(
+        name=f"exit-pin slot {index}",
+        bootstrap=bootstrap,
+        handler=handler,
+        startup_timeout_s=0.4,
+        call_timeout_s=1.0,
+        daemon=False,
+    )
+
+if __name__ == "__main__":
+    _original_start = multiprocessing.process.BaseProcess.start
+
+    def _blocking_start(self):
+        _original_start(self)
+        time.sleep(3600)
+
+    multiprocessing.process.BaseProcess.start = _blocking_start
+    try:
+        EngineWorkerPool(factory, size=1)
+    except EngineWorkerTimeout:
+        raise SystemExit(0)
+    except BaseException as exc:
+        print(f"{type(exc).__name__}: {exc}", file=sys.stderr)
+        raise SystemExit(2)
+    raise SystemExit(3)
+''',
+        encoding='utf-8',
+    )
+    env = os.environ.copy()
+    env['PYTHONPATH'] = os.pathsep.join(
+        [os.getcwd(), env.get('PYTHONPATH', '')]
+    ).rstrip(os.pathsep)
+    proc = subprocess.Popen(
+        [sys.executable, str(script)],
+        cwd=os.getcwd(),
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = proc.communicate(timeout=15.0)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except OSError:
+            proc.kill()
+        stdout, stderr = proc.communicate(timeout=5.0)
+        pytest.fail(
+            'interpreter did not exit within 15s — non-daemon unpublished '
+            f'orphan blocked shutdown stdout={stdout!r} stderr={stderr!r}'
+        )
+    assert proc.returncode == 0, (
+        f'child exited {proc.returncode} stdout={stdout!r} stderr={stderr!r}'
+    )
