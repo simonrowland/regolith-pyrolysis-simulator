@@ -90,6 +90,7 @@ POINT_STATUSES = frozenset(
         "unavailable",
     }
 )
+COVERAGE_PRESSURE_FAMILIES = frozenset({"partial_pressure", "evaporation_flux"})
 
 
 @dataclass(frozen=True)
@@ -207,6 +208,30 @@ def _single_cation_gas_activities(
 
 def _reason_line(value: Any) -> str:
     return " ".join(str(value or "").split())[:800]
+
+
+def coverage_observable_is_pressure(result: EngineResult) -> bool:
+    """Whether this coverage result's observable is a pressure map.
+
+    Declared non-pressure families (activity, domain_gate) are not
+    pressure-scored. An undeclared family fails closed: ok + empty
+    pressures must not stay ok.
+    """
+    family = result.details.get("observable_family")
+    if family in COVERAGE_PRESSURE_FAMILIES:
+        return True
+    if family:
+        return False
+    return True
+
+
+def coverage_cell_accepted(row: Mapping[str, Any], engine: str) -> bool:
+    """Accepted coverage cell: ok, and not a recorded hollow prediction."""
+    if row.get(f"{engine}_status") != "ok":
+        return False
+    if row.get(f"{engine}_finite_prediction") is False:
+        return False
+    return True
 
 
 def _alphamelts_failure_details(values: Mapping[str, Any]) -> dict[str, Any]:
@@ -385,6 +410,7 @@ class ImccEngine:
                 "trust": labels.trust,
                 "envelope_status": labels.envelope_status,
                 "pack_sha256": _sha256(self.pack_path),
+                "observable_family": "activity",
             },
         )
 
@@ -496,6 +522,7 @@ class InternalAnalyticalEngine:
                 "benchmark_activity_basis": "parent_oxide_formula_unit",
                 "gas_path": "shared_tracked_analytical",
                 "warning_count": len(result.warnings),
+                "observable_family": "activity",
             },
         )
 
@@ -686,6 +713,7 @@ class AlphaMeltsEngine:
                 "silicate_network_band_wt_pct": list(
                     assessment.silicate_network_band_wt_pct
                 ),
+                "observable_family": "domain_gate",
             },
         )
 
@@ -773,7 +801,10 @@ class VapoRockEngine:
             return EngineResult(
                 status="unavailable",
                 reason=f"VapoRock unavailable: {self._initialization_error}",
-                details={"dependency_available": False},
+                details={
+                    "dependency_available": False,
+                    "observable_family": "partial_pressure",
+                },
             )
         if fO2_bar is None:
             return EngineResult(
@@ -809,6 +840,8 @@ class VapoRockEngine:
             pressure_bar=1.0e-6,
         )
         raw_status = str(result.status)
+        raw_diagnostics = dict(getattr(result, "diagnostics", None) or {})
+        cause = raw_diagnostics.get("empty_speciation_cause")
         pressures = _positive_finite(
             getattr(result, "vaporock_full_speciation_Pa", None)
             or result.vapor_pressures_Pa
@@ -823,6 +856,8 @@ class VapoRockEngine:
             "units": "Pa",
             "source": "vaporock_eval_gas_abundances",
         }
+        if cause:
+            details["empty_speciation_cause"] = cause
         if raw_status == "unavailable":
             return EngineResult(
                 status="unavailable",
@@ -834,6 +869,32 @@ class VapoRockEngine:
                 status="out_of_domain",
                 reason=_reason_line("; ".join(result.warnings)),
                 details=details,
+            )
+        # Hollow token (or success-shaped empty dict) is missing-output,
+        # not a provider refusal. Check before remapping not_converged.
+        if cause or (
+            not pressures and raw_status in {"ok", "non_authoritative"}
+        ):
+            from simulator.melt_backend.vaporock import (
+                EmptySpeciationCause,
+                empty_speciation_reason,
+            )
+
+            reason = _reason_line("; ".join(result.warnings))
+            if cause:
+                derived = empty_speciation_reason(EmptySpeciationCause(cause))
+                if derived not in reason:
+                    reason = _reason_line(
+                        f"{reason}; {derived}" if reason else derived
+                    )
+            return EngineResult(
+                status="observable_unavailable",
+                reason=reason,
+                details={
+                    **details,
+                    "execution_status": "completed_without_observable",
+                    "finite_prediction": False,
+                },
             )
         if raw_status not in {"ok", "non_authoritative"}:
             return EngineResult(
@@ -1145,8 +1206,32 @@ def run_coverage_map(
                 except Exception as exc:
                     status, reason = classify_engine_exception(exc)
                     result = EngineResult(status=status, reason=reason)
-                row[f"{engine.name}_status"] = result.status
-                row[f"{engine.name}_reason"] = result.reason
+                n_pressures = len(result.partial_pressures or {})
+                if n_pressures > 0:
+                    finite = True
+                elif "finite_prediction" in result.details:
+                    finite = bool(result.details["finite_prediction"])
+                else:
+                    finite = None
+                status = result.status
+                reason = result.reason
+                is_pressure = coverage_observable_is_pressure(result)
+                # Generic hollow-ok close: a success with no finite
+                # values of a pressure observable (declared or
+                # undeclared) is not ok. Activity / domain_gate
+                # engines declare a non-pressure family and skip this.
+                if status == "ok" and is_pressure and (
+                    finite is False or n_pressures == 0
+                ):
+                    status = "observable_unavailable"
+                    finite = False
+                    if not reason:
+                        reason = "engine produced no finite prediction"
+                row[f"{engine.name}_status"] = status
+                row[f"{engine.name}_reason"] = reason
+                if is_pressure:
+                    row[f"{engine.name}_finite_prediction"] = finite
+                    row[f"{engine.name}_n_pressures"] = n_pressures
             rows.append(row)
     return rows
 
@@ -2197,12 +2282,16 @@ def generate_report(
             )
     lines.extend(["", "## Stripping-trajectory coverage", ""])
     for engine in sorted(coverage_engines):
-        accepted = sum(row.get(f"{engine}_status") == "ok" for row in coverage_rows)
+        accepted = sum(
+            coverage_cell_accepted(row, engine) for row in coverage_rows
+        )
         refused = len(coverage_rows) - accepted
         low_silica = [
             row for row in coverage_rows if float(row["SiO2_wt_pct"]) < 30.0
         ]
-        low_refused = sum(row.get(f"{engine}_status") != "ok" for row in low_silica)
+        low_refused = sum(
+            not coverage_cell_accepted(row, engine) for row in low_silica
+        )
         lines.append(
             f"- `{engine}`: {accepted}/{len(coverage_rows)} accepted; {refused} refused/unavailable; "
             f"below 30 wt% SiO2, {len(low_silica) - low_refused}/{len(low_silica)} accepted "

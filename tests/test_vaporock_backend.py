@@ -1881,3 +1881,351 @@ def test_session_warm_boot_cache_reuses_identical_config(monkeypatch):
         assert created[0].get("warm_worker") is True
     finally:
         vaporock_mod.clear_session_backend_cache()
+
+
+class _WarmPayloadFuture:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def result(self):
+        return self._payload
+
+
+class _FakeWarmPool:
+    def __init__(self, payload):
+        self.payload = payload
+        self.requests = []
+
+    def submit(self, request, timeout_s=None):
+        del timeout_s
+        self.requests.append(dict(request))
+        return _WarmPayloadFuture(self.payload)
+
+
+def test_warm_pool_empty_log10_bar_is_typed_not_silent_success():
+    """Empty speciation must latch a typed cause, not `or {}` success.
+
+    Coverage hollow cells are 38-row tables with 0 finite log10(bar)
+    values. After serialization that arrives as `log10_bar={}` — missing
+    input, not a proven zero and not a domain refusal.
+    """
+    from simulator.melt_backend.vaporock import (
+        EmptySpeciationCause,
+        empty_speciation_reason,
+    )
+
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = _FakeWarmPool({
+        "log10_bar": {},
+        "empty_speciation_cause": EmptySpeciationCause.NO_FINITE_VALUES.value,
+        "speciation_row_count": 38,
+        "speciation_finite_count": 0,
+        "speciation_nan_count": 30,
+        "speciation_neginf_count": 8,
+        "speciation_other_nonfinite_count": 0,
+    })
+    backend._last_pressure_authority_warning = None
+    backend._clear_empty_speciation()
+
+    pressures = backend._call_vaporock_via_pool(
+        composition_wt_pct={"SiO2": 31.65, "MgO": 6.79},
+        temperature_K=1900.0,
+        fO2_log=-9.0,
+    )
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.NO_FINITE_VALUES
+    )
+    reason = backend._last_empty_speciation_reason
+    assert reason == empty_speciation_reason(
+        EmptySpeciationCause.NO_FINITE_VALUES,
+        {
+            "speciation_row_count": 38,
+            "speciation_finite_count": 0,
+            "speciation_nan_count": 30,
+            "speciation_neginf_count": 8,
+            "speciation_other_nonfinite_count": 0,
+        },
+    )
+    assert "domain" not in reason.lower()
+    assert "temperature" not in reason.lower()
+
+
+def test_warm_pool_missing_log10_bar_is_typed_not_empty_dict_substitution():
+    from simulator.melt_backend.vaporock import EmptySpeciationCause
+
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = _FakeWarmPool({"path": "system"})
+    backend._clear_empty_speciation()
+
+    pressures = backend._call_vaporock_via_pool(
+        composition_wt_pct={"SiO2": 50.0},
+        temperature_K=1900.0,
+        fO2_log=-9.0,
+    )
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.PAYLOAD_ABSENT
+    )
+    assert "absent" in backend._last_empty_speciation_reason
+    assert "finite of 0 rows" not in backend._last_empty_speciation_reason
+
+
+def test_in_process_all_nonfinite_speciation_is_typed_not_ok_without_reason(
+    monkeypatch,
+):
+    """In-process coverage path: 38 rows of nan/-inf is not a silent {}."""
+    import pandas as pd
+
+    from simulator.melt_backend.vaporock import (
+        EmptySpeciationCause,
+        empty_speciation_reason,
+    )
+
+    values = [float("nan")] * 30 + [float("-inf")] * 8
+    frame = pd.DataFrame(
+        {1900.0: values},
+        index=[f"sp{i}(g)" for i in range(38)],
+    )
+
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            self.composition = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            del temperature, log_fO2
+            return frame
+
+    _install_fake_import(monkeypatch, types.SimpleNamespace(System=FakeSystem))
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(
+        1900.0 - 273.15,
+        composition_kg={"SiO2": 31.65, "MgO": 6.79, "FeO": 19.55},
+        fO2_log=-9.0,
+        pressure_bar=1e-6,
+    )
+
+    assert getattr(result, "vaporock_full_speciation_Pa", {}) == {}
+    assert result.vapor_pressures_Pa == {}
+    assert result.status == "not_converged"
+    assert result.diagnostics.get("empty_speciation_cause") == (
+        EmptySpeciationCause.NO_FINITE_VALUES.value
+    )
+    assert result.diagnostics.get("finite_prediction") is False
+    assert result.diagnostics.get("backend_status_reason") == (
+        f"speciation_{EmptySpeciationCause.NO_FINITE_VALUES.value}"
+    )
+    assert result.diagnostics.get("backend_status_reason") != (
+        OutOfDomainReason.TEMPERATURE_RANGE.value
+    )
+    expected = empty_speciation_reason(
+        EmptySpeciationCause.NO_FINITE_VALUES,
+        {
+            "speciation_row_count": 38,
+            "speciation_finite_count": 0,
+            "speciation_nan_count": 30,
+            "speciation_neginf_count": 8,
+            "speciation_other_nonfinite_count": 0,
+        },
+    )
+    assert any(expected == warning for warning in result.warnings)
+
+
+def test_vaporock_speciation_is_live_ignores_authority_status():
+    from simulator.melt_backend.vaporock import vaporock_speciation_is_live
+
+    assert vaporock_speciation_is_live(
+        "non_authoritative",
+        {
+            "empty_speciation_cause": "no_finite_values",
+            "finite_prediction": False,
+        },
+        {},
+    ) is False
+    assert vaporock_speciation_is_live(
+        "non_authoritative",
+        {"pressure_control_authoritative": False},
+        {"Na": 1000.0},
+    ) is True
+    assert vaporock_speciation_is_live("not_converged", {}, {"Na": 1.0}) is False
+    assert vaporock_speciation_is_live("ok", {}, {}) is False
+
+
+def test_empty_speciation_tokens_are_closed_and_reasons_are_unique():
+    from simulator.melt_backend.vaporock import (
+        EMPTY_SPECIATION_REASON_BY_CAUSE,
+        EmptySpeciationCause,
+        empty_speciation_reason,
+    )
+
+    assert set(EMPTY_SPECIATION_REASON_BY_CAUSE) == set(EmptySpeciationCause)
+    reasons = [empty_speciation_reason(cause) for cause in EmptySpeciationCause]
+    assert len(reasons) == len(set(reasons))
+    pairs = [
+        (left, right)
+        for i, left in enumerate(EmptySpeciationCause)
+        for right in list(EmptySpeciationCause)[i + 1 :]
+    ]
+    for left, right in pairs:
+        assert empty_speciation_reason(left) != empty_speciation_reason(right)
+
+
+def test_empty_speciation_token_table_unreadable():
+    from simulator.melt_backend.vaporock import EmptySpeciationCause
+
+    class _BrokenIloc:
+        def __getitem__(self, key):
+            raise RuntimeError("cannot read table")
+
+    class _Unreadable:
+        iloc = _BrokenIloc()
+        index = True
+        shape = (4, 1)
+
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    pressures = backend._log10_bar_pressures_to_pa(_Unreadable())
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.TABLE_UNREADABLE
+    )
+    reason = backend._last_empty_speciation_reason
+    assert reason == "VapoRock speciation table unreadable or unparseable"
+    assert "0 finite of 0 rows" not in reason
+    assert "finite log10_bar" not in reason
+
+
+def test_empty_speciation_token_payload_absent():
+    from simulator.melt_backend.vaporock import EmptySpeciationCause
+
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    pressures = backend._log10_bar_pressures_to_pa(None)
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.PAYLOAD_ABSENT
+    )
+    reason = backend._last_empty_speciation_reason
+    assert reason == "VapoRock speciation payload absent or None"
+    assert "0 finite of 0 rows" not in reason
+    assert "produced no finite" not in reason
+
+
+def test_empty_speciation_token_no_finite_values():
+    from simulator.melt_backend.vaporock import (
+        EmptySpeciationCause,
+        empty_speciation_reason,
+    )
+
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    raw = {"Na(g)": float("nan"), "K(g)": float("-inf"), "SiO(g)": float("inf")}
+    pressures = backend._log10_bar_pressures_to_pa(raw)
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.NO_FINITE_VALUES
+    )
+    stats = backend._last_empty_speciation_stats
+    assert stats["speciation_row_count"] == 3
+    assert stats["speciation_finite_count"] == 0
+    assert stats["speciation_nan_count"] == 1
+    assert stats["speciation_neginf_count"] == 1
+    assert stats["speciation_other_nonfinite_count"] == 1
+    assert backend._last_empty_speciation_reason == empty_speciation_reason(
+        EmptySpeciationCause.NO_FINITE_VALUES, stats
+    )
+
+
+def test_empty_speciation_token_finite_but_nonpositive_pressure():
+    from simulator.melt_backend.vaporock import (
+        EmptySpeciationCause,
+        empty_speciation_reason,
+    )
+
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    raw = {"Na(g)": -400.0, "K(g)": -500.0}
+    pressures = backend._log10_bar_pressures_to_pa(raw)
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE
+    )
+    stats = backend._last_empty_speciation_stats
+    assert stats["speciation_finite_count"] == 2
+    assert stats["speciation_row_count"] == 2
+    reason = backend._last_empty_speciation_reason
+    assert reason == empty_speciation_reason(
+        EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE, stats
+    )
+    assert "no finite log10_bar" not in reason
+    assert "2 finite of 2 rows" in reason
+
+
+def test_empty_speciation_unreadable_serialize_does_not_claim_zero_rows():
+    from simulator.melt_backend.vaporock import (
+        EmptySpeciationCause,
+        _serialize_log10_bar_pressures,
+    )
+
+    class _BrokenIloc:
+        def __getitem__(self, key):
+            raise RuntimeError("cannot read table")
+
+    class _Unreadable:
+        iloc = _BrokenIloc()
+        index = True
+        shape = (4, 1)
+
+    log10_bar, payload = _serialize_log10_bar_pressures(_Unreadable())
+    assert log10_bar == {}
+    assert payload["empty_speciation_cause"] == (
+        EmptySpeciationCause.TABLE_UNREADABLE.value
+    )
+    assert "speciation_row_count" not in payload
+
+    none_log, none_payload = _serialize_log10_bar_pressures(None)
+    assert none_log == {}
+    assert none_payload["empty_speciation_cause"] == (
+        EmptySpeciationCause.PAYLOAD_ABSENT.value
+    )
+    assert "speciation_row_count" not in none_payload
+
+
+def test_warm_pool_none_log10_bar_is_payload_absent():
+    from simulator.melt_backend.vaporock import EmptySpeciationCause
+
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = _FakeWarmPool({"log10_bar": None, "path": "system"})
+    backend._clear_empty_speciation()
+
+    pressures = backend._call_vaporock_via_pool(
+        composition_wt_pct={"SiO2": 50.0},
+        temperature_K=1900.0,
+        fO2_log=-9.0,
+    )
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.PAYLOAD_ABSENT
+    )
+
+
+def test_healthy_finite_log10_conversion_is_bit_identical():
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    raw = {"Na(g)": -2.0, "SiO(g)": -6.0}
+    pressures = backend._log10_bar_pressures_to_pa(raw)
+
+    assert backend._last_empty_speciation_cause is None
+    assert pressures["Na"] == 10.0 ** -2.0 * 1e5
+    assert pressures["SiO"] == 10.0 ** -6.0 * 1e5

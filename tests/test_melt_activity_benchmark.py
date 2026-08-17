@@ -29,7 +29,10 @@ class _FakeActivityEngine:
 
     def coverage(self, composition_wt_pct, temperature_K):
         del composition_wt_pct, temperature_K
-        return benchmark.EngineResult(status="ok")
+        return benchmark.EngineResult(
+            status="ok",
+            details={"observable_family": "activity"},
+        )
 
 
 def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
@@ -262,12 +265,125 @@ def test_coverage_map_records_melts_refusal_below_30_sio2():
     assert low_silica
     assert all(row["alphamelts_status"] == "out_of_domain" for row in low_silica)
     assert all("SiO2" in row["alphamelts_reason"] for row in low_silica)
+    assert all("alphamelts_finite_prediction" not in row for row in rows)
+    assert all("alphamelts_n_pressures" not in row for row in rows)
     assert {row["composition_id"] for row in rows} == {
         "sf04_tholeiite",
         "sf04_alkali_basalt",
         "sf04_komatiite",
         "sf04_dunite",
     }
+
+
+def test_coverage_empty_pressure_dict_is_not_typed_ok():
+    """A coverage cell that computed nothing must not be recorded as ok.
+
+    Safety-net fixture: the *old* hollow shape (ok + empty +
+    finite_prediction=False). Post-fix VapoRockEngine.evaluate already
+    returns observable_unavailable; this keeps the consumer remap pinned.
+    """
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    class _HollowVaporock:
+        name = "vaporock"
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(
+                status="ok",
+                partial_pressures={},
+                details={
+                    "finite_prediction": False,
+                    "observable_family": "partial_pressure",
+                },
+            )
+
+    rows = benchmark.run_coverage_map(fixture, [_HollowVaporock()], steps=2)
+
+    assert rows
+    assert all(row["vaporock_status"] != "ok" for row in rows)
+    assert all(row["vaporock_status"] == "observable_unavailable" for row in rows)
+    assert all(row["vaporock_finite_prediction"] is False for row in rows)
+    assert all(row["vaporock_n_pressures"] == 0 for row in rows)
+    assert all(not benchmark.coverage_cell_accepted(row, "vaporock") for row in rows)
+
+
+def test_coverage_ok_empty_without_finite_prediction_is_not_typed_ok():
+    """Generic hole: ok + empty pressures + no finite_prediction flag."""
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    class _SilentPressure:
+        name = "silent"
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(status="ok", partial_pressures={})
+
+    rows = benchmark.run_coverage_map(fixture, [_SilentPressure()], steps=2)
+
+    assert rows
+    assert all(row["silent_status"] == "observable_unavailable" for row in rows)
+    assert all(row["silent_finite_prediction"] is False for row in rows)
+    assert all(row["silent_n_pressures"] == 0 for row in rows)
+    assert sum(benchmark.coverage_cell_accepted(row, "silent") for row in rows) == 0
+
+
+def test_coverage_non_pressure_engine_omits_pressure_columns():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    class _DomainOk:
+        name = "alphamelts"
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(
+                status="ok",
+                details={"observable_family": "domain_gate"},
+            )
+
+    rows = benchmark.run_coverage_map(fixture, [_DomainOk()], steps=2)
+
+    assert rows
+    assert all(row["alphamelts_status"] == "ok" for row in rows)
+    assert all("alphamelts_finite_prediction" not in row for row in rows)
+    assert all("alphamelts_n_pressures" not in row for row in rows)
+    assert all(benchmark.coverage_cell_accepted(row, "alphamelts") for row in rows)
+
+
+def test_vaporock_evaluate_empty_speciation_is_not_typed_ok(monkeypatch):
+    class _Result:
+        status = "not_converged"
+        warnings = (
+            "VapoRock speciation table has no finite log10_bar values",
+        )
+        vapor_pressures_Pa = {}
+        vaporock_full_speciation_Pa = {}
+        diagnostics = {
+            "empty_speciation_cause": "no_finite_values",
+            "finite_prediction": False,
+        }
+
+    class _Backend:
+        def initialize(self, config):
+            del config
+            return True
+
+        def equilibrate(self, **kwargs):
+            del kwargs
+            return _Result()
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.vaporock.VapoRockBackend",
+        lambda: _Backend(),
+    )
+    engine = benchmark.VapoRockEngine()
+    result = engine.evaluate({"SiO2": 31.65, "MgO": 6.79}, 1900.0, 1.0e-9)
+
+    assert result.status == "observable_unavailable"
+    assert result.status != "ok"
+    assert result.partial_pressures == {}
+    assert result.details["finite_prediction"] is False
+    assert "no finite log10_bar" in result.reason
 
 
 def test_rump_coverage_reports_internal_only_and_imcc_only_counts():

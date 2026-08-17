@@ -354,6 +354,33 @@ def test_evaluate_cell_requires_warm_pool_and_censors(monkeypatch):
     assert out["constants_version"] == "2026-08-10.ht-c3.1"
 
 
+def test_evaluate_cell_hollow_non_authoritative_is_not_live(monkeypatch):
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = object()
+
+    class _Hollow:
+        status = "non_authoritative"
+        warnings = ["VapoRock speciation table has no finite log10_bar values"]
+        vapor_pressures_Pa = {}
+        vaporock_full_speciation_Pa = {}
+        diagnostics = {
+            "empty_speciation_cause": "no_finite_values",
+            "finite_prediction": False,
+        }
+
+    monkeypatch.setattr(backend, "equilibrate", lambda **kwargs: _Hollow())
+    out = evaluate_cell(
+        backend,
+        build_calibration_cells()[0],
+        species=("SiO", "Na"),
+    )
+    assert out["status"] != "ok"
+    assert out["status"] != "non_authoritative"
+    assert out["n_pressures"] == 0
+    assert all(o.kind is ObservationKind.REFUSED for o in out["observations"])
+
+
 def test_evaluate_cell_rejects_marker_only_h2_diagnostic(monkeypatch):
     backend = VapoRockBackend()
     backend._available = True

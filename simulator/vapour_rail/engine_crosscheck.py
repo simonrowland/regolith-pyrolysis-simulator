@@ -36,6 +36,7 @@ from simulator.melt_backend.vaporock import (
     VAPOROCK_T_MAX_K,
     VAPOROCK_T_MIN_K,
     VapoRockBackend,
+    vaporock_speciation_is_live,
 )
 from simulator.state import MOLAR_MASS
 from simulator.vapour_rail.calibration import (
@@ -349,6 +350,11 @@ def _run_vaporock_cell(
         for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
     }
     reason = None
+    # non_authoritative is pressure-authority, not completeness. Hollow
+    # producer results carry empty_speciation_cause / not_converged.
+    if not vaporock_speciation_is_live(status, result_diagnostics, pressures):
+        if status in {"ok", "non_authoritative"}:
+            status = "not_converged"
     if status not in {"ok", "non_authoritative"}:
         reason = "; ".join(str(item) for item in warnings) or status
         pressures = {}
