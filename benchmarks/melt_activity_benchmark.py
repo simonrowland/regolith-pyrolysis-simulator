@@ -225,10 +225,34 @@ def _alphamelts_failure_details(values: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
+    """Typed row-local exceptions that must not become status=unavailable.
+
+    Classification is by type, not message text. A keep-handle exception
+    whose str() happens to contain "unavailable" is still a row-local
+    refusal; the structural latch detector trusts status=unavailable as
+    adapter-absence, so a substring test here would re-introduce the
+    prose coupling one layer up.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineNonFiniteField,
+    )
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    return (
+        EngineWorkerTimeout,
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineNonFiniteField,
+    )
+
+
 def classify_engine_exception(exc: BaseException) -> tuple[str, str]:
     """Map an engine-boundary exception into the benchmark status vocabulary."""
 
     text = _reason_line(f"{type(exc).__name__}: {exc}")
+    if isinstance(exc, _keep_handle_exception_types()):
+        return "refused", text
     lowered = text.lower()
     category = str(getattr(exc, "backend_failure_category", "") or "").lower()
     if category == "engine_crash" or any(
@@ -670,6 +694,19 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
     """In-process ThermoEngine MELTS diagnostic with intrinsic-fO2 support."""
 
     name = "thermoengine"
+
+    def transport_close_count(self) -> int:
+        """How many times this instance tore down a live transport."""
+        provider = self._provider
+        if provider is None:
+            return 0
+        getter = getattr(provider, "transport_close_count", None)
+        if callable(getter):
+            return int(getter())
+        return 0
+
+    def transport_closed_mid_run(self) -> bool:
+        return self.transport_close_count() > 0
 
     def _initialize(self) -> Any | None:
         if self._provider is not None or self._initialization_error:
@@ -1568,7 +1605,34 @@ def summarize_rump_coverage(
     return summary
 
 
-_ADAPTER_UNAVAILABLE_TOKEN = "adapter not available"
+def engines_with_ok_and_adapter_unavailable(
+    rows: Sequence[Mapping[str, Any]],
+) -> tuple[str, ...]:
+    """Engines that both answered ok and reported themselves unavailable.
+
+    Structural run-level guard (t-683, pulled forward): an engine that
+    produced at least one ``ok`` row cannot also report
+    ``status=unavailable`` in the same run without contradicting itself.
+    Reason text is not consulted, so editing unavailable prose cannot
+    blind this predicate.
+    """
+    flags: dict[str, set[str]] = defaultdict(set)
+    for row in rows:
+        engine = str(row.get("engine") or "")
+        if not engine:
+            continue
+        status = str(row.get("status") or "")
+        if status == "ok":
+            flags[engine].add("ok")
+        elif status == "unavailable":
+            flags[engine].add("unavailable")
+    return tuple(
+        sorted(
+            engine
+            for engine, seen in flags.items()
+            if seen >= {"ok", "unavailable"}
+        )
+    )
 
 
 def _short_latch_reason(text: str) -> str:
@@ -1591,28 +1655,50 @@ def _git_head() -> str | None:
         return None
 
 
+def _row_identity(row: Mapping[str, Any]) -> str:
+    return str(row.get("point_id") or row.get("probe_id") or "")
+
+
 def detect_thermoengine_adapter_latch(
     point_rows: Sequence[Mapping[str, Any]],
+    *,
+    transport_closed_mid_run: bool = False,
 ) -> dict[str, Any] | None:
     """Detect a one-process adapter death that poisons later ThermoEngine rows.
 
-    After a mid-rail RuntimeError the in-process ThermoEngine transport stays
-    down, so every later row inherits ``unavailable`` / "adapter not available".
-    That sequential count is latch-true and physics-false: a fresh adapter can
-    still be asked the later points. Returns None when no such latch is present.
+    Fires when either:
+
+    1. The producer recorded a mid-run transport close
+       (``transport_closed_mid_run``). That covers die-on-first-row,
+       where no ``ok`` exists for a consumer-side contradiction to see.
+    2. The row set is self-contradictory (at least one ``ok`` and at
+       least one ``status=unavailable``).
+
+    Reason text is never consulted. Sequential keep-handle is typed for
+    ``EngineWorkerTimeout``, ``ThermoEngineNonFiniteField``, and
+    ``ThermoEngineFO2UndefinedError`` only. Other close causes still
+    latch the one-process adapter. Isolated retry remains required; any
+    combined sequential+isolated count is an isolated-mode ceiling, not
+    a sequential-mode result of the typed keep-handle.
     """
 
     te_rows = [row for row in point_rows if row.get("engine") == "thermoengine"]
     if not te_rows:
         return None
+    contradiction = "thermoengine" in engines_with_ok_and_adapter_unavailable(
+        te_rows
+    )
+    if not contradiction and not transport_closed_mid_run:
+        return None
     latch_at: int | None = None
     for index, row in enumerate(te_rows):
-        reason = str(row.get("reason") or "").lower()
-        if row.get("status") == "unavailable" and _ADAPTER_UNAVAILABLE_TOKEN in reason:
+        if row.get("status") == "unavailable":
             latch_at = index
             break
     if latch_at is None:
-        return None
+        if not transport_closed_mid_run:
+            return None
+        latch_at = 0
     previous = te_rows[latch_at - 1] if latch_at else None
     latched = te_rows[latch_at:]
     sequential_usable = sum(
@@ -1626,7 +1712,7 @@ def detect_thermoengine_adapter_latch(
     return {
         "detected": True,
         "latch_after_point_id": (
-            str(previous["point_id"]) if previous is not None else None
+            _row_identity(previous) if previous is not None else None
         ),
         "latch_after_status": (
             str(previous.get("status") or "") if previous is not None else ""
@@ -1634,27 +1720,51 @@ def detect_thermoengine_adapter_latch(
         "latch_after_reason": (
             str(previous.get("reason") or "") if previous is not None else ""
         ),
-        "latch_first_point_id": str(latched[0]["point_id"]),
+        "latch_first_point_id": _row_identity(latched[0]),
         "sequential_usable": sequential_usable,
         "sequential_total": len(te_rows),
         "latched_count": len(latched),
-        "latched_point_ids": [str(row["point_id"]) for row in latched],
+        "latched_point_ids": [_row_identity(row) for row in latched],
         "yamaguchi_latched_count": len(yamaguchi_latched),
+        "transport_closed_mid_run": bool(transport_closed_mid_run),
+        "ok_unavailable_contradiction": contradiction,
     }
 
 
 def _adapter_unavailable_result(result: EngineResult) -> bool:
-    return (
-        result.status == "unavailable"
-        and _ADAPTER_UNAVAILABLE_TOKEN in result.reason.lower()
-    )
+    """True when this call reported the adapter absent. Status only."""
+    return result.status == "unavailable"
 
 
-def _adapter_killed_this_call(result: EngineResult) -> bool:
-    text = result.reason.lower()
-    return result.status in {"refused", "crash"} and (
-        "equilibrium failed" in text or "transport unavailable" in text
-    )
+def _engine_transport_close_count(engine: Any) -> int:
+    """Producer mid-run close count. 0 when the engine has no marker."""
+    getter = getattr(engine, "transport_close_count", None)
+    if callable(getter):
+        return int(getter())
+    flag = getattr(engine, "transport_closed_mid_run", None)
+    if callable(flag):
+        return 1 if flag() else 0
+    return 0
+
+
+def _thermoengine_transport_closed_mid_run(
+    engines: Sequence[Any],
+) -> bool:
+    """True when any ThermoEngine producer recorded a mid-run close."""
+    for engine in engines:
+        if getattr(engine, "name", None) != "thermoengine":
+            continue
+        if _engine_transport_close_count(engine) > 0:
+            return True
+        flag = getattr(engine, "transport_closed_mid_run", None)
+        if callable(flag) and flag():
+            return True
+    return False
+
+
+def _adapter_killed_this_call(engine: Any, close_count_before: int) -> bool:
+    """True when this call tore down a live transport. Producer count only."""
+    return _engine_transport_close_count(engine) > close_count_before
 
 
 def _thermoengine_point_prediction_row(
@@ -1740,12 +1850,14 @@ def measure_isolated_thermoengine_points(
         )
         key = (composition_id, temperature_K, fO2_bar)
         if key not in cache:
+            close_count_before = _engine_transport_close_count(engine)
             result = execute_engine(engine, composition, temperature_K, fO2_bar)
             if _adapter_unavailable_result(result):
                 engine = factory()
                 restarts += 1
+                close_count_before = _engine_transport_close_count(engine)
                 result = execute_engine(engine, composition, temperature_K, fO2_bar)
-            if _adapter_killed_this_call(result):
+            if _adapter_killed_this_call(engine, close_count_before):
                 engine = factory()
                 restarts += 1
             cache[key] = result
@@ -1788,6 +1900,7 @@ def generate_report(
     reference_rows: Sequence[Mapping[str, Any]] = (),
     live_vaporock_rows: Sequence[Mapping[str, Any]] = (),
     thermoengine_latch: Mapping[str, Any] | None = None,
+    thermoengine_probe_latch: Mapping[str, Any] | None = None,
 ) -> str:
     metrics = summarize_metrics(point_rows)
     paired_decisions = summarize_paired_decisions(point_rows)
@@ -1945,6 +2058,18 @@ def generate_report(
         lines.append(
             f"| {row['composition_id']} | {row['material_class']} | {row['engine']} | {row['status']} | {_reason_line(row['reason']) or '—'} |"
         )
+    if thermoengine_probe_latch:
+        lines.extend(
+            [
+                "",
+                "ThermoEngine probe-row latch detected: the probe engine set "
+                f"closed its transport mid-run "
+                f"(after `{thermoengine_probe_latch.get('latch_after_point_id') or 'the first probe'}`, "
+                f"{thermoengine_probe_latch.get('latched_count')} later probe rows "
+                "inherited `unavailable`). Isolated retry is applied to "
+                "benchmark point rows only.",
+            ]
+        )
     lines.extend(["", "## Cross-engine verdict", ""])
     if "alphamelts" not in present_engines:
         lines.append("AlphaMELTS was not selected; no IMCC-versus-AlphaMELTS verdict was computed.")
@@ -2027,7 +2152,7 @@ def generate_report(
                     if yam_latched
                     else " —"
                 )
-                + " inherited `unavailable` (\"adapter not available\"). "
+                + " inherited `unavailable`. "
                 "Do not read the sequential count as ThermoEngine being "
                 "unable to score those later points."
             )
@@ -2046,7 +2171,12 @@ def generate_report(
                     f"usable predictions{yam_clause}. Combined coverage of the "
                     f"{true_total}-point set is therefore "
                     f"{true_usable}/{true_total}: sequential pre-latch usable "
-                    "plus isolated latched-point usable."
+                    "plus isolated latched-point usable. That combined figure "
+                    "is an isolated-mode ceiling, not a sequential-mode result: "
+                    "sequential keep-handle is typed for EngineWorkerTimeout, "
+                    "ThermoEngineNonFiniteField, and "
+                    "ThermoEngineFO2UndefinedError only; other close causes "
+                    "still latch, so isolated retry remains required."
                 )
             else:
                 lines.append(
@@ -2077,6 +2207,13 @@ def generate_report(
             f"- `{engine}`: {accepted}/{len(coverage_rows)} accepted; {refused} refused/unavailable; "
             f"below 30 wt% SiO2, {len(low_silica) - low_refused}/{len(low_silica)} accepted "
             f"and {low_refused}/{len(low_silica)} refused/unavailable."
+        )
+    if "thermoengine" in coverage_engines:
+        lines.append(
+            "ThermoEngine coverage rows are AlphaMELTSDomainGate assessments "
+            "and do not call the ThermoEngine transport. A mid-run transport "
+            "close is therefore not visible in this table and is not "
+            "isolated-retried here."
         )
     alpha_rows = [row for row in coverage_rows if "alphamelts_status" in row]
     if alpha_rows:
@@ -2265,9 +2402,15 @@ def run_benchmark(
     reference_rows: list[dict[str, Any]] = []
     live_vaporock_rows: list[dict[str, Any]] = []
     paired_decisions: list[dict[str, Any]] = []
+    probe_engines: list[Any] = []
     if mode in {"benchmark", "all"}:
         point_rows = run_points(fixture, engines)
-        probe_rows = run_composition_probes(fixture, engines)
+        # Fresh instances so a row-local point failure cannot poison probes.
+        # Makes the probe table askable; not a claim those probes score.
+        probe_engines = build_engines(
+            engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
+        )
+        probe_rows = run_composition_probes(fixture, probe_engines)
         reference_rows = run_reference_anchors(fixture)
         if live_vaporock_anchor_check:
             live_vaporock_rows = run_live_vaporock_anchor_check(
@@ -2284,7 +2427,18 @@ def run_benchmark(
         coverage_rows = run_coverage_map(fixture, engines, coverage_steps)
         _write_csv(output_dir / "coverage-map.csv", coverage_rows)
     shutil.copyfile(bench_set_path, output_dir / "bench-set.yaml")
-    latch = detect_thermoengine_adapter_latch(point_rows)
+    latch = detect_thermoengine_adapter_latch(
+        point_rows,
+        transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
+            engines
+        ),
+    )
+    probe_latch = detect_thermoengine_adapter_latch(
+        probe_rows,
+        transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
+            probe_engines
+        ),
+    )
     if latch:
         isolated = measure_isolated_thermoengine_points(
             fixture,
@@ -2336,6 +2490,7 @@ def run_benchmark(
             ),
         },
         "thermoengine_adapter_latch": latch,
+        "thermoengine_probe_latch": probe_latch,
         "artifact_guard": {
             "planned": sorted(guard.planned),
             "retired": sorted(str(name) for name in retired_artifacts),
@@ -2355,6 +2510,7 @@ def run_benchmark(
                 reference_rows,
                 live_vaporock_rows,
                 thermoengine_latch=latch,
+                thermoengine_probe_latch=probe_latch,
             ),
             encoding="utf-8",
         )

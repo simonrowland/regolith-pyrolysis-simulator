@@ -951,6 +951,9 @@ def test_generate_report_states_measured_unlatched_coverage_when_supplied():
     assert "produced 1/1 usable predictions (Yamaguchi: 1/1)" in report
     assert "2/3" in report
     assert "not taken from the latched CSV" in report
+    assert "isolated-mode ceiling" in report
+    assert "isolated retry remains required" in report
+    assert "ThermoEngineFO2UndefinedError" in report
 
 
 def test_isolated_thermoengine_retries_after_adapter_unavailable():
@@ -972,8 +975,8 @@ def test_isolated_thermoengine_retries_after_adapter_unavailable():
                 return benchmark.EngineResult(
                     status="unavailable",
                     reason=(
-                        "AlphaMELTS adapter not available "
-                        "(no ThermoEngine, PetThermoTools, or subprocess transport)"
+                        "ThermoEngine transport closed after "
+                        "RuntimeError: affinity shape"
                     ),
                 )
             return benchmark.EngineResult(
@@ -993,6 +996,389 @@ def test_isolated_thermoengine_retries_after_adapter_unavailable():
     assert measured["yamaguchi_usable"] == 1
     assert measured["restarts"] == 1
     assert measured["rows"][0]["prediction"] is not None
+
+
+def test_ok_and_adapter_unavailable_is_self_contradiction():
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason=(
+                "AlphaMELTS adapter not available "
+                "(no ThermoEngine, PetThermoTools, or subprocess transport)"
+            ),
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == (
+        "thermoengine",
+    )
+
+    edited = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason=(
+                "AlphaMELTS adapter unavailable "
+                "(is_available=False; backend=ThermoEngineBackend)"
+            ),
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(edited) == (
+        "thermoengine",
+    )
+
+    typed_refuse = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "tsaplin2000_a_na2o_x0477_1373",
+            "refused",
+            reason=(
+                "ThermoEngineNonFiniteField: ThermoEngine Liquid "
+                "GibbsFreeEnergy is not finite: nan"
+            ),
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(typed_refuse) == ()
+
+
+def test_detect_thermoengine_adapter_latch_survives_reason_string_edit():
+    """Detector keys on ok+unavailable contradiction, not unavailable prose.
+
+    This is the test that would have caught the t-681 wording-blindness:
+    after the canned "adapter not available" sentence was retired, a
+    token detector returned None and isolated retry never ran. A reason
+    that contains none of the historical tokens must still fire.
+    """
+    edited_reasons = (
+        "AlphaMELTS adapter unavailable "
+        "(is_available=False; backend=ThermoEngineBackend)",
+        "ThermoEngine transport closed after RuntimeError: affinity shape",
+        "entirely new prose that names no adapter at all",
+    )
+    for edited_reason in edited_reasons:
+        assert "adapter not available" not in edited_reason.lower()
+        rows = [
+            _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+            _te_row(
+                "tsaplin2000_a_sio2_x0477_1373",
+                "refused",
+                reason=(
+                    "ThermoEngineNonFiniteField: ThermoEngine Liquid "
+                    "GibbsFreeEnergy is not finite: nan"
+                ),
+            ),
+            _te_row(
+                "yamaguchi1983_a_sio2_liquid_x0205_1373",
+                "unavailable",
+                reason=edited_reason,
+            ),
+        ]
+        latch = benchmark.detect_thermoengine_adapter_latch(rows)
+        assert latch is not None, edited_reason
+        assert latch["latched_count"] == 1
+        assert latch["latch_after_point_id"] == "tsaplin2000_a_sio2_x0477_1373"
+        assert latch["latch_first_point_id"] == (
+            "yamaguchi1983_a_sio2_liquid_x0205_1373"
+        )
+        assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == (
+            "thermoengine",
+        )
+
+
+def test_detect_thermoengine_adapter_latch_absent_when_never_ok():
+    rows = [
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason="ThermoEngine transport not initialized",
+        ),
+    ]
+    assert benchmark.detect_thermoengine_adapter_latch(rows) is None
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ()
+
+
+def test_detect_thermoengine_adapter_latch_fires_on_first_row_death():
+    """Producer close marker detects a latch that begins before any ok.
+
+    Red-by-revert of the marker branch: the ok+unavailable contradiction
+    cannot see [refused, unavailable, unavailable], which is the
+    die-on-first-row shape the retired token detector did fire on.
+    """
+    rows = [
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "refused",
+            reason="RuntimeError: ThermoEngine equilibrium failed: boom",
+        ),
+        _te_row(
+            "tsaplin2000_a_sio2_x0430_1473",
+            "unavailable",
+            reason="ThermoEngine transport closed after RuntimeError: boom",
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason="ThermoEngine transport closed after RuntimeError: boom",
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ()
+    assert benchmark.detect_thermoengine_adapter_latch(rows) is None
+    latch = benchmark.detect_thermoengine_adapter_latch(
+        rows, transport_closed_mid_run=True
+    )
+    assert latch is not None
+    assert latch["transport_closed_mid_run"] is True
+    assert latch["ok_unavailable_contradiction"] is False
+    assert latch["latch_after_point_id"] == "tsaplin2000_a_sio2_x0477_1373"
+    assert latch["latch_first_point_id"] == "tsaplin2000_a_sio2_x0430_1473"
+    assert latch["latched_count"] == 2
+    assert latch["yamaguchi_latched_count"] == 1
+
+
+def test_detect_thermoengine_adapter_latch_accepts_probe_row_ids():
+    rows = [
+        {
+            "probe_id": "sf04_tholeiite",
+            "engine": "thermoengine",
+            "status": "ok",
+            "reason": "",
+        },
+        {
+            "probe_id": "sf04_dunite",
+            "engine": "thermoengine",
+            "status": "unavailable",
+            "reason": "ThermoEngine transport closed after RuntimeError",
+        },
+    ]
+    latch = benchmark.detect_thermoengine_adapter_latch(rows)
+    assert latch is not None
+    assert latch["latch_after_point_id"] == "sf04_tholeiite"
+    assert latch["latch_first_point_id"] == "sf04_dunite"
+    assert latch["latched_count"] == 1
+
+
+def test_classify_keep_handle_is_type_not_substring():
+    """Keep-handle status is decided by type, not the word 'unavailable'.
+
+    Red-by-revert of the type-first gate: a substring classifier maps
+    this message to status=unavailable, which the structural detector
+    then treats as adapter-absence.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineNonFiniteField,
+    )
+
+    nonfinite = ThermoEngineNonFiniteField(
+        "ThermoEngine Liquid GibbsFreeEnergy is unavailable: nan"
+    )
+    status, reason = benchmark.classify_engine_exception(nonfinite)
+    assert status == "refused"
+    assert "unavailable" in reason.lower()
+
+    fo2 = ThermoEngineFO2UndefinedError(
+        "zero-ferric liquid; finite Kress91 fO2 echo is unavailable"
+    )
+    status, reason = benchmark.classify_engine_exception(fo2)
+    assert status == "refused"
+    assert "unavailable" in reason.lower()
+
+
+def test_isolated_retry_rebuilds_on_producer_close_not_reason_prose():
+    """Isolated restart keys on the producer close count, not reason text.
+
+    Red-by-revert of the de-prosed `_adapter_killed_this_call`: a
+    substring test on "equilibrium failed" / "transport unavailable"
+    would miss the first engine (no historical tokens) and would
+    falsely rebuild the second (tokens, no close).
+    """
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    yamaguchi = [
+        point
+        for point in fixture["points"]
+        if point["id"].startswith("yamaguchi1983_a_sio2_liquid")
+    ][:2]
+    assert len(yamaguchi) == 2
+    fixture = {**fixture, "points": yamaguchi}
+
+    class _CloseWithoutHistoricalTokens:
+        created = 0
+
+        def __init__(self):
+            type(self).created += 1
+            self._closes = 0
+            self.calls = 0
+
+        def transport_close_count(self):
+            return self._closes
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            self.calls += 1
+            if type(self).created == 1 and self.calls == 1:
+                self._closes += 1
+                return benchmark.EngineResult(
+                    status="refused",
+                    reason="row-local death with no historical tokens",
+                )
+            return benchmark.EngineResult(
+                status="ok",
+                activities={"SiO2": 0.55},
+                gammas={"SiO2": 0.55},
+            )
+
+    _CloseWithoutHistoricalTokens.created = 0
+    measured = benchmark.measure_isolated_thermoengine_points(
+        fixture,
+        [point["id"] for point in yamaguchi],
+        engine_factory=_CloseWithoutHistoricalTokens,
+    )
+    assert _CloseWithoutHistoricalTokens.created == 2
+    assert measured["restarts"] == 1
+    assert measured["usable"] == 1
+
+    class _ProseWithoutClose:
+        created = 0
+
+        def __init__(self):
+            type(self).created += 1
+            self._closes = 0
+
+        def transport_close_count(self):
+            return self._closes
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="refused",
+                reason="ThermoEngine equilibrium failed: transport unavailable",
+            )
+
+    _ProseWithoutClose.created = 0
+    measured_prose = benchmark.measure_isolated_thermoengine_points(
+        fixture,
+        [point["id"] for point in yamaguchi],
+        engine_factory=_ProseWithoutClose,
+    )
+    assert _ProseWithoutClose.created == 1
+    assert measured_prose["restarts"] == 0
+
+
+def test_run_benchmark_passes_producer_close_marker_to_point_and_probe_detectors(
+    tmp_path, monkeypatch
+):
+    seen: list[tuple[bool, bool]] = []
+
+    def capturing_detect(rows, *, transport_closed_mid_run=False):
+        has_probe_id = any("probe_id" in row for row in rows)
+        has_point_id = any("point_id" in row for row in rows)
+        seen.append((has_point_id, has_probe_id, transport_closed_mid_run))
+        return None
+
+    class _ClosedThermoEngine:
+        name = "thermoengine"
+
+        def transport_close_count(self):
+            return 1
+
+        def transport_closed_mid_run(self):
+            return True
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="refused",
+                reason="first-row death",
+            )
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(status="ok")
+
+    monkeypatch.setattr(
+        benchmark, "detect_thermoengine_adapter_latch", capturing_detect
+    )
+    monkeypatch.setattr(
+        benchmark,
+        "build_engines",
+        lambda names, fixture, alphamelts_timeout_s: [_ClosedThermoEngine()],
+    )
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    fixture["points"] = fixture["points"][:1]
+    fixture["composition_probes"] = fixture["composition_probes"][:1]
+    fixture_path = tmp_path / "tiny.yaml"
+    fixture_path.write_text(yaml.safe_dump(fixture, sort_keys=False), encoding="utf-8")
+
+    result = benchmark.run_benchmark(
+        bench_set_path=fixture_path,
+        output_dir=tmp_path / "out",
+        engine_names=("thermoengine",),
+        mode="all",
+        coverage_steps=2,
+        live_vaporock_anchor_check=False,
+    )
+
+    assert any(item[0] and not item[1] and item[2] for item in seen)
+    assert any(item[1] and item[2] for item in seen)
+    report = (tmp_path / "out" / "report.md").read_text(encoding="utf-8")
+    assert "do not call the ThermoEngine transport" in report
+    assert result["metadata"]["thermoengine_probe_latch"] is None
+
+
+def test_tracked_melt_activity_report_marks_thermoengine_narrative_stale():
+    text = (
+        benchmark.DEFAULT_OUTPUT_DIR / "report.md"
+    ).read_text(encoding="utf-8")
+    assert "STALE (t-681" in text
+    assert "isolated-mode ceiling" in text
+    assert "retired" in text.lower()
+    assert "adapter not available" in text
+
+
+def test_run_benchmark_rebuilds_engines_before_probes(tmp_path, monkeypatch):
+    constructed: list[object] = []
+
+    class CountingEngine:
+        name = "fake"
+
+        def __init__(self):
+            constructed.append(self)
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="ok",
+                activities={"SiO2": 0.2},
+                gammas={"SiO2": 0.2},
+            )
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(status="ok")
+
+    monkeypatch.setattr(
+        benchmark,
+        "build_engines",
+        lambda names, fixture, alphamelts_timeout_s: [CountingEngine()],
+    )
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    fixture["points"] = fixture["points"][:1]
+    fixture["composition_probes"] = fixture["composition_probes"][:1]
+    fixture_path = tmp_path / "tiny.yaml"
+    fixture_path.write_text(yaml.safe_dump(fixture, sort_keys=False), encoding="utf-8")
+
+    benchmark.run_benchmark(
+        bench_set_path=fixture_path,
+        output_dir=tmp_path / "out",
+        engine_names=("fake",),
+        mode="benchmark",
+        live_vaporock_anchor_check=False,
+    )
+
+    assert len(constructed) >= 2
+    assert constructed[0] is not constructed[1]
 
 
 def test_positive_finite_refuses_nonfinite_instead_of_shrinking_the_sample():

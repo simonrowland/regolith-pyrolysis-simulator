@@ -1257,6 +1257,44 @@ def test_provider_returns_unavailable_when_backend_marked_unavailable():
     assert result.status == 'unavailable'
     assert result.transition is None
     assert (result.diagnostic or {}).get('mode') == 'unavailable'
+    assert result.warnings
+    assert 'no ThermoEngine' not in result.warnings[0]
+    assert 'is_available=False' in result.warnings[0]
+
+
+def test_provider_uses_backend_unavailable_reason_when_present():
+    backend = _FakeAlphaMELTSBackend(
+        mode='unavailable',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    backend.unavailable_reason = lambda: (
+        'ThermoEngine transport closed after ImportError: dylib missing'
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    result = provider.dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+        )
+    )
+    assert result.status == 'unavailable'
+    assert result.warnings == (
+        'ThermoEngine transport closed after ImportError: dylib missing',
+    )
+    assert 'adapter not available' not in result.warnings[0]
+
+
+def test_provider_exposes_backend_transport_close_count():
+    backend = _FakeAlphaMELTSBackend(
+        mode='unavailable',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    backend.transport_close_count = lambda: 2
+    provider = AlphaMELTSProvider(backend=backend)
+    assert provider.transport_close_count() == 2
+    assert provider.transport_closed_mid_run() is True
+    backend.transport_close_count = lambda: 0
+    assert provider.transport_closed_mid_run() is False
 
 
 def test_provider_raises_on_nonfinite_ec_liquid_fraction():

@@ -67,7 +67,9 @@ from simulator.vapour_rail.batch import (
     VapourBatch,
 )
 from engines.alphamelts.thermoengine import (
+    ThermoEngineFO2UndefinedError,
     ThermoEngineIsolationError,
+    ThermoEngineNonFiniteField,
     ThermoEnginePayload,
     ThermoEngineTransport,
 )
@@ -2786,6 +2788,127 @@ def test_thermoengine_backend_surfaces_typed_hang_and_keeps_respawn_transport():
     assert backend._mode == 'thermoengine'
 
 
+def test_thermoengine_backend_keeps_transport_after_nonfinite_field():
+    """A row-local NaN must not latch the adapter as absent.
+
+    Red on the unfixed except-Exception close: the first call discards
+    the handle, is_available() stays False, and the healthy composition
+    never reaches the transport.
+    """
+    calls: list[object] = []
+
+    class LatchThenHealthyTransport:
+        def equilibrate(self, **_kwargs):
+            calls.append(object())
+            if len(calls) == 1:
+                raise ThermoEngineNonFiniteField(
+                    'ThermoEngine Liquid GibbsFreeEnergy is not finite: nan'
+                )
+            return ThermoEnginePayload(
+                phases_present=('Liquid',),
+                phase_masses_kg={'Liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={'SiO2': 70.0, 'Al2O3': 30.0},
+                activity_coefficients={'SiO2': 0.4},
+                solved_fO2_log=None,
+                solved_fO2_reason='undefined_zero_ferric_liquid',
+            )
+
+        def close(self):
+            raise AssertionError(
+                'non-finite field must not close the transport handle'
+            )
+
+    backend = ThermoEngineBackend()
+    transport = LatchThenHealthyTransport()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ThermoEngineNonFiniteField, match='not finite'):
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            None,
+            1.0,
+        )
+    assert backend._thermoengine_transport is transport
+    assert backend._mode == 'thermoengine'
+    assert backend.is_available() is True
+    assert backend.unavailable_reason() == ''
+
+    result = backend._equilibrate_thermoengine(
+        1400.0,
+        {'SiO2': 70.0, 'Al2O3': 30.0},
+        None,
+        1.0,
+    )
+    assert result.status == 'ok'
+    assert backend.is_available() is True
+    assert backend._thermoengine_transport is transport
+    assert len(calls) == 2
+    assert backend.transport_close_count() == 0
+
+
+def test_thermoengine_backend_keeps_transport_after_fo2_undefined():
+    """Imposed-fO2 zero-ferric is row-local; must not latch the adapter.
+
+    Red-by-revert of the FO2 keep-handle arm: the untyped except
+    Exception closes the handle and the second call never runs.
+    """
+    calls: list[object] = []
+
+    class LatchThenHealthyTransport:
+        def equilibrate(self, **_kwargs):
+            calls.append(object())
+            if len(calls) == 1:
+                raise ThermoEngineFO2UndefinedError(
+                    'ThermoEngine liquid Fe2O3 is at the zero-ferric limiting '
+                    'state; finite Kress91 fO2 echo is undefined'
+                )
+            return ThermoEnginePayload(
+                phases_present=('Liquid',),
+                phase_masses_kg={'Liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={'SiO2': 70.0, 'Al2O3': 30.0},
+                activity_coefficients={'SiO2': 0.4},
+                solved_fO2_log=None,
+                solved_fO2_reason='undefined_zero_ferric_liquid',
+            )
+
+        def close(self):
+            raise AssertionError(
+                'undefined fO2 must not close the transport handle'
+            )
+
+    backend = ThermoEngineBackend()
+    transport = LatchThenHealthyTransport()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ThermoEngineFO2UndefinedError, match='zero-ferric'):
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+    assert backend._thermoengine_transport is transport
+    assert backend._mode == 'thermoengine'
+    assert backend.is_available() is True
+    assert backend.transport_close_count() == 0
+    assert backend.unavailable_reason() == ''
+
+    result = backend._equilibrate_thermoengine(
+        1400.0,
+        {'SiO2': 70.0, 'Al2O3': 30.0},
+        None,
+        1.0,
+    )
+    assert result.status == 'ok'
+    assert backend.is_available() is True
+    assert len(calls) == 2
+
+
 def test_alphamelts_backend_rejects_thermoengine_transport_mode():
     with pytest.raises(ValueError, match='unsupported AlphaMELTS mode'):
         AlphaMELTSBackend().initialize({'mode': 'thermoengine'})
@@ -4171,11 +4294,212 @@ def test_thermoengine_extras_fail_loud_on_malformed_present_value():
         activity_converter=activity_from_chem_potential,
     )
 
-    with pytest.raises(ValueError, match='chemical potentials.*not finite'):
+    with pytest.raises(
+        ThermoEngineNonFiniteField, match='chemical potentials.*not finite'
+    ):
         transport._strict_finite_mapping(
             {'SiO2': float('nan')},
             context='ThermoEngine liquid chemical potentials',
         )
+
+
+def test_thermoengine_transport_remaps_nonfinite_field_remote_error():
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_nonfinite(_kwargs):
+        raise EngineWorkerRemoteError(
+            'ThermoEngineNonFiniteField',
+            'ThermoEngine Liquid GibbsFreeEnergy is not finite: nan',
+            'remote-traceback',
+        )
+
+    transport._worker.call = _remote_nonfinite
+
+    with pytest.raises(ThermoEngineNonFiniteField, match='not finite'):
+        transport.equilibrate(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            comp_wt=_melts_domain_composition(),
+        )
+
+
+def test_thermoengine_transport_remaps_fo2_undefined_remote_error():
+    """Child ThermoEngineFO2UndefinedError must survive the process boundary.
+
+    Red-by-revert of the remap dict entry: the name degrades to
+    RuntimeError and the backend then closes.
+    """
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_fo2(_kwargs):
+        raise EngineWorkerRemoteError(
+            'ThermoEngineFO2UndefinedError',
+            'ThermoEngine liquid Fe2O3 is at the zero-ferric limiting state',
+            'remote-traceback',
+        )
+
+    transport._worker.call = _remote_fo2
+
+    with pytest.raises(ThermoEngineFO2UndefinedError, match='zero-ferric'):
+        transport.equilibrate(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            comp_wt=_melts_domain_composition(),
+        )
+
+
+def test_thermoengine_transport_unrecognised_remote_name_is_runtime_error():
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_unknown(_kwargs):
+        raise EngineWorkerRemoteError(
+            'SomeNewRemoteError',
+            'affinity shape unexpected',
+            'remote-traceback',
+        )
+
+    transport._worker.call = _remote_unknown
+
+    with pytest.raises(RuntimeError, match='affinity shape unexpected'):
+        transport.equilibrate(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            comp_wt=_melts_domain_composition(),
+        )
+
+
+def test_thermoengine_backend_closes_on_unrecognised_remote_error():
+    """Unknown child names stay untyped and still close the handle."""
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_unknown(_kwargs):
+        raise EngineWorkerRemoteError(
+            'SomeNewRemoteError',
+            'affinity shape unexpected',
+            'remote-traceback',
+        )
+
+    transport._worker.call = _remote_unknown
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(RuntimeError, match='equilibrium failed'):
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            None,
+            1.0,
+        )
+    assert backend.is_available() is False
+    assert backend._thermoengine_transport is None
+    reason = backend.unavailable_reason()
+    assert reason.startswith('ThermoEngine transport closed after RuntimeError')
+    assert 'affinity shape unexpected' in reason
+    assert backend.transport_close_count() == 1
+    assert backend.transport_closed_mid_run() is True
+
+
+def test_thermoengine_close_count_ignores_init_teardown():
+    """Init failure must not look like a mid-run latch."""
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = object()
+    backend._mode = None
+    backend._close_after_failure(ImportError('native library missing'))
+    assert backend.transport_close_count() == 0
+    assert backend.transport_closed_mid_run() is False
+
+
+def test_thermoengine_backend_respawns_worker_after_nonfinite_field():
+    """Keep-handle plus discarded child: the next call must start() again."""
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    payload = ThermoEnginePayload(
+        phases_present=('Liquid',),
+        phase_masses_kg={'Liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={'SiO2': 70.0, 'Al2O3': 30.0},
+        activity_coefficients={'SiO2': 0.4},
+        solved_fO2_log=None,
+        solved_fO2_reason='undefined_zero_ferric_liquid',
+    )
+
+    class RespawnWorker:
+        def __init__(self):
+            self.process = object()
+            self.start_count = 1
+            self.starts = 0
+            self.calls = 0
+
+        def start(self):
+            self.starts += 1
+            self.process = object()
+            self.start_count += 1
+
+        def call(self, _kwargs):
+            if self.process is None:
+                self.start()
+            self.calls += 1
+            if self.calls == 1:
+                self.process = None
+                raise EngineWorkerRemoteError(
+                    'ThermoEngineNonFiniteField',
+                    'ThermoEngine Liquid GibbsFreeEnergy is not finite: nan',
+                    'remote-traceback',
+                )
+            return payload
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    worker = RespawnWorker()
+    transport._worker = worker
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ThermoEngineNonFiniteField, match='not finite'):
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            None,
+            1.0,
+        )
+    assert backend.is_available() is True
+    assert backend._thermoengine_transport is transport
+    assert worker.process is None
+    assert worker.starts == 0
+
+    result = backend._equilibrate_thermoengine(
+        1400.0,
+        {'SiO2': 70.0, 'Al2O3': 30.0},
+        None,
+        1.0,
+    )
+    assert result.status == 'ok'
+    assert worker.starts == 1
+    assert worker.calls == 2
+    assert backend.is_available() is True
 
 
 def test_thermoengine_solution_mu_recovers_before_finite_validation(monkeypatch):

@@ -230,10 +230,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                     backend_status='unavailable',
                     **redox_diagnostic,
                 ).as_diagnostic(),
-                warnings=(
-                'AlphaMELTS adapter not available '
-                '(no ThermoEngine, PetThermoTools, or subprocess transport)',
-                ),
+                warnings=(self._adapter_unavailable_reason(),),
             )
 
         if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
@@ -476,6 +473,36 @@ class AlphaMELTSProvider(ChemistryProvider):
             return bool(is_avail())
         # Backends without is_available() are treated as unavailable.
         return False
+
+    def _adapter_unavailable_reason(self) -> str:
+        """Name the operative cause; never claim a live adapter is absent."""
+        if self._backend is None:
+            return (
+                'AlphaMELTS adapter not bound '
+                '(provider constructed with no backend)'
+            )
+        getter = getattr(self._backend, 'unavailable_reason', None)
+        if callable(getter):
+            reason = getter()
+            if reason:
+                return str(reason)
+        backend_name = type(self._backend).__name__
+        return (
+            f'AlphaMELTS adapter unavailable '
+            f'(is_available=False; backend={backend_name})'
+        )
+
+    def transport_close_count(self) -> int:
+        """Producer mid-run close count, or 0 when the backend has none."""
+        getter = getattr(self._backend, 'transport_close_count', None)
+        if callable(getter):
+            return int(getter())
+        if isinstance(getter, int):
+            return int(getter)
+        return 0
+
+    def transport_closed_mid_run(self) -> bool:
+        return self.transport_close_count() > 0
 
     def _subprocess_required(self) -> bool:
         return bool(getattr(self._backend, 'stage0_subprocess_required', False))
