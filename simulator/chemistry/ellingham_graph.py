@@ -200,6 +200,50 @@ def _antoine_reference_pressure_Pa(
     return 10.0 ** log_P
 
 
+def metal_saturation_pressure_Pa(
+    species: str,
+    temperature_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> float:
+    """Pure-metal saturation pressure (Pa) from the catalog Antoine rail.
+
+    This is *not* oxide-dissociation ``P_eff``. C7's Ca product is metal
+    vapor; the metallothermic vapor term needs condensed-metal ``P_sat``.
+
+    Fail-closed categories (same three-way rule as
+    :func:`_antoine_reference_pressure_Pa`):
+    (1) unknown metal, missing/corrupt Antoine: raise
+        :class:`EllinghamPressureRefusal` (missing input — not a zero).
+    (2) out-of-domain T with evaluable coefficients: compute.
+    (3) catalog ``consumer_status=inactive``: return ``0.0`` (proven zero).
+    """
+
+    from engines.builtin.vapor_pressure import vapor_pressure_antoine_coefficients
+
+    data = _resolve_vapor_pressure_data(vapor_pressure_data)
+    metals = data.get("metals", {}) or {}
+    if species not in metals:
+        raise EllinghamPressureRefusal(
+            f"species {species!r} not in metals catalog; refusing "
+            f"P_sat=0.0 (unknown species is not proof of nonvolatility)"
+        )
+    sp_data = metals[species] or {}
+    if str(sp_data.get("consumer_status", "")).lower() == "inactive":
+        return 0.0
+    antoine, _src = vapor_pressure_antoine_coefficients(
+        sp_data, temperature_K=float(temperature_K)
+    )
+    P_sat = _antoine_reference_pressure_Pa(antoine, temperature_K)
+    if P_sat is None:
+        raise EllinghamPressureRefusal(
+            f"Antoine saturation pressure unavailable for {species!r} at "
+            f"T_K={temperature_K!r}; refusing P_sat=0.0 (missing/corrupt "
+            f"Antoine is not proof of nonvolatility)"
+        )
+    return P_sat
+
+
 def effective_equilibrium_pressure_Pa(
     species: str,
     temperature_K: float,

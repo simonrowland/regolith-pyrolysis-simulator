@@ -1520,7 +1520,7 @@ def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
     monkeypatch.setattr(
         BuiltinCaAluminothermicStepProvider,
         "_computed_thermo_margin_kj_per_mol_o2",
-        lambda self, hold_temp_C: 2.0,
+        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
     )
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints["campaigns"]["C7"].update(
@@ -1584,7 +1584,7 @@ def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
     monkeypatch.setattr(
         BuiltinCaAluminothermicStepProvider,
         "_computed_thermo_margin_kj_per_mol_o2",
-        lambda self, hold_temp_C: 2.0,
+        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
     )
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints["campaigns"]["C7"].update(
@@ -1640,7 +1640,7 @@ def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
     monkeypatch.setattr(
         BuiltinCaAluminothermicStepProvider,
         "_computed_thermo_margin_kj_per_mol_o2",
-        lambda self, hold_temp_C: 2.0,
+        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
     )
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints["campaigns"]["C7"].update(
@@ -1713,7 +1713,7 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
     monkeypatch.setattr(
         BuiltinCaAluminothermicStepProvider,
         "_computed_thermo_margin_kj_per_mol_o2",
-        lambda self, hold_temp_C: 2.0,
+        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
     )
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints["campaigns"]["C7"].update(
@@ -1761,7 +1761,7 @@ def test_c7_transport_refusal_preserves_preexisting_overhead_ca(monkeypatch) -> 
     monkeypatch.setattr(
         BuiltinCaAluminothermicStepProvider,
         "_computed_thermo_margin_kj_per_mol_o2",
-        lambda self, hold_temp_C: 2.0,
+        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
     )
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints["campaigns"]["C7"].update(

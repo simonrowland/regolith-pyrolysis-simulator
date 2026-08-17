@@ -78,6 +78,7 @@ class _ThermoStubbedCaProvider(BuiltinCaAluminothermicStepProvider):
     def _computed_thermo_margin_kj_per_mol_o2(
         self,
         hold_temp_C: float,
+        p_ca_pa: float | None = None,
     ) -> float:
         return self._margin_kj_per_mol_o2
 
@@ -493,6 +494,9 @@ def test_c7_shared_cf7_ca_shell_route_method_gates_dispatch(
 def test_c7_ignores_configured_thermo_scalar_and_uses_computed_margin(
     formula_registry,
 ):
+    # 1100 C / 0.1 mbar sits on the refuse side of the Ca-vapor zero-crossing.
+    # The configured +999 scalar must not override the computed (unfavorable)
+    # vacuum-shifted margin.
     result = BuiltinCaAluminothermicStepProvider().dispatch(
         _request(
             formula_registry,
@@ -501,6 +505,8 @@ def test_c7_ignores_configured_thermo_scalar_and_uses_computed_margin(
                 C7_AL_CREDIT_ACCOUNT: {"Al": 20.0},
             },
             _controls(
+                hold_temp_C=1100.0,
+                p_total_mbar=0.1,
                 thermo_margin_kj_per_mol_o2=999.0,
                 thermo_margin_favorable=True,
             ),
@@ -516,6 +522,109 @@ def test_c7_ignores_configured_thermo_scalar_and_uses_computed_margin(
     assert result.diagnostic["computed_thermo_margin_kj_per_mol_o2"] < 0.0
     assert result.diagnostic["configured_thermo_margin_kj_per_mol_o2"] == 999.0
     assert result.diagnostic["configured_thermo_margin_favorable"] is True
+
+
+def _c7_reduction_accounts():
+    return {
+        "process.cleaned_melt": {"CaO": 60.0},
+        C7_AL_CREDIT_ACCOUNT: {"Al": 20.0},
+    }
+
+
+def test_c7_thermo_gate_passes_when_ca_vapor_term_flips_margin(formula_registry):
+    """1200 C / 0.05 mbar: condensed Al/Ca margin is ~-154 kJ/mol O2, but
+    the Ca(g) product-pressure term flips the vacuum-shifted margin positive.
+    Current HEAD omits that term and always refuses — this test must fail there.
+    """
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            _c7_reduction_accounts(),
+            _controls(hold_temp_C=1200.0, p_total_mbar=0.05),
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    diag = result.diagnostic
+    assert diag["computed_thermo_margin_kj_per_mol_o2"] > 0.0
+    assert diag["condensed_ellingham_margin_kj_per_mol_o2"] < 0.0
+    assert diag["ca_vapor_term_kj_per_mol_o2"] < 0.0
+    assert diag["computed_thermo_margin_kj_per_mol_o2"] == pytest.approx(
+        diag["condensed_ellingham_margin_kj_per_mol_o2"]
+        - diag["ca_vapor_term_kj_per_mol_o2"],
+        abs=1e-9,
+    )
+    assert diag["ca_product_pressure_pa"] == pytest.approx(5.0)
+    assert diag["thermo_fail_closed_category"] == "computed"
+    assert diag["thermo_margin_source"] == "builtin_janaf_ellingham_al_ca_vapor"
+    # REF-043 NIST WebBook / Hartmann & Schneider 1929: log10(P/bar) =
+    # 2.78473 - 3121.368/(T_K - 594.591); catalog A is that intercept + 5
+    # so the same equation yields Pa. Ground-truth, not self-parity.
+    t_k = 1200.0 + 273.15
+    nist_psat_pa = 10.0 ** (2.78473 - 3121.368 / (t_k - 594.591)) * 1.0e5
+    assert diag["ca_vapor_reference_pressure_pa"] == pytest.approx(
+        nist_psat_pa, rel=1e-6
+    )
+
+
+def test_c7_thermo_gate_refuses_when_ca_vapor_term_leaves_margin_unfavorable(
+    formula_registry,
+):
+    """1100 C / 0.1 mbar: same envelope, opposite side of the zero-crossing.
+    Condensed margin is still ~-154 kJ/mol O2; the smaller P_sat / larger
+    p_Ca/P_sat ratio leaves the vacuum-shifted margin negative. Refuse with
+    the typed unfavorable reason — not a silent infeasible.
+    """
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            _c7_reduction_accounts(),
+            _controls(hold_temp_C=1100.0, p_total_mbar=0.1),
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    diag = result.diagnostic
+    assert (
+        diag["reason_refused"] == "c7_vacuum_shifted_thermo_margin_unfavorable"
+    )
+    assert diag["computed_thermo_margin_kj_per_mol_o2"] < 0.0
+    assert diag["condensed_ellingham_margin_kj_per_mol_o2"] < 0.0
+    assert diag["ca_vapor_term_kj_per_mol_o2"] < 0.0
+    # Vapor term helps but does not flip: |vapor| < |condensed|.
+    assert abs(diag["ca_vapor_term_kj_per_mol_o2"]) < abs(
+        diag["condensed_ellingham_margin_kj_per_mol_o2"]
+    )
+    assert diag["ca_product_pressure_pa"] == pytest.approx(10.0)
+    assert diag["thermo_fail_closed_category"] == "computed"
+    assert diag["thermo_margin_source"] == "builtin_janaf_ellingham_al_ca_vapor"
+
+
+def test_c7_thermo_gate_refuses_missing_ca_product_pressure_as_missing_input(
+    formula_registry, monkeypatch
+):
+    """Missing p_Ca is category (1) refuse, not an unfavorable computed margin."""
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_ca_product_pressure_pa",
+        staticmethod(lambda controls: float("nan")),
+    )
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            _c7_reduction_accounts(),
+            _controls(hold_temp_C=1200.0, p_total_mbar=0.05),
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    diag = result.diagnostic
+    assert diag["reason_refused"] == "c7_ca_product_pressure_unavailable"
+    assert diag["thermo_fail_closed_category"] == "missing_input"
+    assert diag["reason_refused"] != "c7_vacuum_shifted_thermo_margin_unfavorable"
 
 
 def test_c7_refuses_insufficient_al_when_partial_extent_forbidden(formula_registry):

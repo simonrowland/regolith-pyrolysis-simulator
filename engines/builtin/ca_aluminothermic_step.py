@@ -13,7 +13,13 @@ from engines.builtin._common import (
     unpack_controls,
 )
 from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
-from simulator.chemistry.ellingham_thermo import ELLINGHAM_THERMO
+from simulator.chemistry import ellingham_graph
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_METAL_PHASE_GAS,
+    ellingham_authority_limit,
+    ellingham_metal_phase_kind,
+    ellingham_stoichiometry,
+)
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -283,6 +289,14 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
             ),
         }
         diagnostic.update(self._extent_diag(candidates, r_c7))
+        diagnostic.update(
+            self._thermo_margin_audit(
+                _finite_float(
+                    controls.get("hold_temp_C"), float(request.temperature_C)
+                ),
+                self._ca_product_pressure_pa(controls),
+            )
+        )
         return IntentResult(
             intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
             status="ok",
@@ -375,8 +389,38 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
         configured_thermo_margin = _finite_float(
             controls.get("thermo_margin_kj_per_mol_o2"), float("nan")
         )
+        p_ca_pa = self._ca_product_pressure_pa(controls)
+        thermo_audit = self._thermo_margin_audit(hold_temp_C, p_ca_pa)
+        fail_closed = str(thermo_audit.get("thermo_fail_closed_category") or "")
+        configured_fields = {
+            "configured_thermo_margin_kj_per_mol_o2": configured_thermo_margin,
+            "configured_thermo_margin_favorable": bool(
+                controls.get("thermo_margin_favorable") or False
+            ),
+        }
+        if fail_closed == "missing_input":
+            return self._refused(
+                str(
+                    thermo_audit.get("reason_refused")
+                    or "c7_ca_product_pressure_unavailable"
+                ),
+                control_audit=control_audit,
+                **configured_fields,
+                **thermo_audit,
+            )
+        if fail_closed == "proven_zero":
+            return self._refused(
+                str(
+                    thermo_audit.get("reason_refused")
+                    or "c7_ca_saturation_pressure_proven_zero"
+                ),
+                control_audit=control_audit,
+                **configured_fields,
+                **thermo_audit,
+            )
         computed_thermo_margin = self._computed_thermo_margin_kj_per_mol_o2(
-            hold_temp_C
+            hold_temp_C,
+            p_ca_pa,
         )
         if not (
             math.isfinite(computed_thermo_margin)
@@ -386,35 +430,192 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
                 "c7_vacuum_shifted_thermo_margin_unfavorable",
                 control_audit=control_audit,
                 thermo_margin_kj_per_mol_o2=computed_thermo_margin,
-                computed_thermo_margin_kj_per_mol_o2=computed_thermo_margin,
-                configured_thermo_margin_kj_per_mol_o2=configured_thermo_margin,
-                configured_thermo_margin_favorable=bool(
-                    controls.get("thermo_margin_favorable") or False
-                ),
-                thermo_margin_source="builtin_janaf_ellingham_al_ca",
+                **configured_fields,
+                **thermo_audit,
             )
         return None
+
+    @staticmethod
+    def _ca_product_pressure_pa(controls: Mapping[str, Any]) -> float:
+        """Overhead Ca product pressure (Pa) for the vapor-term gate.
+
+        C7 writes Ca to ``process.overhead_gas``. The conservative product
+        pressure is the commanded total overhead pressure (Ca cannot exceed
+        p_total). 1 mbar = 100 Pa.
+        """
+
+        p_total_mbar = _finite_float(controls.get("p_total_mbar"), float("nan"))
+        return p_total_mbar * 100.0
+
+    @classmethod
+    def _thermo_margin_audit(
+        cls,
+        hold_temp_C: float,
+        p_ca_pa: float,
+    ) -> dict[str, Any]:
+        """Classify the Ca-vapor thermo inputs; compute when physics allows.
+
+        Fail-closed categories (AGENTS.md; do not conflate):
+        * missing input → refuse (no invented p_Ca or P_sat)
+        * out-of-domain T → compute and mark (still a number)
+        * proven zero P_sat → keep the zero with its tag
+        """
+
+        T_K = float(hold_temp_C) + CELSIUS_TO_KELVIN_OFFSET
+        audit: dict[str, Any] = {
+            "ca_product_pressure_pa": float(p_ca_pa)
+            if math.isfinite(p_ca_pa)
+            else p_ca_pa,
+            "thermo_margin_source": "builtin_janaf_ellingham_al_ca_vapor",
+        }
+        authority = {
+            species: limit
+            for species, limit in (
+                (
+                    "Ca",
+                    ellingham_authority_limit(
+                        T_K,
+                        species="Ca",
+                        consumer="builtin-ca-aluminothermic-step",
+                    ),
+                ),
+                (
+                    "Al",
+                    ellingham_authority_limit(
+                        T_K,
+                        species="Al",
+                        consumer="builtin-ca-aluminothermic-step",
+                    ),
+                ),
+            )
+            if limit is not None
+        }
+        if authority:
+            audit["ellingham_authority_limits"] = authority
+        if not math.isfinite(p_ca_pa) or p_ca_pa <= 0.0:
+            audit["thermo_fail_closed_category"] = "missing_input"
+            audit["reason_refused"] = "c7_ca_product_pressure_unavailable"
+            audit["computed_thermo_margin_kj_per_mol_o2"] = float("nan")
+            return audit
+        if not math.isfinite(T_K):
+            audit["thermo_fail_closed_category"] = "missing_input"
+            audit["reason_refused"] = "c7_ca_product_pressure_unavailable"
+            audit["computed_thermo_margin_kj_per_mol_o2"] = float("nan")
+            return audit
+        try:
+            details = cls._thermo_margin_components(hold_temp_C, p_ca_pa)
+        except ellingham_graph.EllinghamPressureRefusal as exc:
+            audit["thermo_fail_closed_category"] = "missing_input"
+            audit["reason_refused"] = "c7_ca_vapor_reference_pressure_unavailable"
+            audit["computed_thermo_margin_kj_per_mol_o2"] = float("nan")
+            audit["detail"] = str(exc)
+            return audit
+        except (KeyError, ValueError) as exc:
+            audit["thermo_fail_closed_category"] = "missing_input"
+            audit["reason_refused"] = "c7_ca_vapor_reference_pressure_unavailable"
+            audit["computed_thermo_margin_kj_per_mol_o2"] = float("nan")
+            audit["detail"] = str(exc)
+            return audit
+        audit.update(details)
+        if details.get("ca_vapor_reference_pressure_pa") == 0.0:
+            audit["thermo_fail_closed_category"] = "proven_zero"
+            audit["reason_refused"] = "c7_ca_saturation_pressure_proven_zero"
+            return audit
+        if authority or details.get("ca_antoine_out_of_certified_range"):
+            audit["thermo_fail_closed_category"] = "out_of_domain"
+        else:
+            audit["thermo_fail_closed_category"] = "computed"
+        return audit
+
+    @classmethod
+    def _thermo_margin_components(
+        cls,
+        hold_temp_C: float,
+        p_ca_pa: float,
+    ) -> dict[str, Any]:
+        T_K = float(hold_temp_C) + CELSIUS_TO_KELVIN_OFFSET
+        dG_Ca = ellingham_graph.dissociation_delta_g("Ca", T_K)
+        dG_Al = ellingham_graph.dissociation_delta_g("Al", T_K)
+        condensed_margin = dG_Ca - dG_Al
+        n_M, _n_ox = ellingham_stoichiometry("Ca")
+        phase = ellingham_metal_phase_kind("Ca", T_K)
+        if phase == ELLINGHAM_METAL_PHASE_GAS:
+            p_ref_pa = ellingham_graph.ELLINGHAM_STANDARD_PRESSURE_PA
+            antoine_out_of_range = False
+        else:
+            p_ref_pa = ellingham_graph.metal_saturation_pressure_Pa("Ca", T_K)
+            antoine_out_of_range = cls._ca_antoine_out_of_certified_range(T_K)
+        vapor_term = 0.0
+        if p_ref_pa > 0.0 and math.isfinite(p_ref_pa):
+            r_kJ = ellingham_graph.GAS_CONSTANT_J_PER_MOL_K / 1000.0
+            vapor_term = n_M * r_kJ * T_K * math.log(p_ca_pa / p_ref_pa)
+        margin = condensed_margin - vapor_term
+        return {
+            "computed_thermo_margin_kj_per_mol_o2": margin,
+            "condensed_ellingham_margin_kj_per_mol_o2": condensed_margin,
+            "ca_vapor_term_kj_per_mol_o2": vapor_term,
+            "ca_product_pressure_pa": float(p_ca_pa),
+            "ca_vapor_reference_pressure_pa": float(p_ref_pa),
+            "ca_metal_phase_kind": phase,
+            "ca_antoine_out_of_certified_range": bool(antoine_out_of_range),
+        }
+
+    @staticmethod
+    def _ca_antoine_out_of_certified_range(temperature_K: float) -> bool:
+        """Mark (do not refuse) when T is outside the Ca P_sat comfort band."""
+
+        data = ellingham_graph._resolve_vapor_pressure_data(None)
+        row = (data.get("metals") or {}).get("Ca") or {}
+        antoine = row.get("pure_component_antoine") or {}
+        valid = antoine.get("valid_range_K") or ()
+        if len(valid) != 2:
+            return False
+        low, high = float(valid[0]), float(valid[1])
+        return temperature_K < low or temperature_K > high
 
     @classmethod
     def _computed_thermo_margin_kj_per_mol_o2(
         cls,
         hold_temp_C: float,
+        p_ca_pa: float | None = None,
     ) -> float:
-        return cls._ellingham_delta_g_kj_per_mol_o2(
-            "Ca", hold_temp_C
-        ) - cls._ellingham_delta_g_kj_per_mol_o2("Al", hold_temp_C)
-
-    @staticmethod
-    def _ellingham_delta_g_kj_per_mol_o2(
-        metal: str,
-        temperature_C: float,
-    ) -> float:
-        # ELLINGHAM_THERMO is the existing JANAF high-T refit table; keep the
-        # C7 gate on computed table values, not caller-provided scalar signs.
-        dH_f, dS_f, _n_M, _n_ox = ELLINGHAM_THERMO[metal]
-        return dH_f - (
-            (float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET) * dS_f
-        )
+        # Premise: C7 credits Ca to process.overhead_gas, so the metal product
+        # is Ca(g) at the overhead product pressure p_Ca, not Ca(l) at p°.
+        # Below Ca boil (1757 K) the JANAF rail is 2 Ca(l) + O2 -> 2 CaO;
+        # Al is 4/3 Al(l) + O2 -> 2/3 Al2O3. The exchange per mol O2 is
+        # 2 CaO + 4/3 Al -> 2/3 Al2O3 + 2 Ca(g).
+        #
+        # Algebra:
+        #   dG_rxn°(condensed) = dG_Al(T) - dG_Ca(T)          [kJ / mol O2]
+        #   2 Ca(l) -> 2 Ca(g, p_Ca):
+        #     condensed rail: dG_vap = n_M RT ln(p_Ca / P_sat)
+        #     gas rail (T >= T_b): dG_vap = n_M RT ln(p_Ca / p°)
+        #   dG_rxn(p_Ca) = dG_Al - dG_Ca + dG_vap
+        #   margin = -dG_rxn = dG_Ca - dG_Al - n_M RT ln(p_Ca / p_ref)
+        # n_M = 2 mol Ca / mol O2 from ellingham_stoichiometry("Ca").
+        # p_O2 cancels between the two condensed-oxide half-reactions; the
+        # term that does not cancel is the Ca vapor product pressure.
+        #
+        # Unit check: dG_* are kJ/mol O2; n_M is mol Ca / mol O2;
+        # R = 8.31446e-3 kJ/mol-K; T in K; ln(p/p) is dimensionless
+        # => n_M RT ln has kJ/mol O2.
+        #
+        # Sanity:
+        #   p_Ca = p_ref => vapor term 0, margin = condensed Al/Ca
+        #   difference. Segmented JANAF at 1200 C gives -153.81 kJ/mol O2
+        #   (legacy flat ELLINGHAM_THERMO row is -153.94).
+        #   p_Ca -> 0 => ln -> -inf => margin -> +inf (vacuum helps).
+        #   NIST Hartmann–Schneider Ca Antoine at 1200 C: P_sat ≈ 1.706e4 Pa
+        #   (0.171 bar). Zero-crossing at that T is p_Ca ≈ 32 Pa (0.32 mbar).
+        #   C7 1200 C / 0.05 mbar is then favorable; 1 bar product is not.
+        #   At 1100 C / 0.1 mbar the same envelope stays unfavorable
+        #   (P_sat is lower, so p_Ca/P_sat is larger).
+        if p_ca_pa is None:
+            return float("nan")
+        details = cls._thermo_margin_components(hold_temp_C, p_ca_pa)
+        if details["ca_vapor_reference_pressure_pa"] <= 0.0:
+            return float("nan")
+        return float(details["computed_thermo_margin_kj_per_mol_o2"])
 
     def _dispatch_capture(
         self,
