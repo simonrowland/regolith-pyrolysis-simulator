@@ -8,6 +8,8 @@ from pathlib import Path
 import pytest
 
 from simulator.melt_backend.imcc_sf04.gas import (
+    DEFAULT_CONDENSATE_DATABASE_PATH,
+    DEFAULT_GAS_DATABASE_PATH,
     IMCC_GAS_CHANNEL_SPECIES,
     IMCC_GAS_INCOMPLETE_PARENT_SPECIES,
     IMCC_GAS_NO_JANAF_ROWS,
@@ -28,8 +30,43 @@ from simulator.melt_backend.imcc_sf04.gas import (
 # --------------------------------------------------------------------------- #
 
 
+def _require_vaporock_sibling() -> None:
+    """Skip rather than FileNotFoundError when the VapoRock sibling is absent.
+
+    The JANAF gas and condensate tables are NOT part of this repository. They are
+    read from a read-only SIBLING checkout resolved as
+    ``Path(gas.__file__).parents[3] / ".." / "VapoRock"`` (see
+    ``imcc_sf04/gas.py`` ``_default_vaporock_root``). That resolves next to the
+    repo root, so it is present in a normal working clone and ABSENT anywhere the
+    repo is copied on its own — which is exactly what a CI job directory is.
+
+    Measured 2026-08-16 on the pr-tier gate: all 28 tests in this module errored
+    with ``FileNotFoundError … /../VapoRock/src/vaporock/data/JANAF-vapor-data-full.csv``
+    because the runner rsyncs the tree to ``~/repos/ci-jobs/<job>/`` and nothing
+    sits beside it. They read as 28 new defects in the differential when the code
+    under test was fine.
+
+    Same class as the gitignored EXT4 working set guarded by ``_ext4()`` in
+    ``test_imcc_sp_extension.py``: a test whose input lives outside the repo must
+    say so by SKIPPING, so a checkout without it reports honestly instead of
+    manufacturing red. Production still refuses loudly — this guard is test-side
+    only and deliberately does not soften ``load_gas_datapack``.
+    """
+    missing = [
+        path
+        for path in (DEFAULT_GAS_DATABASE_PATH, DEFAULT_CONDENSATE_DATABASE_PATH)
+        if not Path(path).is_file()
+    ]
+    if missing:
+        pytest.skip(
+            "read-only VapoRock sibling checkout is absent from this tree; "
+            f"missing {', '.join(str(p) for p in missing)}"
+        )
+
+
 @pytest.fixture(scope="module")
 def gas_pack() -> ImccGasDatapack:
+    _require_vaporock_sibling()
     return load_gas_datapack()
 
 
@@ -490,6 +527,7 @@ def test_gas_layer_uses_imcc_activities() -> None:
     )
     activities = dict(zip(imcc_result.parent_oxides, imcc_result.parent_activity))
 
+    _require_vaporock_sibling()
     gas_pack = load_gas_datapack()
     pressures = evaluate_gas(
         activities, 2500.0, fO2=1.0e-10, datapack=gas_pack, allow_extrapolation=True
