@@ -108,10 +108,25 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
         record.snapshots = history.materialize()
 
 
+# Immutable leaves cannot contain MappingProxyType, so they cannot need a
+# deepcopy memo seed. Shared interned keys dominate the hourly walk
+# (measured ~7 calls/id by hour 100 on lunar_mare_low_ti); skipping them
+# does not change which proxies get seeded.
+_REFUSAL_SEED_LEAVES = (str, bytes, bytearray, int, float, complex, bool, type(None))
+
+
 def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
     """Deep-copy rollback state while retaining immutable mapping views."""
     visited: set[int] = set()
+    # id() is unique only among live objects. Hold every keyed referent
+    # for the duration of this walk so a freed object cannot alias a
+    # later MappingProxyType and skip its memo seed.
+    visited_keep: list[Any] = []
     prepared_backings: set[int] = set()
+
+    def mark_visited(obj: Any) -> None:
+        visited.add(id(obj))
+        visited_keep.append(obj)
 
     def mapping_referent(proxy: MappingProxyType) -> Any:
         referents = [
@@ -126,6 +141,8 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
         return referents[0]
 
     def seed_mapping_proxies(candidate: Any) -> None:
+        if isinstance(candidate, _REFUSAL_SEED_LEAVES):
+            return
         candidate_id = id(candidate)
         # The committed-history list has an O(1) prefix replacement in the
         # deepcopy memo.  Do not recursively scan the source list after that
@@ -135,7 +152,7 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
             or candidate_id in visited
         ):
             return
-        visited.add(candidate_id)
+        mark_visited(candidate)
 
         if isinstance(candidate, MappingProxyType):
             # Normalized schedules are immutable by contract. Copy the actual
@@ -156,7 +173,7 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
                     )
                 chain_ids.add(backing_id)
                 proxy_chain.append(backing)
-                visited.add(backing_id)
+                mark_visited(backing)
                 backing = mapping_referent(backing)
             if isinstance(backing, MappingProxyType):
                 copied_referent = memo[id(backing)]
@@ -165,6 +182,7 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
                 backing_id = id(backing)
                 copied_referent = memo.setdefault(backing_id, {})
                 base_backing = backing
+                mark_visited(backing)
             else:
                 raise RefusalStateSnapshotError(
                     'mappingproxy rollback snapshot requires a dict backing'

@@ -176,6 +176,50 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     assert slotted_schedule["points"] == [{"temperature_C": 75.0}]
 
 
+def test_shared_mappingproxy_diamond_is_copied_not_live_aliased() -> None:
+    """Visited-set skip must not leave a shared proxy unseeded.
+
+    Two paths reach the same MappingProxyType. copy.deepcopy without a
+    memo seed returns that live proxy (a shared reference). After
+    snapshot, both restored paths must be copies, aliased to each
+    other, and detached from the live backing.
+    """
+
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+    backing = {"points": [{"temperature_C": 25.0}]}
+    proxy = MappingProxyType(backing)
+    sim = object.__new__(PyrolysisSimulator)
+    sim.runtime_state = {
+        "path_a": {"proxy": proxy},
+        "path_b": {"proxy": proxy, "alias": proxy},
+    }
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+
+    state, _ledger, _cost = sim._snapshot_terminal_refusal_hour_state()
+
+    restored_a = state["runtime_state"]["path_a"]["proxy"]
+    restored_b = state["runtime_state"]["path_b"]["proxy"]
+    restored_alias = state["runtime_state"]["path_b"]["alias"]
+
+    assert restored_a is not proxy
+    assert restored_b is restored_a
+    assert restored_alias is restored_a
+    assert restored_a["points"] == [{"temperature_C": 25.0}]
+
+    backing["points"][0]["temperature_C"] = 999.0
+    assert restored_a["points"] == [{"temperature_C": 25.0}]
+    assert proxy["points"] == [{"temperature_C": 999.0}]
+
+
 def test_successful_step_structurally_shares_committed_history(monkeypatch) -> None:
     class HistoricalSnapshot:
         def __deepcopy__(self, _memo):
