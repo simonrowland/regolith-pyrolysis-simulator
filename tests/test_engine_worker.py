@@ -1,15 +1,21 @@
 import json
-import threading
+import math
+import multiprocessing
 import os
+import signal
+import threading
 import time
 
 import pytest
 
 from simulator.engine_pool import (
+    ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S,
+    ENGINE_WORKER_CANCEL_POLL_S,
     EngineWorkerRemoteError,
     EngineWorkerPool,
     EngineWorkerTimeout,
     WarmEngineWorker,
+    _pool_ready_wait_s,
 )
 
 
@@ -219,3 +225,137 @@ def test_canceling_close_fails_in_flight_request_without_orphan():
     # be gone (close joins/reaps, so a live pid here is a real orphan).
     with pytest.raises(ProcessLookupError):
         os.kill(worker_pid, 0)
+
+
+@pytest.mark.timeout(15)
+def test_constructor_refuses_when_worker_thread_never_reports_ready():
+    """Pin: a silent worker thread must not park the constructor forever.
+
+    The test thread joins a constructor thread — it does not call
+    ready.get() itself — because SIGALRM cannot interrupt an untimed
+    lock acquire. Against unbounded ready.get() the constructor thread
+    is still alive after the derived wait (the red-on-HEAD pin).
+    """
+    import simulator.engine_pool as engine_pool
+
+    startup_timeout_s = 1.0
+    size = 1
+
+    spawned_pids = []
+
+    class SilentReadyWorker:
+        """Spawns a child, then never returns from start() so ready.put is skipped."""
+
+        def __init__(self, index):
+            self.name = f'silent-ready-test-{index}'
+            self.startup_timeout_s = startup_timeout_s
+            self.process = None
+            self._pending_reap = []
+            self._halt = threading.Event()
+
+        def start(self, *, timeout_s=None):
+            context = multiprocessing.get_context('spawn')
+            process = context.Process(target=time.sleep, args=(3600,), daemon=True)
+            process.start()
+            self.process = process
+            spawned_pids.append(process.pid)
+            # Park until close() disables the slot. Returning here still
+            # does not ready.put() until after the constructor deadline
+            # has already expired and teardown has begun.
+            self._halt.wait(timeout=3600)
+
+        def request_disable(self):
+            self._halt.set()
+            process = self.process
+            self.process = None
+            if process is not None:
+                self._pending_reap.append(process)
+                if process.is_alive():
+                    try:
+                        process.kill()
+                    except OSError:
+                        pass
+
+        def _reap_pending(self, *, timeout_s):
+            deadline = time.monotonic() + max(0.0, float(timeout_s))
+            remaining = []
+            for process in self._pending_reap:
+                process.join(timeout=max(0.0, deadline - time.monotonic()))
+                if process.is_alive():
+                    try:
+                        process.kill()
+                    except OSError:
+                        pass
+                    process.join(timeout=max(0.0, deadline - time.monotonic()))
+                if process.is_alive():
+                    remaining.append(process)
+            self._pending_reap = remaining
+            return not remaining
+
+        def close(self):
+            self.request_disable()
+            self._reap_pending(timeout_s=1.0)
+
+    def factory(index):
+        return SilentReadyWorker(index)
+
+    ready_wait_s = _pool_ready_wait_s([factory(0)])
+    assert math.isfinite(ready_wait_s)
+    assert ready_wait_s == pytest.approx(
+        startup_timeout_s + size * ENGINE_WORKER_CANCEL_POLL_S
+    )
+    with pytest.raises(ValueError, match='finite and positive'):
+        class InfiniteStartup:
+            startup_timeout_s = float('inf')
+        _pool_ready_wait_s([InfiniteStartup()])
+    class MissingStartup:
+        pass
+    assert _pool_ready_wait_s([MissingStartup()]) == pytest.approx(
+        30.0 + ENGINE_WORKER_CANCEL_POLL_S
+    )
+
+    # Join bound = handshake wait + automatic close budget + slack.
+    # The constructor itself must return inside ready_wait_s + close;
+    # the slack is only so a slow box cannot flake the pin.
+    test_join_s = (
+        ready_wait_s + ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S + 1.0
+    )
+    outcome = {}
+
+    def construct():
+        try:
+            EngineWorkerPool(factory, size=size)
+        except BaseException as exc:
+            outcome['exc'] = exc
+        else:
+            outcome['ok'] = True
+
+    thread = threading.Thread(target=construct, daemon=True)
+    started_at = time.monotonic()
+    thread.start()
+    thread.join(timeout=test_join_s)
+    elapsed = time.monotonic() - started_at
+
+    if thread.is_alive():
+        for pid in spawned_pids:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except OSError:
+                pass
+        for pool in tuple(engine_pool._LIVE_ENGINE_POOLS):
+            engine_pool._discard_engine_pool(pool)
+        pytest.fail(
+            f'constructor still blocked after {elapsed:.3f}s '
+            f'(derived ready wait {ready_wait_s:.3f}s, join budget {test_join_s:.3f}s)'
+        )
+    assert 'ok' not in outcome
+    exc = outcome.get('exc')
+    assert isinstance(exc, EngineWorkerTimeout)
+    assert exc.phase == 'initialization'
+    assert tuple(getattr(exc, 'failed_slots', ())) == (0,)
+    assert exc.timeout_s == pytest.approx(ready_wait_s)
+    assert elapsed <= ready_wait_s + ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S + 1.0
+    assert spawned_pids, 'worker thread never spawned a child to reap'
+    for pid in spawned_pids:
+        with pytest.raises(ProcessLookupError):
+            os.kill(pid, 0)

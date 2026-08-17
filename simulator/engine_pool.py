@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import atexit
 import faulthandler
+import math
 import multiprocessing
 import os
 import signal
@@ -75,14 +76,62 @@ class EngineWorkerRemoteError(RuntimeError):
 class EngineWorkerTimeout(TimeoutError):
     """Typed hard-wall expiry for an isolated engine worker."""
 
-    def __init__(self, worker_name: str, timeout_s: float, *, phase: str):
+    def __init__(
+        self,
+        worker_name: str,
+        timeout_s: float,
+        *,
+        phase: str,
+        failed_slots: tuple[int, ...] | list[int] = (),
+    ):
         self.worker_name = str(worker_name)
         self.timeout_s = float(timeout_s)
         self.phase = str(phase)
+        self.failed_slots = tuple(int(slot) for slot in failed_slots)
         super().__init__(
             f'{self.worker_name} {self.phase} exceeded hard timeout of '
             f'{self.timeout_s:g}s'
         )
+
+
+def _worker_startup_timeout_s(worker: Any) -> float:
+    raw = getattr(worker, 'startup_timeout_s', None)
+    if raw is None:
+        raw = 30.0
+    timeout_s = float(raw)
+    if not math.isfinite(timeout_s) or timeout_s <= 0.0:
+        raise ValueError(
+            f'worker startup_timeout_s must be finite and positive, got {raw!r}'
+        )
+    return timeout_s
+
+
+def _pool_ready_wait_s(workers: list[Any] | tuple[Any, ...]) -> float:
+    # Premise: N daemon threads start concurrently. Each start() already
+    # has a handshake wall of worker.startup_timeout_s. The constructor
+    # then performs N ready.get() calls. A thread that never puts does
+    # not consume its handshake wall, so the constructor cannot wait
+    # "until the slowest start returns" — it needs a scheduled deadline.
+    # Arithmetic: handshake wall is max(startup_i) because starts are
+    # concurrent (a serial sum would over-wait and is not the physical
+    # bound). Add one cancel-poll quantum per worker so N queue hops
+    # can land after the last handshake without a false refusal.
+    #   ready_wait_s = max(startup_i) + N * ENGINE_WORKER_CANCEL_POLL_S
+    # Bounds: the main-thread ready.get() loop (the proven CI wedge).
+    # Does not change the per-worker handshake. process.start() is not
+    # separately wrapped: it has no timeout API, already runs on these
+    # daemon threads, and a wedged spawn is the same missing ready.put
+    # this deadline covers.
+    n = len(workers)
+    if n < 1:
+        raise ValueError('engine worker pool requires at least one worker')
+    budgets = [_worker_startup_timeout_s(worker) for worker in workers]
+    ready_wait_s = max(budgets) + n * ENGINE_WORKER_CANCEL_POLL_S
+    if not math.isfinite(ready_wait_s) or ready_wait_s <= 0.0:
+        raise ValueError(
+            f'pool ready wait must be finite and positive, got {ready_wait_s!r}'
+        )
+    return ready_wait_s
 
 
 def _run_engine_worker(
@@ -640,6 +689,8 @@ class EngineWorkerPool:
         self._cancel_pending = threading.Event()
         _register_engine_pool(self)
         ready: queue.Queue[tuple[int, Optional[BaseException]]] = queue.Queue()
+        ready_wait_s = _pool_ready_wait_s(self._workers)
+        deadline = time.monotonic() + ready_wait_s
         for index, worker in enumerate(self._workers):
             thread = threading.Thread(
                 target=self._start_and_consume,
@@ -649,13 +700,44 @@ class EngineWorkerPool:
             )
             thread.start()
             self._threads.append(thread)
-        errors = []
+        reported: dict[int, Optional[BaseException]] = {}
         for _worker in self._workers:
-            index, error = ready.get()
-            if error is not None:
-                errors.append((index, error))
-        if errors:
-            self.close(cancel_pending=True)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0.0:
+                break
+            try:
+                index, error = ready.get(timeout=remaining)
+            except queue.Empty:
+                break
+            reported[index] = error
+        missing = [
+            index
+            for index in range(len(self._workers))
+            if index not in reported
+        ]
+        errors = [
+            (index, error)
+            for index, error in reported.items()
+            if error is not None
+        ]
+        if missing or errors:
+            close_error: BaseException | None = None
+            try:
+                self.close(cancel_pending=True)
+            except BaseException as exc:
+                close_error = exc
+            if missing:
+                refusal = EngineWorkerTimeout(
+                    f'engine worker pool slots {missing}',
+                    ready_wait_s,
+                    phase='initialization',
+                    failed_slots=missing,
+                )
+                if close_error is not None:
+                    raise refusal from close_error
+                raise refusal
+            if close_error is not None:
+                raise errors[0][1] from close_error
             raise errors[0][1]
 
     @property
