@@ -309,10 +309,20 @@ def execute_engine(
 class ImccEngine:
     """Published or explicitly labelled research IMCC-SF04 adapter."""
 
-    def __init__(self, name: str, pack_path: Path, *, published: bool) -> None:
+    def __init__(
+        self,
+        name: str,
+        pack_path: Path,
+        *,
+        published: bool,
+        allow_extrapolation: bool = False,
+        allow_out_of_envelope: bool = False,
+    ) -> None:
         self.name = name
         self.pack_path = pack_path
         self.published = published
+        self.allow_extrapolation = allow_extrapolation
+        self.allow_out_of_envelope = allow_out_of_envelope
         self._pack: Any | None = None
 
     def _load(self) -> Any:
@@ -378,6 +388,8 @@ class ImccEngine:
                 pack,
                 basis_type="wt",
                 enable_sp_extension=not self.published,
+                allow_extrapolation=self.allow_extrapolation,
+                allow_out_of_envelope=self.allow_out_of_envelope,
             )
         except (
             ImccCompositionOutsideValidatedEnvelopeError,
@@ -400,18 +412,24 @@ class ImccEngine:
             for oxide, value in zip(result.parent_oxides, result.parent_gamma)
         }
         labels = result.labels
+        details: dict[str, Any] = {
+            "model_id": labels.identity["model_id"],
+            "datapack_version": labels.identity["datapack_version"],
+            "trust": labels.trust,
+            "envelope_status": labels.envelope_status,
+            "pack_sha256": _sha256(self.pack_path),
+            "observable_family": "activity",
+        }
+        if self.allow_extrapolation or self.allow_out_of_envelope:
+            # Temperature mark is orthogonal to envelope_status. Publish
+            # it only on the flagged pass so the strict details JSON
+            # stays bit-identical.
+            details["extrapolated"] = bool(result.extrapolated)
         return EngineResult(
             status="ok",
             activities=activities,
             gammas=gammas,
-            details={
-                "model_id": labels.identity["model_id"],
-                "datapack_version": labels.identity["datapack_version"],
-                "trust": labels.trust,
-                "envelope_status": labels.envelope_status,
-                "pack_sha256": _sha256(self.pack_path),
-                "observable_family": "activity",
-            },
+            details=details,
         )
 
     def coverage(
@@ -1127,6 +1145,176 @@ def run_points(
                 }
             )
     return rows
+
+
+def _imcc_engines_with_extrapolation(
+    engines: Sequence[MeltActivityEngine],
+) -> list[ImccEngine]:
+    flagged: list[ImccEngine] = []
+    for engine in engines:
+        if not isinstance(engine, ImccEngine):
+            continue
+        flagged.append(
+            ImccEngine(
+                engine.name,
+                engine.pack_path,
+                published=engine.published,
+                allow_extrapolation=True,
+                allow_out_of_envelope=True,
+            )
+        )
+    return flagged
+
+
+def as_imcc_informational_row(
+    row: Mapping[str, Any],
+    *,
+    extrapolated: bool,
+    envelope_status: str,
+) -> dict[str, Any]:
+    """Promote a computed IMCC row to the non-certifying extrapolated tier.
+
+    ``residual_dex`` is forcibly ``None`` so ``summarize_metrics`` and
+    ``summarize_paired_decisions`` cannot ingest it. The numeric residual
+    lives only in ``informational_residual_dex``. Both marks are required
+    columns: ``extrapolated`` is the temperature-domain mark, and
+    ``envelope_status`` is the composition test.
+    """
+
+    measured = row.get("measured")
+    prediction = row.get("prediction")
+    informational = row.get("residual_dex")
+    if informational is None and prediction is not None and measured is not None:
+        measured_f = float(measured)
+        pred_f = float(prediction)
+        if pred_f > 0.0 and measured_f > 0.0:
+            informational = math.log10(pred_f / measured_f)
+    out = dict(row)
+    out["residual_dex"] = None
+    out["informational_residual_dex"] = informational
+    out["extrapolated"] = bool(extrapolated)
+    out["envelope_status"] = str(envelope_status)
+    return out
+
+
+def run_imcc_extrapolated_points(
+    fixture: Mapping[str, Any],
+    engines: Sequence[MeltActivityEngine],
+) -> list[dict[str, Any]]:
+    """Second IMCC pass: compute-and-mark. Never writes a scored residual."""
+
+    flagged = _imcc_engines_with_extrapolation(engines)
+    if not flagged:
+        return []
+    rows: list[dict[str, Any]] = []
+    for row in run_points(fixture, flagged):
+        details = json.loads(str(row.get("details") or "{}"))
+        if "extrapolated" not in details:
+            continue
+        extrapolated = bool(details["extrapolated"])
+        envelope_status = details.get("envelope_status")
+        if envelope_status is None:
+            continue
+        if not extrapolated and envelope_status != "outside_validated":
+            continue
+        rows.append(
+            as_imcc_informational_row(
+                row,
+                extrapolated=extrapolated,
+                envelope_status=str(envelope_status),
+            )
+        )
+    return rows
+
+
+def summarize_informational_imcc_extrapolation(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Informational RMSE by engine × envelope. Never reads residual_dex."""
+
+    groups: dict[tuple[str, str], list[float]] = defaultdict(list)
+    counts: Counter[tuple[str, str]] = Counter()
+    for row in rows:
+        key = (str(row["engine"]), str(row.get("envelope_status") or ""))
+        counts[key] += 1
+        residual = row.get("informational_residual_dex")
+        if residual is None or not bool(row.get("score", True)):
+            continue
+        groups[key].append(float(residual))
+    summary: list[dict[str, Any]] = []
+    for key in sorted(set(counts) | set(groups)):
+        engine, envelope_status = key
+        residuals = groups.get(key, [])
+        summary.append(
+            {
+                "engine": engine,
+                "envelope_status": envelope_status,
+                "row_count": counts[key],
+                "scored_informational_count": len(residuals),
+                "informational_rmse_dex": _rmse(residuals),
+            }
+        )
+    return summary
+
+
+def _render_imcc_extrapolated_tier(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    if not rows:
+        return []
+    summary = summarize_informational_imcc_extrapolation(rows)
+    lines = [
+        "",
+        "## IMCC extrapolated tier (computed-and-marked, not validated)",
+        "",
+        "These rows are a second IMCC pass with `allow_extrapolation` and "
+        "`allow_out_of_envelope` enabled. They are category-2 out-of-domain "
+        "physics: compute and mark. They are **not** a validated domain "
+        "widening and do **not** certify. Residuals live only in "
+        "`informational_residual_dex` and do not enter the scored RMSE table "
+        "or the decision column.",
+        "",
+        "Marks are orthogonal and both appear on every row: `extrapolated` is "
+        "the temperature-domain mark (`ImccResult.extrapolated`); "
+        "`envelope_status` is the X_Me2O ≤ 0.5 composition test.",
+        "",
+        "### Informational RMSE by composition envelope",
+        "",
+        "| Engine | Envelope | n (tier) | n (scored informational) | Informational RMSE (dex) |",
+        "|---|---|---:|---:|---:|",
+    ]
+    for row in summary:
+        lines.append(
+            "| {engine} | {envelope_status} | {row_count} | {scored_informational_count} | {rmse} |".format(
+                **row,
+                rmse=_fmt(row["informational_rmse_dex"]),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "### Per-row computed-and-marked results",
+            "",
+            "| point_id | engine | T_K | species | observable | extrapolated | envelope_status | informational residual (dex) | prediction | measured |",
+            "|---|---|---:|---|---|---|---|---:|---:|---:|",
+        ]
+    )
+    for row in rows:
+        lines.append(
+            "| {point_id} | {engine} | {temperature} | {species} | {observable} | {extrapolated} | {envelope_status} | {residual} | {prediction} | {measured} |".format(
+                point_id=row["point_id"],
+                engine=row["engine"],
+                temperature=_fmt(row.get("temperature_K")),
+                species=row["species"],
+                observable=row["observable"],
+                extrapolated=row["extrapolated"],
+                envelope_status=row["envelope_status"],
+                residual=_fmt(row.get("informational_residual_dex")),
+                prediction=_fmt(row.get("prediction")),
+                measured=_fmt(row.get("measured")),
+            )
+        )
+    return lines
 
 
 def run_composition_probes(
@@ -1986,6 +2174,7 @@ def generate_report(
     live_vaporock_rows: Sequence[Mapping[str, Any]] = (),
     thermoengine_latch: Mapping[str, Any] | None = None,
     thermoengine_probe_latch: Mapping[str, Any] | None = None,
+    extrapolated_rows: Sequence[Mapping[str, Any]] = (),
 ) -> str:
     metrics = summarize_metrics(point_rows)
     paired_decisions = summarize_paired_decisions(point_rows)
@@ -2063,6 +2252,7 @@ def generate_report(
             )
         )
     lines.extend(["", f"Decision verdict: {_paired_verdict(paired_decisions)}"])
+    lines.extend(_render_imcc_extrapolated_tier(extrapolated_rows))
     if reference_rows:
         anchor = summarize_reference_anchors(fixture, reference_rows)
         lines.extend(
@@ -2490,10 +2680,13 @@ def run_benchmark(
     coverage_rows: list[dict[str, Any]] = []
     reference_rows: list[dict[str, Any]] = []
     live_vaporock_rows: list[dict[str, Any]] = []
+    extrapolated_rows: list[dict[str, Any]] = []
     paired_decisions: list[dict[str, Any]] = []
     probe_engines: list[Any] = []
     if mode in {"benchmark", "all"}:
         point_rows = run_points(fixture, engines)
+        # Additive second IMCC pass. Strict point_rows stay untouched.
+        extrapolated_rows = run_imcc_extrapolated_points(fixture, engines)
         # Fresh instances so a row-local point failure cannot poison probes.
         # Makes the probe table askable; not a claim those probes score.
         probe_engines = build_engines(
@@ -2580,6 +2773,15 @@ def run_benchmark(
         },
         "thermoengine_adapter_latch": latch,
         "thermoengine_probe_latch": probe_latch,
+        "imcc_extrapolated_tier": {
+            "row_count": len(extrapolated_rows),
+            "envelope_counts": dict(
+                sorted(Counter(str(row.get("envelope_status")) for row in extrapolated_rows).items())
+            ),
+            "extrapolated_true_count": sum(
+                bool(row.get("extrapolated")) for row in extrapolated_rows
+            ),
+        },
         "artifact_guard": {
             "planned": sorted(guard.planned),
             "retired": sorted(str(name) for name in retired_artifacts),
@@ -2600,6 +2802,7 @@ def run_benchmark(
                 live_vaporock_rows,
                 thermoengine_latch=latch,
                 thermoengine_probe_latch=probe_latch,
+                extrapolated_rows=extrapolated_rows,
             ),
             encoding="utf-8",
         )
@@ -2609,6 +2812,7 @@ def run_benchmark(
     verify_planned_artifacts_written(output_dir, guard)
     return {
         "point_rows": point_rows,
+        "extrapolated_rows": extrapolated_rows,
         "probe_rows": probe_rows,
         "coverage_rows": coverage_rows,
         "reference_rows": reference_rows,

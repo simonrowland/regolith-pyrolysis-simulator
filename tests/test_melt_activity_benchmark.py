@@ -1517,6 +1517,159 @@ def test_positive_finite_refuses_nonfinite_instead_of_shrinking_the_sample():
         benchmark._positive_finite({"SiO2": 50.0, "MgO": float("inf")})
     assert "MgO" in str(inf_info.value)
 
+
+def test_informational_residual_cannot_reach_scored_rmse_or_decision():
+    """informational_residual_dex must not feed RMSE or the decision column.
+
+    summarize_metrics / summarize_paired_decisions filter on residual_dex
+    is not None and never inspect status. A residual placed in the normal
+    field would silently promote the extrapolated tier.
+    """
+
+    scored = [
+        {
+            "point_id": "strict-1",
+            "species": "SiO",
+            "observable": "activity",
+            "engine": "internal_analytic",
+            "status": "ok",
+            "residual_dex": 0.4,
+        },
+        {
+            "point_id": "strict-1",
+            "species": "SiO",
+            "observable": "activity",
+            "engine": "imcc-published",
+            "status": "ok",
+            "residual_dex": 0.1,
+        },
+    ]
+    leaked = {
+        "point_id": "extrap-1",
+        "species": "SiO",
+        "observable": "activity",
+        "engine": "imcc-published",
+        "status": "ok",
+        "residual_dex": None,
+        "informational_residual_dex": 3.5,
+        "extrapolated": True,
+        "envelope_status": "inside",
+        "score": True,
+    }
+    rows = [*scored, leaked]
+
+    metrics = benchmark.summarize_metrics(rows)
+    imcc = next(row for row in metrics if row["engine"] == "imcc-published")
+    assert imcc["scored_count"] == 1
+    assert imcc["rmse_dex"] == pytest.approx(0.1)
+
+    decisions = benchmark.summarize_paired_decisions(rows)
+    assert len(decisions) == 1
+    assert decisions[0]["paired_count"] == 1
+    assert decisions[0]["imcc_rmse_dex"] == pytest.approx(0.1)
+
+    polluted = dict(leaked)
+    polluted["residual_dex"] = leaked["informational_residual_dex"]
+    polluted_metrics = benchmark.summarize_metrics([*scored, polluted])
+    polluted_imcc = next(
+        row for row in polluted_metrics if row["engine"] == "imcc-published"
+    )
+    assert polluted_imcc["scored_count"] == 2
+    polluted_decisions = benchmark.summarize_paired_decisions([*scored, polluted])
+    assert polluted_decisions[0]["paired_count"] == 1
+    # paired_count stays 1 because extrap-1 has no internal_analytic twin,
+    # but RMSE would still move if residual_dex were set on a paired id.
+    paired_polluted = dict(leaked)
+    paired_polluted["point_id"] = "strict-1"
+    paired_polluted["residual_dex"] = leaked["informational_residual_dex"]
+    moved = benchmark.summarize_paired_decisions([*scored, paired_polluted])
+    assert moved[0]["paired_count"] == 2
+    assert moved[0]["imcc_rmse_dex"] != pytest.approx(0.1)
+
+    produced = benchmark.as_imcc_informational_row(
+        {
+            "point_id": "strict-1",
+            "species": "SiO",
+            "observable": "activity",
+            "engine": "imcc-published",
+            "status": "ok",
+            "residual_dex": 3.5,
+            "measured": 1.0,
+            "prediction": 10 ** 3.5,
+            "score": True,
+        },
+        extrapolated=True,
+        envelope_status="inside",
+    )
+    assert produced["residual_dex"] is None
+    assert produced["informational_residual_dex"] == pytest.approx(3.5)
+    via_helper = benchmark.summarize_metrics([*scored, produced])
+    helper_imcc = next(row for row in via_helper if row["engine"] == "imcc-published")
+    assert helper_imcc["scored_count"] == 1
+    assert helper_imcc["rmse_dex"] == pytest.approx(0.1)
+    via_helper_decisions = benchmark.summarize_paired_decisions([*scored, produced])
+    assert via_helper_decisions[0]["paired_count"] == 1
+    assert via_helper_decisions[0]["imcc_rmse_dex"] == pytest.approx(0.1)
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    report = benchmark.generate_report(
+        fixture,
+        rows,
+        [],
+        [],
+        extrapolated_rows=[leaked],
+    )
+    assert "## Per-species comparison" in report
+    assert "| SiO | activity | imcc-published | 1 | 0.1 |" in report
+    assert "computed-and-marked, not validated" in report
+    assert "| extrap-1 | imcc-published |" in report
+    assert "3.5" in report.split("## IMCC extrapolated tier")[1]
+
+
+def test_extrapolated_tier_carries_both_marks_together():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    wanted = {
+        "yamaguchi1983_a_sio2_liquid_x0205_1373",
+        "tsaplin2000_a_sio2_x0349_1373",
+    }
+    fixture = {
+        **fixture,
+        "points": [point for point in fixture["points"] if point["id"] in wanted],
+    }
+    engines = benchmark.build_engines(
+        ("imcc-published",), fixture, alphamelts_timeout_s=1.0
+    )
+
+    strict = benchmark.run_points(fixture, engines)
+    assert {row["status"] for row in strict} == {"out_of_domain"}
+    assert all(row["residual_dex"] is None for row in strict)
+
+    rows = benchmark.run_imcc_extrapolated_points(fixture, engines)
+    assert len(rows) == 2
+    envelopes = {row["envelope_status"] for row in rows}
+    assert envelopes == {"inside", "outside_validated"}
+    for row in rows:
+        assert row["residual_dex"] is None
+        assert row["informational_residual_dex"] is not None
+        assert row["extrapolated"] is True
+        assert row["envelope_status"] in {"inside", "outside_validated"}
+        assert "extrapolated" in row
+        assert "envelope_status" in row
+        helper = benchmark.as_imcc_informational_row(
+            {
+                "point_id": row["point_id"],
+                "engine": row["engine"],
+                "measured": row["measured"],
+                "prediction": row["prediction"],
+                "residual_dex": row["informational_residual_dex"],
+            },
+            extrapolated=row["extrapolated"],
+            envelope_status=row["envelope_status"],
+        )
+        assert helper["residual_dex"] is None
+        assert helper["extrapolated"] is True
+        assert helper["envelope_status"] == row["envelope_status"]
+
     with pytest.raises(ValueError, match="non-finite"):
         benchmark._normalize_wt({"SiO2": 50.0, "Na2O": float("nan")})
 
