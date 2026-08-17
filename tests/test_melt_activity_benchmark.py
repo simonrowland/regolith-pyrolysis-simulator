@@ -993,3 +993,31 @@ def test_isolated_thermoengine_retries_after_adapter_unavailable():
     assert measured["yamaguchi_usable"] == 1
     assert measured["restarts"] == 1
     assert measured["rows"][0]["prediction"] is not None
+
+
+def test_positive_finite_refuses_nonfinite_instead_of_shrinking_the_sample():
+    """NaN/inf in a bench input must refuse, not silently drop the oxide.
+
+    Unfixed `_positive_finite` kept only the finite keys, so a poisoned
+    composition renormalized as if the missing oxide had never been there.
+    """
+    healthy = {"SiO2": 50.0, "MgO": 25.0}
+    assert benchmark._positive_finite(healthy) == healthy
+    assert benchmark._positive_finite(
+        {"SiO2": 50.0, "MgO": 0.0, "FeO": -1.0}
+    ) == {"SiO2": 50.0}
+
+    with pytest.raises(ValueError, match="non-finite") as nan_info:
+        benchmark._positive_finite({"SiO2": 50.0, "Na2O": float("nan")})
+    assert "Na2O" in str(nan_info.value)
+
+    with pytest.raises(ValueError, match="non-finite") as inf_info:
+        benchmark._positive_finite({"SiO2": 50.0, "MgO": float("inf")})
+    assert "MgO" in str(inf_info.value)
+
+    with pytest.raises(ValueError, match="non-finite"):
+        benchmark._normalize_wt({"SiO2": 50.0, "Na2O": float("nan")})
+
+    renormalized = benchmark._normalize_wt({"SiO2": 25.0, "MgO": 25.0})
+    assert renormalized["SiO2"] == pytest.approx(50.0)
+    assert renormalized["MgO"] == pytest.approx(50.0)

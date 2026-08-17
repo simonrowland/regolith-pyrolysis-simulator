@@ -136,10 +136,19 @@ def _sha256(path: Path) -> str:
 
 def _positive_finite(values: Mapping[str, Any]) -> dict[str, float]:
     result: dict[str, float] = {}
+    nonfinite: list[str] = []
     for key, raw in values.items():
         value = float(raw)
-        if value > 0.0 and math.isfinite(value):
+        if not math.isfinite(value):
+            nonfinite.append(f"{key}={value!r}")
+            continue
+        if value > 0.0:
             result[str(key)] = value
+    if nonfinite:
+        raise ValueError(
+            "non-finite melt-activity value refused (would silently shrink "
+            f"the sample): {', '.join(nonfinite)}"
+        )
     return result
 
 
