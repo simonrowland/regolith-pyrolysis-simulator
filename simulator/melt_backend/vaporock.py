@@ -160,7 +160,7 @@ VAPOROCK_REUSE_EQUIVALENCE_ATOL_LOG10 = 1e-6
 class EmptySpeciationCause(str, enum.Enum):
     """Why a VapoRock speciation produced no positive-Pa species.
 
-    Closed set. A fifth failure mode must add a member here — the
+    Closed set. A new failure mode must add a member here — the
     classifier has no default that inherits a sibling token.
     """
 
@@ -168,6 +168,7 @@ class EmptySpeciationCause(str, enum.Enum):
     PAYLOAD_ABSENT = 'payload_absent'
     NO_FINITE_VALUES = 'no_finite_values'
     FINITE_BUT_NONPOSITIVE_PRESSURE = 'finite_but_nonpositive_pressure'
+    CAUSE_NOT_REPORTED = 'cause_not_reported'
 
 
 EMPTY_SPECIATION_REASON_BY_CAUSE: Mapping[EmptySpeciationCause, str] = {
@@ -183,6 +184,9 @@ EMPTY_SPECIATION_REASON_BY_CAUSE: Mapping[EmptySpeciationCause, str] = {
     EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE: (
         'VapoRock speciation finite log10_bar values all yielded '
         'non-positive Pa'
+    ),
+    EmptySpeciationCause.CAUSE_NOT_REPORTED: (
+        'VapoRock worker did not report an empty-speciation cause'
     ),
 }
 
@@ -455,6 +459,13 @@ def _classify_empty_log10_table(
 def _cause_from_worker_payload(
     payload: Mapping[str, Any],
 ) -> EmptySpeciationCause:
+    """Decode the wire cause. Missing cause+stats is its own token.
+
+    A same-build worker always sends ``empty_speciation_cause``. A
+    historical or foreign worker may send only ``log10_bar={}``. That is
+    missing input, not an examined empty table — do not inherit
+    ``NO_FINITE_VALUES``. Keep the run alive with a truthful refusal.
+    """
     raw = payload.get('empty_speciation_cause')
     if raw is not None:
         return EmptySpeciationCause(raw)
@@ -466,7 +477,7 @@ def _cause_from_worker_payload(
             'warm-worker empty log10_bar with finite_count>0 and no '
             'EmptySpeciationCause; add a token'
         )
-    return EmptySpeciationCause.NO_FINITE_VALUES
+    return EmptySpeciationCause.CAUSE_NOT_REPORTED
 
 
 def _stats_from_payload(payload: Mapping[str, Any]) -> Dict[str, int]:
@@ -1856,6 +1867,7 @@ class VapoRockBackend(MeltBackend):
             if cause in {
                 EmptySpeciationCause.TABLE_UNREADABLE,
                 EmptySpeciationCause.PAYLOAD_ABSENT,
+                EmptySpeciationCause.CAUSE_NOT_REPORTED,
             }:
                 stats = None
             self._latch_empty_speciation(cause, stats)

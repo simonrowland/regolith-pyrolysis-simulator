@@ -2064,7 +2064,15 @@ def test_empty_speciation_tokens_are_closed_and_reasons_are_unique():
     )
 
     assert set(EMPTY_SPECIATION_REASON_BY_CAUSE) == set(EmptySpeciationCause)
+    assert set(EmptySpeciationCause) == {
+        EmptySpeciationCause.TABLE_UNREADABLE,
+        EmptySpeciationCause.PAYLOAD_ABSENT,
+        EmptySpeciationCause.NO_FINITE_VALUES,
+        EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE,
+        EmptySpeciationCause.CAUSE_NOT_REPORTED,
+    }
     reasons = [empty_speciation_reason(cause) for cause in EmptySpeciationCause]
+    assert len(reasons) == 5
     assert len(reasons) == len(set(reasons))
     pairs = [
         (left, right)
@@ -2198,6 +2206,44 @@ def test_empty_speciation_unreadable_serialize_does_not_claim_zero_rows():
         EmptySpeciationCause.PAYLOAD_ABSENT.value
     )
     assert "speciation_row_count" not in none_payload
+
+
+def test_warm_pool_empty_log10_without_cause_or_stats_does_not_claim_examined_table():
+    """Historical/foreign worker: empty log10_bar, no cause key, no stats.
+
+    The shipped serializer always sends empty_speciation_cause (and, for
+    examined tables, stats). A pre-token or foreign worker may send only
+    log10_bar={}. That must not derive NO_FINITE_VALUES with a parenthetical
+    claiming a 0-row table was examined.
+    """
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = _FakeWarmPool({"log10_bar": {}, "path": "system"})
+    backend._clear_empty_speciation()
+
+    pressures = backend._call_vaporock_via_pool(
+        composition_wt_pct={"SiO2": 50.0},
+        temperature_K=1900.0,
+        fO2_log=-9.0,
+    )
+
+    assert pressures == {}
+    from simulator.melt_backend.vaporock import (
+        EmptySpeciationCause,
+        empty_speciation_reason,
+    )
+
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.CAUSE_NOT_REPORTED
+    )
+    reason = backend._last_empty_speciation_reason
+    assert reason == empty_speciation_reason(
+        EmptySpeciationCause.CAUSE_NOT_REPORTED
+    )
+    assert "0 finite of 0 rows" not in reason
+    assert "no finite log10_bar" not in reason.lower()
+    assert "did not report" in reason.lower()
+    assert backend._last_empty_speciation_stats is None
 
 
 def test_warm_pool_none_log10_bar_is_payload_absent():
