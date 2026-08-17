@@ -1135,12 +1135,25 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # b-136 Ca/Ti HKL α=1.0 contributes ~+3.2e-6 kg/hr vs pre-b136
         # b-151-only probe). Recomputed on worktree after rebase onto
         # 4a0a574; never hand-pasted.
+        # 2026-08-17 1742cbb8 rebaseline: not FeO. The −0.00236525603352 kg/hr
+        # total_kg_hr drop (and the matching transport-sat / melt-mass
+        # followers) is exactly the sum of PO+PO2+P2 input masses that used
+        # to debit. Those carriers arrive `status_bearing` / FluxEligible
+        # from the rail, but `_condensation_admission_refusal` types
+        # `inapplicable_by_declared_predicate` (`hot_train_applicability:
+        # stage0_only`; condensation has no Stage-0 context,
+        # condensation.py:4282-4286). Pre-fix that admission left
+        # remaining=rate so evaporation.py:2986-2998 still debited. After,
+        # condensation.py:4361-4366 promotes the typed refusal onto
+        # `refused` and the three P-carriers stay in the melt. Fe still
+        # evaporates (admitted; not flux_dormant). Trio measured at HEAD
+        # c777aa73 / verdict 2026-08-17-feo-verdict; not hand-pasted.
         (
             1,
             1550.0,
-            3.2054325504323558,
-            1300023.718087143,
-            995.556860631312,
+            3.2030672943988354,
+            1299504.7888992433,
+            995.560356926935,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1173,8 +1186,11 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # live on HKL ideal α=1.0 status-bearing upper bound. The seven channels
     # that a refuse posture deleted (evaporate_Ca, evaporate_CaO_gas,
     # evaporate_Ca2, evaporate_Ti, evaporate_TiO, evaporate_TiO2, condense_Ca)
-    # are retained; count stays 36. A 36→29 drop is a silent-zero regression.
-    assert len(sim.atom_ledger.transitions) == 36  # 36 after the P2O5_gas tombstone restore; b-136 keeps Ca/Ti
+    # are retained. 1742cbb8 then drops evaporate_PO, evaporate_PO2, and
+    # evaporate_P2 (stage0_only admission, not a Ca/Ti α refuse). Count
+    # 36→33. A return to 36 without a Stage-0 condensation context is
+    # the P1-1 hole reopening; a 33→26 drop is the b-136 silent-zero.
+    assert len(sim.atom_ledger.transitions) == 33  # 36 minus evaporate_PO/PO2/P2 (1742cbb8)
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
@@ -1203,6 +1219,26 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "fe_redox_respeciation",
         "overhead_bleed",
     )
+    # P-carriers are b-189 admission refusals on this caller, not rail
+    # refusals: incoming status_bearing + FluxEligible does not authorize
+    # a hot-train melt debit when the declared predicate is stage0_only.
+    # Fe is admitted and still debits. Revert of condensation.py:4361-4366
+    # restores evaporate_PO/PO2/P2 and fails these pins.
+    for p_species in ("PO", "PO2", "P2"):
+        assert f"evaporate_{p_species}" not in ca_ti_reasons, p_species
+        p_refusal = sim.condensation_model.last_condensation_refusals_by_species[
+            p_species
+        ]
+        assert p_refusal["reason"] == "inapplicable_by_declared_predicate"
+        assert p_refusal["mass_disposition"] == (
+            "retained_in_source_pending_authority"
+        )
+        assert p_refusal["remaining_mass_kg_hr"] == pytest.approx(0.0)
+        assert p_refusal["retained_in_source_mass_kg_hr"] > 0.0
+        assert p_refusal["mass_closure_error_kg_hr"] == pytest.approx(0.0)
+        assert p_species not in snapshot.evap_flux.species_kg_hr
+    assert "evaporate_Fe" in ca_ti_reasons
+    assert "condense_Fe" in ca_ti_reasons
     assert snapshot.mass_balance_error_pct <= 5.0e-12
 
     payload = _load_yaml("thermal_train_params.yaml")

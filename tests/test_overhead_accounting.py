@@ -775,16 +775,56 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
         },
     )
     sim.load_batch("feo", mass_kg=1000.0)
+    melt_before = dict(sim.atom_ledger.kg_by_account("process.cleaned_melt"))
+    assert melt_before.get("FeO", 0.0) == pytest.approx(1000.0)
+    transition_count_before = len(sim.atom_ledger.transitions)
     flux = EvaporationFlux(species_kg_hr={"FeO": 100.0}, total_kg_hr=100.0)
 
     sim._route_to_condensation(flux)
+    # 2026-08-17 1742cbb8 rebaseline: this fixture's FeO row has parent/stoich/
+    # T_cond and NO Antoine (and the global catalog has no oxide_vapors["FeO"]
+    # row). `_condensation_admission_refusal` therefore types
+    # `antoine_data_unavailable`. Pre-fix, that refusal left remaining=rate
+    # and status `missing`, so evaporation.py:2986-2998 still debited the
+    # melt and booked 100 kg FeO product. After, condensation.py:4361-4366
+    # promotes the admission refusal onto `refused`; Loop 2 retains the
+    # 100 kg in source; the debit reader withholds. The intact-oxide /
+    # zero-O2 stoich is not exercised until the carrier is admitted.
+    # Invariant that still holds: atom/mass closure (error 0.0) and zero
+    # O2 from a 0.0 stoich that never ran.
+    refusal = sim.condensation_model.last_condensation_refusals_by_species["FeO"]
+    assert (
+        sim.condensation_model.last_condensation_authority_by_species["FeO"][
+            "status"
+        ]
+        == "refused"
+    )
+    assert refusal["reason"] == "antoine_data_unavailable"
+    assert refusal["mass_disposition"] == "retained_in_source_pending_authority"
+    assert refusal["retained_in_source_mass_kg_hr"] == pytest.approx(100.0)
+    assert refusal["remaining_mass_kg_hr"] == pytest.approx(0.0)
+    assert refusal["mass_closure_error_kg_hr"] == pytest.approx(0.0)
     sim._update_melt_composition(flux)
     sim._dispatch_overhead_bleed(
         force_drain_all=True,
     )
 
     products = sim.product_ledger()
-    assert products["FeO"] == pytest.approx(100.0)
+    # Moved: products["FeO"] 100 -> 0. Producer typed
+    # antoine_data_unavailable; 1742cbb8 withholds the debit, so no
+    # product is booked. Revert of the promote branch restores the 100 kg.
+    assert products.get("FeO", 0.0) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
+        melt_before
+    )
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "FeO", 0.0
+    ) == pytest.approx(1000.0)
+    assert [
+        transition.name
+        for transition in sim.atom_ledger.transitions[transition_count_before:]
+        if transition.name.startswith("evaporate_")
+    ] == []
     assert sim._oxygen_terminal_partition_kg()["total"] == pytest.approx(0.0)
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
 
@@ -892,18 +932,60 @@ def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
         },
     )
     sim.load_batch("ferric", mass_kg=1000.0)
+    melt_before = dict(sim.atom_ledger.kg_by_account("process.cleaned_melt"))
+    assert melt_before.get("Fe2O3", 0.0) == pytest.approx(1000.0)
+    transition_count_before = len(sim.atom_ledger.transitions)
     flux = EvaporationFlux(species_kg_hr={"FeO": 100.0}, total_kg_hr=100.0)
 
     sim._route_to_condensation(flux)
+    # 2026-08-17 1742cbb8 rebaseline: same no-Antoine FeO identity as
+    # test_intact_oxide_vapor_allows_zero_o2_stoich (custom v1 keys are
+    # parent_oxide / stoich / T_cond only). Admission types
+    # `antoine_data_unavailable`. Pre-fix the debit reader treated
+    # remaining=rate + status `missing` as successful evaporation:
+    # Fe2O3 was consumed and FeO+O2 were booked (100 kg product,
+    # 100*o2_per_feo terminal O2). After, condensation.py:4361-4366
+    # promotes that typed refusal onto `refused`; evaporation.py:2986-2998
+    # then returns no transition. oxide_per_feo / o2_per_feo remain the
+    # ferric→wüstite stoich that would apply IF the carrier were admitted
+    # (Antoine or compiled evaluator, not flux_dormant); they are not
+    # live on this fixture. Invariant that still holds: mass/atom
+    # closure is 0.0 with the 100 kg retained in the Fe2O3 melt.
+    refusal = sim.condensation_model.last_condensation_refusals_by_species["FeO"]
+    assert (
+        sim.condensation_model.last_condensation_authority_by_species["FeO"][
+            "status"
+        ]
+        == "refused"
+    )
+    assert refusal["reason"] == "antoine_data_unavailable"
+    assert refusal["mass_disposition"] == "retained_in_source_pending_authority"
+    assert refusal["retained_in_source_mass_kg_hr"] == pytest.approx(100.0)
+    assert refusal["remaining_mass_kg_hr"] == pytest.approx(0.0)
+    assert refusal["mass_closure_error_kg_hr"] == pytest.approx(0.0)
     sim._update_melt_composition(flux)
     sim._dispatch_overhead_bleed(
         force_drain_all=True,
     )
 
     products = sim.product_ledger()
-    assert products["FeO"] == pytest.approx(100.0)
-    assert sim._oxygen_terminal_partition_kg()["total"] == pytest.approx(
-        100.0 * o2_per_feo)
+    # Moved: products["FeO"] 100 -> 0 and terminal O2 100*o2_per_feo -> 0.
+    # The producer is `_condensation_admission_refusal` (no Antoine), not
+    # an admitted FeO stoich path. Revert of the promote branch restores
+    # both the FeO product and the stoich O2 credit.
+    assert products.get("FeO", 0.0) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
+        melt_before
+    )
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "Fe2O3", 0.0
+    ) == pytest.approx(1000.0)
+    assert [
+        transition.name
+        for transition in sim.atom_ledger.transitions[transition_count_before:]
+        if transition.name.startswith("evaporate_")
+    ] == []
+    assert sim._oxygen_terminal_partition_kg()["total"] == pytest.approx(0.0)
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
 
 

@@ -968,5 +968,23 @@ def test_no_antoine_species_cannot_create_unplaced_capture_budget():
         MeltState(),
     )
 
-    assert route.remaining_by_species["O2"] == pytest.approx(1.0)
+    # 2026-08-17 1742cbb8 rebaseline: species is O2 (not FeO). Default
+    # model has vapor_pressure_data=None, so O2 has no metals/oxide_vapors
+    # row and `_condensation_admission_refusal` types
+    # `antoine_data_unavailable`. Pre-fix that refusal left remaining=1.0
+    # (status `missing` / `status_bearing`); the debit reader treated
+    # remaining=rate as "left the melt" and this test pinned that
+    # pass-through. After, condensation.py:4361-4366 promotes the typed
+    # refusal onto `refused`; remaining becomes 0 and the 1 kg/hr is
+    # retained_in_source. Intent that still holds: no fake capture
+    # budget — condensed stays 0. Revert of the promote branch restores
+    # remaining=1.0.
+    refusal = route.condensation_refusals_by_species["O2"]
+    assert route.remaining_by_species["O2"] == pytest.approx(0.0)
+    assert route.retained_in_source_by_species["O2"] == pytest.approx(1.0)
     assert route.condensed_for_species("O2") == pytest.approx(0.0)
+    assert refusal["reason"] == "antoine_data_unavailable"
+    assert refusal["mass_disposition"] == "retained_in_source_pending_authority"
+    assert refusal["remaining_mass_kg_hr"] == pytest.approx(0.0)
+    assert refusal["retained_in_source_mass_kg_hr"] == pytest.approx(1.0)
+    assert refusal["mass_closure_error_kg_hr"] == pytest.approx(0.0)
