@@ -1676,3 +1676,64 @@ def test_extrapolated_tier_carries_both_marks_together():
     renormalized = benchmark._normalize_wt({"SiO2": 25.0, "MgO": 25.0})
     assert renormalized["SiO2"] == pytest.approx(50.0)
     assert renormalized["MgO"] == pytest.approx(50.0)
+
+
+def test_kinetic_observables_are_refused_not_scored_as_activities():
+    """t-658: a Langmuir alpha must never be scored as an equilibrium activity.
+
+    The two measurement kinds are not interconvertible. KEMS/effusion measures
+    near-equilibrium vapour in a cell and yields activities. Langmuir free
+    evaporation measures open-surface flux,
+
+        J = alpha * P_eq * sqrt(M / (2*pi*R*T))
+
+    where alpha, the evaporation coefficient (<= 1), is KINETIC. P_eq is
+    therefore NOT recoverable from a Langmuir measurement without knowing
+    alpha, so an alpha row carries no equilibrium activity to score against.
+    Scoring one as if it did would fabricate agreement out of a unit mismatch.
+
+    This is already true by construction: _prediction_for_point dispatches on
+    a CLOSED allowlist -- activity, activity_coefficient, partial_pressure,
+    evaporation_flux -- and everything else falls through to a typed refusal.
+    The protection was correct but silent about WHY, so this test states the
+    reason and fails if someone widens that allowlist to admit a kinetic
+    observable.
+
+    Real data makes this reachable rather than hypothetical:
+    data/literature/extracts holds kems-037-richter-2002 and
+    kems-005-fedkin-2006, both carrying observable 'alpha' on silicate-melt
+    phases. Neither is in the bench set today.
+
+    NOTE the converse is a separate concern with a separate mechanism: an
+    equilibrium row must not be consumed as an alpha either. That direction is
+    guarded on the rail side by the source_class/system_class provenance keys
+    in simulator/evaporation_classes.py, not here.
+    """
+
+    ok_result = benchmark.EngineResult(
+        status="ok",
+        activities={"Na2O": 1.0e-3},
+        gammas={"Na2O": 1.0e-3},
+    )
+    kinetic_point = {
+        "observable": "alpha",
+        "parent_oxide": "Na2O",
+        "species": "Na",
+        "temperature_K": 1873.15,
+    }
+
+    value, reason = benchmark._prediction_for_point(kinetic_point, ok_result)
+
+    assert value is None, (
+        "a kinetic alpha observable produced a scored value; equilibrium and "
+        "kinetic measurements must not cross harnesses"
+    )
+    assert "unsupported observable" in reason and "alpha" in reason, reason
+
+    # The control: the engine above CAN answer an equilibrium question, so the
+    # refusal is about the observable kind and not about a dead result.
+    activity_point = dict(kinetic_point, observable="activity")
+    activity_value, activity_reason = benchmark._prediction_for_point(
+        activity_point, ok_result
+    )
+    assert activity_value == pytest.approx(1.0e-3), activity_reason
