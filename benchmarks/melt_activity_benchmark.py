@@ -53,6 +53,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.comparability_verdict import verdict_from_declarations
 from simulator.regeneration_guard import (
     RegenerationShrinkageError,
     regeneration_guard,
@@ -1228,6 +1229,52 @@ def _prediction_for_point(
     return float(value), ""
 
 
+def measured_activity_basis(point: Mapping[str, Any]) -> str:
+    """The reference state the MEASUREMENT declares: pure_solid / liquid / unstated.
+
+    An activity is only meaningful against a stated reference state: a(CaO)
+    referenced to pure SOLID CaO and to pure LIQUID CaO are different numbers,
+    related by the fusion free energy
+
+        log10 a_liquid = log10 a_solid - dG_fus / (2.303 * R * T)
+
+    so a measurement and a prediction may only be differenced when they share a
+    basis. "unstated" is deliberately NOT a pass -- it flows to `undeterminable`.
+    """
+
+    convention = str(point.get("convention") or "").lower()
+    if "solid" in convention:
+        return "pure_solid"
+    if "liquid" in convention:
+        return "liquid"
+    return "unstated"
+
+
+def engine_activity_basis(details: Mapping[str, Any] | None) -> str | None:
+    """The reference state the ENGINE declares, or None when it declares none.
+
+    None is the imcc-published / imcc-ext case: the basis is unknowable from the
+    harness, so no comparison those engines take part in can be checked at the
+    convention level. That is weaker than a known mismatch, not stronger.
+    """
+
+    if not isinstance(details, Mapping):
+        return None
+    standard_state = details.get("activity_standard_state")
+    if standard_state is None:
+        return None
+    # Accept a Mapping OR any object carrying a `phase` attribute. Requiring a
+    # Mapping silently swallowed dataclass identities (e.g. StandardStateIdentity
+    # is NOT a Mapping) as "undeclared" -- which would report an engine that
+    # states its basis perfectly clearly as permanently undeterminable. Reading
+    # a declaration wrong is worse than reading none at all.
+    if isinstance(standard_state, Mapping):
+        phase = standard_state.get("phase")
+    else:
+        phase = getattr(standard_state, "phase", None)
+    return str(phase) if phase is not None else None
+
+
 def run_points(
     fixture: Mapping[str, Any], engines: Sequence[MeltActivityEngine]
 ) -> list[dict[str, Any]]:
@@ -1293,6 +1340,13 @@ def run_points(
                     "residual_dex": residual,
                     "score": bool(point.get("score", True)),
                     "reason": prediction_reason or result.reason,
+                    # b-205 (diagnostic only, owner ruling 2026-08-18): whether
+                    # this row's measurement and prediction share a declared
+                    # activity reference state. Nothing refuses on it yet.
+                    "convention_verdict": verdict_from_declarations(
+                        measured_activity_basis(point),
+                        engine_activity_basis(result.details),
+                    ),
                     "details": json.dumps(result.details, sort_keys=True, default=str),
                 }
             )

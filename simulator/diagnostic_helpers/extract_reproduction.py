@@ -34,6 +34,7 @@ import yaml
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.alpha_kinetics import ALPHA_AUTHORITY_STATUS_FIELD
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.comparability_verdict import verdict_from_membership
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.chemistry.langmuir_knudsen import (
     grounded_alpha,
@@ -1540,6 +1541,28 @@ def rail_system_class_comparability(
     )
 
 
+def rail_system_class_verdict(obs: AdoptedObservation) -> str:
+    """Three-value class-comparability verdict (b-190). DIAGNOSTIC ONLY.
+
+    ``rail_system_class_comparability`` must keep returning ``True`` for an
+    untyped observation -- silently excluding unknown rows would hide coverage
+    drift, which is worse than scoring them. But ``True`` there means "not
+    excluded", NOT "verified comparable", and nothing downstream could tell the
+    two apart. This function draws that distinction without moving the boolean:
+
+        typed and rail-comparable    -> match
+        typed and not rail-comparable -> mismatch
+        untyped / uninferable         -> undeterminable
+
+    Nothing refuses on this verdict; it is recorded so the untyped population is
+    countable. Owner ruling 2026-08-18: third state, no gate.
+    """
+
+    return verdict_from_membership(
+        observation_system_class(obs), RAIL_COMPARABLE_SYSTEM_CLASSES
+    )
+
+
 # ---------------------------------------------------------------------------
 # Condensed-form axis (state-at-measurement)
 # ---------------------------------------------------------------------------
@@ -2049,6 +2072,9 @@ def rail_alpha_comparability(
     runtime: dict[str, Any] = {
         "system_class": system_class,
         "rail_system_class_comparable": class_ok,
+        # b-190: `class_ok` is True both for a verified-comparable class and for
+        # an untyped one. The verdict separates them without changing the gate.
+        "rail_system_class_verdict": rail_system_class_verdict(obs),
         "condensed_form_state": form_state,
         "rail_condensed_form_comparable": form_ok,
         "rail_target_condensed_form": RAIL_TARGET_CONDENSED_FORM,
@@ -3543,6 +3569,7 @@ __all__ = [
     "rail_alpha_comparability",
     "rail_condensed_form_comparability",
     "rail_system_class_comparability",
+    "rail_system_class_verdict",
     "residual_dex",
     "resolve_chamber_pressure_pa",
     "resolve_form_correction",
