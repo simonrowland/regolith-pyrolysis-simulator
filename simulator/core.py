@@ -6425,20 +6425,48 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             0.0, float(comp.get('K2O', 0.0)))
         # IW buffer fit: anchored at log10(fO2/bar) ~= -7.98 at 1873 K,
         # matching the Phase 1 contract's Kress91 basalt reference.
-        # The ferric branch below is NOT dead: sulfate-bearing feedstocks
-        # can populate Fe2O3 in cleaned_melt via Stage-0 FeSO4->Fe2O3
-        # (core.py:186-194; data/foulant_thermo.yaml:199-215;
-        # test_stage0_cation_routing.py:433-434). The ferric 0.25
-        # coefficient plus 1e-12 clamp, and the alkali 0.01 / 0.15 cap,
-        # are ungrounded constants in the live intrinsic-fO2 path:
-        # intrinsic fO2 sets melt.fO2_log every tick (core.py:5398) and
-        # feeds evaporation/equilibrium (evaporation.py:255). SSO-R task
-        # #41 grounds/replaces this with explicit Fe3+/Fe2+ policy
-        # (Kress & Carmichael 1991; fO2 as state variable, fO2->split)
-        # in docs-private/research/2026-06-18-staged-selectivity-optimizer/
-        # sso-r-fe-redox-design.md. That replacement is golden-affecting
-        # for sulfate feedstocks, so it is gated/re-baselined there, not a
-        # replace the placeholder implementation.
+        # ★ THE FERRIC BRANCH BELOW IS INERT WHERE THIS IS ACTUALLY CALLED.
+        # Measured 2026-08-18 (t-655); an earlier version of this comment said
+        # the branch was live and that "intrinsic fO2 sets melt.fO2_log every
+        # tick (core.py:5398)". Both claims were FALSE, and the false one cost
+        # a full investigation, so the evidence is written out here.
+        #
+        #   * The only caller is load_batch, immediately after it sets
+        #     self.melt.temperature_C = 25.0. So T = 298.15 K, not process T.
+        #     (core.py:5398 is an OXYGEN_BUBBLER dispatch and never touched
+        #     this.) After load_batch, fO2 is a STATE VARIABLE and Kress91 is
+        #     used FORWARD by FE_REDOX_RESPECIATION -- nothing re-derives fO2
+        #     from this heuristic per tick.
+        #   * Magnitude check at the seed temperature:
+        #         log_iw = -27215/298.15 + 6.57 = -84.710
+        #     and the return floors at log10(vacuum_floor) ~ -9, so the offset
+        #     must exceed -9 - (-84.710) = +75.71 dex to change anything. Its
+        #     ceiling is 0.25*log10(100) = +0.50 dex at an absurd Fe2O3/FeO of
+        #     100. It cannot move the seed. The floor wins for every feedstock.
+        #   * Exposure is zero independently: 0 of 25 loadable feedstocks put
+        #     non-zero Fe2O3 into cleaned_melt, mars_basalt and
+        #     mars_sulfate_rich included once their required carbon is
+        #     supplied. Shipped Mars sulfate is bulk SO3 with FeSO4 deferred,
+        #     so the Stage-0 FeSO4->Fe2O3 route (foulant_thermo.yaml:199-215;
+        #     test_stage0_cation_routing.py:433-434) never fires today.
+        #
+        # The coefficient IS wrong on its own terms, and that is worth knowing
+        # before anyone revives the branch: Kress91's a = 0.196 (fe_redox.py)
+        # inverts to d(log10 fO2)/d(log10 ratio) = 1/0.196 = 5.102, so 0.25 is
+        # ~20x too weak, and it is handed a WEIGHT ratio where Kress91 takes a
+        # MOLAR one (factor 71.844/159.688 = 0.4499). Do NOT "fix" it by
+        # swapping the constant: on a ledger Fe2O3 that never equilibrated,
+        # inverting Kress91 is a category error, not a correction. The IW fit
+        # itself is sound -- within 0.083 dex of Frost 1991 (-27489/T + 6.702)
+        # across 1273-2273 K -- so leave it alone.
+        # Evidence: docs-private/research/2026-08-18-t655-fo2-gap/.
+        #
+        # SSO-R task #41 is the intended grounded replacement (explicit
+        # Fe3+/Fe2+ policy, Kress & Carmichael 1991, fO2 as state variable ->
+        # split) in docs-private/research/2026-06-18-staged-selectivity-
+        # optimizer/sso-r-fe-redox-design.md. That replacement is
+        # golden-affecting for sulfate feedstocks, so it is gated and
+        # re-baselined there rather than swapped in here.
         log_iw = -27215.0 / T_K + 6.57
         redox_offset = 0.0
         if feo > 0.0 and fe2o3 > 0.0:
