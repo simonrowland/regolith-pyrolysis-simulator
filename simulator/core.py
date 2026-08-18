@@ -9977,13 +9977,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Tuple[Dict[str, float], float, float]:
         """Complete-oxidation products with optional refractory-C withhold.
 
-        Premise: Sephton 2004 (REF-024) partitions organic C into labile
-        and refractory shares. Labile C oxidizes to CO2; refractory C is
-        retained as elemental solid char (process.solid_char_carbon).
         Algebra: labile_C = total_C * (1 - f); CO2_mol = labile_C;
         solid_C_mol = total_C * f; O2 demand uses labile C only.
         Unit check: mol * kg/mol -> kg. Sanity: f=0 recovers the pre-t-325
-        full-oxidation products; f=0.39 on CI organics withholds ~11.5 kg C/t.
+        full-oxidation products; f=0.39 on CI organics withholds ~11.5 kg C/t
+        (repo arithmetic, 4.0 wt% x 0.74 x 0.39 x 10 kg/t = 11.54 -- a derived
+        figure, not a literature measurement).
+
+        ON THIS BRANCH ``f`` IS 0, AND THAT IS THE PHYSICS (b-206, 2026-08-18).
+        The earlier text here cited Sephton (REF-024) as authority for applying
+        a refractory-C withhold under complete oxidation. That reads the paper
+        backwards. REF-024 is the 2004 GCA hydropyrolysis study
+        (10.1016/j.gca.2003.08.019); "refractory" there is defined RELATIVE TO
+        PYROLYSIS -- 15 MPa H2, MoS2 catalyst, ramp to 520 C -- and the very
+        same HyPy residue that generates the 0.56 iom_anchor (2.46 / 4.39 wt% C,
+        Table 1) is then stepped-combusted in 10 mbar O2 and recovered as CO2
+        (Table 3, 2.17 wt% C). Sephton et al. 2003 state it directly: ROM
+        survives solvents, HF/HCl and hydrous pyrolysis, and combusts at
+        350-500 C. The data file says the same thing in its own field:
+        ``regime_caveat: H2_pyrolysis_to_520C_not_O2_bake_to_1050C``.
+
+        WHAT THAT DOES AND DOES NOT LICENCE (narrowed after independent
+        verification, 2026-08-18). It establishes that the HyPy retained
+        fraction is NOT transferable to oxidation stoichiometry: it was
+        measured in the absence of an oxidant, and the same material yields
+        CO2 once one is supplied. It does NOT establish that a process-scale
+        O2 bake is complete -- Sephton's steps are milligram acid residues in
+        a static mass-spectrometer inlet, not a furnace, and the paper's own
+        EA/stepped-combustion totals for that residue differ (2.46 vs 2.17
+        wt% C), so even the laboratory recovery is not closed. Nor is the
+        earlier phrasing "a property of the atmosphere, not of the carbon"
+        defensible as stated: the HyPy residue is also STRUCTURALLY different
+        from the parent material, so atmosphere is not the only variable.
+        The defensible claim is the narrow one -- carrying a HyPy char yield
+        onto oxidation stoichiometry would be the coefficient-transplant the
+        mandate forbids. Callers on
+        ``{complete_oxidation, oxidized}`` therefore pass ``f=0`` explicitly;
+        see ``test_oxidation_branch_does_not_apply_hypy_withhold``.
+
+        What remains genuinely open is DIFFERENT and must not be answered by
+        reviving 0.39: whether a process-scale O2 bake is kinetically complete
+        at every grain surface (dwell, local pO2, grain size). That question is
+        already queued in stage0_carbon_partition.yaml under
+        ``uncertainty_policies.refractory_process_extent`` with
+        ``certified_range: [0.0, 1.0]``. Evidence + limits:
+        docs-private/research/2026-08-18-b206-sephton/findings.md.
         """
         formula = resolve_species_formula(species, self.species_formula_registry)
         species_mol = float(kg) / formula.molar_mass_kg_per_mol()

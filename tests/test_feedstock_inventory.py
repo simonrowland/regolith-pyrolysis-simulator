@@ -1938,3 +1938,127 @@ def test_m_type_phosphorus_routes_to_drain_tap():
 
     assert sim.inventory.drain_tap_kg["P"] == pytest.approx(2.013085)
     assert "P" not in sim.inventory.residual_components_kg
+
+
+def test_oxidation_branch_does_not_apply_hypy_withhold():
+    """b-206: the complete-oxidation branch must NOT apply the Sephton withhold.
+
+    Sephton's "refractory organic matter" is defined relative to PYROLYSIS
+    (REF-024 = 2004 GCA, 15 MPa H2 / MoS2 / 520 C). The very residue that
+    generates the 0.56 iom_anchor is then stepped-combusted in 10 mbar O2 and
+    recovered as CO2 (Table 3), and Sephton et al. 2003 report ROM combusting
+    at 350-500 C. So the withhold is a property of the atmosphere, not of the
+    carbon, and transplanting a HyPy char yield onto oxidation stoichiometry
+    would be a coefficient transplant across regimes.
+
+    Two assertions, because they fail for different reasons:
+      (1) BEHAVIOURAL -- an oxidised organic carrier yields no solid char and
+          conserves every carbon atom into CO2.
+      (2) STRUCTURAL -- the guarded call sites still pass a literal 0.0. This
+          is what actually catches a regression that restores ``f_refractory``
+          there, since (1) would stay green for any feedstock whose partition
+          row happens to be null (67P's is).
+
+    Evidence + limits: docs-private/research/2026-08-18-b206-sephton/findings.md
+    """
+
+    import ast
+
+    # THE FIXTURE KEY IS LOAD-BEARING. `_refractory_organic_c_fraction` keys
+    # off the batch feedstock id, and "comet" resolves to 0.0 because
+    # comet_nucleus's partition row is null -- so a fixture keyed "comet"
+    # could never OBSERVE a withhold and assertion (1) would stay green no
+    # matter what the branch did. (It was keyed that way on first writing;
+    # an adversarial review caught it.) Use a key whose partition row
+    # actually carries floor 0.39, so reading the config is visible here.
+    sim = _sim(
+        {
+            "ci_carbonaceous_chondrite": {
+                "label": "CI (0.39-bearing partition row)",
+                "composition_wt_pct": {"SiO2": 50.0, "organics": 10.0},
+                "stage0_profile": "carbonaceous_degas_cleanup",
+                "stage0_temp_range_C": [20.0, 1050.0],
+                "stage0_formula_inventory": {
+                    "organics": {
+                        "template_formula": "generic_carbonaceous_organic",
+                        "decomposition_temp_range_C": [200.0, 500.0],
+                        "final_temp_C": 1050.0,
+                        "cap_kg_per_tonne": [50.0, 100.0],
+                        "offgas_mode": "complete_oxidation",
+                        "oxygen_source": "controlled_stage0_O2",
+                        "source": "test generic organics inventory",
+                    },
+                },
+                "anhydrous_silicate_after_degassing": {
+                    "composition_wt_pct": {"SiO2": 100.0},
+                },
+            }
+        }
+    )
+    sim.load_batch("ci_carbonaceous_chondrite", mass_kg=1000.0)
+    organics_kg = sim.inventory.raw_components_kg["organics"]
+
+    # Guard the guard: if this stops being 0.39 the test silently loses its
+    # teeth in exactly the way it did when the fixture was keyed "comet".
+    assert sim._refractory_organic_c_fraction(
+        "ci_carbonaceous_chondrite"
+    ) == pytest.approx(0.39), "fixture no longer carries a withhold to detect"
+
+    # (1) Behavioural: no char, and carbon closes into CO2.
+    products, _o2_kg, solid_char_kg = sim._oxidized_stage0_products(
+        "organics", organics_kg
+    )
+    assert solid_char_kg == 0.0, "oxidation branch produced refractory char"
+
+    formula = resolve_species_formula("organics", sim.species_formula_registry)
+    species_mol = organics_kg / formula.molar_mass_kg_per_mol()
+    carbon_mol_in = formula.atom_moles(species_mol).get("C", 0.0)
+    assert carbon_mol_in > 0.0, "fixture must actually carry carbon"
+    # `products` is in kg, so convert before comparing. CO2 carries exactly one
+    # C, hence mol CO2 == mol C when nothing is withheld:
+    #     n(CO2) = m(CO2) / M(CO2)   [kg / (kg/mol) -> mol]
+    # Sanity at the fixture's scale: 451.900 kg / 0.0440087 kg/mol = 10268.4 mol,
+    # which is exactly the carbon carried in -- a withhold of f would show here
+    # as a shortfall of exactly f (f=0.39 would land at 6263.7 mol).
+    co2_molar_mass = resolve_species_formula(
+        "CO2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    assert products["CO2"] / co2_molar_mass == pytest.approx(carbon_mol_in)
+
+    # (2) Structural: both guarded call sites pass a literal 0.0.
+    source = Path(
+        __file__
+    ).resolve().parents[1] / "simulator" / "core.py"
+    tree = ast.parse(source.read_text(encoding="utf-8"))
+    literals: list[float] = []
+    call_sites = 0
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        name = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", "")
+        if name != "_oxidized_stage0_products":
+            continue
+        call_sites += 1
+        for kw in node.keywords:
+            if kw.arg != "refractory_c_fraction":
+                continue
+            assert isinstance(kw.value, ast.Constant), (
+                "refractory_c_fraction at a _oxidized_stage0_products call site is "
+                "no longer a literal -- if the Sephton withhold is being routed "
+                "back onto the oxidation branch, read b-206 findings first"
+            )
+            literals.append(float(kw.value.value))
+
+    assert literals, "expected explicit refractory_c_fraction= call sites in core.py"
+    assert all(value == 0.0 for value in literals), (
+        f"oxidation-branch withhold reintroduced: {literals}"
+    )
+    # EVERY call site must pass the keyword explicitly. Checking only the
+    # literals we happen to find would let a NEW call site that omits the
+    # keyword -- and so silently takes the default -- pass unnoticed, and
+    # that default is precisely what a future edit might change.
+    assert len(literals) == call_sites, (
+        f"{call_sites} _oxidized_stage0_products call sites but only "
+        f"{len(literals)} pass refractory_c_fraction explicitly"
+    )
