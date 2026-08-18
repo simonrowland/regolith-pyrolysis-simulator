@@ -54,8 +54,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.regeneration_guard import (
     RegenerationShrinkageError,
-    assert_no_silent_artifact_loss,
-    verify_planned_artifacts_written,
+    regeneration_guard,
 )
 
 DEFAULT_BENCH_SET = REPO_ROOT / "data/melt_activity/basalt-bench-set-v1.yaml"
@@ -2661,155 +2660,157 @@ def run_benchmark(
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     planned_names = _planned_artifact_names(mode, live_vaporock_anchor_check)
-    guard = assert_no_silent_artifact_loss(
+    # The context-manager form runs BOTH halves: the pre-write shrink check
+    # on entry and the wrote-what-you-planned check on exit. Calling the two
+    # halves by hand is what this call site used to do, and the post-check is
+    # the half that is easy to drop in a later edit -- dropping it restores
+    # the exact b-200 hole the guard exists to close. `with` cannot be
+    # half-used, so the sequencing is structural here rather than remembered.
+    with regeneration_guard(
         output_dir,
         planned_names,
         managed=GENERATED_ARTIFACT_NAMES,
         retired=retired_artifacts,
-    )
-    # The pre-write check above cannot see a planned-but-unwritten artifact --
-    # `planned` passes it by construction. Every planned name is unlinked
-    # below, and several writes downstream are CONDITIONAL (the live-vaporock
-    # CSV writes only when its row list is non-empty), so a false condition
-    # would delete the previous copy and report success. The post-run check at
-    # the end of this function is what closes that.
-    for name in planned_names | set(retired_artifacts):
-        (output_dir / name).unlink(missing_ok=True)
-    point_rows: list[dict[str, Any]] = []
-    probe_rows: list[dict[str, Any]] = []
-    coverage_rows: list[dict[str, Any]] = []
-    reference_rows: list[dict[str, Any]] = []
-    live_vaporock_rows: list[dict[str, Any]] = []
-    extrapolated_rows: list[dict[str, Any]] = []
-    paired_decisions: list[dict[str, Any]] = []
-    probe_engines: list[Any] = []
-    if mode in {"benchmark", "all"}:
-        point_rows = run_points(fixture, engines)
-        # Additive second IMCC pass. Strict point_rows stay untouched.
-        extrapolated_rows = run_imcc_extrapolated_points(fixture, engines)
-        # Fresh instances so a row-local point failure cannot poison probes.
-        # Makes the probe table askable; not a claim those probes score.
-        probe_engines = build_engines(
-            engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
-        )
-        probe_rows = run_composition_probes(fixture, probe_engines)
-        reference_rows = run_reference_anchors(fixture)
-        if live_vaporock_anchor_check:
-            live_vaporock_rows = run_live_vaporock_anchor_check(
-                fixture, reference_rows
+    ) as guard:
+        # The guard's entry check cannot see a planned-but-unwritten artifact --
+        # `planned` passes it by construction. Every planned name is unlinked
+        # below, and several writes downstream are CONDITIONAL (the live-vaporock
+        # CSV writes only when its row list is non-empty), so a false condition
+        # would delete the previous copy and report success. The guard's EXIT
+        # check, on leaving this `with`, is what closes that.
+        for name in planned_names | set(retired_artifacts):
+            (output_dir / name).unlink(missing_ok=True)
+        point_rows: list[dict[str, Any]] = []
+        probe_rows: list[dict[str, Any]] = []
+        coverage_rows: list[dict[str, Any]] = []
+        reference_rows: list[dict[str, Any]] = []
+        live_vaporock_rows: list[dict[str, Any]] = []
+        extrapolated_rows: list[dict[str, Any]] = []
+        paired_decisions: list[dict[str, Any]] = []
+        probe_engines: list[Any] = []
+        if mode in {"benchmark", "all"}:
+            point_rows = run_points(fixture, engines)
+            # Additive second IMCC pass. Strict point_rows stay untouched.
+            extrapolated_rows = run_imcc_extrapolated_points(fixture, engines)
+            # Fresh instances so a row-local point failure cannot poison probes.
+            # Makes the probe table askable; not a claim those probes score.
+            probe_engines = build_engines(
+                engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
             )
-        _write_csv(output_dir / "benchmark-results.csv", point_rows)
-        paired_decisions = summarize_paired_decisions(point_rows)
-        _write_csv(output_dir / "paired-decisions.csv", paired_decisions)
-        _write_csv(output_dir / "composition-probes.csv", probe_rows)
-        _write_csv(output_dir / "reference-anchor-results.csv", reference_rows)
-        if live_vaporock_rows:
-            _write_csv(output_dir / "live-vaporock-check.csv", live_vaporock_rows)
-    if mode in {"coverage", "all"}:
-        coverage_rows = run_coverage_map(fixture, engines, coverage_steps)
-        _write_csv(output_dir / "coverage-map.csv", coverage_rows)
-    shutil.copyfile(bench_set_path, output_dir / "bench-set.yaml")
-    latch = detect_thermoengine_adapter_latch(
-        point_rows,
-        transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
-            engines
-        ),
-    )
-    probe_latch = detect_thermoengine_adapter_latch(
-        probe_rows,
-        transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
-            probe_engines
-        ),
-    )
-    if latch:
-        isolated = measure_isolated_thermoengine_points(
-            fixture,
-            latch["latched_point_ids"],
-            timeout_s=alphamelts_timeout_s,
+            probe_rows = run_composition_probes(fixture, probe_engines)
+            reference_rows = run_reference_anchors(fixture)
+            if live_vaporock_anchor_check:
+                live_vaporock_rows = run_live_vaporock_anchor_check(
+                    fixture, reference_rows
+                )
+            _write_csv(output_dir / "benchmark-results.csv", point_rows)
+            paired_decisions = summarize_paired_decisions(point_rows)
+            _write_csv(output_dir / "paired-decisions.csv", paired_decisions)
+            _write_csv(output_dir / "composition-probes.csv", probe_rows)
+            _write_csv(output_dir / "reference-anchor-results.csv", reference_rows)
+            if live_vaporock_rows:
+                _write_csv(output_dir / "live-vaporock-check.csv", live_vaporock_rows)
+        if mode in {"coverage", "all"}:
+            coverage_rows = run_coverage_map(fixture, engines, coverage_steps)
+            _write_csv(output_dir / "coverage-map.csv", coverage_rows)
+        shutil.copyfile(bench_set_path, output_dir / "bench-set.yaml")
+        latch = detect_thermoengine_adapter_latch(
+            point_rows,
+            transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
+                engines
+            ),
         )
-        latch = {
-            **latch,
-            "isolated_usable": isolated["usable"],
-            "isolated_total": isolated["total"],
-            "isolated_yamaguchi_usable": isolated["yamaguchi_usable"],
-            "isolated_yamaguchi_total": isolated["yamaguchi_total"],
-            "isolated_status_counts": isolated["status_counts"],
-            "isolated_restarts": isolated["restarts"],
-            "true_usable": latch["sequential_usable"] + isolated["usable"],
-            "true_total": latch["sequential_total"],
-        }
-        # Isolated row details stay out of the sequential CSV. Status
-        # counts are enough for the published claim; dropping per-point
-        # isolated rows keeps run-metadata.json a run record, not a
-        # second results table.
-        latch.pop("latched_point_ids", None)
-    metadata = {
-        "schema_version": "melt-activity-benchmark-run.v1",
-        "bench_set": (
-            str(bench_set_path.relative_to(REPO_ROOT))
-            if bench_set_path.is_relative_to(REPO_ROOT)
-            else str(bench_set_path)
-        ),
-        "bench_set_sha256": _sha256(bench_set_path),
-        "produced_at_git_head": _git_head(),
-        "engines": list(engine_names),
-        "mode": mode,
-        "point_status_counts": dict(sorted(Counter(row["status"] for row in point_rows).items())),
-        "probe_status_counts": dict(sorted(Counter(row["status"] for row in probe_rows).items())),
-        "coverage_row_count": len(coverage_rows),
-        "rump_coverage": summarize_rump_coverage(coverage_rows),
-        "paired_decisions": paired_decisions,
-        "reference_anchor": (
-            summarize_reference_anchors(fixture, reference_rows)
-            if reference_rows
-            else None
-        ),
-        "live_vaporock_anchor_check": {
-            "requested": live_vaporock_anchor_check,
-            "row_count": len(live_vaporock_rows),
-            "status_counts": dict(
-                sorted(Counter(row["status"] for row in live_vaporock_rows).items())
+        probe_latch = detect_thermoengine_adapter_latch(
+            probe_rows,
+            transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
+                probe_engines
             ),
-        },
-        "thermoengine_adapter_latch": latch,
-        "thermoengine_probe_latch": probe_latch,
-        "imcc_extrapolated_tier": {
-            "row_count": len(extrapolated_rows),
-            "envelope_counts": dict(
-                sorted(Counter(str(row.get("envelope_status")) for row in extrapolated_rows).items())
-            ),
-            "extrapolated_true_count": sum(
-                bool(row.get("extrapolated")) for row in extrapolated_rows
-            ),
-        },
-        "artifact_guard": {
-            "planned": sorted(guard.planned),
-            "retired": sorted(str(name) for name in retired_artifacts),
-            "retired_removed": sorted(guard.retired_removed),
-        },
-    }
-    (output_dir / "run-metadata.json").write_text(
-        json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    if mode == "all":
-        (output_dir / "report.md").write_text(
-            generate_report(
+        )
+        if latch:
+            isolated = measure_isolated_thermoengine_points(
                 fixture,
-                point_rows,
-                probe_rows,
-                coverage_rows,
-                reference_rows,
-                live_vaporock_rows,
-                thermoengine_latch=latch,
-                thermoengine_probe_latch=probe_latch,
-                extrapolated_rows=extrapolated_rows,
+                latch["latched_point_ids"],
+                timeout_s=alphamelts_timeout_s,
+            )
+            latch = {
+                **latch,
+                "isolated_usable": isolated["usable"],
+                "isolated_total": isolated["total"],
+                "isolated_yamaguchi_usable": isolated["yamaguchi_usable"],
+                "isolated_yamaguchi_total": isolated["yamaguchi_total"],
+                "isolated_status_counts": isolated["status_counts"],
+                "isolated_restarts": isolated["restarts"],
+                "true_usable": latch["sequential_usable"] + isolated["usable"],
+                "true_total": latch["sequential_total"],
+            }
+            # Isolated row details stay out of the sequential CSV. Status
+            # counts are enough for the published claim; dropping per-point
+            # isolated rows keeps run-metadata.json a run record, not a
+            # second results table.
+            latch.pop("latched_point_ids", None)
+        metadata = {
+            "schema_version": "melt-activity-benchmark-run.v1",
+            "bench_set": (
+                str(bench_set_path.relative_to(REPO_ROOT))
+                if bench_set_path.is_relative_to(REPO_ROOT)
+                else str(bench_set_path)
             ),
-            encoding="utf-8",
+            "bench_set_sha256": _sha256(bench_set_path),
+            "produced_at_git_head": _git_head(),
+            "engines": list(engine_names),
+            "mode": mode,
+            "point_status_counts": dict(sorted(Counter(row["status"] for row in point_rows).items())),
+            "probe_status_counts": dict(sorted(Counter(row["status"] for row in probe_rows).items())),
+            "coverage_row_count": len(coverage_rows),
+            "rump_coverage": summarize_rump_coverage(coverage_rows),
+            "paired_decisions": paired_decisions,
+            "reference_anchor": (
+                summarize_reference_anchors(fixture, reference_rows)
+                if reference_rows
+                else None
+            ),
+            "live_vaporock_anchor_check": {
+                "requested": live_vaporock_anchor_check,
+                "row_count": len(live_vaporock_rows),
+                "status_counts": dict(
+                    sorted(Counter(row["status"] for row in live_vaporock_rows).items())
+                ),
+            },
+            "thermoengine_adapter_latch": latch,
+            "thermoengine_probe_latch": probe_latch,
+            "imcc_extrapolated_tier": {
+                "row_count": len(extrapolated_rows),
+                "envelope_counts": dict(
+                    sorted(Counter(str(row.get("envelope_status")) for row in extrapolated_rows).items())
+                ),
+                "extrapolated_true_count": sum(
+                    bool(row.get("extrapolated")) for row in extrapolated_rows
+                ),
+            },
+            "artifact_guard": {
+                "planned": sorted(guard.planned),
+                "retired": sorted(str(name) for name in retired_artifacts),
+                "retired_removed": sorted(guard.retired_removed),
+            },
+        }
+        (output_dir / "run-metadata.json").write_text(
+            json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
-    # Every planned artifact was unlinked before the run; prove each one came
-    # back. Without this a false condition on a conditional write leaves the
-    # output set smaller than it started while the run reports success.
-    verify_planned_artifacts_written(output_dir, guard)
+        if mode == "all":
+            (output_dir / "report.md").write_text(
+                generate_report(
+                    fixture,
+                    point_rows,
+                    probe_rows,
+                    coverage_rows,
+                    reference_rows,
+                    live_vaporock_rows,
+                    thermoengine_latch=latch,
+                    thermoengine_probe_latch=probe_latch,
+                    extrapolated_rows=extrapolated_rows,
+                ),
+                encoding="utf-8",
+            )
     return {
         "point_rows": point_rows,
         "extrapolated_rows": extrapolated_rows,

@@ -326,3 +326,162 @@ def test_migrate_pilot_extracts_refuses_when_janaf_unlinked_and_not_rewritten(
         migrate.main()
 
     assert "janaf-4th.yaml" in str(excinfo.value)
+
+
+# The two halves of the guard, when called by hand rather than through the
+# context manager. Naming them here rather than inline keeps the failure
+# message able to say which one it found.
+_HAND_ROLLED_HALVES = frozenset(
+    {"assert_no_silent_artifact_loss", "verify_planned_artifacts_written"}
+)
+
+# Directories that ship behaviour. `_attic/` and `patches/` are deliberately
+# outside the walk: they are not imported by anything that regenerates a
+# tracked artifact, so flagging them would train people to add exemptions.
+# Repo-root modules ARE walked -- a regenerator dropped at the top level is
+# exactly the case a package-only walk would miss.
+_WALKED_PACKAGES = ("simulator", "benchmarks", "scripts", "tools", "engines", "web")
+
+# Modules allowed to call the halves directly: the guard's own definition
+# site, which necessarily calls both from inside the context manager.
+# `tests/` is not walked, so a test module needs no exemption to unit-test
+# each half in isolation.
+_HAND_ROLL_EXEMPT = frozenset({"simulator/regeneration_guard.py"})
+
+
+def _local_names_bound_to_guard_halves(tree: ast.AST) -> set[str]:
+    """Local bindings that refer to a guard half, including `import ... as`."""
+
+    bound: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                if alias.name in _HAND_ROLLED_HALVES:
+                    bound.add(alias.asname or alias.name)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                tail = alias.name.rsplit(".", 1)[-1]
+                if tail in _HAND_ROLLED_HALVES:
+                    bound.add(alias.asname or tail)
+    return bound
+
+
+def _guard_halves_reached_by(tree: ast.AST) -> set[str]:
+    """Every way this module reaches a guard half by name.
+
+    Covers the three idioms a bare `ast.Name` check misses: an aliased import
+    (`from ... import verify_planned_artifacts_written as check`), an attribute
+    call (`regeneration_guard.verify_planned_artifacts_written(...)`), and a
+    dynamic `getattr(mod, "verify_planned_artifacts_written")`.
+    """
+
+    aliases = _local_names_bound_to_guard_halves(tree)
+    reached: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if isinstance(func, ast.Name):
+            if func.id in _HAND_ROLLED_HALVES:
+                reached.add(func.id)
+            elif func.id in aliases:
+                reached.add(f"{func.id} (aliased)")
+            elif func.id == "getattr":
+                for arg in node.args[1:2]:
+                    if (
+                        isinstance(arg, ast.Constant)
+                        and arg.value in _HAND_ROLLED_HALVES
+                    ):
+                        reached.add(f"{arg.value} (getattr)")
+        elif isinstance(func, ast.Attribute) and func.attr in _HAND_ROLLED_HALVES:
+            reached.add(f"{func.attr} (attribute)")
+    return reached
+
+
+def _scan_for_hand_rolled_guard_use() -> tuple[dict[str, list[str]], list[str]]:
+    """Returns (modules reaching a half by hand, modules that would not parse)."""
+
+    offenders: dict[str, list[str]] = {}
+    unparseable: list[str] = []
+    candidates: list[Path] = [
+        path for path in sorted(REPO_ROOT.glob("*.py")) if path.is_file()
+    ]
+    for package in _WALKED_PACKAGES:
+        root = REPO_ROOT / package
+        if root.is_dir():
+            candidates.extend(sorted(root.rglob("*.py")))
+    for path in candidates:
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        if rel in _HAND_ROLL_EXEMPT:
+            continue
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except (SyntaxError, UnicodeDecodeError):
+            # Fail CLOSED. A module nobody can parse is a module nobody can
+            # certify, so it is reported rather than silently skipped.
+            unparseable.append(rel)
+            continue
+        reached = sorted(_guard_halves_reached_by(tree))
+        if reached:
+            offenders[rel] = reached
+    return offenders, unparseable
+
+
+def test_hand_roll_exemptions_are_live_paths_inside_the_walk():
+    """An exemption that names nothing is an exemption nobody is checking.
+
+    A stale entry proves the list is unvalidated, and worse, any future file
+    created at that path inherits an exemption no one reviewed. Both halves
+    matter: the path must exist, AND it must be somewhere the walk would
+    otherwise visit, or the exemption is decorative.
+    """
+
+    walked_roots = set(_WALKED_PACKAGES)
+    for rel in sorted(_HAND_ROLL_EXEMPT):
+        assert (REPO_ROOT / rel).is_file(), (
+            f"_HAND_ROLL_EXEMPT names {rel!r}, which does not exist. Remove it "
+            "or fix the path."
+        )
+        head = rel.split("/", 1)[0]
+        reachable = head in walked_roots or "/" not in rel
+        assert reachable, (
+            f"_HAND_ROLL_EXEMPT names {rel!r}, which the walk never visits "
+            f"(roots: {sorted(walked_roots)} plus repo-root *.py). The "
+            "exemption is dead and exempts nothing."
+        )
+
+
+def test_no_production_module_hand_rolls_the_guard_halves():
+    """Regenerators must use `with regeneration_guard(...)`, not the halves.
+
+    The two halves are sequenced: the pre-write shrink check on entry, the
+    wrote-what-you-planned check on exit. Calling them by hand works right up
+    until an edit drops the second one, and dropping the second one restores
+    the exact b-200 hole the guard exists to close -- silently, because every
+    guard-module test stays green. `with` cannot be half-used, so the pairing
+    becomes structural instead of remembered.
+
+    This is a structural predicate over the call graph, not a text search:
+    renaming a local or editing a comment cannot blind it, and it follows
+    aliased imports, attribute calls and literal `getattr` rather than only
+    bare-name calls.
+
+    SCOPE, stated so nobody reads more assurance into this than it carries:
+    it catches HALF-USE, not NON-USE. A brand-new regenerator that unlinks
+    tracked artifacts and never imports the guard at all is invisible here.
+    That residual is real and is tracked separately; do not treat a green run
+    as proof that every regeneration path is guarded.
+    """
+
+    offenders, unparseable = _scan_for_hand_rolled_guard_use()
+    assert unparseable == [], (
+        "these modules could not be parsed, so they cannot be checked for "
+        f"hand-rolled guard use: {unparseable}. Fix the file or the encoding; "
+        "an unparseable module must not be exempt by accident."
+    )
+    assert offenders == {}, (
+        "these modules call a regeneration-guard half directly instead of "
+        f"using `with regeneration_guard(...)`: {offenders}. The post-check is "
+        "the half that goes missing in a later edit; use the context manager "
+        "so it cannot."
+    )
