@@ -1,9 +1,25 @@
 schema_version: 1
 kind: melts_liquid_w_matrix
 format: yaml
+status:
+  role: reference_snapshot
+  runtime_input: false
+  extractor: scripts/extract_melts_liquid_w_matrix.py
+  source: ThermoEngine
+  default_prediction_path_reads: false
+  default_prediction_path_verified: '2026-08-18'
+  retained_for: planned_melts_extension
+  expected_consumer_when: melt_chemical_potential_drives_flux
+  value_origin: thermoengine_global_phase_equilibrium_regression
+  per_edge_uncertainty: none
+  note: Reference snapshot extracted from ThermoEngine by scripts/extract_melts_liquid_w_matrix.py;
+    not a runtime input. No code on the current default prediction path reads this file (verified
+    2026-08-18). Retained for the planned MELTS-extension path; expected to acquire a consumer when
+    melt chemical potential drives flux. Values are ThermoEngine regression coefficients from a global
+    phase-equilibrium fit, not direct measurements; no per-edge uncertainty.
 format_reason: YAML matches data/ provenance pins and keeps the 105-edge t-647 missing-pair table human-diffable.
   The matrix is small; JSON would add no numeric fidelity here.
-description: Live ThermoEngine MELTS v1.0 liquid Margules W matrix. 105 bilateral edges over the 15 LiquidMelts
+description: ThermoEngine MELTS v1.0 liquid Margules W matrix (extracted from the installed module, not a runtime input -- see status above). 105 bilateral edges over the 15 LiquidMelts
   endmembers. Extracted from the installed module, not from papers.
 captured_at: '2026-08-13T15:41:10Z'
 extraction_script: scripts/extract_melts_liquid_w_matrix.py

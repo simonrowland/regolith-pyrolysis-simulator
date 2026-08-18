@@ -11,11 +11,27 @@ from scripts.extract_melts_liquid_w_matrix import (
     EXPECTED_EDGE_COUNT,
     EXPECTED_ENDMEMBER_COUNT,
     SNAPSHOT_PATH,
+    SNAPSHOT_STATUS,
+    _dump_snapshot,
     _matrix_digest,
     extract_live_snapshot,
     live_thermoengine_importable,
     load_snapshot,
     sample_edges,
+)
+
+REQUIRED_STATUS_KEYS = (
+    "role",
+    "runtime_input",
+    "extractor",
+    "source",
+    "default_prediction_path_reads",
+    "default_prediction_path_verified",
+    "retained_for",
+    "expected_consumer_when",
+    "value_origin",
+    "per_edge_uncertainty",
+    "note",
 )
 
 
@@ -122,3 +138,73 @@ def test_live_engine_sample_matches_pinned_snapshot() -> None:
         assert live_edge["W_joules"] == pinned_edge["W_joules"]
         assert live_edge["W_S_joules_per_K"] == pinned_edge["W_S_joules_per_K"]
         assert live_edge["W_V_joules_per_bar"] == pinned_edge["W_V_joules_per_bar"]
+
+
+def _assert_status_block(payload: dict) -> None:
+    assert "status" in payload, "status block missing from MELTS W-matrix snapshot"
+    status = payload["status"]
+    assert isinstance(status, dict)
+    missing = [key for key in REQUIRED_STATUS_KEYS if key not in status]
+    assert missing == [], f"status block missing required keys: {missing}"
+    assert status == SNAPSHOT_STATUS
+    assert status["role"] == "reference_snapshot"
+    assert status["runtime_input"] is False
+    assert status["extractor"] == "scripts/extract_melts_liquid_w_matrix.py"
+    assert status["source"] == "ThermoEngine"
+    assert status["default_prediction_path_reads"] is False
+    assert status["default_prediction_path_verified"] == "2026-08-18"
+    assert status["retained_for"] == "planned_melts_extension"
+    assert status["expected_consumer_when"] == "melt_chemical_potential_drives_flux"
+    assert status["value_origin"] == "thermoengine_global_phase_equilibrium_regression"
+    assert status["per_edge_uncertainty"] == "none"
+    assert "not a runtime input" in status["note"]
+    assert "2026-08-18" in status["note"]
+    assert "planned MELTS-extension" in status["note"]
+    assert "not direct measurements" in status["note"]
+    assert "per-edge uncertainty" in status["note"]
+
+
+def test_status_block_present_and_matches_extractor() -> None:
+    payload = _snapshot()
+    _assert_status_block(payload)
+    # Regenerating via extract_live_snapshot must emit the same block.
+    # The constant is the write-side source; YAML must stay in lockstep.
+    assert SNAPSHOT_STATUS.keys() >= set(REQUIRED_STATUS_KEYS)
+
+
+def test_status_block_absent_or_incomplete_fails() -> None:
+    payload = _snapshot()
+    absent = {key: value for key, value in payload.items() if key != "status"}
+    with pytest.raises(AssertionError, match="status block missing"):
+        _assert_status_block(absent)
+
+    incomplete = dict(payload)
+    incomplete["status"] = {
+        key: value
+        for key, value in payload["status"].items()
+        if key != "runtime_input"
+    }
+    with pytest.raises(AssertionError, match="missing required keys"):
+        _assert_status_block(incomplete)
+
+
+def test_extractor_write_path_emits_status_block() -> None:
+    import yaml
+
+    dumped = _dump_snapshot(
+        {
+            "schema_version": 1,
+            "kind": "melts_liquid_w_matrix",
+            "format": "yaml",
+            "status": dict(SNAPSHOT_STATUS),
+            "edges": [],
+        }
+    )
+    rewritten = yaml.safe_load(dumped)
+    _assert_status_block(rewritten)
+    assert list(rewritten.keys())[:4] == [
+        "schema_version",
+        "kind",
+        "format",
+        "status",
+    ]
