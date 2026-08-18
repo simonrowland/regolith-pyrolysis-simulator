@@ -383,14 +383,37 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         )
         + "\n"
     ).encode("utf-8")
-    # Regenerated from the executable t-523 correction to b-118 (2026-08-04):
-    # the coating-risk upper-envelope continuation is unchanged, but
-    # out-of-domain K/Ti again debit inventory while carrying extrapolated,
-    # non-certifying status. The dedicated degraded-path counter is serialized.
-    # b-127 still refuses uncovered condenser Antoine segments rather than
-    # fabricating 100 Pa. Re-derived from the executable path.
+    # Rebaselined 2026-08-18 (t-686) with the cause named, not to make a red
+    # test pass. The prior digest 6e75e35e... was produced by the pre-t-470
+    # rail; TWO intentional rail commits moved this whole-run hash, both
+    # bisected in one tree with the machine-local engines.local.toml held
+    # constant so the comparison could not be confounded:
+    #
+    #   2918b531 feat(rail): six analytical carriers live -- FIRST digest
+    #     mover. vapour_batch.n_requested 15 -> 21 (Al2O, AlO, CaO_gas, CrO3,
+    #     TiO, TiO2_gas). Run still status=ok over 24 h. Its parent 313a7d49
+    #     still hashes to 6e75e35e..., which is what pins the attribution.
+    #
+    #   dd62edf0 fix(rail): t-470 -- transitional-Knudsen band refuses instead
+    #     of silently zeroing -- FIRST status mover. status ok -> refused,
+    #     reason "" -> viscous_p_bulk_transport_out_of_domain, run length
+    #     24 h -> 14 h. End-of-run Kn 0.000273 (viscous, 10 mbar) -> 4.8646
+    #     (transitional, 0.000368 mbar). Its parent 23d48442 already reaches
+    #     Kn 4.8646 at hour 14 and used to continue straight through it.
+    #
+    # So the refusal is the HONEST number and the old 24-hour completion was
+    # the silent one. Nondeterminism is ruled out: two dumps at the tip are
+    # byte-identical, and checking out the pin commit in this same tree
+    # reproduces 6e75e35e... exactly.
+    #
+    # ★ WHAT THIS DIGEST NOW PINS: the default C0 recipe DIES AT HOUR 14
+    # because overhead pressure falls through the viscous-flow band that
+    # mandate section 4 requires (Kn well below 0.01). That is a recipe
+    # question -- raise pN2 before Kn crosses -- not a golden question, and it
+    # is tracked separately. This pin records what the code does; it does not
+    # bless the recipe.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "6e75e35eb39c2413e2e86ca52ac1b4492f6a8f4ebf77e54d069ce8f260c7b9de"
+        "9a1a0c27f7e2aeb3a138dea12c5476813b2bf5fef6d0e99ed3a2ba0539ffa6df"
     )
 
 
