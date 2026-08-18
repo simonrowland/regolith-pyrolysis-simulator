@@ -10,8 +10,10 @@ from engines.alphamelts.domain import (
     CONSTRAINT_OXIDE_BASIS,
     CONSTRAINT_SILICATE_NETWORK_BAND,
     DEFAULT_SILICATE_NETWORK_BAND_WT_PCT,
+    MELTS_PARENT_OXIDE_NOT_ENDMEMBER,
     AlphaMELTSDomainGate,
     DomainGateAssessment,
+    melts_endmember_to_parent_oxide_activity,
 )
 
 
@@ -136,3 +138,75 @@ def test_unrecognised_backend_status_refuses_instead_of_passing():
     assert "kernel_status = 'unavailable'" in code
     # And the refusal must be visible, not silent.
     assert "unrecognised backend_status" in src
+
+
+def test_melts_endmember_identity_matches_hand_worked_sio2_al2o3() -> None:
+    """SiO2 and Al2O3 are MELTS liquid endmembers: identity conversion.
+
+    Hand-worked: the engine reports a(SiO2)=0.42 and a(Al2O3)=0.25. Because
+    those labels *are* the parent oxides, a_parent = a_endmember. Unit check:
+    both sides dimensionless. Sanity: the pure-SiO2 limit is 1 = 1.
+    """
+    activities = {
+        "SiO2": 0.42,
+        "Al2O3": 0.25,
+        "CaSiO3": 0.11,
+        "Mg2SiO4": 0.08,
+        "Ca3(PO4)2": 0.03,
+        "CoSiO3": 0.01,
+    }
+    a_sio2, sio2_reason = melts_endmember_to_parent_oxide_activity(
+        activities, "SiO2"
+    )
+    a_al2o3, al2o3_reason = melts_endmember_to_parent_oxide_activity(
+        activities, "a(Al2O3)"
+    )
+    assert a_sio2 == pytest.approx(0.42)
+    assert sio2_reason == ""
+    assert a_al2o3 == pytest.approx(0.25)
+    assert al2o3_reason == ""
+
+
+def test_melts_cao_mgo_are_typed_refusals_not_fabricated_conversions() -> None:
+    """CaO/MgO are not MELTS liquid endmembers; do not invent a residual.
+
+    The two fabricated conversions this pins against:
+    * stoichiometric proxy  a ≈ ν · a_endmember
+      (CaSiO3 carries 1 CaO → 0.11; Mg2SiO4 carries 2 MgO → 0.16)
+    * chemical-potential inversion without μ°_oxide
+      a(CaO) = a(CaSiO3)/a(SiO2) = 0.11/0.42
+      a(MgO) = sqrt(a(Mg2SiO4)/a(SiO2)) = sqrt(0.08/0.42)
+    Both require a pure-oxide liquid standard state MELTS does not define.
+    """
+    activities = {
+        "SiO2": 0.42,
+        "Al2O3": 0.25,
+        "CaSiO3": 0.11,
+        "Mg2SiO4": 0.08,
+        "Ca3(PO4)2": 0.03,
+        "CoSiO3": 0.01,
+    }
+    a_cao, cao_reason = melts_endmember_to_parent_oxide_activity(
+        activities, "CaO"
+    )
+    a_mgo, mgo_reason = melts_endmember_to_parent_oxide_activity(
+        activities, "MgO"
+    )
+    fabricated_cao_nu = 1.0 * 0.11
+    fabricated_cao_ratio = 0.11 / 0.42
+    fabricated_mgo_nu = 2.0 * 0.08
+    fabricated_mgo_ratio = (0.08 / 0.42) ** 0.5
+
+    assert a_cao is None
+    assert a_mgo is None
+    assert a_cao != pytest.approx(fabricated_cao_nu)
+    assert a_cao != pytest.approx(fabricated_cao_ratio)
+    assert a_mgo != pytest.approx(fabricated_mgo_nu)
+    assert a_mgo != pytest.approx(fabricated_mgo_ratio)
+    assert MELTS_PARENT_OXIDE_NOT_ENDMEMBER in cao_reason
+    assert MELTS_PARENT_OXIDE_NOT_ENDMEMBER in mgo_reason
+    assert "CaSiO3" in cao_reason
+    assert "Ca3(PO4)2" in cao_reason
+    assert "Mg2SiO4" in mgo_reason
+    assert "standard state the model does not define" in cao_reason
+    assert "standard state the model does not define" in mgo_reason

@@ -1128,14 +1128,44 @@ def _prediction_for_point(
     else:
         return None, f"unsupported observable {observable!r}"
     if value is None or not math.isfinite(float(value)) or float(value) <= 0.0:
-        unmapped_labels = tuple(result.details.get("unmapped_activity_labels", ()))
-        if observable in {"activity", "activity_coefficient"} and unmapped_labels:
-            return None, (
-                f"engine completed equilibrium but computed activity under "
-                f"unmapped endmember/component label(s) "
-                f"{', '.join(str(label) for label in unmapped_labels)}; "
-                f"no authoritative {parent} basis conversion"
+        if observable in {"activity", "activity_coefficient"}:
+            from engines.alphamelts.domain import (
+                MELTS_PARENT_OXIDE_NOT_ENDMEMBER,
+                melts_endmember_to_parent_oxide_activity,
             )
+
+            reported_labels = tuple(
+                str(label)
+                for label in result.details.get("reported_activity_labels", ())
+            )
+            unmapped_labels = tuple(
+                str(label)
+                for label in result.details.get("unmapped_activity_labels", ())
+            )
+            label_activities = {
+                str(label): float("nan")
+                for label in (*reported_labels, *unmapped_labels)
+            }
+            label_activities.update(result.activities)
+            converted, conversion_reason = melts_endmember_to_parent_oxide_activity(
+                label_activities,
+                parent,
+            )
+            if (
+                converted is not None
+                and math.isfinite(float(converted))
+                and float(converted) > 0.0
+            ):
+                return float(converted), ""
+            if conversion_reason.startswith(MELTS_PARENT_OXIDE_NOT_ENDMEMBER):
+                return None, conversion_reason
+            if unmapped_labels:
+                return None, (
+                    f"engine completed equilibrium but computed activity under "
+                    f"unmapped endmember/component label(s) "
+                    f"{', '.join(unmapped_labels)}; "
+                    f"no authoritative {parent} basis conversion"
+                )
         if result.details.get("observable_supported") is False and result.reason:
             return None, result.reason
         return None, f"engine returned no positive {observable} for {parent}"

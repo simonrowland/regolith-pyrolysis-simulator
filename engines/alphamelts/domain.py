@@ -21,6 +21,7 @@ kernel planner / provider can decide whether to surface
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
@@ -411,6 +412,37 @@ def _canonical_oxide_name(name: object) -> str | None:
     return _OXIDE_ALIASES.get(key.lower())
 
 
+# MELTS v1.0 / ThermoEngine LiquidMelts endmembers that ARE the parent oxide.
+# Identity conversion is valid only for these labels (see
+# melts_endmember_to_parent_oxide_activity).
+MELTS_LIQUID_OXIDE_ENDMEMBERS: frozenset[str] = frozenset({
+    'SiO2',
+    'TiO2',
+    'Al2O3',
+    'Fe2O3',
+    'H2O',
+})
+
+# Compound MELTS v1.0 liquid endmembers and the parent oxides they carry.
+# These are regular-solution coordinates, not parent-oxide activities.
+MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS: Dict[str, Tuple[str, ...]] = {
+    'CaSiO3': ('CaO', 'SiO2'),
+    'Ca3(PO4)2': ('CaO', 'P2O5'),
+    'Mg2SiO4': ('MgO', 'SiO2'),
+    'MgCr2O4': ('MgO', 'Cr2O3'),
+    'Fe2SiO4': ('FeO', 'SiO2'),
+    'MnSi0.5O2': ('MnO', 'SiO2'),
+    'NiSi0.5O2': ('NiO', 'SiO2'),
+    'CoSiO3': ('CoO', 'SiO2'),
+    'Na2SiO3': ('Na2O', 'SiO2'),
+    'KAlSiO4': ('K2O', 'Al2O3', 'SiO2'),
+}
+
+MELTS_PARENT_OXIDE_NOT_ENDMEMBER = (
+    'typed-refusal:melts_endmember_not_parent_oxide'
+)
+
+
 def canonical_melt_oxide_activity_name(name: object) -> str | None:
     """Map an exact oxide-basis activity label to a canonical key.
 
@@ -418,6 +450,8 @@ def canonical_melt_oxide_activity_name(name: object) -> str | None:
     component labels such as ``Na``, ``Na2SiO3``, or ``Mg2SiO4`` into oxide
     activities. Those labels can be reported diagnostically, but without a
     thermodynamic basis conversion they are not ``Na2O``/``MgO`` activities.
+    Compound-endmember refusal (CaO, MgO, Na2O, ...) lives in
+    :func:`melts_endmember_to_parent_oxide_activity`.
     """
 
     key = str(name).strip().strip('"\'')
@@ -434,6 +468,96 @@ def canonical_melt_oxide_activity_name(name: object) -> str | None:
     if oxide in _MELTS_OXIDE_SET:
         return oxide
     return None
+
+
+def melts_endmember_to_parent_oxide_activity(
+    endmember_activities: Mapping[str, float],
+    parent_oxide: str,
+) -> tuple[float | None, str]:
+    """Map MELTS liquid-endmember activities onto one parent-oxide activity.
+
+    Premise: ThermoEngine MELTS liquid is a regular solution on 15
+    endmembers. Chemical potential of endmember i is
+    ``μ_i = μ_i° + RT ln a_i``, with ``a_i`` referenced to the *pure
+    endmember* (Raoultian). The bench set scores parent-oxide activities
+    ``a(SiO2)``, ``a(Al2O3)``, ``a(CaO)``, ``a(MgO)``.
+
+    Algebra, identity case: SiO2, TiO2, Al2O3, and Fe2O3 *are* liquid
+    endmembers, so the parent-oxide activity is the reported endmember
+    activity. ``a_parent = a_endmember``. Both sides are dimensionless.
+    Sanity: if the engine reports ``a(SiO2)=0.42``, the parent-oxide
+    value is 0.42; at the pure-SiO2 limit both are 1.
+
+    Algebra, compound case: CaO is not an endmember. The Ca-bearing
+    liquid endmembers are CaSiO3 and Ca3(PO4)2. Component inversion
+    would write ``μ_CaO = μ_CaSiO3 − μ_SiO2`` and
+    ``a(CaO) = (a_CaSiO3 / a_SiO2) · exp((μ°_CaSiO3 − μ°_SiO2 − μ°_CaO)/RT)``.
+    The exponential requires ``μ°`` of *pure liquid CaO*. Pure CaO is
+    not a realizable MELTS liquid composition — every Ca endmember also
+    carries SiO2 or P2O5 — so the model does not define that standard
+    state. The vapor-rail proxy ``a ≈ ν · a_endmember`` in
+    ``_oxide_component_stoichiometry`` is explicitly *not* a pure-oxide
+    chemical-potential standard state. Using either formula as a scored
+    residual against experimental ``a(CaO)`` would fabricate a number
+    the model does not produce.
+
+    Same obstruction for MgO (carriers Mg2SiO4, MgCr2O4) and the other
+    oxides that exist only inside compound endmembers (Na2O, K2O, FeO,
+    ...).
+
+    Therefore: identity when the parent is a reported oxide endmember;
+    typed refusal otherwise, naming the compound carriers.
+    """
+    parent = canonical_melt_oxide_activity_name(parent_oxide)
+    if parent is None:
+        parent = str(parent_oxide).strip()
+    if not parent:
+        return None, f'{MELTS_PARENT_OXIDE_NOT_ENDMEMBER}: empty parent oxide'
+
+    reported_labels = tuple(str(label) for label in endmember_activities)
+    for label, raw in endmember_activities.items():
+        oxide = canonical_melt_oxide_activity_name(label)
+        if oxide != parent:
+            continue
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            continue
+        if value > 0.0 and math.isfinite(value):
+            return value, ''
+
+    model_carriers = tuple(
+        endmember
+        for endmember, oxides in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.items()
+        if parent in oxides
+    )
+    if parent in MELTS_LIQUID_OXIDE_ENDMEMBERS:
+        return None, (
+            f'engine returned no positive activity for {parent}'
+        )
+    if model_carriers:
+        reported_carriers = tuple(
+            label
+            for label in reported_labels
+            if parent in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.get(label, ())
+        )
+        reported_text = (
+            ', '.join(reported_carriers)
+            if reported_carriers
+            else f'no {parent}-bearing endmember'
+        )
+        return None, (
+            f'{MELTS_PARENT_OXIDE_NOT_ENDMEMBER}:{parent}: '
+            f'MELTS liquid endmember basis has no {parent} coordinate; '
+            f'{parent} appears only inside {", ".join(model_carriers)} '
+            f'and this solve reported {reported_text}; converting those '
+            f'endmembers to a({parent}) requires a pure-{parent} liquid '
+            f'standard state the model does not define'
+        )
+    return None, (
+        f'{MELTS_PARENT_OXIDE_NOT_ENDMEMBER}:{parent}: '
+        f'MELTS liquid endmember basis has no {parent} activity'
+    )
 
 
 def _is_non_oxide_species_name(name: object) -> bool:
@@ -476,6 +600,10 @@ __all__: Iterable[str] = (
     'DEFAULT_SIO2_MAX_WT_PCT',
     'DEFAULT_SIO2_MIN_WT_PCT',
     'DomainGateAssessment',
+    'MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS',
+    'MELTS_LIQUID_OXIDE_ENDMEMBERS',
     'MELTS_OXIDE_BASIS',
+    'MELTS_PARENT_OXIDE_NOT_ENDMEMBER',
     'canonical_melt_oxide_activity_name',
+    'melts_endmember_to_parent_oxide_activity',
 )
