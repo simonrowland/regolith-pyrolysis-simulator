@@ -804,3 +804,95 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
 
     assert missing_area_efficiency == pytest.approx(0.0)
     assert configured_area_efficiency == pytest.approx(0.2)
+
+
+# ---------------------------------------------------------------------------
+# b-193 / b-195: two fabrications on the coating path, both now refusing.
+# Neither fired on the exercised surface when they were introduced (measured
+# zero-delta, 11 failed / 167 passed either way across the five condensation
+# modules), so these tests exist to keep them closed rather than to prove a
+# live bug was fixed.
+# ---------------------------------------------------------------------------
+
+
+def test_missing_molar_mass_refuses_instead_of_substituting_fifty():
+    """b-193: an unknown species must refuse, not get an invented mass.
+
+    HKL gives J = P / sqrt(2*pi*m*k*T), so flux scales as 1/sqrt(m) and the
+    old 50.0 g/mol substitution rescaled the wall-deposit RATE by
+    sqrt(m_true/50) -- Na would have read 32% low, Mg 30% low. Mandate section
+    4 makes wall_deposit_kg by species the instrument the coating verdict rests
+    on, so a placeholder there is a fabricated answer, and a missing mass is
+    category-1 fail-closed: refuse.
+    """
+
+    from simulator.condensation import MolarMassUnavailable
+
+    with pytest.raises(MolarMassUnavailable) as excinfo:
+        condensation_module._molecular_mass_kg_per_molecule("Unobtainium")
+    assert "Unobtainium" in str(excinfo.value)
+
+    # The control: species that DO carry a mass must be untouched, or the
+    # refusal has been widened into breaking the working path.
+    for species, expected_g_mol in (("SiO", 44.084), ("Na", 22.990), ("Fe", 55.845)):
+        kg_per_molecule = condensation_module._molecular_mass_kg_per_molecule(species)
+        got_g_mol = kg_per_molecule * condensation_module.AVOGADRO_MOL * 1000.0
+        assert got_g_mol == pytest.approx(expected_g_mol, rel=1e-3)
+
+
+def test_setpoints_condensation_temperature_overrides_refuse_bad_input():
+    """b-195: unknown keys and unusable values refuse rather than vanish.
+
+    The consumer is cold_spot_diagnostic -- the mandate section 4 hot-wall
+    check deciding whether a species condenses BEFORE its designated stage --
+    so a typo'd key silently fed that diagnostic and a malformed value silently
+    disappeared while the operator believed the setpoint applied.
+
+    Note the correction to b-195 as filed: this does NOT reach condensation
+    ADMISSION, which gates on the vapour-pressure catalogue that setpoints
+    cannot write. The blast radius is the coating diagnostic.
+    """
+
+    model = condensation_module.CondensationModel(
+        CondensationTrain.create_default()
+    )
+    known = set(model.condensation_temperatures_C)
+    assert "Na" in known and "Sio" not in known
+
+    def _apply(block):
+        model.apply_setpoints_overrides(
+            {"condensation_train": {"condensation_temperatures_C": block}}
+        )
+
+    with pytest.raises(ValueError, match="does not model"):
+        _apply({"Sio": 1200.0})          # typo for SiO
+    with pytest.raises(ValueError, match="not numeric"):
+        _apply({"Na": "warm"})
+    with pytest.raises(ValueError, match="not finite"):
+        _apply({"Na": float("inf")})
+
+    # A valid override still applies, so the guard did not close the door on
+    # the operator surface this whole module exists to provide.
+    _apply({"Na": 812.5})
+    assert model.condensation_temperatures_C["Na"] == pytest.approx(812.5)
+
+
+def test_shipped_setpoints_pass_the_override_guard_unchanged():
+    """The guard must be golden-neutral against the config we actually ship.
+
+    All 11 entries under condensation_train.condensation_temperatures_C are
+    known species with parseable values AND already equal the defaults, so a
+    correct guard changes nothing here. If this fails, either the guard is too
+    strict or setpoints.yaml gained an entry nobody reviewed.
+    """
+
+    repo_root = Path(__file__).resolve().parents[1]
+    setpoints = yaml.safe_load(
+        (repo_root / "data" / "setpoints.yaml").read_text(encoding="utf-8")
+    )
+    model = condensation_module.CondensationModel(
+        CondensationTrain.create_default()
+    )
+    before = dict(model.condensation_temperatures_C)
+    model.apply_setpoints_overrides(setpoints)
+    assert model.condensation_temperatures_C == before

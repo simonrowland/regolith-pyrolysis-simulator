@@ -2361,14 +2361,56 @@ class CondensationModel:
         )
         if not isinstance(block, Mapping):
             return
+        # b-195. This loop used to accept ANY key in the YAML and silently
+        # `continue` past any value it could not parse. Two holes in six lines.
+        #
+        # The unknown-key hole: an operator typo like 'Sio' or a species the
+        # rail does not model became a live entry that nothing ever reported.
+        # The consumer is cold_spot_diagnostic (called below), the mandate
+        # section 4 hot-wall check deciding whether a species condenses BEFORE
+        # reaching its designated stage - so a bogus entry can fabricate or
+        # suppress a cold-spot warning, which is the coating failure mode.
+        #
+        # The silent-skip hole: a malformed temperature vanished instead of
+        # refusing, leaving the operator believing a setpoint was applied when
+        # it was not. Both are fail-closed CATEGORY 1 - missing or unusable
+        # input refuses; it does not get quietly dropped.
+        #
+        # NOTE the correction to b-195 as filed: this does NOT reach
+        # condensation ADMISSION. _condensation_admission_refusal gates on
+        # _assert_condensation_applicable and _species_has_compiled_or_legacy_
+        # pressure, i.e. the vapour-pressure catalogue, which setpoints cannot
+        # write. The blast radius is the coating diagnostic, not the b-189 seam.
+        #
+        # MEASURED GOLDEN-NEUTRAL: data/setpoints.yaml ships 11 entries under
+        # condensation_train.condensation_temperatures_C and all 11 are known
+        # species with parseable values, so nothing in the shipped config
+        # trips either branch.
+        known_species = set(self.condensation_temperatures_C)
         for species, value in block.items():
+            name = str(species)
+            if name not in known_species:
+                raise ValueError(
+                    f"setpoints condensation_temperatures_C names {name!r}, "
+                    "which the condensation train does not model. Known "
+                    f"species: {sorted(known_species)}. Refusing rather than "
+                    "accepting the key, because an unmodelled entry silently "
+                    "feeds the cold-spot diagnostic and nothing reports it."
+                )
             try:
                 T_C = float(value)
             except (TypeError, ValueError):
-                continue
+                raise ValueError(
+                    f"setpoints condensation temperature for {name!r} is not "
+                    f"numeric ({value!r}); refusing rather than skipping, so a "
+                    "mistyped setpoint cannot look like an applied one."
+                ) from None
             if not math.isfinite(T_C):
-                continue
-            self.condensation_temperatures_C[str(species)] = T_C
+                raise ValueError(
+                    f"setpoints condensation temperature for {name!r} is not "
+                    f"finite ({value!r}); refusing rather than skipping."
+                )
+            self.condensation_temperatures_C[name] = T_C
 
     def _build_default_pipe_segments(
         self,
@@ -5575,6 +5617,10 @@ def _segment_species_partial_pressures_pa(
     return by_segment
 
 
+class MolarMassUnavailable(ValueError):
+    """No usable molar mass, so the HKL impingement flux has no honest input."""
+
+
 def _molecular_mass_kg_per_molecule(
     species: str,
     *,
@@ -5587,12 +5633,49 @@ def _molecular_mass_kg_per_molecule(
     value = data.get('molar_mass_g_mol') if isinstance(data, Mapping) else None
     if value is None:
         value = MOLAR_MASS.get(species)
+    # b-193. This used to substitute 50.0 g/mol for any species whose molar
+    # mass was missing or unusable, and hand that invented number to the HKL
+    # impingement flux below. Hertz-Knudsen-Langmuir gives
+    #     J = P / sqrt(2 * pi * m * k * T)      [molecules m^-2 s^-1]
+    # so J scales as 1/sqrt(m) and a substituted mass rescales the DEPOSITION
+    # RATE by sqrt(m_true / 50). Worked at the species that actually matter:
+    # Na (22.990) would read 0.678x, i.e. 32% LOW; Mg (24.305) 0.697x; SiO
+    # (44.084) 0.939x; Fe (55.845) 1.057x; SiO2 (60.083) 1.096x. A 32% error
+    # on wall deposition is not a rounding detail - mandate section 4 makes
+    # wall_deposit_kg by species the instrument that decides whether a recipe
+    # ruins the furnace, so an invented mass there is a fabricated answer on
+    # the one measurement the coating verdict rests on.
+    #
+    # A missing molar mass is fail-closed CATEGORY 1: missing input, refuse.
+    # It is not category 2 (out-of-domain physics, compute and mark) - there
+    # is no domain to extrapolate from, we simply do not know the mass.
+    #
+    # MEASURED ZERO-DELTA when this refusal replaced the substitution
+    # (2026-08-18, tip b7014183): tests/test_coating_rate.py,
+    # test_vr11_instrumentation.py, test_condensation_temperature_overrides.py,
+    # test_knudsen_regime.py and test_sio_yield_regression.py give the
+    # IDENTICAL 11 failed / 167 passed with and without it, same 11 node ids,
+    # and an instrumented stack dump confirmed the branch never fires. Every
+    # species on the exercised path resolves honestly (SiO, Na, K, Fe, Mg, O2,
+    # SiO2 all have masses). So this closes a fabrication that was latent
+    # rather than one that was corrupting numbers today.
     try:
         molar_mass_g_mol = float(value)
     except (TypeError, ValueError):
-        molar_mass_g_mol = 50.0
+        raise MolarMassUnavailable(
+            f"no usable molar mass for {species!r} (got {value!r}); the HKL "
+            "impingement flux cannot be computed without it. Add the species "
+            "to MOLAR_MASS or give its vapour-pressure row a "
+            "'molar_mass_g_mol'. This refuses rather than substituting a "
+            "placeholder because a wrong mass silently rescales the "
+            "wall-deposit rate by sqrt(m_true/m_assumed)."
+        ) from None
     if not math.isfinite(molar_mass_g_mol) or molar_mass_g_mol <= 0.0:
-        molar_mass_g_mol = 50.0
+        raise MolarMassUnavailable(
+            f"molar mass for {species!r} is not a positive finite number "
+            f"({molar_mass_g_mol!r}); refusing rather than substituting a "
+            "placeholder into the HKL impingement flux."
+        )
     return (molar_mass_g_mol / 1000.0) / AVOGADRO_MOL
 
 
