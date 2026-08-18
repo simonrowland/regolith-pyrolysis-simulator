@@ -7,9 +7,11 @@ from types import SimpleNamespace
 import pytest
 
 from scripts.vapour_rail_engine_crosscheck import write_reports
+from simulator.silent_zero import ZeroBecause
 from simulator.vapour_rail.engine_crosscheck import (
     CrosscheckComposition,
     EngineCrosscheckError,
+    _observation,
     build_crosscheck_report,
     divergence_label,
     render_crosscheck_markdown,
@@ -313,3 +315,101 @@ def test_wild_disagreement_is_plainly_rendered_and_reports_are_deterministic(
     json_path, markdown_path = write_reports(report, tmp_path)
     assert json.loads(json_path.read_text()) == report
     assert markdown_path.read_text() == markdown
+
+
+def test_proven_zero_is_not_classified_refused():
+    """A 0 Pa inventory mask is proven empty, not a numerical refusal.
+
+    Red-by-revert: the old classifier treated pressure <= 0.0 as
+    refused with reason "non-finite or non-positive pressure".
+    """
+    obs = _observation(
+        {"Cr": 0.0, "Na": 4.0},
+        "Cr",
+        cell_status="ok",
+        cell_reason=None,
+        p_floor_Pa=1.0e-30,
+    )
+    assert obs["kind"] == ZeroBecause.PROVEN_EMPTY_INVENTORY.value
+    assert obs["kind"] != "refused"
+    assert obs["pressure_Pa"] == 0.0
+    reason = obs["reason"] or ""
+    assert "non-finite" not in reason.lower()
+    assert "Cr2O3" in reason
+
+
+def test_proven_zero_uses_producer_note_detail_when_present():
+    producer_detail = (
+        "VapoRock set log10(P/bar)=-inf because melt Cr2O3 was "
+        "exactly 0 wt% in the input; this is the a=0 limit, not a T/fO2 "
+        "result and not missing JANAF data"
+    )
+    obs = _observation(
+        {"Cr": 0.0},
+        "Cr",
+        cell_status="non_authoritative",
+        cell_reason=None,
+        p_floor_Pa=1.0e-30,
+        silent_zero_notes=[
+            {
+                "zero_because": ZeroBecause.PROVEN_EMPTY_INVENTORY.value,
+                "species": "Cr",
+                "detail": producer_detail,
+            }
+        ],
+    )
+    assert obs["kind"] == ZeroBecause.PROVEN_EMPTY_INVENTORY.value
+    assert obs["pressure_Pa"] == 0.0
+    assert obs["reason"] == producer_detail
+    assert "non-finite" not in obs["reason"].lower()
+
+
+def test_nonfinite_pressure_still_refuses_with_true_reason():
+    obs = _observation(
+        {"Na": float("nan")},
+        "Na",
+        cell_status="ok",
+        cell_reason=None,
+        p_floor_Pa=1.0e-30,
+    )
+    assert obs["kind"] == "refused"
+    assert obs["pressure_Pa"] is None
+    assert obs["reason"] == "non-finite or non-positive pressure"
+
+
+def test_proven_zero_row_is_not_refused_in_crosscheck_report():
+    report = build_crosscheck_report(
+        composition=COMPOSITION,
+        temperatures_K=[1500.0],
+        fo2_log10_bar=[-9.0],
+        raw_cells=[
+            {
+                "temperature_K": 1500.0,
+                "fo2_log10_bar": -9.0,
+                "rail": {
+                    "status": "ok",
+                    "reason": None,
+                    "pressures_Pa": {"SiO": 1.0, "Cr": 2.0},
+                },
+                "vaporock": {
+                    "status": "non_authoritative",
+                    "reason": None,
+                    "pressures_Pa": {"SiO": 1.0, "Cr": 0.0},
+                },
+            }
+        ],
+        rail_declared_species=["SiO", "Cr"],
+        vaporock_declared_species=["SiO", "Cr"],
+        p_floor_Pa=1.0e-30,
+        generated_at="fixed",
+    )
+    cr = next(row for row in report["rows"] if row["species"] == "Cr")
+    assert cr["vaporock"]["kind"] == ZeroBecause.PROVEN_EMPTY_INVENTORY.value
+    assert cr["vaporock"]["kind"] != "refused"
+    assert cr["vaporock"]["pressure_Pa"] == 0.0
+    reason = cr["vaporock"]["reason"] or ""
+    assert "non-finite" not in reason.lower()
+    assert "Cr2O3" in reason
+    sio = next(row for row in report["rows"] if row["species"] == "SiO")
+    assert sio["vaporock"]["kind"] == "point"
+    assert sio["vaporock"]["pressure_Pa"] == 1.0
