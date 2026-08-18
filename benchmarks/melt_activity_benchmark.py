@@ -36,6 +36,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -939,12 +940,68 @@ class VapoRockEngine:
         return self.evaluate(composition_wt_pct, temperature_K, 1.0e-9)
 
 
+# Four-or-more-digit `_xNNNN` in a point id. The token is not a composition
+# field: Tsaplin encodes x_SiO2, Yamaguchi encodes x_Na2O. Consumers must
+# read composition_wt_pct / published_mole_fraction on the point.
+_ID_ENCODED_XTOKEN = re.compile(r"_x\d{3,}(?:_|$)")
+
+
+def id_encodes_composition_token(point_id: str) -> bool:
+    return bool(_ID_ENCODED_XTOKEN.search(str(point_id)))
+
+
+def missing_explicit_composition_fields(
+    point: Mapping[str, Any],
+) -> tuple[str, ...]:
+    missing: list[str] = []
+    wt = point.get("composition_wt_pct")
+    if not isinstance(wt, Mapping) or not wt:
+        missing.append("composition_wt_pct")
+    mole_fraction = point.get("published_mole_fraction")
+    if not isinstance(mole_fraction, Mapping) or not mole_fraction:
+        missing.append("published_mole_fraction")
+    return tuple(missing)
+
+
+def assert_xtoken_points_carry_explicit_composition(
+    points: Sequence[Mapping[str, Any]],
+) -> None:
+    """Refuse points that bury composition only in an `_xNNNN` identifier."""
+    offenders: list[str] = []
+    for point in points:
+        point_id = str(point.get("id", ""))
+        if not id_encodes_composition_token(point_id):
+            continue
+        missing = missing_explicit_composition_fields(point)
+        if missing:
+            offenders.append(f"{point_id} missing {', '.join(missing)}")
+    if offenders:
+        raise ValueError(
+            "melt-activity bench point encodes composition only in its id; "
+            "carry composition_wt_pct and published_mole_fraction on the "
+            f"point (t-691): {'; '.join(offenders)}"
+        )
+
+
+def composition_wt_pct_for_point(
+    point: Mapping[str, Any],
+    compositions: Mapping[str, Any],
+) -> dict[str, float]:
+    """Prefer the point's explicit wt% vector; never parse the point id."""
+    inline = point.get("composition_wt_pct")
+    if isinstance(inline, Mapping) and inline:
+        return _normalize_wt(inline)
+    composition_id = str(point["composition_id"])
+    return _normalize_wt(compositions[composition_id]["composition_wt_pct"])
+
+
 def load_bench_set(path: Path) -> dict[str, Any]:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or data.get("schema_version") != "melt-activity-bench.v1":
         raise ValueError(f"unsupported melt activity bench set: {path}")
     if not data.get("compositions") or not data.get("points"):
         raise ValueError(f"bench set lacks compositions or points: {path}")
+    assert_xtoken_points_carry_explicit_composition(data["points"])
     return data
 
 
@@ -1083,7 +1140,7 @@ def run_points(
     rows: list[dict[str, Any]] = []
     for point in fixture["points"]:
         composition_id = str(point["composition_id"])
-        composition = _normalize_wt(compositions[composition_id]["composition_wt_pct"])
+        composition = composition_wt_pct_for_point(point, compositions)
         temperature_K = float(point["temperature_K"])
         activity_observable = str(point["observable"]) in {
             "activity",
@@ -2107,9 +2164,7 @@ def measure_isolated_thermoengine_points(
     restarts = 0
     for point in points:
         composition_id = str(point["composition_id"])
-        composition = _normalize_wt(
-            compositions[composition_id]["composition_wt_pct"]
-        )
+        composition = composition_wt_pct_for_point(point, compositions)
         temperature_K = float(point["temperature_K"])
         activity_observable = str(point["observable"]) in {
             "activity",
