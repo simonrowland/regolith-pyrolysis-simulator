@@ -7,6 +7,7 @@ import warnings
 
 from engines.alphamelts.thermoengine import (
     THERMOENGINE_WARM_CALL_TIMEOUT_S,
+    ThermoEngineFO2OmittedError,
     ThermoEngineFO2UndefinedError,
     ThermoEngineNonFiniteField,
     ThermoEngineTransport,
@@ -287,10 +288,17 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 and payload.solved_fO2_reason
                 != 'undefined_zero_ferric_liquid'
             ):
-                raise RuntimeError(
+                # Row-local: the child already returned a payload. A
+                # failed MELTS search (empty assemblage) and an
+                # unexplained missing echo are both refusals of this
+                # row, not evidence the adapter is gone.
+                detail = (
                     'ThermoEngine equilibrium omitted solved fO2 without a '
                     'typed proven-undefined reason'
                 )
+                if payload.warnings:
+                    detail = f'{detail}: {"; ".join(payload.warnings)}'
+                raise ThermoEngineFO2OmittedError(detail)
             if fO2_log is not None:
                 if solved_fO2_log is None:
                     raise RuntimeError(
@@ -412,14 +420,20 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             EngineWorkerTimeout,
             ThermoEngineNonFiniteField,
             ThermoEngineFO2UndefinedError,
+            ThermoEngineFO2OmittedError,
         ):
             # TYPED keep-handle. Complete set:
-            #   EngineWorkerTimeout          — pool already evicted the child
-            #   ThermoEngineNonFiniteField   — row-local NaN/Inf field
+            #   EngineWorkerTimeout           — pool already evicted the child
+            #   ThermoEngineNonFiniteField    — row-local NaN/Inf field
             #   ThermoEngineFO2UndefinedError — zero-ferric Kress91 echo
-            # Both NonFinite and FO2Undefined are ValueError subclasses:
-            # do not add `except ValueError` on this path. The child may
-            # already be dead; the parent transport handle stays.
+            #   ThermoEngineFO2OmittedError   — payload omitted fO2 with
+            #                                   no typed proven-undefined
+            #                                   reason (failed assemblage
+            #                                   or unexplained missing echo)
+            # NonFinite, FO2Undefined, and FO2Omitted are ValueError
+            # subclasses: do not add `except ValueError` on this path.
+            # The child may already be dead; the parent transport
+            # handle stays.
             raise
         except ImportError as exc:
             # Genuine adapter death. Close is correct.
@@ -428,10 +442,11 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         except Exception as exc:
             # UNTYPED close. Sequential mode may still latch here
             # (builtin TimeoutError remap, remapped ValueError, unknown
-            # child exc_name → RuntimeError, parent-side RuntimeError,
-            # ThermoEngineIsolationError). Isolated retry remains
-            # required. Isolated-mode ceilings (e.g. 12→32) are not a
-            # sequential result of the typed keep-handle.
+            # child exc_name → RuntimeError, parent-side RuntimeError
+            # other than FO2Omitted, ThermoEngineIsolationError).
+            # Isolated retry remains required. Isolated-mode ceilings
+            # (e.g. 12→32) are not a sequential result of the typed
+            # keep-handle.
             self._close_after_failure(exc)
             raise RuntimeError(
                 f'ThermoEngine equilibrium failed: {exc}'
@@ -440,6 +455,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
 
 __all__ = [
     'ThermoEngineBackend',
+    'ThermoEngineFO2OmittedError',
     'ThermoEngineFO2UndefinedError',
     'ThermoEngineNonFiniteField',
 ]

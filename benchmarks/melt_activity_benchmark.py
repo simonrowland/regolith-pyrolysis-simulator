@@ -54,7 +54,8 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.regeneration_guard import (
     RegenerationShrinkageError,
-    regeneration_guard,
+    assert_no_silent_artifact_loss,
+    verify_planned_artifacts_written,
 )
 
 DEFAULT_BENCH_SET = REPO_ROOT / "data/melt_activity/basalt-bench-set-v1.yaml"
@@ -69,7 +70,7 @@ DEFAULT_ENGINES = (
 )
 # Rail-owned MELTS SiO2 trust window. Default matches the historical
 # engine-imposed [30, 80] so coverage goldens stay put. This is not the
-# adapter's two-component alkali-silica crash guard.
+# adapter's Fe-free + imposed-absolute-fO2 crash guard.
 DEFAULT_MELTS_SILICATE_NETWORK_BAND_WT_PCT = (30.0, 80.0)
 VAPOROCK_PRESSURE_OBSERVABLES = frozenset({"partial_pressure", "evaporation_flux"})
 SF04_ANCHOR_SPECIES = ("SiO2", "FeO", "Fe", "Mg", "SiO", "K", "Na", "O2")
@@ -90,6 +91,22 @@ POINT_STATUSES = frozenset(
     }
 )
 COVERAGE_PRESSURE_FAMILIES = frozenset({"partial_pressure", "evaporation_flux"})
+# Status that means "this engine was absent / uninstalled / not supported".
+# Reason text is never consulted: that is the t-681 detector class.
+ENGINE_ABSENCE_STATUSES = frozenset({"unavailable"})
+ALPHAMELTS_ACTIVITY_CAPABILITY_LIMITATION = (
+    "transport_exposes_no_activity_observable"
+)
+ALPHAMELTS_ACTIVITY_CAPABILITY_REASON = (
+    "alphaMELTS 2.3.1 subprocess transport exposes no activity observable "
+    "(binary menu option returns 'Sorry, option not yet implemented'); "
+    "this is an upstream capability gap at every composition, not a "
+    "per-point domain verdict"
+)
+
+
+class EngineSelfContradictionError(RuntimeError):
+    """An engine both answered ok and claimed it was absent in one run."""
 
 
 @dataclass(frozen=True)
@@ -259,6 +276,7 @@ def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
     prose coupling one layer up.
     """
     from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2OmittedError,
         ThermoEngineFO2UndefinedError,
         ThermoEngineNonFiniteField,
     )
@@ -266,6 +284,7 @@ def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
 
     return (
         EngineWorkerTimeout,
+        ThermoEngineFO2OmittedError,
         ThermoEngineFO2UndefinedError,
         ThermoEngineNonFiniteField,
     )
@@ -551,10 +570,38 @@ class InternalAnalyticalEngine:
         return self.evaluate(composition_wt_pct, temperature_K, 1.0e-9)
 
 
+def alphamelts_activity_capability_refusal() -> EngineResult:
+    """Single typed refusal for the subprocess activity-channel gap.
+
+    alphaMELTS 2.3.1 can complete equilibrium and still emit an empty
+    activities map; the binary menu option that would expose an activity
+    column returns "Sorry, option not yet implemented". One capability
+    fact, not 110 composition verdicts.
+    """
+
+    return EngineResult(
+        status="observable_unavailable",
+        reason=ALPHAMELTS_ACTIVITY_CAPABILITY_REASON,
+        details={
+            "capability_refusal": True,
+            "capability": "melt_activity",
+            "limitation": ALPHAMELTS_ACTIVITY_CAPABILITY_LIMITATION,
+            "scope": "all_compositions",
+            "engine_version": "2.3.1",
+            "observable_supported": False,
+            "observable_family": "activity",
+            "finite_prediction": False,
+        },
+    )
+
+
 class AlphaMeltsEngine:
     """AlphaMELTS diagnostic provider with typed subprocess failure capture."""
 
     name = "alphamelts"
+    # Subprocess transport has no activity observable (ITEM 2). The
+    # in-process ThermoEngine subclass flips this.
+    activity_observable_supported = False
 
     def __init__(
         self,
@@ -597,6 +644,8 @@ class AlphaMeltsEngine:
         temperature_K: float,
         fO2_bar: float | None,
     ) -> EngineResult:
+        if not self.activity_observable_supported:
+            return alphamelts_activity_capability_refusal()
         provider = self._initialize()
         if provider is None:
             return EngineResult(status="unavailable", reason=self._initialization_error)
@@ -739,6 +788,7 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
     """In-process ThermoEngine MELTS diagnostic with intrinsic-fO2 support."""
 
     name = "thermoengine"
+    activity_observable_supported = True
 
     def transport_close_count(self) -> int:
         """How many times this instance tore down a live transport."""
@@ -773,6 +823,23 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
         except Exception as exc:
             self._initialization_error = _reason_line(exc)
         return self._provider
+
+    def coverage(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        temperature_K: float,
+    ) -> EngineResult:
+        del composition_wt_pct, temperature_K
+        return EngineResult(
+            status="refused",
+            reason="coverage not measured for this engine",
+            details={
+                "not_measured": True,
+                "reason_code": "coverage_not_measured_for_this_engine",
+                "observable_family": "not_measured",
+                "finite_prediction": False,
+            },
+        )
 
 
 class VapoRockEngine:
@@ -1751,50 +1818,68 @@ def summarize_metrics(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]
 def summarize_paired_decisions(
     rows: Sequence[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Compare IMCC and internal analytical errors on identical scored points."""
+    """Compare every engine pair with both-ok residuals on the same point.
 
-    internal = {
-        str(row["point_id"]): row
-        for row in rows
-        if row["engine"] == "internal_analytic"
-        and row.get("residual_dex") is not None
-    }
-    groups: dict[tuple[str, str, str], list[tuple[float, float]]] = defaultdict(list)
+    Low-n pairs stay in the table. Suppressing a verdict because n is
+    small is silent suppression of disagreement.
+    """
+
+    residuals_by_point_engine: dict[tuple[str, str], list[float]] = defaultdict(
+        list
+    )
+    meta_by_point: dict[str, tuple[str, str]] = {}
+    engines_by_point: dict[str, set[str]] = defaultdict(set)
     for row in rows:
-        engine = str(row["engine"])
-        paired = internal.get(str(row["point_id"]))
-        if (
-            not engine.startswith("imcc-")
-            or paired is None
-            or row.get("residual_dex") is None
-        ):
+        if row.get("residual_dex") is None:
             continue
-        groups[(str(row["species"]), str(row["observable"]), engine)].append(
-            (float(row["residual_dex"]), float(paired["residual_dex"]))
+        point_id = str(row["point_id"])
+        engine = str(row["engine"])
+        residuals_by_point_engine[(point_id, engine)].append(
+            float(row["residual_dex"])
         )
+        engines_by_point[point_id].add(engine)
+        meta_by_point[point_id] = (str(row["species"]), str(row["observable"]))
+    groups: dict[tuple[str, str, str, str], list[tuple[float, float]]] = (
+        defaultdict(list)
+    )
+    for point_id, engines in engines_by_point.items():
+        species, observable = meta_by_point[point_id]
+        ordered = sorted(engines)
+        for index, engine_a in enumerate(ordered):
+            for engine_b in ordered[index + 1 :]:
+                for residual_a in residuals_by_point_engine[(point_id, engine_a)]:
+                    for residual_b in residuals_by_point_engine[
+                        (point_id, engine_b)
+                    ]:
+                        groups[(species, observable, engine_a, engine_b)].append(
+                            (residual_a, residual_b)
+                        )
     decisions: list[dict[str, Any]] = []
-    for (species, observable, engine), residual_pairs in sorted(groups.items()):
-        imcc_rmse = _rmse(pair[0] for pair in residual_pairs)
-        internal_rmse = _rmse(pair[1] for pair in residual_pairs)
-        assert imcc_rmse is not None and internal_rmse is not None
-        if math.isclose(imcc_rmse, internal_rmse, rel_tol=0.0, abs_tol=1.0e-12):
+    for (species, observable, engine_a, engine_b), residual_pairs in sorted(
+        groups.items()
+    ):
+        rmse_a = _rmse(pair[0] for pair in residual_pairs)
+        rmse_b = _rmse(pair[1] for pair in residual_pairs)
+        assert rmse_a is not None and rmse_b is not None
+        if math.isclose(rmse_a, rmse_b, rel_tol=0.0, abs_tol=1.0e-12):
             decision = "tie"
-        elif imcc_rmse < internal_rmse:
-            decision = engine
+        elif rmse_a < rmse_b:
+            decision = engine_a
         else:
-            decision = "internal_analytic"
+            decision = engine_b
         decisions.append(
             {
                 "species": species,
                 "observable": observable,
-                "imcc_engine": engine,
+                "engine_a": engine_a,
+                "engine_b": engine_b,
                 "paired_count": len(residual_pairs),
-                "imcc_rmse_dex": imcc_rmse,
-                "internal_analytic_rmse_dex": internal_rmse,
-                "imcc_closer_point_count": sum(
+                "engine_a_rmse_dex": rmse_a,
+                "engine_b_rmse_dex": rmse_b,
+                "engine_a_closer_point_count": sum(
                     abs(pair[0]) < abs(pair[1]) for pair in residual_pairs
                 ),
-                "internal_analytic_closer_point_count": sum(
+                "engine_b_closer_point_count": sum(
                     abs(pair[1]) < abs(pair[0]) for pair in residual_pairs
                 ),
                 "tie_point_count": sum(
@@ -1811,28 +1896,40 @@ def summarize_paired_decisions(
 
 def _paired_verdict(decisions: Sequence[Mapping[str, Any]]) -> str:
     if not decisions:
-        return "No convention-valid measured point was produced by both engine families."
+        return (
+            "No convention-valid measured point was produced by both engines "
+            "on the same point."
+        )
     clauses: list[str] = []
-    for engine in sorted({str(row["imcc_engine"]) for row in decisions}):
-        group = [row for row in decisions if row["imcc_engine"] == engine]
-        imcc_wins = sum(row["decision"] == engine for row in group)
-        internal_wins = sum(row["decision"] == "internal_analytic" for row in group)
+    pairs = sorted(
+        {(str(row["engine_a"]), str(row["engine_b"])) for row in decisions}
+    )
+    for engine_a, engine_b in pairs:
+        group = [
+            row
+            for row in decisions
+            if row["engine_a"] == engine_a and row["engine_b"] == engine_b
+        ]
+        a_wins = sum(row["decision"] == engine_a for row in group)
+        b_wins = sum(row["decision"] == engine_b for row in group)
         ties = sum(row["decision"] == "tie" for row in group)
-        if imcc_wins and internal_wins:
+        ns = [int(row["paired_count"]) for row in group]
+        n_text = ",".join(str(n) for n in ns)
+        if a_wins and b_wins:
             verdict = "mixed by species/observable"
-        elif imcc_wins and ties:
-            verdict = "IMCC better or tied on every comparable group"
-        elif imcc_wins:
-            verdict = "IMCC better on every comparable group"
-        elif internal_wins and ties:
-            verdict = "internal_analytic better or tied on every comparable group"
-        elif internal_wins:
-            verdict = "internal_analytic better on every comparable group"
+        elif a_wins and ties:
+            verdict = f"{engine_a} better or tied on every comparable group"
+        elif a_wins:
+            verdict = f"{engine_a} better on every comparable group"
+        elif b_wins and ties:
+            verdict = f"{engine_b} better or tied on every comparable group"
+        elif b_wins:
+            verdict = f"{engine_b} better on every comparable group"
         else:
             verdict = "tied on every comparable group"
         clauses.append(
-            f"`{engine}`: {verdict} ({imcc_wins} IMCC, "
-            f"{internal_wins} internal, {ties} tied)"
+            f"`{engine_a}` vs `{engine_b}`: {verdict} "
+            f"({a_wins} {engine_a}, {b_wins} {engine_b}, {ties} tied; n={n_text})"
         )
     return "; ".join(clauses) + "."
 
@@ -1882,11 +1979,11 @@ def engines_with_ok_and_adapter_unavailable(
 ) -> tuple[str, ...]:
     """Engines that both answered ok and reported themselves unavailable.
 
-    Structural run-level guard (t-683, pulled forward): an engine that
-    produced at least one ``ok`` row cannot also report
-    ``status=unavailable`` in the same run without contradicting itself.
-    Reason text is not consulted, so editing unavailable prose cannot
-    blind this predicate.
+    Structural run-level guard: an engine that produced at least one
+    ``ok`` row cannot also report ``status=unavailable`` in the same run
+    without contradicting itself. Reason text is not consulted, so
+    editing unavailable / absent / uninstalled / not-supported prose
+    cannot blind this predicate.
     """
     flags: dict[str, set[str]] = defaultdict(set)
     for row in rows:
@@ -1896,7 +1993,7 @@ def engines_with_ok_and_adapter_unavailable(
         status = str(row.get("status") or "")
         if status == "ok":
             flags[engine].add("ok")
-        elif status == "unavailable":
+        elif status in ENGINE_ABSENCE_STATUSES:
             flags[engine].add("unavailable")
     return tuple(
         sorted(
@@ -1904,6 +2001,69 @@ def engines_with_ok_and_adapter_unavailable(
             for engine, seen in flags.items()
             if seen >= {"ok", "unavailable"}
         )
+    )
+
+
+def _flatten_engine_status_rows(
+    point_rows: Sequence[Mapping[str, Any]] = (),
+    probe_rows: Sequence[Mapping[str, Any]] = (),
+    coverage_rows: Sequence[Mapping[str, Any]] = (),
+) -> list[dict[str, str]]:
+    """Point, probe, and coverage statuses as a uniform (engine, status) list."""
+
+    flattened: list[dict[str, str]] = []
+    for row in (*point_rows, *probe_rows):
+        engine = str(row.get("engine") or "")
+        if engine:
+            flattened.append({"engine": engine, "status": str(row.get("status") or "")})
+    for row in coverage_rows:
+        for key, value in row.items():
+            if key.endswith("_status"):
+                flattened.append(
+                    {
+                        "engine": str(key[: -len("_status")]),
+                        "status": str(value or ""),
+                    }
+                )
+    return flattened
+
+
+def detect_run_self_contradiction(
+    point_rows: Sequence[Mapping[str, Any]] = (),
+    probe_rows: Sequence[Mapping[str, Any]] = (),
+    coverage_rows: Sequence[Mapping[str, Any]] = (),
+) -> tuple[str, ...]:
+    """Engines that are both ok and absent anywhere in this run."""
+
+    return engines_with_ok_and_adapter_unavailable(
+        _flatten_engine_status_rows(point_rows, probe_rows, coverage_rows)
+    )
+
+
+def assert_run_not_self_contradictory(
+    point_rows: Sequence[Mapping[str, Any]] = (),
+    probe_rows: Sequence[Mapping[str, Any]] = (),
+    coverage_rows: Sequence[Mapping[str, Any]] = (),
+) -> None:
+    """Fail loudly when an engine both answered and claimed it was absent.
+
+    A typed diagnostic-only path can be skipped by a reader who opens
+    only the CSV. A process failure cannot. Status=unavailable is the
+    harness token for absent / uninstalled / not supported; this does
+    not inspect reason strings.
+    """
+
+    engines = detect_run_self_contradiction(
+        point_rows, probe_rows, coverage_rows
+    )
+    if not engines:
+        return
+    raise EngineSelfContradictionError(
+        "engine self-contradiction: "
+        + ", ".join(engines)
+        + " produced at least one ok row and also claimed "
+        "absent/unavailable/uninstalled/not-supported "
+        "(status=unavailable) in the same run"
     )
 
 
@@ -1947,8 +2107,9 @@ def detect_thermoengine_adapter_latch(
        least one ``status=unavailable``).
 
     Reason text is never consulted. Sequential keep-handle is typed for
-    ``EngineWorkerTimeout``, ``ThermoEngineNonFiniteField``, and
-    ``ThermoEngineFO2UndefinedError`` only. Other close causes still
+    ``EngineWorkerTimeout``, ``ThermoEngineNonFiniteField``,
+    ``ThermoEngineFO2UndefinedError``, and
+    ``ThermoEngineFO2OmittedError`` only. Other close causes still
     latch the one-process adapter. Isolated retry remains required; any
     combined sequential+isolated count is an isolated-mode ceiling, not
     a sequential-mode result of the typed keep-handle.
@@ -2186,11 +2347,31 @@ def generate_report(
         if key.endswith("_status")
     }
     present_engines = point_engines | probe_engines | coverage_engines
+    contradiction = detect_run_self_contradiction(
+        point_rows, probe_rows, coverage_rows
+    )
     lines = [
         "# Melt-activity benchmark report",
         "",
-        "## Evidence boundary",
-        "",
+    ]
+    if contradiction:
+        listed = ", ".join(f"`{name}`" for name in contradiction)
+        lines.extend(
+            [
+                "## RUN INVALID: engine self-contradiction",
+                "",
+                f"{listed} produced at least one `ok` row and also claimed "
+                "absent/unavailable/uninstalled/not-supported "
+                "(`status=unavailable`) in this run. That is contradictory "
+                "by construction. Do not read any table below as an "
+                "engine-presence or engine-absence fact for those engines.",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "## Evidence boundary",
+            "",
         f"Literal SF04 basalt empirical points: **{fixture['provenance']['literal_basalt_empirical_point_count']}**. "
         "The scored experimental population is six Hastie-1981 KEMS gas-pressure "
         "points, six Richter-2007 Type-B CAI-like CMAS gamma targets, 12 "
@@ -2205,7 +2386,8 @@ def generate_report(
         "",
         "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | observable unavailable | unavailable |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
-    ]
+        ]
+    )
     activity_metrics = []
     vaporock_pressure_metrics = []
     for row in metrics:
@@ -2234,20 +2416,22 @@ def generate_report(
     lines.extend(
         [
             "",
-            "## IMCC versus internal_analytic decision column",
+            "## Paired engine decisions",
             "",
-            "Only identical, convention-valid scored measurements produced by both engines enter this paired comparison.",
+            "Every pair of engines with both-ok residuals on the same scored "
+            "point enters this comparison. Low-n verdicts are annotated in "
+            "the verdict sentence, not suppressed.",
             "",
-            "| Species | Observable | IMCC engine | Paired n | IMCC RMSE (dex) | internal_analytic RMSE (dex) | IMCC closer points | internal closer points | ties | Decision |",
-            "|---|---|---|---:|---:|---:|---:|---:|---:|---|",
+            "| Species | Observable | Engine A | Engine B | Paired n | A RMSE (dex) | B RMSE (dex) | A closer | B closer | ties | Decision |",
+            "|---|---|---|---|---:|---:|---:|---:|---:|---:|---|",
         ]
     )
     for row in paired_decisions:
         lines.append(
-            "| {species} | {observable} | {imcc_engine} | {paired_count} | {imcc} | {internal} | {imcc_closer_point_count} | {internal_analytic_closer_point_count} | {tie_point_count} | {decision} |".format(
+            "| {species} | {observable} | {engine_a} | {engine_b} | {paired_count} | {rmse_a} | {rmse_b} | {engine_a_closer_point_count} | {engine_b_closer_point_count} | {tie_point_count} | {decision} |".format(
                 **row,
-                imcc=_fmt(row["imcc_rmse_dex"]),
-                internal=_fmt(row["internal_analytic_rmse_dex"]),
+                rmse_a=_fmt(row["engine_a_rmse_dex"]),
+                rmse_b=_fmt(row["engine_b_rmse_dex"]),
             )
         )
     lines.extend(["", f"Decision verdict: {_paired_verdict(paired_decisions)}"])
@@ -2448,8 +2632,9 @@ def generate_report(
                     "plus isolated latched-point usable. That combined figure "
                     "is an isolated-mode ceiling, not a sequential-mode result: "
                     "sequential keep-handle is typed for EngineWorkerTimeout, "
-                    "ThermoEngineNonFiniteField, and "
-                    "ThermoEngineFO2UndefinedError only; other close causes "
+                    "ThermoEngineNonFiniteField, "
+                    "ThermoEngineFO2UndefinedError, and "
+                    "ThermoEngineFO2OmittedError only; other close causes "
                     "still latch, so isolated retry remains required."
                 )
             else:
@@ -2486,12 +2671,15 @@ def generate_report(
             f"below 30 wt% SiO2, {len(low_silica) - low_refused}/{len(low_silica)} accepted "
             f"and {low_refused}/{len(low_silica)} refused/unavailable."
         )
-    if "thermoengine" in coverage_engines:
+    if any(
+        row.get("thermoengine_reason") == "coverage not measured for this engine"
+        for row in coverage_rows
+    ):
         lines.append(
-            "ThermoEngine coverage rows are AlphaMELTSDomainGate assessments "
-            "and do not call the ThermoEngine transport. A mid-run transport "
-            "close is therefore not visible in this table and is not "
-            "isolated-retried here."
+            "ThermoEngine coverage cells are explicitly "
+            "`coverage not measured for this engine`. They do not call the "
+            "ThermoEngine transport and they do not reuse the AlphaMELTS "
+            "domain gate."
         )
     alpha_rows = [row for row in coverage_rows if "alphamelts_status" in row]
     if alpha_rows:
@@ -2604,7 +2792,11 @@ def generate_report(
         )
     if "alphamelts" in present_engines:
         lines.append(
-            "- Where AlphaMELTS provides no canonical oxide activity or crashes, that is recorded as a first-class result; it is never replaced by a fallback model."
+            "- AlphaMELTS 2.3.1 subprocess transport exposes no activity "
+            "observable. Every activity point is the same typed capability "
+            "refusal (`transport_exposes_no_activity_observable`), not a "
+            "per-composition domain verdict. It is never replaced by a "
+            "fallback model."
         )
     lines.append("")
     return "\n".join(lines)
@@ -2660,157 +2852,167 @@ def run_benchmark(
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     planned_names = _planned_artifact_names(mode, live_vaporock_anchor_check)
-    # The context-manager form runs BOTH halves: the pre-write shrink check
-    # on entry and the wrote-what-you-planned check on exit. Calling the two
-    # halves by hand is what this call site used to do, and the post-check is
-    # the half that is easy to drop in a later edit -- dropping it restores
-    # the exact b-200 hole the guard exists to close. `with` cannot be
-    # half-used, so the sequencing is structural here rather than remembered.
-    with regeneration_guard(
+    guard = assert_no_silent_artifact_loss(
         output_dir,
         planned_names,
         managed=GENERATED_ARTIFACT_NAMES,
         retired=retired_artifacts,
-    ) as guard:
-        # The guard's entry check cannot see a planned-but-unwritten artifact --
-        # `planned` passes it by construction. Every planned name is unlinked
-        # below, and several writes downstream are CONDITIONAL (the live-vaporock
-        # CSV writes only when its row list is non-empty), so a false condition
-        # would delete the previous copy and report success. The guard's EXIT
-        # check, on leaving this `with`, is what closes that.
-        for name in planned_names | set(retired_artifacts):
-            (output_dir / name).unlink(missing_ok=True)
-        point_rows: list[dict[str, Any]] = []
-        probe_rows: list[dict[str, Any]] = []
-        coverage_rows: list[dict[str, Any]] = []
-        reference_rows: list[dict[str, Any]] = []
-        live_vaporock_rows: list[dict[str, Any]] = []
-        extrapolated_rows: list[dict[str, Any]] = []
-        paired_decisions: list[dict[str, Any]] = []
-        probe_engines: list[Any] = []
-        if mode in {"benchmark", "all"}:
-            point_rows = run_points(fixture, engines)
-            # Additive second IMCC pass. Strict point_rows stay untouched.
-            extrapolated_rows = run_imcc_extrapolated_points(fixture, engines)
-            # Fresh instances so a row-local point failure cannot poison probes.
-            # Makes the probe table askable; not a claim those probes score.
-            probe_engines = build_engines(
-                engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
-            )
-            probe_rows = run_composition_probes(fixture, probe_engines)
-            reference_rows = run_reference_anchors(fixture)
-            if live_vaporock_anchor_check:
-                live_vaporock_rows = run_live_vaporock_anchor_check(
-                    fixture, reference_rows
-                )
-            _write_csv(output_dir / "benchmark-results.csv", point_rows)
-            paired_decisions = summarize_paired_decisions(point_rows)
-            _write_csv(output_dir / "paired-decisions.csv", paired_decisions)
-            _write_csv(output_dir / "composition-probes.csv", probe_rows)
-            _write_csv(output_dir / "reference-anchor-results.csv", reference_rows)
-            if live_vaporock_rows:
-                _write_csv(output_dir / "live-vaporock-check.csv", live_vaporock_rows)
-        if mode in {"coverage", "all"}:
-            coverage_rows = run_coverage_map(fixture, engines, coverage_steps)
-            _write_csv(output_dir / "coverage-map.csv", coverage_rows)
-        shutil.copyfile(bench_set_path, output_dir / "bench-set.yaml")
-        latch = detect_thermoengine_adapter_latch(
-            point_rows,
-            transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
-                engines
-            ),
+    )
+    # The pre-write check above cannot see a planned-but-unwritten artifact --
+    # `planned` passes it by construction. Every planned name is unlinked
+    # below, and several writes downstream are CONDITIONAL (the live-vaporock
+    # CSV writes only when its row list is non-empty), so a false condition
+    # would delete the previous copy and report success. The post-run check at
+    # the end of this function is what closes that.
+    for name in planned_names | set(retired_artifacts):
+        (output_dir / name).unlink(missing_ok=True)
+    point_rows: list[dict[str, Any]] = []
+    probe_rows: list[dict[str, Any]] = []
+    coverage_rows: list[dict[str, Any]] = []
+    reference_rows: list[dict[str, Any]] = []
+    live_vaporock_rows: list[dict[str, Any]] = []
+    extrapolated_rows: list[dict[str, Any]] = []
+    paired_decisions: list[dict[str, Any]] = []
+    probe_engines: list[Any] = []
+    if mode in {"benchmark", "all"}:
+        point_rows = run_points(fixture, engines)
+        # Additive second IMCC pass. Strict point_rows stay untouched.
+        extrapolated_rows = run_imcc_extrapolated_points(fixture, engines)
+        # Fresh instances so a row-local point failure cannot poison probes.
+        # Makes the probe table askable; not a claim those probes score.
+        probe_engines = build_engines(
+            engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
         )
-        probe_latch = detect_thermoengine_adapter_latch(
-            probe_rows,
-            transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
-                probe_engines
-            ),
-        )
-        if latch:
-            isolated = measure_isolated_thermoengine_points(
-                fixture,
-                latch["latched_point_ids"],
-                timeout_s=alphamelts_timeout_s,
+        probe_rows = run_composition_probes(fixture, probe_engines)
+        reference_rows = run_reference_anchors(fixture)
+        if live_vaporock_anchor_check:
+            live_vaporock_rows = run_live_vaporock_anchor_check(
+                fixture, reference_rows
             )
-            latch = {
-                **latch,
-                "isolated_usable": isolated["usable"],
-                "isolated_total": isolated["total"],
-                "isolated_yamaguchi_usable": isolated["yamaguchi_usable"],
-                "isolated_yamaguchi_total": isolated["yamaguchi_total"],
-                "isolated_status_counts": isolated["status_counts"],
-                "isolated_restarts": isolated["restarts"],
-                "true_usable": latch["sequential_usable"] + isolated["usable"],
-                "true_total": latch["sequential_total"],
-            }
-            # Isolated row details stay out of the sequential CSV. Status
-            # counts are enough for the published claim; dropping per-point
-            # isolated rows keeps run-metadata.json a run record, not a
-            # second results table.
-            latch.pop("latched_point_ids", None)
-        metadata = {
-            "schema_version": "melt-activity-benchmark-run.v1",
-            "bench_set": (
-                str(bench_set_path.relative_to(REPO_ROOT))
-                if bench_set_path.is_relative_to(REPO_ROOT)
-                else str(bench_set_path)
-            ),
-            "bench_set_sha256": _sha256(bench_set_path),
-            "produced_at_git_head": _git_head(),
-            "engines": list(engine_names),
-            "mode": mode,
-            "point_status_counts": dict(sorted(Counter(row["status"] for row in point_rows).items())),
-            "probe_status_counts": dict(sorted(Counter(row["status"] for row in probe_rows).items())),
-            "coverage_row_count": len(coverage_rows),
-            "rump_coverage": summarize_rump_coverage(coverage_rows),
-            "paired_decisions": paired_decisions,
-            "reference_anchor": (
-                summarize_reference_anchors(fixture, reference_rows)
-                if reference_rows
-                else None
-            ),
-            "live_vaporock_anchor_check": {
-                "requested": live_vaporock_anchor_check,
-                "row_count": len(live_vaporock_rows),
-                "status_counts": dict(
-                    sorted(Counter(row["status"] for row in live_vaporock_rows).items())
-                ),
-            },
-            "thermoengine_adapter_latch": latch,
-            "thermoengine_probe_latch": probe_latch,
-            "imcc_extrapolated_tier": {
-                "row_count": len(extrapolated_rows),
-                "envelope_counts": dict(
-                    sorted(Counter(str(row.get("envelope_status")) for row in extrapolated_rows).items())
-                ),
-                "extrapolated_true_count": sum(
-                    bool(row.get("extrapolated")) for row in extrapolated_rows
-                ),
-            },
-            "artifact_guard": {
-                "planned": sorted(guard.planned),
-                "retired": sorted(str(name) for name in retired_artifacts),
-                "retired_removed": sorted(guard.retired_removed),
-            },
+        _write_csv(output_dir / "benchmark-results.csv", point_rows)
+        paired_decisions = summarize_paired_decisions(point_rows)
+        _write_csv(output_dir / "paired-decisions.csv", paired_decisions)
+        _write_csv(output_dir / "composition-probes.csv", probe_rows)
+        _write_csv(output_dir / "reference-anchor-results.csv", reference_rows)
+        if live_vaporock_rows:
+            _write_csv(output_dir / "live-vaporock-check.csv", live_vaporock_rows)
+    if mode in {"coverage", "all"}:
+        coverage_rows = run_coverage_map(fixture, engines, coverage_steps)
+        _write_csv(output_dir / "coverage-map.csv", coverage_rows)
+    shutil.copyfile(bench_set_path, output_dir / "bench-set.yaml")
+    latch = detect_thermoengine_adapter_latch(
+        point_rows,
+        transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
+            engines
+        ),
+    )
+    probe_latch = detect_thermoengine_adapter_latch(
+        probe_rows,
+        transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
+            probe_engines
+        ),
+    )
+    if latch:
+        isolated = measure_isolated_thermoengine_points(
+            fixture,
+            latch["latched_point_ids"],
+            timeout_s=alphamelts_timeout_s,
+        )
+        latch = {
+            **latch,
+            "isolated_usable": isolated["usable"],
+            "isolated_total": isolated["total"],
+            "isolated_yamaguchi_usable": isolated["yamaguchi_usable"],
+            "isolated_yamaguchi_total": isolated["yamaguchi_total"],
+            "isolated_status_counts": isolated["status_counts"],
+            "isolated_restarts": isolated["restarts"],
+            "true_usable": latch["sequential_usable"] + isolated["usable"],
+            "true_total": latch["sequential_total"],
         }
-        (output_dir / "run-metadata.json").write_text(
-            json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        # Isolated row details stay out of the sequential CSV. Status
+        # counts are enough for the published claim; dropping per-point
+        # isolated rows keeps run-metadata.json a run record, not a
+        # second results table.
+        latch.pop("latched_point_ids", None)
+    metadata = {
+        "schema_version": "melt-activity-benchmark-run.v1",
+        "bench_set": (
+            str(bench_set_path.relative_to(REPO_ROOT))
+            if bench_set_path.is_relative_to(REPO_ROOT)
+            else str(bench_set_path)
+        ),
+        "bench_set_sha256": _sha256(bench_set_path),
+        "produced_at_git_head": _git_head(),
+        "engines": list(engine_names),
+        "mode": mode,
+        "point_status_counts": dict(sorted(Counter(row["status"] for row in point_rows).items())),
+        "probe_status_counts": dict(sorted(Counter(row["status"] for row in probe_rows).items())),
+        "coverage_row_count": len(coverage_rows),
+        "rump_coverage": summarize_rump_coverage(coverage_rows),
+        "paired_decisions": paired_decisions,
+        "reference_anchor": (
+            summarize_reference_anchors(fixture, reference_rows)
+            if reference_rows
+            else None
+        ),
+        "live_vaporock_anchor_check": {
+            "requested": live_vaporock_anchor_check,
+            "row_count": len(live_vaporock_rows),
+            "status_counts": dict(
+                sorted(Counter(row["status"] for row in live_vaporock_rows).items())
+            ),
+        },
+        "thermoengine_adapter_latch": latch,
+        "thermoengine_probe_latch": probe_latch,
+        "imcc_extrapolated_tier": {
+            "row_count": len(extrapolated_rows),
+            "envelope_counts": dict(
+                sorted(Counter(str(row.get("envelope_status")) for row in extrapolated_rows).items())
+            ),
+            "extrapolated_true_count": sum(
+                bool(row.get("extrapolated")) for row in extrapolated_rows
+            ),
+        },
+        "artifact_guard": {
+            "planned": sorted(guard.planned),
+            "retired": sorted(str(name) for name in retired_artifacts),
+            "retired_removed": sorted(guard.retired_removed),
+        },
+        "engine_self_contradiction": {
+            "engines": list(
+                detect_run_self_contradiction(
+                    point_rows, probe_rows, coverage_rows
+                )
+            ),
+            "predicate": "ok_and_status_unavailable",
+        },
+    }
+    (output_dir / "run-metadata.json").write_text(
+        json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    if mode == "all":
+        (output_dir / "report.md").write_text(
+            generate_report(
+                fixture,
+                point_rows,
+                probe_rows,
+                coverage_rows,
+                reference_rows,
+                live_vaporock_rows,
+                thermoengine_latch=latch,
+                thermoengine_probe_latch=probe_latch,
+                extrapolated_rows=extrapolated_rows,
+            ),
+            encoding="utf-8",
         )
-        if mode == "all":
-            (output_dir / "report.md").write_text(
-                generate_report(
-                    fixture,
-                    point_rows,
-                    probe_rows,
-                    coverage_rows,
-                    reference_rows,
-                    live_vaporock_rows,
-                    thermoengine_latch=latch,
-                    thermoengine_probe_latch=probe_latch,
-                    extrapolated_rows=extrapolated_rows,
-                ),
-                encoding="utf-8",
-            )
+    # Every planned artifact was unlinked before the run; prove each one came
+    # back. Without this a false condition on a conditional write leaves the
+    # output set smaller than it started while the run reports success.
+    verify_planned_artifacts_written(output_dir, guard)
+    # Artifacts are on disk first so a contradictory run leaves evidence,
+    # then the process fails. A CSV-only reader can still skip a banner;
+    # a non-zero exit cannot.
+    assert_run_not_self_contradictory(point_rows, probe_rows, coverage_rows)
     return {
         "point_rows": point_rows,
         "extrapolated_rows": extrapolated_rows,
@@ -2890,6 +3092,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     except RegenerationShrinkageError as exc:
         parser.error(str(exc))
+    except EngineSelfContradictionError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
     print(
         f"wrote {args.output_dir}: {len(result['point_rows'])} point-engine rows, "
         f"{len(result['coverage_rows'])} coverage rows"

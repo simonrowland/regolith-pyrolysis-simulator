@@ -67,6 +67,7 @@ from simulator.vapour_rail.batch import (
     VapourBatch,
 )
 from engines.alphamelts.thermoengine import (
+    ThermoEngineFO2OmittedError,
     ThermoEngineFO2UndefinedError,
     ThermoEngineIsolationError,
     ThermoEngineNonFiniteField,
@@ -2909,6 +2910,69 @@ def test_thermoengine_backend_keeps_transport_after_fo2_undefined():
     assert len(calls) == 2
 
 
+def test_thermoengine_backend_keeps_transport_after_fo2_omitted():
+    """Omitted solved fO2 without a typed reason is row-local.
+
+    Red-by-revert of the FO2Omitted keep-handle arm: the untyped except
+    Exception closes the handle and the healthy composition never
+    reaches the transport.
+    """
+    calls: list[object] = []
+
+    class LatchThenHealthyTransport:
+        def equilibrate(self, **_kwargs):
+            calls.append(object())
+            if len(calls) == 1:
+                raise ThermoEngineFO2OmittedError(
+                    'ThermoEngine equilibrium omitted solved fO2 without a '
+                    'typed proven-undefined reason: ThermoEngine equilibrium '
+                    'status: failure, The linear search direction has '
+                    '*zero* length.'
+                )
+            return ThermoEnginePayload(
+                phases_present=('Liquid',),
+                phase_masses_kg={'Liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={'SiO2': 70.0, 'Al2O3': 30.0},
+                activity_coefficients={'SiO2': 0.4},
+                solved_fO2_log=None,
+                solved_fO2_reason='undefined_zero_ferric_liquid',
+            )
+
+        def close(self):
+            raise AssertionError(
+                'omitted fO2 must not close the transport handle'
+            )
+
+    backend = ThermoEngineBackend()
+    transport = LatchThenHealthyTransport()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ThermoEngineFO2OmittedError, match='omitted solved fO2'):
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            None,
+            1.0,
+        )
+    assert backend._thermoengine_transport is transport
+    assert backend._mode == 'thermoengine'
+    assert backend.is_available() is True
+    assert backend.transport_close_count() == 0
+    assert backend.unavailable_reason() == ''
+
+    result = backend._equilibrate_thermoengine(
+        1400.0,
+        {'SiO2': 70.0, 'Al2O3': 30.0},
+        None,
+        1.0,
+    )
+    assert result.status == 'ok'
+    assert backend.is_available() is True
+    assert len(calls) == 2
+
+
 def test_alphamelts_backend_rejects_thermoengine_transport_mode():
     with pytest.raises(ValueError, match='unsupported AlphaMELTS mode'):
         AlphaMELTSBackend().initialize({'mode': 'thermoengine'})
@@ -4358,6 +4422,37 @@ def test_thermoengine_transport_remaps_fo2_undefined_remote_error():
         )
 
 
+def test_thermoengine_transport_remaps_fo2_omitted_remote_error():
+    """Child ThermoEngineFO2OmittedError must survive the process boundary.
+
+    Red-by-revert of the remap dict entry: the name degrades to
+    RuntimeError and the backend then closes.
+    """
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_omitted(_kwargs):
+        raise EngineWorkerRemoteError(
+            'ThermoEngineFO2OmittedError',
+            'ThermoEngine equilibrium omitted solved fO2 without a '
+            'typed proven-undefined reason',
+            'remote-traceback',
+        )
+
+    transport._worker.call = _remote_omitted
+
+    with pytest.raises(ThermoEngineFO2OmittedError, match='omitted solved fO2'):
+        transport.equilibrate(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            comp_wt=_melts_domain_composition(),
+        )
+
+
 def test_thermoengine_transport_unrecognised_remote_name_is_runtime_error():
     from simulator.engine_pool import EngineWorkerRemoteError
 
@@ -5209,12 +5304,15 @@ def test_thermoengine_backend_rejects_untyped_missing_intrinsic_fo2():
             )
 
         def close(self):
-            return None
+            raise AssertionError(
+                'omitted fO2 must not close the transport handle'
+            )
 
-    backend._thermoengine_transport = FakeTransport()
+    transport = FakeTransport()
+    backend._thermoengine_transport = transport
 
     with pytest.raises(
-        RuntimeError,
+        ThermoEngineFO2OmittedError,
         match='omitted solved fO2 without a typed proven-undefined reason',
     ):
         backend.equilibrate(
@@ -5223,6 +5321,9 @@ def test_thermoengine_backend_rejects_untyped_missing_intrinsic_fo2():
             fO2_log=None,
             pressure_bar=1.0,
         )
+    assert backend._thermoengine_transport is transport
+    assert backend.is_available() is True
+    assert backend.transport_close_count() == 0
 
 
 def test_thermoengine_pinned_fo2_request_on_fe_free_composition_still_refuses():

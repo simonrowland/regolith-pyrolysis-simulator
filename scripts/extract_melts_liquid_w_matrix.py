@@ -34,6 +34,30 @@ EXPECTED_EDGE_COUNT = 105
 PARAM_NAME_RE = re.compile(r"^W\(\s*(.+?)\s*,\s*(.+?)\s*\)$")
 # Deterministic mix of large fitted edges and every live exact-zero edge.
 DRIFT_GUARD_SAMPLE_INDICES = (0, 1, 10, 35, 40, 59, 75, 76, 88, 89, 93, 94, 104)
+# Written into the YAML on every regeneration. Not a runtime input.
+# default_prediction_path_verified is the controller audit date, not capture time.
+SNAPSHOT_STATUS: dict[str, Any] = {
+    "role": "reference_snapshot",
+    "runtime_input": False,
+    "extractor": "scripts/extract_melts_liquid_w_matrix.py",
+    "source": "ThermoEngine",
+    "default_prediction_path_reads": False,
+    "default_prediction_path_verified": "2026-08-18",
+    "retained_for": "planned_melts_extension",
+    "expected_consumer_when": "melt_chemical_potential_drives_flux",
+    "value_origin": "thermoengine_global_phase_equilibrium_regression",
+    "per_edge_uncertainty": "none",
+    "note": (
+        "Reference snapshot extracted from ThermoEngine by "
+        "scripts/extract_melts_liquid_w_matrix.py; not a runtime input. "
+        "No code on the current default prediction path reads this file "
+        "(verified 2026-08-18). Retained for the planned MELTS-extension "
+        "path; expected to acquire a consumer when melt chemical potential "
+        "drives flux. Values are ThermoEngine regression coefficients from "
+        "a global phase-equilibrium fit, not direct measurements; no "
+        "per-edge uncertainty."
+    ),
+}
 
 
 def _package_version(name: str) -> str:
@@ -185,6 +209,7 @@ def extract_live_snapshot() -> dict[str, Any]:
         "schema_version": 1,
         "kind": "melts_liquid_w_matrix",
         "format": "yaml",
+        "status": dict(SNAPSHOT_STATUS),
         "format_reason": (
             "YAML matches data/ provenance pins and keeps the 105-edge "
             "t-647 missing-pair table human-diffable. The matrix is small; "

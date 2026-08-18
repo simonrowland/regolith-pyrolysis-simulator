@@ -56,8 +56,8 @@ _OXIDE_ALIASES.update({
 # sub-30 wt% points, in 2-4.5 s, reproduced in fresh isolated processes.
 # Alkali basalt, dunite and komatiite die at 34.0 wt%; tholeiite returns at
 # 33.96 (with no activities) and dies at 31.65. This was NOT the
-# two-component alkali-silica guard -- these are full multi-oxide rump
-# compositions, and the crash happens anyway.
+# Fe-free + imposed-absolute-fO2 guard -- these are full multi-oxide
+# Fe-bearing rump compositions, and the crash happens anyway.
 #
 # So the earlier comment here, that outside the band MELTS can still compute
 # and the rail merely distrusts it, is FALSE below the floor and has been
@@ -131,7 +131,8 @@ def _resolve_silicate_network_band(
     # Non-bypassable for an EXPLICIT band. Below the floor alphaMELTS SIGABRTs rather than
     # returning a distrusted number, so this is doctrine category (1) -- the
     # engine CANNOT compute -- not category (2) out-of-domain physics. It is
-    # the same class as the adapter's two-component SIGSEGV guard and is
+    # the same class as the adapter's Fe-free + imposed-absolute-fO2
+    # SIGSEGV guard and is
     # equally not a knob. Widening the band is a trust decision; lowering it
     # past the floor is a crash.
     # Passing the default explicitly must behave exactly like passing nothing;
