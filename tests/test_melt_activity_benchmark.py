@@ -1310,6 +1310,7 @@ def test_classify_keep_handle_is_type_not_substring():
     then treats as adapter-absence.
     """
     from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2OmittedError,
         ThermoEngineFO2UndefinedError,
         ThermoEngineNonFiniteField,
     )
@@ -1325,6 +1326,14 @@ def test_classify_keep_handle_is_type_not_substring():
         "zero-ferric liquid; finite Kress91 fO2 echo is unavailable"
     )
     status, reason = benchmark.classify_engine_exception(fo2)
+    assert status == "refused"
+    assert "unavailable" in reason.lower()
+
+    omitted = ThermoEngineFO2OmittedError(
+        "ThermoEngine equilibrium omitted solved fO2 without a "
+        "typed proven-undefined reason: adapter unavailable after close"
+    )
+    status, reason = benchmark.classify_engine_exception(omitted)
     assert status == "refused"
     assert "unavailable" in reason.lower()
 
@@ -1930,3 +1939,47 @@ def test_retyped_crash_guard_is_engine_crash_not_out_of_domain():
     produced = engine.evaluate({"SiO2": 75.0, "Na2O": 25.0}, 1400.0, 1.0e-9)
     assert produced.status == "crash"
     assert produced.status != "out_of_domain"
+
+
+def test_kume_expanded_set_completes_without_self_contradiction():
+    """Full 292-point Kume set must finish; the guard must have nothing to fire on.
+
+    Pre-fix the sequential adapter latched at s226 (parent-side omitted-fO2
+    RuntimeError, not in the keep-handle set). s226 cached as refused;
+    s227 and the remainder inherited status=unavailable after earlier ok
+    rows, and assert_run_not_self_contradictory aborted the run.
+    """
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    kume_points = [
+        point
+        for point in fixture["points"]
+        if str(point.get("composition_id") or "").startswith("kume2000_")
+    ]
+    assert len(kume_points) == 292
+    fixture = {**fixture, "points": kume_points}
+
+    engine = benchmark.ThermoEngineMeltActivityEngine(timeout_s=30.0)
+    provider = engine._initialize()
+    if provider is None:
+        pytest.skip(f"ThermoEngine unavailable: {engine._initialization_error}")
+
+    try:
+        rows = benchmark.run_points(fixture, [engine])
+        assert len(rows) == 292
+        assert engine.transport_close_count() == 0
+        benchmark.assert_run_not_self_contradictory(rows)
+        unavailable = [row for row in rows if row["status"] == "unavailable"]
+        assert unavailable == []
+        s227 = [row for row in rows if "kume2000_s227" in str(row["point_id"])]
+        assert s227
+        assert all(row["status"] != "unavailable" for row in s227)
+        # Unmapped MELTS endmembers: this fix must not invent CaO/MgO scores.
+        for oxide in ("CaO", "MgO"):
+            oxide_rows = [row for row in rows if row["parent_oxide"] == oxide]
+            assert oxide_rows
+            assert all(row.get("residual_dex") is None for row in oxide_rows)
+    finally:
+        backend = getattr(provider, "_backend", None)
+        closer = getattr(backend, "close", None)
+        if callable(closer):
+            closer()

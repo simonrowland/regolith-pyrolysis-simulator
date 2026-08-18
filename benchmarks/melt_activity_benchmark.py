@@ -276,6 +276,7 @@ def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
     prose coupling one layer up.
     """
     from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2OmittedError,
         ThermoEngineFO2UndefinedError,
         ThermoEngineNonFiniteField,
     )
@@ -283,6 +284,7 @@ def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
 
     return (
         EngineWorkerTimeout,
+        ThermoEngineFO2OmittedError,
         ThermoEngineFO2UndefinedError,
         ThermoEngineNonFiniteField,
     )
@@ -2105,8 +2107,9 @@ def detect_thermoengine_adapter_latch(
        least one ``status=unavailable``).
 
     Reason text is never consulted. Sequential keep-handle is typed for
-    ``EngineWorkerTimeout``, ``ThermoEngineNonFiniteField``, and
-    ``ThermoEngineFO2UndefinedError`` only. Other close causes still
+    ``EngineWorkerTimeout``, ``ThermoEngineNonFiniteField``,
+    ``ThermoEngineFO2UndefinedError``, and
+    ``ThermoEngineFO2OmittedError`` only. Other close causes still
     latch the one-process adapter. Isolated retry remains required; any
     combined sequential+isolated count is an isolated-mode ceiling, not
     a sequential-mode result of the typed keep-handle.
@@ -2629,8 +2632,9 @@ def generate_report(
                     "plus isolated latched-point usable. That combined figure "
                     "is an isolated-mode ceiling, not a sequential-mode result: "
                     "sequential keep-handle is typed for EngineWorkerTimeout, "
-                    "ThermoEngineNonFiniteField, and "
-                    "ThermoEngineFO2UndefinedError only; other close causes "
+                    "ThermoEngineNonFiniteField, "
+                    "ThermoEngineFO2UndefinedError, and "
+                    "ThermoEngineFO2OmittedError only; other close causes "
                     "still latch, so isolated retry remains required."
                 )
             else:

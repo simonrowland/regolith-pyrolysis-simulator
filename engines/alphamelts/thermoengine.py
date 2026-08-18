@@ -62,6 +62,15 @@ class ThermoEngineNonFiniteField(ValueError):
     """
 
 
+class ThermoEngineFO2OmittedError(ValueError):
+    """Solved fO2 was omitted without a typed proven-undefined reason.
+
+    Row-local: the child returned a payload (failed assemblage or
+    unexplained missing echo). The parent transport handle is still
+    the live adapter. Not evidence the adapter is missing.
+    """
+
+
 _FO2_ECHO_TOLERANCE = 1.0e-3
 _FO2_MONOTONIC_EPSILON = 1.0e-7
 _FO2_FRACTION_WIDTH_TOLERANCE = 1.0e-10
@@ -481,6 +490,7 @@ print('ok')
             'ValueError': ValueError,
             'ThermoEngineNonFiniteField': ThermoEngineNonFiniteField,
             'ThermoEngineFO2UndefinedError': ThermoEngineFO2UndefinedError,
+            'ThermoEngineFO2OmittedError': ThermoEngineFO2OmittedError,
         }.get(exc_name, RuntimeError)
         raise exception_type(
             f'ThermoEngine equilibrium failed: {detail}\n{child_traceback}'
@@ -1448,6 +1458,7 @@ def thermoengine_available(backend: Any) -> bool:
 
 
 __all__ = (
+    'ThermoEngineFO2OmittedError',
     'ThermoEngineFO2UndefinedError',
     'ThermoEngineNonFiniteField',
     'ThermoEnginePayload',
