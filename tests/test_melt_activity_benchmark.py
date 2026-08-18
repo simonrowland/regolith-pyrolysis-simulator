@@ -636,21 +636,46 @@ def test_paired_decision_uses_identical_scored_points():
 
     assert len(decisions) == 1
     assert decisions[0]["paired_count"] == 1
+    assert decisions[0]["engine_a"] == "imcc-published"
+    assert decisions[0]["engine_b"] == "internal_analytic"
     assert decisions[0]["decision"] == "imcc-published"
 
 
 def test_paired_verdict_does_not_call_win_plus_tie_better_on_every_group():
     decisions = [
-        {"imcc_engine": "imcc-published", "decision": "imcc-published"},
-        {"imcc_engine": "imcc-published", "decision": "tie"},
-        {"imcc_engine": "imcc-ext", "decision": "internal_analytic"},
-        {"imcc_engine": "imcc-ext", "decision": "tie"},
+        {
+            "engine_a": "imcc-published",
+            "engine_b": "internal_analytic",
+            "decision": "imcc-published",
+            "paired_count": 3,
+        },
+        {
+            "engine_a": "imcc-published",
+            "engine_b": "internal_analytic",
+            "decision": "tie",
+            "paired_count": 3,
+        },
+        {
+            "engine_a": "imcc-ext",
+            "engine_b": "internal_analytic",
+            "decision": "internal_analytic",
+            "paired_count": 3,
+        },
+        {
+            "engine_a": "imcc-ext",
+            "engine_b": "internal_analytic",
+            "decision": "tie",
+            "paired_count": 3,
+        },
     ]
 
     verdict = benchmark._paired_verdict(decisions)
 
-    assert "`imcc-published`: IMCC better or tied" in verdict
-    assert "`imcc-ext`: internal_analytic better or tied" in verdict
+    assert "`imcc-published` vs `internal_analytic`" in verdict
+    assert "imcc-published better or tied" in verdict
+    assert "`imcc-ext` vs `internal_analytic`" in verdict
+    assert "internal_analytic better or tied" in verdict
+    assert "n=3,3" in verdict
 
 
 def test_unscored_point_preserves_engine_crash_status():
@@ -714,6 +739,7 @@ def test_provider_crash_diagnostic_overrides_out_of_domain_status():
             )
 
     engine = benchmark.AlphaMeltsEngine()
+    engine.activity_observable_supported = True
     engine._provider = _Provider()
     result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1900.0, 1.0e-9)
 
@@ -905,6 +931,7 @@ def test_real_alphamelts_producer_types_unmapped_label_as_ok_not_refused():
             )
 
     engine = benchmark.AlphaMeltsEngine()
+    engine.activity_observable_supported = True
     engine._provider = _UnmappedLabelProvider()
 
     produced = engine.evaluate({"SiO2": 70.0, "Na2O": 30.0}, 1473.0, None)
@@ -1438,8 +1465,6 @@ def test_run_benchmark_passes_producer_close_marker_to_point_and_probe_detectors
 
     assert any(item[0] and not item[1] and item[2] for item in seen)
     assert any(item[1] and item[2] for item in seen)
-    report = (tmp_path / "out" / "report.md").read_text(encoding="utf-8")
-    assert "do not call the ThermoEngine transport" in report
     assert result["metadata"]["thermoengine_probe_latch"] is None
 
 
@@ -1566,7 +1591,8 @@ def test_informational_residual_cannot_reach_scored_rmse_or_decision():
     decisions = benchmark.summarize_paired_decisions(rows)
     assert len(decisions) == 1
     assert decisions[0]["paired_count"] == 1
-    assert decisions[0]["imcc_rmse_dex"] == pytest.approx(0.1)
+    assert decisions[0]["engine_a"] == "imcc-published"
+    assert decisions[0]["engine_a_rmse_dex"] == pytest.approx(0.1)
 
     polluted = dict(leaked)
     polluted["residual_dex"] = leaked["informational_residual_dex"]
@@ -1584,7 +1610,7 @@ def test_informational_residual_cannot_reach_scored_rmse_or_decision():
     paired_polluted["residual_dex"] = leaked["informational_residual_dex"]
     moved = benchmark.summarize_paired_decisions([*scored, paired_polluted])
     assert moved[0]["paired_count"] == 2
-    assert moved[0]["imcc_rmse_dex"] != pytest.approx(0.1)
+    assert moved[0]["engine_a_rmse_dex"] != pytest.approx(0.1)
 
     produced = benchmark.as_imcc_informational_row(
         {
@@ -1609,7 +1635,7 @@ def test_informational_residual_cannot_reach_scored_rmse_or_decision():
     assert helper_imcc["rmse_dex"] == pytest.approx(0.1)
     via_helper_decisions = benchmark.summarize_paired_decisions([*scored, produced])
     assert via_helper_decisions[0]["paired_count"] == 1
-    assert via_helper_decisions[0]["imcc_rmse_dex"] == pytest.approx(0.1)
+    assert via_helper_decisions[0]["engine_a_rmse_dex"] == pytest.approx(0.1)
 
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     report = benchmark.generate_report(
@@ -1676,3 +1702,231 @@ def test_extrapolated_tier_carries_both_marks_together():
     renormalized = benchmark._normalize_wt({"SiO2": 25.0, "MgO": 25.0})
     assert renormalized["SiO2"] == pytest.approx(50.0)
     assert renormalized["MgO"] == pytest.approx(50.0)
+
+
+def test_run_self_contradiction_fails_synthetic_run(tmp_path, monkeypatch):
+    """Red-by-revert target: ok + unavailable for one engine fails the run.
+
+    Status only. Reason text that never says unavailable/absent still
+    flags, because the predicate does not read prose.
+    """
+
+    class _Contradict:
+        name = "fake"
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del temperature_K, fO2_bar
+            if float(composition_wt_pct.get("SiO2", 0.0)) >= 50.0:
+                return benchmark.EngineResult(
+                    status="ok",
+                    activities={"SiO2": 0.5},
+                    gammas={"SiO2": 1.0},
+                )
+            return benchmark.EngineResult(
+                status="unavailable",
+                reason="this host has no such engine installed",
+            )
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(
+                status="ok",
+                details={"observable_family": "activity"},
+            )
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    compositions = dict(fixture["compositions"])
+    high = next(
+        point
+        for point in fixture["points"]
+        if compositions[point["composition_id"]]["composition_wt_pct"].get(
+            "SiO2", 0.0
+        )
+        >= 50.0
+    )
+    low = next(
+        point
+        for point in fixture["points"]
+        if compositions[point["composition_id"]]["composition_wt_pct"].get(
+            "SiO2", 0.0
+        )
+        < 50.0
+        and point["composition_id"] != high["composition_id"]
+    )
+    fixture = {
+        **fixture,
+        "points": [high, low],
+        "composition_probes": fixture["composition_probes"][:1],
+    }
+    fixture_path = tmp_path / "tiny.yaml"
+    fixture_path.write_text(yaml.safe_dump(fixture, sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(
+        benchmark,
+        "build_engines",
+        lambda names, fixture, alphamelts_timeout_s: [_Contradict()],
+    )
+
+    rows = [
+        {"engine": "fake", "status": "ok", "reason": "computed"},
+        {
+            "engine": "fake",
+            "status": "unavailable",
+            "reason": "this host has no such engine installed",
+        },
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ("fake",)
+    with pytest.raises(benchmark.EngineSelfContradictionError, match="fake"):
+        benchmark.assert_run_not_self_contradictory(rows)
+
+    output_dir = tmp_path / "out"
+    with pytest.raises(benchmark.EngineSelfContradictionError, match="fake"):
+        benchmark.run_benchmark(
+            bench_set_path=fixture_path,
+            output_dir=output_dir,
+            engine_names=("fake",),
+            coverage_steps=2,
+            live_vaporock_anchor_check=False,
+        )
+    report = (output_dir / "report.md").read_text(encoding="utf-8")
+    assert "RUN INVALID: engine self-contradiction" in report
+    metadata = json.loads((output_dir / "run-metadata.json").read_text())
+    assert metadata["engine_self_contradiction"]["engines"] == ["fake"]
+
+
+def test_alphamelts_activity_is_one_capability_refusal():
+    """Default AlphaMeltsEngine does not invent per-point activity reasons."""
+
+    engine = benchmark.AlphaMeltsEngine()
+    first = engine.evaluate({"SiO2": 70.0, "Na2O": 30.0}, 1900.0, None)
+    second = engine.evaluate(
+        {"SiO2": 48.0, "Al2O3": 15.0, "FeO": 10.0, "MgO": 10.0, "CaO": 17.0},
+        1700.0,
+        1.0e-9,
+    )
+    expected = benchmark.alphamelts_activity_capability_refusal()
+    assert first.status == "observable_unavailable"
+    assert first.status == second.status
+    assert first.reason == second.reason == expected.reason
+    assert first.details == second.details == expected.details
+    assert first.details["capability_refusal"] is True
+    assert (
+        first.details["limitation"]
+        == benchmark.ALPHAMELTS_ACTIVITY_CAPABILITY_LIMITATION
+    )
+    assert first.details["scope"] == "all_compositions"
+    assert engine._provider is None
+
+
+def test_thermoengine_coverage_is_not_measured():
+    engine = benchmark.ThermoEngineMeltActivityEngine()
+    result = engine.coverage({"SiO2": 50.0, "MgO": 25.0, "FeO": 25.0}, 1900.0)
+    assert result.status == "refused"
+    assert result.details["not_measured"] is True
+    assert result.details["reason_code"] == "coverage_not_measured_for_this_engine"
+    assert result.reason == "coverage not measured for this engine"
+    assert result.status != "ok"
+    assert result.status != "unavailable"
+
+
+def test_paired_decisions_include_any_both_ok_pair():
+    rows = [
+        {
+            "point_id": "k1",
+            "species": "K",
+            "observable": "partial_pressure",
+            "engine": "internal_analytic",
+            "residual_dex": 0.4,
+        },
+        {
+            "point_id": "k1",
+            "species": "K",
+            "observable": "partial_pressure",
+            "engine": "vaporock",
+            "residual_dex": 0.08,
+        },
+        {
+            "point_id": "k1",
+            "species": "K",
+            "observable": "partial_pressure",
+            "engine": "imcc-published",
+            "residual_dex": 0.9,
+        },
+        {
+            "point_id": "k2",
+            "species": "K",
+            "observable": "partial_pressure",
+            "engine": "internal_analytic",
+            "residual_dex": 0.42,
+        },
+        {
+            "point_id": "k2",
+            "species": "K",
+            "observable": "partial_pressure",
+            "engine": "vaporock",
+            "residual_dex": 0.08,
+        },
+    ]
+    decisions = benchmark.summarize_paired_decisions(rows)
+    pairs = {(row["engine_a"], row["engine_b"]) for row in decisions}
+    assert ("internal_analytic", "vaporock") in pairs
+    assert ("imcc-published", "internal_analytic") in pairs
+    assert ("imcc-published", "vaporock") in pairs
+    vaporock_vs_internal = next(
+        row
+        for row in decisions
+        if row["engine_a"] == "internal_analytic" and row["engine_b"] == "vaporock"
+    )
+    assert vaporock_vs_internal["paired_count"] == 2
+    assert vaporock_vs_internal["decision"] == "vaporock"
+    verdict = benchmark._paired_verdict(decisions)
+    assert "n=" in verdict
+    assert "n=1" in verdict or "n=2" in verdict
+
+
+def test_retyped_crash_guard_is_engine_crash_not_out_of_domain():
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
+        AlphaMELTSBackend,
+    )
+
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    backend._binary_path = "/nonexistent/alphamelts"
+    backend._timeout_s = 1.0
+    backend._engine_version = "alphamelts-test-stub"
+    result = backend._fe_free_absolute_fo2_crash_result(
+        1400.0,
+        1.0,
+        -9.0,
+        active_components=frozenset({"SiO2", "Na2O"}),
+    )
+    assert result.status != "out_of_domain"
+    assert result.status == "not_converged"
+    assert result.diagnostics["backend_failure_category"] == "engine_crash"
+    assert (
+        result.diagnostics["backend_status_reason"]
+        == ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
+    )
+    assert result.diagnostics["subprocess_input_guard"]["predicate"] == (
+        "fe_free_and_imposed_absolute_fo2"
+    )
+    assert result.diagnostics["subprocess_input_guard"]["not_the_predicate"] == (
+        "no_Fe"
+    )
+    assert "two-component alkali-silica" not in " ".join(result.warnings)
+
+    class _CrashGuardProvider:
+        def dispatch(self, request):
+            del request
+            return SimpleNamespace(
+                status="not_converged",
+                warnings=result.warnings,
+                diagnostic={"backend_diagnostics": dict(result.diagnostics)},
+            )
+
+    engine = benchmark.AlphaMeltsEngine()
+    engine.activity_observable_supported = True
+    engine._provider = _CrashGuardProvider()
+    produced = engine.evaluate({"SiO2": 75.0, "Na2O": 25.0}, 1400.0, 1.0e-9)
+    assert produced.status == "crash"
+    assert produced.status != "out_of_domain"

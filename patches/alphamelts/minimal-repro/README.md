@@ -1,4 +1,4 @@
-# alphaMELTS 2.3.1 alkali-silica crash
+# alphaMELTS 2.3.1 Fe-free + imposed-absolute-fO2 crash
 
 Run from this directory on Apple Silicon macOS:
 

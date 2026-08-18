@@ -8,7 +8,7 @@ import pytest
 
 from engines.alphamelts.subprocess_runner import equilibrate_via_subprocess
 from simulator.melt_backend.alphamelts import (
-    ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED,
+    ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
     ALPHAMELTS_REASON_SUBPROCESS_DIED,
     ALPHAMELTS_REASON_TIMEOUT,
     AlphaMELTSBackend,
@@ -142,14 +142,28 @@ def test_known_crashing_alkali_silica_binary_refuses_before_launch(tmp_path):
 
     result = _run(backend, composition)
 
-    assert result.status == 'out_of_domain'
+    assert result.status != 'out_of_domain'
+    assert result.status == 'not_converged'
     assert result.diagnostics['backend_status_reason'] == (
-        ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED
+        ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
+    )
+    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
+    assert result.diagnostics['subprocess_input_guard']['predicate'] == (
+        'fe_free_and_imposed_absolute_fo2'
+    )
+    assert result.diagnostics['subprocess_input_guard']['matching_scope'] == (
+        'two_component_na2o_or_k2o_silica_family'
+    )
+    assert result.diagnostics['subprocess_input_guard']['not_the_predicate'] == (
+        'no_Fe'
     )
     assert result.diagnostics['subprocess_input_guard']['active_components'] == [
         'Na2O',
         'SiO2',
     ]
+    assert 'Fe-free' in result.warnings[0]
+    assert 'imposed' in result.warnings[0]
+    assert 'two-component alkali-silica' not in result.warnings[0]
     assert result.diagnostics['out_of_domain_crash_point'][
         'composition_mol_by_account'
     ] == composition

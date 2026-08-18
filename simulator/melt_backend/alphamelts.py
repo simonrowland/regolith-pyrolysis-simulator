@@ -141,8 +141,13 @@ ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED = 'subprocess_pressure_below_minimum'
 ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED = (
     'subprocess_temperature_below_minimum'
 )
+ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH = (
+    'subprocess_fe_free_absolute_fo2_crash'
+)
+# Retired name: the matching scope is still the two-component
+# Na2O/K2O-SiO2 family, but that is not the crash predicate.
 ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED = (
-    'subprocess_alkali_silica_binary_unsupported'
+    ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
 )
 ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID = 'fo2_constraint_invalid'
 ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED = 'fo2_constraint_unapplied'
@@ -229,7 +234,7 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_EXECUTED_T_MISMATCH: 'contract_error',
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: 'out_of_domain',
-    ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED: 'out_of_domain',
+    ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH: 'engine_crash',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: 'contract_error',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: 'contract_error',
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
@@ -272,9 +277,12 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: (
         'AlphaMELTS subprocess does not support the requested temperature'
     ),
-    ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED: (
-        'AlphaMELTS subprocess rejects a known-crashing two-component '
-        'alkali-silica input'
+    ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH: (
+        'AlphaMELTS subprocess crash family: Fe-free melt with an imposed '
+        'absolute fO2. Matching scope is the two-component Na2O/K2O-SiO2 '
+        'family that hits that trigger; the predicate is not no-Fe. A '
+        'separate Fe-bearing sub-34 wt% SiO2 crash family is gated in '
+        'engines/alphamelts/domain.py'
     ),
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: (
         'AlphaMELTS subprocess fO2 constraint was invalid'
@@ -1671,7 +1679,10 @@ class _MELTSBackendSupport(MeltBackend):
                 liquid_fraction=resolved_liquid_fraction,
                 phase_masses_kg=phase_masses,
             )
-        if self._requested_operating_point_non_authoritative(result_diagnostics):
+        if (
+            result_status == 'ok'
+            and self._requested_operating_point_non_authoritative(result_diagnostics)
+        ):
             result_status = 'out_of_domain'
             result_diagnostics['backend_status'] = 'out_of_domain'
             result_diagnostics.setdefault(
@@ -2004,6 +2015,57 @@ class _MELTSBackendSupport(MeltBackend):
             reasons,
             diagnostics=diagnostics,
             reason=reason,
+        )
+
+    def _fe_free_absolute_fo2_crash_result(
+        self,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: Optional[float],
+        *,
+        active_components: frozenset[str],
+        diagnostics: Optional[Mapping[str, object]] = None,
+    ) -> EquilibriumResult:
+        """Pre-launch refusal of a measured crash family, not a domain gate.
+
+        Measured trigger (2026-08-17 harness audit): Fe-free melt AND an
+        imposed absolute fO2. The subprocess transport imposes fO2=-9 when
+        the request carries none, so this family dies on the binary path.
+        Matching scope here is the two-component Na2O/K2O-SiO2 family that
+        hits that trigger. This is not a general no-Fe predicate: Fe-free
+        melts without imposed absolute fO2 can compute. A separate
+        Fe-bearing sub-34 wt% SiO2 crash family is gated in
+        ``engines/alphamelts/domain.py``.
+        """
+        message = ALPHAMELTS_BACKEND_FAILURE_MESSAGES[
+            ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
+        ]
+        diagnostics_out = dict(diagnostics or {})
+        diagnostics_out['authoritative_for_requested_conditions'] = False
+        diagnostics_out['subprocess_input_guard'] = {
+            'predicate': 'fe_free_and_imposed_absolute_fo2',
+            'matching_scope': 'two_component_na2o_or_k2o_silica_family',
+            'not_the_predicate': 'no_Fe',
+            'separate_family': 'fe_bearing_sub_34_wt_pct_sio2',
+            'active_components': sorted(active_components),
+            'engine_version': self._engine_version or 'unknown',
+        }
+        diagnostics_out['backend_status_reason'] = (
+            ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
+        )
+        _annotate_alphamelts_backend_failure(
+            diagnostics_out,
+            reason_code=ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
+            backend_status='not_converged',
+            message=message,
+        )
+        return self._emit_equilibrium_result(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            warnings=[message],
+            status='not_converged',
+            diagnostics=diagnostics_out,
         )
 
     def _domain_gate_result(self, temperature_C: float, pressure_bar: float,
@@ -2650,22 +2712,12 @@ class _MELTSBackendSupport(MeltBackend):
             frozenset({'SiO2', 'Na2O'}),
             frozenset({'SiO2', 'K2O'}),
         ):
-            guard_diagnostics = dict(diagnostics or {})
-            guard_diagnostics['subprocess_input_guard'] = {
-                'predicate': 'two_component_alkali_silica',
-                'active_components': sorted(active_components),
-                'engine_version': self._engine_version or 'unknown',
-            }
-            return self._domain_gate_result(
+            return self._fe_free_absolute_fo2_crash_result(
                 requested_temperature_C,
                 requested_pressure_bar,
                 fO2_log,
-                [
-                    'two-component alkali-silica input is a known crash '
-                    'boundary in bundled alphaMELTS 2.3.1'
-                ],
-                diagnostics=guard_diagnostics,
-                reason=ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED,
+                active_components=active_components,
+                diagnostics=diagnostics,
             )
         fO2_path, fO2_offset = self._subprocess_fo2_constraint(fO2_log)
         with tempfile.TemporaryDirectory() as tmpdir:
