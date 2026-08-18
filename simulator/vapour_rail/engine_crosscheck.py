@@ -36,8 +36,10 @@ from simulator.melt_backend.vaporock import (
     VAPOROCK_T_MAX_K,
     VAPOROCK_T_MIN_K,
     VapoRockBackend,
+    _parent_oxide_for_vaporock_gas,
     vaporock_speciation_is_live,
 )
+from simulator.silent_zero import ZeroBecause
 from simulator.state import MOLAR_MASS
 from simulator.vapour_rail.calibration import (
     DEFAULT_P_FLOOR_PA,
@@ -365,7 +367,26 @@ def _run_vaporock_cell(
         "reason": reason,
         "warnings": warnings,
         "pressures_Pa": pressures,
+        "silent_zero_notes": list(
+            result_diagnostics.get("silent_zero_notes") or []
+        ),
     }
+
+
+def _proven_empty_reason(
+    species: str,
+    silent_zero_notes: Sequence[Mapping[str, Any]] | None,
+) -> str:
+    token = ZeroBecause.PROVEN_EMPTY_INVENTORY.value
+    for note in silent_zero_notes or ():
+        if (
+            str(note.get("species") or "") == species
+            and note.get("zero_because") == token
+            and note.get("detail")
+        ):
+            return str(note["detail"])
+    parent = _parent_oxide_for_vaporock_gas(species) or "unknown_parent_oxide"
+    return f"parent oxide {parent} absent from feedstock"
 
 
 def _observation(
@@ -375,6 +396,7 @@ def _observation(
     cell_status: str,
     cell_reason: str | None,
     p_floor_Pa: float,
+    silent_zero_notes: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if cell_status not in {"ok", "non_authoritative"}:
         return {
@@ -388,7 +410,19 @@ def _observation(
         pressure = float(pressures[species])
     except (TypeError, ValueError):
         pressure = math.nan
-    if not math.isfinite(pressure) or pressure <= 0.0:
+    if not math.isfinite(pressure):
+        return {
+            "kind": "refused",
+            "pressure_Pa": None,
+            "reason": "non-finite or non-positive pressure",
+        }
+    if pressure == 0.0:
+        return {
+            "kind": ZeroBecause.PROVEN_EMPTY_INVENTORY.value,
+            "pressure_Pa": 0.0,
+            "reason": _proven_empty_reason(species, silent_zero_notes),
+        }
+    if pressure < 0.0:
         return {
             "kind": "refused",
             "pressure_Pa": None,
@@ -623,6 +657,7 @@ def build_crosscheck_report(
                 cell_status=cell["vaporock"]["status"],
                 cell_reason=cell["vaporock"].get("reason"),
                 p_floor_Pa=p_floor_Pa,
+                silent_zero_notes=cell["vaporock"].get("silent_zero_notes"),
             )
             coverage = _coverage_label(rail, vaporock)
             if coverage == "neither_answered" and species not in shared_declared:

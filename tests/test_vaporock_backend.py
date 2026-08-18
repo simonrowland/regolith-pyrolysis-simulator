@@ -2013,6 +2013,8 @@ def test_in_process_all_nonfinite_speciation_is_typed_not_ok_without_reason(
     assert getattr(result, "vaporock_full_speciation_Pa", {}) == {}
     assert result.vapor_pressures_Pa == {}
     assert result.status == "not_converged"
+    for name in ("Cr", "Mn", "Ni", "Co", "NiO_gas", "CrO", "CrO2", "CrO3"):
+        assert name not in getattr(result, "vaporock_full_speciation_Pa", {})
     assert result.diagnostics.get("empty_speciation_cause") == (
         EmptySpeciationCause.NO_FINITE_VALUES.value
     )
@@ -2275,3 +2277,325 @@ def test_healthy_finite_log10_conversion_is_bit_identical():
     assert backend._last_empty_speciation_cause is None
     assert pressures["Na"] == 10.0 ** -2.0 * 1e5
     assert pressures["SiO"] == 10.0 ** -6.0 * 1e5
+
+
+_HEALTHY_MASKED_GASES = (
+    "Cr(g)",
+    "CrO(g)",
+    "CrO2(g)",
+    "CrO3(g)",
+    "Mn(g)",
+    "Ni(g)",
+    "Co(g)",
+    "NiO(g)",
+)
+
+
+def _healthy_finite_plus_inventory_mask():
+    finite = {"Na(g)": -2.0, "SiO(g)": -6.0, "O2(g)": -9.0}
+    masked = {name: float("-inf") for name in _HEALTHY_MASKED_GASES}
+    return {**finite, **masked}
+
+
+def test_neginf_is_retained_as_proven_empty_inventory_zero():
+    """-inf is the empty-parent-oxide mask, not missing thermo.
+
+    Red-by-revert: current adapter drops -inf because 10**-inf == 0.0
+    and the surviving filter keeps only pressure_pa > 0.0.
+    """
+    from simulator.melt_backend.vaporock import EmptySpeciationCause
+    from simulator.silent_zero import CATEGORY_PROVEN_ZERO, ZeroBecause
+
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    pressures = backend._log10_bar_pressures_to_pa(
+        _healthy_finite_plus_inventory_mask(),
+        composition_wt_pct={
+            "SiO2": 50.0,
+            "Na2O": 3.0,
+            "Cr2O3": 0.0,
+            "MnO": 0.0,
+            "NiO": 0.0,
+            "CoO": 0.0,
+        },
+    )
+
+    assert backend._last_empty_speciation_cause is None
+    assert pressures["Na"] == 10.0 ** -2.0 * 1e5
+    assert pressures["SiO"] == 10.0 ** -6.0 * 1e5
+    assert pressures["O2"] == 10.0 ** -9.0 * 1e5
+    assert pressures["Cr"] == 0.0
+    assert pressures["CrO"] == 0.0
+    assert pressures["CrO2"] == 0.0
+    assert pressures["CrO3"] == 0.0
+    assert pressures["Mn"] == 0.0
+    assert pressures["Ni"] == 0.0
+    assert pressures["Co"] == 0.0
+    assert pressures["NiO_gas"] == 0.0
+
+    notes = list(backend._last_silent_zero_notes)
+    by_species = {note["species"]: note for note in notes}
+    assert set(by_species) == {
+        "Cr",
+        "CrO",
+        "CrO2",
+        "CrO3",
+        "Mn",
+        "Ni",
+        "Co",
+        "NiO_gas",
+    }
+    cr_note = by_species["Cr"]
+    assert cr_note["zero_because"] == ZeroBecause.PROVEN_EMPTY_INVENTORY.value
+    assert cr_note["doctrine_category"] == CATEGORY_PROVEN_ZERO
+    assert "Cr2O3" in cr_note["detail"]
+    assert "missing" not in cr_note["detail"].lower() or "not missing" in (
+        cr_note["detail"].lower()
+    )
+    assert cr_note["zero_because"] not in {cause.value for cause in EmptySpeciationCause}
+    assert by_species["Mn"]["detail"].find("MnO") >= 0
+    assert by_species["NiO_gas"]["detail"].find("NiO") >= 0
+    assert by_species["Co"]["detail"].find("CoO") >= 0
+
+
+def test_equilibrate_attaches_proven_empty_notes_to_diagnostics(monkeypatch):
+    from simulator.silent_zero import CATEGORY_PROVEN_ZERO, ZeroBecause
+
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            self.composition = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            del temperature, log_fO2
+            return _healthy_finite_plus_inventory_mask()
+
+    _install_fake_import(monkeypatch, types.SimpleNamespace(System=FakeSystem))
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+    full = getattr(result, "vaporock_full_speciation_Pa", {})
+    assert full["Cr"] == 0.0
+    assert full["Na"] == 10.0 ** -2.0 * 1e5
+    notes = result.diagnostics.get("silent_zero_notes") or []
+    cr = next(note for note in notes if note.get("species") == "Cr")
+    assert cr["zero_because"] == ZeroBecause.PROVEN_EMPTY_INVENTORY.value
+    assert cr["doctrine_category"] == CATEGORY_PROVEN_ZERO
+    assert "Cr2O3" in cr["detail"]
+    assert result.status != "not_converged"
+
+
+def test_failed_solve_with_inventory_mask_still_refuses():
+    """30 NaN + 8 -inf is a failed solve, not eight successful zeros."""
+    from simulator.melt_backend.vaporock import EmptySpeciationCause
+
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    raw = {f"sp{i}(g)": float("nan") for i in range(30)}
+    for name in _HEALTHY_MASKED_GASES:
+        raw[name] = float("-inf")
+
+    pressures = backend._log10_bar_pressures_to_pa(
+        raw,
+        composition_wt_pct={"SiO2": 40.0, "P2O5": 10.0},
+    )
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.NO_FINITE_VALUES
+    )
+    assert backend._last_silent_zero_notes == []
+    for name in ("Cr", "Mn", "Ni", "Co", "NiO_gas", "CrO", "CrO2", "CrO3"):
+        assert name not in pressures
+
+
+def test_failed_solve_sidecar_cannot_rehabilitate_empty_log10():
+    """A worker sidecar of -inf species must not turn a hollow cell live."""
+    from simulator.melt_backend.vaporock import EmptySpeciationCause
+
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = _FakeWarmPool({
+        "log10_bar": {},
+        "empty_speciation_cause": EmptySpeciationCause.NO_FINITE_VALUES.value,
+        "speciation_row_count": 38,
+        "speciation_finite_count": 0,
+        "speciation_nan_count": 30,
+        "speciation_neginf_count": 8,
+        "speciation_other_nonfinite_count": 0,
+        "proven_empty_inventory_species": list(_HEALTHY_MASKED_GASES),
+    })
+    backend._clear_empty_speciation()
+
+    pressures = backend._call_vaporock_via_pool(
+        composition_wt_pct={"SiO2": 40.0, "P2O5": 10.0},
+        temperature_K=1900.0,
+        fO2_log=-9.0,
+    )
+
+    assert pressures == {}
+    assert backend._last_empty_speciation_cause is (
+        EmptySpeciationCause.NO_FINITE_VALUES
+    )
+    assert backend._last_silent_zero_notes == []
+
+
+def test_proven_empty_zero_keys_do_not_change_pressure_total():
+    from simulator.melt_backend.vaporock import vaporock_sum_pressure_bar
+
+    backend = VapoRockBackend()
+    finite = {"Na(g)": -2.0, "SiO(g)": -6.0, "O2(g)": -9.0}
+    backend._clear_empty_speciation()
+    without_mask = backend._log10_bar_pressures_to_pa(finite)
+    backend._clear_empty_speciation()
+    with_mask = backend._log10_bar_pressures_to_pa(
+        _healthy_finite_plus_inventory_mask()
+    )
+
+    assert vaporock_sum_pressure_bar(without_mask) == vaporock_sum_pressure_bar(
+        with_mask
+    )
+    assert sum(without_mask.values()) == sum(
+        value for value in with_mask.values() if value > 0.0
+    )
+    # 0 Pa contributes 0 mass in any P * M projection.
+    mass_without = sum(without_mask.values())
+    mass_with = sum(with_mask.values())
+    assert mass_with == mass_without
+    assert all(with_mask[key] == 0.0 for key in (
+        "Cr", "CrO", "CrO2", "CrO3", "Mn", "Ni", "Co", "NiO_gas"
+    ))
+
+
+def test_nan_on_present_oxide_is_not_converted_to_proven_empty_zero():
+    from simulator.melt_backend.vaporock import EmptySpeciationCause
+    from simulator.silent_zero import ZeroBecause
+
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    pressures = backend._log10_bar_pressures_to_pa(
+        {"Na(g)": float("nan"), "SiO(g)": -6.0, "Cr(g)": float("-inf")},
+        composition_wt_pct={"SiO2": 50.0, "Na2O": 3.0},
+    )
+
+    assert "Na" not in pressures
+    assert pressures["SiO"] == 10.0 ** -6.0 * 1e5
+    assert pressures["Cr"] == 0.0
+    assert backend._last_empty_speciation_cause is None
+    notes = backend._last_silent_zero_notes
+    assert all(
+        note["zero_because"] == ZeroBecause.PROVEN_EMPTY_INVENTORY.value
+        for note in notes
+    )
+    assert notes[0]["species"] == "Cr"
+    # The NaN row is a missing-result, not an EmptySpeciationCause of the
+    # whole table (finite SiO survived) and not a proven-empty zero.
+    assert EmptySpeciationCause.NO_FINITE_VALUES not in {
+        backend._last_empty_speciation_cause
+    }
+
+
+def test_absent_thermo_row_is_not_invented_as_inventory_zero():
+    backend = VapoRockBackend()
+    backend._clear_empty_speciation()
+    pressures = backend._log10_bar_pressures_to_pa({"Na(g)": -2.0})
+
+    assert pressures == {"Na": 10.0 ** -2.0 * 1e5}
+    assert "Cr" not in pressures
+    assert backend._last_silent_zero_notes == []
+
+
+def test_serialize_attaches_inventory_mask_only_when_finite_values_exist():
+    from simulator.melt_backend.vaporock import (
+        EmptySpeciationCause,
+        _serialize_log10_bar_pressures,
+    )
+
+    healthy_log, healthy_extra = _serialize_log10_bar_pressures(
+        _healthy_finite_plus_inventory_mask()
+    )
+    assert set(healthy_log) == {"Na(g)", "SiO(g)", "O2(g)"}
+    assert healthy_log["Na(g)"] == -2.0
+    assert set(healthy_extra["proven_empty_inventory_species"]) == set(
+        _HEALTHY_MASKED_GASES
+    )
+    assert "empty_speciation_cause" not in healthy_extra
+
+    failed = {f"sp{i}(g)": float("nan") for i in range(30)}
+    for name in _HEALTHY_MASKED_GASES:
+        failed[name] = float("-inf")
+    failed_log, failed_payload = _serialize_log10_bar_pressures(failed)
+    assert failed_log == {}
+    assert failed_payload["empty_speciation_cause"] == (
+        EmptySpeciationCause.NO_FINITE_VALUES.value
+    )
+    assert "proven_empty_inventory_species" not in failed_payload
+
+
+def test_warm_pool_sidecar_zeros_are_retained_on_healthy_cell():
+    from simulator.silent_zero import ZeroBecause
+
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = _FakeWarmPool({
+        "log10_bar": {"Na(g)": -2.0, "SiO(g)": -6.0},
+        "speciation_row_count": 10,
+        "speciation_finite_count": 2,
+        "speciation_nan_count": 0,
+        "speciation_neginf_count": 8,
+        "speciation_other_nonfinite_count": 0,
+        "proven_empty_inventory_species": list(_HEALTHY_MASKED_GASES),
+    })
+    backend._clear_empty_speciation()
+
+    pressures = backend._call_vaporock_via_pool(
+        composition_wt_pct={
+            "SiO2": 50.0,
+            "Na2O": 3.0,
+            "Cr2O3": 0.0,
+            "MnO": 0.0,
+            "NiO": 0.0,
+            "CoO": 0.0,
+        },
+        temperature_K=1900.0,
+        fO2_log=-9.0,
+    )
+
+    assert backend._last_empty_speciation_cause is None
+    assert pressures["Na"] == 10.0 ** -2.0 * 1e5
+    assert pressures["SiO"] == 10.0 ** -6.0 * 1e5
+    assert pressures["Cr"] == 0.0
+    assert pressures["NiO_gas"] == 0.0
+    notes = {note["species"]: note for note in backend._last_silent_zero_notes}
+    assert notes["Cr"]["zero_because"] == ZeroBecause.PROVEN_EMPTY_INVENTORY.value
+    assert "Cr2O3" in notes["Cr"]["detail"]
+
+
+def test_provider_keeps_proven_empty_zero_pressure():
+    from engines.vaporock import VapoRockProvider
+    from simulator.melt_backend.melt_envelope import melt_extrapolation_envelope
+
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={},
+        vaporock_full_speciation_Pa={"Na": 1000.0, "Cr": 0.0},
+        warnings=(),
+        status="non_authoritative",
+        diagnostics={},
+    )
+    diagnostics = VapoRockProvider._project_equilibrium(
+        equilibrium,
+        pO2_bar=1e-9,
+        mode="system_eval_gas_abundances",
+        engine_version="test",
+        allowed_species=frozenset({"Na", "Cr"}),
+        melt_envelope=melt_extrapolation_envelope(1600.0, "MELTS-v1.0"),
+    )
+    assert diagnostics.vaporock_full_speciation_Pa["Na"] == 1000.0
+    assert diagnostics.vaporock_full_speciation_Pa["Cr"] == 0.0
+    payload = diagnostics.as_diagnostic()
+    assert "silent_zero_notes" not in payload
+

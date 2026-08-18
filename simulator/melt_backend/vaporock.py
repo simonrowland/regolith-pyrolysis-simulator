@@ -117,6 +117,12 @@ from simulator.melt_backend.base import (
     split_cleaned_melt_account,
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
+from simulator.silent_zero import (
+    CATEGORY_PROVEN_ZERO,
+    ZeroBecause,
+    merge_notes_into_mapping,
+    note_dict,
+)
 from simulator.state import OXIDE_SPECIES
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -229,6 +235,50 @@ _GAS_NAMESPACE_SUFFIX = '_gas'
 # builtin Antoine path and the VapoRock path share keys for the shared
 # volatiles.
 _OXIDE_COLLIDING_GAS_SPECIES = frozenset(OXIDE_SPECIES)
+
+# VapoRock ``eval_gas_abundances`` overwrites log10(P/bar) to -inf when
+# any melt oxide in that gas reaction is exactly 0 wt% (JANAF-full
+# ``rxn_coefs`` columns except O2). Measured 2026-08-17 against the
+# installed System(); this is an inventory mask, not missing thermo.
+# See docs-private/research/2026-08-17-vaporock-neginf/findings.md.
+_VAPOROCK_GAS_PARENT_OXIDE: Mapping[str, str] = {
+    'Mg(g)': 'MgO',
+    'MgO(g)': 'MgO',
+    'Mg2(g)': 'MgO',
+    'Ca(g)': 'CaO',
+    'CaO(g)': 'CaO',
+    'Ca2(g)': 'CaO',
+    'Al(g)': 'Al2O3',
+    'AlO(g)': 'Al2O3',
+    'AlO2(g)': 'Al2O3',
+    'Al2(g)': 'Al2O3',
+    'Al2O(g)': 'Al2O3',
+    'Al2O2(g)': 'Al2O3',
+    'Si(g)': 'SiO2',
+    'SiO(g)': 'SiO2',
+    'SiO2(g)': 'SiO2',
+    'Si2(g)': 'SiO2',
+    'Si3(g)': 'SiO2',
+    'Na(g)': 'Na2O',
+    'NaO(g)': 'Na2O',
+    'Na2(g)': 'Na2O',
+    'K(g)': 'K2O',
+    'KO(g)': 'K2O',
+    'K2(g)': 'K2O',
+    'Fe(g)': 'FeO',
+    'FeO(g)': 'FeO',
+    'Ti(g)': 'TiO2',
+    'TiO(g)': 'TiO2',
+    'TiO2(g)': 'TiO2',
+    'Cr(g)': 'Cr2O3',
+    'CrO(g)': 'Cr2O3',
+    'CrO2(g)': 'Cr2O3',
+    'CrO3(g)': 'Cr2O3',
+    'Mn(g)': 'MnO',
+    'Ni(g)': 'NiO',
+    'NiO(g)': 'NiO',
+    'Co(g)': 'CoO',
+}
 
 # VapoRock consumes the same oxide basis as MELTS / alphaMELTS plus volatile
 # melt components that upstream declares (H2O/CO2). Project 1:1 by name and
@@ -393,6 +443,50 @@ def _speciation_value_stats(
     return stats
 
 
+def _parent_oxide_for_vaporock_gas(species: Any) -> Optional[str]:
+    """Return the rxn_coefs parent oxide for a VapoRock gas name, if known."""
+    raw = str(species).strip()
+    parent = _VAPOROCK_GAS_PARENT_OXIDE.get(raw)
+    if parent is not None:
+        return parent
+    if raw.endswith(_GAS_NAMESPACE_SUFFIX):
+        bare = raw[: -len(_GAS_NAMESPACE_SUFFIX)]
+        return _VAPOROCK_GAS_PARENT_OXIDE.get(f'{bare}(g)')
+    if _GAS_SUFFIX_RE.search(raw) is None:
+        return _VAPOROCK_GAS_PARENT_OXIDE.get(f'{raw}(g)')
+    return None
+
+
+def _parent_oxide_is_empty(
+    composition_wt_pct: Optional[Mapping[str, float]],
+    oxide: str,
+) -> bool:
+    """True when the parent oxide is absent or exactly 0 wt%.
+
+    ``None`` composition means the caller has only the engine's -inf
+    token; that token is itself the inventory mask, so treat as empty.
+    """
+    if composition_wt_pct is None:
+        return True
+    if oxide not in composition_wt_pct:
+        return True
+    try:
+        wt = float(composition_wt_pct[oxide])
+    except (TypeError, ValueError):
+        return True
+    if not math.isfinite(wt):
+        return True
+    return wt == 0.0
+
+
+def _proven_empty_inventory_detail(parent_oxide: str) -> str:
+    return (
+        f'VapoRock set log10(P/bar)=-inf because melt {parent_oxide} was '
+        f'exactly 0 wt% in the input; this is the a=0 limit, not a T/fO2 '
+        f'result and not missing JANAF data'
+    )
+
+
 def empty_speciation_reason(
     cause: EmptySpeciationCause,
     stats: Optional[Mapping[str, Any]] = None,
@@ -523,6 +617,7 @@ def _serialize_log10_bar_pressures(
         )
     stats = _speciation_value_stats(items)
     out: Dict[str, float] = {}
+    proven_empty: List[str] = []
     for species, log10_bar in items:
         try:
             value = float(log10_bar)
@@ -530,7 +625,12 @@ def _serialize_log10_bar_pressures(
             continue
         if math.isfinite(value):
             out[str(species)] = value
+        elif math.isinf(value) and value < 0.0:
+            proven_empty.append(str(species))
     if not out:
+        # Failed / all-nonfinite table. Do not attach the inventory
+        # sidecar: -inf rows on a NaN table must not rehabilitate the
+        # cell as an all-zero success.
         if int(stats['speciation_finite_count']) != 0:
             raise RuntimeError(
                 'serializer emptied a table that still had finite log10_bar '
@@ -540,7 +640,10 @@ def _serialize_log10_bar_pressures(
         return {}, _serialize_cause_payload(
             EmptySpeciationCause.NO_FINITE_VALUES, stats
         )
-    return out, stats
+    extra: Dict[str, Any] = dict(stats)
+    if proven_empty:
+        extra['proven_empty_inventory_species'] = proven_empty
+    return out, extra
 
 
 def vaporock_speciation_is_live(
@@ -604,7 +707,7 @@ def _eval_system_log10_bar(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
     fO2_log: float,
-) -> tuple[Dict[str, float], Dict[str, int]]:
+) -> tuple[Dict[str, float], Dict[str, Any]]:
     """Run set_melt_comp + eval_gas_abundances on *system*; return log10 map."""
     set_melt_comp = getattr(system, 'set_melt_comp')
     eval_gas_abundances = getattr(system, 'eval_gas_abundances')
@@ -1003,6 +1106,7 @@ class VapoRockBackend(MeltBackend):
         self._last_empty_speciation_cause: Optional[EmptySpeciationCause] = None
         self._last_empty_speciation_stats: Optional[Dict[str, int]] = None
         self._last_empty_speciation_reason: Optional[str] = None
+        self._last_silent_zero_notes: List[Dict[str, Any]] = []
         # Warm pool (DESIGN-REV5 §5.5 / VR-5). Opt-in: calibration runners
         # and live warm-path tests pass warm_worker=True. Default off so
         # the diagnostic shadow and corpus harnesses do not spawn a pool
@@ -1575,6 +1679,11 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics['temperature_K'] = float(temperature_K)
             projection_diagnostics['sum_pressure_bar'] = float(sum_bar)
 
+        if self._last_silent_zero_notes:
+            merge_notes_into_mapping(
+                projection_diagnostics, self._last_silent_zero_notes
+            )
+
         if not vaporock_full_speciation_Pa:
             cause = self._last_empty_speciation_cause
             if cause is None:
@@ -1672,6 +1781,7 @@ class VapoRockBackend(MeltBackend):
         self._last_empty_speciation_cause = None
         self._last_empty_speciation_stats = None
         self._last_empty_speciation_reason = None
+        self._last_silent_zero_notes = []
 
     def _latch_empty_speciation(
         self,
@@ -1806,7 +1916,9 @@ class VapoRockBackend(MeltBackend):
                 )
                 # log10(bar) result is unit-unambiguous; convert directly
                 # without the declared-unit dict path.
-                return self._log10_bar_pressures_to_pa(logP)
+                return self._log10_bar_pressures_to_pa(
+                    logP, composition_wt_pct=composition_wt_pct
+                )
             except Exception as exc:  # noqa: BLE001 - upstream boundary
                 last_attr_error = exc
 
@@ -1872,7 +1984,13 @@ class VapoRockBackend(MeltBackend):
                 stats = None
             self._latch_empty_speciation(cause, stats)
             return {}
-        return self._log10_bar_pressures_to_pa(log10_bar)
+        return self._log10_bar_pressures_to_pa(
+            log10_bar,
+            composition_wt_pct=composition_wt_pct,
+            proven_empty_species=payload.get(
+                'proven_empty_inventory_species'
+            ),
+        )
 
     # ------------------------------------------------------------------
     # Composition / result projection
@@ -1958,7 +2076,53 @@ class VapoRockBackend(MeltBackend):
             return {}
         return pressures
 
-    def _log10_bar_pressures_to_pa(self, raw: Any) -> Dict[str, float]:
+    def _retain_proven_empty_inventory(
+        self,
+        pressures: Dict[str, float],
+        neginf_species: Sequence[Any],
+        composition_wt_pct: Optional[Mapping[str, float]],
+    ) -> None:
+        """Keep -inf species as explicit 0 Pa with a typed inventory note.
+
+        Do not recover pre-mask MELTS chemical potentials. Those values
+        are fabricated at zero moles. Do not invent a zero when the
+        parent oxide is actually present — that token is not this mask.
+        """
+        seen: set[str] = set()
+        for raw_species in neginf_species:
+            key = self._strip_gas_suffix(raw_species)
+            if key in seen:
+                continue
+            seen.add(key)
+            parent = _parent_oxide_for_vaporock_gas(raw_species)
+            if parent is None:
+                parent = _parent_oxide_for_vaporock_gas(key)
+            if parent is not None and not _parent_oxide_is_empty(
+                composition_wt_pct, parent
+            ):
+                continue
+            if key in pressures and pressures[key] != 0.0:
+                continue
+            pressures[key] = 0.0
+            oxide_name = parent or 'unknown_parent_oxide'
+            self._last_silent_zero_notes.append(
+                note_dict(
+                    ZeroBecause.PROVEN_EMPTY_INVENTORY,
+                    site='vaporock.eval_gas_abundances.inventory_mask',
+                    species=key,
+                    field='pressure_Pa',
+                    detail=_proven_empty_inventory_detail(oxide_name),
+                    doctrine_category=CATEGORY_PROVEN_ZERO,
+                )
+            )
+
+    def _log10_bar_pressures_to_pa(
+        self,
+        raw: Any,
+        *,
+        composition_wt_pct: Optional[Mapping[str, float]] = None,
+        proven_empty_species: Optional[Sequence[Any]] = None,
+    ) -> Dict[str, float]:
         """
         Convert VapoRock System log10(bar) output to simulator Pa.
 
@@ -1967,10 +2131,27 @@ class VapoRockBackend(MeltBackend):
         values are log10(partial pressure / bar).  Species names carry a
         ``(g)`` phase suffix; ``_strip_gas_suffix`` maps them onto the
         simulator's collision-free vocabulary (oxide-colliding gas names
-        namespaced with ``_gas``, the rest bare).  ``-inf`` rows (species
-        with no thermodynamic data, e.g. Cr gases in some builds) drop
-        out.
+        namespaced with ``_gas``, the rest bare).
+
+        ``-inf`` is an explicit inventory mask: after evaluating every
+        gas, VapoRock overwrites any species whose formation reaction
+        uses a melt oxide at exactly 0 wt%. That is the ``a_oxide = 0``
+        limit (proven empty inventory), not missing JANAF data, not
+        underflow, and not a T/fO2 vanishing. Those species are retained
+        at ``P = 0.0 Pa`` with a typed ``proven_empty_inventory`` note
+        naming the empty parent oxide. Pre-mask MELTS chemical
+        potentials at zero moles are fabricated and must not be
+        recovered.
+
+        ``NaN`` on a species whose parent oxide is present is a failed
+        evaluation of that row and is dropped, not converted to zero.
+        A table with no finite log10(bar) values (the 30 NaN + 8 -inf
+        failed-solve shape) still refuses: the -inf rows must not
+        rehabilitate the cell as an all-zero success. A species absent
+        from the thermo table never appears as ``-inf`` and is not
+        invented here.
         """
+        self._last_silent_zero_notes = []
         if raw is None:
             if self._last_empty_speciation_cause is None:
                 self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
@@ -1985,6 +2166,7 @@ class VapoRockBackend(MeltBackend):
 
         stats = _speciation_value_stats(items)
         pressures: Dict[str, float] = {}
+        neginf_species: List[Any] = []
         for species, log10_bar in items:
             try:
                 value = float(log10_bar)
@@ -1994,6 +2176,10 @@ class VapoRockBackend(MeltBackend):
                 pressure_pa = (10.0 ** value) * 1e5
                 if pressure_pa > 0.0:
                     pressures[self._strip_gas_suffix(species)] = pressure_pa
+            elif math.isinf(value) and value < 0.0:
+                neginf_species.append(species)
+        if proven_empty_species:
+            neginf_species.extend(proven_empty_species)
         if not pressures:
             if self._last_empty_speciation_cause is None:
                 self._latch_empty_speciation(
@@ -2003,6 +2189,9 @@ class VapoRockBackend(MeltBackend):
                     stats,
                 )
             return {}
+        self._retain_proven_empty_inventory(
+            pressures, neginf_species, composition_wt_pct
+        )
         return pressures
 
     @staticmethod
