@@ -2924,6 +2924,7 @@ class EvaporationMixin:
                 0.0, overhead_after_kg - overhead_before_kg,
             )
 
+        self._apply_organic_tar_wall_deposit()
         self._sync_oxygen_kg_counters()
 
         committed_flux = EvaporationFlux(
@@ -3257,6 +3258,47 @@ class EvaporationMixin:
         self._record_wall_deposit_delta(species, diagnostic)
         self._record_wall_alkali_binding_diagnostic_state(diagnostic)
         return float(diagnostic.get('credited_condensed_kg', 0.0))
+
+    def _apply_organic_tar_wall_deposit(self) -> None:
+        """Move cold-wall tar from overhead_gas onto process.wall_deposit.
+
+        Uses the existing CONDENSATION_ROUTE wall split. Hot walls
+        (default 1500 C) leave tar in overhead_gas.
+        """
+        from simulator.chemistry.organics_pyrolysis import tar_fate
+
+        tar_kg = float(
+            self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                'organic_tar', 0.0,
+            )
+            or 0.0
+        )
+        if tar_kg <= 1e-12:
+            return
+        wall_T = float(self.condensation_model.wall_temperature_C)
+        melt_T = float(getattr(self.melt, 'temperature_C', wall_T) or wall_T)
+        formula = resolve_species_formula(
+            'organic_tar', self.species_formula_registry
+        )
+        tar_mol = tar_kg / formula.molar_mass_kg_per_mol()
+        atoms = formula.atom_moles(tar_mol)
+        fate = tar_fate(atoms, melt_T, wall_T)
+        if fate.coat_frac <= 1e-12:
+            return
+
+        class _TarRoute:
+            wall_deposit_fraction_by_species = {'organic_tar': 1.0}
+            wall_deposit_account_fractions_by_species = {
+                'organic_tar': {'process.wall_deposit': 1.0}
+            }
+
+        coat_kg = tar_kg * fate.coat_frac
+        self._dispatch_condensation_route(
+            'organic_tar',
+            coat_kg,
+            {},
+            _TarRoute(),
+        )
 
     def _record_wall_deposit_delta(
         self,

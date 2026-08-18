@@ -1640,6 +1640,12 @@ class PyrolysisRun:
             run_metadata["c0_char_diagnostic"] = _json_safe(
                 c0_char_diagnostic
             )
+        organics_source = getattr(sim, "_last_organics_source", None) or {}
+        if organics_source:
+            run_metadata["organics_evolved_gas"] = _json_safe(
+                organics_source.get("evolved_gas_combined") or {}
+            )
+            run_metadata["organics_source"] = _json_safe(organics_source)
         return payload
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:
@@ -2697,6 +2703,26 @@ def _c0_char_diagnostic(
         if isinstance(row.get("refractory_mol"), (int, float))
         and float(row["refractory_mol"]) > 0.0
     )
+    organics_source = dict(getattr(sim, "_last_organics_source", {}) or {})
+    organics_char_mol = float(organics_source.get("final_char_c_mol") or 0.0)
+    if organics_char_mol > 0.0:
+        # The retired Sephton-floor partition_carbon diagnostic still
+        # emits for the same organic carrier. That row is not a second
+        # carbon pool — drop it before adding the committed organics
+        # char so a mixed feedstock (partition C + organic carrier)
+        # still sums, without double-counting CI organics.
+        from simulator.core import PyrolysisSimulator as _Sim
+
+        partition_char_mol = sum(
+            float(row["refractory_mol"])
+            for row in carbon_diagnostics
+            if isinstance(row.get("refractory_mol"), (int, float))
+            and float(row["refractory_mol"]) > 0.0
+            and not _Sim._species_is_carbonaceous_organic_carrier(
+                str(row.get("carrier") or "")
+            )
+        )
+        partition_char_mol += organics_char_mol
     ledger_char_mol = max(
         0.0,
         float(
@@ -2723,6 +2749,52 @@ def _c0_char_diagnostic(
     partition_fraction = refractory_partition.get("floor")
     if partition_fraction is None:
         partition_fraction = refractory_partition.get("iom_anchor")
+    organics_fired = organics_char_mol > 0.0
+    if organics_fired:
+        from simulator.chemistry.organics_pyrolysis import (
+            load_organics_pyrolysis_params,
+        )
+
+        char_row = dict(
+            (load_organics_pyrolysis_params().get("nascent_char") or {}).get(
+                "f_char_of_bulk_organic_C"
+            )
+            or {}
+        )
+        primary = dict(organics_source.get("primary") or {})
+        organics_fraction = primary.get("f_char_C")
+        if organics_fraction is None:
+            organics_fraction = char_row.get("value")
+        partition_block = {
+            "feedstock_id": feedstock_id,
+            "mechanism": "organic_source_term",
+            "f_refractory_organic_C": float(organics_fraction),
+            "fraction_basis": "f_char_of_bulk_organic_C",
+            "source": char_row.get("source"),
+            "regime_caveat": char_row.get("derivation"),
+        }
+    elif partition_fraction is None:
+        partition_block = {
+            "feedstock_id": feedstock_id,
+            "mechanism": "stage0_carbon_partition",
+            "f_refractory_organic_C": "not_speciated",
+            "fraction_basis": "not_speciated",
+            "source": refractory_partition.get("source"),
+            "regime_caveat": refractory_partition.get("regime_caveat"),
+        }
+    else:
+        partition_block = {
+            "feedstock_id": feedstock_id,
+            "mechanism": "stage0_carbon_partition",
+            "f_refractory_organic_C": float(partition_fraction),
+            "fraction_basis": (
+                "floor"
+                if refractory_partition.get("floor") is not None
+                else "iom_anchor"
+            ),
+            "source": refractory_partition.get("source"),
+            "regime_caveat": refractory_partition.get("regime_caveat"),
+        }
 
     o2_molar_mass_kg_per_mol = MOLAR_MASS["O2"] / 1000.0
     carbon_molar_mass_kg_per_mol = ATOMIC_WEIGHTS_G_PER_MOL["C"] / 1000.0
@@ -2808,17 +2880,7 @@ def _c0_char_diagnostic(
         "status": "WARN" if warning_fired else "OK",
         "diagnostic_only": True,
         "warning": warning,
-        "partition": {
-            "feedstock_id": feedstock_id,
-            "f_refractory_organic_C": float(partition_fraction),
-            "fraction_basis": (
-                "floor"
-                if refractory_partition.get("floor") is not None
-                else "iom_anchor"
-            ),
-            "source": refractory_partition.get("source"),
-            "regime_caveat": refractory_partition.get("regime_caveat"),
-        },
+        "partition": partition_block,
         "inventory": {
             "formed_refractory_char_C_mol": partition_char_mol,
             "refractory_char_C_mol": refractory_char_mol,
@@ -2929,6 +2991,20 @@ def _c0_char_diagnostic(
                 "speciation"
             ),
         },
+        "reductant_inventory": {
+            "account": SOLID_CHAR_CARBON_ACCOUNT,
+            "species": "C",
+            "char_C_mol": refractory_char_mol,
+            "char_C_kg": refractory_char_mol * carbon_molar_mass_kg_per_mol,
+            "role": "in_situ_reductant",
+            "note": "Surviving char is debitable reductant inventory, not waste.",
+        },
+        "evolved_gas": (
+            dict(getattr(sim, "_last_organics_source", {}) or {}).get(
+                "evolved_gas_combined"
+            )
+            or {}
+        ),
     }
 
 

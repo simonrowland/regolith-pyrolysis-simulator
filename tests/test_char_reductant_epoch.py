@@ -88,7 +88,14 @@ def _raw_feed_c_atoms(sim: PyrolysisSimulator) -> float:
 
 
 def test_ci_commits_refractory_char_account_from_sephton_partition() -> None:
-    """CI Stage-0 withholds f_refractory * organic C as solid char."""
+    """CI Stage-0 commits surviving char from the organics source term.
+
+    Mechanism: nascent char is Alexander inert 0.725 of IOM C times the
+    Sephton 0.70 IOM share (0.5075 of bulk organic C), then Boudouard
+    at Stage-0 T and tar coke adjust the surviving inventory. The HyPy
+    floor 0.39 remains in stage0_carbon_partition.yaml as the aggressive-
+    release lower bound, not the committed amount.
+    """
     sim = _build_sim("ci_carbonaceous_chondrite")
     partition = (
         sim._load_carbon_partition_config()
@@ -99,20 +106,22 @@ def test_ci_commits_refractory_char_account_from_sephton_partition() -> None:
     assert f_ref == pytest.approx(0.39)
 
     char_mol = _committed_char_mol(sim)
-    carrier_kg = sim.inventory.raw_components_kg["carbonaceous_organic"]
-    carrier_formula = resolve_species_formula(
-        "carbonaceous_organic", sim.species_formula_registry
+    expected_char_mol = float(
+        sim._last_organics_source["final_char_c_mol"]
     )
-    carrier_mol = carrier_kg / carrier_formula.molar_mass_kg_per_mol()
-    carrier_c_mol = carrier_formula.atom_moles(carrier_mol)["C"]
-    expected_char_mol = carrier_c_mol * f_ref
     assert char_mol == pytest.approx(expected_char_mol)
-
-    # Labile C went to CO2; solid char is not also in offgas as CO2.
-    co2_mol = float(
-        sim.atom_ledger.mol_by_account("terminal.offgas").get("CO2", 0.0) or 0.0
-    )
-    assert co2_mol >= carrier_c_mol - expected_char_mol
+    # Magnitude pin: Alexander 0.5075 nascent + tar coke − Boudouard at
+    # Stage-0 1050 C. Self-parity above is necessary; this catches a
+    # silent class-constant move (B4).
+    assert char_mol == pytest.approx(1305.7985635282805)
+    assert char_mol > f_ref * resolve_species_formula(
+        "carbonaceous_organic", sim.species_formula_registry
+    ).atom_moles(
+        sim.inventory.raw_components_kg["carbonaceous_organic"]
+        / resolve_species_formula(
+            "carbonaceous_organic", sim.species_formula_registry
+        ).molar_mass_kg_per_mol()
+    )["C"]
     assert _total_c_atoms(sim) == pytest.approx(_raw_feed_c_atoms(sim))
 
 
@@ -125,13 +134,16 @@ def test_ci_total_c_atom_closure_across_all_accounts() -> None:
     # FeO + C path moves C from solid char to CO; total C must hold.
     sim.melt.temperature_C = FEO_CHAR_REDUCTION_MIN_T_C + 50.0
     char_before = _committed_char_mol(sim)
+    co_before = float(
+        sim.atom_ledger.mol_by_account("terminal.offgas").get("CO", 0.0) or 0.0
+    )
     diag = sim._apply_char_feo_reduction()
     assert diag["extent_mol"] == pytest.approx(char_before)
     assert _total_c_atoms(sim) == pytest.approx(total_before)
     assert _committed_char_mol(sim) == pytest.approx(0.0)
     assert float(
         sim.atom_ledger.mol_by_account("terminal.offgas").get("CO", 0.0) or 0.0
-    ) == pytest.approx(char_before)
+    ) == pytest.approx(co_before + char_before)
     fe_mol = float(
         sim.atom_ledger.mol_by_account("process.metal_phase").get("Fe", 0.0)
         or 0.0
@@ -283,18 +295,20 @@ def test_co_basis_lance_uses_half_mole_o2_per_mole_char(monkeypatch) -> None:
         lambda: ("C_plus_half_O2_to_CO", 0.5, "CO"),
     )
     o2_mol = 0.5 * half_char
+    co_before = float(
+        sim.atom_ledger.mol_by_account("terminal.offgas").get("CO", 0.0) or 0.0
+    )
     sim.atom_ledger.load_external_mol(
         "reservoir.fo2_buffer", {"O2": o2_mol}, source="test CO-basis lance",
         material_origin="reagent",
     )
 
     diagnostic = sim._apply_char_lance_oxidation(o2_available_mol=o2_mol)
-
     assert diagnostic["extent_mol"] == pytest.approx(half_char)
     assert diagnostic["o2_consumed_mol"] == pytest.approx(o2_mol)
     assert float(
         sim.atom_ledger.mol_by_account("terminal.offgas").get("CO", 0.0) or 0.0
-    ) == pytest.approx(half_char)
+    ) == pytest.approx(co_before + half_char)
 
 
 def test_ci_c0_char_diagnostic_reads_committed_ledger_inventory() -> None:
@@ -305,14 +319,13 @@ def test_ci_c0_char_diagnostic_reads_committed_ledger_inventory() -> None:
         allow_fallback_vapor=True,
     ).run()
     diagnostic = payload["run_metadata"]["c0_char_diagnostic"]
+    live_char = diagnostic["inventory"]["refractory_char_C_mol"]
     assert diagnostic["inventory"]["formed_refractory_char_C_mol"] > 0.0
-    assert diagnostic["inventory"]["refractory_char_C_mol"] == pytest.approx(
-        958.7221688514541
-    )
+    assert live_char > 0.0
     # Default C0 has no bubbler dose; un-lanced residual equals inventory.
     assert diagnostic["lance_stoichiometry"]["C_plus_O2_to_CO2"][
         "un_lanced_char_C_mol"
-    ] == pytest.approx(958.7221688514541)
+    ] == pytest.approx(live_char)
     assert diagnostic["status"] == "WARN"
     assert diagnostic["contamination_risk"]["status"] == "WARN"
     assert "SiO2+C" in diagnostic["contamination_risk"]["out_of_scope"]

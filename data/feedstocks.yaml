@@ -1984,16 +1984,14 @@ ci_carbonaceous_chondrite:
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [30, 55]
-      offgas_mode: complete_oxidation
-      oxygen_source: controlled_stage0_O2
+      offgas_mode: vacuum_pyrolysis
       source: "REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup."
     hydrocarbons:
       template_formula: generic_carbonaceous_hydrocarbon
       decomposition_temp_range_C: [200, 500]
       final_temp_C: 1050
       cap_kg_per_tonne: [15, 30]
-      offgas_mode: complete_oxidation
-      oxygen_source: controlled_stage0_O2
+      offgas_mode: vacuum_pyrolysis
       source: "MODELED BUCKET (not a cited table); generic carbonaceous hydrocarbon cleanup bucket; C/H mass fractions approximate sourcebook-style volatile tables when exact organics speciation is unavailable."
   anhydrous_silicate_after_degassing:
     note: "650-800 kg per tonne survives C0; this is the C1-C6 input"
@@ -2090,8 +2088,7 @@ cm_carbonaceous_chondrite:
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [15, 30]
-      offgas_mode: complete_oxidation
-      oxygen_source: controlled_stage0_O2
+      offgas_mode: vacuum_pyrolysis
       source: "REF-025 Pearson et al. 2006 + Smith & Kaplan 1970 constrain CM organic matter to 2.0 wt% [1.5, 3.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup."
   anhydrous_silicate_after_degassing:
     note: "Similar to CI but slightly higher SiO2, lower FeO"
@@ -2233,8 +2230,7 @@ ceres_regolith:
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [5, 15]
-      offgas_mode: complete_oxidation
-      oxygen_source: controlled_stage0_O2
+      offgas_mode: vacuum_pyrolysis
       source: "REF-008 De Sanctis et al. 2017 constrains Ceres global organics to <=1 wt%; generic C/H/O/N inventory is a process surrogate for oxidative cleanup."
   anhydrous_silicate_after_degassing:
     note: "Identical to CI (SiO2 32-40, FeO 25-35, MgO 22-26) but slightly Mg-richer"

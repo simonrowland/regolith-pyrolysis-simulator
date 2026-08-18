@@ -1516,14 +1516,22 @@ def test_runner_schema_shape_contract():
     ("scenario", "reagent_elements"),
     (
         (SCENARIOS[1], {"C", "O"}),
-        (SCENARIOS[2], {"O"}),
+        (SCENARIOS[2], set()),
     ),
-    ids=("mars_stage0_process_gas", "ci_stage0_oxidant"),
+    ids=("mars_stage0_process_gas", "ci_stage0_vacuum_organics"),
 )
 def test_stage0_yield_disposition_closes_from_typed_origin(
     scenario,
     reagent_elements,
 ):
+    """Typed-origin reagent-cycle closure.
+
+    Mars still consumes declared C+O reagents. CI organics no longer
+    declare ``oxygen_source: controlled_stage0_O2`` — Stage 0 is the
+    vacuum organics source term, so the reagent-cycle O row is gone.
+    Complete-oxidation fixtures that still declare an oxidant keep the
+    O2 credit (see ``test_feedstock_inventory``).
+    """
     payload = _run_scenario(scenario)
     disposition = payload["yield_disposition"]
 
@@ -1548,7 +1556,7 @@ def test_stage0_yield_disposition_closes_from_typed_origin(
     assert {
         row["attribution_method"]
         for row in disposition["reagent_cycle"]["rows"]
-    } == {"tracked"}
+    } == ({"tracked"} if reagent_elements else set())
 
 
 def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):

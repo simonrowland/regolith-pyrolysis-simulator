@@ -698,6 +698,49 @@ def test_stage0_formula_offgas_mode_is_required():
         sim.load_batch("comet", mass_kg=1000.0)
 
 
+def _stage0_formula_entry(**overrides):
+    entry = {
+        "template_formula": "generic_carbonaceous_organic",
+        "decomposition_temp_range_C": [200.0, 800.0],
+        "final_temp_C": 1050.0,
+        "cap_kg_per_tonne": [30.0, 55.0],
+        "offgas_mode": "complete_oxidation",
+        "source": "test formula metadata",
+    }
+    entry.update(overrides)
+    return entry
+
+
+def test_complete_oxidation_organic_carrier_requires_oxygen_source():
+    with pytest.raises(ValueError, match="oxygen_source is required"):
+        PyrolysisSimulator._validate_stage0_formula_metadata(
+            "carbonaceous_organic",
+            _stage0_formula_entry(offgas_mode="complete_oxidation"),
+        )
+
+
+def test_vacuum_pyrolysis_with_oxygen_source_raises():
+    with pytest.raises(
+        ValueError,
+        match="offgas_mode=vacuum_pyrolysis with oxygen_source=",
+    ):
+        PyrolysisSimulator._validate_stage0_formula_metadata(
+            "carbonaceous_organic",
+            _stage0_formula_entry(
+                offgas_mode="vacuum_pyrolysis",
+                oxygen_source="controlled_stage0_O2",
+            ),
+        )
+
+
+def test_unknown_offgas_mode_still_raises():
+    with pytest.raises(ValueError, match="offgas_mode is unknown"):
+        PyrolysisSimulator._validate_stage0_formula_metadata(
+            "carbonaceous_organic",
+            _stage0_formula_entry(offgas_mode="not_a_real_mode"),
+        )
+
+
 def test_mixed_organic_stage0_formula_routes_to_oxidized_offgas():
     sim = _sim(
         {

@@ -181,6 +181,7 @@ REACTION_FAMILY_PARTITION_CARBON = "partition_carbon"
 REACTION_FAMILY_INERT_TO_RUMP = "inert_to_rump"
 REACTION_FAMILY_CHAR_LANCE_OXIDATION = "char_lance_oxidation"
 REACTION_FAMILY_CHAR_FEO_REDUCTION = "char_feo_reduction"
+REACTION_FAMILY_ORGANIC_SOURCE_TERM = "organic_source_term"
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_COMPLETE_OXIDATION,
     REACTION_FAMILY_SULFATE_CARBON,
@@ -195,6 +196,7 @@ VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_INERT_TO_RUMP,
     REACTION_FAMILY_CHAR_LANCE_OXIDATION,
     REACTION_FAMILY_CHAR_FEO_REDUCTION,
+    REACTION_FAMILY_ORGANIC_SOURCE_TERM,
 })
 
 OXYGEN_SPECIES = "O2"
@@ -260,6 +262,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         STAGE0_FOULANT_ACCOUNT,
         "process.cleaned_melt",
         SOLID_CHAR_CARBON_ACCOUNT,
+        "process.overhead_gas",
+        "process.wall_deposit",
         "process.metal_phase",
         "reservoir.stage0_oxidant",
         "reservoir.stage0_process_gas",
@@ -394,6 +398,10 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             )
         if reaction_family == REACTION_FAMILY_CHAR_FEO_REDUCTION:
             return self._dispatch_char_feo_reduction(
+                controls, registry, resolve_species_formula, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_ORGANIC_SOURCE_TERM:
+            return self._dispatch_organic_source_term(
                 controls, registry, resolve_species_formula, control_audit,
             )
         if reaction_family == REACTION_FAMILY_BOUDOUARD:
@@ -1667,6 +1675,103 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                     "one-hour timestep; no sourced kinetic law or free "
                     "rate constant"
                 ),
+            },
+        )
+
+    def _dispatch_organic_source_term(
+        self,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        """Bulk organic -> gas + tar + char. Combined three-stage commit.
+
+        CO in products_kg is char-fate output, never a primary product.
+        Tar credits ``process.overhead_gas`` so the existing condensation
+        wall split can see it. Optional wall_tar_kg credits the existing
+        ``process.wall_deposit`` account (no parallel fouling path).
+        """
+        species = str(controls.get("species") or "")
+        feed_kg = float(controls.get("feed_kg") or 0.0)
+        products_kg = dict(controls.get("products_kg") or {})
+        solid_char_c_kg = float(controls.get("solid_char_c_kg") or 0.0)
+        tar_kg = float(controls.get("tar_kg") or 0.0)
+        wall_tar_kg = float(controls.get("wall_tar_kg") or 0.0)
+        if not species or feed_kg <= 1e-12:
+            return self._out_of_domain(
+                "organic_source_term requires species and positive feed_kg",
+                control_audit=control_audit,
+            )
+        feed_formula = resolve_species_formula(species, registry)
+        mol_feed = feed_kg / feed_formula.molar_mass_kg_per_mol()
+        if mol_feed <= 0.0:
+            return self._out_of_domain(
+                f"organic_source_term feed_kg {feed_kg!r} non-positive",
+                control_audit=control_audit,
+            )
+        debits: dict[str, dict[str, float]] = {
+            "process.stage0_volatile_feed": {species: mol_feed},
+        }
+        credits: dict[str, dict[str, float]] = {}
+        offgas_mol: dict[str, float] = {}
+        for product_species, product_kg in products_kg.items():
+            kg_val = float(product_kg)
+            if kg_val <= 1e-12:
+                continue
+            product_formula = resolve_species_formula(
+                str(product_species), registry,
+            )
+            offgas_mol[str(product_species)] = (
+                kg_val / product_formula.molar_mass_kg_per_mol()
+            )
+        if offgas_mol:
+            credits[OFFGAS_ACCOUNT] = offgas_mol
+        if solid_char_c_kg > 1e-12:
+            c_formula = resolve_species_formula(CHAR_SPECIES, registry)
+            mol_char = solid_char_c_kg / c_formula.molar_mass_kg_per_mol()
+            if mol_char > 0.0:
+                credits[SOLID_CHAR_CARBON_ACCOUNT] = {CHAR_SPECIES: mol_char}
+        if tar_kg > 1e-12:
+            tar_formula = resolve_species_formula("organic_tar", registry)
+            mol_tar = tar_kg / tar_formula.molar_mass_kg_per_mol()
+            if mol_tar > 0.0:
+                credits["process.overhead_gas"] = {"organic_tar": mol_tar}
+        if wall_tar_kg > 1e-12:
+            tar_formula = resolve_species_formula("organic_tar", registry)
+            mol_wall = wall_tar_kg / tar_formula.molar_mass_kg_per_mol()
+            if mol_wall > 0.0:
+                credits.setdefault("process.wall_deposit", {})
+                credits["process.wall_deposit"]["organic_tar"] = mol_wall
+        if not credits:
+            return self._empty_result(
+                f"organic_source_term skipped: no positive products for "
+                f"{species!r}",
+                control_audit=control_audit,
+            )
+        atom_proof = build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula,
+        )
+        proposal = LedgerTransitionProposal(
+            debits=debits,
+            credits=credits,
+            reason=f"stage0_organic_source_term_{species}",
+            atom_balance_proof=atom_proof,
+        )
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=proposal,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_ORGANIC_SOURCE_TERM,
+                "species": species,
+                "feed_kg": feed_kg,
+                "offgas_kg": dict(products_kg),
+                "solid_char_c_kg": solid_char_c_kg,
+                "tar_kg": tar_kg,
+                "wall_tar_kg": wall_tar_kg,
+                "output_status": "status_bearing_non_authoritative",
             },
         )
 

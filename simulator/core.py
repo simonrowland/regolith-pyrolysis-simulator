@@ -1266,6 +1266,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_char_lance_diagnostic: Dict[str, Any] = {}
         self._last_char_feo_reduction_diagnostic: Dict[str, Any] = {}
         self._last_char_contamination_diagnostic: Dict[str, Any] = {}
+        self._last_organics_source: Dict[str, Any] = {}
         required_carbon_kg = self.inventory.carbon_reductant_required_kg
         if (
             required_carbon_kg > 1e-12
@@ -7742,6 +7743,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # strip it from residual so raw_feedstock does not double-count.
         residual_for_raw = dict(self.inventory.residual_components_kg)
         residual_for_raw.pop(CHAR_SPECIES, None)
+        residual_for_raw.pop('organic_tar', None)
         self._load_ledger_account(
             'process.raw_feedstock',
             residual_for_raw,
@@ -7893,19 +7895,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         product_totals: Dict[str, float] = {}
         for species, entry in entries.items():
             mode = str(entry.get('offgas_mode', '')).lower()
-            if mode not in {'complete_oxidation', 'oxidized'}:
-                continue
             kg = float(self.inventory.raw_components_kg.get(species, 0.0))
             if kg <= 1e-12:
                 continue
-            f_refractory = (
-                refractory_fraction
-                if self._species_is_carbonaceous_organic_carrier(species)
-                else 0.0
-            )
+            if mode == 'vacuum_pyrolysis':
+                spec = self._organic_source_spec(species, kg, entry, feedstock)
+                if spec is not None:
+                    specs.append(spec)
+                    self._merge_masses(product_totals, spec['products_kg'])
+                continue
+            if mode not in {'complete_oxidation', 'oxidized'}:
+                continue
             products_kg, oxidant_kg, solid_char_c_kg = (
                 self._oxidized_stage0_products(
-                    species, kg, refractory_c_fraction=f_refractory
+                    species, kg, refractory_c_fraction=0.0
                 )
             )
             if not products_kg and solid_char_c_kg <= 1e-12:
@@ -7947,6 +7950,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         from engines.builtin.stage0_pretreatment import (
             REACTION_FAMILY_COMPLETE_OXIDATION,
+            REACTION_FAMILY_ORGANIC_SOURCE_TERM,
         )
 
         feed_account = 'process.stage0_volatile_feed'
@@ -7955,7 +7959,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species = str(spec['species'])
             feed_kg = float(spec['feed_kg'])
             products_kg = dict(spec['products_kg'])
-            oxidant_kg = float(spec['oxidant_kg'])
+            oxidant_kg = float(spec.get('oxidant_kg') or 0.0)
+            if spec.get('reaction_family') == REACTION_FAMILY_ORGANIC_SOURCE_TERM:
+                self.atom_ledger.load_external(
+                    feed_account,
+                    {species: feed_kg},
+                    source=f'{label} Stage 0 {species} organic feed',
+                    material_origin='feedstock',
+                )
+                self._dispatch_and_commit(
+                    ChemistryIntent.STAGE0_PRETREATMENT,
+                    control_inputs={
+                        'reaction_family': REACTION_FAMILY_ORGANIC_SOURCE_TERM,
+                        'species': species,
+                        'feed_kg': feed_kg,
+                        'products_kg': products_kg,
+                        'solid_char_c_kg': float(
+                            spec.get('solid_char_c_kg') or 0.0
+                        ),
+                        'tar_kg': float(spec.get('tar_kg') or 0.0),
+                        'wall_tar_kg': float(spec.get('wall_tar_kg') or 0.0),
+                    },
+                )
+                continue
 
             # Seed the feed + oxidant accounts (legacy
             # load_external semantics; the proposal layer expects the
@@ -9569,6 +9595,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         solid_char_park = dict(buckets.pop('_solid_char_carbon', {}) or {})
         if solid_char_park:
             self._merge_masses(residual, solid_char_park)
+        organic_tar_park = dict(buckets.pop('_organic_tar', {}) or {})
+        if organic_tar_park:
+            self._merge_masses(residual, organic_tar_park)
         stage0_mass_balance_delta_kg = self._add_stage0_balance_residue(
             residual,
             mass_kg,
@@ -9851,7 +9880,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
         offgas_mode = str(entry['offgas_mode']).lower()
         if offgas_mode not in {'complete_oxidation', 'oxidized',
-                               'native_mixture'}:
+                               'native_mixture', 'vacuum_pyrolysis'}:
             raise ValueError(
                 f'stage0_formula_inventory.{species}.offgas_mode is unknown'
             )
@@ -9859,6 +9888,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if needs_oxygen_source and not entry.get('oxygen_source'):
             raise ValueError(
                 f'stage0_formula_inventory.{species}.oxygen_source is required'
+            )
+        if (
+            offgas_mode == 'vacuum_pyrolysis'
+            and cls._stage0_entry_declares_oxidant(entry)
+        ):
+            raise ValueError(
+                f'stage0_formula_inventory.{species} cannot declare '
+                f'offgas_mode=vacuum_pyrolysis with oxygen_source='
+                f'{entry.get("oxygen_source")!r}'
             )
 
     @staticmethod
@@ -9886,21 +9924,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # dedicated side map that _build_process_inventory merges into
         # residual_components_kg after classification.
         solid_char_park = buckets.setdefault('_solid_char_carbon', {})
+        organic_tar_park = buckets.setdefault('_organic_tar', {})
         for species, kg in list(gas_bucket.items()):
             entry = entries.get(species)
             if not entry:
                 continue
             mode = str(entry.get('offgas_mode', '')).lower()
+            if mode == 'vacuum_pyrolysis':
+                spec = self._organic_source_spec(
+                    species, kg, entry, feedstock
+                )
+                if spec is not None:
+                    gas_bucket.pop(species, None)
+                    self._merge_masses(gas_bucket, spec['products_kg'])
+                    solid_char_c_kg = float(spec.get('solid_char_c_kg') or 0.0)
+                    if solid_char_c_kg > 1e-12:
+                        solid_char_park[CHAR_SPECIES] = (
+                            solid_char_park.get(CHAR_SPECIES, 0.0) + solid_char_c_kg
+                        )
+                    tar_kg = float(spec.get('tar_kg') or 0.0) + float(
+                        spec.get('wall_tar_kg') or 0.0
+                    )
+                    if tar_kg > 1e-12:
+                        organic_tar_park['organic_tar'] = (
+                            organic_tar_park.get('organic_tar', 0.0) + tar_kg
+                        )
+                continue
             if mode not in {'complete_oxidation', 'oxidized'}:
                 continue
-            f_refractory = (
-                refractory_fraction
-                if self._species_is_carbonaceous_organic_carrier(species)
-                else 0.0
-            )
             products_kg, oxidant_kg, solid_char_c_kg = (
                 self._oxidized_stage0_products(
-                    species, kg, refractory_c_fraction=f_refractory
+                    species, kg, refractory_c_fraction=0.0
                 )
             )
             gas_bucket.pop(species, None)
@@ -9981,6 +10035,156 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             CHAR_SPECIES, self.species_formula_registry
         ).molar_mass_kg_per_mol()
         return products_kg, oxidant_kg, solid_char_c_kg
+
+    def _stage0_organics_temperature_C(
+        self,
+        entry: Mapping[str, Any],
+        feedstock: Mapping[str, Any],
+    ) -> float:
+        final_temp = entry.get('final_temp_C')
+        if final_temp is not None:
+            return float(final_temp)
+        range_C = feedstock.get('stage0_temp_range_C') or [20.0, 1050.0]
+        return float(range_C[-1])
+
+    def _stage0_organics_pO2_bar(self) -> float:
+        from simulator.chemistry.organics_pyrolysis import (
+            load_organics_pyrolysis_params,
+        )
+
+        fate = (load_organics_pyrolysis_params().get('char_fate') or {})
+        row = fate.get('vacuum_pO2_bar')
+        if isinstance(row, Mapping):
+            return float(row.get('value') or 1.0e-12)
+        return 1.0e-12
+
+    def _install_organic_tar_formula(self, tar_atoms: Mapping[str, float]) -> None:
+        from simulator.accounting.formulas import SpeciesFormula
+
+        cleaned = {
+            str(element): float(count)
+            for element, count in dict(tar_atoms).items()
+            if float(count) > 1e-18
+        }
+        if not cleaned:
+            return
+        self.species_formula_registry['organic_tar'] = SpeciesFormula.from_atoms(
+            'organic_tar',
+            cleaned,
+            estimated=True,
+            source='organics_pyrolysis leftover-atom formula',
+        )
+
+    @staticmethod
+    def _stage0_entry_declares_oxidant(entry: Mapping[str, Any]) -> bool:
+        """True when the formula row names a Stage-0 oxidant (complete oxidation)."""
+        return bool(str(entry.get('oxygen_source') or '').strip())
+
+    def _organic_partition_is_speciated(self, feedstock_key: str) -> bool:
+        """Refuse the organics source term when the partition row is ungrounded.
+
+        Same row ``_refractory_organic_c_fraction`` reads. ``not_speciated``
+        or both anchors missing is AGENTS category 1: missing input → refuse,
+        do not apply the Murchison class constant.
+        """
+        if not feedstock_key:
+            return False
+        partition_row = (
+            self._load_carbon_partition_config()
+            .get('phase_partitions', {})
+            .get(feedstock_key, {})
+            or {}
+        )
+        refractory = dict(partition_row.get('f_refractory_organic_C') or {})
+        if str(refractory.get('status') or '') == 'not_speciated':
+            return False
+        if refractory.get('floor') is None and refractory.get('iom_anchor') is None:
+            return False
+        return True
+
+    def _organic_source_spec(
+        self,
+        species: str,
+        kg: float,
+        entry: Mapping[str, Any],
+        feedstock: Mapping[str, Any],
+    ) -> Dict[str, Any] | None:
+        """Primary pyrolysis + char fate + tar fate for one organic carrier."""
+        from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_ORGANIC_SOURCE_TERM,
+        )
+        from simulator.chemistry.organics_pyrolysis import apply_organics_source
+
+        feedstock_key = str(getattr(self, '_batch_feedstock_key', '') or '')
+        if not self._organic_partition_is_speciated(feedstock_key):
+            return None
+
+        formula = resolve_species_formula(species, self.species_formula_registry)
+        species_mol = float(kg) / formula.molar_mass_kg_per_mol()
+        atoms = formula.atom_moles(species_mol)
+        temperature_C = self._stage0_organics_temperature_C(entry, feedstock)
+        wall_T = float(
+            getattr(
+                getattr(self, 'condensation_model', None),
+                'wall_temperature_C',
+                1500.0,
+            )
+            or 1500.0
+        )
+        result = apply_organics_source(
+            atoms,
+            temperature_C,
+            self._stage0_organics_pO2_bar(),
+            wall_T,
+        )
+        if not result.closed:
+            raise AccountingError(
+                'organic source term failed independent atom closure: '
+                f'{result.atom_closure}'
+            )
+        tar_atoms = dict(result.final_tar_atoms)
+        wall_atoms = dict(result.wall_tar_atoms)
+        # One formula for leftover tar. Wall tar, if any, uses the same
+        # ratio as remaining+coat combined so a single species id closes.
+        combined_tar = dict(tar_atoms)
+        for element, count in wall_atoms.items():
+            combined_tar[element] = combined_tar.get(element, 0.0) + count
+        self._install_organic_tar_formula(combined_tar or tar_atoms)
+
+        def _atoms_to_kg(atom_map: Mapping[str, float]) -> float:
+            total = 0.0
+            for element, count in dict(atom_map).items():
+                total += (
+                    float(count) * ATOMIC_WEIGHTS_G_PER_MOL[str(element)] / 1000.0
+                )
+            return total
+
+        products_kg = {
+            product: mol * resolve_species_formula(
+                product, self.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for product, mol in result.final_gas_mol.items()
+            if mol > 0.0
+        }
+        char_kg = result.final_char_c_mol * resolve_species_formula(
+            CHAR_SPECIES, self.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        tar_kg = _atoms_to_kg(tar_atoms)
+        wall_tar_kg = _atoms_to_kg(wall_atoms)
+        self._last_organics_source = result.as_dict()
+        if not products_kg and char_kg <= 1e-12 and tar_kg <= 1e-12:
+            return None
+        return {
+            'reaction_family': REACTION_FAMILY_ORGANIC_SOURCE_TERM,
+            'species': species,
+            'feed_kg': kg,
+            'products_kg': products_kg,
+            'oxidant_kg': 0.0,
+            'solid_char_c_kg': char_kg,
+            'tar_kg': tar_kg,
+            'wall_tar_kg': wall_tar_kg,
+        }
 
     def _refractory_organic_c_fraction(self, feedstock_key: str) -> float:
         """Return Sephton-floor (or iom_anchor) f_refractory for feedstock."""

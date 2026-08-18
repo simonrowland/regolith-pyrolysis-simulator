@@ -115,14 +115,12 @@ def test_provider_declares_only_stage0_pretreatment_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_exactly_nineteen_stage0_accounts():
-    """Provider declares exactly the nineteen accounts touched by every
-    legacy ``_record_stage0_*_transitions`` call including carbonate
-    decomposition and cation-sulfate carbothermal cleanup (MO -> melt,
-    CaS -> sulfide matte), plus foulant residual-C diagnostic accounts.
-    MC-4b adds the process.stage0_foulant debit reservoir for executable
-    salt/overhead phase transfers. Pinning the set stops a future refactor
-    from silently widening the surface beyond Stage 0's scope.
+def test_provider_declares_exactly_twenty_one_stage0_accounts():
+    """Provider declares the Stage-0 accounts plus organics tar hookup.
+
+    ``process.overhead_gas`` and ``process.wall_deposit`` are admitted so
+    tar can use the existing condensation / coating path. Pinning the set
+    stops a future refactor from silently widening the surface.
     """
 
     provider = BuiltinStage0PretreatmentProvider()
@@ -137,6 +135,8 @@ def test_provider_declares_exactly_nineteen_stage0_accounts():
             "process.stage0_foulant",
             "process.cleaned_melt",
         "process.solid_char_carbon",
+        "process.overhead_gas",
+        "process.wall_deposit",
         "process.metal_phase",
         "reservoir.stage0_oxidant",
         "reservoir.stage0_process_gas",
@@ -152,7 +152,7 @@ def test_provider_declares_exactly_nineteen_stage0_accounts():
     # Sanity: Stage 0 must not touch unrelated downstream accounts.
     # process.metal_phase is admitted only for t-325 FeO+C -> Fe + CO.
     assert "process.stage0_carbon_reductant" not in profile.declared_accounts
-    assert "process.overhead_gas" not in profile.declared_accounts
+    assert "process.overhead_gas" in profile.declared_accounts
     assert "process.condensation_train" not in profile.declared_accounts
     assert "terminal.oxygen_mre_anode_stored" not in profile.declared_accounts
     assert "terminal.oxygen_melt_offgas_stored" not in profile.declared_accounts

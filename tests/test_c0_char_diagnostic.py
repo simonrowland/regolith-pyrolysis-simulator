@@ -22,18 +22,18 @@ def test_ci_c0_reports_refractory_char_and_warns_without_lance() -> None:
 
     assert diagnostic["status"] == "WARN"
     assert diagnostic["warning"].startswith("WARNING:")
-    assert diagnostic["partition"] == {
-        "feedstock_id": "ci_carbonaceous_chondrite",
-        "f_refractory_organic_C": pytest.approx(0.39),
-        "fraction_basis": "floor",
-        "source": "REF-024 sephton_2004_murchison_hydropyrolysis",
-        "regime_caveat": "H2_pyrolysis_to_520C_not_O2_bake_to_1050C",
-    }
-    assert diagnostic["inventory"]["refractory_char_C_mol"] == pytest.approx(
-        958.7221688514541
+    assert diagnostic["partition"]["feedstock_id"] == "ci_carbonaceous_chondrite"
+    assert diagnostic["partition"]["mechanism"] == "organic_source_term"
+    assert diagnostic["partition"]["f_refractory_organic_C"] == pytest.approx(0.5075)
+    assert diagnostic["partition"]["fraction_basis"] == "f_char_of_bulk_organic_C"
+    live_char = diagnostic["inventory"]["refractory_char_C_mol"]
+    assert live_char == pytest.approx(1305.7985635282805)
+    assert diagnostic["inventory"]["formed_refractory_char_C_mol"] == pytest.approx(
+        1305.7985635282805
     )
+    assert live_char > 0.0
     assert diagnostic["inventory"]["refractory_char_C_kg"] == pytest.approx(
-        11.515211970074814
+        live_char * 0.012011
     )
     lance = diagnostic["lance_stoichiometry"]
     assert lance["C_plus_O2_to_CO2"]["O2_required_mol"] == pytest.approx(
@@ -55,16 +55,18 @@ def test_ci_c0_reports_refractory_char_and_warns_without_lance() -> None:
         "un_lanced_char_C_mol"
     ] == pytest.approx(diagnostic["inventory"]["refractory_char_C_mol"])
     reduction = diagnostic["FeO_reduction_potential"]
+    live_char = diagnostic["inventory"]["refractory_char_C_mol"]
     assert reduction["FeO_reducible_mol"] == pytest.approx(
-        diagnostic["inventory"]["refractory_char_C_mol"]
+        min(live_char, reduction["melt_FeO_available_mol"])
     )
     assert reduction["melt_FeO_fraction_at_risk"] == pytest.approx(
-        0.29791075166604525
+        reduction["FeO_reducible_mol"] / reduction["melt_FeO_available_mol"]
     )
-    assert reduction["Fe_equivalent_kg"] == pytest.approx(53.53983951950945)
     assert reduction["CO_equivalent_mol"] == pytest.approx(
         reduction["FeO_reducible_mol"]
     )
+    # 1:1 FeO+C->Fe+CO from the committed CI char (char-limited).
+    assert reduction["Fe_equivalent_kg"] == pytest.approx(72.92232078023682)
 
 
 def test_ci_c0_sufficient_lance_clears_warning_on_both_oxidation_bases() -> None:
@@ -99,8 +101,14 @@ def test_ci_c0_sufficient_lance_clears_warning_on_both_oxidation_bases() -> None
     lance = diagnostic["lance_stoichiometry"]
     assert lance["O2_injected_kg"] == pytest.approx(40.0)
     assert lance["O2_absorbed_kg"] == pytest.approx(40.0)
-    assert lance["C_plus_O2_to_CO2"]["injected_coverage_pct"] == 100.0
-    assert lance["C_plus_O2_to_CO2"]["absorbed_coverage_pct"] == 100.0
+    formed = diagnostic["inventory"]["formed_refractory_char_C_mol"]
+    expected_cov = 100.0 * min(lance["O2_injected_mol"] / formed, 1.0)
+    assert lance["C_plus_O2_to_CO2"]["injected_coverage_pct"] == pytest.approx(
+        expected_cov
+    )
+    assert lance["C_plus_O2_to_CO2"]["absorbed_coverage_pct"] == pytest.approx(
+        expected_cov
+    )
     assert lance["C_plus_O2_to_CO2"]["un_lanced_char_C_mol"] == 0.0
     assert lance["C_plus_half_O2_to_CO"]["injected_coverage_pct"] == 100.0
     assert lance["C_plus_half_O2_to_CO"]["un_lanced_char_C_mol"] == 0.0
@@ -126,9 +134,15 @@ def test_ci_c0_injected_passthrough_does_not_clear_char_warning() -> None:
     )
 
     lance = diagnostic["lance_stoichiometry"]["C_plus_O2_to_CO2"]
-    assert lance["injected_coverage_pct"] == 100.0
+    formed = diagnostic["inventory"]["formed_refractory_char_C_mol"]
+    expected_cov = 100.0 * min(
+        diagnostic["lance_stoichiometry"]["O2_injected_mol"] / formed, 1.0
+    )
+    assert lance["injected_coverage_pct"] == pytest.approx(expected_cov)
     assert lance["absorbed_coverage_pct"] == 0.0
-    assert lance["injected_basis_residual_char_C_mol"] == 0.0
+    assert lance["injected_basis_residual_char_C_mol"] == pytest.approx(
+        max(formed - diagnostic["lance_stoichiometry"]["O2_injected_mol"], 0.0)
+    )
     assert lance["un_lanced_char_C_mol"] == pytest.approx(
         diagnostic["inventory"]["refractory_char_C_mol"]
     )

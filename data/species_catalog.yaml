@@ -413,6 +413,28 @@ species:
   category: gas
   estimated: false
   source: Stoichiometric molecular formula from species id.
+- id: H2
+  formula: H2
+  atoms:
+    H: 2.0
+  basis: molecular_formula
+  category: gas
+  phase: gas
+  catalog_role: vapour_species
+  direct_vapour_flux: false
+  estimated: false
+  validation:
+    status: pending_validation
+    certification_ceiling: never
+    anchor_refs: []
+  code_metadata:
+    formula_id: H2
+    canonical_aliases: []
+    request_rule: stage0_only
+    source_account: terminal.offgas
+  source: Stage-0 organic pyrolysis product; species was on the U0 demand
+    manifest but missing from the formula catalog. Status-bearing, never
+    certifying. Not a melt-fO2 owner (CHANNEL_H2 remains unowned).
 - id: NH3
   formula: NH3
   atoms:
@@ -838,6 +860,24 @@ species:
   direct_vapour_flux: false
   requires_balanced_decomposition: true
   pressure_models: []
+- id: organic_tar
+  atom_mass_fractions:
+    C: 0.84
+    H: 0.06
+    O: 0.08
+    N: 0.02
+  basis: generic_template
+  category: organic_group
+  estimated: true
+  uncertainty: high
+  formula: null
+  catalog_role: carrier_only
+  direct_vapour_flux: false
+  requires_balanced_decomposition: true
+  pressure_models: []
+  source: Lumped aromatic pyrolysis-tar template (class-level). Runtime
+    leftover-atom formulas replace this template when the source term
+    constructs a batch-specific SpeciesFormula.
 - id: AlO
   formula: AlO
   atoms:

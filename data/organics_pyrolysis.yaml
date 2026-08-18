@@ -1,0 +1,218 @@
+# Primary pyrolysis + char-fate + tar-fate parameters.
+# CACHE-INERT. Class-level coefficients are status-bearing and never
+# a measurement. Swap one row without redesigning the source term.
+#
+# Status vocabulary (existing only — no sixth vocabulary):
+#   status_bearing_non_authoritative  class-routed non-computed placement
+#   partly_grounded                   sourced shape / floor, magnitude open
+#   not_speciated                     field exists, value refused
+#   proven_zero                       independently empty inventory
+#   out_of_domain                     compute and mark
+#   refusal                           missing / unparseable, not a zero
+
+schema: organics_pyrolysis.v1
+output_status: status_bearing_non_authoritative
+
+iom_stoichiometry:
+  # Alexander 2017, Chemie der Erde: CR IOM C100H75–79O11–17N3–4S1–3.
+  # Midpoint used as the class template. Carrier atoms still come from
+  # the feedstock formula registry (generic_carbonaceous_organic today);
+  # this row is the sourced drop-in and the report provenance.
+  formula_per_C100:
+    C: 100.0
+    H: 77.0
+    O: 14.0
+    N: 3.5
+    S: 2.0
+  source: "REF-005 Alexander 2017 Chemie der Erde; CR IOM C100H75-79O11-17N3-4S1-3 midpoint"
+  status: status_bearing_non_authoritative
+  confidence: partly_grounded
+  certified_point: null
+
+iom_fraction_of_organic_C:
+  value: 0.70
+  source: "REF-024 Sephton 2004 GCA 68:1287, abstract: solvent-insoluble macromolecular material constitutes at least 70% of total organic content"
+  status: status_bearing_non_authoritative
+  confidence: partly_grounded
+  certified_point: null
+
+nascent_char:
+  # Inert / vacuum primary pyrolysis (the Stage-0 thermal split).
+  # Alexander 2017: inert flash pyrolysis of IOM at 600-650 C loses
+  # 25-30 wt%, i.e. char 70-75% of IOM. Midpoint 0.725 of IOM C.
+  # Bulk-organic carrier: 0.70 * 0.725 = 0.5075 of total organic C.
+  f_char_of_iom_C:
+    value: 0.725
+    interval: [0.70, 0.75]
+    source: "REF-005 Alexander 2017 inert flash pyrolysis 600-650 C; 25-30 wt% lost as volatiles"
+    status: status_bearing_non_authoritative
+    confidence: partly_grounded
+    certified_point: null
+  f_char_of_bulk_organic_C:
+    value: 0.5075
+    derivation: "iom_fraction 0.70 * f_char_of_iom_C 0.725"
+    source: "REF-005 REF-024 product of Sephton IOM fraction and Alexander inert char fraction"
+    status: status_bearing_non_authoritative
+    confidence: partly_grounded
+    certified_point: null
+  hy_py_floor_of_bulk_organic_C:
+    value: 0.39
+    source: "REF-024 Sephton 2004 HyPy: 0.70 IOM * 0.56 residue = 0.39; HyPy is the most aggressive release regime, so this is a lower bound on char"
+    regime_caveat: H2_pyrolysis_to_520C_not_inert_or_O2_bake
+    status: status_bearing_non_authoritative
+    confidence: partly_grounded
+    certified_point: null
+  default_basis: f_char_of_bulk_organic_C
+
+# Voropaev et al. 2023, Solar System Research 57(6):581,
+# doi:10.1134/S0038094623050064. Murchison CM2, stepwise 50-800 C,
+# 30-min holds, helium purge between steps, GC. Table 2 cumulative %
+# on the paper's own 200-800 C basis. Step sums reproduce printed
+# totals (CO2 29800, CO 6110, N2 3060, CH4 238, H2 70.4, H2S 27.5,
+# COS 7.53, H2O 19600 ug/g).
+#
+# Caveats (do not drop):
+# - The 800 C "100%" column is an artifact of the run ending, not
+#   proof of complete release. Never treat 800 C as fully evolved.
+# - Sub-200 C water (3728 ug/g) is terrestrial sorbate; not feedstock.
+# - GC H2O = 2.34 wt% is ~4x below CM TGA gravimetry. Use SHAPE, not
+#   absolute magnitudes, as the mass anchor.
+# - CO is char gasification, not a primary pyrolysis product.
+voropaev_2023_release:
+  source: "REF-059 Voropaev et al. 2023 Solar System Research 57(6):581 doi:10.1134/S0038094623050064 Tables 1-2"
+  status: partly_grounded
+  temperature_C: [200, 300, 400, 500, 600, 700, 800]
+  cumulative_pct:
+    CH4: [12.4, 15.4, 63.7, 91.0, 96.1, 99.7, 100.0]
+    N2: [25.0, 39.6, 54.3, 75.5, 83.5, 91.8, 100.0]
+    H2O: [17.5, 35.1, 53.1, 69.4, 87.9, 97.9, 100.0]
+    CO2: [4.8, 18.0, 35.6, 53.2, 68.9, 88.7, 100.0]
+    COS: [12.2, 35.7, 42.5, 45.4, 50.9, 72.0, 100.0]
+    H2S: [0.0, 0.0, 7.5, 34.9, 59.9, 87.0, 100.0]
+    H2: [0.0, 3.7, 6.9, 15.5, 23.4, 67.6, 100.0]
+    CO: [0.0, 0.2, 0.9, 1.9, 3.0, 24.1, 100.0]
+  run_end_C: 800.0
+  run_end_is_complete_release: false
+  terrestrial_sorbate_H2O_below_C: 200.0
+  use: shape_only_not_mass_anchor
+
+co2_populations:
+  adsorbed:
+    value: 0.0
+    source: "Voropaev 2023: exactly zero CO2 at 50 and 110 C"
+    status: proven_zero
+  organic_decarboxylation:
+    band_C: [200, 500]
+    fraction_of_voropaev_CO2_by_500C: 0.532
+    source: "Voropaev 2023 Table 2: 53.2% of CO2 out by 500 C, rising smoothly from 200 C"
+    status: partly_grounded
+  carbonate:
+    band_C: [600, 900]
+    source: "Voropaev 2023 second maximum at 700 C (5910 ug/g) attributed to carbonates; not an organic-carrier product"
+    status: not_speciated
+    note: "Carbonate CO2 stays on the existing Stage-0 carbonate decomposition path. Do not emit it from the organic source term."
+
+# Class-level yield of mobilized C that becomes primary gas (not tar).
+# Magnitudes are status-bearing; Voropaev supplies the T-shape only.
+# CO is forbidden here.
+primary_gas_yields_of_mobilized_C:
+  CH4:
+    value: 0.02
+    status: status_bearing_non_authoritative
+    source: "class placement; Voropaev CH4 is a minor C sink vs bulk C (~0.8% of Murchison C)"
+    certified_point: null
+  CO2_organic:
+    value: 0.20
+    status: status_bearing_non_authoritative
+    source: "class placement; Voropaev organic-decarboxylation population is about half of measured CO2, itself a large C sink vs CH4"
+    certified_point: null
+  COS:
+    value: 0.002
+    status: status_bearing_non_authoritative
+    source: "class placement; Voropaev COS is a trace C sink; requires carrier S or proven-zero"
+    certified_point: null
+  CO:
+    value: 0.0
+    status: proven_zero
+    source: "Voropaev 2023: CO steps still accelerating at 800 C; char gasification, not primary pyrolysis"
+
+# Residual H/C on tar (aromatic). Leftover H after gas goes to tar,
+# then leftover H after tar H/C cap goes to H2.
+tar:
+  species_id: organic_tar
+  H_per_C:
+    value: 0.80
+    status: status_bearing_non_authoritative
+    source: "class placement; aromatic pyrolysis tar H/C typically ~0.7-1.0"
+    certified_point: null
+  dewpoint_C:
+    value: 400.0
+    status: status_bearing_non_authoritative
+    source: "class placement; typical pyrolysis-tar dewpoint band 200-400 C"
+    certified_point: null
+    uncertainty: "least-certain leg; kinetics ungrounded on IOM tar"
+  crack_above_C:
+    value: 700.0
+    status: status_bearing_non_authoritative
+    source: "class placement; high-T / long-residence cracking favoured above ~700 C"
+    certified_point: null
+  coke_below_C:
+    value: 500.0
+    status: status_bearing_non_authoritative
+    source: "class placement; cooler surfaces favour coking onto char"
+    certified_point: null
+  crack_frac_above_crack_T:
+    value: 0.70
+    status: status_bearing_non_authoritative
+    source: "class placement; high-T crack share of non-coating tar"
+    certified_point: null
+  coke_frac_above_crack_T:
+    value: 0.20
+    status: status_bearing_non_authoritative
+    source: "class placement; high-T coke share of non-coating tar; 15.9% of committed CI char at 1050 C"
+    certified_point: null
+  crack_frac_below_coke_T:
+    value: 0.10
+    status: status_bearing_non_authoritative
+    source: "class placement; low-T crack share of non-coating tar"
+    certified_point: null
+  coke_frac_below_coke_T:
+    value: 0.40
+    status: status_bearing_non_authoritative
+    source: "class placement; low-T coke share of non-coating tar"
+    certified_point: null
+  fate_honesty: "Tar fate is kinetic and the least certain leg. Coefficients are class-level and swappable."
+
+char_fate:
+  boudouard:
+    # Voropaev 2023: lg Kp = -9001/T + 9.28 for C + CO2 <-> 2CO
+    lg_Kp_A: -9001.0
+    lg_Kp_B: 9.28
+    T_crossover_K: 970.0
+    T_crossover_C: 696.85
+    source: "REF-059 Voropaev et al. 2023: lg Kp = -9001/T + 9.28; Kp=1 at 9001/9.28 = 970 K = 697 C (1-bar crossover; total pressure is not modelled)"
+    status: partly_grounded
+  cco_buffer:
+    source: "Jakobsson & Oskarsson 1994 CCO via engines/builtin/cco_redox_buffer.py"
+    use: "a_C = 1 reference line at (T, P); high pO2 vs CCO means char is thermodynamically unstable"
+  lancing_pO2_bar:
+    value: 0.21
+    source: "air / oxygen-lance end-member; carbon activity far below unity"
+  vacuum_pO2_bar:
+    value: 1.0e-12
+    source: "hard-vacuum floor used by the probe; not a measured furnace pO2"
+  pO2_half_gasification_bar:
+    value: 1.0e-4
+    status: status_bearing_non_authoritative
+    source: "class placement; logistic half-point between vacuum and lance for the pO2 oxidant-limited branch"
+    certified_point: null
+
+reducing_species:
+  - H2
+  - CO
+  - CH4
+  - H2S
+
+evolved_gas_record:
+  schema: organics_evolved_gas.v1
+  note: "Per-species moles and mole fractions. Reducing species are individually visible. Not coupled to melt fO2."
