@@ -602,9 +602,9 @@ def test_activity_observable_without_oxide_label_is_typed_separately_from_refusa
 
     assert row["status"] == "observable_unavailable"
     assert row["prediction"] is None
-    assert "computed activity under unmapped" in row["reason"]
+    assert "typed-refusal:melts_endmember_not_parent_oxide:Na2O" in row["reason"]
     assert "Na2SiO3" in row["reason"]
-    assert "no authoritative Na2O basis conversion" in row["reason"]
+    assert "standard state the model does not define" in row["reason"]
 
 
 def test_paired_decision_uses_identical_scored_points():
@@ -957,7 +957,68 @@ def test_real_alphamelts_producer_types_unmapped_label_as_ok_not_refused():
     row = benchmark.run_points(fixture, [engine])[0]
     assert row["status"] == "observable_unavailable"
     assert row["status"] != "refused"
+    assert "typed-refusal:melts_endmember_not_parent_oxide:Na2O" in row["reason"]
     assert "Na2SiO3" in row["reason"]
+
+
+def test_kume_style_cao_mgo_rows_are_typed_refusals_not_residuals() -> None:
+    """Red-by-revert: CaSiO3/Mg2SiO4 must not become scored a(CaO)/a(MgO)."""
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    kume_points = [
+        point
+        for point in fixture["points"]
+        if str(point.get("composition_id") or "").startswith("kume2000_")
+        and point["parent_oxide"] in {"SiO2", "Al2O3", "CaO", "MgO"}
+        and point.get("score", True)
+    ]
+    by_oxide = {}
+    for point in kume_points:
+        by_oxide.setdefault(point["parent_oxide"], point)
+    assert set(by_oxide) == {"SiO2", "Al2O3", "CaO", "MgO"}
+    fixture = {**fixture, "points": [by_oxide[oxide] for oxide in sorted(by_oxide)]}
+
+    class _KumeLabelEngine(_FakeActivityEngine):
+        name = "thermoengine"
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="ok",
+                activities={"SiO2": 0.42, "Al2O3": 0.25},
+                details={
+                    "reported_activity_labels": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaSiO3",
+                        "Mg2SiO4",
+                        "Ca3(PO4)2",
+                        "CoSiO3",
+                    ],
+                    "unmapped_activity_labels": [
+                        "CaSiO3",
+                        "Mg2SiO4",
+                        "Ca3(PO4)2",
+                        "CoSiO3",
+                    ],
+                },
+            )
+
+    rows = benchmark.run_points(fixture, [_KumeLabelEngine()])
+    by_parent = {row["parent_oxide"]: row for row in rows}
+
+    assert by_parent["SiO2"]["prediction"] == pytest.approx(0.42)
+    assert by_parent["SiO2"]["residual_dex"] is not None
+    assert by_parent["Al2O3"]["prediction"] == pytest.approx(0.25)
+    assert by_parent["Al2O3"]["residual_dex"] is not None
+
+    for oxide in ("CaO", "MgO"):
+        assert by_parent[oxide]["prediction"] is None
+        assert by_parent[oxide]["residual_dex"] is None
+        assert by_parent[oxide]["status"] == "observable_unavailable"
+        assert (
+            f"typed-refusal:melts_endmember_not_parent_oxide:{oxide}"
+            in by_parent[oxide]["reason"]
+        )
 
 
 def _te_row(point_id, status, *, prediction=None, reason=""):
@@ -2039,6 +2100,17 @@ def test_kume_expanded_set_completes_without_self_contradiction():
             oxide_rows = [row for row in rows if row["parent_oxide"] == oxide]
             assert oxide_rows
             assert all(row.get("residual_dex") is None for row in oxide_rows)
+            unavailable = [
+                row
+                for row in oxide_rows
+                if row["status"] == "observable_unavailable"
+            ]
+            assert unavailable
+            assert all(
+                f"typed-refusal:melts_endmember_not_parent_oxide:{oxide}"
+                in str(row["reason"])
+                for row in unavailable
+            )
     finally:
         backend = getattr(provider, "_backend", None)
         closer = getattr(backend, "close", None)
