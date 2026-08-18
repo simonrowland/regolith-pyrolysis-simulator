@@ -46,7 +46,7 @@ from typing import Any, Mapping, Sequence
 # rather than re-implemented: a private helper of a pinned file is a
 # stabler contract here than a second copy of the same arithmetic.
 from benchmarks.melt_activity_benchmark import (
-    _normalize_wt,
+    composition_wt_pct_for_point,
     load_bench_set,
 )
 from benchmarks.w0_sens import W0SensAbort
@@ -543,7 +543,7 @@ def read_eligible_corpus(bench_set_path: Path | str) -> EligibleCorpus:
                 f"row {point_id!r} names composition {composition_id!r} that the "
                 "bench set does not define"
             )
-        composition = _normalize_wt(meta["composition_wt_pct"])
+        composition = composition_wt_pct_for_point(entry, compositions)
         if not composition:
             raise CorpusRefusal(
                 f"composition {composition_id!r} normalizes to nothing"
