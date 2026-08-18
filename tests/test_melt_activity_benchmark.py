@@ -29,7 +29,10 @@ class _FakeActivityEngine:
 
     def coverage(self, composition_wt_pct, temperature_K):
         del composition_wt_pct, temperature_K
-        return benchmark.EngineResult(status="ok")
+        return benchmark.EngineResult(
+            status="ok",
+            details={"observable_family": "activity"},
+        )
 
 
 def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
@@ -262,12 +265,125 @@ def test_coverage_map_records_melts_refusal_below_30_sio2():
     assert low_silica
     assert all(row["alphamelts_status"] == "out_of_domain" for row in low_silica)
     assert all("SiO2" in row["alphamelts_reason"] for row in low_silica)
+    assert all("alphamelts_finite_prediction" not in row for row in rows)
+    assert all("alphamelts_n_pressures" not in row for row in rows)
     assert {row["composition_id"] for row in rows} == {
         "sf04_tholeiite",
         "sf04_alkali_basalt",
         "sf04_komatiite",
         "sf04_dunite",
     }
+
+
+def test_coverage_empty_pressure_dict_is_not_typed_ok():
+    """A coverage cell that computed nothing must not be recorded as ok.
+
+    Safety-net fixture: the *old* hollow shape (ok + empty +
+    finite_prediction=False). Post-fix VapoRockEngine.evaluate already
+    returns observable_unavailable; this keeps the consumer remap pinned.
+    """
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    class _HollowVaporock:
+        name = "vaporock"
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(
+                status="ok",
+                partial_pressures={},
+                details={
+                    "finite_prediction": False,
+                    "observable_family": "partial_pressure",
+                },
+            )
+
+    rows = benchmark.run_coverage_map(fixture, [_HollowVaporock()], steps=2)
+
+    assert rows
+    assert all(row["vaporock_status"] != "ok" for row in rows)
+    assert all(row["vaporock_status"] == "observable_unavailable" for row in rows)
+    assert all(row["vaporock_finite_prediction"] is False for row in rows)
+    assert all(row["vaporock_n_pressures"] == 0 for row in rows)
+    assert all(not benchmark.coverage_cell_accepted(row, "vaporock") for row in rows)
+
+
+def test_coverage_ok_empty_without_finite_prediction_is_not_typed_ok():
+    """Generic hole: ok + empty pressures + no finite_prediction flag."""
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    class _SilentPressure:
+        name = "silent"
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(status="ok", partial_pressures={})
+
+    rows = benchmark.run_coverage_map(fixture, [_SilentPressure()], steps=2)
+
+    assert rows
+    assert all(row["silent_status"] == "observable_unavailable" for row in rows)
+    assert all(row["silent_finite_prediction"] is False for row in rows)
+    assert all(row["silent_n_pressures"] == 0 for row in rows)
+    assert sum(benchmark.coverage_cell_accepted(row, "silent") for row in rows) == 0
+
+
+def test_coverage_non_pressure_engine_omits_pressure_columns():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    class _DomainOk:
+        name = "alphamelts"
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(
+                status="ok",
+                details={"observable_family": "domain_gate"},
+            )
+
+    rows = benchmark.run_coverage_map(fixture, [_DomainOk()], steps=2)
+
+    assert rows
+    assert all(row["alphamelts_status"] == "ok" for row in rows)
+    assert all("alphamelts_finite_prediction" not in row for row in rows)
+    assert all("alphamelts_n_pressures" not in row for row in rows)
+    assert all(benchmark.coverage_cell_accepted(row, "alphamelts") for row in rows)
+
+
+def test_vaporock_evaluate_empty_speciation_is_not_typed_ok(monkeypatch):
+    class _Result:
+        status = "not_converged"
+        warnings = (
+            "VapoRock speciation table has no finite log10_bar values",
+        )
+        vapor_pressures_Pa = {}
+        vaporock_full_speciation_Pa = {}
+        diagnostics = {
+            "empty_speciation_cause": "no_finite_values",
+            "finite_prediction": False,
+        }
+
+    class _Backend:
+        def initialize(self, config):
+            del config
+            return True
+
+        def equilibrate(self, **kwargs):
+            del kwargs
+            return _Result()
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.vaporock.VapoRockBackend",
+        lambda: _Backend(),
+    )
+    engine = benchmark.VapoRockEngine()
+    result = engine.evaluate({"SiO2": 31.65, "MgO": 6.79}, 1900.0, 1.0e-9)
+
+    assert result.status == "observable_unavailable"
+    assert result.status != "ok"
+    assert result.partial_pressures == {}
+    assert result.details["finite_prediction"] is False
+    assert "no finite log10_bar" in result.reason
 
 
 def test_rump_coverage_reports_internal_only_and_imcc_only_counts():
@@ -605,6 +721,162 @@ def test_provider_crash_diagnostic_overrides_out_of_domain_status():
     assert "SIGSEGV" in result.reason
 
 
+def test_coverage_silicate_band_is_rail_owned():
+    # UPDATED 2026-08-16: was SiO2 10.0 with band (0, 100). That asserted the
+    # rail could open alphaMELTS down to 10 wt%; the rump-hotwire measurement
+    # found it SIGABRTs on all 40 multi-component sub-30 points, so a band
+    # below the 34.0 wt% crash floor is now refused. Widening is still
+    # rail-owned -- it goes UPWARD past the default 80 wt% max.
+    composition = {"SiO2": 85.0, "MgO": 7.5, "FeO": 7.5}
+    default = benchmark.AlphaMeltsEngine()
+    widened = benchmark.AlphaMeltsEngine(silicate_network_band=(34.0, 100.0))
+
+    refused = default.coverage(composition, 1900.0)
+    admitted = widened.coverage(composition, 1900.0)
+
+    assert refused.status == "out_of_domain"
+    assert "silicate_network_band" in refused.details["failed_constraints"]
+    assert refused.details["silicate_network_band_wt_pct"] == [30.0, 80.0]
+    assert admitted.status == "ok"
+    assert admitted.details["failed_constraints"] == []
+
+
+def test_vaporock_activity_call_does_not_ask_the_library(monkeypatch):
+    calls = []
+
+    class _Backend:
+        def initialize(self, config):
+            del config
+            return True
+
+        def equilibrate(self, **kwargs):
+            calls.append(kwargs)
+            raise AssertionError("activity path must not call equilibrate")
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.vaporock.VapoRockBackend",
+        lambda: _Backend(),
+    )
+    engine = benchmark.VapoRockEngine()
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1900.0, None)
+
+    assert result.status == "ok"
+    assert result.activities == {}
+    assert result.partial_pressures == {}
+    assert result.details["observable_supported"] is False
+    assert "partial pressures" in result.reason
+    assert calls == []
+
+
+def test_vaporock_evaluate_returns_native_partial_pressures(monkeypatch):
+    class _Result:
+        status = "ok"
+        warnings = ()
+        vapor_pressures_Pa = {"SiO": 0.11, "K": 2.5}
+        vaporock_full_speciation_Pa = {"SiO": 0.11, "K": 2.5, "O2": 0.5}
+
+    class _Backend:
+        def initialize(self, config):
+            del config
+            return True
+
+        def equilibrate(self, **kwargs):
+            assert kwargs["fO2_log"] == pytest.approx(-5.0)
+            return _Result()
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.vaporock.VapoRockBackend",
+        lambda: _Backend(),
+    )
+    engine = benchmark.VapoRockEngine()
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1900.0, 1.0e-5)
+
+    assert result.status == "ok"
+    assert result.partial_pressures["SiO"] == pytest.approx(0.11)
+    assert result.activities == {}
+    assert result.details["observable_family"] == "partial_pressure"
+
+
+def test_vaporock_partial_pressure_is_scored_on_native_offgas():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        item
+        for item in fixture["points"]
+        if item["id"] == "hastie_sio_1907_796"
+    )
+    composition = benchmark._normalize_wt(
+        fixture["compositions"][point["composition_id"]]["composition_wt_pct"]
+    )
+    produced = benchmark.EngineResult(
+        status="ok",
+        partial_pressures={"SiO": 0.2, "K": 3.0},
+        details={"observable_family": "partial_pressure"},
+    )
+
+    prediction, reason = benchmark._prediction_for_point(
+        {**point, "composition_wt_pct": composition},
+        produced,
+    )
+
+    assert reason == ""
+    assert prediction == pytest.approx(0.2)
+
+
+def test_vaporock_activity_rows_are_typed_not_dead():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        item
+        for item in fixture["points"]
+        if item["observable"] == "activity"
+    )
+    fixture["points"] = [point]
+
+    class _Vaporock(benchmark.VapoRockEngine):
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            assert fO2_bar is None
+            return super().evaluate(composition_wt_pct, temperature_K, fO2_bar)
+
+        def _initialize(self):
+            return object()
+
+    row = benchmark.run_points(fixture, [_Vaporock()])[0]
+
+    assert row["engine"] == "vaporock"
+    assert row["status"] == "observable_unavailable"
+    assert row["prediction"] is None
+    assert row["status"] != "unavailable"
+    assert "partial pressures" in row["reason"]
+
+
+def test_report_presents_vaporock_as_vapour_pressure_leg_not_empty_activity():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    rows = [
+        {
+            "point_id": "hastie_sio_1907_796",
+            "species": "SiO",
+            "observable": "partial_pressure",
+            "engine": "vaporock",
+            "status": "ok",
+            "residual_dex": 0.05,
+        },
+        {
+            "point_id": "tsaplin_dummy",
+            "species": "Na",
+            "observable": "activity",
+            "engine": "vaporock",
+            "status": "observable_unavailable",
+            "residual_dex": None,
+        },
+    ]
+
+    report = benchmark.generate_report(fixture, rows, [], [])
+
+    assert "## VapoRock vapour-pressure leg" in report
+    assert "1 scored / 1 planned" in report
+    assert "| Na | activity | vaporock |" not in report
+    assert "| SiO | partial_pressure | vaporock | 1 |" in report
+
+
 def test_real_alphamelts_producer_types_unmapped_label_as_ok_not_refused():
     """The REAL AlphaMeltsEngine producer must emit ok/completed_without_observable
     when the engine computed an activity under an unmapped endmember label.
@@ -795,6 +1067,9 @@ def test_generate_report_states_measured_unlatched_coverage_when_supplied():
     assert "produced 1/1 usable predictions (Yamaguchi: 1/1)" in report
     assert "2/3" in report
     assert "not taken from the latched CSV" in report
+    assert "isolated-mode ceiling" in report
+    assert "isolated retry remains required" in report
+    assert "ThermoEngineFO2UndefinedError" in report
 
 
 def test_isolated_thermoengine_retries_after_adapter_unavailable():
@@ -816,8 +1091,8 @@ def test_isolated_thermoengine_retries_after_adapter_unavailable():
                 return benchmark.EngineResult(
                     status="unavailable",
                     reason=(
-                        "AlphaMELTS adapter not available "
-                        "(no ThermoEngine, PetThermoTools, or subprocess transport)"
+                        "ThermoEngine transport closed after "
+                        "RuntimeError: affinity shape"
                     ),
                 )
             return benchmark.EngineResult(
@@ -837,3 +1112,567 @@ def test_isolated_thermoengine_retries_after_adapter_unavailable():
     assert measured["yamaguchi_usable"] == 1
     assert measured["restarts"] == 1
     assert measured["rows"][0]["prediction"] is not None
+
+
+def test_ok_and_adapter_unavailable_is_self_contradiction():
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason=(
+                "AlphaMELTS adapter not available "
+                "(no ThermoEngine, PetThermoTools, or subprocess transport)"
+            ),
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == (
+        "thermoengine",
+    )
+
+    edited = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason=(
+                "AlphaMELTS adapter unavailable "
+                "(is_available=False; backend=ThermoEngineBackend)"
+            ),
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(edited) == (
+        "thermoengine",
+    )
+
+    typed_refuse = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "tsaplin2000_a_na2o_x0477_1373",
+            "refused",
+            reason=(
+                "ThermoEngineNonFiniteField: ThermoEngine Liquid "
+                "GibbsFreeEnergy is not finite: nan"
+            ),
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(typed_refuse) == ()
+
+
+def test_detect_thermoengine_adapter_latch_survives_reason_string_edit():
+    """Detector keys on ok+unavailable contradiction, not unavailable prose.
+
+    This is the test that would have caught the t-681 wording-blindness:
+    after the canned "adapter not available" sentence was retired, a
+    token detector returned None and isolated retry never ran. A reason
+    that contains none of the historical tokens must still fire.
+    """
+    edited_reasons = (
+        "AlphaMELTS adapter unavailable "
+        "(is_available=False; backend=ThermoEngineBackend)",
+        "ThermoEngine transport closed after RuntimeError: affinity shape",
+        "entirely new prose that names no adapter at all",
+    )
+    for edited_reason in edited_reasons:
+        assert "adapter not available" not in edited_reason.lower()
+        rows = [
+            _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+            _te_row(
+                "tsaplin2000_a_sio2_x0477_1373",
+                "refused",
+                reason=(
+                    "ThermoEngineNonFiniteField: ThermoEngine Liquid "
+                    "GibbsFreeEnergy is not finite: nan"
+                ),
+            ),
+            _te_row(
+                "yamaguchi1983_a_sio2_liquid_x0205_1373",
+                "unavailable",
+                reason=edited_reason,
+            ),
+        ]
+        latch = benchmark.detect_thermoengine_adapter_latch(rows)
+        assert latch is not None, edited_reason
+        assert latch["latched_count"] == 1
+        assert latch["latch_after_point_id"] == "tsaplin2000_a_sio2_x0477_1373"
+        assert latch["latch_first_point_id"] == (
+            "yamaguchi1983_a_sio2_liquid_x0205_1373"
+        )
+        assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == (
+            "thermoengine",
+        )
+
+
+def test_detect_thermoengine_adapter_latch_absent_when_never_ok():
+    rows = [
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason="ThermoEngine transport not initialized",
+        ),
+    ]
+    assert benchmark.detect_thermoengine_adapter_latch(rows) is None
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ()
+
+
+def test_detect_thermoengine_adapter_latch_fires_on_first_row_death():
+    """Producer close marker detects a latch that begins before any ok.
+
+    Red-by-revert of the marker branch: the ok+unavailable contradiction
+    cannot see [refused, unavailable, unavailable], which is the
+    die-on-first-row shape the retired token detector did fire on.
+    """
+    rows = [
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "refused",
+            reason="RuntimeError: ThermoEngine equilibrium failed: boom",
+        ),
+        _te_row(
+            "tsaplin2000_a_sio2_x0430_1473",
+            "unavailable",
+            reason="ThermoEngine transport closed after RuntimeError: boom",
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "unavailable",
+            reason="ThermoEngine transport closed after RuntimeError: boom",
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ()
+    assert benchmark.detect_thermoengine_adapter_latch(rows) is None
+    latch = benchmark.detect_thermoengine_adapter_latch(
+        rows, transport_closed_mid_run=True
+    )
+    assert latch is not None
+    assert latch["transport_closed_mid_run"] is True
+    assert latch["ok_unavailable_contradiction"] is False
+    assert latch["latch_after_point_id"] == "tsaplin2000_a_sio2_x0477_1373"
+    assert latch["latch_first_point_id"] == "tsaplin2000_a_sio2_x0430_1473"
+    assert latch["latched_count"] == 2
+    assert latch["yamaguchi_latched_count"] == 1
+
+
+def test_detect_thermoengine_adapter_latch_accepts_probe_row_ids():
+    rows = [
+        {
+            "probe_id": "sf04_tholeiite",
+            "engine": "thermoengine",
+            "status": "ok",
+            "reason": "",
+        },
+        {
+            "probe_id": "sf04_dunite",
+            "engine": "thermoengine",
+            "status": "unavailable",
+            "reason": "ThermoEngine transport closed after RuntimeError",
+        },
+    ]
+    latch = benchmark.detect_thermoengine_adapter_latch(rows)
+    assert latch is not None
+    assert latch["latch_after_point_id"] == "sf04_tholeiite"
+    assert latch["latch_first_point_id"] == "sf04_dunite"
+    assert latch["latched_count"] == 1
+
+
+def test_classify_keep_handle_is_type_not_substring():
+    """Keep-handle status is decided by type, not the word 'unavailable'.
+
+    Red-by-revert of the type-first gate: a substring classifier maps
+    this message to status=unavailable, which the structural detector
+    then treats as adapter-absence.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineNonFiniteField,
+    )
+
+    nonfinite = ThermoEngineNonFiniteField(
+        "ThermoEngine Liquid GibbsFreeEnergy is unavailable: nan"
+    )
+    status, reason = benchmark.classify_engine_exception(nonfinite)
+    assert status == "refused"
+    assert "unavailable" in reason.lower()
+
+    fo2 = ThermoEngineFO2UndefinedError(
+        "zero-ferric liquid; finite Kress91 fO2 echo is unavailable"
+    )
+    status, reason = benchmark.classify_engine_exception(fo2)
+    assert status == "refused"
+    assert "unavailable" in reason.lower()
+
+
+def test_isolated_retry_rebuilds_on_producer_close_not_reason_prose():
+    """Isolated restart keys on the producer close count, not reason text.
+
+    Red-by-revert of the de-prosed `_adapter_killed_this_call`: a
+    substring test on "equilibrium failed" / "transport unavailable"
+    would miss the first engine (no historical tokens) and would
+    falsely rebuild the second (tokens, no close).
+    """
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    yamaguchi = [
+        point
+        for point in fixture["points"]
+        if point["id"].startswith("yamaguchi1983_a_sio2_liquid")
+    ][:2]
+    assert len(yamaguchi) == 2
+    fixture = {**fixture, "points": yamaguchi}
+
+    class _CloseWithoutHistoricalTokens:
+        created = 0
+
+        def __init__(self):
+            type(self).created += 1
+            self._closes = 0
+            self.calls = 0
+
+        def transport_close_count(self):
+            return self._closes
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            self.calls += 1
+            if type(self).created == 1 and self.calls == 1:
+                self._closes += 1
+                return benchmark.EngineResult(
+                    status="refused",
+                    reason="row-local death with no historical tokens",
+                )
+            return benchmark.EngineResult(
+                status="ok",
+                activities={"SiO2": 0.55},
+                gammas={"SiO2": 0.55},
+            )
+
+    _CloseWithoutHistoricalTokens.created = 0
+    measured = benchmark.measure_isolated_thermoengine_points(
+        fixture,
+        [point["id"] for point in yamaguchi],
+        engine_factory=_CloseWithoutHistoricalTokens,
+    )
+    assert _CloseWithoutHistoricalTokens.created == 2
+    assert measured["restarts"] == 1
+    assert measured["usable"] == 1
+
+    class _ProseWithoutClose:
+        created = 0
+
+        def __init__(self):
+            type(self).created += 1
+            self._closes = 0
+
+        def transport_close_count(self):
+            return self._closes
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="refused",
+                reason="ThermoEngine equilibrium failed: transport unavailable",
+            )
+
+    _ProseWithoutClose.created = 0
+    measured_prose = benchmark.measure_isolated_thermoengine_points(
+        fixture,
+        [point["id"] for point in yamaguchi],
+        engine_factory=_ProseWithoutClose,
+    )
+    assert _ProseWithoutClose.created == 1
+    assert measured_prose["restarts"] == 0
+
+
+def test_run_benchmark_passes_producer_close_marker_to_point_and_probe_detectors(
+    tmp_path, monkeypatch
+):
+    seen: list[tuple[bool, bool]] = []
+
+    def capturing_detect(rows, *, transport_closed_mid_run=False):
+        has_probe_id = any("probe_id" in row for row in rows)
+        has_point_id = any("point_id" in row for row in rows)
+        seen.append((has_point_id, has_probe_id, transport_closed_mid_run))
+        return None
+
+    class _ClosedThermoEngine:
+        name = "thermoengine"
+
+        def transport_close_count(self):
+            return 1
+
+        def transport_closed_mid_run(self):
+            return True
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="refused",
+                reason="first-row death",
+            )
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(status="ok")
+
+    monkeypatch.setattr(
+        benchmark, "detect_thermoengine_adapter_latch", capturing_detect
+    )
+    monkeypatch.setattr(
+        benchmark,
+        "build_engines",
+        lambda names, fixture, alphamelts_timeout_s: [_ClosedThermoEngine()],
+    )
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    fixture["points"] = fixture["points"][:1]
+    fixture["composition_probes"] = fixture["composition_probes"][:1]
+    fixture_path = tmp_path / "tiny.yaml"
+    fixture_path.write_text(yaml.safe_dump(fixture, sort_keys=False), encoding="utf-8")
+
+    result = benchmark.run_benchmark(
+        bench_set_path=fixture_path,
+        output_dir=tmp_path / "out",
+        engine_names=("thermoengine",),
+        mode="all",
+        coverage_steps=2,
+        live_vaporock_anchor_check=False,
+    )
+
+    assert any(item[0] and not item[1] and item[2] for item in seen)
+    assert any(item[1] and item[2] for item in seen)
+    report = (tmp_path / "out" / "report.md").read_text(encoding="utf-8")
+    assert "do not call the ThermoEngine transport" in report
+    assert result["metadata"]["thermoengine_probe_latch"] is None
+
+
+def test_tracked_melt_activity_report_marks_thermoengine_narrative_stale():
+    text = (
+        benchmark.DEFAULT_OUTPUT_DIR / "report.md"
+    ).read_text(encoding="utf-8")
+    assert "STALE (t-681" in text
+    assert "isolated-mode ceiling" in text
+    assert "retired" in text.lower()
+    assert "adapter not available" in text
+
+
+def test_run_benchmark_rebuilds_engines_before_probes(tmp_path, monkeypatch):
+    constructed: list[object] = []
+
+    class CountingEngine:
+        name = "fake"
+
+        def __init__(self):
+            constructed.append(self)
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="ok",
+                activities={"SiO2": 0.2},
+                gammas={"SiO2": 0.2},
+            )
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(status="ok")
+
+    monkeypatch.setattr(
+        benchmark,
+        "build_engines",
+        lambda names, fixture, alphamelts_timeout_s: [CountingEngine()],
+    )
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    fixture["points"] = fixture["points"][:1]
+    fixture["composition_probes"] = fixture["composition_probes"][:1]
+    fixture_path = tmp_path / "tiny.yaml"
+    fixture_path.write_text(yaml.safe_dump(fixture, sort_keys=False), encoding="utf-8")
+
+    benchmark.run_benchmark(
+        bench_set_path=fixture_path,
+        output_dir=tmp_path / "out",
+        engine_names=("fake",),
+        mode="benchmark",
+        live_vaporock_anchor_check=False,
+    )
+
+    assert len(constructed) >= 2
+    assert constructed[0] is not constructed[1]
+
+
+def test_positive_finite_refuses_nonfinite_instead_of_shrinking_the_sample():
+    """NaN/inf in a bench input must refuse, not silently drop the oxide.
+
+    Unfixed `_positive_finite` kept only the finite keys, so a poisoned
+    composition renormalized as if the missing oxide had never been there.
+    """
+    healthy = {"SiO2": 50.0, "MgO": 25.0}
+    assert benchmark._positive_finite(healthy) == healthy
+    assert benchmark._positive_finite(
+        {"SiO2": 50.0, "MgO": 0.0, "FeO": -1.0}
+    ) == {"SiO2": 50.0}
+
+    with pytest.raises(ValueError, match="non-finite") as nan_info:
+        benchmark._positive_finite({"SiO2": 50.0, "Na2O": float("nan")})
+    assert "Na2O" in str(nan_info.value)
+
+    with pytest.raises(ValueError, match="non-finite") as inf_info:
+        benchmark._positive_finite({"SiO2": 50.0, "MgO": float("inf")})
+    assert "MgO" in str(inf_info.value)
+
+
+def test_informational_residual_cannot_reach_scored_rmse_or_decision():
+    """informational_residual_dex must not feed RMSE or the decision column.
+
+    summarize_metrics / summarize_paired_decisions filter on residual_dex
+    is not None and never inspect status. A residual placed in the normal
+    field would silently promote the extrapolated tier.
+    """
+
+    scored = [
+        {
+            "point_id": "strict-1",
+            "species": "SiO",
+            "observable": "activity",
+            "engine": "internal_analytic",
+            "status": "ok",
+            "residual_dex": 0.4,
+        },
+        {
+            "point_id": "strict-1",
+            "species": "SiO",
+            "observable": "activity",
+            "engine": "imcc-published",
+            "status": "ok",
+            "residual_dex": 0.1,
+        },
+    ]
+    leaked = {
+        "point_id": "extrap-1",
+        "species": "SiO",
+        "observable": "activity",
+        "engine": "imcc-published",
+        "status": "ok",
+        "residual_dex": None,
+        "informational_residual_dex": 3.5,
+        "extrapolated": True,
+        "envelope_status": "inside",
+        "score": True,
+    }
+    rows = [*scored, leaked]
+
+    metrics = benchmark.summarize_metrics(rows)
+    imcc = next(row for row in metrics if row["engine"] == "imcc-published")
+    assert imcc["scored_count"] == 1
+    assert imcc["rmse_dex"] == pytest.approx(0.1)
+
+    decisions = benchmark.summarize_paired_decisions(rows)
+    assert len(decisions) == 1
+    assert decisions[0]["paired_count"] == 1
+    assert decisions[0]["imcc_rmse_dex"] == pytest.approx(0.1)
+
+    polluted = dict(leaked)
+    polluted["residual_dex"] = leaked["informational_residual_dex"]
+    polluted_metrics = benchmark.summarize_metrics([*scored, polluted])
+    polluted_imcc = next(
+        row for row in polluted_metrics if row["engine"] == "imcc-published"
+    )
+    assert polluted_imcc["scored_count"] == 2
+    polluted_decisions = benchmark.summarize_paired_decisions([*scored, polluted])
+    assert polluted_decisions[0]["paired_count"] == 1
+    # paired_count stays 1 because extrap-1 has no internal_analytic twin,
+    # but RMSE would still move if residual_dex were set on a paired id.
+    paired_polluted = dict(leaked)
+    paired_polluted["point_id"] = "strict-1"
+    paired_polluted["residual_dex"] = leaked["informational_residual_dex"]
+    moved = benchmark.summarize_paired_decisions([*scored, paired_polluted])
+    assert moved[0]["paired_count"] == 2
+    assert moved[0]["imcc_rmse_dex"] != pytest.approx(0.1)
+
+    produced = benchmark.as_imcc_informational_row(
+        {
+            "point_id": "strict-1",
+            "species": "SiO",
+            "observable": "activity",
+            "engine": "imcc-published",
+            "status": "ok",
+            "residual_dex": 3.5,
+            "measured": 1.0,
+            "prediction": 10 ** 3.5,
+            "score": True,
+        },
+        extrapolated=True,
+        envelope_status="inside",
+    )
+    assert produced["residual_dex"] is None
+    assert produced["informational_residual_dex"] == pytest.approx(3.5)
+    via_helper = benchmark.summarize_metrics([*scored, produced])
+    helper_imcc = next(row for row in via_helper if row["engine"] == "imcc-published")
+    assert helper_imcc["scored_count"] == 1
+    assert helper_imcc["rmse_dex"] == pytest.approx(0.1)
+    via_helper_decisions = benchmark.summarize_paired_decisions([*scored, produced])
+    assert via_helper_decisions[0]["paired_count"] == 1
+    assert via_helper_decisions[0]["imcc_rmse_dex"] == pytest.approx(0.1)
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    report = benchmark.generate_report(
+        fixture,
+        rows,
+        [],
+        [],
+        extrapolated_rows=[leaked],
+    )
+    assert "## Per-species comparison" in report
+    assert "| SiO | activity | imcc-published | 1 | 0.1 |" in report
+    assert "computed-and-marked, not validated" in report
+    assert "| extrap-1 | imcc-published |" in report
+    assert "3.5" in report.split("## IMCC extrapolated tier")[1]
+
+
+def test_extrapolated_tier_carries_both_marks_together():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    wanted = {
+        "yamaguchi1983_a_sio2_liquid_x0205_1373",
+        "tsaplin2000_a_sio2_x0349_1373",
+    }
+    fixture = {
+        **fixture,
+        "points": [point for point in fixture["points"] if point["id"] in wanted],
+    }
+    engines = benchmark.build_engines(
+        ("imcc-published",), fixture, alphamelts_timeout_s=1.0
+    )
+
+    strict = benchmark.run_points(fixture, engines)
+    assert {row["status"] for row in strict} == {"out_of_domain"}
+    assert all(row["residual_dex"] is None for row in strict)
+
+    rows = benchmark.run_imcc_extrapolated_points(fixture, engines)
+    assert len(rows) == 2
+    envelopes = {row["envelope_status"] for row in rows}
+    assert envelopes == {"inside", "outside_validated"}
+    for row in rows:
+        assert row["residual_dex"] is None
+        assert row["informational_residual_dex"] is not None
+        assert row["extrapolated"] is True
+        assert row["envelope_status"] in {"inside", "outside_validated"}
+        assert "extrapolated" in row
+        assert "envelope_status" in row
+        helper = benchmark.as_imcc_informational_row(
+            {
+                "point_id": row["point_id"],
+                "engine": row["engine"],
+                "measured": row["measured"],
+                "prediction": row["prediction"],
+                "residual_dex": row["informational_residual_dex"],
+            },
+            extrapolated=row["extrapolated"],
+            envelope_status=row["envelope_status"],
+        )
+        assert helper["residual_dex"] is None
+        assert helper["extrapolated"] is True
+        assert helper["envelope_status"] == row["envelope_status"]
+
+    with pytest.raises(ValueError, match="non-finite"):
+        benchmark._normalize_wt({"SiO2": 50.0, "Na2O": float("nan")})
+
+    renormalized = benchmark._normalize_wt({"SiO2": 25.0, "MgO": 25.0})
+    assert renormalized["SiO2"] == pytest.approx(50.0)
+    assert renormalized["MgO"] == pytest.approx(50.0)

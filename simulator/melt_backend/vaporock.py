@@ -90,6 +90,7 @@ conflate gaseous SiO2 with melt SiO2 and break the atom-explicit
 
 from __future__ import annotations
 
+import enum
 import importlib
 import math
 import os
@@ -98,7 +99,7 @@ import tempfile
 import threading
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.engine_pool import (
@@ -116,6 +117,12 @@ from simulator.melt_backend.base import (
     split_cleaned_melt_account,
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
+from simulator.silent_zero import (
+    CATEGORY_PROVEN_ZERO,
+    ZeroBecause,
+    merge_notes_into_mapping,
+    note_dict,
+)
 from simulator.state import OXIDE_SPECIES
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -152,6 +159,62 @@ VAPOROCK_WORKER_STARTUP_TIMEOUT_S = 60.0
 VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT = 20
 VAPOROCK_REUSE_EQUIVALENCE_ATOL_LOG10 = 1e-6
 
+# Hollow-success class: the adapter emptied the Pa dict. The *cause* is
+# a closed token; the human string is derived from it. Do not invent a
+# physical cause (domain / temperature) and do not share one parent
+# sentence across structurally different failures.
+class EmptySpeciationCause(str, enum.Enum):
+    """Why a VapoRock speciation produced no positive-Pa species.
+
+    Closed set. A new failure mode must add a member here — the
+    classifier has no default that inherits a sibling token.
+    """
+
+    TABLE_UNREADABLE = 'table_unreadable'
+    PAYLOAD_ABSENT = 'payload_absent'
+    NO_FINITE_VALUES = 'no_finite_values'
+    FINITE_BUT_NONPOSITIVE_PRESSURE = 'finite_but_nonpositive_pressure'
+    CAUSE_NOT_REPORTED = 'cause_not_reported'
+
+
+EMPTY_SPECIATION_REASON_BY_CAUSE: Mapping[EmptySpeciationCause, str] = {
+    EmptySpeciationCause.TABLE_UNREADABLE: (
+        'VapoRock speciation table unreadable or unparseable'
+    ),
+    EmptySpeciationCause.PAYLOAD_ABSENT: (
+        'VapoRock speciation payload absent or None'
+    ),
+    EmptySpeciationCause.NO_FINITE_VALUES: (
+        'VapoRock speciation table has no finite log10_bar values'
+    ),
+    EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE: (
+        'VapoRock speciation finite log10_bar values all yielded '
+        'non-positive Pa'
+    ),
+    EmptySpeciationCause.CAUSE_NOT_REPORTED: (
+        'VapoRock worker did not report an empty-speciation cause'
+    ),
+}
+
+# Backward alias: the measured hollow population (all-nonfinite table).
+# New call sites must key on EmptySpeciationCause, not this string.
+EMPTY_SPECIATION_REASON = EMPTY_SPECIATION_REASON_BY_CAUSE[
+    EmptySpeciationCause.NO_FINITE_VALUES
+]
+EMPTY_SPECIATION_STATUS_REASON = 'speciation_no_finite_values'
+if set(EMPTY_SPECIATION_REASON_BY_CAUSE) != set(EmptySpeciationCause):
+    raise RuntimeError(
+        'EMPTY_SPECIATION_REASON_BY_CAUSE must cover every '
+        'EmptySpeciationCause member'
+    )
+_SPECIATION_STAT_KEYS = (
+    'speciation_row_count',
+    'speciation_finite_count',
+    'speciation_nan_count',
+    'speciation_neginf_count',
+    'speciation_other_nonfinite_count',
+)
+
 
 # VapoRock gas-species names carry a "(g)" phase suffix.  This pattern
 # matches a trailing "(g)" (with optional surrounding whitespace) so the
@@ -172,6 +235,50 @@ _GAS_NAMESPACE_SUFFIX = '_gas'
 # builtin Antoine path and the VapoRock path share keys for the shared
 # volatiles.
 _OXIDE_COLLIDING_GAS_SPECIES = frozenset(OXIDE_SPECIES)
+
+# VapoRock ``eval_gas_abundances`` overwrites log10(P/bar) to -inf when
+# any melt oxide in that gas reaction is exactly 0 wt% (JANAF-full
+# ``rxn_coefs`` columns except O2). Measured 2026-08-17 against the
+# installed System(); this is an inventory mask, not missing thermo.
+# See docs-private/research/2026-08-17-vaporock-neginf/findings.md.
+_VAPOROCK_GAS_PARENT_OXIDE: Mapping[str, str] = {
+    'Mg(g)': 'MgO',
+    'MgO(g)': 'MgO',
+    'Mg2(g)': 'MgO',
+    'Ca(g)': 'CaO',
+    'CaO(g)': 'CaO',
+    'Ca2(g)': 'CaO',
+    'Al(g)': 'Al2O3',
+    'AlO(g)': 'Al2O3',
+    'AlO2(g)': 'Al2O3',
+    'Al2(g)': 'Al2O3',
+    'Al2O(g)': 'Al2O3',
+    'Al2O2(g)': 'Al2O3',
+    'Si(g)': 'SiO2',
+    'SiO(g)': 'SiO2',
+    'SiO2(g)': 'SiO2',
+    'Si2(g)': 'SiO2',
+    'Si3(g)': 'SiO2',
+    'Na(g)': 'Na2O',
+    'NaO(g)': 'Na2O',
+    'Na2(g)': 'Na2O',
+    'K(g)': 'K2O',
+    'KO(g)': 'K2O',
+    'K2(g)': 'K2O',
+    'Fe(g)': 'FeO',
+    'FeO(g)': 'FeO',
+    'Ti(g)': 'TiO2',
+    'TiO(g)': 'TiO2',
+    'TiO2(g)': 'TiO2',
+    'Cr(g)': 'Cr2O3',
+    'CrO(g)': 'Cr2O3',
+    'CrO2(g)': 'Cr2O3',
+    'CrO3(g)': 'Cr2O3',
+    'Mn(g)': 'MnO',
+    'Ni(g)': 'NiO',
+    'NiO(g)': 'NiO',
+    'Co(g)': 'CoO',
+}
 
 # VapoRock consumes the same oxide basis as MELTS / alphaMELTS plus volatile
 # melt components that upstream declares (H2O/CO2). Project 1:1 by name and
@@ -278,33 +385,239 @@ def _dropped_account_species(
     return result
 
 
-def _serialize_log10_bar_pressures(raw: Any) -> Dict[str, float]:
-    """Flatten upstream log10(bar) output to a plain ``species → float`` dict.
+def _empty_speciation_stats() -> Dict[str, int]:
+    return {
+        'speciation_row_count': 0,
+        'speciation_finite_count': 0,
+        'speciation_nan_count': 0,
+        'speciation_neginf_count': 0,
+        'speciation_other_nonfinite_count': 0,
+    }
 
-    Used inside the warm worker so the pipe only carries pickle-safe
-    primitives (pandas DataFrames do not need to cross the process
-    boundary).
+
+def _flatten_log10_bar(raw: Any) -> Optional[List[tuple[Any, Any]]]:
+    """Flatten a DataFrame/dict speciation table to ``(species, value)`` pairs.
+
+    Returns ``None`` when the payload cannot be read. Callers must
+    classify ``raw is None`` as ``PAYLOAD_ABSENT`` before calling —
+    ``None`` is not an unreadable table.
     """
     if raw is None:
-        return {}
+        raise TypeError(
+            '_flatten_log10_bar does not accept None; classify '
+            'EmptySpeciationCause.PAYLOAD_ABSENT at the caller'
+        )
     if hasattr(raw, 'iloc') and hasattr(raw, 'index'):
         try:
             if len(getattr(raw, 'shape', ())) == 2:
                 series = raw.iloc[:, 0]
             else:
                 series = raw
-            items = series.items()
+            return list(series.items())
         except Exception:  # noqa: BLE001
-            # P3 disposition (review-vr5-km P3-2): empty return keeps the
-            # pre-existing in-process shape (silent empty speciation →
-            # non_authoritative). A typed worker error tag is deferred;
-            # output remains diagnostic-only for SC-50 consumers.
-            return {}
-    elif isinstance(raw, dict):
-        items = raw.items()
-    else:
-        return {}
+            return None
+    if isinstance(raw, dict):
+        return list(raw.items())
+    return None
+
+
+def _speciation_value_stats(
+    items: Sequence[tuple[Any, Any]],
+) -> Dict[str, int]:
+    stats = _empty_speciation_stats()
+    stats['speciation_row_count'] = len(items)
+    for _species, raw in items:
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            stats['speciation_other_nonfinite_count'] += 1
+            continue
+        if math.isnan(value):
+            stats['speciation_nan_count'] += 1
+        elif math.isinf(value) and value < 0.0:
+            stats['speciation_neginf_count'] += 1
+        elif math.isfinite(value):
+            stats['speciation_finite_count'] += 1
+        else:
+            stats['speciation_other_nonfinite_count'] += 1
+    return stats
+
+
+def _parent_oxide_for_vaporock_gas(species: Any) -> Optional[str]:
+    """Return the rxn_coefs parent oxide for a VapoRock gas name, if known."""
+    raw = str(species).strip()
+    parent = _VAPOROCK_GAS_PARENT_OXIDE.get(raw)
+    if parent is not None:
+        return parent
+    if raw.endswith(_GAS_NAMESPACE_SUFFIX):
+        bare = raw[: -len(_GAS_NAMESPACE_SUFFIX)]
+        return _VAPOROCK_GAS_PARENT_OXIDE.get(f'{bare}(g)')
+    if _GAS_SUFFIX_RE.search(raw) is None:
+        return _VAPOROCK_GAS_PARENT_OXIDE.get(f'{raw}(g)')
+    return None
+
+
+def _parent_oxide_is_empty(
+    composition_wt_pct: Optional[Mapping[str, float]],
+    oxide: str,
+) -> bool:
+    """True when the parent oxide is absent or exactly 0 wt%.
+
+    ``None`` composition means the caller has only the engine's -inf
+    token; that token is itself the inventory mask, so treat as empty.
+    """
+    if composition_wt_pct is None:
+        return True
+    if oxide not in composition_wt_pct:
+        return True
+    try:
+        wt = float(composition_wt_pct[oxide])
+    except (TypeError, ValueError):
+        return True
+    if not math.isfinite(wt):
+        return True
+    return wt == 0.0
+
+
+def _proven_empty_inventory_detail(parent_oxide: str) -> str:
+    return (
+        f'VapoRock set log10(P/bar)=-inf because melt {parent_oxide} was '
+        f'exactly 0 wt% in the input; this is the a=0 limit, not a T/fO2 '
+        f'result and not missing JANAF data'
+    )
+
+
+def empty_speciation_reason(
+    cause: EmptySpeciationCause,
+    stats: Optional[Mapping[str, Any]] = None,
+) -> str:
+    """Human string derived from *cause*. Stats only for the token that fired."""
+    try:
+        parent = EMPTY_SPECIATION_REASON_BY_CAUSE[cause]
+    except KeyError as exc:
+        raise ValueError(
+            f'EmptySpeciationCause {cause!r} has no reason template; '
+            'add one when adding a token'
+        ) from exc
+    if cause is EmptySpeciationCause.NO_FINITE_VALUES and stats is not None:
+        n_rows, n_finite, n_nan, n_neginf, n_other = _stats_counts(stats)
+        return (
+            f'{parent} ({n_finite} finite of {n_rows} rows; '
+            f'{n_nan} nan, {n_neginf} -inf, {n_other} other_nonfinite)'
+        )
+    if (
+        cause is EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE
+        and stats is not None
+    ):
+        n_rows, n_finite, _n_nan, _n_neginf, _n_other = _stats_counts(stats)
+        return (
+            f'{parent} ({n_finite} finite of {n_rows} rows all non-positive Pa)'
+        )
+    return parent
+
+
+def _stats_counts(stats: Mapping[str, Any]) -> tuple[int, int, int, int, int]:
+    try:
+        return (
+            int(stats.get('speciation_row_count') or 0),
+            int(stats.get('speciation_finite_count') or 0),
+            int(stats.get('speciation_nan_count') or 0),
+            int(stats.get('speciation_neginf_count') or 0),
+            int(stats.get('speciation_other_nonfinite_count') or 0),
+        )
+    except (TypeError, ValueError):
+        return 0, 0, 0, 0, 0
+
+
+def _classify_empty_log10_table(
+    stats: Mapping[str, Any],
+    *,
+    n_positive_pa: int,
+) -> EmptySpeciationCause:
+    """Classify a *readable* table that produced no positive-Pa species.
+
+    No default branch: a new emptying mode must add a token.
+    """
+    n_finite = int(stats.get('speciation_finite_count') or 0)
+    if n_finite == 0:
+        return EmptySpeciationCause.NO_FINITE_VALUES
+    if n_positive_pa == 0:
+        return EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE
+    raise RuntimeError(
+        'empty-speciation classifier reached a readable table with '
+        f'finite_count={n_finite} and n_positive_pa={n_positive_pa}; '
+        'add a new EmptySpeciationCause'
+    )
+
+
+def _cause_from_worker_payload(
+    payload: Mapping[str, Any],
+) -> EmptySpeciationCause:
+    """Decode the wire cause. Missing cause+stats is its own token.
+
+    A same-build worker always sends ``empty_speciation_cause``. A
+    historical or foreign worker may send only ``log10_bar={}``. That is
+    missing input, not an examined empty table — do not inherit
+    ``NO_FINITE_VALUES``. Keep the run alive with a truthful refusal.
+    """
+    raw = payload.get('empty_speciation_cause')
+    if raw is not None:
+        return EmptySpeciationCause(raw)
+    if 'speciation_finite_count' in payload:
+        n_finite = int(payload.get('speciation_finite_count') or 0)
+        if n_finite == 0:
+            return EmptySpeciationCause.NO_FINITE_VALUES
+        raise RuntimeError(
+            'warm-worker empty log10_bar with finite_count>0 and no '
+            'EmptySpeciationCause; add a token'
+        )
+    return EmptySpeciationCause.CAUSE_NOT_REPORTED
+
+
+def _stats_from_payload(payload: Mapping[str, Any]) -> Dict[str, int]:
+    stats = _empty_speciation_stats()
+    for key in _SPECIATION_STAT_KEYS:
+        if key in payload:
+            try:
+                stats[key] = int(payload[key])
+            except (TypeError, ValueError):
+                continue
+    return stats
+
+
+def _serialize_cause_payload(
+    cause: EmptySpeciationCause,
+    stats: Optional[Mapping[str, int]] = None,
+) -> Dict[str, Any]:
+    payload: Dict[str, Any] = {'empty_speciation_cause': cause.value}
+    if cause in {
+        EmptySpeciationCause.NO_FINITE_VALUES,
+        EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE,
+    } and stats is not None:
+        payload.update({key: int(stats[key]) for key in _SPECIATION_STAT_KEYS})
+    return payload
+
+
+def _serialize_log10_bar_pressures(
+    raw: Any,
+) -> tuple[Dict[str, float], Dict[str, Any]]:
+    """Flatten upstream log10(bar) output to a plain ``species → float`` dict.
+
+    Used inside the warm worker so the pipe only carries pickle-safe
+    primitives (pandas DataFrames do not need to cross the process
+    boundary). An empty dict always travels with ``empty_speciation_cause``.
+    Unreadable / absent payloads do not claim a zero-row table.
+    """
+    if raw is None:
+        return {}, _serialize_cause_payload(EmptySpeciationCause.PAYLOAD_ABSENT)
+    items = _flatten_log10_bar(raw)
+    if items is None:
+        return {}, _serialize_cause_payload(
+            EmptySpeciationCause.TABLE_UNREADABLE
+        )
+    stats = _speciation_value_stats(items)
     out: Dict[str, float] = {}
+    proven_empty: List[str] = []
     for species, log10_bar in items:
         try:
             value = float(log10_bar)
@@ -312,7 +625,52 @@ def _serialize_log10_bar_pressures(raw: Any) -> Dict[str, float]:
             continue
         if math.isfinite(value):
             out[str(species)] = value
-    return out
+        elif math.isinf(value) and value < 0.0:
+            proven_empty.append(str(species))
+    if not out:
+        # Failed / all-nonfinite table. Do not attach the inventory
+        # sidecar: -inf rows on a NaN table must not rehabilitate the
+        # cell as an all-zero success.
+        if int(stats['speciation_finite_count']) != 0:
+            raise RuntimeError(
+                'serializer emptied a table that still had finite log10_bar '
+                'values; Pa conversion happens parent-side — add a '
+                'EmptySpeciationCause token'
+            )
+        return {}, _serialize_cause_payload(
+            EmptySpeciationCause.NO_FINITE_VALUES, stats
+        )
+    extra: Dict[str, Any] = dict(stats)
+    if proven_empty:
+        extra['proven_empty_inventory_species'] = proven_empty
+    return out, extra
+
+
+def vaporock_speciation_is_live(
+    status: str,
+    diagnostics: Optional[Mapping[str, Any]],
+    pressures: Optional[Mapping[str, Any]],
+) -> bool:
+    """True only when a VapoRock result is a live speciation cell.
+
+    ``non_authoritative`` is the System-path *pressure-authority* token
+    (eval_gas_abundances ignores total P). It is not evidence that any
+    species arrived. Rail consumers that treat ``{ok, non_authoritative}``
+    as live must call this instead: hollowness is ``empty_speciation_cause``
+    (plus ``finite_prediction is False`` / an empty resolved pressure
+    dict). ``not_converged`` on a hollow producer result is what keeps
+    those consumers from walking an empty dict as a success.
+    """
+    diag = diagnostics or {}
+    if diag.get('empty_speciation_cause'):
+        return False
+    if diag.get('finite_prediction') is False:
+        return False
+    if status not in {'ok', 'non_authoritative'}:
+        return False
+    if not (pressures or {}):
+        return False
+    return True
 
 
 def _log10_bar_maps_equivalent(
@@ -349,7 +707,7 @@ def _eval_system_log10_bar(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
     fO2_log: float,
-) -> Dict[str, float]:
+) -> tuple[Dict[str, float], Dict[str, Any]]:
     """Run set_melt_comp + eval_gas_abundances on *system*; return log10 map."""
     set_melt_comp = getattr(system, 'set_melt_comp')
     eval_gas_abundances = getattr(system, 'eval_gas_abundances')
@@ -473,7 +831,7 @@ def _handle_vaporock_request(
         # Actual reuse path — optionally probe against a fresh System.
         checks_done = int(resource.get('reuse_equivalence_checks_done') or 0)
         probe = checks_done < int(VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT)
-        reused_log = _eval_system_log10_bar(
+        reused_log, reused_stats = _eval_system_log10_bar(
             stored,
             composition_wt_pct=composition_wt_pct,
             temperature_K=temperature_K,
@@ -481,7 +839,7 @@ def _handle_vaporock_request(
         )
         if probe:
             fresh_system = _construct_system(resource)
-            fresh_log = _eval_system_log10_bar(
+            fresh_log, fresh_stats = _eval_system_log10_bar(
                 fresh_system,
                 composition_wt_pct=composition_wt_pct,
                 temperature_K=temperature_K,
@@ -504,20 +862,23 @@ def _handle_vaporock_request(
                     },
                 )
                 log10_bar = fresh_log
+                spec_stats = fresh_stats
                 reuse_mode = 'fresh_latched'
             else:
                 # Probe passed: keep the stored System as the reuse target.
                 # (fresh_system is discarded — construct count still rose.)
                 log10_bar = reused_log
+                spec_stats = reused_stats
                 reuse_mode = 'reused_probed'
         else:
             log10_bar = reused_log
+            spec_stats = reused_stats
             reuse_mode = 'reused'
     else:
         system = _construct_system(resource)
         if want_reuse:
             resource['system'] = system
-        log10_bar = _eval_system_log10_bar(
+        log10_bar, spec_stats = _eval_system_log10_bar(
             system,
             composition_wt_pct=composition_wt_pct,
             temperature_K=temperature_K,
@@ -529,6 +890,7 @@ def _handle_vaporock_request(
 
     payload: dict[str, Any] = {
         'log10_bar': log10_bar,
+        **spec_stats,
         'path': 'system',
         'system_construct_count': int(
             resource.get('system_construct_count') or 0
@@ -741,6 +1103,10 @@ class VapoRockBackend(MeltBackend):
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
         self._last_pressure_authority_warning: Optional[str] = None
+        self._last_empty_speciation_cause: Optional[EmptySpeciationCause] = None
+        self._last_empty_speciation_stats: Optional[Dict[str, int]] = None
+        self._last_empty_speciation_reason: Optional[str] = None
+        self._last_silent_zero_notes: List[Dict[str, Any]] = []
         # Warm pool (DESIGN-REV5 §5.5 / VR-5). Opt-in: calibration runners
         # and live warm-path tests pass warm_worker=True. Default off so
         # the diagnostic shadow and corpus harnesses do not spawn a pool
@@ -1313,6 +1679,45 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics['temperature_K'] = float(temperature_K)
             projection_diagnostics['sum_pressure_bar'] = float(sum_bar)
 
+        if self._last_silent_zero_notes:
+            merge_notes_into_mapping(
+                projection_diagnostics, self._last_silent_zero_notes
+            )
+
+        if not vaporock_full_speciation_Pa:
+            cause = self._last_empty_speciation_cause
+            if cause is None:
+                raise RuntimeError(
+                    'empty speciation with no EmptySpeciationCause; '
+                    'the converter must classify before returning {}'
+                )
+            empty_reason = empty_speciation_reason(
+                cause, self._last_empty_speciation_stats
+            )
+            self._last_empty_speciation_reason = empty_reason
+            if empty_reason not in prior_warnings:
+                prior_warnings.append(empty_reason)
+            projection_diagnostics['finite_prediction'] = False
+            projection_diagnostics['empty_speciation_cause'] = cause.value
+            projection_diagnostics['backend_status_reason'] = (
+                f'speciation_{cause.value}'
+            )
+
+        # Hollow speciation did not produce a usable result. Status is
+        # not_converged (documented: "ran but did not produce one"), not
+        # non_authoritative. non_authoritative is the pressure-authority
+        # outcome of a *completed* speciation and remains in diagnostics
+        # / warnings via pressure_control_authoritative=False. Rail
+        # consumers treat only {ok, non_authoritative} as live cells;
+        # this status is what stops evaluate_cell / engine_crosscheck
+        # walking a hollow dict as a live success.
+        if not vaporock_full_speciation_Pa:
+            result_status = 'not_converged'
+        elif pressure_authority_warning:
+            result_status = 'non_authoritative'
+        else:
+            result_status = 'ok'
+
         # _call_vaporock already returns a finished species -> Pa dict
         # (declared-unit dict path or unambiguous log10(bar) path); do not
         # re-scale here or an already-Pa result is inflated 1e5x.
@@ -1327,11 +1732,7 @@ class VapoRockBackend(MeltBackend):
             fO2_log=fO2_log,
             liquid_fraction=liquid_fraction,
             phase_assemblage_available=False,
-            status=(
-                'non_authoritative'
-                if pressure_authority_warning
-                else 'ok'
-            ),
+            status=result_status,
             warnings=list(prior_warnings),
             vapor_pressures_Pa=(
                 {}
@@ -1376,6 +1777,24 @@ class VapoRockBackend(MeltBackend):
         )
         return None
 
+    def _clear_empty_speciation(self) -> None:
+        self._last_empty_speciation_cause = None
+        self._last_empty_speciation_stats = None
+        self._last_empty_speciation_reason = None
+        self._last_silent_zero_notes = []
+
+    def _latch_empty_speciation(
+        self,
+        cause: EmptySpeciationCause,
+        stats: Optional[Mapping[str, Any]] = None,
+    ) -> None:
+        stats_copy = dict(stats) if stats is not None else None
+        self._last_empty_speciation_cause = cause
+        self._last_empty_speciation_stats = stats_copy
+        self._last_empty_speciation_reason = empty_speciation_reason(
+            cause, stats_copy
+        )
+
     def _call_vaporock(
         self,
         composition_wt_pct: Dict[str, float],
@@ -1410,6 +1829,7 @@ class VapoRockBackend(MeltBackend):
         class — it is a no-op on the current build but harmless.
         """
         self._last_pressure_authority_warning = None
+        self._clear_empty_speciation()
         temperature_K = (
             float(temperature)
             if self._temperature_units == 'K'
@@ -1496,7 +1916,9 @@ class VapoRockBackend(MeltBackend):
                 )
                 # log10(bar) result is unit-unambiguous; convert directly
                 # without the declared-unit dict path.
-                return self._log10_bar_pressures_to_pa(logP)
+                return self._log10_bar_pressures_to_pa(
+                    logP, composition_wt_pct=composition_wt_pct
+                )
             except Exception as exc:  # noqa: BLE001 - upstream boundary
                 last_attr_error = exc
 
@@ -1534,14 +1956,41 @@ class VapoRockBackend(MeltBackend):
                 f'VapoRock warm worker returned non-dict payload: '
                 f'{type(payload)!r}'
             )
-        log10_bar = payload.get('log10_bar') or {}
         self._last_pressure_authority_warning = (
             'VapoRock System.eval_gas_abundances ignores total '
             'pressure; requested pressure_bar is diagnostic-only '
             'and this vapor result is non-authoritative for '
             'pressure-sensitive transport.'
         )
-        return self._log10_bar_pressures_to_pa(log10_bar)
+        if 'log10_bar' not in payload:
+            self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
+            return {}
+        log10_bar = payload.get('log10_bar')
+        if log10_bar is None:
+            self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
+            return {}
+        if not isinstance(log10_bar, dict):
+            raise RuntimeError(
+                f'VapoRock warm worker log10_bar has type {type(log10_bar)!r}'
+            )
+        if not log10_bar:
+            cause = _cause_from_worker_payload(payload)
+            stats = _stats_from_payload(payload)
+            if cause in {
+                EmptySpeciationCause.TABLE_UNREADABLE,
+                EmptySpeciationCause.PAYLOAD_ABSENT,
+                EmptySpeciationCause.CAUSE_NOT_REPORTED,
+            }:
+                stats = None
+            self._latch_empty_speciation(cause, stats)
+            return {}
+        return self._log10_bar_pressures_to_pa(
+            log10_bar,
+            composition_wt_pct=composition_wt_pct,
+            proven_empty_species=payload.get(
+                'proven_empty_inventory_species'
+            ),
+        )
 
     # ------------------------------------------------------------------
     # Composition / result projection
@@ -1565,6 +2014,7 @@ class VapoRockBackend(MeltBackend):
         FactSAGE ``amount_unit`` explicit-declaration pattern.
         """
         if raw is None:
+            self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
             return {}
 
         # Some upstream builds wrap the dict in an object with a
@@ -1581,19 +2031,32 @@ class VapoRockBackend(MeltBackend):
                     try:
                         raw = to_dict()
                     except Exception:  # noqa: BLE001
+                        self._latch_empty_speciation(
+                            EmptySpeciationCause.TABLE_UNREADABLE
+                        )
                         return {}
                 else:
+                    self._latch_empty_speciation(
+                        EmptySpeciationCause.TABLE_UNREADABLE
+                    )
                     return {}
 
         if not isinstance(raw, dict):
+            self._latch_empty_speciation(EmptySpeciationCause.TABLE_UNREADABLE)
             return {}
 
+        items = list(raw.items())
         try:
-            float_values = [float(v) for v in raw.values()]
+            float_values = [float(v) for _k, v in items]
         except (TypeError, ValueError):
+            self._latch_empty_speciation(EmptySpeciationCause.TABLE_UNREADABLE)
             return {}
 
+        stats = _speciation_value_stats(items)
         if not float_values:
+            self._latch_empty_speciation(
+                EmptySpeciationCause.NO_FINITE_VALUES, stats
+            )
             return {}
 
         # Scale by the explicitly-declared output unit; never guess.
@@ -1603,9 +2066,63 @@ class VapoRockBackend(MeltBackend):
             pressure = float(value) * scale
             if pressure > 0.0:
                 pressures[self._strip_gas_suffix(species)] = pressure
+        if not pressures:
+            self._latch_empty_speciation(
+                _classify_empty_log10_table(
+                    stats, n_positive_pa=0
+                ),
+                stats,
+            )
+            return {}
         return pressures
 
-    def _log10_bar_pressures_to_pa(self, raw: Any) -> Dict[str, float]:
+    def _retain_proven_empty_inventory(
+        self,
+        pressures: Dict[str, float],
+        neginf_species: Sequence[Any],
+        composition_wt_pct: Optional[Mapping[str, float]],
+    ) -> None:
+        """Keep -inf species as explicit 0 Pa with a typed inventory note.
+
+        Do not recover pre-mask MELTS chemical potentials. Those values
+        are fabricated at zero moles. Do not invent a zero when the
+        parent oxide is actually present — that token is not this mask.
+        """
+        seen: set[str] = set()
+        for raw_species in neginf_species:
+            key = self._strip_gas_suffix(raw_species)
+            if key in seen:
+                continue
+            seen.add(key)
+            parent = _parent_oxide_for_vaporock_gas(raw_species)
+            if parent is None:
+                parent = _parent_oxide_for_vaporock_gas(key)
+            if parent is not None and not _parent_oxide_is_empty(
+                composition_wt_pct, parent
+            ):
+                continue
+            if key in pressures and pressures[key] != 0.0:
+                continue
+            pressures[key] = 0.0
+            oxide_name = parent or 'unknown_parent_oxide'
+            self._last_silent_zero_notes.append(
+                note_dict(
+                    ZeroBecause.PROVEN_EMPTY_INVENTORY,
+                    site='vaporock.eval_gas_abundances.inventory_mask',
+                    species=key,
+                    field='pressure_Pa',
+                    detail=_proven_empty_inventory_detail(oxide_name),
+                    doctrine_category=CATEGORY_PROVEN_ZERO,
+                )
+            )
+
+    def _log10_bar_pressures_to_pa(
+        self,
+        raw: Any,
+        *,
+        composition_wt_pct: Optional[Mapping[str, float]] = None,
+        proven_empty_species: Optional[Sequence[Any]] = None,
+    ) -> Dict[str, float]:
         """
         Convert VapoRock System log10(bar) output to simulator Pa.
 
@@ -1614,28 +2131,42 @@ class VapoRockBackend(MeltBackend):
         values are log10(partial pressure / bar).  Species names carry a
         ``(g)`` phase suffix; ``_strip_gas_suffix`` maps them onto the
         simulator's collision-free vocabulary (oxide-colliding gas names
-        namespaced with ``_gas``, the rest bare).  ``-inf`` rows (species
-        with no thermodynamic data, e.g. Cr gases in some builds) drop
-        out.
+        namespaced with ``_gas``, the rest bare).
+
+        ``-inf`` is an explicit inventory mask: after evaluating every
+        gas, VapoRock overwrites any species whose formation reaction
+        uses a melt oxide at exactly 0 wt%. That is the ``a_oxide = 0``
+        limit (proven empty inventory), not missing JANAF data, not
+        underflow, and not a T/fO2 vanishing. Those species are retained
+        at ``P = 0.0 Pa`` with a typed ``proven_empty_inventory`` note
+        naming the empty parent oxide. Pre-mask MELTS chemical
+        potentials at zero moles are fabricated and must not be
+        recovered.
+
+        ``NaN`` on a species whose parent oxide is present is a failed
+        evaluation of that row and is dropped, not converted to zero.
+        A table with no finite log10(bar) values (the 30 NaN + 8 -inf
+        failed-solve shape) still refuses: the -inf rows must not
+        rehabilitate the cell as an all-zero success. A species absent
+        from the thermo table never appears as ``-inf`` and is not
+        invented here.
         """
+        self._last_silent_zero_notes = []
         if raw is None:
+            if self._last_empty_speciation_cause is None:
+                self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
+            return {}
+        items = _flatten_log10_bar(raw)
+        if items is None:
+            if self._last_empty_speciation_cause is None:
+                self._latch_empty_speciation(
+                    EmptySpeciationCause.TABLE_UNREADABLE
+                )
             return {}
 
-        if hasattr(raw, 'iloc') and hasattr(raw, 'index'):
-            try:
-                if len(getattr(raw, 'shape', ())) == 2:
-                    series = raw.iloc[:, 0]
-                else:
-                    series = raw
-                items = series.items()
-            except Exception:  # noqa: BLE001
-                return {}
-        elif isinstance(raw, dict):
-            items = raw.items()
-        else:
-            return {}
-
+        stats = _speciation_value_stats(items)
         pressures: Dict[str, float] = {}
+        neginf_species: List[Any] = []
         for species, log10_bar in items:
             try:
                 value = float(log10_bar)
@@ -1645,6 +2176,22 @@ class VapoRockBackend(MeltBackend):
                 pressure_pa = (10.0 ** value) * 1e5
                 if pressure_pa > 0.0:
                     pressures[self._strip_gas_suffix(species)] = pressure_pa
+            elif math.isinf(value) and value < 0.0:
+                neginf_species.append(species)
+        if proven_empty_species:
+            neginf_species.extend(proven_empty_species)
+        if not pressures:
+            if self._last_empty_speciation_cause is None:
+                self._latch_empty_speciation(
+                    _classify_empty_log10_table(
+                        stats, n_positive_pa=len(pressures)
+                    ),
+                    stats,
+                )
+            return {}
+        self._retain_proven_empty_inventory(
+            pressures, neginf_species, composition_wt_pct
+        )
         return pressures
 
     @staticmethod

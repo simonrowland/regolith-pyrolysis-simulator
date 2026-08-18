@@ -1,5 +1,17 @@
 # Melt-activity benchmark report
 
+> **STALE (t-681, 2026-08-17).** This tracked artifact's ThermoEngine
+> narrative predates the t-681 latch fix and must not be read as a
+> current sequential-mode result. Combined **32/110** is an
+> isolated-mode ceiling (sequential pre-latch usable plus isolated
+> latched-point usable). Isolated retry remains required. The quoted
+> reason string `"adapter not available"` / `"AlphaMELTS adapter not
+> available (no ThermoEngine, PetThermoTools, or subprocess
+> transport)"` is retired: a live adapter that has already answered is
+> no longer described that way. Regeneration of
+> `benchmarks/results/melt_activity/` is frozen; do not treat this
+> file as regenerated evidence.
+
 ## Evidence boundary
 
 Literal SF04 basalt empirical points: **0**. The scored experimental population is six Hastie-1981 KEMS gas-pressure points, six Richter-2007 Type-B CAI-like CMAS gamma targets, 12 Tsaplin-2000 Na2O-SiO2 a(SiO2) targets, and 28 Yamaguchi-1983 Na2O-SiO2 liquid-reference a(SiO2) targets. SF04 workbook pressures are scored only as an explicitly non-empirical regression anchor.
@@ -100,6 +112,11 @@ The installed VapoRock run reproduces the frozen snapshot within 0.0005 dex.
 
 These are engine robustness/coverage probes, not empirical score points.
 
+> **STALE (t-681).** ThermoEngine probe rows below still print the
+> retired `"AlphaMELTS adapter not available (no ThermoEngine,
+> PetThermoTools, or subprocess transport)"` string. That wording is
+> retired; this table predates the fix and was not regenerated.
+
 | Composition | Class | Engine | Status | Reason |
 |---|---|---|---|---|
 | sf04_tholeiite | literal_basalt | imcc-published | ok | — |
@@ -139,11 +156,20 @@ AlphaMELTS equilibrium completed on all literal SF04 basalt probes, but its prov
 
 IMCC-versus-AlphaMELTS empirical verdict: **none**. No point has both a convention-valid measurement and successful canonical activities from both engine families.
 
+> **STALE (t-681).** The next two sentences are the pre-fix narrative.
+> **32/110** is an isolated-mode ceiling, not a sequential-mode result
+> of the typed keep-handle. The parenthetical `"adapter not available"`
+> is the retired reason string.
+
 ThermoEngine sequential one-process yield: 12/110 usable benchmark predictions. This figure is a post-latch artifact: after `tsaplin2000_a_na2o_x0477_1373` the in-process adapter died (RuntimeError: ThermoEngine equilibrium failed: ThermoEngine equilibrium failed: ThermoEngine Liquid GibbsFreeEnergy is not finite: nan), and the remaining 78 ThermoEngine rows — including all 70 Yamaguchi 1983 points — inherited `unavailable` ("adapter not available"). Do not read the sequential count as ThermoEngine being unable to score those later points.
 Isolated ThermoEngine re-evaluation of the latched points (fresh adapter after each adapter-death; not taken from the latched CSV) produced 20/78 usable predictions (Yamaguchi: 20/70). Combined coverage of the 110-point set is therefore 32/110: sequential pre-latch usable plus isolated latched-point usable.
 Converged results without the requested canonical observable remain typed `observable_unavailable`.
 
 ## Stripping-trajectory coverage
+
+> **STALE (t-681).** ThermoEngine coverage rows below are
+> AlphaMELTSDomainGate assessments and do not call the ThermoEngine
+> transport. A mid-run transport close is not visible in this table.
 
 - `alphamelts`: 112/168 accepted; 56 refused/unavailable; below 30 wt% SiO2, 0/40 accepted and 40/40 refused/unavailable.
 - `imcc-ext`: 159/168 accepted; 9 refused/unavailable; below 30 wt% SiO2, 37/40 accepted and 3/40 refused/unavailable.

@@ -230,10 +230,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                     backend_status='unavailable',
                     **redox_diagnostic,
                 ).as_diagnostic(),
-                warnings=(
-                'AlphaMELTS adapter not available '
-                '(no ThermoEngine, PetThermoTools, or subprocess transport)',
-                ),
+                warnings=(self._adapter_unavailable_reason(),),
             )
 
         if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
@@ -267,15 +264,35 @@ class AlphaMELTSProvider(ChemistryProvider):
         diagnostics = _with_backend_status_reason(diagnostics)
 
         backend_status = diagnostics.backend_status
-        # Map the adapter's status vocabulary onto the kernel's:
-        # 'ok' / 'not_converged' / 'out_of_domain' / 'unavailable' /
-        # 'unsupported'. The adapter already uses the same vocabulary so
-        # this is mostly a pass-through; we surface 'unavailable' when
-        # the adapter signalled it during the run (e.g. PetThermoTools
-        # path crashed mid-call and the adapter zeroed _mode).
-        kernel_status = backend_status if backend_status in (
-            'ok', 'not_converged', 'out_of_domain', 'unavailable'
-        ) else 'ok'
+        # Map the adapter's status vocabulary onto the kernel's. An
+        # UNRECOGNISED status refuses; it does NOT pass as success.
+        #
+        # This previously read `else 'ok'`, which is fail-open on exactly the
+        # case you cannot reason about: a status nobody taught this mapper.
+        # The project vocabulary is much wider than the four accepted here --
+        # a repo scan finds backend_status also set to failed, missing, stale,
+        # not_run, not_attempted, stub, diagnostic_stub, fallback,
+        # mixed_backend and no_compared_results, three of them in production
+        # code at simulator/optimize/fidelity.py. Every one of those would
+        # have been reported as a successful equilibrium. `failed -> ok` and
+        # `missing -> ok` are the whole fail-open class in two tokens.
+        #
+        # Doctrine: an unknown state is a missing input, category (1), so it
+        # refuses. 'unavailable' is the kernel's no-usable-result token, and
+        # the unrecognised value is recorded in the diagnostic rather than
+        # dropped, so the refusal is debuggable instead of merely safe.
+        _KERNEL_STATUSES = ('ok', 'not_converged', 'out_of_domain', 'unavailable')
+        extra_warnings: tuple[str, ...] = ()
+        if backend_status in _KERNEL_STATUSES:
+            kernel_status = backend_status
+        else:
+            kernel_status = 'unavailable'
+            # Carried as an extra warning rather than appended to
+            # diagnostics.backend_warnings, which is a tuple in some paths.
+            extra_warnings = (
+                f'unrecognised backend_status {backend_status!r} refused as '
+                f'unavailable; kernel accepts {_KERNEL_STATUSES}',
+            )
 
         return IntentResult(
             intent=request.intent,
@@ -283,7 +300,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             transition=None,  # Diagnostic-only -- checklist item 5.
             control_audit=control_audit,
             diagnostic=diagnostics.as_diagnostic(),
-            warnings=tuple(diagnostics.backend_warnings),
+            warnings=tuple(diagnostics.backend_warnings) + extra_warnings,
         )
 
     # ------------------------------------------------------------------
@@ -456,6 +473,36 @@ class AlphaMELTSProvider(ChemistryProvider):
             return bool(is_avail())
         # Backends without is_available() are treated as unavailable.
         return False
+
+    def _adapter_unavailable_reason(self) -> str:
+        """Name the operative cause; never claim a live adapter is absent."""
+        if self._backend is None:
+            return (
+                'AlphaMELTS adapter not bound '
+                '(provider constructed with no backend)'
+            )
+        getter = getattr(self._backend, 'unavailable_reason', None)
+        if callable(getter):
+            reason = getter()
+            if reason:
+                return str(reason)
+        backend_name = type(self._backend).__name__
+        return (
+            f'AlphaMELTS adapter unavailable '
+            f'(is_available=False; backend={backend_name})'
+        )
+
+    def transport_close_count(self) -> int:
+        """Producer mid-run close count, or 0 when the backend has none."""
+        getter = getattr(self._backend, 'transport_close_count', None)
+        if callable(getter):
+            return int(getter())
+        if isinstance(getter, int):
+            return int(getter)
+        return 0
+
+    def transport_closed_mid_run(self) -> bool:
+        return self.transport_close_count() > 0
 
     def _subprocess_required(self) -> bool:
         return bool(getattr(self._backend, 'stage0_subprocess_required', False))

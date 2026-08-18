@@ -7,6 +7,8 @@ import warnings
 
 from engines.alphamelts.thermoengine import (
     THERMOENGINE_WARM_CALL_TIMEOUT_S,
+    ThermoEngineFO2UndefinedError,
+    ThermoEngineNonFiniteField,
     ThermoEngineTransport,
 )
 from simulator.engine_pool import EngineWorkerTimeout
@@ -39,6 +41,8 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         super().__init__()
         self._thermoengine_transport: Optional[ThermoEngineTransport] = None
         self._thermoengine_import_error: Optional[BaseException] = None
+        self._unavailable_reason: Optional[str] = None
+        self._transport_close_count = 0
         self._health_timeout_s = 8.0
 
     @property
@@ -58,6 +62,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         self._engine_version = None
         self._thermoengine_transport = None
         self._thermoengine_import_error = None
+        self._unavailable_reason = None
         self._model = str(config.get('model', self._model))
         raw_health_timeout_s = config.get('thermoengine_health_timeout_s', 8.0)
         raw_equilibrate_timeout_s = config.get(
@@ -88,6 +93,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     raise ImportError(reason)
             self._engine_version = transport.engine_version
             self._mode = 'thermoengine'
+            self._unavailable_reason = None
             return True
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             self._thermoengine_import_error = exc
@@ -132,15 +138,54 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             transport.close()
 
     def _close_after_failure(self, primary_error: BaseException) -> None:
+        # Count only a live adapter torn down after it had answered (or
+        # was ready to). Init failures close a transport that never
+        # reached mode='thermoengine' and must not look like a mid-run
+        # latch: no consumer-side ok+unavailable contradiction can see
+        # a death that happens before the first ok, so this counter is
+        # the producer-side signal for that case.
+        had_live_transport = (
+            self._thermoengine_transport is not None
+            and self._mode == 'thermoengine'
+        )
+        self._unavailable_reason = (
+            f'ThermoEngine transport closed after '
+            f'{type(primary_error).__name__}: {primary_error}'
+        )
         try:
             self.close()
         except Exception as cleanup_error:  # noqa: BLE001 - preserve primary
             primary_error.add_note(
                 f'ThermoEngine cleanup also failed: {cleanup_error}'
             )
+        if had_live_transport:
+            self._transport_close_count += 1
+
+    def transport_close_count(self) -> int:
+        """How many times a live transport was torn down mid-run."""
+        return self._transport_close_count
+
+    def transport_closed_mid_run(self) -> bool:
+        return self._transport_close_count > 0
 
     def is_available(self) -> bool:
         return self._thermoengine_transport is not None and self._mode == 'thermoengine'
+
+    def unavailable_reason(self) -> str:
+        """Operative cause when the adapter is genuinely not usable."""
+        if self.is_available():
+            return ''
+        if self._unavailable_reason:
+            return self._unavailable_reason
+        if self._thermoengine_import_error is not None:
+            return (
+                'ThermoEngine transport unavailable: '
+                f'{type(self._thermoengine_import_error).__name__}: '
+                f'{self._thermoengine_import_error}'
+            )
+        if self._thermoengine_transport is None:
+            return 'ThermoEngine transport not initialized'
+        return f'ThermoEngine adapter unavailable (mode={self._mode!r})'
 
     def get_engine_version(self) -> str:
         if self._thermoengine_transport is not None:
@@ -363,18 +408,38 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             )
             eq.fe_redox_split = dict(payload.fe_redox_split)
             return self._fail_closed_on_clamped_operating_point(eq)
-        except EngineWorkerTimeout:
-            # WarmEngineWorker has evicted the hung process. Keep the
-            # transport live so the next call respawns this slot.
+        except (
+            EngineWorkerTimeout,
+            ThermoEngineNonFiniteField,
+            ThermoEngineFO2UndefinedError,
+        ):
+            # TYPED keep-handle. Complete set:
+            #   EngineWorkerTimeout          — pool already evicted the child
+            #   ThermoEngineNonFiniteField   — row-local NaN/Inf field
+            #   ThermoEngineFO2UndefinedError — zero-ferric Kress91 echo
+            # Both NonFinite and FO2Undefined are ValueError subclasses:
+            # do not add `except ValueError` on this path. The child may
+            # already be dead; the parent transport handle stays.
             raise
         except ImportError as exc:
+            # Genuine adapter death. Close is correct.
             self._close_after_failure(exc)
             raise
         except Exception as exc:
+            # UNTYPED close. Sequential mode may still latch here
+            # (builtin TimeoutError remap, remapped ValueError, unknown
+            # child exc_name → RuntimeError, parent-side RuntimeError,
+            # ThermoEngineIsolationError). Isolated retry remains
+            # required. Isolated-mode ceilings (e.g. 12→32) are not a
+            # sequential result of the typed keep-handle.
             self._close_after_failure(exc)
             raise RuntimeError(
                 f'ThermoEngine equilibrium failed: {exc}'
             ) from exc
 
 
-__all__ = ['ThermoEngineBackend']
+__all__ = [
+    'ThermoEngineBackend',
+    'ThermoEngineFO2UndefinedError',
+    'ThermoEngineNonFiniteField',
+]

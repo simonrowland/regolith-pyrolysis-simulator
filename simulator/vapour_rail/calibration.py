@@ -45,6 +45,7 @@ from simulator.melt_backend.vaporock import (
     VAPOROCK_T_MAX_K,
     VAPOROCK_T_MIN_K,
     VapoRockBackend,
+    vaporock_speciation_is_live,
 )
 from simulator.vapour_rail.trace_acquisition import list_pending_validation
 
@@ -1401,6 +1402,13 @@ def evaluate_cell(
         for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS
     }
     instrument_status = envelope_source["instrument_status"]
+
+    # non_authoritative is pressure-authority, not completeness. Hollow
+    # producer results carry empty_speciation_cause / not_converged so
+    # this cell is not a live speciation.
+    if not vaporock_speciation_is_live(status, result_diagnostics, pressures):
+        if status in {"ok", "non_authoritative"}:
+            status = "not_converged"
 
     observations: list[SpeciesObservation] = []
     if status not in {"ok", "non_authoritative"}:

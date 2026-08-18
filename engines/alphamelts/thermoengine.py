@@ -45,7 +45,21 @@ class ThermoEngineIsolationError(RuntimeError):
 
 
 class ThermoEngineFO2UndefinedError(ValueError):
-    """A finite intrinsic fO2 diagnostic is physically undefined."""
+    """A finite fO2 diagnostic is physically undefined (zero-ferric liquid).
+
+    Row-local: Kress91 cannot echo a finite log fO2 at Fe2O3 == 0. The
+    child process may already be dead, but the parent transport handle
+    is still the live adapter. Not evidence the adapter is missing.
+    """
+
+
+class ThermoEngineNonFiniteField(ValueError):
+    """A required ThermoEngine numeric field was NaN or infinite.
+
+    Row-local: the child process may already be dead, but the parent
+    transport handle is still the live adapter. Not evidence the
+    adapter is missing.
+    """
 
 
 _FO2_ECHO_TOLERANCE = 1.0e-3
@@ -459,10 +473,14 @@ print('ok')
             exc_name = exc.exc_name
             detail = exc.detail
             child_traceback = exc.remote_traceback
+        # Exact child type name only. Unknown names become RuntimeError
+        # and then close (untyped). Do not substring-match the detail.
         exception_type = {
             'ImportError': ImportError,
             'TimeoutError': TimeoutError,
             'ValueError': ValueError,
+            'ThermoEngineNonFiniteField': ThermoEngineNonFiniteField,
+            'ThermoEngineFO2UndefinedError': ThermoEngineFO2UndefinedError,
         }.get(exc_name, RuntimeError)
         raise exception_type(
             f'ThermoEngine equilibrium failed: {detail}\n{child_traceback}'
@@ -1389,7 +1407,9 @@ print('ok')
         except (TypeError, ValueError) as exc:
             raise ValueError(f'{context} is not numeric: {value!r}') from exc
         if not math.isfinite(result):
-            raise ValueError(f'{context} is not finite: {value!r}')
+            raise ThermoEngineNonFiniteField(
+                f'{context} is not finite: {value!r}'
+            )
         return result
 
 
@@ -1429,6 +1449,7 @@ def thermoengine_available(backend: Any) -> bool:
 
 __all__ = (
     'ThermoEngineFO2UndefinedError',
+    'ThermoEngineNonFiniteField',
     'ThermoEnginePayload',
     'ThermoEngineTransport',
     'equilibrate_via_thermoengine',

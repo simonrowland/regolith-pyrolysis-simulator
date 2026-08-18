@@ -424,8 +424,8 @@ class VapoRockProvider(ChemistryProvider):
         ``allowed_species`` is retained in the signature for callers
         that share construction code with the builtin provider. VapoRock
         no longer exports a filtered authoritative pressure dict; every
-        finite positive pressure stays under
-        ``vaporock_full_speciation_Pa``.
+        finite non-negative pressure (including proven-empty 0 Pa
+        inventory zeros) stays under ``vaporock_full_speciation_Pa``.
         """
         envelope_fields = asdict(melt_envelope)
         if equilibrium is None:
@@ -451,7 +451,7 @@ class VapoRockProvider(ChemistryProvider):
             if not _is_finite(value):
                 continue
             pressure = float(value)
-            if pressure > 0.0:
+            if pressure >= 0.0:
                 vaporock_full_speciation_Pa[str(species)] = pressure
         del allowed_species
         vapor_pressures_Pa: dict[str, float] = {}

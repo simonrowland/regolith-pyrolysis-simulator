@@ -68,6 +68,11 @@ DEFAULT_ENGINES = (
     "thermoengine",
     "vaporock",
 )
+# Rail-owned MELTS SiO2 trust window. Default matches the historical
+# engine-imposed [30, 80] so coverage goldens stay put. This is not the
+# adapter's two-component alkali-silica crash guard.
+DEFAULT_MELTS_SILICATE_NETWORK_BAND_WT_PCT = (30.0, 80.0)
+VAPOROCK_PRESSURE_OBSERVABLES = frozenset({"partial_pressure", "evaporation_flux"})
 SF04_ANCHOR_SPECIES = ("SiO2", "FeO", "Fe", "Mg", "SiO", "K", "Na", "O2")
 SF04_SHEET_COMPOSITIONS = {
     "tho": "sf04_tholeiite",
@@ -85,6 +90,7 @@ POINT_STATUSES = frozenset(
         "unavailable",
     }
 )
+COVERAGE_PRESSURE_FAMILIES = frozenset({"partial_pressure", "evaporation_flux"})
 
 
 @dataclass(frozen=True)
@@ -96,6 +102,7 @@ class EngineResult:
     gammas: Mapping[str, float] = field(default_factory=dict)
     reason: str = ""
     details: Mapping[str, Any] = field(default_factory=dict)
+    partial_pressures: Mapping[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.status not in POINT_STATUSES:
@@ -130,10 +137,19 @@ def _sha256(path: Path) -> str:
 
 def _positive_finite(values: Mapping[str, Any]) -> dict[str, float]:
     result: dict[str, float] = {}
+    nonfinite: list[str] = []
     for key, raw in values.items():
         value = float(raw)
-        if value > 0.0 and math.isfinite(value):
+        if not math.isfinite(value):
+            nonfinite.append(f"{key}={value!r}")
+            continue
+        if value > 0.0:
             result[str(key)] = value
+    if nonfinite:
+        raise ValueError(
+            "non-finite melt-activity value refused (would silently shrink "
+            f"the sample): {', '.join(nonfinite)}"
+        )
     return result
 
 
@@ -194,6 +210,30 @@ def _reason_line(value: Any) -> str:
     return " ".join(str(value or "").split())[:800]
 
 
+def coverage_observable_is_pressure(result: EngineResult) -> bool:
+    """Whether this coverage result's observable is a pressure map.
+
+    Declared non-pressure families (activity, domain_gate) are not
+    pressure-scored. An undeclared family fails closed: ok + empty
+    pressures must not stay ok.
+    """
+    family = result.details.get("observable_family")
+    if family in COVERAGE_PRESSURE_FAMILIES:
+        return True
+    if family:
+        return False
+    return True
+
+
+def coverage_cell_accepted(row: Mapping[str, Any], engine: str) -> bool:
+    """Accepted coverage cell: ok, and not a recorded hollow prediction."""
+    if row.get(f"{engine}_status") != "ok":
+        return False
+    if row.get(f"{engine}_finite_prediction") is False:
+        return False
+    return True
+
+
 def _alphamelts_failure_details(values: Mapping[str, Any]) -> dict[str, Any]:
     failure = dict(values.get("subprocess_failure", {}) or {})
     return {
@@ -210,10 +250,34 @@ def _alphamelts_failure_details(values: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
+    """Typed row-local exceptions that must not become status=unavailable.
+
+    Classification is by type, not message text. A keep-handle exception
+    whose str() happens to contain "unavailable" is still a row-local
+    refusal; the structural latch detector trusts status=unavailable as
+    adapter-absence, so a substring test here would re-introduce the
+    prose coupling one layer up.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineNonFiniteField,
+    )
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    return (
+        EngineWorkerTimeout,
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineNonFiniteField,
+    )
+
+
 def classify_engine_exception(exc: BaseException) -> tuple[str, str]:
     """Map an engine-boundary exception into the benchmark status vocabulary."""
 
     text = _reason_line(f"{type(exc).__name__}: {exc}")
+    if isinstance(exc, _keep_handle_exception_types()):
+        return "refused", text
     lowered = text.lower()
     category = str(getattr(exc, "backend_failure_category", "") or "").lower()
     if category == "engine_crash" or any(
@@ -245,10 +309,20 @@ def execute_engine(
 class ImccEngine:
     """Published or explicitly labelled research IMCC-SF04 adapter."""
 
-    def __init__(self, name: str, pack_path: Path, *, published: bool) -> None:
+    def __init__(
+        self,
+        name: str,
+        pack_path: Path,
+        *,
+        published: bool,
+        allow_extrapolation: bool = False,
+        allow_out_of_envelope: bool = False,
+    ) -> None:
         self.name = name
         self.pack_path = pack_path
         self.published = published
+        self.allow_extrapolation = allow_extrapolation
+        self.allow_out_of_envelope = allow_out_of_envelope
         self._pack: Any | None = None
 
     def _load(self) -> Any:
@@ -314,6 +388,8 @@ class ImccEngine:
                 pack,
                 basis_type="wt",
                 enable_sp_extension=not self.published,
+                allow_extrapolation=self.allow_extrapolation,
+                allow_out_of_envelope=self.allow_out_of_envelope,
             )
         except (
             ImccCompositionOutsideValidatedEnvelopeError,
@@ -336,17 +412,24 @@ class ImccEngine:
             for oxide, value in zip(result.parent_oxides, result.parent_gamma)
         }
         labels = result.labels
+        details: dict[str, Any] = {
+            "model_id": labels.identity["model_id"],
+            "datapack_version": labels.identity["datapack_version"],
+            "trust": labels.trust,
+            "envelope_status": labels.envelope_status,
+            "pack_sha256": _sha256(self.pack_path),
+            "observable_family": "activity",
+        }
+        if self.allow_extrapolation or self.allow_out_of_envelope:
+            # Temperature mark is orthogonal to envelope_status. Publish
+            # it only on the flagged pass so the strict details JSON
+            # stays bit-identical.
+            details["extrapolated"] = bool(result.extrapolated)
         return EngineResult(
             status="ok",
             activities=activities,
             gammas=gammas,
-            details={
-                "model_id": labels.identity["model_id"],
-                "datapack_version": labels.identity["datapack_version"],
-                "trust": labels.trust,
-                "envelope_status": labels.envelope_status,
-                "pack_sha256": _sha256(self.pack_path),
-            },
+            details=details,
         )
 
     def coverage(
@@ -457,6 +540,7 @@ class InternalAnalyticalEngine:
                 "benchmark_activity_basis": "parent_oxide_formula_unit",
                 "gas_path": "shared_tracked_analytical",
                 "warning_count": len(result.warnings),
+                "observable_family": "activity",
             },
         )
 
@@ -473,8 +557,17 @@ class AlphaMeltsEngine:
 
     name = "alphamelts"
 
-    def __init__(self, timeout_s: float = 30.0) -> None:
+    def __init__(
+        self,
+        timeout_s: float = 30.0,
+        silicate_network_band: tuple[float, float] | None = None,
+    ) -> None:
         self.timeout_s = float(timeout_s)
+        self.silicate_network_band = (
+            DEFAULT_MELTS_SILICATE_NETWORK_BAND_WT_PCT
+            if silicate_network_band is None
+            else (float(silicate_network_band[0]), float(silicate_network_band[1]))
+        )
         self._provider: Any | None = None
         self._initialization_error = ""
 
@@ -621,13 +714,25 @@ class AlphaMeltsEngine:
         del temperature_K
         from engines.alphamelts.domain import AlphaMELTSDomainGate
 
-        valid, warnings, reason = AlphaMELTSDomainGate.validate_with_reason(
-            composition_wt_pct
+        assessment = AlphaMELTSDomainGate.assess(
+            composition_wt_pct,
+            silicate_network_band=self.silicate_network_band,
         )
         return EngineResult(
-            status="ok" if valid else "out_of_domain",
-            reason="" if valid else _reason_line("; ".join(warnings)),
-            details={"domain_reason": reason},
+            status="ok" if assessment.valid else "out_of_domain",
+            reason=(
+                ""
+                if assessment.valid
+                else _reason_line("; ".join(assessment.warnings))
+            ),
+            details={
+                "domain_reason": assessment.reason,
+                "failed_constraints": list(assessment.failed_constraints),
+                "silicate_network_band_wt_pct": list(
+                    assessment.silicate_network_band_wt_pct
+                ),
+                "observable_family": "domain_gate",
+            },
         )
 
 
@@ -635,6 +740,19 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
     """In-process ThermoEngine MELTS diagnostic with intrinsic-fO2 support."""
 
     name = "thermoengine"
+
+    def transport_close_count(self) -> int:
+        """How many times this instance tore down a live transport."""
+        provider = self._provider
+        if provider is None:
+            return 0
+        getter = getattr(provider, "transport_close_count", None)
+        if callable(getter):
+            return int(getter())
+        return 0
+
+    def transport_closed_mid_run(self) -> bool:
+        return self.transport_close_count() > 0
 
     def _initialize(self) -> Any | None:
         if self._provider is not None or self._initialization_error:
@@ -659,16 +777,22 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
 
 
 class VapoRockEngine:
-    """VapoRock availability reporter for the activity-only comparison."""
+    """VapoRock vapour-pressure (offgas) leg.
+
+    VapoRock emits log10 partial pressures, not per-oxide melt
+    activities. Activity/gamma calls are typed as a missing observable
+    without asking the library for a quantity it does not produce.
+    """
 
     name = "vaporock"
 
     def __init__(self) -> None:
-        self._availability_result: tuple[bool, str] | None = None
+        self._backend: Any | None = None
+        self._initialization_error = ""
 
-    def _availability(self) -> tuple[bool, str]:
-        if self._availability_result is not None:
-            return self._availability_result
+    def _initialize(self) -> Any | None:
+        if self._backend is not None or self._initialization_error:
+            return self._backend
         try:
             from simulator.melt_backend.vaporock import VapoRockBackend
 
@@ -676,11 +800,13 @@ class VapoRockEngine:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 available = bool(backend.initialize({}))
-            backend.close()
-            self._availability_result = (available, "")
+            if not available:
+                self._initialization_error = "VapoRock backend unavailable"
+                return None
+            self._backend = backend
         except Exception as exc:
-            self._availability_result = (False, _reason_line(exc))
-        return self._availability_result
+            self._initialization_error = _reason_line(exc)
+        return self._backend
 
     def evaluate(
         self,
@@ -688,18 +814,122 @@ class VapoRockEngine:
         temperature_K: float,
         fO2_bar: float | None,
     ) -> EngineResult:
-        del composition_wt_pct, temperature_K, fO2_bar
-        available, error = self._availability()
-        reason = (
-            "VapoRock dependency is present but exposes no public per-oxide "
-            "melt-activity surface; internally coupled gas pressures are excluded"
-            if available
-            else f"VapoRock unavailable: {error or 'initialization failed'}"
+        backend = self._initialize()
+        if backend is None:
+            return EngineResult(
+                status="unavailable",
+                reason=f"VapoRock unavailable: {self._initialization_error}",
+                details={
+                    "dependency_available": False,
+                    "observable_family": "partial_pressure",
+                },
+            )
+        if fO2_bar is None:
+            return EngineResult(
+                status="ok",
+                reason=(
+                    "VapoRock emits log10 partial pressures, not per-oxide "
+                    "melt activities"
+                ),
+                details={
+                    "dependency_available": True,
+                    "observable_family": "partial_pressure",
+                    "observable_supported": False,
+                    "finite_prediction": False,
+                    "execution_status": "completed_without_observable",
+                },
+            )
+        if float(fO2_bar) <= 0.0 or not math.isfinite(float(fO2_bar)):
+            return EngineResult(
+                status="refused",
+                reason="VapoRock vapour-pressure solve requires a positive finite fO2 pin",
+                details={
+                    "dependency_available": True,
+                    "observable_family": "partial_pressure",
+                    "observable_supported": True,
+                },
+            )
+        result = backend.equilibrate(
+            temperature_C=float(temperature_K) - 273.15,
+            composition_kg={
+                str(oxide): float(wt) for oxide, wt in composition_wt_pct.items()
+            },
+            fO2_log=math.log10(float(fO2_bar)),
+            pressure_bar=1.0e-6,
         )
+        raw_status = str(result.status)
+        raw_diagnostics = dict(getattr(result, "diagnostics", None) or {})
+        cause = raw_diagnostics.get("empty_speciation_cause")
+        pressures = _positive_finite(
+            getattr(result, "vaporock_full_speciation_Pa", None)
+            or result.vapor_pressures_Pa
+            or {}
+        )
+        details = {
+            "dependency_available": True,
+            "observable_family": "partial_pressure",
+            "observable_supported": True,
+            "finite_prediction": bool(pressures),
+            "backend_status": raw_status,
+            "units": "Pa",
+            "source": "vaporock_eval_gas_abundances",
+        }
+        if cause:
+            details["empty_speciation_cause"] = cause
+        if raw_status == "unavailable":
+            return EngineResult(
+                status="unavailable",
+                reason=_reason_line("; ".join(result.warnings)),
+                details=details,
+            )
+        if raw_status == "out_of_domain":
+            return EngineResult(
+                status="out_of_domain",
+                reason=_reason_line("; ".join(result.warnings)),
+                details=details,
+            )
+        # Hollow token (or success-shaped empty dict) is missing-output,
+        # not a provider refusal. Check before remapping not_converged.
+        if cause or (
+            not pressures and raw_status in {"ok", "non_authoritative"}
+        ):
+            from simulator.melt_backend.vaporock import (
+                EmptySpeciationCause,
+                empty_speciation_reason,
+            )
+
+            reason = _reason_line("; ".join(result.warnings))
+            if cause:
+                derived = empty_speciation_reason(EmptySpeciationCause(cause))
+                if derived not in reason:
+                    reason = _reason_line(
+                        f"{reason}; {derived}" if reason else derived
+                    )
+            return EngineResult(
+                status="observable_unavailable",
+                reason=reason,
+                details={
+                    **details,
+                    "execution_status": "completed_without_observable",
+                    "finite_prediction": False,
+                },
+            )
+        if raw_status not in {"ok", "non_authoritative"}:
+            return EngineResult(
+                status="refused",
+                reason=_reason_line(
+                    f"provider status {raw_status}: {'; '.join(result.warnings)}"
+                ),
+                details=details,
+            )
         return EngineResult(
-            status="unavailable",
-            reason=reason,
-            details={"dependency_available": available},
+            status="ok",
+            partial_pressures=pressures,
+            details={
+                **details,
+                "execution_status": "converged",
+                "species": sorted(pressures),
+            },
         )
 
     def coverage(
@@ -731,7 +961,10 @@ def build_engines(
             "imcc-ext", _repo_path(packs["imcc-ext"]), published=False
         ),
         "internal_analytic": InternalAnalyticalEngine,
-        "alphamelts": lambda: AlphaMeltsEngine(timeout_s=alphamelts_timeout_s),
+        "alphamelts": lambda: AlphaMeltsEngine(
+            timeout_s=alphamelts_timeout_s,
+            silicate_network_band=DEFAULT_MELTS_SILICATE_NETWORK_BAND_WT_PCT,
+        ),
         "thermoengine": lambda: ThermoEngineMeltActivityEngine(
             timeout_s=alphamelts_timeout_s
         ),
@@ -741,6 +974,35 @@ def build_engines(
     if unknown:
         raise ValueError(f"unknown engines: {', '.join(unknown)}")
     return [constructors[name]() for name in names]
+
+
+def _native_partial_pressure_pa(
+    result: EngineResult, species: str
+) -> float | None:
+    pressures = result.partial_pressures or {}
+    if species in pressures:
+        return float(pressures[species])
+    namespaced = f"{species}_gas"
+    if namespaced in pressures:
+        return float(pressures[namespaced])
+    return None
+
+
+def _hertz_knudsen_flux_mol_m2_s(
+    pressure_pa: float, species: str, temperature_K: float
+) -> float:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.physical_constants import GAS_CONSTANT
+
+    molar_mass = resolve_species_formula(species).molar_mass_kg_per_mol()
+    # Premise: Hertz–Knudsen molar flux into vacuum is
+    # J = P / sqrt(2 π M R T). Algebra: P has units kg m^-1 s^-2;
+    # sqrt(M R T) = sqrt((kg/mol)·(J mol^-1 K^-1)·K) = kg m s^-1 mol^-1;
+    # so J has units mol m^-2 s^-1. Sanity: flux rises with P and falls
+    # with sqrt(T); this is the same form as the shared analytical path.
+    return pressure_pa / math.sqrt(
+        2.0 * math.pi * molar_mass * GAS_CONSTANT * float(temperature_K)
+    )
 
 
 def _prediction_for_point(
@@ -755,6 +1017,20 @@ def _prediction_for_point(
     elif observable == "activity_coefficient":
         value = result.gammas.get(parent)
     elif observable in {"partial_pressure", "evaporation_flux"}:
+        native_pa = _native_partial_pressure_pa(result, str(point["species"]))
+        if native_pa is not None:
+            value = (
+                native_pa
+                if observable == "partial_pressure"
+                else _hertz_knudsen_flux_mol_m2_s(
+                    native_pa, str(point["species"]), float(point["temperature_K"])
+                )
+            )
+            if value is None or not math.isfinite(float(value)) or float(value) <= 0.0:
+                return None, (
+                    f"engine returned no positive {observable} for {parent}"
+                )
+            return float(value), ""
         if "fO2_bar" not in point:
             return None, "gas comparison refused: observation has no independent fO2 pin"
         try:
@@ -776,14 +1052,10 @@ def _prediction_for_point(
             if observable == "partial_pressure":
                 value = pressure_pa
             else:
-                from simulator.accounting.formulas import resolve_species_formula
-                from simulator.physical_constants import GAS_CONSTANT
-
-                molar_mass = resolve_species_formula(
-                    str(point["species"])
-                ).molar_mass_kg_per_mol()
-                value = pressure_pa / math.sqrt(
-                    2.0 * math.pi * molar_mass * GAS_CONSTANT * float(point["temperature_K"])
+                value = _hertz_knudsen_flux_mol_m2_s(
+                    pressure_pa,
+                    str(point["species"]),
+                    float(point["temperature_K"]),
                 )
         except Exception as exc:
             return None, f"shared gas layer refused: {_reason_line(exc)}"
@@ -798,6 +1070,8 @@ def _prediction_for_point(
                 f"{', '.join(str(label) for label in unmapped_labels)}; "
                 f"no authoritative {parent} basis conversion"
             )
+        if result.details.get("observable_supported") is False and result.reason:
+            return None, result.reason
         return None, f"engine returned no positive {observable} for {parent}"
     return float(value), ""
 
@@ -871,6 +1145,176 @@ def run_points(
                 }
             )
     return rows
+
+
+def _imcc_engines_with_extrapolation(
+    engines: Sequence[MeltActivityEngine],
+) -> list[ImccEngine]:
+    flagged: list[ImccEngine] = []
+    for engine in engines:
+        if not isinstance(engine, ImccEngine):
+            continue
+        flagged.append(
+            ImccEngine(
+                engine.name,
+                engine.pack_path,
+                published=engine.published,
+                allow_extrapolation=True,
+                allow_out_of_envelope=True,
+            )
+        )
+    return flagged
+
+
+def as_imcc_informational_row(
+    row: Mapping[str, Any],
+    *,
+    extrapolated: bool,
+    envelope_status: str,
+) -> dict[str, Any]:
+    """Promote a computed IMCC row to the non-certifying extrapolated tier.
+
+    ``residual_dex`` is forcibly ``None`` so ``summarize_metrics`` and
+    ``summarize_paired_decisions`` cannot ingest it. The numeric residual
+    lives only in ``informational_residual_dex``. Both marks are required
+    columns: ``extrapolated`` is the temperature-domain mark, and
+    ``envelope_status`` is the composition test.
+    """
+
+    measured = row.get("measured")
+    prediction = row.get("prediction")
+    informational = row.get("residual_dex")
+    if informational is None and prediction is not None and measured is not None:
+        measured_f = float(measured)
+        pred_f = float(prediction)
+        if pred_f > 0.0 and measured_f > 0.0:
+            informational = math.log10(pred_f / measured_f)
+    out = dict(row)
+    out["residual_dex"] = None
+    out["informational_residual_dex"] = informational
+    out["extrapolated"] = bool(extrapolated)
+    out["envelope_status"] = str(envelope_status)
+    return out
+
+
+def run_imcc_extrapolated_points(
+    fixture: Mapping[str, Any],
+    engines: Sequence[MeltActivityEngine],
+) -> list[dict[str, Any]]:
+    """Second IMCC pass: compute-and-mark. Never writes a scored residual."""
+
+    flagged = _imcc_engines_with_extrapolation(engines)
+    if not flagged:
+        return []
+    rows: list[dict[str, Any]] = []
+    for row in run_points(fixture, flagged):
+        details = json.loads(str(row.get("details") or "{}"))
+        if "extrapolated" not in details:
+            continue
+        extrapolated = bool(details["extrapolated"])
+        envelope_status = details.get("envelope_status")
+        if envelope_status is None:
+            continue
+        if not extrapolated and envelope_status != "outside_validated":
+            continue
+        rows.append(
+            as_imcc_informational_row(
+                row,
+                extrapolated=extrapolated,
+                envelope_status=str(envelope_status),
+            )
+        )
+    return rows
+
+
+def summarize_informational_imcc_extrapolation(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Informational RMSE by engine × envelope. Never reads residual_dex."""
+
+    groups: dict[tuple[str, str], list[float]] = defaultdict(list)
+    counts: Counter[tuple[str, str]] = Counter()
+    for row in rows:
+        key = (str(row["engine"]), str(row.get("envelope_status") or ""))
+        counts[key] += 1
+        residual = row.get("informational_residual_dex")
+        if residual is None or not bool(row.get("score", True)):
+            continue
+        groups[key].append(float(residual))
+    summary: list[dict[str, Any]] = []
+    for key in sorted(set(counts) | set(groups)):
+        engine, envelope_status = key
+        residuals = groups.get(key, [])
+        summary.append(
+            {
+                "engine": engine,
+                "envelope_status": envelope_status,
+                "row_count": counts[key],
+                "scored_informational_count": len(residuals),
+                "informational_rmse_dex": _rmse(residuals),
+            }
+        )
+    return summary
+
+
+def _render_imcc_extrapolated_tier(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    if not rows:
+        return []
+    summary = summarize_informational_imcc_extrapolation(rows)
+    lines = [
+        "",
+        "## IMCC extrapolated tier (computed-and-marked, not validated)",
+        "",
+        "These rows are a second IMCC pass with `allow_extrapolation` and "
+        "`allow_out_of_envelope` enabled. They are category-2 out-of-domain "
+        "physics: compute and mark. They are **not** a validated domain "
+        "widening and do **not** certify. Residuals live only in "
+        "`informational_residual_dex` and do not enter the scored RMSE table "
+        "or the decision column.",
+        "",
+        "Marks are orthogonal and both appear on every row: `extrapolated` is "
+        "the temperature-domain mark (`ImccResult.extrapolated`); "
+        "`envelope_status` is the X_Me2O ≤ 0.5 composition test.",
+        "",
+        "### Informational RMSE by composition envelope",
+        "",
+        "| Engine | Envelope | n (tier) | n (scored informational) | Informational RMSE (dex) |",
+        "|---|---|---:|---:|---:|",
+    ]
+    for row in summary:
+        lines.append(
+            "| {engine} | {envelope_status} | {row_count} | {scored_informational_count} | {rmse} |".format(
+                **row,
+                rmse=_fmt(row["informational_rmse_dex"]),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "### Per-row computed-and-marked results",
+            "",
+            "| point_id | engine | T_K | species | observable | extrapolated | envelope_status | informational residual (dex) | prediction | measured |",
+            "|---|---|---:|---|---|---|---|---:|---:|---:|",
+        ]
+    )
+    for row in rows:
+        lines.append(
+            "| {point_id} | {engine} | {temperature} | {species} | {observable} | {extrapolated} | {envelope_status} | {residual} | {prediction} | {measured} |".format(
+                point_id=row["point_id"],
+                engine=row["engine"],
+                temperature=_fmt(row.get("temperature_K")),
+                species=row["species"],
+                observable=row["observable"],
+                extrapolated=row["extrapolated"],
+                envelope_status=row["envelope_status"],
+                residual=_fmt(row.get("informational_residual_dex")),
+                prediction=_fmt(row.get("prediction")),
+                measured=_fmt(row.get("measured")),
+            )
+        )
+    return lines
 
 
 def run_composition_probes(
@@ -950,8 +1394,32 @@ def run_coverage_map(
                 except Exception as exc:
                     status, reason = classify_engine_exception(exc)
                     result = EngineResult(status=status, reason=reason)
-                row[f"{engine.name}_status"] = result.status
-                row[f"{engine.name}_reason"] = result.reason
+                n_pressures = len(result.partial_pressures or {})
+                if n_pressures > 0:
+                    finite = True
+                elif "finite_prediction" in result.details:
+                    finite = bool(result.details["finite_prediction"])
+                else:
+                    finite = None
+                status = result.status
+                reason = result.reason
+                is_pressure = coverage_observable_is_pressure(result)
+                # Generic hollow-ok close: a success with no finite
+                # values of a pressure observable (declared or
+                # undeclared) is not ok. Activity / domain_gate
+                # engines declare a non-pressure family and skip this.
+                if status == "ok" and is_pressure and (
+                    finite is False or n_pressures == 0
+                ):
+                    status = "observable_unavailable"
+                    finite = False
+                    if not reason:
+                        reason = "engine produced no finite prediction"
+                row[f"{engine.name}_status"] = status
+                row[f"{engine.name}_reason"] = reason
+                if is_pressure:
+                    row[f"{engine.name}_finite_prediction"] = finite
+                    row[f"{engine.name}_n_pressures"] = n_pressures
             rows.append(row)
     return rows
 
@@ -1410,7 +1878,34 @@ def summarize_rump_coverage(
     return summary
 
 
-_ADAPTER_UNAVAILABLE_TOKEN = "adapter not available"
+def engines_with_ok_and_adapter_unavailable(
+    rows: Sequence[Mapping[str, Any]],
+) -> tuple[str, ...]:
+    """Engines that both answered ok and reported themselves unavailable.
+
+    Structural run-level guard (t-683, pulled forward): an engine that
+    produced at least one ``ok`` row cannot also report
+    ``status=unavailable`` in the same run without contradicting itself.
+    Reason text is not consulted, so editing unavailable prose cannot
+    blind this predicate.
+    """
+    flags: dict[str, set[str]] = defaultdict(set)
+    for row in rows:
+        engine = str(row.get("engine") or "")
+        if not engine:
+            continue
+        status = str(row.get("status") or "")
+        if status == "ok":
+            flags[engine].add("ok")
+        elif status == "unavailable":
+            flags[engine].add("unavailable")
+    return tuple(
+        sorted(
+            engine
+            for engine, seen in flags.items()
+            if seen >= {"ok", "unavailable"}
+        )
+    )
 
 
 def _short_latch_reason(text: str) -> str:
@@ -1433,28 +1928,50 @@ def _git_head() -> str | None:
         return None
 
 
+def _row_identity(row: Mapping[str, Any]) -> str:
+    return str(row.get("point_id") or row.get("probe_id") or "")
+
+
 def detect_thermoengine_adapter_latch(
     point_rows: Sequence[Mapping[str, Any]],
+    *,
+    transport_closed_mid_run: bool = False,
 ) -> dict[str, Any] | None:
     """Detect a one-process adapter death that poisons later ThermoEngine rows.
 
-    After a mid-rail RuntimeError the in-process ThermoEngine transport stays
-    down, so every later row inherits ``unavailable`` / "adapter not available".
-    That sequential count is latch-true and physics-false: a fresh adapter can
-    still be asked the later points. Returns None when no such latch is present.
+    Fires when either:
+
+    1. The producer recorded a mid-run transport close
+       (``transport_closed_mid_run``). That covers die-on-first-row,
+       where no ``ok`` exists for a consumer-side contradiction to see.
+    2. The row set is self-contradictory (at least one ``ok`` and at
+       least one ``status=unavailable``).
+
+    Reason text is never consulted. Sequential keep-handle is typed for
+    ``EngineWorkerTimeout``, ``ThermoEngineNonFiniteField``, and
+    ``ThermoEngineFO2UndefinedError`` only. Other close causes still
+    latch the one-process adapter. Isolated retry remains required; any
+    combined sequential+isolated count is an isolated-mode ceiling, not
+    a sequential-mode result of the typed keep-handle.
     """
 
     te_rows = [row for row in point_rows if row.get("engine") == "thermoengine"]
     if not te_rows:
         return None
+    contradiction = "thermoengine" in engines_with_ok_and_adapter_unavailable(
+        te_rows
+    )
+    if not contradiction and not transport_closed_mid_run:
+        return None
     latch_at: int | None = None
     for index, row in enumerate(te_rows):
-        reason = str(row.get("reason") or "").lower()
-        if row.get("status") == "unavailable" and _ADAPTER_UNAVAILABLE_TOKEN in reason:
+        if row.get("status") == "unavailable":
             latch_at = index
             break
     if latch_at is None:
-        return None
+        if not transport_closed_mid_run:
+            return None
+        latch_at = 0
     previous = te_rows[latch_at - 1] if latch_at else None
     latched = te_rows[latch_at:]
     sequential_usable = sum(
@@ -1468,7 +1985,7 @@ def detect_thermoengine_adapter_latch(
     return {
         "detected": True,
         "latch_after_point_id": (
-            str(previous["point_id"]) if previous is not None else None
+            _row_identity(previous) if previous is not None else None
         ),
         "latch_after_status": (
             str(previous.get("status") or "") if previous is not None else ""
@@ -1476,27 +1993,51 @@ def detect_thermoengine_adapter_latch(
         "latch_after_reason": (
             str(previous.get("reason") or "") if previous is not None else ""
         ),
-        "latch_first_point_id": str(latched[0]["point_id"]),
+        "latch_first_point_id": _row_identity(latched[0]),
         "sequential_usable": sequential_usable,
         "sequential_total": len(te_rows),
         "latched_count": len(latched),
-        "latched_point_ids": [str(row["point_id"]) for row in latched],
+        "latched_point_ids": [_row_identity(row) for row in latched],
         "yamaguchi_latched_count": len(yamaguchi_latched),
+        "transport_closed_mid_run": bool(transport_closed_mid_run),
+        "ok_unavailable_contradiction": contradiction,
     }
 
 
 def _adapter_unavailable_result(result: EngineResult) -> bool:
-    return (
-        result.status == "unavailable"
-        and _ADAPTER_UNAVAILABLE_TOKEN in result.reason.lower()
-    )
+    """True when this call reported the adapter absent. Status only."""
+    return result.status == "unavailable"
 
 
-def _adapter_killed_this_call(result: EngineResult) -> bool:
-    text = result.reason.lower()
-    return result.status in {"refused", "crash"} and (
-        "equilibrium failed" in text or "transport unavailable" in text
-    )
+def _engine_transport_close_count(engine: Any) -> int:
+    """Producer mid-run close count. 0 when the engine has no marker."""
+    getter = getattr(engine, "transport_close_count", None)
+    if callable(getter):
+        return int(getter())
+    flag = getattr(engine, "transport_closed_mid_run", None)
+    if callable(flag):
+        return 1 if flag() else 0
+    return 0
+
+
+def _thermoengine_transport_closed_mid_run(
+    engines: Sequence[Any],
+) -> bool:
+    """True when any ThermoEngine producer recorded a mid-run close."""
+    for engine in engines:
+        if getattr(engine, "name", None) != "thermoengine":
+            continue
+        if _engine_transport_close_count(engine) > 0:
+            return True
+        flag = getattr(engine, "transport_closed_mid_run", None)
+        if callable(flag) and flag():
+            return True
+    return False
+
+
+def _adapter_killed_this_call(engine: Any, close_count_before: int) -> bool:
+    """True when this call tore down a live transport. Producer count only."""
+    return _engine_transport_close_count(engine) > close_count_before
 
 
 def _thermoengine_point_prediction_row(
@@ -1582,12 +2123,14 @@ def measure_isolated_thermoengine_points(
         )
         key = (composition_id, temperature_K, fO2_bar)
         if key not in cache:
+            close_count_before = _engine_transport_close_count(engine)
             result = execute_engine(engine, composition, temperature_K, fO2_bar)
             if _adapter_unavailable_result(result):
                 engine = factory()
                 restarts += 1
+                close_count_before = _engine_transport_close_count(engine)
                 result = execute_engine(engine, composition, temperature_K, fO2_bar)
-            if _adapter_killed_this_call(result):
+            if _adapter_killed_this_call(engine, close_count_before):
                 engine = factory()
                 restarts += 1
             cache[key] = result
@@ -1630,6 +2173,8 @@ def generate_report(
     reference_rows: Sequence[Mapping[str, Any]] = (),
     live_vaporock_rows: Sequence[Mapping[str, Any]] = (),
     thermoengine_latch: Mapping[str, Any] | None = None,
+    thermoengine_probe_latch: Mapping[str, Any] | None = None,
+    extrapolated_rows: Sequence[Mapping[str, Any]] = (),
 ) -> str:
     metrics = summarize_metrics(point_rows)
     paired_decisions = summarize_paired_decisions(point_rows)
@@ -1662,7 +2207,18 @@ def generate_report(
         "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | observable unavailable | unavailable |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
+    activity_metrics = []
+    vaporock_pressure_metrics = []
     for row in metrics:
+        if (
+            row["engine"] == "vaporock"
+            and row["observable"] not in VAPOROCK_PRESSURE_OBSERVABLES
+        ):
+            continue
+        if row["engine"] == "vaporock":
+            vaporock_pressure_metrics.append(row)
+        activity_metrics.append(row)
+    for row in activity_metrics:
         lines.append(
             "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {observable_unavailable} | {unavailable} |".format(
                 **row,
@@ -1696,6 +2252,7 @@ def generate_report(
             )
         )
     lines.extend(["", f"Decision verdict: {_paired_verdict(paired_decisions)}"])
+    lines.extend(_render_imcc_extrapolated_tier(extrapolated_rows))
     if reference_rows:
         anchor = summarize_reference_anchors(fixture, reference_rows)
         lines.extend(
@@ -1775,6 +2332,18 @@ def generate_report(
     for row in probe_rows:
         lines.append(
             f"| {row['composition_id']} | {row['material_class']} | {row['engine']} | {row['status']} | {_reason_line(row['reason']) or '—'} |"
+        )
+    if thermoengine_probe_latch:
+        lines.extend(
+            [
+                "",
+                "ThermoEngine probe-row latch detected: the probe engine set "
+                f"closed its transport mid-run "
+                f"(after `{thermoengine_probe_latch.get('latch_after_point_id') or 'the first probe'}`, "
+                f"{thermoengine_probe_latch.get('latched_count')} later probe rows "
+                "inherited `unavailable`). Isolated retry is applied to "
+                "benchmark point rows only.",
+            ]
         )
     lines.extend(["", "## Cross-engine verdict", ""])
     if "alphamelts" not in present_engines:
@@ -1858,7 +2427,7 @@ def generate_report(
                     if yam_latched
                     else " —"
                 )
-                + " inherited `unavailable` (\"adapter not available\"). "
+                + " inherited `unavailable`. "
                 "Do not read the sequential count as ThermoEngine being "
                 "unable to score those later points."
             )
@@ -1877,7 +2446,12 @@ def generate_report(
                     f"usable predictions{yam_clause}. Combined coverage of the "
                     f"{true_total}-point set is therefore "
                     f"{true_usable}/{true_total}: sequential pre-latch usable "
-                    "plus isolated latched-point usable."
+                    "plus isolated latched-point usable. That combined figure "
+                    "is an isolated-mode ceiling, not a sequential-mode result: "
+                    "sequential keep-handle is typed for EngineWorkerTimeout, "
+                    "ThermoEngineNonFiniteField, and "
+                    "ThermoEngineFO2UndefinedError only; other close causes "
+                    "still latch, so isolated retry remains required."
                 )
             else:
                 lines.append(
@@ -1898,16 +2472,27 @@ def generate_report(
             )
     lines.extend(["", "## Stripping-trajectory coverage", ""])
     for engine in sorted(coverage_engines):
-        accepted = sum(row.get(f"{engine}_status") == "ok" for row in coverage_rows)
+        accepted = sum(
+            coverage_cell_accepted(row, engine) for row in coverage_rows
+        )
         refused = len(coverage_rows) - accepted
         low_silica = [
             row for row in coverage_rows if float(row["SiO2_wt_pct"]) < 30.0
         ]
-        low_refused = sum(row.get(f"{engine}_status") != "ok" for row in low_silica)
+        low_refused = sum(
+            not coverage_cell_accepted(row, engine) for row in low_silica
+        )
         lines.append(
             f"- `{engine}`: {accepted}/{len(coverage_rows)} accepted; {refused} refused/unavailable; "
             f"below 30 wt% SiO2, {len(low_silica) - low_refused}/{len(low_silica)} accepted "
             f"and {low_refused}/{len(low_silica)} refused/unavailable."
+        )
+    if "thermoengine" in coverage_engines:
+        lines.append(
+            "ThermoEngine coverage rows are AlphaMELTSDomainGate assessments "
+            "and do not call the ThermoEngine transport. A mid-run transport "
+            "close is therefore not visible in this table and is not "
+            "isolated-retried here."
         )
     alpha_rows = [row for row in coverage_rows if "alphamelts_status" in row]
     if alpha_rows:
@@ -1954,6 +2539,50 @@ def generate_report(
                     **row
                 )
             )
+    if "vaporock" in present_engines:
+        vaporock_pp = [
+            row
+            for row in point_rows
+            if row["engine"] == "vaporock"
+            and row["observable"] == "partial_pressure"
+        ]
+        vaporock_scored = [
+            row for row in vaporock_pp if row.get("residual_dex") is not None
+        ]
+        lines.extend(
+            [
+                "",
+                "## VapoRock vapour-pressure leg",
+                "",
+                "VapoRock is scored on native log10 partial pressures converted to Pa, "
+                "not on per-oxide melt activities. Activity and gamma points are omitted "
+                "from the comparison table rather than reported as a dead activity engine.",
+                "",
+                f"Partial-pressure points: **{len(vaporock_scored)} scored / "
+                f"{len(vaporock_pp)} planned**.",
+            ]
+        )
+        if vaporock_pressure_metrics:
+            lines.extend(
+                [
+                    "",
+                    "| Species | n | RMSE (dex) | Median residual | ok | OOD | refused |",
+                    "|---|---:|---:|---:|---:|---:|---:|",
+                ]
+            )
+            for row in vaporock_pressure_metrics:
+                if row["observable"] != "partial_pressure":
+                    continue
+                lines.append(
+                    "| {species} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {refused} |".format(
+                        **row,
+                        rmse=_fmt(row["rmse_dex"]),
+                        median=_fmt(row["median_signed_residual_dex"]),
+                        ok=row["ok_count"],
+                        ood=row["out_of_domain_count"],
+                        refused=row["refused_count"],
+                    )
+                )
     lines.extend(
         [
             "",
@@ -1963,13 +2592,16 @@ def generate_report(
             "- Richter-2007 is an in-domain Type-B CAI-like CMAS melt, not a literal basalt; its six gamma targets are reported separately.",
             "- Four OCR-digitized Richter Mg flux points are retained but refused for scoring because no independent experimental fO2 pin closes the gas/reference-state comparison.",
             "- KEMS-008 Table 10 values are kinetic vaporization coefficients, not basalt melt activities.",
-            "- Every scored gas observable uses the fixture's pinned fO2 and the shared tracked analytical gas layer. Parent-formula activities are converted to the rail's single-cation component basis first; internally coupled engine gas pressures are excluded.",
+            "- Melt-activity engines score gas observables through the fixture's pinned fO2 and the shared tracked analytical gas layer. Parent-formula activities are converted to the rail's single-cation component basis first. VapoRock is the exception: it is scored on its native offgas partial pressures, not on a derived activity surface.",
             "- Activity coefficients are reported as `gamma = a/x` on the parent-oxide formula-unit basis. The internal analytical adapter converts its native single-cation activity and mole-fraction provenance before comparison.",
         ]
     )
     if "vaporock" in present_engines:
         lines.append(
-            "- VapoRock currently exposes no public per-oxide melt-activity surface, so its internally coupled gas results are excluded from the activity-only swap; its separate frozen MAGMA/KEMS and optional live-snapshot diagnostics remain reported."
+            "- VapoRock is a vapour-pressure / offgas engine: native partial "
+            "pressures are scored on their own leg. Activity/gamma points stay "
+            "unasked (`observable_unavailable`). Frozen MAGMA/KEMS and the "
+            "live-versus-frozen drift check remain."
         )
     if "alphamelts" in present_engines:
         lines.append(
@@ -2048,10 +2680,19 @@ def run_benchmark(
     coverage_rows: list[dict[str, Any]] = []
     reference_rows: list[dict[str, Any]] = []
     live_vaporock_rows: list[dict[str, Any]] = []
+    extrapolated_rows: list[dict[str, Any]] = []
     paired_decisions: list[dict[str, Any]] = []
+    probe_engines: list[Any] = []
     if mode in {"benchmark", "all"}:
         point_rows = run_points(fixture, engines)
-        probe_rows = run_composition_probes(fixture, engines)
+        # Additive second IMCC pass. Strict point_rows stay untouched.
+        extrapolated_rows = run_imcc_extrapolated_points(fixture, engines)
+        # Fresh instances so a row-local point failure cannot poison probes.
+        # Makes the probe table askable; not a claim those probes score.
+        probe_engines = build_engines(
+            engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
+        )
+        probe_rows = run_composition_probes(fixture, probe_engines)
         reference_rows = run_reference_anchors(fixture)
         if live_vaporock_anchor_check:
             live_vaporock_rows = run_live_vaporock_anchor_check(
@@ -2068,7 +2709,18 @@ def run_benchmark(
         coverage_rows = run_coverage_map(fixture, engines, coverage_steps)
         _write_csv(output_dir / "coverage-map.csv", coverage_rows)
     shutil.copyfile(bench_set_path, output_dir / "bench-set.yaml")
-    latch = detect_thermoengine_adapter_latch(point_rows)
+    latch = detect_thermoengine_adapter_latch(
+        point_rows,
+        transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
+            engines
+        ),
+    )
+    probe_latch = detect_thermoengine_adapter_latch(
+        probe_rows,
+        transport_closed_mid_run=_thermoengine_transport_closed_mid_run(
+            probe_engines
+        ),
+    )
     if latch:
         isolated = measure_isolated_thermoengine_points(
             fixture,
@@ -2120,6 +2772,16 @@ def run_benchmark(
             ),
         },
         "thermoengine_adapter_latch": latch,
+        "thermoengine_probe_latch": probe_latch,
+        "imcc_extrapolated_tier": {
+            "row_count": len(extrapolated_rows),
+            "envelope_counts": dict(
+                sorted(Counter(str(row.get("envelope_status")) for row in extrapolated_rows).items())
+            ),
+            "extrapolated_true_count": sum(
+                bool(row.get("extrapolated")) for row in extrapolated_rows
+            ),
+        },
         "artifact_guard": {
             "planned": sorted(guard.planned),
             "retired": sorted(str(name) for name in retired_artifacts),
@@ -2139,6 +2801,8 @@ def run_benchmark(
                 reference_rows,
                 live_vaporock_rows,
                 thermoengine_latch=latch,
+                thermoengine_probe_latch=probe_latch,
+                extrapolated_rows=extrapolated_rows,
             ),
             encoding="utf-8",
         )
@@ -2148,6 +2812,7 @@ def run_benchmark(
     verify_planned_artifacts_written(output_dir, guard)
     return {
         "point_rows": point_rows,
+        "extrapolated_rows": extrapolated_rows,
         "probe_rows": probe_rows,
         "coverage_rows": coverage_rows,
         "reference_rows": reference_rows,
