@@ -191,7 +191,7 @@ experiments:
       equilibrium assumption holds in THIS furnace, which the module
       deliberately refuses to answer with a rate constant.
     current_evidence: >
-      None in-tree. b-203 module (7eb86482) computes the imposed fO2 and
+      None in-tree. The b-203 module (simulator/chemistry/offgas_fo2.py) computes the imposed fO2 and
       reports assumption strain, unverified by construction.
     acceptance: >
       Relative species signals vs T, any calibration state, with the

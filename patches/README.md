@@ -111,6 +111,14 @@ alphaMELTS is AGPL-3.0. If a patched executable or source fork is redistributed,
 the unresolved distribution-posture decision is `q-004`; this record does not
 decide it.
 
+### mace — pip 0.3.16 (venv site-packages; no checkout)
+
+- `0001-mps-device-aware-energy-accumulation.patch` — MPS has no float64; the
+  energy-accumulation dtype follows the device. Verify per box with
+  `patches/mace/verify-applied.sh <venv-python>` (0 applied / 1 absent /
+  2 cannot-determine, and 2 refuses on purpose). Applied+verified:
+  studio-2 and studio-3 `imcc-md` venvs.
+
 ### sulfliq — `~/Repos/sulfliq` @ `89d345a`
 
 | # | patch | STATUS | note |

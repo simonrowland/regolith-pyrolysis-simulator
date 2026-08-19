@@ -22,6 +22,11 @@ ENVELOPE_FORBIDDEN_KEYS = frozenset({
     "would_be_inventory_advance",
     "chnops_expansion",
     "aggregate_remaining_fraction",
+    # Milestone P3 (2026-08-19): the scan must cover EVERY record field,
+    # including the error-path record, or a partial leak passes unseen.
+    "depletion_hour",
+    "remaining_accounts",
+    "exclude_elements",
 })
 
 

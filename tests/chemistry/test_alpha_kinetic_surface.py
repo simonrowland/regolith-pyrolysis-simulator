@@ -289,7 +289,7 @@ def test_cro2_composite_refuses_missing_activity_evidence() -> None:
     assert "CrO2" not in flux_pressures
 
 
-def test_sio_typed_alpha_correlation_remains_flux_eligible() -> None:
+def test_sio_catalog_only_fixture_refuses_missing_evidence() -> None:
     """Typed SiO alpha does not replace the required melt activity.
 
     344a8d06 (RG-1 precondition) routes melt-sourced species through the
