@@ -244,6 +244,14 @@ def test_cross_engine_shared_count_requires_both_engine_families_to_score():
     assert "share 1 scored" not in report
 
 
+def test_benchmark_cli_plumbs_thermoengine_health_timeout():
+    parser = benchmark.build_arg_parser()
+    default = parser.parse_args([])
+    assert default.thermoengine_health_timeout_s is None
+    explicit = parser.parse_args(["--thermoengine-health-timeout-s", "45"])
+    assert explicit.thermoengine_health_timeout_s == 45.0
+
+
 def test_build_engines_includes_intrinsic_thermoengine_leg():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
 
@@ -255,6 +263,11 @@ def test_build_engines_includes_intrinsic_thermoengine_leg():
     assert isinstance(engines[0], benchmark.ThermoEngineMeltActivityEngine)
     assert engines[0].name == "thermoengine"
     assert engines[0].timeout_s == 17.0
+    from engines.alphamelts.thermoengine import THERMOENGINE_HEALTH_TIMEOUT_S
+
+    assert engines[0].health_timeout_s == THERMOENGINE_HEALTH_TIMEOUT_S
+    benchmark._apply_thermoengine_health_timeout(engines, 19.0)
+    assert engines[0].health_timeout_s == 19.0
 
 
 def test_coverage_map_records_melts_refusal_below_30_sio2():
@@ -330,6 +343,28 @@ def test_coverage_ok_empty_without_finite_prediction_is_not_typed_ok():
     assert sum(benchmark.coverage_cell_accepted(row, "silent") for row in rows) == 0
 
 
+def test_coverage_cell_accepted_requires_positive_finite_prediction():
+    """Red-by-revert: missing finite_prediction is not acceptance.
+
+    Invert: restore `if finite_prediction is False: return False` and
+    the absent-key / None rows become accepted. silent_zero category 1:
+    a measurement that never happened is not a computed yes.
+    """
+    assert not benchmark.coverage_cell_accepted({"eng_status": "ok"}, "eng")
+    assert not benchmark.coverage_cell_accepted(
+        {"eng_status": "ok", "eng_finite_prediction": None}, "eng"
+    )
+    assert not benchmark.coverage_cell_accepted(
+        {"eng_status": "ok", "eng_finite_prediction": False}, "eng"
+    )
+    assert benchmark.coverage_cell_accepted(
+        {"eng_status": "ok", "eng_finite_prediction": True}, "eng"
+    )
+    assert not benchmark.coverage_cell_accepted(
+        {"eng_status": "refused", "eng_finite_prediction": True}, "eng"
+    )
+
+
 def test_coverage_non_pressure_engine_omits_pressure_columns():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
 
@@ -349,7 +384,9 @@ def test_coverage_non_pressure_engine_omits_pressure_columns():
     assert all(row["alphamelts_status"] == "ok" for row in rows)
     assert all("alphamelts_finite_prediction" not in row for row in rows)
     assert all("alphamelts_n_pressures" not in row for row in rows)
-    assert all(benchmark.coverage_cell_accepted(row, "alphamelts") for row in rows)
+    assert all(
+        not benchmark.coverage_cell_accepted(row, "alphamelts") for row in rows
+    )
 
 
 def test_vaporock_evaluate_empty_speciation_is_not_typed_ok(monkeypatch):
@@ -1095,6 +1132,49 @@ def test_detect_thermoengine_adapter_latch_absent_when_all_rows_are_live():
     assert benchmark.detect_thermoengine_adapter_latch(rows) is None
 
 
+def test_generate_report_publishes_not_converged_and_not_attempted_not_absence():
+    """Red-by-revert: the writer must name the statuses the code emits.
+
+    Invert: drop the not_converged column or restore 'inherited
+    unavailable' and this fails. Rows are constructed with the live
+    tokens, not a pre-rendered report snippet.
+    """
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "not_converged",
+            reason="smoke_equilibrium_timeout: ThermoEngine smoke equilibrium timed out",
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "not_attempted",
+            reason=(
+                "ThermoEngine probe not attempted: a prior row closed "
+                "the transport"
+            ),
+        ),
+    ]
+    latch = {
+        "latch_after_point_id": "tsaplin2000_a_sio2_x0477_1373",
+        "latch_after_reason": "RuntimeError: transport closed",
+        "latched_count": 1,
+        "yamaguchi_latched_count": 1,
+        "transport_closed_mid_run": True,
+        "latched_point_ids": ["yamaguchi1983_a_sio2_liquid_x0205_1373"],
+    }
+
+    report = benchmark.generate_report(
+        fixture, rows, [], [], thermoengine_latch=latch
+    )
+
+    assert "| not converged |" in report
+    assert "not_converged" in report or "not converged" in report
+    assert "inherited `not_attempted`" in report
+    assert "inherited `unavailable`" not in report
+
+
 def test_generate_report_does_not_publish_latched_count_as_engine_capability():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     rows = [
@@ -1202,6 +1282,32 @@ def test_isolated_thermoengine_retries_after_adapter_unavailable():
     assert measured["yamaguchi_usable"] == 1
     assert measured["restarts"] == 1
     assert measured["rows"][0]["prediction"] is not None
+
+
+def test_genuine_never_installed_thermoengine_reports_unavailable():
+    """A never-initialized adapter must still mint the absence token."""
+    engine = benchmark.ThermoEngineMeltActivityEngine()
+    engine._initialization_error = "ThermoEngine backend unavailable"
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1700.0, 1.0e-9)
+    assert result.status == "unavailable"
+    assert result.reason == "ThermoEngine backend unavailable"
+
+
+def test_ok_and_not_attempted_is_not_self_contradiction():
+    """Prior-close not_attempted is honest, not an absence contradiction."""
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            "not_attempted",
+            reason=(
+                "ThermoEngine probe not attempted: a prior row closed "
+                "the transport"
+            ),
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ()
+    benchmark.assert_run_not_self_contradictory(rows, (), ())
 
 
 def test_ok_and_adapter_unavailable_is_self_contradiction():
@@ -1365,6 +1471,377 @@ def test_detect_thermoengine_adapter_latch_accepts_probe_row_ids():
     assert latch["latched_count"] == 1
 
 
+def test_detect_thermoengine_adapter_latch_on_ok_then_not_attempted():
+    """Post-arc later rows are not_attempted. Detector must not latch from 0.
+
+    Invert: first-status==unavailable only, and with
+    transport_closed_mid_run this latches the whole series including
+    the ok and not_converged answers. generate_report is called without
+    an injected latch dict so the detector is the producer.
+    """
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+    )
+
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "not_converged",
+            reason=(
+                "warm_call_equilibrium_timeout: ThermoEngine warm-call "
+                "equilibrium timed out after 3.0s"
+            ),
+        ),
+        _te_row(
+            "tsaplin2000_a_sio2_x0430_1473",
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+            reason=THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+            reason=THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ()
+    benchmark.assert_run_not_self_contradictory(rows, (), ())
+
+    latch = benchmark.detect_thermoengine_adapter_latch(rows)
+    assert latch is not None
+    assert latch["latch_after_point_id"] == "tsaplin2000_a_sio2_x0477_1373"
+    assert latch["latch_first_point_id"] == "tsaplin2000_a_sio2_x0430_1473"
+    assert latch["latched_count"] == 2
+    assert latch["sequential_usable"] == 1
+    assert latch["latched_point_ids"] == [
+        "tsaplin2000_a_sio2_x0430_1473",
+        "yamaguchi1983_a_sio2_liquid_x0205_1373",
+    ]
+    assert "hastie_sio_1907_796" not in latch["latched_point_ids"]
+
+    flagged = benchmark.detect_thermoengine_adapter_latch(
+        rows, transport_closed_mid_run=True
+    )
+    assert flagged is not None
+    assert flagged["latched_point_ids"] == latch["latched_point_ids"]
+    assert flagged["latch_after_point_id"] == latch["latch_after_point_id"]
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    report = benchmark.generate_report(fixture, rows, [], [])
+    assert "inherited `not_attempted`" in report
+    assert "inherited `unavailable`" not in report
+    assert "inherited `ok`" not in report
+    assert "inherited `not_converged`" not in report
+    assert "tsaplin2000_a_sio2_x0477_1373" in report
+    assert "ThermoEngine sequential one-process yield: 1/4" in report
+
+
+def _eval_key(composition, temperature_K, fO2_bar):
+    items = tuple(
+        sorted((str(k), round(float(v), 6)) for k, v in composition.items())
+    )
+    fo2 = None if fO2_bar is None else round(float(fO2_bar), 12)
+    return (items, round(float(temperature_K), 6), fo2)
+
+
+def test_generate_report_popped_latch_does_not_inherit_keep_handle_status():
+    """Writer with production-popped latch (no latched_point_ids).
+
+    This is the reviewer's stripped-latch reproduction. It is not a
+    substitute for the run_benchmark pop test below.
+    """
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+    )
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    rows = [
+        _te_row("hastie_sio_1907_796", "ok", prediction=0.05),
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "not_converged",
+            reason=(
+                "warm_call_equilibrium_timeout: ThermoEngine warm-call "
+                "equilibrium timed out after 3.0s"
+            ),
+        ),
+        _te_row(
+            "tsaplin2000_a_sio2_x0430_1473",
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+            reason=THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+            reason=THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        ),
+    ]
+    latch = benchmark.detect_thermoengine_adapter_latch(
+        rows, transport_closed_mid_run=True
+    )
+    assert latch is not None
+    latch = {**latch}
+    latch.pop("latched_point_ids", None)
+    assert "latched_point_ids" not in latch
+
+    report = benchmark.generate_report(
+        fixture, rows, [], [], thermoengine_latch=latch
+    )
+
+    assert "inherited `not_attempted`" in report
+    assert "independently produced `not_converged`" in report
+    assert "inherited `not_converged`" not in report
+    assert "inherited `not_converged`, `not_attempted`" not in report
+    assert "inherited `unavailable`" not in report
+
+
+def test_run_benchmark_popped_latch_does_not_name_keep_handle_as_inherited(
+    tmp_path, monkeypatch
+):
+    """Drive run_benchmark through the production latched_point_ids pop.
+
+    Invert: restore _latched_status_phrase's else-branch that selects
+    every status != ok, and this fails. Pre-fix generate_report tests
+    never took that pop: they re-detected (ids present) or injected
+    latched_point_ids, so they stayed green while production named a
+    keep-handle not_converged as inherited. This test cannot pass on
+    that writer because capturing_generate receives the popped latch
+    and report.md is built from it.
+
+    Would-have-passed-on-old-code trap: calling generate_report with
+    no latch, or with latched_point_ids still present, re-selects only
+    not_attempted and stays green on the broken else-branch.
+    """
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+    )
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    wanted_ids = (
+        "hastie_sio_1907_796",
+        "tsaplin2000_a_sio2_x0477_1373",
+        "tsaplin2000_a_sio2_x0430_1473",
+        "yamaguchi1983_a_sio2_liquid_x0205_1373",
+    )
+    by_id = {point["id"]: point for point in fixture["points"]}
+    selected_points = [by_id[point_id] for point_id in wanted_ids]
+    compositions = dict(fixture["compositions"])
+    status_by_id = {
+        "hastie_sio_1907_796": "ok",
+        "tsaplin2000_a_sio2_x0477_1373": "not_converged",
+        "tsaplin2000_a_sio2_x0430_1473": (
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+        ),
+        "yamaguchi1983_a_sio2_liquid_x0205_1373": (
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+        ),
+    }
+    reason_by_id = {
+        "tsaplin2000_a_sio2_x0477_1373": (
+            "warm_call_equilibrium_timeout: ThermoEngine warm-call "
+            "equilibrium timed out after 3.0s"
+        ),
+        "tsaplin2000_a_sio2_x0430_1473": (
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON
+        ),
+        "yamaguchi1983_a_sio2_liquid_x0205_1373": (
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON
+        ),
+    }
+    plan = {}
+    for point in selected_points:
+        composition = benchmark.composition_wt_pct_for_point(
+            point, compositions
+        )
+        activity_observable = str(point["observable"]) in {
+            "activity",
+            "activity_coefficient",
+        }
+        fO2_bar = (
+            None
+            if activity_observable or point.get("fO2_bar") is None
+            else float(point["fO2_bar"])
+        )
+        plan[
+            _eval_key(composition, float(point["temperature_K"]), fO2_bar)
+        ] = {
+            "status": status_by_id[point["id"]],
+            "reason": reason_by_id.get(point["id"], ""),
+        }
+
+    class _SequencedThermoEngine:
+        name = "thermoengine"
+
+        def __init__(self, *, closed):
+            self._closed = closed
+
+        def transport_close_count(self):
+            return 1 if self._closed else 0
+
+        def transport_closed_mid_run(self):
+            return bool(self._closed)
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            spec = plan.get(
+                _eval_key(composition_wt_pct, temperature_K, fO2_bar)
+            )
+            if spec is None:
+                return benchmark.EngineResult(
+                    status="ok",
+                    activities={"SiO2": 0.2, "MgO": 0.02},
+                    gammas={"SiO2": 0.2, "MgO": 0.1},
+                )
+            if spec["status"] == "ok":
+                return benchmark.EngineResult(
+                    status="ok",
+                    activities={"SiO2": 0.2, "MgO": 0.02},
+                    gammas={"SiO2": 0.2, "MgO": 0.1},
+                    partial_pressures={"SiO": 0.1},
+                )
+            return benchmark.EngineResult(
+                status=spec["status"], reason=spec["reason"]
+            )
+
+        def coverage(self, composition_wt_pct, temperature_K):
+            del composition_wt_pct, temperature_K
+            return benchmark.EngineResult(
+                status="ok",
+                details={
+                    "observable_family": "activity",
+                    "finite_prediction": True,
+                },
+            )
+
+    built = []
+
+    def fake_build(names, loaded, alphamelts_timeout_s):
+        del names, loaded, alphamelts_timeout_s
+        engine = _SequencedThermoEngine(closed=not built)
+        built.append(engine)
+        return [engine]
+
+    isolated_ids: list[str] = []
+
+    def fake_isolated(loaded, point_ids, **kwargs):
+        del loaded, kwargs
+        isolated_ids.extend(str(item) for item in point_ids)
+        yam = sum("yamaguchi" in item.lower() for item in isolated_ids)
+        return {
+            "usable": 0,
+            "total": len(isolated_ids),
+            "yamaguchi_usable": 0,
+            "yamaguchi_total": yam,
+            "status_counts": {"not_attempted": len(isolated_ids)},
+            "restarts": 0,
+            "rows": [],
+        }
+
+    captured: dict[str, object] = {}
+    orig_generate = benchmark.generate_report
+
+    def capturing_generate(*args, **kwargs):
+        latch = kwargs.get("thermoengine_latch")
+        captured["latch"] = dict(latch) if isinstance(latch, dict) else latch
+        captured["has_ids"] = bool(
+            isinstance(latch, dict) and latch.get("latched_point_ids")
+        )
+        return orig_generate(*args, **kwargs)
+
+    monkeypatch.setattr(benchmark, "build_engines", fake_build)
+    monkeypatch.setattr(
+        benchmark, "measure_isolated_thermoengine_points", fake_isolated
+    )
+    monkeypatch.setattr(benchmark, "generate_report", capturing_generate)
+
+    fixture["points"] = selected_points
+    fixture["composition_probes"] = fixture["composition_probes"][:1]
+    fixture_path = tmp_path / "tiny.yaml"
+    fixture_path.write_text(
+        yaml.safe_dump(fixture, sort_keys=False), encoding="utf-8"
+    )
+    output_dir = tmp_path / "out"
+
+    result = benchmark.run_benchmark(
+        bench_set_path=fixture_path,
+        output_dir=output_dir,
+        engine_names=("thermoengine",),
+        mode="all",
+        coverage_steps=2,
+        live_vaporock_anchor_check=False,
+    )
+
+    statuses = {
+        row["point_id"]: row["status"] for row in result["point_rows"]
+    }
+    assert statuses[wanted_ids[0]] == "ok"
+    assert statuses[wanted_ids[1]] == "not_converged"
+    assert statuses[wanted_ids[2]] == THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    assert statuses[wanted_ids[3]] == THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    assert isolated_ids == [
+        "tsaplin2000_a_sio2_x0430_1473",
+        "yamaguchi1983_a_sio2_liquid_x0205_1373",
+    ]
+    assert captured["has_ids"] is False
+    assert isinstance(captured["latch"], dict)
+    assert "latched_point_ids" not in captured["latch"]
+    metadata_latch = result["metadata"]["thermoengine_adapter_latch"]
+    assert "latched_point_ids" not in metadata_latch
+    assert metadata_latch["latched_count"] == 2
+    assert metadata_latch["latch_after_point_id"] == wanted_ids[1]
+    assert metadata_latch["latch_first_point_id"] == wanted_ids[2]
+
+    report = (output_dir / "report.md").read_text(encoding="utf-8")
+    assert "inherited `not_attempted`" in report
+    assert "independently produced `not_converged`" in report
+    assert "inherited `not_converged`" not in report
+    assert "inherited `not_converged`, `not_attempted`" not in report
+    assert "inherited `unavailable`" not in report
+    assert "inherited `ok`" not in report
+
+
+def test_detect_thermoengine_adapter_latch_first_row_death_not_attempted():
+    """Die-on-first-row later probes are not_attempted, not unavailable.
+
+    Invert: latch_at=0 when no unavailable row exists, and the refused
+    first row is marked latched.
+    """
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+    )
+
+    rows = [
+        _te_row(
+            "tsaplin2000_a_sio2_x0477_1373",
+            "refused",
+            reason="RuntimeError: ThermoEngine equilibrium failed: boom",
+        ),
+        _te_row(
+            "tsaplin2000_a_sio2_x0430_1473",
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+            reason=THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        ),
+        _te_row(
+            "yamaguchi1983_a_sio2_liquid_x0205_1373",
+            THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+            reason=THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        ),
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ()
+    assert benchmark.detect_thermoengine_adapter_latch(rows) is None
+    latch = benchmark.detect_thermoengine_adapter_latch(
+        rows, transport_closed_mid_run=True
+    )
+    assert latch is not None
+    assert latch["latch_after_point_id"] == "tsaplin2000_a_sio2_x0477_1373"
+    assert latch["latch_first_point_id"] == "tsaplin2000_a_sio2_x0430_1473"
+    assert latch["latched_count"] == 2
+    assert "tsaplin2000_a_sio2_x0477_1373" not in latch["latched_point_ids"]
+
+
 def test_classify_keep_handle_is_type_not_substring():
     """Keep-handle status is decided by type, not the word 'unavailable'.
 
@@ -1426,8 +1903,20 @@ def test_classify_overflow_subclass_keeps_typed_message():
     assert reason != "numerical_overflow"
 
 
-def test_classify_thermoengine_fo2_valueerror_paths_not_retuned():
-    """t-718 sibling: OverflowError mapping must not retune ValueError paths."""
+def test_classify_thermoengine_fo2_valueerror_and_overflow_coexist():
+    """t-717 + b-207/t-718 merged: the two fixes must not disturb each other.
+
+    History, so the assertion flip is auditable: this test originally pinned
+    that the t-717 OverflowError branch did NOT retune the ValueError paths --
+    including the then-live defect that "unavailable" prose minted the absence
+    token. The engine line (2b065dfe/ffe26479) fixed exactly that defect while
+    this test sat staged, so on the merged classifier the OLD expectation
+    became an assertion of the bug. Now asserted: the fO2-bracket ValueError
+    is typed out_of_domain via the cause maps; absence is NEVER minted from
+    message prose (the same string that previously classified unavailable now
+    falls through); and the OverflowError branch still fires first without
+    touching any of it.
+    """
 
     outside = ValueError(
         "ThermoEngine absolute fO2 target is outside the attainable "
@@ -1438,16 +1927,20 @@ def test_classify_thermoengine_fo2_valueerror_paths_not_retuned():
     assert "ValueError" in reason
     assert "OverflowError" not in reason
 
-    finite = ValueError("ThermoEngine absolute fO2 target must be finite")
-    status, reason = benchmark.classify_engine_exception(finite)
-    assert status == "refused"
-    assert "ValueError" in reason
-
+    # Prose containing "unavailable" must not mint the absence token (b-207):
+    # an untyped ValueError with that word now falls through, absence needs a
+    # typed category or EngineWorkerUnavailable.
     wrapped_unavailable = ValueError(
         "ThermoEngine absolute fO2 target solve unavailable after close"
     )
     status, reason = benchmark.classify_engine_exception(wrapped_unavailable)
-    assert status == "unavailable"
+    assert status != "unavailable"
+
+    # And the t-717 branch is untouched by the merge.
+    status, reason = benchmark.classify_engine_exception(
+        OverflowError(34, "Result too large")
+    )
+    assert (status, reason) == ("crash", "numerical_overflow")
 
 
 @pytest.mark.parametrize(
@@ -1477,6 +1970,409 @@ def test_internal_analytic_lime_rich_binary_does_not_overflow(composition):
     assert result.activities
     for name, value in result.activities.items():
         assert math.isfinite(value) and value > 0.0, (name, value)
+
+_DUNITE_FO2_RUNTIME = RuntimeError(
+    "ThermoEngine equilibrium failed: ThermoEngine equilibrium failed: "
+    "ThermoEngine absolute fO2 target is outside the attainable "
+    "Fe-redox bracket: requested=-9"
+)
+_RICHTER_FO2_CLOSE_REASON = (
+    "ThermoEngine transport closed after ValueError: "
+    "ThermoEngine equilibrium failed: "
+    "ThermoEngine absolute fO2 target is outside the attainable "
+    "Fe-redox bracket: requested=-9"
+)
+
+
+def test_measured_fo2_bracket_is_out_of_domain_and_prior_close_is_not_attempted():
+    """Dunite bracket is row-local OOD. A later unrun probe is not_attempted."""
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+        midrun_thermoengine_prior_close_result,
+    )
+
+    dunite_status, _ = benchmark.classify_engine_exception(_DUNITE_FO2_RUNTIME)
+    typed = ThermoEngineOutOfDomainError(
+        ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+        requested=-9.0,
+    )
+    typed_status, _ = benchmark.classify_engine_exception(typed)
+    prior_status, prior_reason, prior_mode = (
+        midrun_thermoengine_prior_close_result()
+    )
+    assert dunite_status == typed_status == "out_of_domain"
+    assert prior_status == THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    assert prior_status != dunite_status
+    assert "affinity" not in prior_reason
+    assert "transport closed after" not in prior_reason
+    assert prior_mode != "thermoengine"
+
+
+def test_fo2_ood_refusal_never_emits_absence_token():
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+        midrun_thermoengine_prior_close_result,
+    )
+
+    surfaces = [
+        benchmark.classify_engine_exception(_DUNITE_FO2_RUNTIME)[0],
+        midrun_thermoengine_prior_close_result()[0],
+        benchmark.classify_engine_exception(
+            ValueError(
+                "ThermoEngine absolute fO2 target is outside the attainable "
+                "Fe-redox bracket: requested=-9"
+            )
+        )[0],
+        benchmark.classify_engine_exception(
+            ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+                requested=-9.0,
+            )
+        )[0],
+        benchmark.classify_engine_exception(
+            RuntimeError(_RICHTER_FO2_CLOSE_REASON)
+        )[0],
+        benchmark.classify_engine_exception(
+            RuntimeError(
+                "ThermoEngine transport closed after ImportError: "
+                "adapter unavailable"
+            )
+        )[0],
+        benchmark.classify_engine_exception(
+            ValueError(
+                "ThermoEngine cannot impose absolute fO2 without FeO/Fe2O3"
+            )
+        )[0],
+    ]
+    assert "unavailable" not in surfaces
+    assert surfaces[0] == surfaces[2] == surfaces[3] == "out_of_domain"
+    assert surfaces[1] == THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    assert surfaces[4] == "out_of_domain"
+    assert surfaces[5] == "refused"
+    assert surfaces[6] == "refused"
+
+
+def test_alphamelts_producer_passes_kernel_not_converged():
+    """Red-by-revert: provider status=not_converged must leave as unfinished.
+
+    Invert: restore the remap to refused and this sees status=refused.
+    The fixture is a dispatch result, not a pre-built EngineResult.
+    """
+    class _EmptyAssemblageProvider:
+        def dispatch(self, request):
+            del request
+            return SimpleNamespace(
+                status="not_converged",
+                warnings=["empty phases_present"],
+                diagnostic={
+                    "backend_diagnostics": {
+                        "backend_status_reason": "empty_phases_present",
+                    }
+                },
+            )
+
+    engine = benchmark.AlphaMeltsEngine()
+    engine.activity_observable_supported = True
+    engine._provider = _EmptyAssemblageProvider()
+    produced = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1700.0, 1.0e-9)
+    assert produced.status == "not_converged"
+    assert produced.status != "refused"
+    assert produced.status != "unavailable"
+
+
+def test_classify_engine_worker_timeout_is_not_converged_not_refused():
+    """Red-by-revert: the warm-call wall is unfinished, not a policy refusal.
+
+    Invert: drop WARM_CALL_EQUILIBRIUM_TIMEOUT and from_exception returns
+    None, classify_engine_exception falls through keep-handle to refused.
+    The exception is a real EngineWorkerTimeout, not a pre-typed
+    ThermoEngineTimeoutError.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineTimeoutCause,
+        thermoengine_timeout_cause_from_exception,
+    )
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    exc = EngineWorkerTimeout("ThermoEngine equilibrium", 3.0, phase="job")
+    cause = thermoengine_timeout_cause_from_exception(exc)
+    assert cause is ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT
+    status, _ = benchmark.classify_engine_exception(exc)
+    assert status == "not_converged"
+    assert status != "refused"
+    assert status != "unavailable"
+
+
+def test_classify_smoke_timeout_is_not_converged_not_absence():
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineTimeoutCause,
+        ThermoEngineTimeoutError,
+    )
+
+    exc = ThermoEngineTimeoutError(
+        ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT,
+        timeout_s=1.0,
+    )
+    status, reason = benchmark.classify_engine_exception(exc)
+    assert status == "not_converged"
+    assert status != "unavailable"
+    assert "unavailable" not in reason.lower()
+    wrapped = ImportError(f"ThermoEngine transport unavailable: {exc}")
+    wrapped_status, _ = benchmark.classify_engine_exception(wrapped)
+    assert wrapped_status == "not_converged"
+    assert wrapped_status != "unavailable"
+
+
+def test_benchmark_smoke_timeout_does_not_emit_absence(monkeypatch):
+    """Forced TimeoutExpired on initialize must not mint status=unavailable."""
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineTimeoutCause,
+        ThermoEngineTimeoutError,
+    )
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    def fail_init(self, config):
+        del config
+        raise ThermoEngineTimeoutError(
+            ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT,
+            timeout_s=1.0,
+        )
+
+    monkeypatch.setattr(ThermoEngineBackend, "initialize", fail_init)
+    engine = benchmark.ThermoEngineMeltActivityEngine(health_timeout_s=1.0)
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1700.0, 1.0e-9)
+    assert result.status == "not_converged"
+    assert result.status != "unavailable"
+    rows = [
+        {"engine": "thermoengine", "status": "ok", "reason": "computed"},
+        {
+            "engine": "thermoengine",
+            "status": result.status,
+            "reason": result.reason,
+        },
+    ]
+    assert benchmark.engines_with_ok_and_adapter_unavailable(rows) == ()
+    benchmark.assert_run_not_self_contradictory(rows)
+
+
+def test_benchmark_init_ood_smoke_is_not_absence(monkeypatch):
+    """Red-by-revert: init-time physics-marked smoke is not engine absence.
+
+    Invert: initialize wraps the health-check OOD as ImportError again
+    and/or the bench adapter ignores refusal causes, and evaluate emits
+    unavailable. Forces the real initialize wrapper via a fake
+    transport health_check, not a pre-built ThermoEngineOutOfDomainError.
+    """
+    from engines.alphamelts.thermoengine import ThermoEngineRefusalCause
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    created: list[object] = []
+
+    class FakeThermoEngineTransport:
+        engine_version = "thermoengine fake"
+
+        def __init__(
+            self,
+            *,
+            model_name,
+            activity_converter,
+            equilibrate_timeout_s,
+            health_timeout_s=None,
+        ):
+            del model_name, activity_converter, equilibrate_timeout_s
+            del health_timeout_s
+            self.close_calls = 0
+            created.append(self)
+
+        def initialize(self):
+            return True
+
+        def health_check(self, timeout_s=None):
+            del timeout_s
+            return False, (
+                "ThermoEngine smoke equilibrium failed: "
+                "ThermoEngineOutOfDomainError: "
+                "fo2_outside_attainable_bracket: ThermoEngine absolute "
+                "fO2 target is outside the attainable Fe-redox bracket: "
+                "requested=-9"
+            )
+
+        def close(self):
+            self.close_calls += 1
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.thermoengine.ThermoEngineTransport",
+        FakeThermoEngineTransport,
+    )
+    backend = ThermoEngineBackend()
+    with pytest.raises(Exception) as init_exc:
+        backend.initialize({})
+    assert type(init_exc.value).__name__ == "ThermoEngineOutOfDomainError"
+    assert init_exc.value.cause is ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET
+    assert type(init_exc.value).__name__ != "ImportError"
+
+    engine = benchmark.ThermoEngineMeltActivityEngine()
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1700.0, 1.0e-9)
+    assert result.status == "out_of_domain"
+    assert result.status != "unavailable"
+
+
+def test_benchmark_init_worker_timeout_is_not_absence(monkeypatch):
+    """Red-by-revert: init EngineWorkerTimeout must not mint unavailable.
+
+    Invert: initialize wraps the worker wall as ImportError again and
+    the bench adapter has no timeout status, so evaluate emits
+    unavailable. Forces transport.initialize() to raise the pool type,
+    not a pre-built ThermoEngineTimeoutError and not a patched
+    ThermoEngineBackend.initialize.
+    """
+    from engines.alphamelts.thermoengine import ThermoEngineTimeoutCause
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    class FakeThermoEngineTransport:
+        engine_version = "thermoengine fake"
+
+        def __init__(
+            self,
+            *,
+            model_name,
+            activity_converter,
+            equilibrate_timeout_s,
+            health_timeout_s=None,
+        ):
+            del model_name, activity_converter, equilibrate_timeout_s
+            del health_timeout_s
+
+        def initialize(self):
+            raise EngineWorkerTimeout(
+                "ThermoEngine transport", 8.0, phase="init"
+            )
+
+        def health_check(self, timeout_s=None):
+            del timeout_s
+            raise AssertionError("health_check must not run after init timeout")
+
+        def close(self):
+            return None
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.thermoengine.ThermoEngineTransport",
+        FakeThermoEngineTransport,
+    )
+    backend = ThermoEngineBackend()
+    with pytest.raises(Exception) as init_exc:
+        backend.initialize({})
+    assert type(init_exc.value).__name__ == "ThermoEngineTimeoutError"
+    assert (
+        init_exc.value.cause
+        is ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT
+    )
+    assert type(init_exc.value).__name__ != "ImportError"
+
+    engine = benchmark.ThermoEngineMeltActivityEngine()
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1700.0, 1.0e-9)
+    assert result.status == "not_converged"
+    assert result.status != "unavailable"
+
+
+def test_benchmark_never_installed_thermoengine_still_unavailable(monkeypatch):
+    """P0: a missing engine must still report status=unavailable."""
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    def fail_init(self, config):
+        del config
+        raise ImportError(
+            "ThermoEngine transport unavailable: No module named 'thermoengine'"
+        ) from ModuleNotFoundError("No module named 'thermoengine'")
+
+    monkeypatch.setattr(ThermoEngineBackend, "initialize", fail_init)
+    engine = benchmark.ThermoEngineMeltActivityEngine()
+    result = engine.evaluate({"SiO2": 50.0, "MgO": 50.0}, 1700.0, 1.0e-9)
+    assert result.status == "unavailable"
+    assert result.status != "not_converged"
+
+
+def test_absence_token_is_not_minted_from_unavailable_prose():
+    """P2-A: the production worker-unavailable sentence is not absence."""
+    from simulator.engine_pool import EngineWorkerUnavailable
+
+    prose = RuntimeError("ThermoEngine equilibrium worker is unavailable")
+    wrapped = RuntimeError(
+        "ThermoEngine equilibrium failed: ThermoEngine equilibrium "
+        "worker is unavailable"
+    )
+    import_prose = ImportError(
+        "ThermoEngine transport unavailable: dylib missing"
+    )
+    adapter_prose = RuntimeError("adapter unavailable after close")
+    for exc in (prose, wrapped, import_prose, adapter_prose):
+        status, _ = benchmark.classify_engine_exception(exc)
+        assert status != "unavailable", type(exc).__name__
+    typed = EngineWorkerUnavailable("ThermoEngine equilibrium")
+    status, _ = benchmark.classify_engine_exception(typed)
+    assert status == "unavailable"
+    tokened = RuntimeError("row-local refusal")
+    tokened.backend_failure_category = "backend_unavailable"
+    status, _ = benchmark.classify_engine_exception(tokened)
+    assert status == "unavailable"
+
+
+def test_sequential_fo2_bracket_probes_share_status_through_provider():
+    """Both measured probe surfaces must stay out_of_domain on one backend."""
+    from engines.alphamelts import AlphaMELTSProvider
+    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+    from simulator.chemistry.kernel.dto import ProviderAccountView
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    class _BracketTransport:
+        def equilibrate(self, **_kwargs):
+            raise ValueError(
+                "ThermoEngine absolute fO2 target is outside the attainable "
+                "Fe-redox bracket: requested=-9"
+            )
+
+        def close(self):
+            return None
+
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = _BracketTransport()
+    backend._mode = "thermoengine"
+    provider = AlphaMELTSProvider(backend=backend)
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {
+                    "SiO2": 0.8,
+                    "Al2O3": 0.15,
+                    "FeO": 0.1,
+                    "MgO": 0.2,
+                    "CaO": 0.15,
+                    "Na2O": 0.05,
+                }
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1626.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        control_inputs={},
+    )
+    statuses = []
+    for _ in range(2):
+        try:
+            statuses.append(provider.dispatch(request).status)
+        except Exception as exc:
+            status, _ = benchmark.classify_engine_exception(exc)
+            statuses.append(status)
+    assert statuses == ["out_of_domain", "out_of_domain"]
+    assert backend.is_available() is True
+    assert backend.transport_close_count() == 0
 
 
 def test_isolated_retry_rebuilds_on_producer_close_not_reason_prose():

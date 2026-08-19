@@ -17,6 +17,7 @@ from engines.builtin.vapor_pressure import (
 import simulator.optimize.evaluate as evaluate_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
+from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import (
@@ -3094,8 +3095,15 @@ def test_backend_unavailable_poison_pair_fires_named_gate() -> None:
     assert "missing binary" in str(raised.value)
 
 
-def test_genuine_missing_backend_status_aborts_as_backend_unavailable() -> None:
-    with pytest.raises(BackendUnavailableAbort) as raised:
+def test_observable_unavailable_prose_is_not_backend_unavailable() -> None:
+    """Red-by-revert: substring 'unavailable' must not mint absence.
+
+    Invert: restore the nine-substring sniffer and this raises
+    BackendUnavailableAbort because 'observable_unavailable' contains
+    the word. The real failed-run path carries only the status token
+    in the message — not a typed EngineWorkerUnavailable.
+    """
+    with pytest.raises(EngineBugAbort) as raised:
         evaluate(
             _valid_patch(),
             "lunar_mare_low_ti",
@@ -3104,15 +3112,38 @@ def test_genuine_missing_backend_status_aborts_as_backend_unavailable() -> None:
             executor=FakeExecutor(
                 _execution(
                     status="failed",
-                    error_message=(
-                        "backend failure: AlphaMELTS unavailable; "
-                        "run install-dependencies.py"
-                    ),
+                    error_message="observable_unavailable",
                 )
             ),
         )
 
+    assert raised.value.category is FailureCategory.ENGINE_BUG
+    assert raised.value.category is not FailureCategory.BACKEND_UNAVAILABLE
+
+
+def test_engine_worker_unavailable_still_aborts_optimizer() -> None:
+    """Genuine never-installed worker: type-keyed absence still aborts.
+
+    Invert: drop the EngineWorkerUnavailable handler and this becomes
+    EngineBugAbort. The executor raises the production absence type,
+    not a prose string that says 'unavailable'.
+    """
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                exc=EngineWorkerUnavailable("ThermoEngine equilibrium")
+            ),
+        )
+
     assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert EngineWorkerUnavailable.reason_code in {
+        getattr(raised.value.__cause__, "reason_code", None),
+        EngineWorkerUnavailable.reason_code,
+    }
 
 
 def test_real_backend_missing_backend_status_aborts_as_backend_unavailable() -> None:
@@ -3153,6 +3184,437 @@ def test_real_backend_unavailable_backend_status_aborts_as_backend_unavailable()
 
     assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
     assert "backend_status='unavailable'" in str(raised.value)
+
+
+def test_real_backend_refused_is_physics_refused_not_unavailable() -> None:
+    """Red-by-revert: backend_status=refused must not abort the study.
+
+    Invert: restore `if backend_status != "ok": raise BackendUnavailableAbort`
+    and this raises. The execution is a completed run whose engine answered
+    a physics refusal (Fe-free / unattainable fO2), not a missing backend.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _execution(
+                backend_status="refused",
+                backend_authoritative=False,
+                reason="fo2_requires_iron",
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "refused"
+    assert "fo2_requires_iron" in result.notes
+
+
+def test_real_backend_not_converged_is_timeout_not_unavailable() -> None:
+    """Red-by-revert: unfinished computation must not be backend-unavailable.
+
+    Invert: the != ok abort still fires and this raises BackendUnavailableAbort.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _execution(
+                backend_status="not_converged",
+                backend_authoritative=True,
+                reason="empty_phases_present",
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.TIMEOUT
+    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "not_converged"
+    assert any("not_converged" in note for note in result.notes)
+
+
+def test_real_backend_not_attempted_is_not_unavailable() -> None:
+    """Red-by-revert: a probe that never ran is not engine absence.
+
+    Invert: the != ok abort still fires and this raises BackendUnavailableAbort.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _execution(
+                backend_status="not_attempted",
+                backend_authoritative=True,
+                reason="prior transport closed",
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.failure_category is not FailureCategory.ENGINE_BUG
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "not_attempted"
+    assert result.run_reference.status == "not_attempted"
+
+
+def test_never_installed_engine_importerror_still_aborts_optimizer() -> None:
+    """Genuine missing library: ImportError type is absence, not prose.
+
+    Invert: drop ImportError from the typed-absence set and this becomes
+    EngineBugAbort. The executor raises the production initialize wrap
+    for a never-installed ThermoEngine, not a backend_status token.
+    """
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                exc=ImportError(
+                    "ThermoEngine transport unavailable: "
+                    "No module named 'thermoengine'"
+                )
+            ),
+        )
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert raised.value.category is not FailureCategory.ENGINE_BUG
+    assert "thermoengine" in str(raised.value).lower()
+
+
+def test_unknown_backend_name_aborts_via_resolve_backend() -> None:
+    """Real resolve_backend absence still aborts the study.
+
+    Invert: if only FakeExecutor-injected types abort and a missing
+    runner-strict backend becomes EngineBugAbort, this fails. Uses the
+    live RunExecutor so session.start → resolve_backend is the producer.
+    The raised type is the session unavailable class (RunnerError) with
+    a stamped reason_code — not the word 'unavailable' in the name.
+    """
+    profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "not_a_real_engine"},
+        "fidelities": {"high": {"backend_name": "not_a_real_engine", "hours": 1}},
+    }
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=profile,
+        )
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert raised.value.category is not FailureCategory.ENGINE_BUG
+    assert "not_a_real_engine" in str(raised.value)
+    cause = raised.value.__cause__
+    assert cause is not None
+    assert getattr(cause, "reason_code", None) == BackendUnavailableError.reason_code
+
+
+def test_never_installed_thermoengine_aborts_optimizer_via_resolve_backend(
+    monkeypatch,
+) -> None:
+    """Never-installed ThermoEngine: initialize ImportError → study abort.
+
+    Invert: if _try_backend lets ImportError leak and evaluate treats it
+    as EngineBugAbort without the typed-absence path, this fails. Forces
+    the live RunExecutor + resolve_backend, not a FakeExecutor.
+    """
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    def fail_init(self, config):
+        del config
+        raise ImportError("No module named 'thermoengine'")
+
+    monkeypatch.setattr(ThermoEngineBackend, "initialize", fail_init)
+    profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "thermoengine"},
+        "fidelities": {"high": {"backend_name": "thermoengine", "hours": 1}},
+    }
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=profile,
+        )
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert raised.value.category is not FailureCategory.ENGINE_BUG
+    assert "ThermoEngine unavailable" in str(raised.value)
+
+
+def test_runnererror_cause_backend_unavailable_still_aborts() -> None:
+    """Absence wrapped as RunnerError is keyed by cause type, not text.
+
+    Invert: restore the prose sniffer and this still passes; drop the
+    __cause__ walk and this becomes EngineBugAbort. The message is
+    deliberately free of the word 'unavailable'.
+    """
+    try:
+        raise BackendUnavailableError("missing binary")
+    except BackendUnavailableError as missing:
+        wrapped = RunnerError("run failed: engine handle gone")
+        wrapped.__cause__ = missing
+
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(exc=wrapped),
+        )
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert raised.value.category is not FailureCategory.ENGINE_BUG
+
+
+def test_thermoengine_ood_exception_is_not_unavailable_or_bug() -> None:
+    """Raise-path pin: typed OOD from execute() must not abort the study.
+
+    Invert: leave ThermoEngineOutOfDomainError in the catch-all
+    EngineBugAbort and this raises. This does not exercise the
+    production RunExecutor failed envelope; see
+    test_evaluate_production_run_executor_ood_envelope_is_not_bug.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            exc=ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+                requested=-9.0,
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.failure_category is not FailureCategory.ENGINE_BUG
+
+
+def test_engine_worker_timeout_exception_is_not_unavailable() -> None:
+    """Raise-path pin: execute() raising EngineWorkerTimeout is unfinished.
+
+    Invert: drop the EngineWorkerTimeout membership of
+    ThermoEngineTimeoutCause and the catch-all still raises
+    EngineBugAbort / BackendUnavailableAbort. FakeExecutor.exc re-raises;
+    production execute_session does not. The production envelope is
+    test_evaluate_production_run_executor_timeout_envelope_is_not_bug.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            exc=EngineWorkerTimeout("ThermoEngine equilibrium", 3.0, phase="job")
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.TIMEOUT
+    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.failure_category is not FailureCategory.ENGINE_BUG
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "not_converged"
+
+
+class _ProductionEnvelopeExecutor(RunExecutor):
+    """Real execute_session envelope, skipping session.start.
+
+    Production mid-run exceptions are raised from drive_session and
+    enveloped here. FakeExecutor(exc=...) never reaches this path.
+    """
+
+    def execute(self, config: object, **_kwargs: object) -> object:
+        del config
+        return self.execute_session(
+            type("BareSession", (), {"simulator": SimpleNamespace()})(),
+            hours=1,
+        )
+
+
+def test_evaluate_production_run_executor_timeout_envelope_is_not_bug(
+    monkeypatch,
+) -> None:
+    """Red-by-revert: production failed envelope must not EngineBugAbort a timeout.
+
+    Invert: restore `if status == "failed": raise EngineBugAbort` without
+    reading failure_exception and this raises. FakeExecutor(exc=timeout)
+    would still pass because it never hits execute_session.
+    """
+    timeout = EngineWorkerTimeout("ThermoEngine equilibrium", 3.0, phase="job")
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise timeout
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=_ProductionEnvelopeExecutor(),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.TIMEOUT
+    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.failure_category is not FailureCategory.ENGINE_BUG
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "not_converged"
+
+
+def test_evaluate_production_run_executor_typed_timeout_envelope_is_not_bug(
+    monkeypatch,
+) -> None:
+    """Same envelope with the retyped ThermoEngineTimeoutError mid-run wall."""
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineTimeoutCause,
+        ThermoEngineTimeoutError,
+    )
+
+    typed = ThermoEngineTimeoutError(
+        ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT,
+        timeout_s=3.0,
+    )
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise typed
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=_ProductionEnvelopeExecutor(),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.TIMEOUT
+    assert result.failure_category is not FailureCategory.ENGINE_BUG
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "not_converged"
+
+
+def test_evaluate_production_run_executor_ood_envelope_is_not_bug(
+    monkeypatch,
+) -> None:
+    """Red-by-revert: production failed envelope must not EngineBugAbort OOD.
+
+    Invert: drop failure_exception recovery and this raises EngineBugAbort.
+    FakeExecutor(exc=ThermoEngineOutOfDomainError) would still pass.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    ood = ThermoEngineOutOfDomainError(
+        ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+        requested=-9.0,
+    )
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise ood
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=_ProductionEnvelopeExecutor(),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.failure_category is not FailureCategory.ENGINE_BUG
+
+
+def test_evaluate_production_run_executor_importerror_envelope_still_aborts(
+    monkeypatch,
+) -> None:
+    """Genuine never-installed ImportError through the envelope still aborts."""
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise ImportError("No module named 'thermoengine'")
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=_ProductionEnvelopeExecutor(),
+        )
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert raised.value.category is not FailureCategory.ENGINE_BUG
+    assert raised.value.category is not FailureCategory.TIMEOUT
+
+
+def test_evaluate_production_run_executor_generic_failure_is_still_bug(
+    monkeypatch,
+) -> None:
+    """The envelope recovery is typed. A generic crash stays EngineBugAbort."""
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise RuntimeError("oxide ledger exploded")
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+    with pytest.raises(EngineBugAbort, match="oxide ledger exploded"):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=_ProductionEnvelopeExecutor(),
+        )
 
 
 def test_non_authoritative_backend_status_green_path_requires_authoritative_ok() -> None:
@@ -3920,12 +4382,13 @@ def test_strict_vaporock_unavailable_eval_fails_closed_with_vaporock_key(
         },
         "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
     }
-    executor = FakeExecutor(
-        _execution(
-            status="failed",
-            error_message="VapoRock provider unavailable",
-        )
+    failed = _execution(
+        status="failed",
+        error_message="VapoRock provider unavailable",
+        backend_status="unavailable",
     )
+    failed.reason_code = BackendUnavailableError.reason_code
+    executor = FakeExecutor(failed)
 
     monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: False)
     with pytest.raises(BackendUnavailableAbort) as raised:

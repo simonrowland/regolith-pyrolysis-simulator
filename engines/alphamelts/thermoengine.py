@@ -22,6 +22,7 @@ import time
 import traceback
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 
@@ -33,6 +34,7 @@ from simulator.engine_local_config import (
 )
 from simulator.engine_pool import (
     EngineWorkerRemoteError,
+    EngineWorkerTimeout,
     WarmEngineWorker,
 )
 
@@ -71,11 +73,521 @@ class ThermoEngineFO2OmittedError(ValueError):
     """
 
 
+class ThermoEngineRefusalCause(str, Enum):
+    """Closed set of ThermoEngine row-local refusal causes.
+
+    Status is derived from the token. A new refusal mode must add a
+    member here — classifiers have no default that inherits a sibling
+    token, and an unclassified cause raises. The engine-absence token
+    is import-time forbidden.
+    """
+
+    FO2_OUTSIDE_ATTAINABLE_BRACKET = 'fo2_outside_attainable_bracket'
+    FO2_ECHO_OUTSIDE_TOLERANCE = 'fo2_echo_outside_tolerance'
+    FO2_REQUIRES_IRON = 'fo2_requires_iron'
+    FO2_SEED_NOT_INTERIOR = 'fo2_seed_not_interior'
+    FO2_NONMONOTONIC_BUFFERED = 'fo2_nonmonotonic_buffered'
+    FO2_BRACKET_COLLAPSED = 'fo2_bracket_collapsed'
+    FO2_IMPOSE_OUTSIDE_TOLERANCE = 'fo2_impose_outside_tolerance'
+    FO2_ECHO_REQUIRES_LIQUID = 'fo2_echo_requires_liquid'
+    FO2_ECHO_NONFINITE = 'fo2_echo_nonfinite'
+    FO2_TARGET_NOT_FINITE = 'fo2_target_not_finite'
+
+
+REASON_BY_REFUSAL_CAUSE: Mapping[ThermoEngineRefusalCause, str] = {
+    ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET: (
+        'ThermoEngine absolute fO2 target is outside the attainable '
+        'Fe-redox bracket'
+    ),
+    ThermoEngineRefusalCause.FO2_ECHO_OUTSIDE_TOLERANCE: (
+        'ThermoEngine absolute fO2 echo outside tolerance'
+    ),
+    ThermoEngineRefusalCause.FO2_REQUIRES_IRON: (
+        'ThermoEngine cannot impose absolute fO2 without FeO/Fe2O3'
+    ),
+    ThermoEngineRefusalCause.FO2_SEED_NOT_INTERIOR: (
+        'ThermoEngine Kress91 fO2 seed must have a positive finite '
+        'ferric fraction below one'
+    ),
+    ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED: (
+        'ThermoEngine non-monotonic/buffered fO2 region'
+    ),
+    ThermoEngineRefusalCause.FO2_BRACKET_COLLAPSED: (
+        'ThermoEngine fO2 bracket collapsed in ferric-fraction space '
+        'before its fO2 width converged'
+    ),
+    ThermoEngineRefusalCause.FO2_IMPOSE_OUTSIDE_TOLERANCE: (
+        'ThermoEngine failed to impose absolute fO2 within tolerance'
+    ),
+    ThermoEngineRefusalCause.FO2_ECHO_REQUIRES_LIQUID: (
+        'ThermoEngine cannot echo imposed fO2 without a liquid phase'
+    ),
+    ThermoEngineRefusalCause.FO2_ECHO_NONFINITE: (
+        'ThermoEngine returned a non-finite fO2 echo'
+    ),
+    ThermoEngineRefusalCause.FO2_TARGET_NOT_FINITE: (
+        'ThermoEngine absolute fO2 target must be finite'
+    ),
+}
+
+# Kernel / benchmark status derived from the token. Never the absence
+# token. Category 2 (computed, unattainable / non-injective) is
+# out_of_domain; category 1 (missing input / missing required couple)
+# is refused. FO2_REQUIRES_IRON stays refused: Fe-free is a refused
+# operation, not the empty-bracket case of the Fe-bearing walk.
+STATUS_BY_REFUSAL_CAUSE: Mapping[ThermoEngineRefusalCause, str] = {
+    ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET: 'out_of_domain',
+    ThermoEngineRefusalCause.FO2_ECHO_OUTSIDE_TOLERANCE: 'out_of_domain',
+    ThermoEngineRefusalCause.FO2_REQUIRES_IRON: 'refused',
+    ThermoEngineRefusalCause.FO2_SEED_NOT_INTERIOR: 'out_of_domain',
+    ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED: 'out_of_domain',
+    ThermoEngineRefusalCause.FO2_BRACKET_COLLAPSED: 'out_of_domain',
+    ThermoEngineRefusalCause.FO2_IMPOSE_OUTSIDE_TOLERANCE: 'out_of_domain',
+    ThermoEngineRefusalCause.FO2_ECHO_REQUIRES_LIQUID: 'out_of_domain',
+    ThermoEngineRefusalCause.FO2_ECHO_NONFINITE: 'out_of_domain',
+    ThermoEngineRefusalCause.FO2_TARGET_NOT_FINITE: 'refused',
+}
+
+_ALLOWED_CAUSE_STATUSES = frozenset({'out_of_domain', 'refused'})
+
+if set(REASON_BY_REFUSAL_CAUSE) != set(ThermoEngineRefusalCause):
+    raise RuntimeError(
+        'REASON_BY_REFUSAL_CAUSE must cover every '
+        'ThermoEngineRefusalCause member'
+    )
+if set(STATUS_BY_REFUSAL_CAUSE) != set(ThermoEngineRefusalCause):
+    raise RuntimeError(
+        'STATUS_BY_REFUSAL_CAUSE must cover every '
+        'ThermoEngineRefusalCause member'
+    )
+if 'unavailable' in set(STATUS_BY_REFUSAL_CAUSE.values()):
+    raise RuntimeError(
+        'ThermoEngineRefusalCause must not map to the engine-absence token'
+    )
+if not set(STATUS_BY_REFUSAL_CAUSE.values()) <= _ALLOWED_CAUSE_STATUSES:
+    raise RuntimeError(
+        'ThermoEngineRefusalCause status must be out_of_domain or refused'
+    )
+
+
+class ThermoEngineTimeoutCause(str, Enum):
+    """Closed set of ThermoEngine unfinished-computation causes.
+
+    A timeout is not absence, not a policy refusal, and not an
+    out-of-domain result. Status is derived from the token. No
+    default branch: an unclassified cause raises. The engine-absence
+    token is import-time forbidden.
+    """
+
+    SMOKE_EQUILIBRIUM_TIMEOUT = 'smoke_equilibrium_timeout'
+    WARM_CALL_EQUILIBRIUM_TIMEOUT = 'warm_call_equilibrium_timeout'
+
+
+REASON_BY_TIMEOUT_CAUSE: Mapping[ThermoEngineTimeoutCause, str] = {
+    ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT: (
+        'ThermoEngine smoke equilibrium timed out'
+    ),
+    ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT: (
+        'ThermoEngine warm-call equilibrium timed out'
+    ),
+}
+
+# Kernel status derived from the token. A timeout is unfinished
+# computation: the engine was invoked and the deadline expired
+# before a result. IntentResult vocabulary (dto.py) is ok / refused
+# / not_converged / out_of_domain / unavailable / unsupported.
+# refused is a policy gate; unavailable is engine-absent;
+# out_of_domain is computed-unattainable; not_converged is the
+# existing unfinished-computation token. silent_zero's three
+# categories (missing input / out-of-domain / proven zero) do not
+# cover a wall-clock miss. Do not add a fourth kernel status.
+STATUS_BY_TIMEOUT_CAUSE: Mapping[ThermoEngineTimeoutCause, str] = {
+    ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT: 'not_converged',
+    ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT: 'not_converged',
+}
+
+_ALLOWED_TIMEOUT_STATUSES = frozenset({'not_converged'})
+_SMOKE_TIMEOUT_MARK = 'smoke equilibrium timed out'
+_WARM_CALL_TIMEOUT_MARK = 'warm-call equilibrium timed out'
+_TIMEOUT_MARKS: tuple[tuple[str, ThermoEngineTimeoutCause], ...] = (
+    (_SMOKE_TIMEOUT_MARK, ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT),
+    (_WARM_CALL_TIMEOUT_MARK, ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT),
+)
+
+if set(REASON_BY_TIMEOUT_CAUSE) != set(ThermoEngineTimeoutCause):
+    raise RuntimeError(
+        'REASON_BY_TIMEOUT_CAUSE must cover every '
+        'ThermoEngineTimeoutCause member'
+    )
+if set(STATUS_BY_TIMEOUT_CAUSE) != set(ThermoEngineTimeoutCause):
+    raise RuntimeError(
+        'STATUS_BY_TIMEOUT_CAUSE must cover every '
+        'ThermoEngineTimeoutCause member'
+    )
+if 'unavailable' in set(STATUS_BY_TIMEOUT_CAUSE.values()):
+    raise RuntimeError(
+        'ThermoEngineTimeoutCause must not map to the engine-absence token'
+    )
+if not set(STATUS_BY_TIMEOUT_CAUSE.values()) <= _ALLOWED_TIMEOUT_STATUSES:
+    raise RuntimeError(
+        'ThermoEngineTimeoutCause status must be not_converged'
+    )
+
+
+def _require_timeout_cause(
+    cause: ThermoEngineTimeoutCause | str,
+) -> ThermoEngineTimeoutCause:
+    if isinstance(cause, ThermoEngineTimeoutCause):
+        return cause
+    try:
+        return ThermoEngineTimeoutCause(cause)
+    except ValueError as exc:
+        raise RuntimeError(
+            f'unclassified ThermoEngineTimeoutCause {cause!r}; add a token'
+        ) from exc
+
+
+def timeout_reason(
+    cause: ThermoEngineTimeoutCause,
+    *,
+    timeout_s: float,
+) -> str:
+    """Human string derived from *cause*. No default template."""
+    try:
+        parent = REASON_BY_TIMEOUT_CAUSE[cause]
+    except KeyError as exc:
+        raise RuntimeError(
+            f'ThermoEngineTimeoutCause {cause!r} has no reason template; '
+            'add one when adding a token'
+        ) from exc
+    return f'{parent} after {float(timeout_s):.1f}s'
+
+
+def _timeout_message(
+    cause: ThermoEngineTimeoutCause,
+    *,
+    timeout_s: float,
+) -> str:
+    return (
+        f'{cause.value}: '
+        f'{timeout_reason(cause, timeout_s=timeout_s)}'
+    )
+
+
+def classify_thermoengine_timeout_message(
+    text: str,
+) -> ThermoEngineTimeoutCause:
+    """Closed-set classifier. Unknown text raises; it does not inherit."""
+    raw = str(text or '')
+    leading = _leading_timeout_cause_token(raw)
+    if leading is not None:
+        return leading
+    matches = [
+        cause for mark, cause in _TIMEOUT_MARKS if mark in raw
+    ]
+    if len(matches) == 1:
+        return matches[0]
+    if len(matches) > 1:
+        raise RuntimeError(
+            'ambiguous ThermoEngine timeout marks; '
+            f'{[cause.value for cause in matches]} in {raw!r}'
+        )
+    raise RuntimeError(
+        'unclassified ThermoEngine timeout; '
+        f'add a ThermoEngineTimeoutCause: {raw!r}'
+    )
+
+
+def _leading_timeout_cause_token(
+    text: str,
+) -> ThermoEngineTimeoutCause | None:
+    head = str(text or '').replace('\n', ' ').strip()
+    if not head:
+        return None
+    token = head.split(':', 1)[0].strip()
+    try:
+        return ThermoEngineTimeoutCause(token)
+    except ValueError:
+        return None
+
+
+def thermoengine_timeout_cause_from_text(
+    text: str,
+) -> ThermoEngineTimeoutCause:
+    """Classify *text* or raise. No default token."""
+    return classify_thermoengine_timeout_message(text)
+
+
+def thermoengine_timeout_cause_from_exception(
+    exc: BaseException,
+) -> ThermoEngineTimeoutCause | None:
+    """Membership test. None means not a closed-set timeout cause.
+
+    None is not a status. Callers must not mint refused / unavailable
+    from it.
+    """
+    if isinstance(exc, ThermoEngineTimeoutError):
+        return exc.cause
+    if isinstance(exc, EngineWorkerTimeout):
+        return ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT
+    try:
+        return classify_thermoengine_timeout_message(str(exc))
+    except RuntimeError:
+        return None
+
+
+class ThermoEngineTimeoutError(TimeoutError):
+    """Typed unfinished computation. The engine was invoked.
+
+    Human string and status are derived from
+    :class:`ThermoEngineTimeoutCause`. This is never engine-absence.
+    """
+
+    def __init__(
+        self,
+        cause: ThermoEngineTimeoutCause | str,
+        *,
+        timeout_s: float,
+    ) -> None:
+        self.cause = _require_timeout_cause(cause)
+        self.timeout_s = float(timeout_s)
+        super().__init__(
+            _timeout_message(self.cause, timeout_s=self.timeout_s)
+        )
+
+    @property
+    def backend_failure_category(self) -> str:
+        return STATUS_BY_TIMEOUT_CAUSE[self.cause]
+
+
+# Honest sequential token for a probe that never ran because a prior
+# row tore the live transport down. Not refused (that is a row-local
+# result), not unavailable (that is never-installed). Constant fields
+# — never inherit the prior row's teardown.
+THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS = 'not_attempted'
+THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON = (
+    'ThermoEngine probe not attempted: a prior row closed the transport'
+)
+THERMOENGINE_PRIOR_TRANSPORT_CLOSED_MODE = 'not_attempted'
+
+_FO2_BRACKET_MARK = 'outside the attainable Fe-redox bracket'
+_FO2_ECHO_MARK = 'absolute fO2 echo outside tolerance'
+_FO2_REQUIRES_IRON_MARK = 'cannot impose absolute fO2 without FeO/Fe2O3'
+_FO2_SEED_MARK = (
+    'Kress91 fO2 seed must have a positive finite ferric fraction below one'
+)
+_FO2_NONMONOTONIC_MARK = 'non-monotonic/buffered fO2 region'
+_FO2_COLLAPSED_MARK = 'fO2 bracket collapsed in ferric-fraction space'
+_FO2_IMPOSE_TOLERANCE_MARK = 'failed to impose absolute fO2 within tolerance'
+_FO2_ECHO_LIQUID_MARK = 'cannot echo imposed fO2 without a liquid phase'
+_FO2_ECHO_NONFINITE_MARK = 'returned a non-finite fO2 echo'
+_FO2_TARGET_NOT_FINITE_MARK = 'absolute fO2 target must be finite'
+_REFUSAL_MARKS: tuple[tuple[str, ThermoEngineRefusalCause], ...] = (
+    (_FO2_BRACKET_MARK, ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET),
+    (_FO2_ECHO_MARK, ThermoEngineRefusalCause.FO2_ECHO_OUTSIDE_TOLERANCE),
+    (_FO2_REQUIRES_IRON_MARK, ThermoEngineRefusalCause.FO2_REQUIRES_IRON),
+    (_FO2_SEED_MARK, ThermoEngineRefusalCause.FO2_SEED_NOT_INTERIOR),
+    (_FO2_NONMONOTONIC_MARK, ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED),
+    (_FO2_COLLAPSED_MARK, ThermoEngineRefusalCause.FO2_BRACKET_COLLAPSED),
+    (_FO2_IMPOSE_TOLERANCE_MARK, ThermoEngineRefusalCause.FO2_IMPOSE_OUTSIDE_TOLERANCE),
+    (_FO2_ECHO_LIQUID_MARK, ThermoEngineRefusalCause.FO2_ECHO_REQUIRES_LIQUID),
+    (_FO2_ECHO_NONFINITE_MARK, ThermoEngineRefusalCause.FO2_ECHO_NONFINITE),
+    (_FO2_TARGET_NOT_FINITE_MARK, ThermoEngineRefusalCause.FO2_TARGET_NOT_FINITE),
+)
+_FO2_FIELD_RE = re.compile(
+    r'(requested|solved)=([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)'
+)
+
+
+def _require_refusal_cause(
+    cause: ThermoEngineRefusalCause | str,
+) -> ThermoEngineRefusalCause:
+    if isinstance(cause, ThermoEngineRefusalCause):
+        return cause
+    try:
+        return ThermoEngineRefusalCause(cause)
+    except ValueError as exc:
+        raise RuntimeError(
+            f'unclassified ThermoEngineRefusalCause {cause!r}; add a token'
+        ) from exc
+
+
+def refusal_reason(
+    cause: ThermoEngineRefusalCause,
+    *,
+    requested: float | None = None,
+    solved: float | None = None,
+) -> str:
+    """Human string derived from *cause*. No default template."""
+    try:
+        parent = REASON_BY_REFUSAL_CAUSE[cause]
+    except KeyError as exc:
+        raise RuntimeError(
+            f'ThermoEngineRefusalCause {cause!r} has no reason template; '
+            'add one when adding a token'
+        ) from exc
+    extras: list[str] = []
+    if requested is not None:
+        extras.append(f'requested={float(requested):g}')
+    if solved is not None:
+        extras.append(f'solved={float(solved):g}')
+    if extras:
+        return f'{parent}: {", ".join(extras)}'
+    return parent
+
+
+def _refusal_message(
+    cause: ThermoEngineRefusalCause,
+    *,
+    requested: float | None = None,
+    solved: float | None = None,
+) -> str:
+    return (
+        f'{cause.value}: '
+        f'{refusal_reason(cause, requested=requested, solved=solved)}'
+    )
+
+
+def classify_thermoengine_refusal_message(
+    text: str,
+) -> ThermoEngineRefusalCause:
+    """Closed-set classifier. Unknown text raises; it does not inherit.
+
+    Only the message *prefix* may name a token (``{cause.value}: …``).
+    Scanning every colon fragment would let a later debug label steal
+    the cause. Legacy wire text without a prefix matches exactly one
+    mark; zero or two-plus marks raise.
+    """
+    raw = str(text or '')
+    leading = _leading_cause_token(raw)
+    if leading is not None:
+        return leading
+    matches = [
+        cause for mark, cause in _REFUSAL_MARKS if mark in raw
+    ]
+    if len(matches) == 1:
+        return matches[0]
+    if len(matches) > 1:
+        raise RuntimeError(
+            'ambiguous ThermoEngine refusal marks; '
+            f'{[cause.value for cause in matches]} in {raw!r}'
+        )
+    raise RuntimeError(
+        'unclassified ThermoEngine out-of-domain refusal; '
+        f'add a ThermoEngineRefusalCause: {raw!r}'
+    )
+
+
+def _leading_cause_token(text: str) -> ThermoEngineRefusalCause | None:
+    head = str(text or '').replace('\n', ' ').strip()
+    if not head:
+        return None
+    token = head.split(':', 1)[0].strip()
+    try:
+        return ThermoEngineRefusalCause(token)
+    except ValueError:
+        return None
+
+
+def thermoengine_refusal_cause_from_text(
+    text: str,
+) -> ThermoEngineRefusalCause:
+    """Classify *text* or raise. No default token."""
+    return classify_thermoengine_refusal_message(text)
+
+
+def thermoengine_refusal_cause_from_exception(
+    exc: BaseException,
+) -> ThermoEngineRefusalCause | None:
+    """Membership test for keep-handle. None means not a closed-set cause.
+
+    None is not a status. Callers must not mint refused / unavailable
+    from it.
+    """
+    if isinstance(exc, ThermoEngineOutOfDomainError):
+        return exc.cause
+    try:
+        return classify_thermoengine_refusal_message(str(exc))
+    except RuntimeError:
+        return None
+
+
+def midrun_thermoengine_prior_close_result() -> tuple[str, str, str]:
+    """Honest fields for a probe that never ran after a live close.
+
+    Does not inspect the prior row. Status, reason, and mode are
+    constants so a later probe cannot inherit teardown prose.
+    """
+    return (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_MODE,
+    )
+
+
+def _parse_fo2_field(text: str, name: str) -> float | None:
+    for field_name, raw in _FO2_FIELD_RE.findall(str(text or '')):
+        if field_name == name:
+            return float(raw)
+    return None
+
+
+def reconstruct_thermoengine_out_of_domain_error(
+    detail: str,
+) -> 'ThermoEngineOutOfDomainError':
+    cause = classify_thermoengine_refusal_message(detail)
+    return ThermoEngineOutOfDomainError(
+        cause,
+        requested=_parse_fo2_field(detail, 'requested'),
+        solved=_parse_fo2_field(detail, 'solved'),
+    )
+
+
+class ThermoEngineOutOfDomainError(ValueError):
+    """Row-local typed refusal. Keep the parent transport handle.
+
+    The human string and status token are derived from
+    :class:`ThermoEngineRefusalCause`. This is never engine-absence.
+    """
+
+    def __init__(
+        self,
+        cause: ThermoEngineRefusalCause | str,
+        *,
+        requested: float | None = None,
+        solved: float | None = None,
+    ) -> None:
+        self.cause = _require_refusal_cause(cause)
+        self.requested = requested
+        self.solved = solved
+        super().__init__(
+            _refusal_message(
+                self.cause, requested=requested, solved=solved
+            )
+        )
+
+    @property
+    def backend_failure_category(self) -> str:
+        return STATUS_BY_REFUSAL_CAUSE[self.cause]
+
+
 _FO2_ECHO_TOLERANCE = 1.0e-3
 _FO2_MONOTONIC_EPSILON = 1.0e-7
 _FO2_FRACTION_WIDTH_TOLERANCE = 1.0e-10
 THERMOENGINE_WARM_CALL_TIMEOUT_S = 3.0
 _DEFAULT_EQUILIBRATE_TIMEOUT_S = THERMOENGINE_WARM_CALL_TIMEOUT_S
+# Smoke health-check is a COLD subprocess: spawn + import thermoengine +
+# Berman MELTS Database + MELTSmodel + one absolute-fO2 equilibrate.
+# The 8.0 s wall was quiet-box calibrated and expired at load ~58 while
+# the same engine scored 114 ok rows in the same run. MAGEMIN's sibling
+# quiet-box 2 s warm-call wall needed ~8x p99 headroom (15 s); this
+# probe is colder than a warm call (import+construct are inside the
+# wall) and lighter than MAGEMIN's 60 s liquidus-scan aggregate. 30 s
+# is 10x the 3 s warm-call budget (covers import+construct+solve under
+# contention) and half the 60 s equilibrate CLI default. Finite cap:
+# not None, not inf.
+THERMOENGINE_HEALTH_TIMEOUT_S = 30.0
+_DEFAULT_HEALTH_TIMEOUT_S = THERMOENGINE_HEALTH_TIMEOUT_S
 _DEFAULT_WATCHDOG_GRACE_S = 0.25
 _THERMOENGINE_ADAPTER_VERSION = 'regolith-thermoengine-v2'
 
@@ -227,6 +739,7 @@ class ThermoEngineTransport:
         model_name: str = 'MELTSv1.0.2',
         activity_converter: ActivityConverter,
         equilibrate_timeout_s: float = _DEFAULT_EQUILIBRATE_TIMEOUT_S,
+        health_timeout_s: float = _DEFAULT_HEALTH_TIMEOUT_S,
         diagnostic_log_dir: str | os.PathLike[str] | None = None,
         watchdog_grace_s: float = _DEFAULT_WATCHDOG_GRACE_S,
         diagnostic_signal: int = signal.SIGUSR1,
@@ -241,6 +754,12 @@ class ThermoEngineTransport:
         self._activity_converter = activity_converter
         self._equilibrate_timeout_s = max(
             1.0, float(equilibrate_timeout_s))
+        health = float(health_timeout_s)
+        if not math.isfinite(health):
+            raise ValueError(
+                'health_timeout_s must be a finite bound; unbounded is forbidden'
+            )
+        self._health_timeout_s = max(1.0, health)
         self._diagnostic_log_path = thermoengine_diagnostic_log_path(
             diagnostic_log_dir)
         self._watchdog_grace_s = max(0.0, float(watchdog_grace_s))
@@ -288,6 +807,14 @@ class ThermoEngineTransport:
                 f'{exc.remote_traceback}'
             ) from exc
         return True
+
+    @property
+    def equilibrate_timeout_s(self) -> float:
+        return self._equilibrate_timeout_s
+
+    @property
+    def health_timeout_s(self) -> float:
+        return self._health_timeout_s
 
     @property
     def diagnostic_log_path(self) -> Path:
@@ -349,11 +876,19 @@ class ThermoEngineTransport:
     def health_check(
         self,
         *,
-        timeout_s: float = 8.0,
+        timeout_s: float | None = None,
         failure_cache_ttl_s: float = 30.0,
         force_refresh: bool = False,
     ) -> tuple[bool, str]:
-        timeout = max(1.0, float(timeout_s))
+        timeout = float(
+            self._health_timeout_s if timeout_s is None else timeout_s
+        )
+        if not math.isfinite(timeout):
+            raise ValueError(
+                'health_check timeout_s must be a finite bound; '
+                'unbounded is forbidden'
+            )
+        timeout = max(1.0, timeout)
         cache_key = f'{self._model_name}:{timeout:.3f}'
         cached = self._health_cache.get(cache_key)
         now = time.monotonic()
@@ -434,8 +969,10 @@ print('ok')
         except subprocess.TimeoutExpired:
             health = (
                 False,
-                f'ThermoEngine smoke equilibrium timed out after '
-                f'{timeout:.1f}s',
+                _timeout_message(
+                    ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT,
+                    timeout_s=timeout,
+                ),
             )
         except OSError as exc:
             health = (False, f'ThermoEngine smoke equilibrium failed: {exc}')
@@ -483,7 +1020,11 @@ print('ok')
             detail = exc.detail
             child_traceback = exc.remote_traceback
         # Exact child type name only. Unknown names become RuntimeError
-        # and then close (untyped). Do not substring-match the detail.
+        # and then close (untyped). Do not substring-match the detail
+        # to choose the type. ThermoEngineOutOfDomainError reconstructs
+        # its cause from the closed token set; an unknown cause raises.
+        if exc_name == 'ThermoEngineOutOfDomainError':
+            raise reconstruct_thermoengine_out_of_domain_error(detail)
         exception_type = {
             'ImportError': ImportError,
             'TimeoutError': TimeoutError,
@@ -976,15 +1517,17 @@ print('ok')
         target_fO2_log: float,
     ) -> tuple[Any, Any, float, int]:
         if not math.isfinite(target_fO2_log):
-            raise ValueError('ThermoEngine absolute fO2 target must be finite')
+            raise ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_TARGET_NOT_FINITE,
+            )
         feo_moles = float(bulk_wt.get('FeO', 0.0) or 0.0) / _FE_O_MOLAR_MASS
         fe2o3_moles = (
             float(bulk_wt.get('Fe2O3', 0.0) or 0.0) / _FE2_O3_MOLAR_MASS
         )
         total_fe_moles = feo_moles + 2.0 * fe2o3_moles
         if total_fe_moles <= 0.0:
-            raise ValueError(
-                'ThermoEngine cannot impose absolute fO2 without FeO/Fe2O3'
+            raise ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_REQUIRES_IRON,
             )
         from simulator.fe_redox import (
             kress91_split,
@@ -999,9 +1542,9 @@ print('ok')
         )
         initial_fraction = float(seed['fe3'])
         if not math.isfinite(initial_fraction) or not 0.0 < initial_fraction < 1.0:
-            raise ValueError(
-                'ThermoEngine Kress91 fO2 seed must have a positive finite '
-                'ferric fraction below one'
+            raise ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_SEED_NOT_INTERIOR,
+                requested=target_fO2_log,
             )
         solve_count = 0
 
@@ -1139,9 +1682,9 @@ print('ok')
             sampled.sort(key=lambda item: item[0])
             self._validate_fO2_order(sampled)
         if not sampled[0][1] <= target_fO2_log <= sampled[-1][1]:
-            raise ValueError(
-                'ThermoEngine absolute fO2 target is outside the attainable '
-                f'Fe-redox bracket: requested={target_fO2_log:g}'
+            raise ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+                requested=target_fO2_log,
             )
         for index, point in enumerate(sampled):
             if abs(point[1] - target_fO2_log) < _FO2_ECHO_TOLERANCE:
@@ -1167,9 +1710,9 @@ print('ok')
                     return closest[2], closest[3], closest[1], solve_count
                 break
             if right[0] - left[0] <= _FO2_FRACTION_WIDTH_TOLERANCE:
-                raise RuntimeError(
-                    'ThermoEngine fO2 bracket collapsed in ferric-fraction '
-                    'space before its fO2 width converged'
+                raise ThermoEngineOutOfDomainError(
+                    ThermoEngineRefusalCause.FO2_BRACKET_COLLAPSED,
+                    requested=target_fO2_log,
                 )
             fraction = 0.5 * (left[0] + right[0])
             model, result, solved = evaluate(fraction)
@@ -1181,11 +1724,14 @@ print('ok')
                 left = point
             else:
                 right = point
-        raise RuntimeError(
-            'ThermoEngine failed to impose absolute fO2 within tolerance: '
-            f'requested={target_fO2_log:g}, '
-            f'bracket={left[1]:g}..{right[1]:g}, '
-            f'tolerance={_FO2_ECHO_TOLERANCE:g}'
+        nearest = min(
+            (left, right),
+            key=lambda item: abs(item[1] - target_fO2_log),
+        )
+        raise ThermoEngineOutOfDomainError(
+            ThermoEngineRefusalCause.FO2_IMPOSE_OUTSIDE_TOLERANCE,
+            requested=target_fO2_log,
+            solved=nearest[1],
         )
 
     @staticmethod
@@ -1194,10 +1740,10 @@ print('ok')
         for lower, upper in zip(ordered, ordered[1:]):
             delta = float(upper[1]) - float(lower[1])
             if delta <= _FO2_MONOTONIC_EPSILON:
-                raise ValueError(
-                    'ThermoEngine non-monotonic/buffered fO2 region: '
-                    f'ferric fractions {lower[0]:.8g}..{upper[0]:.8g} '
-                    f'echo {lower[1]:.8g}..{upper[1]:.8g}'
+                raise ThermoEngineOutOfDomainError(
+                    ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED,
+                    requested=float(lower[1]),
+                    solved=float(upper[1]),
                 )
 
     def _echo_log_fO2(
@@ -1215,8 +1761,8 @@ print('ok')
         )
         liquid_phase = self._select_liquid_phase(phases)
         if liquid_phase is None:
-            raise ValueError(
-                'ThermoEngine cannot echo imposed fO2 without a liquid phase'
+            raise ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_ECHO_REQUIRES_LIQUID,
             )
         liquid = self._finite_mapping(
             melts.get_composition_of_phase(root, liquid_phase, 'oxide_wt')
@@ -1255,7 +1801,9 @@ print('ok')
             method='Kress91',
         )).reshape(-1)[0])
         if not math.isfinite(solved):
-            raise ValueError('ThermoEngine returned a non-finite fO2 echo')
+            raise ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_ECHO_NONFINITE,
+            )
         return solved
 
     def _activities_from_chemical_potentials(
@@ -1458,12 +2006,30 @@ def thermoengine_available(backend: Any) -> bool:
 
 
 __all__ = (
+    'STATUS_BY_REFUSAL_CAUSE',
+    'STATUS_BY_TIMEOUT_CAUSE',
+    'THERMOENGINE_HEALTH_TIMEOUT_S',
+    'THERMOENGINE_PRIOR_TRANSPORT_CLOSED_MODE',
+    'THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON',
+    'THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS',
     'ThermoEngineFO2OmittedError',
     'ThermoEngineFO2UndefinedError',
     'ThermoEngineNonFiniteField',
+    'ThermoEngineOutOfDomainError',
     'ThermoEnginePayload',
+    'ThermoEngineRefusalCause',
+    'ThermoEngineTimeoutCause',
+    'ThermoEngineTimeoutError',
     'ThermoEngineTransport',
+    'classify_thermoengine_refusal_message',
+    'classify_thermoengine_timeout_message',
     'equilibrate_via_thermoengine',
-    'thermoengine_diagnostic_log_path',
+    'midrun_thermoengine_prior_close_result',
+    'reconstruct_thermoengine_out_of_domain_error',
     'thermoengine_available',
+    'thermoengine_diagnostic_log_path',
+    'thermoengine_refusal_cause_from_exception',
+    'thermoengine_refusal_cause_from_text',
+    'thermoengine_timeout_cause_from_exception',
+    'thermoengine_timeout_cause_from_text',
 )

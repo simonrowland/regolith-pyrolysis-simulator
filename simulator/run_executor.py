@@ -96,6 +96,12 @@ class RunExecution:
     envelope_detail_unavailable: str = ""
     campaigns_elapsed: float = 1.0
     campaigns_elapsed_start: float = 0.0
+    # Terminal exception that stopped the run, when status is "failed"
+    # or "refused". evaluate() recovers honest engine answers from this
+    # object; dropping it flattens a timeout/OOD into EngineBugAbort.
+    failure_exception: BaseException | None = field(
+        default=None, compare=False, repr=False
+    )
 
 
 def _campaigns_elapsed_from_session_history(
@@ -467,6 +473,11 @@ class RunExecutor:
                 getattr(sim, "_backend_status_history", ()),
                 latest_backend_status,
             )
+            honest_backend_status = _backend_status_from_honest_exception(
+                failure_exc
+            )
+            if honest_backend_status is not None:
+                backend_status = honest_backend_status
             backend_authoritative = bool(
                 getattr(sim, "_backend_authoritative", True)
             )
@@ -485,6 +496,7 @@ class RunExecutor:
                 reduced_real_cache=reduced_real_cache,
                 backend_status=backend_status,
                 backend_authoritative=backend_authoritative,
+                failure_exception=failure_exc,
                 campaigns_elapsed=_campaigns_elapsed_from_session_history(
                     session,
                     fallback=float(
@@ -522,6 +534,11 @@ class RunExecutor:
                 ),
                 "unavailable",
             )
+            honest_backend_status = _backend_status_from_honest_exception(
+                failure_exc
+            )
+            if honest_backend_status is not None:
+                backend_status = honest_backend_status
             backend_authoritative = _safe_bool(
                 lambda: getattr(sim, "_backend_authoritative", False),
                 False,
@@ -541,6 +558,7 @@ class RunExecutor:
                 reduced_real_cache=reduced_real_cache,
                 backend_status=backend_status,
                 backend_authoritative=backend_authoritative,
+                failure_exception=failure_exc,
                 envelope_detail_unavailable=(
                     "envelope detail unavailable: "
                     f"{_safe_exception_text(envelope_exc)}"
@@ -671,6 +689,44 @@ def _aggregate_backend_status(history: Any, latest: str) -> str:
         if status in statuses:
             return status
     return str(latest)
+
+
+def _backend_status_from_honest_exception(
+    exc: BaseException | None,
+) -> str | None:
+    """Map a typed engine answer to backend_status. None is not a status.
+
+    Type-driven. ImportError / EngineWorkerUnavailable are absence, not
+    an honest non-ok token, and must not be rewritten here.
+    """
+    if exc is None:
+        return None
+    from engines.alphamelts.thermoengine import (
+        STATUS_BY_REFUSAL_CAUSE,
+        STATUS_BY_TIMEOUT_CAUSE,
+        ThermoEngineOutOfDomainError,
+        ThermoEngineTimeoutError,
+        thermoengine_refusal_cause_from_exception,
+        thermoengine_timeout_cause_from_exception,
+    )
+    from simulator.backends import BackendUnavailableError
+    from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
+
+    if isinstance(
+        exc, (ImportError, EngineWorkerUnavailable, BackendUnavailableError)
+    ):
+        return None
+    timeout = thermoengine_timeout_cause_from_exception(exc)
+    if timeout is not None:
+        return STATUS_BY_TIMEOUT_CAUSE[timeout]
+    if isinstance(exc, (EngineWorkerTimeout, ThermoEngineTimeoutError)):
+        return "not_converged"
+    refusal = thermoengine_refusal_cause_from_exception(exc)
+    if refusal is not None:
+        return STATUS_BY_REFUSAL_CAUSE[refusal]
+    if isinstance(exc, ThermoEngineOutOfDomainError):
+        return STATUS_BY_REFUSAL_CAUSE[exc.cause]
+    return None
 
 
 def _collect_shadow_trace(

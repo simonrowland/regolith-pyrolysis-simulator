@@ -106,6 +106,11 @@ def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
 
     assert default_args.backend == "subprocess"
     assert default_args.engine_epoch == 3
+    from engines.alphamelts.thermoengine import THERMOENGINE_HEALTH_TIMEOUT_S
+    assert (
+        default_args.thermoengine_health_timeout_s
+        == THERMOENGINE_HEALTH_TIMEOUT_S
+    )
     assert grid_pregrind.backend_config(default_args)["mode"] == "subprocess"
     assert grid_pregrind.backend_config(default_args)[
         "vapor_transport_pO2_bar"

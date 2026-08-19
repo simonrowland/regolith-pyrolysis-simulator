@@ -1297,6 +1297,76 @@ def test_provider_exposes_backend_transport_close_count():
     assert provider.transport_closed_mid_run() is False
 
 
+def test_midrun_close_is_not_attempted_and_does_not_inherit_prior_teardown():
+    """P1-A: a probe that never ran must not inherit prior-row fields."""
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_MODE,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+    )
+
+    backend = _FakeAlphaMELTSBackend(
+        mode='unavailable',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    backend.backend_name = 'thermoengine'
+    backend.transport_close_count = lambda: 1
+    backend.unavailable_reason = lambda: (
+        'ThermoEngine transport closed after RuntimeError: affinity shape mismatch'
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    result = provider.dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+        )
+    )
+    assert result.status == THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    assert result.status not in {'unavailable', 'refused', 'out_of_domain'}
+    assert result.warnings == (THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,)
+    assert 'affinity shape' not in result.warnings[0]
+    assert 'transport closed after' not in result.warnings[0]
+    diagnostic = result.diagnostic or {}
+    assert diagnostic.get('mode') == THERMOENGINE_PRIOR_TRANSPORT_CLOSED_MODE
+    assert diagnostic.get('mode') != 'thermoengine'
+    assert diagnostic.get('backend_status') == (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    )
+
+
+def test_provider_passes_through_refused_backend_status():
+    """P1-C: status=refused must not collapse to unavailable."""
+    backend = _FakeAlphaMELTSBackend(
+        mode='thermoengine',
+        equilibrium=_build_equilibrium_for_basalt(status='refused'),
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    result = provider.dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+        )
+    )
+    assert result.status == 'refused'
+    assert result.status != 'unavailable'
+
+
+def test_provider_raises_on_unrecognised_backend_status():
+    """P1-C: unrecognised status raises; it does not become absence."""
+    backend = _FakeAlphaMELTSBackend(
+        mode='thermoengine',
+        equilibrium=_build_equilibrium_for_basalt(status='totally_unknown'),
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    with pytest.raises(RuntimeError, match='unrecognised backend_status'):
+        provider.dispatch(
+            _make_request(
+                ChemistryIntent.SILICATE_EQUILIBRIUM,
+                composition_mol=_basalt_species_mol(),
+            )
+        )
+
+
 def test_provider_raises_on_nonfinite_ec_liquid_fraction():
     def _bad_equilibrate(**_: object) -> SimpleNamespace:
         return SimpleNamespace(

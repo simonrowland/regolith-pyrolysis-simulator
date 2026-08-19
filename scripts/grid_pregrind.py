@@ -37,6 +37,9 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
     utc_now,
 )
 from engines.alphamelts.domain import AlphaMELTSDomainGate  # noqa: E402
+from engines.alphamelts.thermoengine import (  # noqa: E402
+    THERMOENGINE_HEALTH_TIMEOUT_S,
+)
 from engines.domain_reason import OutOfDomainReason  # noqa: E402
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
 from simulator.engine_pool import (  # noqa: E402
@@ -1732,7 +1735,13 @@ def run_cycle(
             bootstrap_args=(config, args.assume_queued_run_mode),
             startup_timeout_s=max(
                 30.0,
-                float(config.get("thermoengine_health_timeout_s", 8.0)) + 30.0,
+                float(
+                    config.get(
+                        "thermoengine_health_timeout_s",
+                        THERMOENGINE_HEALTH_TIMEOUT_S,
+                    )
+                )
+                + 30.0,
             ),
             call_timeout_s=outer_timeout_s,
             daemon=False,
@@ -1892,7 +1901,11 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument(
         "--thermoengine-equilibrate-timeout-s", type=float, default=60.0
     )
-    result.add_argument("--thermoengine-health-timeout-s", type=float, default=8.0)
+    result.add_argument(
+        "--thermoengine-health-timeout-s",
+        type=float,
+        default=THERMOENGINE_HEALTH_TIMEOUT_S,
+    )
     result.add_argument(
         "--allow-zero-component-boundary",
         action="store_true",
