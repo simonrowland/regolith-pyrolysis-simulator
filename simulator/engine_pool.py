@@ -72,6 +72,22 @@ class EngineWorkerRemoteError(RuntimeError):
         self.remote_traceback = remote_traceback
 
 
+class EngineWorkerUnavailable(RuntimeError):
+    """Parent-side: the isolated worker handle is absent after start.
+
+    Token-bearing. Consumers must key on the type or ``reason_code``,
+    never on the human string. This is not by itself engine-absence
+    after a live adapter has already answered — sequential mid-run
+    death is ``not_attempted`` on later rows.
+    """
+
+    reason_code = 'engine_worker_unavailable'
+
+    def __init__(self, worker_name: str) -> None:
+        self.worker_name = str(worker_name)
+        super().__init__(f'{self.worker_name} worker is unavailable')
+
+
 class EngineWorkerTimeout(TimeoutError):
     """Typed hard-wall expiry for an isolated engine worker."""
 
@@ -359,7 +375,7 @@ class WarmEngineWorker:
             connection = self.connection
             disabled = self.disabled
         if process is None or connection is None:
-            raise RuntimeError(f'{self.name} worker is unavailable')
+            raise EngineWorkerUnavailable(self.name)
         if disabled:
             self._discard_current(
                 diagnostic=False,

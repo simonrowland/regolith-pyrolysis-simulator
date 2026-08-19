@@ -87,6 +87,8 @@ POINT_STATUSES = frozenset(
         "out_of_domain",
         "crash",
         "refused",
+        "not_converged",
+        "not_attempted",
         "observable_unavailable",
         "unavailable",
     }
@@ -280,6 +282,7 @@ def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
         ThermoEngineFO2OmittedError,
         ThermoEngineFO2UndefinedError,
         ThermoEngineNonFiniteField,
+        ThermoEngineOutOfDomainError,
     )
     from simulator.engine_pool import EngineWorkerTimeout
 
@@ -288,24 +291,48 @@ def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
         ThermoEngineFO2OmittedError,
         ThermoEngineFO2UndefinedError,
         ThermoEngineNonFiniteField,
+        ThermoEngineOutOfDomainError,
     )
 
 
 def classify_engine_exception(exc: BaseException) -> tuple[str, str]:
-    """Map an engine-boundary exception into the benchmark status vocabulary."""
+    """Map an engine-boundary exception into the benchmark status vocabulary.
+
+    Absence is token-driven: a typed ``backend_failure_category`` or
+    ``EngineWorkerUnavailable``. The word "unavailable" in a message
+    must not mint the absence token.
+    """
+
+    from engines.alphamelts.thermoengine import (
+        STATUS_BY_REFUSAL_CAUSE,
+        STATUS_BY_TIMEOUT_CAUSE,
+        thermoengine_refusal_cause_from_exception,
+        thermoengine_timeout_cause_from_exception,
+    )
+    from simulator.engine_pool import EngineWorkerUnavailable
 
     text = _reason_line(f"{type(exc).__name__}: {exc}")
+    timeout = thermoengine_timeout_cause_from_exception(exc)
+    if timeout is not None:
+        return STATUS_BY_TIMEOUT_CAUSE[timeout], text
+    ood = thermoengine_refusal_cause_from_exception(exc)
+    if ood is not None:
+        return STATUS_BY_REFUSAL_CAUSE[ood], text
     if isinstance(exc, _keep_handle_exception_types()):
         return "refused", text
-    lowered = text.lower()
     category = str(getattr(exc, "backend_failure_category", "") or "").lower()
     if category == "engine_crash" or any(
-        token in lowered for token in ("sigsegv", "sigabrt", "signal 11", "signal 6")
+        token in text.lower()
+        for token in ("sigsegv", "sigabrt", "signal 11", "signal 6")
     ):
         return "crash", text
-    if "unavailable" in lowered or category == "backend_unavailable":
+    if category == "out_of_domain":
+        return "out_of_domain", text
+    if category == "backend_unavailable":
         return "unavailable", text
-    if "outside" in lowered or "out_of_domain" in lowered:
+    if isinstance(exc, EngineWorkerUnavailable):
+        return "unavailable", text
+    if "out_of_domain" in text.lower():
         return "out_of_domain", text
     return "refused", text
 
@@ -617,6 +644,7 @@ class AlphaMeltsEngine:
         )
         self._provider: Any | None = None
         self._initialization_error = ""
+        self._initialization_status: str | None = None
 
     def _initialize(self) -> Any | None:
         if self._provider is not None or self._initialization_error:
@@ -649,7 +677,10 @@ class AlphaMeltsEngine:
             return alphamelts_activity_capability_refusal()
         provider = self._initialize()
         if provider is None:
-            return EngineResult(status="unavailable", reason=self._initialization_error)
+            return EngineResult(
+                status=self._initialization_status or "unavailable",
+                reason=self._initialization_error,
+            )
         from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
         from simulator.chemistry.kernel.dto import ProviderAccountView
 
@@ -691,7 +722,7 @@ class AlphaMeltsEngine:
                     details=_alphamelts_failure_details(backend_diag),
                 )
             return EngineResult(status="refused", reason=reason, details=backend_diag)
-        if status in {"out_of_domain", "unavailable"}:
+        if status in {"out_of_domain", "unavailable", "not_attempted"}:
             return EngineResult(
                 status=status,
                 reason=_reason_line("; ".join(result.warnings)),
@@ -791,6 +822,24 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
     name = "thermoengine"
     activity_observable_supported = True
 
+    def __init__(
+        self,
+        timeout_s: float = 30.0,
+        silicate_network_band: tuple[float, float] | None = None,
+        health_timeout_s: float | None = None,
+    ) -> None:
+        super().__init__(
+            timeout_s=timeout_s,
+            silicate_network_band=silicate_network_band,
+        )
+        from engines.alphamelts.thermoengine import THERMOENGINE_HEALTH_TIMEOUT_S
+
+        self.health_timeout_s = (
+            THERMOENGINE_HEALTH_TIMEOUT_S
+            if health_timeout_s is None
+            else float(health_timeout_s)
+        )
+
     def transport_close_count(self) -> int:
         """How many times this instance tore down a live transport."""
         provider = self._provider
@@ -816,13 +865,22 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
                 warnings.simplefilter("ignore")
                 available = backend.initialize({
                     "thermoengine_equilibrate_timeout_s": self.timeout_s,
+                    "thermoengine_health_timeout_s": self.health_timeout_s,
                 })
             if not available:
                 self._initialization_error = "ThermoEngine backend unavailable"
                 return None
             self._provider = AlphaMELTSProvider(backend)
         except Exception as exc:
+            from engines.alphamelts.thermoengine import (
+                STATUS_BY_TIMEOUT_CAUSE,
+                thermoengine_timeout_cause_from_exception,
+            )
+
             self._initialization_error = _reason_line(exc)
+            timeout = thermoengine_timeout_cause_from_exception(exc)
+            if timeout is not None:
+                self._initialization_status = STATUS_BY_TIMEOUT_CAUSE[timeout]
         return self._provider
 
     def coverage(
@@ -1097,6 +1155,19 @@ def build_engines(
     if unknown:
         raise ValueError(f"unknown engines: {', '.join(unknown)}")
     return [constructors[name]() for name in names]
+
+
+def _apply_thermoengine_health_timeout(
+    engines: Sequence[Any],
+    health_timeout_s: float | None,
+) -> None:
+    """Override smoke budget on live ThermoEngine engines. No-op for fakes."""
+    if health_timeout_s is None:
+        return
+    timeout = float(health_timeout_s)
+    for engine in engines:
+        if isinstance(engine, ThermoEngineMeltActivityEngine):
+            engine.health_timeout_s = timeout
 
 
 def _native_partial_pressure_pa(
@@ -2469,8 +2540,8 @@ def generate_report(
         "",
         "## Per-species comparison",
         "",
-        "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | observable unavailable | unavailable |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | not attempted | observable unavailable | unavailable |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     activity_metrics = []
@@ -2486,7 +2557,7 @@ def generate_report(
         activity_metrics.append(row)
     for row in activity_metrics:
         lines.append(
-            "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {observable_unavailable} | {unavailable} |".format(
+            "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {not_attempted} | {observable_unavailable} | {unavailable} |".format(
                 **row,
                 rmse=_fmt(row["rmse_dex"]),
                 median=_fmt(row["median_signed_residual_dex"]),
@@ -2494,6 +2565,7 @@ def generate_report(
                 ood=row["out_of_domain_count"],
                 crash=row["crash_count"],
                 refused=row["refused_count"],
+                not_attempted=row["not_attempted_count"],
                 observable_unavailable=row["observable_unavailable_count"],
                 unavailable=row["unavailable_count"],
             )
@@ -2928,6 +3000,7 @@ def run_benchmark(
     mode: str = "all",
     coverage_steps: int = 21,
     alphamelts_timeout_s: float = 30.0,
+    thermoengine_health_timeout_s: float | None = None,
     live_vaporock_anchor_check: bool = True,
     retired_artifacts: Sequence[str] = (),
 ) -> dict[str, Any]:
@@ -2935,6 +3008,7 @@ def run_benchmark(
     engines = build_engines(
         engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
     )
+    _apply_thermoengine_health_timeout(engines, thermoengine_health_timeout_s)
     output_dir.mkdir(parents=True, exist_ok=True)
     planned_names = _planned_artifact_names(mode, live_vaporock_anchor_check)
     guard = assert_no_silent_artifact_loss(
@@ -2967,6 +3041,9 @@ def run_benchmark(
         # Makes the probe table askable; not a claim those probes score.
         probe_engines = build_engines(
             engine_names, fixture, alphamelts_timeout_s=alphamelts_timeout_s
+        )
+        _apply_thermoengine_health_timeout(
+            probe_engines, thermoengine_health_timeout_s
         )
         probe_rows = run_composition_probes(fixture, probe_engines)
         reference_rows = run_reference_anchors(fixture)
@@ -3137,6 +3214,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--coverage-steps", type=int, default=21)
     parser.add_argument("--alphamelts-timeout-s", type=float, default=30.0)
     parser.add_argument(
+        "--thermoengine-health-timeout-s",
+        type=float,
+        default=None,
+        help=(
+            "ThermoEngine smoke-equilibrium wall (seconds). Default is "
+            "engines.alphamelts.thermoengine.THERMOENGINE_HEALTH_TIMEOUT_S. "
+            "Must be a positive finite bound; not unbounded."
+        ),
+    )
+    parser.add_argument(
         "--live-vaporock-anchor-check",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -3163,6 +3250,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
+    if args.thermoengine_health_timeout_s is not None and (
+        not math.isfinite(args.thermoengine_health_timeout_s)
+        or args.thermoengine_health_timeout_s <= 0.0
+    ):
+        parser.error(
+            "--thermoengine-health-timeout-s must be a positive finite bound"
+        )
     names = tuple(value.strip() for value in args.engines.split(",") if value.strip())
     try:
         result = run_benchmark(
@@ -3172,6 +3266,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             mode=args.mode,
             coverage_steps=args.coverage_steps,
             alphamelts_timeout_s=args.alphamelts_timeout_s,
+            thermoengine_health_timeout_s=args.thermoengine_health_timeout_s,
             live_vaporock_anchor_check=args.live_vaporock_anchor_check,
             retired_artifacts=tuple(args.retire_artifact),
         )

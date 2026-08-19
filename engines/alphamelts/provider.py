@@ -100,6 +100,17 @@ _DECLARED_ACCOUNT = 'process.cleaned_melt'
 # Note attached to the ControlAudit for every dispatch (checklist 6).
 _DIAGNOSTIC_AUDIT_NOTE = 'diagnostic, not enforced'
 
+# Closed result vocabulary. Unrecognised backend_status raises; it
+# must not collapse to the absence token.
+KERNEL_RESULT_STATUSES = frozenset({
+    'ok',
+    'not_converged',
+    'out_of_domain',
+    'unavailable',
+    'refused',
+    'not_attempted',
+})
+
 
 class AlphaMELTSProvider(ChemistryProvider):
     """Diagnostic-only provider for AlphaMELTS via the kernel.
@@ -219,18 +230,29 @@ class AlphaMELTSProvider(ChemistryProvider):
             )
 
         if self._backend is None or not self._backend_available():
+            if self.transport_closed_mid_run():
+                from engines.alphamelts.thermoengine import (
+                    midrun_thermoengine_prior_close_result,
+                )
+                # A probe that never ran must not inherit the prior
+                # row's teardown — not status, reason, mode, or details.
+                status, reason, mode = midrun_thermoengine_prior_close_result()
+            else:
+                status = 'unavailable'
+                mode = 'unavailable'
+                reason = self._adapter_unavailable_reason()
             return IntentResult(
                 intent=request.intent,
-                status='unavailable',
+                status=status,
                 transition=None,
                 control_audit=control_audit,
                 diagnostic=LiquidusDiagnostics(
-                    mode='unavailable',
+                    mode=mode,
                     engine_version=self._engine_version(),
-                    backend_status='unavailable',
+                    backend_status=status,
                     **redox_diagnostic,
                 ).as_diagnostic(),
-                warnings=(self._adapter_unavailable_reason(),),
+                warnings=(reason,),
             )
 
         if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
@@ -264,35 +286,18 @@ class AlphaMELTSProvider(ChemistryProvider):
         diagnostics = _with_backend_status_reason(diagnostics)
 
         backend_status = diagnostics.backend_status
-        # Map the adapter's status vocabulary onto the kernel's. An
-        # UNRECOGNISED status refuses; it does NOT pass as success.
-        #
-        # This previously read `else 'ok'`, which is fail-open on exactly the
-        # case you cannot reason about: a status nobody taught this mapper.
-        # The project vocabulary is much wider than the four accepted here --
-        # a repo scan finds backend_status also set to failed, missing, stale,
-        # not_run, not_attempted, stub, diagnostic_stub, fallback,
-        # mixed_backend and no_compared_results, three of them in production
-        # code at simulator/optimize/fidelity.py. Every one of those would
-        # have been reported as a successful equilibrium. `failed -> ok` and
-        # `missing -> ok` are the whole fail-open class in two tokens.
-        #
-        # Doctrine: an unknown state is a missing input, category (1), so it
-        # refuses. 'unavailable' is the kernel's no-usable-result token, and
-        # the unrecognised value is recorded in the diagnostic rather than
-        # dropped, so the refusal is debuggable instead of merely safe.
-        _KERNEL_STATUSES = ('ok', 'not_converged', 'out_of_domain', 'unavailable')
+        # Closed kernel vocabulary. An unrecognised backend status
+        # raises — it must not become the absence token, and it must
+        # not silently become refused either. `refused` and
+        # `not_attempted` are first-class members so a typed row-local
+        # refusal cannot collapse to unavailable.
         extra_warnings: tuple[str, ...] = ()
-        if backend_status in _KERNEL_STATUSES:
-            kernel_status = backend_status
-        else:
-            kernel_status = 'unavailable'
-            # Carried as an extra warning rather than appended to
-            # diagnostics.backend_warnings, which is a tuple in some paths.
-            extra_warnings = (
-                f'unrecognised backend_status {backend_status!r} refused as '
-                f'unavailable; kernel accepts {_KERNEL_STATUSES}',
+        if backend_status not in KERNEL_RESULT_STATUSES:
+            raise RuntimeError(
+                f'unrecognised backend_status {backend_status!r}; '
+                f'kernel accepts {tuple(sorted(KERNEL_RESULT_STATUSES))}'
             )
+        kernel_status = backend_status
 
         return IntentResult(
             intent=request.intent,

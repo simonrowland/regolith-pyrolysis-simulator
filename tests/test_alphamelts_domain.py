@@ -135,9 +135,11 @@ def test_unrecognised_backend_status_refuses_instead_of_passing():
     assert "else 'ok'" not in code, (
         "unknown backend_status must not default to ok"
     )
-    assert "kernel_status = 'unavailable'" in code
-    # And the refusal must be visible, not silent.
+    assert "kernel_status = 'unavailable'" not in code
+    assert "KERNEL_RESULT_STATUSES" in src
+    # Unrecognised must raise, not collapse to the absence token.
     assert "unrecognised backend_status" in src
+    assert "kernel accepts" in src
 
 
 def test_melts_endmember_identity_matches_hand_worked_sio2_al2o3() -> None:

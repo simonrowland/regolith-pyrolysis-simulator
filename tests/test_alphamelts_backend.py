@@ -67,12 +67,19 @@ from simulator.vapour_rail.batch import (
     VapourBatch,
 )
 from engines.alphamelts.thermoengine import (
+    STATUS_BY_TIMEOUT_CAUSE,
+    THERMOENGINE_HEALTH_TIMEOUT_S,
     ThermoEngineFO2OmittedError,
     ThermoEngineFO2UndefinedError,
     ThermoEngineIsolationError,
     ThermoEngineNonFiniteField,
     ThermoEnginePayload,
+    ThermoEngineTimeoutCause,
+    ThermoEngineTimeoutError,
     ThermoEngineTransport,
+    classify_thermoengine_timeout_message,
+    thermoengine_timeout_cause_from_exception,
+    thermoengine_timeout_cause_from_text,
 )
 from engines.magemin.parity import MAGEMinParityComparator
 
@@ -2748,10 +2755,11 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
         engine_version = 'thermoengine fake'
 
         def __init__(self, *, model_name, activity_converter,
-                     equilibrate_timeout_s):
+                     equilibrate_timeout_s, health_timeout_s=None):
             self.model_name = model_name
             self.activity_converter = activity_converter
             self.equilibrate_timeout_s = equilibrate_timeout_s
+            self.health_timeout_s = health_timeout_s
 
         def initialize(self):
             return True
@@ -2766,6 +2774,10 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     assert backend._mode == 'thermoengine'
     assert backend.get_engine_version() == 'thermoengine fake'
     assert backend._thermoengine_transport.equilibrate_timeout_s == 3.0
+    assert (
+        backend._thermoengine_transport.health_timeout_s
+        == THERMOENGINE_HEALTH_TIMEOUT_S
+    )
 
 
 def test_thermoengine_backend_surfaces_typed_hang_and_keeps_respawn_transport():
@@ -3050,6 +3062,154 @@ def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
         'ThermoEngine smoke equilibrium completed',
     )
     assert len(calls) == 4
+
+
+def test_smoke_timeout_reason_is_derived_from_token_not_absence(monkeypatch):
+    """DEFECT 1: a TimeoutExpired smoke wall is unfinished, not missing."""
+
+    def fake_run(args, **kwargs):
+        raise subprocess.TimeoutExpired(args, kwargs['timeout'])
+
+    monkeypatch.setattr(
+        'engines.alphamelts.thermoengine.subprocess.run',
+        fake_run,
+    )
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    ok, reason = transport.health_check(timeout_s=1.0)
+
+    assert ok is False
+    assert 'unavailable' not in reason.lower()
+    cause = classify_thermoengine_timeout_message(reason)
+    assert cause is ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT
+    assert STATUS_BY_TIMEOUT_CAUSE[cause] == 'not_converged'
+    assert STATUS_BY_TIMEOUT_CAUSE[cause] != 'unavailable'
+    assert reason.startswith(f'{cause.value}:')
+    assert thermoengine_timeout_cause_from_text(reason) is cause
+    legacy = 'ThermoEngine smoke equilibrium timed out after 8.0s'
+    assert classify_thermoengine_timeout_message(legacy) is cause
+
+
+def test_initialize_smoke_timeout_raises_typed_timeout_not_import_error(
+    monkeypatch,
+):
+    """DEFECT 1: initialize must not wrap a timeout as transport-unavailable."""
+
+    def fake_run(args, **kwargs):
+        raise subprocess.TimeoutExpired(args, kwargs['timeout'])
+
+    monkeypatch.setattr(ThermoEngineTransport, 'initialize', lambda self: True)
+    monkeypatch.setattr(ThermoEngineTransport, 'close', lambda self: None)
+    monkeypatch.setattr(
+        'engines.alphamelts.thermoengine.subprocess.run',
+        fake_run,
+    )
+    backend = ThermoEngineBackend()
+    with pytest.raises(ThermoEngineTimeoutError) as excinfo:
+        backend.initialize({'thermoengine_health_timeout_s': 1.0})
+    assert excinfo.value.cause is ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT
+    assert excinfo.value.backend_failure_category == 'not_converged'
+    assert excinfo.value.backend_failure_category != 'unavailable'
+    assert 'unavailable' not in str(excinfo.value).lower()
+    assert backend.is_available() is False
+
+
+def test_never_installed_thermoengine_still_reports_unavailable(monkeypatch):
+    """P0: genuine absence must still mint the absence token."""
+
+    def fail_init(self):
+        raise ModuleNotFoundError("No module named 'thermoengine'")
+
+    monkeypatch.setattr(ThermoEngineTransport, 'initialize', fail_init)
+    backend = ThermoEngineBackend()
+    with pytest.raises(ImportError, match='transport unavailable') as excinfo:
+        backend.initialize({})
+    assert isinstance(excinfo.value.__cause__, ModuleNotFoundError)
+    assert thermoengine_timeout_cause_from_exception(excinfo.value) is None
+    assert backend.is_available() is False
+
+
+def test_timeout_cause_closed_set_forbids_absence_and_unclassified_raises():
+    assert set(STATUS_BY_TIMEOUT_CAUSE) == set(ThermoEngineTimeoutCause)
+    assert 'unavailable' not in set(STATUS_BY_TIMEOUT_CAUSE.values())
+    assert set(STATUS_BY_TIMEOUT_CAUSE.values()) <= {'not_converged'}
+    with pytest.raises(RuntimeError, match='unclassified'):
+        classify_thermoengine_timeout_message(
+            'some new hang nobody classified'
+        )
+    with pytest.raises(RuntimeError, match='unclassified'):
+        ThermoEngineTimeoutError('not_a_real_cause', timeout_s=1.0)
+
+
+def test_health_timeout_default_is_contention_robust_and_overridable(
+    monkeypatch,
+):
+    """DEFECT 2: smoke wall is 30s, overridable, and never unbounded."""
+
+    assert THERMOENGINE_HEALTH_TIMEOUT_S == 30.0
+    assert math.isfinite(THERMOENGINE_HEALTH_TIMEOUT_S)
+    assert THERMOENGINE_HEALTH_TIMEOUT_S > 8.0
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    assert transport.health_timeout_s == THERMOENGINE_HEALTH_TIMEOUT_S
+    seen: list[float] = []
+
+    def fake_run(args, **kwargs):
+        seen.append(float(kwargs['timeout']))
+        raise subprocess.TimeoutExpired(args, kwargs['timeout'])
+
+    monkeypatch.setattr(
+        'engines.alphamelts.thermoengine.subprocess.run',
+        fake_run,
+    )
+    transport.health_check()
+    assert seen == [THERMOENGINE_HEALTH_TIMEOUT_S]
+    overridden = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+        health_timeout_s=12.5,
+    )
+    overridden.health_check()
+    assert seen[-1] == 12.5
+    with pytest.raises(ValueError, match='finite bound'):
+        ThermoEngineTransport(
+            activity_converter=activity_from_chem_potential,
+            health_timeout_s=float('inf'),
+        )
+    with pytest.raises(ValueError, match='finite bound'):
+        transport.health_check(timeout_s=float('inf'))
+
+
+def test_backend_health_timeout_config_reaches_transport(monkeypatch):
+    class FakeThermoEngineTransport:
+        engine_version = 'thermoengine fake'
+
+        def __init__(self, *, model_name, activity_converter,
+                     equilibrate_timeout_s, health_timeout_s=None):
+            self.equilibrate_timeout_s = equilibrate_timeout_s
+            self.health_timeout_s = health_timeout_s
+
+        def initialize(self):
+            return True
+
+        def health_check(self, timeout_s=None):
+            return True, 'ThermoEngine smoke equilibrium completed'
+
+        def close(self):
+            return None
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.thermoengine.ThermoEngineTransport',
+        FakeThermoEngineTransport,
+    )
+    backend = ThermoEngineBackend()
+    assert backend.initialize({
+        'thermoengine_health_timeout_s': 41.0,
+        'thermoengine_equilibrate_timeout_s': 7.0,
+    }) is True
+    assert backend._thermoengine_transport.health_timeout_s == 41.0
+    assert backend._thermoengine_transport.equilibrate_timeout_s == 7.0
 
 
 def test_thermoengine_transport_rejects_unknown_model_name():
@@ -4595,6 +4755,512 @@ def test_thermoengine_backend_respawns_worker_after_nonfinite_field():
     assert worker.starts == 1
     assert worker.calls == 2
     assert backend.is_available() is True
+
+
+_FO2_BRACKET_VALUEERROR = (
+    'ThermoEngine absolute fO2 target is outside the attainable '
+    'Fe-redox bracket: requested=-9'
+)
+
+
+def test_thermoengine_fo2_bracket_valueerror_is_retyped_and_keeps_handle():
+    """Producer: OOD physics must not tear down a live transport."""
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_bracket(**_kwargs):
+        raise ValueError(_FO2_BRACKET_VALUEERROR)
+
+    transport.equilibrate = _remote_bracket
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ThermoEngineOutOfDomainError) as excinfo:
+        backend._equilibrate_thermoengine(
+            1626.85,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+    assert (
+        excinfo.value.cause
+        is ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET
+    )
+    assert excinfo.value.backend_failure_category == 'out_of_domain'
+    assert backend.is_available() is True
+    assert backend._thermoengine_transport is transport
+    assert backend.transport_close_count() == 0
+    assert backend.unavailable_reason() == ''
+
+
+def test_thermoengine_typed_fo2_ood_does_not_close_transport():
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_typed(**_kwargs):
+        raise ThermoEngineOutOfDomainError(
+            ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+            requested=-9.0,
+        )
+
+    transport.equilibrate = _remote_typed
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ThermoEngineOutOfDomainError):
+        backend._equilibrate_thermoengine(
+            1750.0,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+    assert backend.is_available() is True
+    assert backend.transport_close_count() == 0
+
+
+def test_thermoengine_close_refuses_timeout_cause():
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = object()
+    backend._mode = 'thermoengine'
+    with pytest.raises(RuntimeError, match='must not close'):
+        backend._close_after_failure(
+            ThermoEngineTimeoutError(
+                ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT,
+                timeout_s=1.0,
+            )
+        )
+    assert backend.is_available() is True
+    assert backend.transport_close_count() == 0
+
+
+def test_thermoengine_close_refuses_out_of_domain_cause():
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = object()
+    backend._mode = 'thermoengine'
+    with pytest.raises(RuntimeError, match='must not close'):
+        backend._close_after_failure(
+            ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+                requested=-9.0,
+            )
+        )
+    assert backend.is_available() is True
+    assert backend.transport_close_count() == 0
+
+
+_SMOKE_OOD_HEALTH_REASON = (
+    'ThermoEngine smoke equilibrium failed: ThermoEngineOutOfDomainError: '
+    'fo2_outside_attainable_bracket: ThermoEngine absolute fO2 target is '
+    'outside the attainable Fe-redox bracket: requested=-9'
+)
+
+_IMPORT_ERROR_QUOTING_REFUSAL_MARK = ImportError(
+    'ThermoEngine worker died after: fo2_outside_attainable_bracket: '
+    'ThermoEngine absolute fO2 target is outside the attainable '
+    'Fe-redox bracket: requested=-9'
+)
+
+
+def test_initialize_ood_smoke_closes_and_raises_importerror(monkeypatch):
+    """Init-time OOD-marked smoke failure must close and keep ImportError."""
+    from engines.alphamelts.thermoengine import (
+        thermoengine_refusal_cause_from_exception,
+    )
+
+    created: list[object] = []
+
+    class FakeThermoEngineTransport:
+        engine_version = 'thermoengine fake'
+
+        def __init__(
+            self,
+            *,
+            model_name,
+            activity_converter,
+            equilibrate_timeout_s,
+            health_timeout_s=None,
+        ):
+            self.close_calls = 0
+            created.append(self)
+
+        def initialize(self):
+            return True
+
+        def health_check(self, timeout_s=None):
+            return False, _SMOKE_OOD_HEALTH_REASON
+
+        def close(self):
+            self.close_calls += 1
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.thermoengine.ThermoEngineTransport',
+        FakeThermoEngineTransport,
+    )
+    backend = ThermoEngineBackend()
+    smoke_exc = ImportError(_SMOKE_OOD_HEALTH_REASON)
+    assert thermoengine_refusal_cause_from_exception(smoke_exc) is not None
+
+    with pytest.raises(ImportError) as excinfo:
+        backend.initialize({})
+    assert type(excinfo.value) is ImportError
+    assert 'must not close the transport' not in str(excinfo.value)
+    assert _SMOKE_OOD_HEALTH_REASON in str(excinfo.value)
+    assert len(created) == 1
+    assert created[0].close_calls == 1
+    assert backend._thermoengine_transport is None
+    assert backend.is_available() is False
+    assert backend.transport_close_count() == 0
+
+
+def test_midrun_ood_keeps_handle_and_never_emits_absence_token():
+    """Live mid-run OOD must keep the handle and must not mint absence."""
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+    from benchmarks.melt_activity_benchmark import classify_engine_exception
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_typed(**_kwargs):
+        raise ThermoEngineOutOfDomainError(
+            ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+            requested=-9.0,
+        )
+
+    transport.equilibrate = _remote_typed
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ThermoEngineOutOfDomainError) as excinfo:
+        backend._equilibrate_thermoengine(
+            1750.0,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+    assert type(excinfo.value) is ThermoEngineOutOfDomainError
+    assert backend.is_available() is True
+    assert backend._thermoengine_transport is transport
+    assert backend.transport_close_count() == 0
+    assert backend.unavailable_reason() == ''
+    status, reason = classify_engine_exception(excinfo.value)
+    assert status != 'unavailable'
+    assert 'unavailable' not in reason.lower()
+
+
+def test_midrun_importerror_quoting_refusal_mark_closes_and_is_counted():
+    """Adapter death whose ImportError quotes a refusal mark must close."""
+    from engines.alphamelts.thermoengine import (
+        thermoengine_refusal_cause_from_exception,
+    )
+
+    assert (
+        thermoengine_refusal_cause_from_exception(
+            _IMPORT_ERROR_QUOTING_REFUSAL_MARK
+        )
+        is not None
+    )
+
+    class DyingTransport:
+        def __init__(self):
+            self.close_calls = 0
+
+        def equilibrate(self, **_kwargs):
+            raise ImportError(str(_IMPORT_ERROR_QUOTING_REFUSAL_MARK))
+
+        def close(self):
+            self.close_calls += 1
+
+    backend = ThermoEngineBackend()
+    transport = DyingTransport()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ImportError) as excinfo:
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+    assert type(excinfo.value) is ImportError
+    assert 'must not close the transport' not in str(excinfo.value)
+    assert transport.close_calls == 1
+    assert backend._thermoengine_transport is None
+    assert backend.is_available() is False
+    assert backend.transport_close_count() == 1
+    assert backend.transport_closed_mid_run() is True
+    with pytest.raises(ImportError, match='not initialized'):
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+
+
+def test_thermoengine_transport_remaps_ood_remote_by_name():
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_ood(_kwargs):
+        raise EngineWorkerRemoteError(
+            'ThermoEngineOutOfDomainError',
+            (
+                'fo2_outside_attainable_bracket: ThermoEngine absolute fO2 '
+                'target is outside the attainable Fe-redox bracket: '
+                'requested=-9'
+            ),
+            'remote-traceback',
+        )
+
+    transport._worker.call = _remote_ood
+    with pytest.raises(ThermoEngineOutOfDomainError) as excinfo:
+        transport.equilibrate(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            comp_wt=_melts_domain_composition(),
+            fO2_log=-9.0,
+        )
+    assert (
+        excinfo.value.cause
+        is ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET
+    )
+    assert excinfo.value.requested == pytest.approx(-9.0)
+
+
+def test_thermoengine_fo2_requires_iron_is_retyped_and_keeps_handle():
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+
+    def _remote_no_fe(**_kwargs):
+        raise ValueError(
+            'ThermoEngine cannot impose absolute fO2 without FeO/Fe2O3'
+        )
+
+    transport.equilibrate = _remote_no_fe
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(ThermoEngineOutOfDomainError) as excinfo:
+        backend._equilibrate_thermoengine(
+            1750.0,
+            {'SiO2': 50.0, 'Al2O3': 20.0, 'CaO': 30.0},
+            -9.0,
+            1.0,
+        )
+    assert excinfo.value.cause is ThermoEngineRefusalCause.FO2_REQUIRES_IRON
+    assert excinfo.value.backend_failure_category == 'refused'
+    assert backend.is_available() is True
+    assert backend.transport_close_count() == 0
+
+
+def test_unclassified_ood_message_raises_instead_of_inheriting():
+    from engines.alphamelts.thermoengine import (
+        reconstruct_thermoengine_out_of_domain_error,
+        thermoengine_refusal_cause_from_text,
+    )
+
+    with pytest.raises(RuntimeError, match='unclassified'):
+        reconstruct_thermoengine_out_of_domain_error(
+            'some new physics refusal nobody classified'
+        )
+    with pytest.raises(RuntimeError, match='unclassified'):
+        thermoengine_refusal_cause_from_text(
+            'some new physics refusal nobody classified'
+        )
+
+
+def test_classifier_rejects_first_colon_fragment_win():
+    """P2-B: a later token in a debug string must not steal the cause."""
+    from engines.alphamelts.thermoengine import (
+        classify_thermoengine_refusal_message,
+    )
+
+    with pytest.raises(RuntimeError, match='unclassified'):
+        classify_thermoengine_refusal_message(
+            'debug: fo2_requires_iron: later we also saw '
+            'fo2_outside_attainable_bracket: requested=-9'
+        )
+
+
+def test_fo2_impose_sibling_causes_are_closed_and_keep_handle():
+    """P1-B: impose-family raises classify and do not tear the transport."""
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+        classify_thermoengine_refusal_message,
+    )
+
+    expected = (
+        (
+            'ThermoEngine Kress91 fO2 seed must have a positive finite '
+            'ferric fraction below one',
+            ThermoEngineRefusalCause.FO2_SEED_NOT_INTERIOR,
+            'out_of_domain',
+        ),
+        (
+            'ThermoEngine non-monotonic/buffered fO2 region: '
+            'ferric fractions 0.1..0.2 echo 1..1',
+            ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED,
+            'out_of_domain',
+        ),
+        (
+            'ThermoEngine fO2 bracket collapsed in ferric-fraction '
+            'space before its fO2 width converged',
+            ThermoEngineRefusalCause.FO2_BRACKET_COLLAPSED,
+            'out_of_domain',
+        ),
+        (
+            'ThermoEngine failed to impose absolute fO2 within tolerance',
+            ThermoEngineRefusalCause.FO2_IMPOSE_OUTSIDE_TOLERANCE,
+            'out_of_domain',
+        ),
+        (
+            'ThermoEngine cannot echo imposed fO2 without a liquid phase',
+            ThermoEngineRefusalCause.FO2_ECHO_REQUIRES_LIQUID,
+            'out_of_domain',
+        ),
+        (
+            'ThermoEngine returned a non-finite fO2 echo',
+            ThermoEngineRefusalCause.FO2_ECHO_NONFINITE,
+            'out_of_domain',
+        ),
+        (
+            'ThermoEngine absolute fO2 target must be finite',
+            ThermoEngineRefusalCause.FO2_TARGET_NOT_FINITE,
+            'refused',
+        ),
+    )
+    def _raise_message(text: str):
+        def _equilibrate(**_kwargs):
+            raise ValueError(text)
+        return _equilibrate
+
+    for message, cause, status in expected:
+        assert classify_thermoengine_refusal_message(message) is cause
+        transport = ThermoEngineTransport(
+            activity_converter=activity_from_chem_potential,
+        )
+        transport.equilibrate = _raise_message(message)
+        backend = ThermoEngineBackend()
+        backend._thermoengine_transport = transport
+        backend._mode = 'thermoengine'
+        with pytest.raises(ThermoEngineOutOfDomainError) as excinfo:
+            backend._equilibrate_thermoengine(
+                1400.0,
+                _melts_domain_composition(),
+                -9.0,
+                1.0,
+            )
+        assert excinfo.value.cause is cause
+        assert excinfo.value.backend_failure_category == status
+        assert backend.is_available() is True
+        assert backend.transport_close_count() == 0
+
+
+def test_untyped_close_then_next_probe_is_not_attempted():
+    """P1-A: untyped teardown must not fabricate the next row's fields."""
+    from engines.alphamelts import AlphaMELTSProvider
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+    )
+    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+    from simulator.chemistry.kernel.dto import ProviderAccountView
+
+    class _OnceThenDead:
+        def __init__(self):
+            self.calls = 0
+
+        def equilibrate(self, **_kwargs):
+            self.calls += 1
+            raise RuntimeError('affinity shape mismatch')
+
+        def close(self):
+            return None
+
+    backend = ThermoEngineBackend()
+    transport = _OnceThenDead()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+    provider = AlphaMELTSProvider(backend=backend)
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        account_view=ProviderAccountView(
+            accounts={
+                'process.cleaned_melt': {
+                    'SiO2': 0.8,
+                    'Al2O3': 0.15,
+                    'FeO': 0.1,
+                    'MgO': 0.2,
+                    'CaO': 0.15,
+                    'Na2O': 0.05,
+                }
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1626.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        control_inputs={},
+    )
+    with pytest.raises(RuntimeError, match='affinity shape mismatch'):
+        provider.dispatch(request)
+    assert transport.calls == 1
+    assert backend.transport_close_count() == 1
+    second = provider.dispatch(request)
+    assert transport.calls == 1
+    assert second.status == THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    assert second.warnings == (THERMOENGINE_PRIOR_TRANSPORT_CLOSED_REASON,)
+    assert 'affinity shape' not in second.warnings[0]
+    diagnostic = second.diagnostic or {}
+    assert diagnostic.get('mode') != 'thermoengine'
+    assert diagnostic.get('backend_status') == (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    )
 
 
 def test_thermoengine_solution_mu_recovers_before_finite_validation(monkeypatch):

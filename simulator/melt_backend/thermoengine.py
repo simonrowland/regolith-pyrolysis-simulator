@@ -6,11 +6,18 @@ from typing import List, Mapping, Optional
 import warnings
 
 from engines.alphamelts.thermoengine import (
+    THERMOENGINE_HEALTH_TIMEOUT_S,
     THERMOENGINE_WARM_CALL_TIMEOUT_S,
     ThermoEngineFO2OmittedError,
     ThermoEngineFO2UndefinedError,
     ThermoEngineNonFiniteField,
+    ThermoEngineOutOfDomainError,
+    ThermoEngineRefusalCause,
+    ThermoEngineTimeoutError,
     ThermoEngineTransport,
+    reconstruct_thermoengine_out_of_domain_error,
+    thermoengine_refusal_cause_from_exception,
+    thermoengine_timeout_cause_from_exception,
 )
 from simulator.engine_pool import EngineWorkerTimeout
 from simulator.melt_backend.alphamelts import (
@@ -44,7 +51,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         self._thermoengine_import_error: Optional[BaseException] = None
         self._unavailable_reason: Optional[str] = None
         self._transport_close_count = 0
-        self._health_timeout_s = 8.0
+        self._health_timeout_s = THERMOENGINE_HEALTH_TIMEOUT_S
 
     @property
     def transport(self) -> Optional[ThermoEngineTransport]:
@@ -65,7 +72,10 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         self._thermoengine_import_error = None
         self._unavailable_reason = None
         self._model = str(config.get('model', self._model))
-        raw_health_timeout_s = config.get('thermoengine_health_timeout_s', 8.0)
+        raw_health_timeout_s = config.get(
+            'thermoengine_health_timeout_s',
+            THERMOENGINE_HEALTH_TIMEOUT_S,
+        )
         raw_equilibrate_timeout_s = config.get(
             'thermoengine_equilibrate_timeout_s',
             THERMOENGINE_WARM_CALL_TIMEOUT_S,
@@ -84,6 +94,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 model_name=self._model,
                 activity_converter=activity_from_chem_potential,
                 equilibrate_timeout_s=float(raw_equilibrate_timeout_s),
+                health_timeout_s=self._health_timeout_s,
             )
             self._thermoengine_transport = transport
             transport.initialize()
@@ -91,11 +102,27 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             if callable(health_check):
                 ok, reason = health_check(timeout_s=self._health_timeout_s)
                 if not ok:
+                    timeout_cause = thermoengine_timeout_cause_from_exception(
+                        RuntimeError(reason)
+                    )
+                    if timeout_cause is not None:
+                        raise ThermoEngineTimeoutError(
+                            timeout_cause,
+                            timeout_s=self._health_timeout_s,
+                        )
                     raise ImportError(reason)
             self._engine_version = transport.engine_version
             self._mode = 'thermoengine'
             self._unavailable_reason = None
             return True
+        except ThermoEngineTimeoutError as exc:
+            try:
+                self.close()
+            except Exception as cleanup_error:  # noqa: BLE001 - preserve timeout
+                exc.add_note(
+                    f'ThermoEngine cleanup also failed: {cleanup_error}'
+                )
+            raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             self._thermoengine_import_error = exc
             self._close_after_failure(exc)
@@ -149,6 +176,23 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             self._thermoengine_transport is not None
             and self._mode == 'thermoengine'
         )
+        # ImportError is adapter death even when its text quotes a
+        # refusal mark. The no-close guard is only for a live mid-run
+        # physics refusal / unfinished compute — not init, and not a
+        # genuine adapter-death ImportError.
+        if had_live_transport and not isinstance(primary_error, ImportError):
+            ood = thermoengine_refusal_cause_from_exception(primary_error)
+            if ood is not None:
+                raise RuntimeError(
+                    'out-of-domain ThermoEngine refusal must not close the '
+                    f'transport (cause={ood.value})'
+                )
+            timeout = thermoengine_timeout_cause_from_exception(primary_error)
+            if timeout is not None:
+                raise RuntimeError(
+                    'unfinished ThermoEngine computation must not close the '
+                    f'transport (cause={timeout.value})'
+                )
         self._unavailable_reason = (
             f'ThermoEngine transport closed after '
             f'{type(primary_error).__name__}: {primary_error}'
@@ -301,16 +345,16 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 raise ThermoEngineFO2OmittedError(detail)
             if fO2_log is not None:
                 if solved_fO2_log is None:
-                    raise RuntimeError(
+                    raise ThermoEngineFO2UndefinedError(
                         'ThermoEngine equilibrium did not report the requested '
                         'solved fO2'
                     )
                 echo_delta = abs(solved_fO2_log - float(fO2_log))
                 if echo_delta >= 1.0e-3:
-                    raise RuntimeError(
-                        'ThermoEngine absolute fO2 echo outside tolerance: '
-                        f'requested={float(fO2_log):g}, '
-                        f'solved={solved_fO2_log:g}'
+                    raise ThermoEngineOutOfDomainError(
+                        ThermoEngineRefusalCause.FO2_ECHO_OUTSIDE_TOLERANCE,
+                        requested=float(fO2_log),
+                        solved=solved_fO2_log,
                     )
                 fO2_transport = 'thermoengine_oxygen_root'
                 clamp_diagnostics['requested_fO2_log'] = float(fO2_log)
@@ -421,6 +465,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             ThermoEngineNonFiniteField,
             ThermoEngineFO2UndefinedError,
             ThermoEngineFO2OmittedError,
+            ThermoEngineOutOfDomainError,
         ):
             # TYPED keep-handle. Complete set:
             #   EngineWorkerTimeout           — pool already evicted the child
@@ -430,20 +475,28 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             #                                   no typed proven-undefined
             #                                   reason (failed assemblage
             #                                   or unexplained missing echo)
-            # NonFinite, FO2Undefined, and FO2Omitted are ValueError
-            # subclasses: do not add `except ValueError` on this path.
-            # The child may already be dead; the parent transport
-            # handle stays.
+            #   ThermoEngineOutOfDomainError  — unattainable fO2 / echo
+            # NonFinite, FO2Undefined, FO2Omitted, and OutOfDomain are
+            # ValueError subclasses: do not add `except ValueError` on
+            # this path. The child may already be dead; the parent
+            # transport handle stays.
             raise
         except ImportError as exc:
             # Genuine adapter death. Close is correct.
             self._close_after_failure(exc)
             raise
         except Exception as exc:
+            # Legacy wire / remapped ValueError may still carry an
+            # out-of-domain mark. Retype it; never close on OOD.
+            cause = thermoengine_refusal_cause_from_exception(exc)
+            if cause is not None:
+                raise reconstruct_thermoengine_out_of_domain_error(
+                    str(exc)
+                ) from exc
             # UNTYPED close. Sequential mode may still latch here
-            # (builtin TimeoutError remap, remapped ValueError, unknown
-            # child exc_name → RuntimeError, parent-side RuntimeError
-            # other than FO2Omitted, ThermoEngineIsolationError).
+            # (builtin TimeoutError remap, unknown child exc_name →
+            # RuntimeError, parent-side RuntimeError other than the
+            # typed keep-handles, ThermoEngineIsolationError).
             # Isolated retry remains required. Isolated-mode ceilings
             # (e.g. 12→32) are not a sequential result of the typed
             # keep-handle.
@@ -458,4 +511,6 @@ __all__ = [
     'ThermoEngineFO2OmittedError',
     'ThermoEngineFO2UndefinedError',
     'ThermoEngineNonFiniteField',
+    'ThermoEngineOutOfDomainError',
+    'ThermoEngineTimeoutError',
 ]
