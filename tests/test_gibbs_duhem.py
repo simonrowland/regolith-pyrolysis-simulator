@@ -326,3 +326,203 @@ def test_internal_analytic_engine_produces_a_typed_report():
         "consistency_index",
         "skipped_nodes",
     }
+
+
+# ---------------------------------------------------------------------------
+# battery_verdict: the two-condition rule (rectified index AND materiality)
+# ---------------------------------------------------------------------------
+
+from benchmarks.gibbs_duhem import battery_verdict  # noqa: E402
+
+
+def _tiny_tail_inconsistent_activities(wt):
+    """Inconsistent in SHAPE but with numerically tiny gamma variation.
+
+    Same independent-gamma construction as _inconsistent_activities but with
+    B scaled to 1e-5, mimicking the measured internal_analytic shell-adjacent
+    rows: rectified index ~1.0 over TV far below the 1e-3 materiality floor.
+    A one-condition verdict on the index alone would flag this as a defect;
+    the ratified two-condition rule must not.
+    """
+
+    x = mole_fractions_from_wt(wt)
+    import math as _math
+
+    return {
+        "SiO2": x["SiO2"] * _math.exp(1e-5 * x["SiO2"]),
+        "CaO": x["CaO"] * 1.0,
+    }
+
+
+def test_verdict_consistent_on_material_variation():
+    report = gibbs_duhem_residual(
+        _consistent_activities, START, END, T_K=1673.15, engine_name="synthetic"
+    )
+    assert report.total_variation > 1e-3
+    assert battery_verdict(report) == "consistent_on_this_path"
+
+
+def test_verdict_flags_material_inconsistency():
+    report = gibbs_duhem_residual(
+        _inconsistent_activities, START, END, T_K=1673.15, engine_name="synthetic"
+    )
+    assert report.total_variation > 1e-3
+    assert battery_verdict(report) == "inconsistent"
+
+
+def test_verdict_two_condition_rule_spares_immaterial_violation():
+    report = gibbs_duhem_residual(
+        _tiny_tail_inconsistent_activities,
+        START,
+        END,
+        T_K=1673.15,
+        engine_name="synthetic",
+    )
+    # The trap this rule exists for: index says O(1), physics says nothing.
+    assert report.rectified_index is not None and report.rectified_index > 0.5
+    assert report.total_variation < 1e-3
+    assert battery_verdict(report) == "immaterial_variation"
+
+
+def test_verdict_constant_gamma_is_immaterial_not_consistent():
+    report = gibbs_duhem_residual(
+        _constant_gamma_activities, START, END, T_K=1673.15, engine_name="synthetic"
+    )
+    assert battery_verdict(report) == "immaterial_variation"
+
+
+def test_verdict_not_evaluable_when_coverage_cannot_close():
+    """Adapter exposing only ONE of two components -> every node skipped.
+
+    This is the structural MELTS-family outcome (parent-oxide adapter carries
+    no CaO/MgO/alkali activities): the sum cannot close anywhere, and the
+    verdict must say not_evaluable rather than anything reassuring.
+    """
+
+    def only_sio2(wt):
+        x = mole_fractions_from_wt(wt)
+        return {"SiO2": x["SiO2"]}
+
+    report = gibbs_duhem_residual(
+        only_sio2, START, END, T_K=1673.15, engine_name="partial-adapter"
+    )
+    assert len(report.skipped_nodes) == report.n_nodes
+    assert battery_verdict(report) == "not_evaluable"
+
+
+def test_verdict_thresholds_are_overridable_and_defaults_asserted():
+    """Both knobs exercised in both directions, and the default pinned.
+
+    Review 2026-08-19 (grok P2-2): the earlier version asserted only one
+    hostile direction of one knob and never the default — an always-
+    "inconsistent" constant satisfied it. Each assert here excludes at least
+    one constant-function replacement.
+    """
+
+    report = gibbs_duhem_residual(
+        _consistent_activities, START, END, T_K=1673.15, engine_name="synthetic"
+    )
+    assert battery_verdict(report) == "consistent_on_this_path"
+    assert battery_verdict(report, index_threshold=-1.0) == "inconsistent"
+    # Floor raised above this path's real TV: material becomes immaterial.
+    assert (
+        battery_verdict(report, materiality_floor_ln=report.total_variation * 2)
+        == "immaterial_variation"
+    )
+
+
+def test_verdict_boundaries_are_exclusive_flag_inclusive_immaterial():
+    """TV exactly at the floor is immaterial (<=); index exactly at the
+    threshold is not flagged (strict >). Pins the boundary semantics the
+    docstring implies (review P3-1)."""
+
+    report = gibbs_duhem_residual(
+        _inconsistent_activities, START, END, T_K=1673.15, engine_name="synthetic"
+    )
+    assert battery_verdict(report, materiality_floor_ln=report.total_variation) == (
+        "immaterial_variation"
+    )
+    assert report.rectified_index is not None
+    assert (
+        battery_verdict(report, index_threshold=report.rectified_index)
+        == "consistent_on_this_path"
+    )
+
+
+def test_verdict_keys_on_closed_segments_not_usable_nodes():
+    """The two measured misclassification directions of the node-count
+    predicate (review P1-1): isolated usable nodes must be not_evaluable no
+    matter how many there are; two ADJACENT usable nodes carrying a material
+    inconsistent residual must flag."""
+
+    n_nodes = 21
+
+    # Build refusal patterns by node index via a stateful wrapper: the
+    # activity_fn sees compositions, not indices, so count calls instead.
+    def by_index(pattern, base_fn):
+        calls = {"i": -1}
+
+        def fn(wt):
+            calls["i"] += 1
+            # gibbs_duhem_residual runs a second fine pass only when nothing
+            # was skipped; these patterns always skip, so indices are stable.
+            return base_fn(wt) if pattern(calls["i"] % n_nodes) else None
+
+        return fn
+
+    isolated = gibbs_duhem_residual(
+        by_index(lambda i: i % 2 == 0, _inconsistent_activities),
+        START,
+        END,
+        T_K=1673.15,
+        engine_name="synthetic",
+    )
+    assert isolated.closed_segments == 0
+    assert isolated.n_nodes - len(isolated.skipped_nodes) == 11
+    assert battery_verdict(isolated) == "not_evaluable"
+
+    adjacent_pair = gibbs_duhem_residual(
+        by_index(lambda i: i in (10, 11), _inconsistent_activities),
+        START,
+        END,
+        T_K=1673.15,
+        engine_name="synthetic",
+    )
+    assert adjacent_pair.closed_segments == 1
+    assert adjacent_pair.total_variation > 1e-3
+    assert battery_verdict(adjacent_pair) == "inconsistent"
+
+
+def test_verdict_never_crashes_on_hand_built_reports():
+    """A public classifier returns tokens, not AssertionError/TypeError
+    (review P2-1): material TV with a None or NaN index is unreadable
+    evidence, not a crash."""
+
+    from benchmarks.gibbs_duhem import GibbsDuhemReport
+
+    for index in (None, float("nan")):
+        report = GibbsDuhemReport(
+            n_nodes=21,
+            total_variation=0.01,
+            rectified_index=index,
+            closed_segments=5,
+        )
+        assert battery_verdict(report) == "not_evaluable"
+
+
+def test_zero_segments_note_replaces_trivial_wording():
+    """TV == 0 from zero segments must say "untested", never "trivially
+    satisfied" (review P1-1: the triviality note dressed an untested path as
+    a tested-and-small one)."""
+
+    def only_sio2(wt):
+        x = mole_fractions_from_wt(wt)
+        return {"SiO2": x["SiO2"]}
+
+    report = gibbs_duhem_residual(
+        only_sio2, START, END, T_K=1673.15, engine_name="partial-adapter"
+    )
+    assert report.closed_segments == 0
+    joined = " ".join(report.notes)
+    assert "never integrated" in joined
+    assert "satisfied trivially" not in joined

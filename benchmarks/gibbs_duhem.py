@@ -132,6 +132,11 @@ class GibbsDuhemReport:
     max_segment_residual: float = 0.0
     #: Nodes the engine refused / returned unusable activities for, by index.
     skipped_nodes: tuple[int, ...] = ()
+    #: Segments actually integrated (adjacent usable pairs with a shared
+    #: component set). Zero means NOTHING was tested — isolated usable nodes
+    #: and all-birth paths accumulate no residual and no TV, which is not the
+    #: same thing as a constant-gamma trivial pass (review 2026-08-19, P1-1).
+    closed_segments: int = 0
     notes: tuple[str, ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
@@ -148,6 +153,7 @@ class GibbsDuhemReport:
             "residual_at_double_resolution": self.residual_at_double_resolution,
             "max_segment_residual": self.max_segment_residual,
             "skipped_nodes": list(self.skipped_nodes),
+            "closed_segments": self.closed_segments,
             "notes": list(self.notes),
         }
 
@@ -243,6 +249,7 @@ def _residual_over_nodes(
     total_variation = 0.0
     max_segment = 0.0
     birth_segments = 0
+    closed_segments = 0
     for left, right in zip(evaluated, evaluated[1:]):
         if left is None or right is None:
             continue
@@ -264,6 +271,7 @@ def _residual_over_nodes(
         residual += segment
         rectified += abs(segment)
         max_segment = max(max_segment, abs(segment))
+        closed_segments += 1
     return (
         residual,
         rectified,
@@ -271,6 +279,7 @@ def _residual_over_nodes(
         max_segment,
         skipped,
         birth_segments,
+        closed_segments,
         components,
     )
 
@@ -301,6 +310,7 @@ def gibbs_duhem_residual(
         max_segment,
         skipped,
         birth_segments,
+        closed_segments,
         components,
     ) = _residual_over_nodes(activity_fn, nodes)
 
@@ -310,7 +320,7 @@ def gibbs_duhem_residual(
     double_res: float | None = None
     if not skipped:
         fine_nodes = _path_nodes(start_wt, end_wt, 2 * n_nodes - 1)
-        fine_residual, _, _, _, fine_skipped, _, _ = _residual_over_nodes(
+        fine_residual, _, _, _, fine_skipped, _, _, _ = _residual_over_nodes(
             activity_fn, fine_nodes
         )
         if not fine_skipped:
@@ -318,17 +328,27 @@ def gibbs_duhem_residual(
 
     trivial = tv < TRIVIAL_TOTAL_VARIATION_FLOOR
     notes: list[str] = []
-    if trivial:
+    if trivial and closed_segments > 0:
         notes.append(
             "no gamma variation along this path: the identity is satisfied "
             "trivially (e.g. a constant-gamma model) and this run is NOT "
             "evidence of consistency on paths where gamma varies"
         )
+    if closed_segments == 0:
+        # Review 2026-08-19 (grok P1-1): TV == 0 here means NOTHING WAS
+        # INTEGRATED, not that gamma was constant — isolated usable nodes and
+        # all-birth paths form zero segments. Without this note the trivial
+        # wording above would dress an untested path as a tested-and-small one.
+        notes.append(
+            "zero closed segments: no adjacent usable node pair existed, so "
+            "the identity was never integrated on this path — this is an "
+            "untested path, not a trivially-satisfied one"
+        )
     if skipped:
         notes.append(
             f"{len(skipped)} of {n_nodes} nodes skipped (engine refusal or "
             "incomplete activity coverage); the residual covers the remaining "
-            "contiguous segments only"
+            f"{closed_segments} contiguous segment(s) only"
         )
     if birth_segments:
         notes.append(
@@ -349,14 +369,90 @@ def gibbs_duhem_residual(
         residual_at_double_resolution=double_res,
         max_segment_residual=max_segment,
         skipped_nodes=tuple(skipped),
+        closed_segments=closed_segments,
         notes=tuple(notes),
     )
 
 
+#: Two-condition battery verdict thresholds, ratified by the first
+#: commissioning runs (t-706, 2026-08-19). A scale-free index alone screams
+#: 1.0 on near-trivial paths (measured: internal_analytic shell-adjacent rows
+#: at rectified 1.0 over TV 7e-8..8e-6 ln units — true violations of no
+#: physical consequence), so the battery flags only when BOTH hold:
+#: rectified_index above threshold AND total variation above materiality.
+#: Materiality floor 1e-3 ln units: five orders above the 1e-9 float-noise
+#: TV floor, at the bottom of the gamma effects this project acts on.
+#: Index threshold 0.1: measured consistent engines sit at 1e-4..4e-3
+#: (internal_analytic substantive paths; IMCC in-domain) and measured true
+#: violations at 1.0 — an order-of-magnitude gap on either side of 0.1.
+BATTERY_INDEX_THRESHOLD = 0.1
+BATTERY_MATERIALITY_FLOOR_LN = 1e-3
+
+def battery_verdict(
+    report: GibbsDuhemReport,
+    *,
+    index_threshold: float = BATTERY_INDEX_THRESHOLD,
+    materiality_floor_ln: float = BATTERY_MATERIALITY_FLOOR_LN,
+) -> str:
+    """Two-condition commissioning verdict for one GD path report.
+
+    The evaluability predicate is CLOSED SEGMENTS, not usable-node count
+    (review 2026-08-19, grok P1-1, measured both failure directions): one
+    closed segment needs two ADJACENT usable nodes, so eleven alternating
+    usable nodes can integrate nothing while two adjacent ones carry a real
+    material residual. Counting nodes misclassified both.
+
+    Vocabulary (no bare "ok"/"pass" — each token states what was actually
+    established):
+
+    - ``not_evaluable``: zero closed segments — the identity was never
+      integrated on this path (engine refusals, incomplete activity coverage,
+      or all-birth segments). This is the structural outcome for adapters
+      that expose activities for only a subset of melt components (e.g. the
+      MELTS-family parent-oxide adapter, which refuses CaO/MgO and carries no
+      alkali activities): the sum cannot close, and the checker refuses to
+      fabricate a partial closure. Also the token for a non-finite or absent
+      index on an otherwise material path: a number that cannot be read is
+      not evidence either way.
+    - ``immaterial_variation``: segments were integrated but traversed gamma
+      variation at or below the materiality floor; whatever the index says
+      there, it is not evidence of consistency OR of actionable
+      inconsistency.
+    - ``inconsistent``: rectified index above threshold on material
+      variation — the flag condition, requiring BOTH. Not path-suffixed on
+      purpose: one integrated counterexample falsifies model consistency
+      globally (existential claim), where consistency is only ever
+      established path-by-path (universal claim).
+    - ``consistent_on_this_path``: the identity closes on material
+      variation. Path-scoped on purpose: consistency elsewhere, and
+      correctness anywhere, are not established (GD is a wrong-shape
+      detector, never a correctness certificate).
+    """
+
+    if report.closed_segments == 0:
+        return "not_evaluable"
+    if report.total_variation <= materiality_floor_ln:
+        return "immaterial_variation"
+    # rectified_index is None below the 1e-9 triviality floor, which the
+    # materiality branch normally absorbs — but hostile floor overrides and
+    # hand-built/deserialized reports can reach here with None or NaN. A
+    # crash is the wrong shape for a public classifier; an unreadable index
+    # on a material path is not evidence either way (review P2-1).
+    index = report.rectified_index
+    if index is None or not math.isfinite(index):
+        return "not_evaluable"
+    if index > index_threshold:
+        return "inconsistent"
+    return "consistent_on_this_path"
+
+
 __all__ = [
+    "BATTERY_INDEX_THRESHOLD",
+    "BATTERY_MATERIALITY_FLOOR_LN",
     "TRIVIAL_TOTAL_VARIATION_FLOOR",
     "GibbsDuhemInapplicable",
     "GibbsDuhemReport",
+    "battery_verdict",
     "gibbs_duhem_residual",
     "mole_fractions_from_wt",
 ]
