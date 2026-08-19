@@ -290,6 +290,17 @@ def test_cro2_composite_refuses_missing_activity_evidence() -> None:
 
 
 def test_sio_typed_alpha_correlation_remains_flux_eligible() -> None:
+    """Typed SiO alpha does not replace the required melt activity.
+
+    344a8d06 (RG-1 precondition) routes melt-sourced species through the
+    VR-9 activity seam and forbids silent pure-component a=1. SiO's catalog
+    row sets ``allow_henrian_upper_bound: false``, and this catalog-only
+    fixture supplies no provider-reported activity, so the channel refuses
+    ``missing_evidence`` — the same class as CrO2. The Arrhenius alpha
+    correlation remains loadable (tests above); it does not keep the
+    catalog channel flux-eligible.
+    """
+
     catalog = compile_vapour_rail_catalog(_vapor_pressure_data())
     batch = catalog.resolve_batch(
         {"process.cleaned_melt": {"SiO2": 1.0}},
@@ -305,8 +316,18 @@ def test_sio_typed_alpha_correlation_remains_flux_eligible() -> None:
     )
 
     answer = batch.channel("SiO")
-    assert not answer.is_refused
-    assert "SiO" in batch.flux_active_species_ids
+    assert answer.refusal_code == "missing_evidence"
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "assemblage/potential evidence" in answer.pressure.detail
+    assert "SiO" not in batch.flux_active_species_ids
+    assert serialize_vapour_answer(answer)["is_refused"] is True
+    flux_pressures, _ = flux_pressures_from_batch(
+        batch,
+        effective_pressure_source=EffectivePressureSource("test", {}),
+    )
+    assert "SiO" not in flux_pressures
 
 
 def test_grounded_cr_ignores_unmeasured_fallback_opt_in():
