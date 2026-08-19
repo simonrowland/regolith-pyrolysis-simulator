@@ -689,6 +689,94 @@ def test_run_executor_preserves_nonfinite_c6_hold_refusal(monkeypatch):
     }
 
 
+def _envelope_session() -> object:
+    return type("BareSession", (), {"simulator": SimpleNamespace()})()
+
+
+def test_run_executor_timeout_envelope_keeps_honest_exception(monkeypatch):
+    """Mid-run timeout must survive execute_session, not flatten to a bare failed.
+
+    Invert: drop failure_exception and restore backend_status from the
+    empty sim default ('ok') and evaluate's failed branch EngineBugAborts.
+    drive_session is the production raise site; this is not FakeExecutor.
+    """
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    timeout = EngineWorkerTimeout("ThermoEngine equilibrium", 3.0, phase="job")
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise timeout
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    execution = RunExecutor().execute_session(_envelope_session(), hours=1)
+
+    assert execution.status == "failed"
+    assert execution.failure_exception is timeout
+    assert execution.backend_status == "not_converged"
+    assert execution.backend_status != "unavailable"
+    assert type(execution.failure_exception) is EngineWorkerTimeout
+
+
+def test_run_executor_ood_envelope_keeps_honest_exception(monkeypatch):
+    """Mid-run typed OOD must survive execute_session as out_of_domain.
+
+    Invert: envelope-only status=failed with no failure_exception and
+    evaluate treats the run as EngineBugAbort.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    ood = ThermoEngineOutOfDomainError(
+        ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+        requested=-9.0,
+    )
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise ood
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    execution = RunExecutor().execute_session(_envelope_session(), hours=1)
+
+    assert execution.status == "failed"
+    assert execution.failure_exception is ood
+    assert execution.backend_status == "out_of_domain"
+    assert execution.backend_status != "unavailable"
+
+
+def test_run_executor_importerror_envelope_is_still_absence(monkeypatch):
+    """Genuine missing library through the envelope is still absence.
+
+    Invert: map ImportError onto not_converged in the envelope helper
+    and backend_status becomes not_converged.
+    """
+    missing = ImportError("No module named 'thermoengine'")
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise missing
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    execution = RunExecutor().execute_session(_envelope_session(), hours=1)
+
+    assert execution.status == "failed"
+    assert execution.failure_exception is missing
+    assert execution.backend_status != "not_converged"
+    assert execution.backend_status != "out_of_domain"
+
+
 def test_run_executor_failure_envelope_uses_safe_exception_text(monkeypatch):
     class BadStr(Exception):
         def __str__(self):

@@ -47,6 +47,7 @@ from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
+from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
@@ -194,6 +195,41 @@ _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES = (
     TransportRegimeRefusal,
     VaporPressureRangeError,
 )
+_ABSENCE_REASON_CODES = frozenset(
+    {
+        EngineWorkerUnavailable.reason_code,
+        BackendUnavailableError.reason_code,
+    }
+)
+_HONEST_NON_OK_BACKEND_STATUSES = frozenset(
+    {
+        "refused",
+        "not_converged",
+        "not_attempted",
+        "out_of_domain",
+    }
+)
+_TYPED_ABSENCE_EXCEPTION_CLASSES = (
+    BackendUnavailableError,
+    EngineWorkerUnavailable,
+    ImportError,
+)
+# Honest engine answers that the fidelity backend/status alias table
+# was not re-read for. Keep them on RunReference.backend_status; do
+# not send them through translate_legacy_token.
+_FIDELITY_PASSTHROUGH_BACKEND_STATUSES = frozenset(
+    {
+        "refused",
+        "not_converged",
+        "not_attempted",
+    }
+)
+
+
+def _fidelity_alias_backend_status(status: str | None) -> str | None:
+    if status in _FIDELITY_PASSTHROUGH_BACKEND_STATUSES:
+        return None
+    return status
 
 
 @dataclass(frozen=True)
@@ -323,7 +359,7 @@ class RunReference:
             backend_name=canonical_backend_name(
                 self.backend_name or _carrier_value(self.trace, "backend_name")
             ),
-            backend_status=self.backend_status,
+            backend_status=_fidelity_alias_backend_status(self.backend_status),
             backend_authoritative=self.backend_authoritative,
             evidence_class=self.evidence_class or _carrier_value(self.trace, "evidence_class"),
         )
@@ -712,7 +748,7 @@ def evaluate(
             patch=validated_patch,
             candidate_id=candidate_id,
         ) from exc
-    except BackendUnavailableError as exc:
+    except _TYPED_ABSENCE_EXCEPTION_CLASSES as exc:
         raise BackendUnavailableAbort(
             str(exc),
             patch=validated_patch,
@@ -769,7 +805,7 @@ def evaluate(
             eval_spec=spec,
             cache_key_value=key,
         ) from exc
-    except BackendUnavailableError as exc:
+    except _TYPED_ABSENCE_EXCEPTION_CLASSES as exc:
         raise BackendUnavailableAbort(
             str(exc),
             patch=validated_patch,
@@ -785,7 +821,7 @@ def evaluate(
             exc,
         )
     except RunnerError as exc:
-        if _is_backend_unavailable_message(str(exc)):
+        if _is_backend_unavailable(exc):
             raise BackendUnavailableAbort(
                 str(exc),
                 patch=validated_patch,
@@ -829,6 +865,15 @@ def evaluate(
             f"{type(exc).__name__}: {exc}",
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
+        honest = _result_from_honest_engine_exception(
+            candidate_id,
+            spec,
+            key,
+            exc,
+            profile,
+        )
+        if honest is not None:
+            return honest
         raise EngineBugAbort(
             f"{type(exc).__name__}: {exc}",
             patch=validated_patch,
@@ -840,9 +885,10 @@ def evaluate(
     status = str(getattr(run_execution, "status", "ok"))
     error_message = str(getattr(run_execution, "error_message", ""))
     if status == "failed":
-        if _is_backend_unavailable_message(error_message):
+        failure_exc = getattr(run_execution, "failure_exception", None)
+        if _is_backend_unavailable(failure_exc, carrier=run_execution):
             raise BackendUnavailableAbort(
-                error_message,
+                error_message or "backend unavailable",
                 patch=validated_patch,
                 candidate_id=candidate_id,
                 eval_spec=spec,
@@ -875,6 +921,16 @@ def evaluate(
                 run_execution=run_execution,
                 profile=profile,
             )
+        if isinstance(failure_exc, BaseException):
+            honest = _result_from_honest_engine_exception(
+                candidate_id,
+                spec,
+                key,
+                failure_exc,
+                profile,
+            )
+            if honest is not None:
+                return honest
         raise EngineBugAbort(
             error_message or "run executor failed",
             patch=validated_patch,
@@ -897,6 +953,16 @@ def evaluate(
             patch=validated_patch,
             schema=active_schema,
             constraints=active_constraints,
+        )
+
+    if backend_status in {"refused", "not_converged", "not_attempted"}:
+        return _honest_non_ok_backend_result(
+            candidate_id,
+            spec,
+            key,
+            run_execution,
+            profile,
+            backend_status=backend_status,
         )
 
     _abort_on_non_authoritative_backend_status(
@@ -1111,6 +1177,217 @@ def _typed_physics_refusal_result(
         reason=reason,
         error_message=str(exc) or reason,
         diagnostic=getattr(exc, "diagnostic", None),
+    )
+
+
+def _honest_non_ok_backend_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    *,
+    backend_status: str,
+) -> ScoredResult:
+    """Map an honest non-ok engine answer to a named infeasible result.
+
+    These tokens are answers, not absence. A missing backend still aborts
+    via ``BackendUnavailableAbort``; this path must not.
+    """
+    reason = (
+        _latest_backend_status_reason(run_execution)
+        or _run_execution_refusal_reason(run_execution)
+        or backend_status
+    )
+    message = (
+        f"backend_status={backend_status!r} for real backend "
+        f"{spec.backend_name!r}"
+    )
+    if backend_status == "not_converged":
+        return _engine_not_converged_result(
+            candidate_id,
+            spec,
+            key,
+            run_execution,
+            profile,
+            reason=reason,
+            message=message,
+        )
+    if backend_status == "not_attempted":
+        return _not_attempted_backend_result(
+            candidate_id,
+            spec,
+            key,
+            run_execution,
+            profile,
+            reason=reason,
+            message=message,
+        )
+    return _physics_refused_result(
+        candidate_id,
+        spec,
+        key,
+        reason=reason,
+        error_message=message,
+        run_execution=run_execution,
+        profile=profile,
+    )
+
+
+def _result_from_honest_engine_exception(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    exc: BaseException,
+    profile: Mapping[str, Any],
+) -> ScoredResult | None:
+    """Map a typed engine answer that did not complete a successful run.
+
+    Used both when ``_execute_run`` re-raises and when production
+    ``RunExecutor`` envelopes the same exception as ``status="failed"``
+    with ``failure_exception`` attached. ``ImportError`` is absence and
+    is handled by the typed-absence except / failed-path absence check.
+    None means the caller should treat *exc* as an engine bug.
+    """
+    from engines.alphamelts.thermoengine import (
+        STATUS_BY_REFUSAL_CAUSE,
+        ThermoEngineOutOfDomainError,
+        ThermoEngineTimeoutError,
+        thermoengine_refusal_cause_from_exception,
+        thermoengine_timeout_cause_from_exception,
+    )
+
+    timeout = thermoengine_timeout_cause_from_exception(exc)
+    if timeout is not None or isinstance(exc, (EngineWorkerTimeout, ThermoEngineTimeoutError)):
+        return _engine_not_converged_result(
+            candidate_id,
+            spec,
+            key,
+            None,
+            profile,
+            reason=str(getattr(timeout, "value", None) or exc),
+            message=f"{type(exc).__name__}: {exc}",
+        )
+    refusal = thermoengine_refusal_cause_from_exception(exc)
+    if refusal is None and not isinstance(exc, ThermoEngineOutOfDomainError):
+        return None
+    if refusal is None:
+        refusal = exc.cause
+    status = STATUS_BY_REFUSAL_CAUSE[refusal]
+    reason = str(refusal.value)
+    message = f"{type(exc).__name__}: {exc}"
+    if status == "out_of_domain":
+        return _preflight_out_of_domain_result(
+            candidate_id,
+            spec,
+            key,
+            reason,
+        )
+    return _physics_refused_result(
+        candidate_id,
+        spec,
+        key,
+        reason=reason,
+        error_message=message,
+        profile=profile,
+    )
+
+
+def _engine_not_converged_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    *,
+    reason: str,
+    message: str,
+) -> ScoredResult:
+    threshold = ThresholdSpec(
+        id="engine_not_converged",
+        value=0.0,
+        units="convergence",
+        source="runtime_backend_status",
+        source_ref="simulator.optimize.evaluate: backend_status=not_converged",
+    )
+    margin = GateMargin(
+        gate="engine_not_converged",
+        feasible=False,
+        margin=-1.0,
+        threshold=threshold,
+        observed=1.0,
+        detail=str(reason or "not_converged"),
+        status_reason="not_converged",
+    )
+    if run_execution is None:
+        run_reference = RunReference(
+            status="not_converged",
+            error_message=message,
+            reason=str(reason or "not_converged"),
+            backend_name=spec.backend_name,
+            backend_status="not_converged",
+            backend_authoritative=True,
+        )
+    else:
+        run_reference = replace(
+            _run_reference(run_execution, profile),
+            status="not_converged",
+            error_message=message,
+            reason=str(reason or "not_converged"),
+        )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.TIMEOUT,
+        feasibility_margins={"engine_not_converged": margin},
+        failing_gates=("engine_not_converged",),
+        run_reference=run_reference,
+        notes=tuple(
+            dict.fromkeys(
+                note
+                for note in (message, str(reason or "not_converged"))
+                if note
+            )
+        ),
+    )
+
+
+def _not_attempted_backend_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    *,
+    reason: str,
+    message: str,
+) -> ScoredResult:
+    run_reference = replace(
+        _run_reference(run_execution, profile),
+        status="not_attempted",
+        error_message=message,
+        reason=str(reason or "not_attempted"),
+    )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.PHYSICS_REFUSED,
+        feasibility_margins={
+            PHYSICS_REFUSAL_GATE: _physics_refusal_margin(reason or "not_attempted"),
+        },
+        failing_gates=(PHYSICS_REFUSAL_GATE,),
+        run_reference=run_reference,
+        notes=tuple(
+            dict.fromkeys(
+                note
+                for note in (message, str(reason or "not_attempted"))
+                if note
+            )
+        ),
     )
 
 
@@ -5411,13 +5688,18 @@ def _canonical_backend_trace_fields(
     backend_status = _latest_backend_status(run_execution)
     backend_status_reason = _latest_backend_status_reason(run_execution)
     backend_authoritative = _backend_authoritative(run_execution)
+    # refused / not_converged / not_attempted are honest engine answers.
+    # The fidelity translator's backend/status alias set was not re-read
+    # for them; do not fold them into absence or raise as unknown tokens.
     payload = canonicalize_fidelity_emission(
         backend_name=backend_name,
-        backend_status=backend_status,
+        backend_status=_fidelity_alias_backend_status(backend_status),
         backend_authoritative=backend_authoritative,
     )
     if backend_name is not None:
         payload["backend_name"] = backend_name
+    if backend_status is not None:
+        payload["backend_status"] = backend_status
     if backend_status_reason is not None:
         payload["backend_status_reason"] = backend_status_reason
     return payload
@@ -5442,9 +5724,20 @@ def _abort_on_non_authoritative_backend_status(
             eval_spec=spec,
             cache_key_value=key,
         )
-    if backend_status != "ok":
+    if backend_status == "unavailable":
         raise BackendUnavailableAbort(
             "backend_status="
+            f"{backend_status!r} for real backend {spec.backend_name!r}",
+            patch=patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        )
+    if backend_status in _HONEST_NON_OK_BACKEND_STATUSES:
+        return
+    if backend_status != "ok":
+        raise EngineBugAbort(
+            "unrecognised backend_status="
             f"{backend_status!r} for real backend {spec.backend_name!r}",
             patch=patch,
             candidate_id=candidate_id,
@@ -5678,23 +5971,43 @@ def _thaw_value(value: Any) -> Any:
     return value
 
 
-def _is_backend_unavailable_message(message: str) -> bool:
-    lowered = message.lower()
-    if lowered.startswith("backend failure:"):
-        lowered = lowered.removeprefix("backend failure:").strip()
-    explicit_unavailable = (
-        "unavailable" in lowered
-        or "not initialized" in lowered
-        or "not configured" in lowered
-        or "config error" in lowered
-        or "no module named" in lowered
-        or "module not initialized" in lowered
-        or "missing binary" in lowered
-        or "binary is not configured" in lowered
-        or "subprocess transport unavailable" in lowered
+def _is_backend_unavailable(
+    exc: BaseException | None = None,
+    *,
+    carrier: Any = None,
+) -> bool:
+    """Genuine engine absence: type or reason_code, never prose.
+
+    The word "unavailable" in a message is not absence — it matches
+    ``observable_unavailable``. Consumers key on
+    ``EngineWorkerUnavailable`` / ``BackendUnavailableError`` or on
+    ``reason_code`` / ``backend_status==unavailable``.
+    """
+    seen: set[int] = set()
+    stack: list[BaseException | None] = [exc]
+    while stack:
+        current = stack.pop()
+        if current is None or id(current) in seen:
+            continue
+        seen.add(id(current))
+        if isinstance(current, _TYPED_ABSENCE_EXCEPTION_CLASSES):
+            return True
+        reason = getattr(current, "reason_code", None)
+        if reason in _ABSENCE_REASON_CODES:
+            return True
+        if str(getattr(current, "backend_status", "") or "") == "unavailable":
+            return True
+        stack.append(current.__cause__)
+        stack.append(current.__context__)
+    if carrier is None:
+        return False
+    if str(getattr(carrier, "backend_status", "") or "") == "unavailable":
+        return True
+    carrier_reason = (
+        getattr(carrier, "reason_code", None)
+        or getattr(carrier, "backend_failure_reason_code", None)
     )
-    import_failure = lowered.startswith("importerror") or " importerror" in lowered
-    return explicit_unavailable or import_failure
+    return carrier_reason in _ABSENCE_REASON_CODES
 
 
 def _is_non_finite_payload_message(message: str) -> bool:

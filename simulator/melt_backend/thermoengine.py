@@ -13,6 +13,7 @@ from engines.alphamelts.thermoengine import (
     ThermoEngineNonFiniteField,
     ThermoEngineOutOfDomainError,
     ThermoEngineRefusalCause,
+    ThermoEngineTimeoutCause,
     ThermoEngineTimeoutError,
     ThermoEngineTransport,
     reconstruct_thermoengine_out_of_domain_error,
@@ -110,19 +111,41 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                             timeout_cause,
                             timeout_s=self._health_timeout_s,
                         )
+                    refusal_cause = thermoengine_refusal_cause_from_exception(
+                        RuntimeError(reason)
+                    )
+                    if refusal_cause is not None:
+                        raise reconstruct_thermoengine_out_of_domain_error(
+                            reason
+                        )
                     raise ImportError(reason)
             self._engine_version = transport.engine_version
             self._mode = 'thermoengine'
             self._unavailable_reason = None
             return True
-        except ThermoEngineTimeoutError as exc:
+        except (ThermoEngineTimeoutError, ThermoEngineOutOfDomainError) as exc:
             try:
                 self.close()
-            except Exception as cleanup_error:  # noqa: BLE001 - preserve timeout
+            except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
                 exc.add_note(
                     f'ThermoEngine cleanup also failed: {cleanup_error}'
                 )
             raise
+        except EngineWorkerTimeout as exc:
+            # Init wall: unfinished computation, not missing library.
+            # Retype onto the closed timeout set before the generic
+            # ImportError wrap below can mint absence.
+            typed = ThermoEngineTimeoutError(
+                ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT,
+                timeout_s=exc.timeout_s,
+            )
+            try:
+                self.close()
+            except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
+                typed.add_note(
+                    f'ThermoEngine cleanup also failed: {cleanup_error}'
+                )
+            raise typed from exc
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             self._thermoengine_import_error = exc
             self._close_after_failure(exc)
@@ -460,15 +483,23 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             )
             eq.fe_redox_split = dict(payload.fe_redox_split)
             return self._fail_closed_on_clamped_operating_point(eq)
+        except EngineWorkerTimeout as exc:
+            # Warm-call wall: unfinished computation, not absence and
+            # not a policy refusal. Retype onto the closed timeout set
+            # so consumers can classify by token.
+            raise ThermoEngineTimeoutError(
+                ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT,
+                timeout_s=exc.timeout_s,
+            ) from exc
         except (
-            EngineWorkerTimeout,
+            ThermoEngineTimeoutError,
             ThermoEngineNonFiniteField,
             ThermoEngineFO2UndefinedError,
             ThermoEngineFO2OmittedError,
             ThermoEngineOutOfDomainError,
         ):
             # TYPED keep-handle. Complete set:
-            #   EngineWorkerTimeout           — pool already evicted the child
+            #   ThermoEngineTimeoutError      — smoke or warm-call wall
             #   ThermoEngineNonFiniteField    — row-local NaN/Inf field
             #   ThermoEngineFO2UndefinedError — zero-ferric Kress91 echo
             #   ThermoEngineFO2OmittedError   — payload omitted fO2 with

@@ -3,7 +3,8 @@
 
 The harness reads a tracked YAML bench set, runs a configurable engine set,
 captures every point as ``ok``, ``out_of_domain``, ``crash``, ``refused``,
-``observable_unavailable``, or ``unavailable``, and writes deterministic
+``not_converged``, ``not_attempted``, ``observable_unavailable``, or
+``unavailable``, and writes deterministic
 CSV/JSON/Markdown artifacts. For
 gas observables it converts parent-formula activities to each rail's
 single-cation basis, then holds the tracked analytical gas layer constant and
@@ -245,12 +246,15 @@ def coverage_observable_is_pressure(result: EngineResult) -> bool:
 
 
 def coverage_cell_accepted(row: Mapping[str, Any], engine: str) -> bool:
-    """Accepted coverage cell: ok, and not a recorded hollow prediction."""
+    """Accepted coverage cell: ok AND a positively recorded finite prediction.
+
+    silent_zero category 1 (missing input → refuse): an absent
+    ``finite_prediction`` field is a measurement that never happened.
+    Acceptance is a positive claim and may not be inferred from silence.
+    """
     if row.get(f"{engine}_status") != "ok":
         return False
-    if row.get(f"{engine}_finite_prediction") is False:
-        return False
-    return True
+    return row.get(f"{engine}_finite_prediction") is True
 
 
 def _alphamelts_failure_details(values: Mapping[str, Any]) -> dict[str, Any]:
@@ -446,7 +450,7 @@ class ImccEngine:
         ) as exc:
             return EngineResult(status="out_of_domain", reason=_reason_line(exc))
         except ImccNonconvergenceError as exc:
-            return EngineResult(status="refused", reason=_reason_line(exc))
+            return EngineResult(status="not_converged", reason=_reason_line(exc))
         except ImccRefusal as exc:
             return EngineResult(status="refused", reason=_reason_line(exc))
         activities = {
@@ -721,7 +725,11 @@ class AlphaMeltsEngine:
                     reason=reason,
                     details=_alphamelts_failure_details(backend_diag),
                 )
-            return EngineResult(status="refused", reason=reason, details=backend_diag)
+            return EngineResult(
+                status="not_converged",
+                reason=reason,
+                details=backend_diag,
+            )
         if status in {"out_of_domain", "unavailable", "not_attempted"}:
             return EngineResult(
                 status=status,
@@ -873,7 +881,9 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
             self._provider = AlphaMELTSProvider(backend)
         except Exception as exc:
             from engines.alphamelts.thermoengine import (
+                STATUS_BY_REFUSAL_CAUSE,
                 STATUS_BY_TIMEOUT_CAUSE,
+                thermoengine_refusal_cause_from_exception,
                 thermoengine_timeout_cause_from_exception,
             )
 
@@ -881,6 +891,10 @@ class ThermoEngineMeltActivityEngine(AlphaMeltsEngine):
             timeout = thermoengine_timeout_cause_from_exception(exc)
             if timeout is not None:
                 self._initialization_status = STATUS_BY_TIMEOUT_CAUSE[timeout]
+            else:
+                refusal = thermoengine_refusal_cause_from_exception(exc)
+                if refusal is not None:
+                    self._initialization_status = STATUS_BY_REFUSAL_CAUSE[refusal]
         return self._provider
 
     def coverage(
@@ -2249,6 +2263,81 @@ def _row_identity(row: Mapping[str, Any]) -> str:
     return str(row.get("point_id") or row.get("probe_id") or "")
 
 
+def _latched_rows(
+    rows: Sequence[Mapping[str, Any]],
+    latch: Mapping[str, Any] | None,
+) -> list[Mapping[str, Any]]:
+    """Rows whose statuses may be named as inherited.
+
+    Production ``run_benchmark`` pops ``latched_point_ids`` before
+    ``generate_report`` so run-metadata.json is not a second results
+    table. ``latch_first_point_id`` survives that pop and is the first
+    inherited row; later ThermoEngine rows in order are the rest.
+    Independently produced non-ok statuses (a keep-handle
+    ``not_converged`` on latch_after) sit before that first id and
+    must not be selected. Never fall back to every non-ok row: that
+    is the retired absence narrative (calling a live answer inherited).
+    """
+    row_list = [row for row in rows]
+    if not latch:
+        return row_list
+    te_rows = [row for row in row_list if row.get("engine") == "thermoengine"]
+    pool = te_rows if te_rows else row_list
+    ids = latch.get("latched_point_ids")
+    if ids:
+        wanted = {str(item) for item in ids}
+        return [row for row in pool if _row_identity(row) in wanted]
+    first_id = str(latch.get("latch_first_point_id") or "")
+    if not first_id:
+        return []
+    start = next(
+        (i for i, row in enumerate(pool) if _row_identity(row) == first_id),
+        None,
+    )
+    if start is None:
+        return []
+    return pool[start:]
+
+
+def _latched_status_phrase(
+    rows: Sequence[Mapping[str, Any]],
+    latch: Mapping[str, Any] | None = None,
+) -> str:
+    """Name the statuses the latched rows actually carry.
+
+    Post-arc later probes are ``not_attempted``, not inherited
+    ``unavailable``. A keep-handle ``not_converged`` is an independently
+    produced answer, not an inherited skip. Silence here would
+    republish the retired absence narrative.
+    """
+    statuses: list[str] = []
+    for row in _latched_rows(rows, latch):
+        status = str(row.get("status") or "")
+        if status and status not in statuses:
+            statuses.append(status)
+    if not statuses:
+        return "`not_attempted`"
+    return ", ".join(f"`{status}`" for status in statuses)
+
+
+def _independently_produced_latch_clause(
+    latch: Mapping[str, Any],
+    inherited_phrase: str,
+) -> str:
+    """Name latch_after when that row independently produced its status.
+
+    Genuinely inherited rows are the ``inherited …`` phrase. The row
+    immediately before the latch (keep-handle timeout, typed refusal)
+    produced its own status and must not be folded into that phrase.
+    """
+    after_status = str(latch.get("latch_after_status") or "")
+    if not after_status or after_status == "ok":
+        return ""
+    if f"`{after_status}`" in inherited_phrase:
+        return ""
+    return f" independently produced `{after_status}`,"
+
+
 def detect_thermoengine_adapter_latch(
     point_rows: Sequence[Mapping[str, Any]],
     *,
@@ -2256,13 +2345,17 @@ def detect_thermoengine_adapter_latch(
 ) -> dict[str, Any] | None:
     """Detect a one-process adapter death that poisons later ThermoEngine rows.
 
-    Fires when either:
+    Fires when any of:
 
     1. The producer recorded a mid-run transport close
        (``transport_closed_mid_run``). That covers die-on-first-row,
        where no ``ok`` exists for a consumer-side contradiction to see.
     2. The row set is self-contradictory (at least one ``ok`` and at
-       least one ``status=unavailable``).
+       least one ``status=unavailable``). That predicate is unchanged
+       and is NOT widened to ``not_attempted``.
+    3. An ``ok`` is followed by the post-arc prior-close skip token
+       (``not_attempted``). Isolated retry still applies to those
+       later rows; they are not engine-absence.
 
     Reason text is never consulted. Sequential keep-handle is typed for
     ``EngineWorkerTimeout``, ``ThermoEngineNonFiniteField``,
@@ -2271,7 +2364,16 @@ def detect_thermoengine_adapter_latch(
     latch the one-process adapter. Isolated retry remains required; any
     combined sequential+isolated count is an isolated-mode ceiling, not
     a sequential-mode result of the typed keep-handle.
+
+    Later-row token after a mid-run close is
+    ``THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS`` (``not_attempted``),
+    not ``unavailable``. A first-``unavailable`` scan would miss that
+    series and, with ``transport_closed_mid_run``, latch from index 0.
     """
+
+    from engines.alphamelts.thermoengine import (
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS,
+    )
 
     te_rows = [row for row in point_rows if row.get("engine") == "thermoengine"]
     if not te_rows:
@@ -2279,11 +2381,19 @@ def detect_thermoengine_adapter_latch(
     contradiction = "thermoengine" in engines_with_ok_and_adapter_unavailable(
         te_rows
     )
-    if not contradiction and not transport_closed_mid_run:
+    statuses = [str(row.get("status") or "") for row in te_rows]
+    prior_close_skip = (
+        "ok" in statuses
+        and THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS in statuses
+    )
+    if not contradiction and not transport_closed_mid_run and not prior_close_skip:
         return None
+    latch_start = ENGINE_ABSENCE_STATUSES | {
+        THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS
+    }
     latch_at: int | None = None
     for index, row in enumerate(te_rows):
-        if row.get("status") == "unavailable":
+        if str(row.get("status") or "") in latch_start:
             latch_at = index
             break
     if latch_at is None:
@@ -2540,8 +2650,8 @@ def generate_report(
         "",
         "## Per-species comparison",
         "",
-        "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | not attempted | observable unavailable | unavailable |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | not converged | not attempted | observable unavailable | unavailable |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     activity_metrics = []
@@ -2557,7 +2667,7 @@ def generate_report(
         activity_metrics.append(row)
     for row in activity_metrics:
         lines.append(
-            "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {not_attempted} | {observable_unavailable} | {unavailable} |".format(
+            "| {species} | {observable} | {engine} | {scored_count} | {rmse} | {median} | {ok} | {ood} | {crash} | {refused} | {not_converged} | {not_attempted} | {observable_unavailable} | {unavailable} |".format(
                 **row,
                 rmse=_fmt(row["rmse_dex"]),
                 median=_fmt(row["median_signed_residual_dex"]),
@@ -2565,6 +2675,7 @@ def generate_report(
                 ood=row["out_of_domain_count"],
                 crash=row["crash_count"],
                 refused=row["refused_count"],
+                not_converged=row["not_converged_count"],
                 not_attempted=row["not_attempted_count"],
                 observable_unavailable=row["observable_unavailable_count"],
                 unavailable=row["unavailable_count"],
@@ -2674,14 +2785,25 @@ def generate_report(
             f"| {row['composition_id']} | {row['material_class']} | {row['engine']} | {row['status']} | {_reason_line(row['reason']) or '—'} |"
         )
     if thermoengine_probe_latch:
+        probe_inherited = _latched_status_phrase(
+            probe_rows, thermoengine_probe_latch
+        )
+        probe_after = (
+            thermoengine_probe_latch.get("latch_after_point_id")
+            or "the first probe"
+        )
+        probe_independent = _independently_produced_latch_clause(
+            thermoengine_probe_latch, probe_inherited
+        )
+        probe_after_sep = probe_independent if probe_independent else ","
         lines.extend(
             [
                 "",
                 "ThermoEngine probe-row latch detected: the probe engine set "
                 f"closed its transport mid-run "
-                f"(after `{thermoengine_probe_latch.get('latch_after_point_id') or 'the first probe'}`, "
+                f"(after `{probe_after}`{probe_after_sep} "
                 f"{thermoengine_probe_latch.get('latched_count')} later probe rows "
-                "inherited `unavailable`). Isolated retry is applied to "
+                f"inherited {probe_inherited}). Isolated retry is applied to "
                 "benchmark point rows only.",
             ]
         )
@@ -2755,11 +2877,14 @@ def generate_report(
             isolated_total = latch.get("isolated_total")
             isolated_usable = latch.get("isolated_usable")
             isolated_measured = isolated_total is not None and isolated_usable is not None
+            inherited_phrase = _latched_status_phrase(thermoengine_rows, latch)
             lines.append(
                 f"ThermoEngine sequential one-process yield: "
                 f"{thermoengine_usable}/{len(thermoengine_rows)} usable "
                 "benchmark predictions. This figure is a post-latch artifact: "
-                f"after `{after_id}` the in-process adapter died "
+                f"after `{after_id}`"
+                f"{_independently_produced_latch_clause(latch, inherited_phrase)} "
+                f"the in-process adapter died "
                 f"({after_reason}), and the remaining "
                 f"{latch['latched_count']} ThermoEngine rows"
                 + (
@@ -2767,7 +2892,7 @@ def generate_report(
                     if yam_latched
                     else " —"
                 )
-                + " inherited `unavailable`. "
+                + f" inherited {inherited_phrase}. "
                 "Do not read the sequential count as ThermoEngine being "
                 "unable to score those later points."
             )

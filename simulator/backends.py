@@ -108,6 +108,38 @@ if TYPE_CHECKING:
 class BackendUnavailableError(RuntimeError):
     """Requested backend is required for this run but is unavailable."""
 
+    reason_code = "backend_unavailable"
+
+
+def stamp_unavailable_reason(exc: BaseException) -> BaseException:
+    """Attach the absence reason_code without consulting message text."""
+    if getattr(exc, "reason_code", None) == BackendUnavailableError.reason_code:
+        return exc
+    try:
+        exc.reason_code = BackendUnavailableError.reason_code
+    except (AttributeError, TypeError):
+        pass
+    return exc
+
+
+def _unavailable_error_cls_with_reason(cls: type[_E]) -> type[_E]:
+    if getattr(cls, "reason_code", None) == BackendUnavailableError.reason_code:
+        return cls
+
+    class _StampedUnavailable(cls):  # type: ignore[misc,valid-type]
+        reason_code = BackendUnavailableError.reason_code
+
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            stamp_unavailable_reason(self)
+
+    _StampedUnavailable.__name__ = getattr(cls, "__name__", "UnavailableError")
+    _StampedUnavailable.__qualname__ = getattr(
+        cls, "__qualname__", _StampedUnavailable.__name__
+    )
+    _StampedUnavailable.__module__ = getattr(cls, "__module__", __name__)
+    return _StampedUnavailable  # type: ignore[return-value]
+
 
 class BackendSelectionPolicy(Enum):
     """Explicit backend-selection semantics for each caller surface."""
@@ -814,6 +846,7 @@ def resolve_backend(
     # Accept legacy analytical names before every name-keyed branch and emit
     # only the 0.6 serialization token.
     backend_name = canonical_backend_name(backend_name)
+    unavailable_error_cls = _unavailable_error_cls_with_reason(unavailable_error_cls)
 
     subprocess_required = requires_stage0_subprocess(
         feedstock_id,
@@ -1233,8 +1266,14 @@ def _try_backend(
     backend_cls: type,
     backend_config: Mapping[str, Any] | None = None,
 ):
+    from simulator.engine_pool import EngineWorkerUnavailable
+
     backend = backend_cls()
-    if backend.initialize(dict(backend_config or {})) and backend.is_available():
+    try:
+        available = backend.initialize(dict(backend_config or {}))
+    except (ImportError, EngineWorkerUnavailable):
+        return None
+    if available and backend.is_available():
         return backend
     return None
 

@@ -34,6 +34,24 @@ def test_backend_honesty_internal_analytical_rejected_for_real_liquid_fraction_i
         )
 
 
+def test_never_installed_thermoengine_resolve_is_backend_unavailable(monkeypatch):
+    """Genuine missing ThermoEngine must surface as BackendUnavailableError.
+
+    Invert: restore _try_backend without catching ImportError and this
+    raises ImportError instead of BackendUnavailableError. Forces the
+    real resolve_backend / initialize path, not a FakeExecutor.
+    """
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    def fail_init(self, config):
+        del config
+        raise ImportError("No module named 'thermoengine'")
+
+    monkeypatch.setattr(ThermoEngineBackend, "initialize", fail_init)
+    with pytest.raises(BackendUnavailableError, match="ThermoEngine unavailable"):
+        resolve_backend("thermoengine", BackendSelectionPolicy.RUNNER_STRICT)
+
+
 def test_backend_honesty_internal_analytical_equilibrate_does_not_claim_liquid_fraction():
     result = InternalAnalyticalBackend().equilibrate(temperature_C=1500.0)
 

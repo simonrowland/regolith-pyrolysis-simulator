@@ -2790,13 +2790,18 @@ def test_thermoengine_backend_surfaces_typed_hang_and_keeps_respawn_transport():
     backend._thermoengine_transport = transport
     backend._mode = 'thermoengine'
 
-    with pytest.raises(EngineWorkerTimeout):
+    with pytest.raises(ThermoEngineTimeoutError) as excinfo:
         backend._equilibrate_thermoengine(
             1400.0,
             _melts_domain_composition(),
             -9.0,
             1.0,
         )
+    assert (
+        excinfo.value.cause
+        is ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT
+    )
+    assert excinfo.value.backend_failure_category == 'not_converged'
     assert backend._thermoengine_transport is transport
     assert backend._mode == 'thermoengine'
 
@@ -4882,9 +4887,16 @@ _IMPORT_ERROR_QUOTING_REFUSAL_MARK = ImportError(
 )
 
 
-def test_initialize_ood_smoke_closes_and_raises_importerror(monkeypatch):
-    """Init-time OOD-marked smoke failure must close and keep ImportError."""
+def test_initialize_ood_smoke_closes_and_raises_typed_refusal(monkeypatch):
+    """Init-time OOD-marked smoke failure is a typed refusal, not ImportError.
+
+    Invert: wrap the health-check OOD as ImportError again and this fails
+    because the raised type is ImportError. Forces the real initialize
+    wrapper via health_check, not a pre-built ThermoEngineOutOfDomainError.
+    """
     from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
         thermoengine_refusal_cause_from_exception,
     )
 
@@ -4921,16 +4933,83 @@ def test_initialize_ood_smoke_closes_and_raises_importerror(monkeypatch):
     smoke_exc = ImportError(_SMOKE_OOD_HEALTH_REASON)
     assert thermoengine_refusal_cause_from_exception(smoke_exc) is not None
 
-    with pytest.raises(ImportError) as excinfo:
+    with pytest.raises(ThermoEngineOutOfDomainError) as excinfo:
         backend.initialize({})
-    assert type(excinfo.value) is ImportError
+    assert type(excinfo.value) is ThermoEngineOutOfDomainError
+    assert excinfo.value.cause is ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET
+    assert type(excinfo.value) is not ImportError
     assert 'must not close the transport' not in str(excinfo.value)
-    assert _SMOKE_OOD_HEALTH_REASON in str(excinfo.value)
+    assert 'fo2_outside_attainable_bracket' in str(excinfo.value)
+    assert 'outside the attainable Fe-redox bracket' in str(excinfo.value)
     assert len(created) == 1
     assert created[0].close_calls == 1
     assert backend._thermoengine_transport is None
     assert backend.is_available() is False
     assert backend.transport_close_count() == 0
+
+
+def test_initialize_worker_timeout_raises_typed_timeout_not_import_error(
+    monkeypatch,
+):
+    """Init-wall EngineWorkerTimeout is unfinished computation, not absence.
+
+    Invert: wrap transport.initialize() EngineWorkerTimeout as ImportError
+    again and this fails because the raised type is ImportError. Forces
+    the real initialize wrapper, not a pre-built ThermoEngineTimeoutError.
+    """
+    created: list[object] = []
+
+    class FakeThermoEngineTransport:
+        engine_version = 'thermoengine fake'
+
+        def __init__(
+            self,
+            *,
+            model_name,
+            activity_converter,
+            equilibrate_timeout_s,
+            health_timeout_s=None,
+        ):
+            del model_name, activity_converter, equilibrate_timeout_s
+            del health_timeout_s
+            self.close_calls = 0
+            created.append(self)
+
+        def initialize(self):
+            raise EngineWorkerTimeout(
+                'ThermoEngine transport', 8.0, phase='init'
+            )
+
+        def health_check(self, timeout_s=None):
+            del timeout_s
+            raise AssertionError(
+                'health_check must not run after initialize timeout'
+            )
+
+        def close(self):
+            self.close_calls += 1
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.thermoengine.ThermoEngineTransport',
+        FakeThermoEngineTransport,
+    )
+    backend = ThermoEngineBackend()
+    with pytest.raises(ThermoEngineTimeoutError) as excinfo:
+        backend.initialize({})
+    assert type(excinfo.value) is ThermoEngineTimeoutError
+    assert type(excinfo.value) is not ImportError
+    assert (
+        excinfo.value.cause
+        is ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT
+    )
+    assert excinfo.value.backend_failure_category == 'not_converged'
+    assert excinfo.value.backend_failure_category != 'unavailable'
+    assert 'unavailable' not in str(excinfo.value).lower()
+    assert len(created) == 1
+    assert created[0].close_calls == 1
+    assert backend.is_available() is False
+    assert backend.transport_close_count() == 0
+    assert isinstance(excinfo.value.__cause__, EngineWorkerTimeout)
 
 
 def test_midrun_ood_keeps_handle_and_never_emits_absence_token():

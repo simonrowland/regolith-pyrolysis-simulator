@@ -34,6 +34,7 @@ from simulator.engine_local_config import (
 )
 from simulator.engine_pool import (
     EngineWorkerRemoteError,
+    EngineWorkerTimeout,
     WarmEngineWorker,
 )
 
@@ -179,11 +180,15 @@ class ThermoEngineTimeoutCause(str, Enum):
     """
 
     SMOKE_EQUILIBRIUM_TIMEOUT = 'smoke_equilibrium_timeout'
+    WARM_CALL_EQUILIBRIUM_TIMEOUT = 'warm_call_equilibrium_timeout'
 
 
 REASON_BY_TIMEOUT_CAUSE: Mapping[ThermoEngineTimeoutCause, str] = {
     ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT: (
         'ThermoEngine smoke equilibrium timed out'
+    ),
+    ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT: (
+        'ThermoEngine warm-call equilibrium timed out'
     ),
 }
 
@@ -198,12 +203,15 @@ REASON_BY_TIMEOUT_CAUSE: Mapping[ThermoEngineTimeoutCause, str] = {
 # cover a wall-clock miss. Do not add a fourth kernel status.
 STATUS_BY_TIMEOUT_CAUSE: Mapping[ThermoEngineTimeoutCause, str] = {
     ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT: 'not_converged',
+    ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT: 'not_converged',
 }
 
 _ALLOWED_TIMEOUT_STATUSES = frozenset({'not_converged'})
 _SMOKE_TIMEOUT_MARK = 'smoke equilibrium timed out'
+_WARM_CALL_TIMEOUT_MARK = 'warm-call equilibrium timed out'
 _TIMEOUT_MARKS: tuple[tuple[str, ThermoEngineTimeoutCause], ...] = (
     (_SMOKE_TIMEOUT_MARK, ThermoEngineTimeoutCause.SMOKE_EQUILIBRIUM_TIMEOUT),
+    (_WARM_CALL_TIMEOUT_MARK, ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT),
 )
 
 if set(REASON_BY_TIMEOUT_CAUSE) != set(ThermoEngineTimeoutCause):
@@ -320,6 +328,8 @@ def thermoengine_timeout_cause_from_exception(
     """
     if isinstance(exc, ThermoEngineTimeoutError):
         return exc.cause
+    if isinstance(exc, EngineWorkerTimeout):
+        return ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT
     try:
         return classify_thermoengine_timeout_message(str(exc))
     except RuntimeError:
