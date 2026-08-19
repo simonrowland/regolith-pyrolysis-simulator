@@ -60,6 +60,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.accounting.stage0_inventory import sibling_artifact_payload
 from simulator.accounting.yield_disposition import (
     build_yield_disposition,
     capture_ledger_snapshot,
@@ -988,6 +989,9 @@ class PyrolysisRun:
     run_metadata_overrides: dict[str, Any] = field(default_factory=dict)
     reduced_real_cache: Mapping[str, Any] | None = None
     strict_result_contract: bool = field(init=False, default=True)
+    _target_inventory_by_hour: list[dict[str, Any]] = field(
+        default_factory=list, init=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         # Fold legacy analytical aliases onto the canonical
@@ -1062,6 +1066,7 @@ class PyrolysisRun:
             config = self._session_config()
             execution = RunExecutor().execute(config)
         document = self._build_output(execution)
+        self._capture_target_inventory_side_channel(execution)
         execution.session._set_result_document(document)
         return document
 
@@ -1075,6 +1080,7 @@ class PyrolysisRun:
         self._apply_sio_pre_run_controls(session.simulator)
         execution = RunExecutor().execute_session(session, hours=int(self.hours))
         document = self._build_output(execution)
+        self._capture_target_inventory_side_channel(execution)
         execution.session._set_result_document(document)
         return document
 
@@ -1110,6 +1116,12 @@ class PyrolysisRun:
                 self.sio_liner_temperature_c,
                 self.sio_pO2_mbar,
             )
+        )
+
+    def _capture_target_inventory_side_channel(self, execution: RunExecution) -> None:
+        sim = getattr(getattr(execution, "session", None), "simulator", None)
+        self._target_inventory_by_hour = list(
+            getattr(sim, "_target_inventory_by_hour", []) or []
         )
 
     def _apply_sio_pre_run_controls(self, sim: PyrolysisSimulator) -> None:
@@ -5122,6 +5134,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "plus furnace-lifespan diagnostics"
         ),
     )
+    parser.add_argument(
+        "--write-target-inventory",
+        action="store_true",
+        help=(
+            "Write an opt-in sibling JSON artifact "
+            "(<output>.target_inventory.json) with the C0 target-inventory "
+            "diagnostic. Not part of the run envelope."
+        ),
+    )
     parser.add_argument("--output", required=True,
                         help="Path to write the JSON result document")
     parser.add_argument("--started-at-utc", default=None,
@@ -5155,6 +5176,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     comparison_artifact_path: Path | None = None
     comparison_markdown: str | None = None
     comparison_markdown_path: Path | None = None
+    run: PyrolysisRun | None = None
 
     try:
         if args.compare and not args.preset:
@@ -5410,6 +5432,24 @@ def main(argv: Optional[list[str]] = None) -> int:
             comparison_markdown,
             encoding="utf-8",
         )
+    if args.write_target_inventory:
+        target_inventory_path = Path(args.output).with_suffix(
+            ".target_inventory.json"
+        )
+        target_inventory_path.parent.mkdir(parents=True, exist_ok=True)
+        with target_inventory_path.open("w") as f:
+            json.dump(
+                _json_safe(
+                    sibling_artifact_payload(
+                        list(getattr(run, "_target_inventory_by_hour", []) or [])
+                    )
+                ),
+                f,
+                indent=2,
+                sort_keys=False,
+                allow_nan=False,
+            )
+            f.write("\n")
 
     return 0 if result["status"] not in {"failed", "refused"} else 1
 

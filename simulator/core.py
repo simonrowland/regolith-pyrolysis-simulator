@@ -309,6 +309,10 @@ from simulator.accounting.completeness import (
     extraction_completeness_by_target,
     vapor_contract_completeness,
 )
+from simulator.accounting.stage0_inventory import (
+    STAGE0_RELEASE_KINETICS,
+    depletion_record,
+)
 from simulator.alphamelts_reference_pressure import (
     alphamelts_condensed_phase_pressure_bar,
     annotate_alphamelts_reference_pressure,
@@ -975,6 +979,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._melt_activity_shadow_enabled: bool = False
         self._melt_activity_engine_inputs: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
+        self._last_target_inventory_diagnostic: Dict[str, Any] = {}
+        self._target_inventory_by_hour: list[Dict[str, Any]] = []
+        self._target_inventory_depletion_hour: int | str | None = None
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
         self._non_feedstock_reagent_element_kg_by_account: Dict[
@@ -1324,6 +1331,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapour_batch_report = None
         self._last_vapour_batch_flux_overlay = {}
         self._last_vapour_batch_resolve_error = {}
+        self._last_target_inventory_diagnostic = {}
+        self._target_inventory_by_hour = []
+        self._target_inventory_depletion_hour = None
         self._last_native_fe_partition_diagnostic = {}
         self._last_native_fe_saturation_event = {}
         self._last_fe_redox_respeciation_diagnostic = {}
@@ -12151,6 +12161,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 hard_regime_diagnostic
             )
 
+    def _update_target_inventory_diagnostic(self) -> None:
+        inventory = getattr(getattr(self, "record", None), "initial_inventory", None)
+        ledger = getattr(self, "atom_ledger", None)
+        if inventory is None or ledger is None:
+            self._last_target_inventory_diagnostic = {}
+            return
+        try:
+            record = depletion_record(
+                hour=int(getattr(self.melt, "hour", 0) or 0),
+                campaign=str(getattr(self.melt.campaign, "name", "") or ""),
+                temperature_C=float(getattr(self.melt, "temperature_C", 0.0) or 0.0),
+                ledger=ledger,
+                initial_inventory=inventory,
+                registry=getattr(ledger, "registry", None),
+                setpoints=getattr(self, "setpoints", None),
+                feedstocks=getattr(self, "feedstocks", None),
+                feedstock_key=str(
+                    getattr(self.record, "feedstock_key", "")
+                    or getattr(self, "_batch_feedstock_key", "")
+                    or ""
+                ),
+                previous_depletion_hour=getattr(
+                    self, "_target_inventory_depletion_hour", None
+                ),
+            )
+        except Exception as exc:
+            record = {
+                "hour": int(getattr(self.melt, "hour", 0) or 0),
+                "campaign": str(getattr(self.melt.campaign, "name", "") or ""),
+                "T_C": float(getattr(self.melt, "temperature_C", 0.0) or 0.0),
+                "targets": [],
+                "error": f"unknown: {exc}",
+                "stage0_release_kinetics": STAGE0_RELEASE_KINETICS,
+                "would_be_inventory_advance": False,
+                "depleted": False,
+                "depletion_hour": getattr(
+                    self, "_target_inventory_depletion_hour", None
+                ),
+            }
+        self._last_target_inventory_diagnostic = record
+        self._target_inventory_depletion_hour = record.get("depletion_hour")
+        history = getattr(self, "_target_inventory_by_hour", None)
+        if not isinstance(history, list):
+            history = []
+            self._target_inventory_by_hour = history
+        history.append(record)
+
     def product_ledger(self) -> Dict[str, float]:
         """
         Return output products accumulated outside the remaining melt.
@@ -12677,6 +12734,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_partial_melt_offgassing_diagnostic = {}
         self._silent_zero_notes = []
         self._last_extraction_completeness_diagnostic = {}
+        self._last_target_inventory_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
         self._last_metal_phase_stratification_diagnostic = {}
         self._last_phase_context_diagnostic = {}
@@ -13027,6 +13085,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         self._update_overlap_evaporation_diagnostic(evap_flux)
         self._update_extraction_completeness_diagnostic()
+        self._update_target_inventory_diagnostic()
         evap_plane_selectivity = self._evap_plane_selectivity_diagnostic(
             evap_flux,
         )
