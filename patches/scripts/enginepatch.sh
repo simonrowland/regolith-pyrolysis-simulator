@@ -28,6 +28,14 @@ engines() { for d in "$PATCHES"/*/; do b="$(basename "$d")"; [ "$b" = scripts ] 
 
 pin_sha() { [ -f "$PATCHES/$1/UPSTREAM.pin" ] && awk '/^base_sha:/{print $2}' "$PATCHES/$1/UPSTREAM.pin" || echo ""; }
 
+# pip_target: the patch dir targets a pip-installed package (site-packages of a
+# named venv), not a sibling git checkout. Declared explicitly in UPSTREAM.pin
+# (install_kind: pip-venv), never inferred — an undeclared dir with no checkout
+# mapping stays a hard FAILURE, per the couldnt-check-never-reads-clean rule.
+pip_target() {
+  awk '$1=="install_kind:" && $2=="pip-venv"{found=1} END{exit !found}'     "$PATCHES/$1/UPSTREAM.pin" 2>/dev/null
+}
+
 report_only() {
   ! ls "$PATCHES/$1"/*.patch >/dev/null 2>&1 &&
     awk '$1=="checkout:" && $2=="absent"{found=1} END{exit !found}' \
@@ -39,6 +47,13 @@ cmd_status() {
   for e in ${1:-$(engines)}; do
     if report_only "$e"; then
       echo "$e: REPORT-ONLY (source checkout absent; no engine patch)"
+      continue
+    fi
+    if pip_target "$e"; then
+      # Verification for a pip target happens ON THE BOX that holds the venv,
+      # via patches/<e>/verify-applied.sh <python>. On other hosts this line is
+      # a declared remote-scope notice, not a pass: it never says clean.
+      echo "$e: PIP-TARGET (verify on the target box: patches/$e/verify-applied.sh <venv-python>)"
       continue
     fi
     d="$(engine_dir "$e")"
@@ -62,6 +77,18 @@ cmd_verify() {
   for e in ${1:-$(engines)}; do
     if report_only "$e"; then
       echo "$e: REPORT-ONLY (source checkout absent; no engine patch)"
+      continue
+    fi
+    if pip_target "$e"; then
+      if [ -n "${MACE_PYTHON:-}" ] && [ "$e" = "mace" ]; then
+        if "$PATCHES/$e/verify-applied.sh" "$MACE_PYTHON"; then
+          echo "$e: PIP-TARGET verify OK (via MACE_PYTHON)"
+        else
+          echo "$e: PIP-TARGET verify FAILED (via MACE_PYTHON)"; rc=1
+        fi
+      else
+        echo "$e: PIP-TARGET (venv not bound on this host; run patches/$e/verify-applied.sh <venv-python> on the target box — this line is not a pass)"
+      fi
       continue
     fi
     d="$(engine_dir "$e")"

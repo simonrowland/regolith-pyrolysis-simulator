@@ -10,8 +10,13 @@ the task store (umbrella task + per-item tasks).
 reproduce Na₂SiO₃ *structure* essentially perfectly (Si-O-Si 134.7° vs 133–144°
 experimental, NBO/Si exactly 2.00, Q²-dominant speciation, Na preferring NBO 3.6:1)
 while missing absolute density by ~20%. MPS float32 checkpoints are staged md5-verified
-on studios 1–2 (~2.55× wall-clock), with a known +0.0079 g/cm³ MPS-high offset — fine
-for structural questions, not for cross-checkpoint comparison. **Absolute free energies
+on studios 1–2 per the fleet record (~2.55× wall-clock), with a known +0.0079 g/cm³
+MPS-high offset — fine for structural questions, not for cross-checkpoint comparison.
+Checkpoints are NOT the whole story: mace 0.3.16 needs the MPS hotfix recorded at
+`patches/mace/0001` to run on MPS at all, which is applied+verified on **studio-2's
+`imcc-md` venv only**; before any MD on another box, run
+`patches/mace/verify-applied.sh <venv-python>` (exit 0 required — absent or
+undeterminable both refuse the launch). **Absolute free energies
 are NOT certified**; the pre-registered Mg₂SiO₄ Frenkel–Ladd pilot (≤5 kJ/mol RSS gate)
 is the gatekeeper, and its prereg explicitly states a pass does not generalize to
 Na-bearing associates. The tiers below respect that boundary.

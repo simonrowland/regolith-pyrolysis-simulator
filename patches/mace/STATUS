@@ -12,9 +12,14 @@ Verification (2026-08-19, studio-2, mace-mpa0-f32.model, SiO2 probe):
 
 Where applied:  studio-2 /Users/simonrowland/venvs/imcc-md (backup kept as
                 mace/modules/models.py.orig-pre-mps-hotfix alongside the file)
-Where NOT:      laptop (no MACE install), studio-3 (no MACE env), studio-1 (unknown -
-                verify before any MD there). MD-17 Stage 2 MUST verify this patch is
-                present on every box it runs on (the campaign doc records this).
+Where NOT:      laptop (no MACE install), studio-3 (no MACE env), studio-1 (MACE
+                state unverified this session; fleet notes record f32 CHECKPOINTS
+                staged on studios 1-2 — checkpoints and this patch are different
+                things). The presence check is EXECUTABLE:
+                    patches/mace/verify-applied.sh <venv-python>
+                (exit 0 applied / 1 absent / 2 cannot-determine; 2 is an error on
+                purpose). MD-17 Stage 2 runs it before any MD launch on any box;
+                enginepatch.sh verify also runs it when MACE_PYTHON is exported.
 
 Upstream: not yet filed. The clean upstream shape is probably a dtype-policy flag
 rather than a device sniff; file when the MD-17 campaign proves the patch out in
