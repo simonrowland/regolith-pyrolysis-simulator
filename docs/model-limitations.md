@@ -229,6 +229,60 @@ Melt iron redox is not future work: it is live. The Fe vapor-pressure path consu
 - **Ferric reduction in electrolysis is a diagnostic path, not a validated model.** The electrolysis path can reduce ferric Fe₂O₃ to FeO rather than driving the old over-reducing full-reduction rung, but that ferric-to-ferrous step is explicitly uncertified/diagnostic and is not a validated ferric-current-partition model.
 - **The iron/silica de-confliction is one-sided.** The Fe vapor activity responds to melt fO₂, but the `SiO2 ⇌ SiO` lever still reads the headspace pO₂ rather than the melt fO₂. Full Fe/SiO de-confliction — using one consistent oxygen scale on both sides of the overlap — requires coupling the SiO side to the same melt fO₂, which is not yet done.
 
+## Claim classes: what kind of number each output is
+
+Every number this simulator emits belongs to one of four claim classes, and the class —
+not the subsystem that produced it — determines how much of the error budget it inherits
+and what kind of evidence can validate it. The Good Uses / Bad Uses lists below are
+applications of this taxonomy.
+
+| Class | Examples | Error behaviour | What validates it |
+|---|---|---|---|
+| **Ordinal** (sequence, order, which-first) | Na/K before Fe before SiO; "does skipping MRE lose anything?" | Robust: rides vapor-pressure ratios spanning many orders of magnitude, so it survives activity errors that would destroy an absolute prediction | Rank agreement with KEMS series and depletion experiments; cross-engine order agreement |
+| **Ratio** (purity, selectivity, relative split) | Stage-tap contamination; Fe:SiO co-evolution in the 1500–1700 °C overlap | Partially self-correcting: systematic factors genuinely SHARED by both fluxes (HKL prefactor, geometry) cancel in the ratio. Alpha does NOT cancel — it is species-specific in this project (DS-007), so a cross-species ratio retains alpha_A/alpha_B | Cross-engine ratio agreement; paired-species measurements |
+| **Inventory** (end-state, converged-hold) | Final yields at a depletion-verified hold; rump composition; stoichiometric O₂ total | Capped by conservation — but review (2026-08-19) forced precision here: ledger closure (≤5e-12 %) bounds the SUM of accounts, not the SPLIT between them, and "held long enough" is only meaningful when the hold criterion is inventory exhaustion itself (t-699), not wall-clock. Given a depletion-verified hold, endpoint errors are capped by inventory; the split between destinations still inherits selectivity error | Atom/mass closure (bounds the sum); depletion-verified hold criterion; speciation cross-checks (bound the split) |
+| **Cardinal** (absolute flux, absolute rate) | Wall-coating rate; time-to-depletion; cold-train peak mass flow; `campaigns_to_resinter` | Inherits the full error budget multiplicatively: activity × P_sat × alpha × transport × geometry; nothing cancels | Only physical measurement. No amount of simulation cross-checking certifies a cardinal number |
+
+Two corollaries worth stating as limitations in their own right:
+
+- **The mandate's two failure modes sit in different classes.** Incomplete extraction is
+  ordinal + inventory and therefore comparatively robust at current error bars. Furnace
+  coating is cardinal, and the in-tree validation lake currently contains **no deposition
+  dataset at all** (DS-001/003/006 note "geometry/inventory absent"; the others have
+  different gaps — none is a deposition measurement) — so the no-coating half
+  of any conclusion inherits the full, unvalidated cardinal budget. Treat coating outputs
+  as the least-certified numbers this simulator produces.
+- **Converged-hold ledgers and rate trajectories deserve different confidence, even from
+  the same run.** An end-state ledger at a generous hold is inventory-class; the per-hour
+  trajectory that produced it is cardinal-class. Quoting a trajectory number with the
+  end-state's confidence is a category error.
+
+**The threshold reformulation of the no-coating claim (owner-framed 2026-08-19), and
+what it costs.** "Wall coating rate" is cardinal, but "no coating at all" can be a
+*threshold* claim: if every wall segment upstream of the designated condenser stays above
+the local dew point of every species present (P_sat(T_wall) > partial pressure), nothing
+condenses — and dew points ride the vapor-pressure curves, which are among the
+best-grounded data in the project. A conservative version needs only an UPPER BOUND on
+partial pressure (total evolved inventory over volume suffices), so the claim inherits
+threshold-class robustness rather than the full cardinal flux budget. Two honest limits:
+(1) the *margin* to the dew point is still cardinal — how close you may run is a
+flux-and-transport question; (2) the threshold covers CONDENSATION only. Reactive
+deposition and chemical attack (alkali penetration of silica, SiO reaction with oxide
+walls — the `reactive_exchange_templates` and `chemical_attack` entries in
+`data/wall_materials.yaml`) do not require supersaturation and are *accelerated*, not
+prevented, by hot walls. Hot-wall design therefore trades a condensation-fouling claim
+(threshold, robust) for a corrosion claim — whose current in-tree grounding is severity
+labels with an evidence census of 18 direct / 35 analogous / 27 uncharacterized, i.e. a
+rate model does not exist yet.
+
+A useful screen when reading any output: mass-loss and depletion experiments constrain the
+**product** gamma × P_sat × alpha jointly (DS-001/003/005/006 in
+`validation-data/timeseries/`), which is what inventory- and ordinal-class outputs ride on;
+they do not decompose it. Claims that need the decomposition — anything transferring a
+coefficient to a new composition, temperature, or geometry — are cardinal-adjacent and need
+the individual factors, which is what KEMS activity data and evaporation-coefficient rows
+(DS-007) supply.
+
 ## Good Uses
 
 - Compare feedstock classes.

@@ -1,0 +1,252 @@
+# Wanted-experiments registry: physical measurements we want results for.
+#
+# Owner-framed 2026-08-18: "a datastructure to collect and score physical tests
+# that we'd like to have results for, even as prose." Entries are allowed to be
+# entirely prose in `question` / `acceptance` — the point is that a wanted
+# measurement is a RECORDED LIABILITY with a score, not a vague wish. The
+# validating test (tests/test_wanted_experiments.py) checks structure only.
+#
+# SCORING. attention = leverage x uncertainty x feasibility, each 1-5:
+#   leverage:     how much headline output moves if this number changes
+#                 (calibrate against the sensitivity queue, t-705, once live)
+#   uncertainty:  how unconstrained the quantity is TODAY (5 = nothing at all,
+#                 1 = well-pinned, we want confirmation only)
+#   feasibility:  5 = desktop/bench doable with owner's equipment as prose-level
+#                 measurement; 1 = needs a facility we do not have
+# Scores are judgments, revisited when evidence lands; the RANKING is the
+# product, not any single axis.
+#
+# claim_class vocabulary (docs/model-limitations.md "Claim classes"):
+#   ordinal | ratio | inventory | cardinal
+# status vocabulary:
+#   wanted | partially_satisfied | satisfied | superseded
+#
+# When a result arrives (even a single prose number), record it under `results:`
+# with date + provenance and re-score. A satisfied entry is not deleted — it is
+# the provenance trail for the coefficient it grounded.
+
+schema: wanted_experiments.v1
+
+experiments:
+
+  - id: WE-001
+    title: Integrated wall/cold-surface deposit mass per bakeout run
+    claim_class: cardinal
+    question: >
+      After one complete desktop pyrolysis run, how many grams landed on
+      cold surfaces instead of the designated condenser — total, whole-run,
+      one number? A weighed cold finger, foil liner, or removable coupon,
+      before/after, is sufficient. This is the FIRST physical anchor the
+      coating model would ever have: the validation lake currently holds
+      zero deposition datasets (DS-001/003/006 note "geometry/inventory
+      absent"; the rest have other gaps), and coating is the cardinal-class half
+      of the North Star that inherits the full multiplicative error budget.
+    current_evidence: >
+      None in-tree. Owner indicated (2026-08-18) desktop pyrolysis runs may
+      already have produced this — POSSIBLY ALREADY MEASURED; if a number or
+      even a qualitative observation ("the sight glass fogged by hour 3")
+      exists in lab notes, record it here as a result and re-score.
+    acceptance: >
+      Any bounded number with its run conditions (feedstock mass, T profile,
+      pressure regime, run duration). Prose acceptable. Even an upper bound
+      ("less than 0.1 g on a 20 cm2 coupon") is decision-grade against a
+      model currently validated by nothing.
+    feeds: [t-044, t-056, t-713, mandate-s4-wall-deposit]
+    leverage: 5
+    uncertainty: 5
+    feasibility: 4
+    status: wanted
+    results: []
+
+  - id: WE-002
+    title: Species-resolved deposit assay on the same coupon
+    claim_class: cardinal
+    question: >
+      Of the deposit in WE-001, what is it? Even coarse discrimination
+      helps enormously: magnetic fraction (Fe), water-soluble fraction
+      (alkali), insoluble glassy remainder (SiO/silica). XRF/SEM-EDS if
+      available; kitchen-grade fractionation if not.
+    current_evidence: None in-tree.
+    acceptance: >
+      Mass fractions to one significant figure across >= 2 bins, with the
+      assay method stated.
+    feeds: [t-056, wall_deposit_by_species_instrumentation]
+    leverage: 4
+    uncertainty: 5
+    feasibility: 3
+    status: wanted
+    results: []
+
+  - id: WE-003
+    title: Dilute-alkali activity measurement inside the empty KEMS band
+    claim_class: cardinal
+    question: >
+      a(NaO0.5) (or equivalently gamma_Na) in a silicate melt at
+      x_Na2O < 0.05 — the band where lunar mare actually sits (x_Na2O parent
+      basis 0.00415; 0.00761 on the single-cation NaO0.5 basis) and where
+      the IN-TREE record is empty (bench-set published_x_Na2O starts at
+      0.205; lowest KEMS extract found is 0.09 — the global literature has
+      not been independently re-certified as empty below 0.05). KEMS, transpiration, or EMF
+      method; any composition inside the band helps. Note what DS-005-class
+      depletion data CANNOT give us: mass-loss series constrain the product
+      gamma x P_sat x alpha jointly, not the split; transferring the model
+      to new compositions needs the split.
+    current_evidence: >
+      In-tree KEMS record empty below x=0.05. CORRECTED after review
+      2026-08-19: an earlier note called Mathieu 2011 "circular via Sossi";
+      the provenance arrow is the REVERSE — Mathieu 2011 is the primary
+      BEHIND Sossi & Fegley 2018 Table 2, and the project anchors to Sossi
+      2019 (a different, experimental paper) instead because Mathieu is a
+      soda-lime-silica melt. So Mathieu is a genuine dilute-adjacent
+      primary whose acquisition is a LIVE option, with a
+      composition-transfer caveat, not a circularity. DS-005 (Yu 2003)
+      constrains the joint gamma x P_sat x alpha product in time-series
+      form. MD Henry-plateau spot-check (t-707) can give plateau
+      existence/location but not certified absolutes until the free-energy
+      pilot gate passes.
+    acceptance: >
+      One measured activity with stated T, composition, and method inside
+      the band; error bar mandatory.
+    feeds: [t-689, t-707, na-vapor-rail]
+    leverage: 5
+    uncertainty: 4
+    feasibility: 1
+    status: wanted
+    results: []
+
+  - id: WE-004
+    title: Thermogravimetric residue-vs-time on OUR simulant
+    claim_class: inventory
+    question: >
+      Mass loss vs time at 2-3 fixed temperatures for the actual feedstock
+      simulant used in desktop runs (not Murchison, not a literature
+      basalt). The lake has depletion series on other materials
+      (DS-001/003/005/006); a run on our own material closes the
+      composition-transfer question those cannot.
+    current_evidence: >
+      DS-001 (Sossi 2019), DS-003 (Richter 2007), DS-005 (Yu 2003),
+      DS-006 (Hashimoto 1983) — validated scale-free, other materials.
+    acceptance: >
+      Residue wt% vs time at declared T and pressure; a bathroom-scale
+      version (weigh crucible at intervals) is genuinely usable at the
+      scale-free level the lake already uses.
+    feeds: [timeseries-concordance, ds-lake]
+    leverage: 3
+    uncertainty: 3
+    feasibility: 5
+    status: wanted
+    results: []
+
+  - id: WE-005
+    title: Sticking coupon at controlled wall temperature
+    claim_class: cardinal
+    question: >
+      Known vapor flux (e.g. a small Na or Zn charge evaporated at set T)
+      onto a coupon held at a controlled, varied wall temperature: deposit
+      mass vs wall T. Separates the sticking/re-evaporation factor from
+      transport — the pair to MD target D13, which supplies the ordering
+      while this anchors the absolute.
+    current_evidence: None in-tree; MD-D13 (t-713) planned for the ordering.
+    acceptance: >
+      Deposit mass vs >= 3 wall temperatures at one source condition.
+    feeds: [t-044, t-056, t-713]
+    leverage: 4
+    uncertainty: 5
+    feasibility: 3
+    status: wanted
+    results: []
+
+  - id: WE-006
+    title: IR-decay endpoint trace during a bakeout
+    claim_class: ordinal
+    question: >
+      C0's declared hard endpoint is ir_signal_decay (threshold 0.05,
+      data/setpoints.yaml) but no run has ever recorded the actual decay
+      curve. One logged IR trace across a full bakeout tells us whether
+      the signal decays when the volatile inventory depletes (validating
+      t-699's inventory-based advance criterion) or lags/leads it.
+    current_evidence: >
+      None. b-204 probe (2026-08-18) showed the simulated run never even
+      reaches endpoint evaluation; measured completion (~725 C on
+      lunar_mare_low_ti) matches the setpoints design note (~700 C).
+    acceptance: >
+      Any time-stamped IR (or even thermocouple-plus-pressure) trace over a
+      run with the endpoint region included.
+    feeds: [t-699, b-204]
+    leverage: 3
+    uncertainty: 4
+    feasibility: 5
+    status: wanted
+    results: []
+
+  - id: WE-007
+    title: Offgas composition vs temperature during bakeout
+    claim_class: ratio
+    question: >
+      Even coarse offgas speciation vs T (RGA if available; else
+      single-gas sensors for H2O / CO2 / SO2) during a desktop bakeout.
+      Directly tests Stage-0 speciation ordering AND gives the first
+      measured input to the b-203 offgas-fO2 coupling — including a
+      measured log10(Q/K_wgs) strain, i.e. whether the water-gas-shift
+      equilibrium assumption holds in THIS furnace, which the module
+      deliberately refuses to answer with a rate constant.
+    current_evidence: >
+      None in-tree. b-203 module (7eb86482) computes the imposed fO2 and
+      reports assumption strain, unverified by construction.
+    acceptance: >
+      Relative species signals vs T, any calibration state, with the
+      sensor/method named. Ratios are the deliverable, so absolute
+      calibration is not required.
+    feeds: [b-203, stage0-speciation]
+    leverage: 4
+    uncertainty: 4
+    feasibility: 3
+    status: wanted
+    results: []
+
+  - id: WE-008
+    title: Fused-silica capture on the pO2-hold to pN2-sweep switch
+    claim_class: ordinal
+    question: >
+      The mandate's on-demand SiO capture story (product class 2): under a
+      pO2 hold, SiO stays locked; switch the cover gas to N2 sweep and SiO
+      should release and land on the Stage-3 baffle. A qualitative
+      before/after on a silica witness plate across the switch is a direct
+      yes/no on the most distinctive recipe lever the project claims.
+    current_evidence: None physical; simulated only (t-054 LIVE-PO2-SWEEP).
+    acceptance: >
+      Witness-plate deposit appearing after the switch and not before, at
+      stated T and pressures. Purely qualitative is acceptable.
+    feeds: [t-054, t-046, mandate-product-2]
+    leverage: 4
+    uncertainty: 4
+    feasibility: 2
+    status: wanted
+    results: []
+
+  - id: WE-009
+    title: Hot-wall corrosion coupon (mass loss above the dew point)
+    claim_class: cardinal
+    question: >
+      A wall-material coupon (fused silica, alumina, or the rump ceramic)
+      held ABOVE the local dew point in the vapor stream for a known
+      exposure: mass change and any visible surface alteration. This is the
+      corrosion-side complement of WE-001/WE-005 — hot-wall design trades
+      condensation fouling for chemical attack, and the attack side
+      currently has no rate anchor at all (severity labels only, 27 of 80
+      evidence entries uncharacterized). One coupon calibrates the
+      parabolic-rate law whose diffusion coefficient MD target 16 supplies.
+    current_evidence: >
+      data/wall_materials.yaml chemical_attack severity labels (direct
+      evidence on 18 entries, none of it rate data). No in-tree corrosion
+      rate measurement.
+    acceptance: >
+      Mass delta (either sign) with exposure time, wall T, and what the
+      coupon was, plus a prose description of the surface. A "no measurable
+      change after N hours at T" null is decision-grade.
+    feeds: [t-056, liner_life, md-target-16, md-target-17, mandate-s5-bootstrap]
+    leverage: 4
+    uncertainty: 5
+    feasibility: 3
+    status: wanted
+    results: []
