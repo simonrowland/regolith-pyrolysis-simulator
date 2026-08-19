@@ -130,6 +130,15 @@ _REFERENCE_STRUCTURAL_STATE = {
     "optical_basicity": 0.6148157641396143,
 }
 
+# Orthosilicate M2SiO4 is the last composition whose tetrahedral-network
+# description is intact. Past this ceiling the log-linear gamma surface is
+# out of domain (see structural_gamma_domain_verdict).
+NBO_T_ORTHOSILICATE_CEILING = 4.0
+# Pre-existing diagnostic display envelope, now applied in log10 space so
+# 10**x is never evaluated on an overflowing argument (t-717).
+_LOG10_GAMMA_DISPLAY_MIN = -12.0  # gamma = 1e-12
+_LOG10_GAMMA_DISPLAY_MAX = 0.0  # gamma = 1.0
+
 _GAMMA_MODEL = {
     "NaO0.5": {
         # DeMaria-inverted lunar-basalt anchor from local volatility grounding:
@@ -375,15 +384,94 @@ def structural_activity_features(
     )
 
 
+def structural_gamma_domain_verdict(
+    nbo_t: float | None,
+    optical_basicity: float | None,
+) -> tuple[str, str]:
+    """Return ``('ok', '')`` or ``('out_of_domain', typed reason)``.
+
+    Derivation
+    ----------
+    1. Premise: Mysen & Richet NBO/T = (2 O - 4 T) / T counts non-bridging
+       oxygen per tetrahedral network-former. It describes a silicate
+       *network*, not free-oxide melt with a vanishing T budget.
+    2. Algebra: NBO/T = 4  =>  2O - 4T = 4T  =>  O = 4T. Each tetrahedral
+       cation is then an isolated SiO4 (orthosilicate M2SiO4). For
+       T_cations -> 0 the coordinate diverges; this module already stores
+       nbo_t = None at T = 0.
+    3. Premise: the log-linear gamma surface is a first-order expansion
+       about lunar-basalt NBO/T ~ 1.14 (DeMaria/12022). The KO0.5 NBO/T
+       slope is 3.0 dex per NBO/T unit, so at NBO/T ~ 105 (2 wt% SiO2 in
+       CaO) unconstrained log10(gamma_KO0.5) ~ 308.5, and 10**x overflows
+       a C double (IEEE-754 binary64 max ~ 1.80e308, log10 ~ 308.25).
+    4. Domain statement: NBO/T > 4 is dilute_network_former_out_of_domain.
+       Returning a clamped finite gamma there would fabricate an activity
+       coefficient the expansion does not support. nbo_t is None is the
+       same reason (no tetrahedral network at all).
+    5. Unit check: NBO/T is mol/mol, dimensionless. Ceiling 4 is
+       dimensionless.
+    6. Sanity: silica NBO/T = 0; sodium disilicate NBO/T = 1; Ca2SiO4
+       (2 CaO + 1 SiO2) NBO/T = 4, in-domain inclusive; 2 wt% SiO2 in CaO
+       has NBO/T ~ 105, out of domain.
+    """
+
+    if nbo_t is None:
+        return (
+            "out_of_domain",
+            "dilute_network_former_out_of_domain: tetrahedral "
+            "network-former cations are absent so NBO/T is undefined",
+        )
+    nbo = float(nbo_t)
+    if not math.isfinite(nbo):
+        return (
+            "out_of_domain",
+            "dilute_network_former_out_of_domain: NBO/T is non-finite",
+        )
+    if nbo > NBO_T_ORTHOSILICATE_CEILING:
+        return (
+            "out_of_domain",
+            "dilute_network_former_out_of_domain: "
+            f"NBO/T={nbo:.6g} exceeds orthosilicate ceiling "
+            f"{NBO_T_ORTHOSILICATE_CEILING:g} (Mysen tetrahedral-network "
+            "budget; isolated SiO4 at NBO/T=4)",
+        )
+    if optical_basicity is None or not math.isfinite(float(optical_basicity)):
+        return (
+            "out_of_domain",
+            "optical_basicity_undefined: no finite Duffy-Ingram Lambda "
+            "for the log-linear gamma surface",
+        )
+    return "ok", ""
+
+
 def reference_activity_coefficients(
     *,
     nbo_t: float | None,
     optical_basicity: float | None,
     temperature_K: float,
 ) -> dict[str, float]:
-    """Return provisional log-linear structural gamma_MOx values."""
+    """Return provisional log-linear structural gamma_MOx values.
 
-    if nbo_t is None or optical_basicity is None:
+    Out of the NBO/T domain the surface returns empty rather than a
+    clamped number. In-domain, the diagnostic envelope [1e-12, 1] is
+    applied in log10 space so ``10**x`` is never attempted on an
+    overflowing argument.
+
+    Derivation (in-domain log-space envelope)
+    -----------------------------------------
+    1. Premise: the UNCERTIFIED display envelope is gamma in [1e-12, 1]
+       (the previous ``min(1.0, max(1e-12, 10**x))`` contract).
+    2. Algebra: 10**x overflows a C double for x > log10(DBL_MAX) ≈
+       308.2547. Comparing x to log10(envelope) first makes the pow a
+       no-op outside (-12, 0) and finite inside it.
+    3. Unit check: log10(gamma) is dimensionless dex; 10**dex = gamma
+       dimensionless.
+    4. Sanity: at the 12022 / 1500 K intercept, every delta is 0 so
+       gamma_NaO0.5 = 4.5e-3 (inside the envelope, unclamped).
+    """
+
+    status, _reason = structural_gamma_domain_verdict(nbo_t, optical_basicity)
+    if status != "ok":
         return {}
     gamma: dict[str, float] = {}
     for species, params in _GAMMA_MODEL.items():
@@ -398,7 +486,16 @@ def reference_activity_coefficients(
         log10_gamma += float(params["nbo_t_slope_dex"]) * (
             float(nbo_t) - _REFERENCE_STRUCTURAL_STATE["nbo_t"]
         )
-        gamma[species] = min(1.0, max(1.0e-12, 10.0 ** log10_gamma))
+        if not math.isfinite(log10_gamma):
+            # Non-finite log is not a finite gamma. Skip the species
+            # rather than raise OverflowError or invent a number.
+            continue
+        if log10_gamma >= _LOG10_GAMMA_DISPLAY_MAX:
+            gamma[species] = 1.0
+        elif log10_gamma <= _LOG10_GAMMA_DISPLAY_MIN:
+            gamma[species] = 1.0e-12
+        else:
+            gamma[species] = 10.0 ** log10_gamma
     return gamma
 
 
@@ -454,6 +551,9 @@ def structural_activity_diagnostic(
     """Build the run diagnostic payload for structural gamma tuning."""
 
     features = structural_activity_features(oxide_mol_by_species)
+    gamma_status, gamma_reason = structural_gamma_domain_verdict(
+        features.nbo_t, features.optical_basicity
+    )
     gamma = reference_activity_coefficients(
         nbo_t=features.nbo_t,
         optical_basicity=features.optical_basicity,
@@ -489,6 +589,9 @@ def structural_activity_diagnostic(
         "single_cation_mole_fractions": features.single_cation_mole_fractions,
         "formula_unit_mole_fractions": features.formula_unit_mole_fractions,
         "liquidus": liquidus,
+        "reference_gamma_status": gamma_status,
+        "reference_gamma_reason": gamma_reason,
+        "nbo_t_orthosilicate_ceiling": NBO_T_ORTHOSILICATE_CEILING,
         "reference_gamma_MOx": gamma,
         "reference_activity_MOx": reference_activity,
         "comparison_anchors": dict(_GAMMA_COMPARISON_ANCHORS),

@@ -5,6 +5,8 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import json
+import math
+
 import pytest
 import yaml
 
@@ -1397,6 +1399,84 @@ def test_classify_keep_handle_is_type_not_substring():
     status, reason = benchmark.classify_engine_exception(omitted)
     assert status == "refused"
     assert "unavailable" in reason.lower()
+
+
+def test_classify_bare_overflow_is_crash_not_refusal():
+    """t-717: OverflowError is a numerical crash; raw errno must not be the reason."""
+
+    status, reason = benchmark.classify_engine_exception(
+        OverflowError(34, "Result too large")
+    )
+    assert status == "crash"
+    assert reason == "numerical_overflow"
+    assert "OverflowError" not in reason
+
+
+def test_classify_overflow_subclass_keeps_typed_message():
+    """Subclasses that already carry a typed prefix are not collapsed."""
+
+    class VaporishOverflow(OverflowError):
+        pass
+
+    status, reason = benchmark.classify_engine_exception(
+        VaporishOverflow("vapor_pressure_numerical_overflow: species=Na field=K_decomp")
+    )
+    assert status == "refused"
+    assert "vapor_pressure_numerical_overflow" in reason
+    assert reason != "numerical_overflow"
+
+
+def test_classify_thermoengine_fo2_valueerror_paths_not_retuned():
+    """t-718 sibling: OverflowError mapping must not retune ValueError paths."""
+
+    outside = ValueError(
+        "ThermoEngine absolute fO2 target is outside the attainable "
+        "Fe-redox bracket: requested=-9"
+    )
+    status, reason = benchmark.classify_engine_exception(outside)
+    assert status == "out_of_domain"
+    assert "ValueError" in reason
+    assert "OverflowError" not in reason
+
+    finite = ValueError("ThermoEngine absolute fO2 target must be finite")
+    status, reason = benchmark.classify_engine_exception(finite)
+    assert status == "refused"
+    assert "ValueError" in reason
+
+    wrapped_unavailable = ValueError(
+        "ThermoEngine absolute fO2 target solve unavailable after close"
+    )
+    status, reason = benchmark.classify_engine_exception(wrapped_unavailable)
+    assert status == "unavailable"
+
+
+@pytest.mark.parametrize(
+    "composition",
+    (
+        {"SiO2": 2.0, "CaO": 98.0},
+        {"SiO2": 0.5, "CaO": 99.5},
+    ),
+)
+def test_internal_analytic_lime_rich_binary_does_not_overflow(composition):
+    """t-717: CaO-SiO2 at X_Ca >= 0.981 must not wear OverflowError as a refusal.
+
+    Table-gamma activities are computable (the 0.5 wt% SiO2 point is inside
+    the X>0.99 Raoultian shell). The structural diagnostic is out of
+    domain; it must not abort the engine.
+    """
+
+    engine = benchmark.InternalAnalyticalEngine()
+    result = benchmark.execute_engine(engine, composition, 1673.15, 1.0e-9)
+    assert "OverflowError" not in (result.reason or "")
+    if result.status != "ok":
+        assert result.status in benchmark.POINT_STATUSES
+        assert result.status != "crash"
+        reason = result.reason or ""
+        assert "dilute_network_former_out_of_domain" in reason or reason
+        return
+    assert result.activities
+    for name, value in result.activities.items():
+        assert math.isfinite(value) and value > 0.0, (name, value)
 
 
 def test_isolated_retry_rebuilds_on_producer_close_not_reason_prose():

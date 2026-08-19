@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import math
+import sys
+
 import pytest
 
 from engines.builtin._common import composition_wt_pct_from_account_view
@@ -7,9 +10,11 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.chemistry.structural_activity import (
+    NBO_T_ORTHOSILICATE_CEILING,
     reference_activity_coefficients,
     structural_activity_diagnostic,
     structural_activity_features,
+    structural_gamma_domain_verdict,
 )
 from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
@@ -99,6 +104,94 @@ def test_na_activity_shift_refuses_invalid_temperature(temperature_K):
         na_reductant_activity_shift_kj_per_mol_o2(temperature_K)
 
 
+def test_orthosilicate_nbo_t_is_four_and_in_domain() -> None:
+    """Ca2SiO4: O = 4T so NBO/T = 4, inclusive in-domain bound."""
+
+    features = structural_activity_features({"CaO": 2.0, "SiO2": 1.0})
+    assert features.nbo_t == pytest.approx(4.0)
+    status, reason = structural_gamma_domain_verdict(
+        features.nbo_t, features.optical_basicity
+    )
+    assert status == "ok"
+    assert reason == ""
+
+
+def test_past_orthosilicate_is_typed_dilute_network_former_refusal() -> None:
+    """One extra CaO past Ca2SiO4 crosses the orthosilicate ceiling."""
+
+    features = structural_activity_features({"CaO": 2.01, "SiO2": 1.0})
+    assert features.nbo_t is not None
+    assert features.nbo_t > NBO_T_ORTHOSILICATE_CEILING
+    status, reason = structural_gamma_domain_verdict(
+        features.nbo_t, features.optical_basicity
+    )
+    assert status == "out_of_domain"
+    assert reason.startswith("dilute_network_former_out_of_domain")
+    assert "OverflowError" not in reason
+    gamma = reference_activity_coefficients(
+        nbo_t=features.nbo_t,
+        optical_basicity=features.optical_basicity,
+        temperature_K=1673.15,
+    )
+    assert gamma == {}
+
+
+def test_cao_sio2_2wt_pct_silica_is_out_of_structural_gamma_domain() -> None:
+    """The t-717 crash composition: NBO/T ~ 105, KO0.5 10**x would overflow."""
+
+    features = structural_activity_features(_mol_from_wt_pct({"SiO2": 2.0, "CaO": 98.0}))
+    assert features.nbo_t is not None
+    assert features.nbo_t > 100.0
+    # Unconstrained KO0.5 log-linear term at this NBO/T overflows a C double.
+    log10_gamma_k = math.log10(3.5e-5)
+    log10_gamma_k += math.log10(3.5e-5 / 7.2e-5) / 200.0 * (1673.15 - 1500.0)
+    log10_gamma_k += 4.5 * (
+        features.optical_basicity - 0.6148157641396143
+    )
+    log10_gamma_k += 3.0 * (features.nbo_t - 1.143864967345075)
+    assert log10_gamma_k > math.log10(sys.float_info.max)
+    diagnostic = structural_activity_diagnostic(
+        _mol_from_wt_pct({"SiO2": 2.0, "CaO": 98.0}),
+        temperature_K=1673.15,
+    )
+    assert diagnostic["reference_gamma_status"] == "out_of_domain"
+    assert diagnostic["reference_gamma_reason"].startswith(
+        "dilute_network_former_out_of_domain"
+    )
+    assert "OverflowError" not in diagnostic["reference_gamma_reason"]
+    assert diagnostic["reference_gamma_MOx"] == {}
+
+
+def test_reference_gamma_nbo_t_slope_hand_check() -> None:
+    """At T=1500 K and Lambda*, dNBO/T = -0.5 is a round-trip of the Na slope.
+
+    log10(gamma) = log10(4.5e-3) + 2.8 * (-0.5); 10**x is inside (1e-12, 1)
+    so the display envelope is the identity.
+    """
+
+    features = structural_activity_features(_mol_from_wt_pct(_LUNAR_12022_WT_PCT))
+    delta = -0.5
+    gamma = reference_activity_coefficients(
+        nbo_t=features.nbo_t + delta,
+        optical_basicity=features.optical_basicity,
+        temperature_K=1500.0,
+    )
+    expected = 4.5e-3 * 10.0 ** (2.8 * delta)
+    assert 1.0e-12 < expected < 1.0
+    assert gamma["NaO0.5"] == pytest.approx(expected, rel=1e-12)
+
+
+def test_absent_network_former_is_typed_dilute_refusal() -> None:
+    features = structural_activity_features({"CaO": 1.0})
+    assert features.nbo_t is None
+    status, reason = structural_gamma_domain_verdict(
+        features.nbo_t, features.optical_basicity
+    )
+    assert status == "out_of_domain"
+    assert reason.startswith("dilute_network_former_out_of_domain")
+    assert "OverflowError" not in reason
+
+
 def test_liquidus_flag_trips_for_demaria_12022_sub_liquidus_case() -> None:
     diagnostic = structural_activity_diagnostic(
         _mol_from_wt_pct(_LUNAR_12022_WT_PCT),
@@ -161,3 +254,31 @@ def test_builtin_vapor_pressure_exposes_structural_reference_diagnostic_only(
     ] == pytest.approx(
         consumed_na_activity.activity
     )
+
+
+def test_builtin_vapor_pressure_survives_dilute_silica_structural_ood(
+    vapor_pressure_data,
+) -> None:
+    """Structural gamma OOD must not abort the vapor-pressure path (t-717)."""
+
+    account_mol = _mol_from_wt_pct({"SiO2": 2.0, "CaO": 98.0})
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": dict(account_mol)},
+            species_formula_registry={},
+        ),
+        temperature_C=1673.15 - 273.15,
+        pressure_bar=1e-6,
+        fO2_log=-9.0,
+        control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
+    )
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
+    diagnostic = result.diagnostic or {}
+    structural = diagnostic["structural_activity_reference"]
+    assert structural["reference_gamma_status"] == "out_of_domain"
+    assert "OverflowError" not in structural["reference_gamma_reason"]
+    consumed = melt_oxide_activity("CaO", account_mol, temperature_K=1673.15)
+    assert consumed is not None
+    assert math.isfinite(consumed.activity) and consumed.activity > 0.0
+    assert diagnostic["activities"]["Ca"] == pytest.approx(consumed.activity)

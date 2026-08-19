@@ -292,8 +292,33 @@ def _keep_handle_exception_types() -> tuple[type[BaseException], ...]:
 
 
 def classify_engine_exception(exc: BaseException) -> tuple[str, str]:
-    """Map an engine-boundary exception into the benchmark status vocabulary."""
+    """Map an engine-boundary exception into the benchmark status vocabulary.
 
+    Bare ``OverflowError`` is a numerical crash, not a physics refusal.
+    A typed refusal states a domain or capability reason;
+    ``OverflowError: (34, 'Result too large')`` is an untyped crash wearing
+    a refusal costume (t-717). Reason token is ``numerical_overflow``; the
+    raw C-errno string must not reach the reason field.
+
+    Exact-type match on ``OverflowError`` only. Subclasses that already
+    carry a typed prefix (e.g. ``VaporPressureNumericalOverflowError``)
+    continue through the mapping below. Other exception types keep their
+    previous mapping and must not be retuned here (t-718 sibling:
+    ThermoEngine absolute-fO2 ``ValueError`` still hits the substring
+    gates; the t-718 fix belongs in this function as a type-first branch
+    for that ValueError family, analogous to ``_keep_handle_exception_types``,
+    and must not be bundled with t-717).
+
+    Remaining map, unchanged:
+    keep-handle provider types -> refused (type-first, including
+    messages that contain "unavailable"); native signal / engine_crash
+    category -> crash; "unavailable" substring / backend_unavailable
+    category -> unavailable; "outside" / "out_of_domain" -> out_of_domain;
+    everything else -> refused with the exception line.
+    """
+
+    if type(exc) is OverflowError:
+        return "crash", "numerical_overflow"
     text = _reason_line(f"{type(exc).__name__}: {exc}")
     if isinstance(exc, _keep_handle_exception_types()):
         return "refused", text
