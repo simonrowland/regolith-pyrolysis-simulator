@@ -22,11 +22,11 @@ patches/
     UPSTREAM.pin                 # remote URL + base SHA the patches apply to
     NNNN-<slug>.patch            # ordered, each independently revertible
   scripts/enginepatch.sh         # one tool, three verbs: apply | refresh | verify
+```
 
- differs from the checkout-based engines: its patches target the pip-installed
+`mace/` differs from the checkout-based engines: its patches target the pip-installed
 package (site-packages of a named venv), pinned by released version rather than git SHA.
 Same rule applies — an edited site-packages with no patch here is invisible drift.
-```
 
 Patches are ordered and cumulative: `0002` applies on top of `0001`.
 
