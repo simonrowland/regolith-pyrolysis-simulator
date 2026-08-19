@@ -1,0 +1,21 @@
+--- a/mace/modules/models.py
++++ b/mace/modules/models.py
+@@ -578,7 +578,17 @@
+         inter_e = scatter_sum(node_inter_es, data["batch"], dim=-1, dim_size=num_graphs)
+ 
+         total_energy = e0 + inter_e
+-        node_energy = node_e0.clone().double() + node_inter_es.clone().double()
++        # MPS-hotfix 2026-08-19 (regolith MD-17): MPS has no float64, so the
++        # hard .double() casts crash there. Accumulate in float64 wherever the
++        # device supports it (unchanged behaviour on CPU/CUDA); on MPS keep the
++        # model working dtype (float32 checkpoints). Original line preserved in
++        # models.py.orig-pre-mps-hotfix alongside this file.
++        _acc_dtype = (
++            node_e0.dtype if node_e0.device.type == "mps" else torch.float64
++        )
++        node_energy = node_e0.clone().to(_acc_dtype) + node_inter_es.clone().to(
++            _acc_dtype
++        )
+ 
+         forces, virials, stress, hessian, edge_forces = get_outputs(
+             energy=inter_e,

@@ -1,0 +1,21 @@
+0001-mps-device-aware-energy-accumulation.patch    APPLIED on studio-2 (~/venvs/imcc-md)
+
+What it fixes: mace/modules/models.py:581 hard-casts node_energy accumulation to
+float64 (.double()); Apple MPS has no float64, so every forward pass on MPS crashes
+even with float32 checkpoints. The patch makes the accumulation dtype device-aware:
+float64 wherever the device supports it (behaviour unchanged on CPU/CUDA), the model
+working dtype on MPS.
+
+Verification (2026-08-19, studio-2, mace-mpa0-f32.model, SiO2 probe):
+  MPS f32 vs CPU f32:  dE = 0.00 eV,  max|dF| = 3.9e-6 eV/A
+  (finite, matching — behaviourally correct, not merely crash-free)
+
+Where applied:  studio-2 /Users/simonrowland/venvs/imcc-md (backup kept as
+                mace/modules/models.py.orig-pre-mps-hotfix alongside the file)
+Where NOT:      laptop (no MACE install), studio-3 (no MACE env), studio-1 (unknown -
+                verify before any MD there). MD-17 Stage 2 MUST verify this patch is
+                present on every box it runs on (the campaign doc records this).
+
+Upstream: not yet filed. The clean upstream shape is probably a dtype-policy flag
+rather than a device sniff; file when the MD-17 campaign proves the patch out in
+sustained trajectories.
