@@ -221,7 +221,10 @@ def test_constant_gamma_has_zero_decay_exponent():
     )
     assert report.verdict == "violates_raoultian"
     assert report.decay_exponent == pytest.approx(0.0, abs=1e-9)
-    assert any("no Raoultian decay" in n for n in report.notes)
+    # wording changed by RL-3: the note now says the exponent was LOCALLY
+    # MEASURED, because "no Raoultian decay" was also being emitted when the
+    # exponent was merely unmeasurable.
+    assert any("locally MEASURED" in n for n in report.notes)
 
 
 def test_regular_solution_decay_exponent_is_two():
@@ -256,3 +259,86 @@ def test_unreachable_report_labels_midrange_gamma():
     )
     assert report.verdict == "endmember_unreachable"
     assert any("MID-RANGE reading" in n for n in report.notes)
+
+
+# ---------------------------------------------------------------------------
+# SC-130 sweep (2026-08-22): RL-1, RL-2, RL-3
+# ---------------------------------------------------------------------------
+
+def test_seam_straddling_chord_never_convicts():
+    """RL-1: `decay_p` is documented as a LOCAL exponent but estimated as a
+    two-point chord. The engines this checker targets put a continuity-shell
+    slope corner at exactly X_NEAR_ENDMEMBER, so a chord across it blends the
+    slopes either side. Measured on this repo's OWN pinned shell model — whose
+    other test says it must never read a violation — the verdict was
+    NON-MONOTONE in walk depth, convicting at 0.86/0.90/0.92 wt% while both a
+    deeper and a shallower walk read otherwise."""
+
+    fn = _shell_model_fu(math.log(3.5e-5), 2)
+    for floor in (0.86, 0.90, 0.92):
+        r = raoultian_limit(
+            fn, COMPONENT, DILUENT, T_K=1673.15, wt_impurity_floor=floor
+        )
+        assert r.verdict != "violates_raoultian", (floor, r.as_dict())
+        assert r.verdict == "shape_indeterminate", floor
+        # a non-local chord must not be serialized as a local exponent
+        assert r.decay_exponent is None, floor
+        assert any("straddle" in n for n in r.notes), floor
+
+    # deeper and shallower walks, where both nodes are inside the shell
+    for floor, expect in ((0.60, "walk_inconclusive"), (0.01, "approaches_raoultian")):
+        r = raoultian_limit(
+            fn, COMPONENT, DILUENT, T_K=1673.15, wt_impurity_floor=floor
+        )
+        assert r.verdict == expect, floor
+        assert r.decay_exponent == pytest.approx(2.0, abs=0.05), floor
+
+
+def test_a_real_violation_still_convicts_after_the_locality_fix():
+    """The other half of RL-1: the repair must not blunt real detection. A
+    constant gamma has p = 0 exactly, measured on a local chord."""
+
+    r = raoultian_limit(
+        _constant_gamma, COMPONENT, DILUENT, T_K=1673.15, engine_name="synthetic"
+    )
+    assert r.verdict == "violates_raoultian"
+    assert r.decay_exponent == pytest.approx(0.0, abs=1e-6)
+    assert any("locally MEASURED" in n for n in r.notes)
+
+
+def test_self_pair_refuses_instead_of_passing_clean():
+    """RL-2, the silentest finding and the only false-PASS direction: a
+    self-pair collapsed the wt dict to one component, walked x = 1.0 at every
+    rung, and returned `approaches_raoultian` with 25/25 usable nodes and ZERO
+    notes — the best-looking row in a results table while being the only
+    untested one."""
+
+    with pytest.raises(ValueError, match="must differ"):
+        raoultian_limit(_regular_solution, COMPONENT, COMPONENT, T_K=1673.15)
+
+
+def test_unmeasurable_shape_is_not_reported_as_absent_decay():
+    """RL-3: with one usable node the old code fell through to
+    `violates_raoultian` and asserted 'no Raoultian decay (p=undefined)' —
+    stating as absent what was merely unmeasured."""
+
+    calls = {"n": 0}
+
+    def one_usable_node(wt):
+        calls["n"] += 1
+        # Cutoff computed from the default ladder, not guessed: its deepest
+        # SiO2/CaO node sits at x = 0.9998929 and the next at 0.9998472, so
+        # 0.99987 admits exactly one node and no chord can be formed.
+        x = mole_fractions_from_wt(wt)
+        if x[COMPONENT] < 0.99987:
+            return None
+        return {name: 0.7 * value for name, value in x.items()}
+
+    r = raoultian_limit(
+        one_usable_node, COMPONENT, DILUENT, T_K=1673.15, engine_name="synthetic"
+    )
+    assert r.n_usable == 1
+    assert r.verdict == "shape_indeterminate"
+    assert r.decay_exponent is None
+    assert any("UNMEASURED shape, not" in n for n in r.notes)
+    assert not any("no Raoultian decay" in n for n in r.notes)

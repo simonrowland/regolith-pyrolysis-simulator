@@ -71,8 +71,12 @@ class RaoultianLimitReport:
     #: |ln gamma| at the median usable node, context for the walk shape.
     abs_ln_gamma_mid: float | None = None
     #: Local decay exponent from the two closest usable nodes (see
-    #: DECAY_EXPONENT_MIN); None when fewer than two distinct nodes or a
-    #: zero |ln gamma| makes it undefined.
+    #: DECAY_EXPONENT_MIN). None when fewer than two distinct nodes, a zero
+    #: |ln gamma|, or — since the SC-130 sweep — when the chord would straddle
+    #: X_NEAR_ENDMEMBER and therefore would not be LOCAL. A non-local chord is
+    #: no longer serialized here: it degrades continuously (measured 1.797
+    #: against a true 2.000 before the verdict even flips), so publishing it
+    #: in a field documented as a local exponent was itself misleading.
     decay_exponent: float | None = None
     verdict: str = ""
     notes: tuple[str, ...] = ()
@@ -147,6 +151,22 @@ def raoultian_limit(
     why the verdict keys on it rather than on the magnitude alone.
     """
 
+    if component == diluent:
+        # `wt = {component: 100 - imp, diluent: imp}` — with one key the later
+        # write wins, the majority weight is discarded, and every rung
+        # normalises to x = 1.0. Measured (SC-130 sweep, RL-2): 25/25 "usable"
+        # nodes, x_reached = 1.000000, decay exponent None, ZERO notes, and the
+        # verdict `approaches_raoultian` — the best-looking row a results table
+        # can carry while being the only untested one. Pointed at the exact
+        # pathology this module exists to catch (a constant Henry-side gamma
+        # honouring a = 1 at x = 1), the proper walk convicts and the self-pair
+        # passes clean.
+        raise ValueError(
+            f"component and diluent must differ (both {component!r}): a "
+            "self-pair collapses the composition dict to one component and "
+            "walks x = 1.0 at every rung, which measures nothing"
+        )
+
     usable: list[tuple[float, float]] = []  # (x_component, gamma_component)
     refused_beyond_last_usable: float | None = None
     for wt_imp in _impurity_wt_ladder(n_nodes, wt_impurity_start, wt_impurity_floor):
@@ -182,18 +202,33 @@ def raoultian_limit(
 
     # Local decay exponent from the two closest usable nodes (basis-invariant
     # shape evidence; see DECAY_EXPONENT_MIN derivation).
+    # decay_p is documented as a LOCAL exponent d ln|ln gamma| / d ln(1-x), but
+    # it is estimated as a two-point chord. If that chord straddles a slope
+    # corner in the model — and the engines this checker is pointed at put a
+    # continuity-shell seam at exactly X_NEAR_ENDMEMBER, by construction — the
+    # chord returns a blend of the slopes either side, set by where the deepest
+    # node happened to land. Measured (SC-130 sweep, RL-1) on this repo's own
+    # pinned shell model, whose test says it must NEVER read a violation: the
+    # verdict is NON-MONOTONE in walk depth, reading `violates_raoultian` at
+    # impurity floors 0.86/0.90/0.92 wt% while both a deeper and a shallower
+    # walk read otherwise. A chord is therefore only trusted as a local
+    # exponent when BOTH of its nodes sit inside the endmember region.
     decay_p: float | None = None
+    decay_non_local = False
     if len(usable) >= 2:
         x_prev, gamma_prev = usable[-2]
         ln_prev = abs(math.log(gamma_prev))
-        if (
+        measurable = (
             abs_ln_reached > 0.0
             and ln_prev > 0.0
             and 0.0 < (1.0 - x_reached) < (1.0 - x_prev)
-        ):
+        )
+        if measurable and x_prev >= X_NEAR_ENDMEMBER:
             decay_p = math.log(abs_ln_reached / ln_prev) / math.log(
                 (1.0 - x_reached) / (1.0 - x_prev)
             )
+        elif measurable:
+            decay_non_local = True
 
     if refused_beyond_last_usable is not None and refused_beyond_last_usable > x_reached:
         notes.append(
@@ -215,7 +250,34 @@ def raoultian_limit(
         )
     elif abs_ln_reached <= LN_GAMMA_TOLERANCE:
         verdict = "approaches_raoultian"
-    elif decay_p is not None and decay_p >= DECAY_EXPONENT_MIN:
+    elif decay_p is None:
+        # The magnitude is over tolerance but the SHAPE could not be measured
+        # — either fewer than two usable nodes, or the only available chord
+        # straddles the endmember boundary and is therefore not a local
+        # exponent. The module's own reasoning (below) forbids calling that a
+        # violation: an unmeasurable shape is not an absent one, and the old
+        # `else` routed both to the accusation with a note that asserted
+        # "no Raoultian decay (p=undefined)" — stating as absent what was
+        # merely unmeasured (SC-130 sweep, RL-1 tail and RL-3).
+        verdict = "shape_indeterminate"
+        if decay_non_local:
+            notes.append(
+                f"|ln gamma|={abs_ln_reached:.4f} at x={x_reached:.4f} exceeds "
+                f"{LN_GAMMA_TOLERANCE}, but the decay exponent could not be "
+                f"measured LOCALLY: the closest two usable nodes straddle "
+                f"x={X_NEAR_ENDMEMBER} (x_prev={x_prev:.6f}), and a chord "
+                "across that boundary blends the slopes either side rather "
+                "than measuring one. Walk deeper (lower wt_impurity_floor) so "
+                "both nodes sit inside the endmember region."
+            )
+        else:
+            notes.append(
+                f"|ln gamma|={abs_ln_reached:.4f} at x={x_reached:.4f} exceeds "
+                f"{LN_GAMMA_TOLERANCE}, but only one usable node was available "
+                "so no decay exponent exists. This is an UNMEASURED shape, not "
+                "an absent one."
+            )
+    elif decay_p >= DECAY_EXPONENT_MIN:
         # Over tolerance at the closest node BUT measurably decaying with a
         # Raoultian-tail exponent: granting a pass would overclaim, flagging a
         # violation would state a falsehood (review P1-1: a steep continuity
@@ -232,10 +294,9 @@ def raoultian_limit(
         verdict = "violates_raoultian"
         notes.append(
             f"|ln gamma|={abs_ln_reached:.4f} at x={x_reached:.4f} exceeds "
-            f"{LN_GAMMA_TOLERANCE} with no Raoultian decay "
-            f"(p={'undefined' if decay_p is None else f'{decay_p:.2f}'}): "
-            "gamma does not approach 1 at the engine's own pure-liquid "
-            "standard state"
+            f"{LN_GAMMA_TOLERANCE} and the locally MEASURED decay exponent is "
+            f"p={decay_p:.2f}, below {DECAY_EXPONENT_MIN}: gamma does not "
+            "approach 1 at the engine's own pure-liquid standard state"
         )
 
     return RaoultianLimitReport(
