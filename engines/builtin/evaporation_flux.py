@@ -1138,6 +1138,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         from simulator.evaporation import (
             viscous_p_bulk_out_of_domain_diagnostic,
         )
+        from simulator.transport_regime import continuum_validity_refuses
 
         # When gas resistance is disabled, the executed model is the HKL-only
         # path and does not use viscous Poiseuille P_bulk. Batch carriers can
@@ -1146,6 +1147,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         commanded_pressure_pa = _finite_float(
             controls.get("commanded_pressure_pa"),
             overhead_pressure_pa,
+        )
+        campaign_name_raw = controls.get("campaign_name")
+        campaign_name = (
+            None
+            if campaign_name_raw is None
+            else (str(campaign_name_raw).strip() or None)
         )
         domain_refusal = None
         if gas_resistance_enabled and overhead_pressure_pa > 0.0:
@@ -1163,8 +1170,13 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 gas_temperature_K=gas_temperature_K,
                 carrier_gas=carrier_gas,
                 affected_species=tuple(active_gas_transport_species),
+                campaign_name=campaign_name,
+                asking_site="engines.builtin.evaporation_flux",
             )
-            if active_gas_transport_species and domain_refusal is not None:
+            if (
+                active_gas_transport_species
+                and continuum_validity_refuses(domain_refusal)
+            ):
                 domain_diagnostic = dict(domain_refusal)
                 _attach_missing_alpha_records(
                     domain_diagnostic,
@@ -1467,6 +1479,36 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "missing molar_mass_g_mol for evaporation species in "
                 "data/vapor_pressures.yaml: "
                 + ", ".join(sorted(missing_molar_mass))
+            )
+        if (
+            domain_refusal is not None
+            and not continuum_validity_refuses(domain_refusal)
+        ):
+            from simulator.silent_zero import merge_notes_into_mapping
+
+            diagnostic["p_bulk_transport_domain"] = domain_refusal.get(
+                "p_bulk_transport_domain"
+            )
+            diagnostic["process_regime"] = domain_refusal.get("process_regime")
+            diagnostic["campaign_name"] = domain_refusal.get("campaign_name")
+            diagnostic["stage"] = domain_refusal.get("stage")
+            diagnostic["asking_site"] = domain_refusal.get("asking_site")
+            diagnostic["doctrine_category"] = domain_refusal.get(
+                "doctrine_category"
+            )
+            diagnostic["continuum_formula_status"] = domain_refusal.get(
+                "status"
+            )
+            diagnostic["authority_reason_continuum"] = domain_refusal.get(
+                "authority_reason"
+            )
+            merge_notes_into_mapping(
+                diagnostic, domain_refusal.get("silent_zero_notes") or ()
+            )
+            warning_messages.append(
+                "continuum_formula_out_of_domain_marked: "
+                "Stage 0 / non-pyrolysis path computed HKL flux below the "
+                "Bernoulli continuum threshold"
             )
 
         return IntentResult(

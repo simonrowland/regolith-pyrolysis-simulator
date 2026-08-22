@@ -6988,18 +6988,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         except EvaporationFluxConfigurationError as exc:
             raise evaporation_flux_refusal_from_configuration_error(exc) from exc
         # Transitional Kn domain: this bounded native-Fe projection suppresses
-        # capacity under its diagnostic-limited policy. The authoritative
-        # EVAPORATION_FLUX provider instead refuses; neither path labels the
-        # unsupported result as upper-bound HKL. t-379 lifts this suppression.
+        # capacity under its diagnostic-limited policy when continuum transport
+        # is load-bearing (pyrolysis). Stage 0 bakeout marks and keeps the
+        # computed HKL capacity. The authoritative EVAPORATION_FLUX provider
+        # refuses the pyrolysis case; t-379 lifts this suppression.
+        from simulator.transport_regime import continuum_validity_refuses
+
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,
             pipe_diameter_m=pipe_diameter_m,
             gas_temperature_K=gas_temperature_K,
             carrier_gas=str(carrier_gas),
+            campaign_name=str(
+                getattr(getattr(self.melt, 'campaign', None), 'name', '') or ''
+            ) or None,
+            asking_site='core.native_fe_vapor_partition',
         )
         _flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        if domain_diag is not None:
+        if continuum_validity_refuses(domain_diag):
             _flux_kg_s_m2 = 0.0
         capacity_kg_hr = max(
             0.0,
@@ -7013,33 +7020,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pool = native_fe_available_mol
         series_diag = series_flux.as_diagnostic()
         if domain_diag is not None:
-            # Relabel series diagnostic: HKL upper-bound authority is wrong
-            # when the viscous P_bulk carrier is out of domain — use the
-            # typed validity vocabulary (provider / C7 parity).
+            # Relabel series diagnostic with the typed continuum-validity
+            # vocabulary. Pyrolysis refusals still suppress flux; bakeout
+            # marks keep the computed HKL number.
             series_diag = dict(series_diag)
-            series_diag.update(
-                {
-                    'authority_class': domain_diag['authority_class'],
-                    'authority_reason': domain_diag['authority_reason'],
-                    'reason': domain_diag['reason'],
-                    'p_bulk_transport_domain': domain_diag[
-                        'p_bulk_transport_domain'
-                    ],
-                    'ledger_yields_authorized': False,
-                    'detail': domain_diag['detail'],
-                    'model_domain': domain_diag['model_domain'],
-                    'VISCOUS_KNUDSEN_MAX': domain_diag['VISCOUS_KNUDSEN_MAX'],
-                    'FREE_MOLECULAR_KNUDSEN_MIN': domain_diag[
-                        'FREE_MOLECULAR_KNUDSEN_MIN'
-                    ],
-                    'overhead_pressure_pa': domain_diag['overhead_pressure_pa'],
-                    'pipe_diameter_m': domain_diag['pipe_diameter_m'],
-                    'gas_temperature_K': domain_diag['gas_temperature_K'],
-                    'carrier_gas': domain_diag['carrier_gas'],
-                    'framing': domain_diag['framing'],
-                    'flux_kg_s_m2': 0.0,
-                }
-            )
+            series_update = {
+                'authority_class': domain_diag['authority_class'],
+                'authority_reason': domain_diag['authority_reason'],
+                'reason': domain_diag['reason'],
+                'p_bulk_transport_domain': domain_diag[
+                    'p_bulk_transport_domain'
+                ],
+                'ledger_yields_authorized': domain_diag[
+                    'ledger_yields_authorized'
+                ],
+                'detail': domain_diag['detail'],
+                'model_domain': domain_diag['model_domain'],
+                'VISCOUS_KNUDSEN_MAX': domain_diag['VISCOUS_KNUDSEN_MAX'],
+                'FREE_MOLECULAR_KNUDSEN_MIN': domain_diag[
+                    'FREE_MOLECULAR_KNUDSEN_MIN'
+                ],
+                'overhead_pressure_pa': domain_diag['overhead_pressure_pa'],
+                'pipe_diameter_m': domain_diag['pipe_diameter_m'],
+                'gas_temperature_K': domain_diag['gas_temperature_K'],
+                'carrier_gas': domain_diag['carrier_gas'],
+                'framing': domain_diag['framing'],
+            }
+            if continuum_validity_refuses(domain_diag):
+                series_update['flux_kg_s_m2'] = 0.0
+            series_diag.update(series_update)
         diagnostic = {
             'native_fe_pool_mol': pool,
             'native_fe_vapor_mol': vapor_mol,
@@ -7085,10 +7094,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'p_bulk_transport_domain': domain_diag[
                         'p_bulk_transport_domain'
                     ],
-                    'ledger_yields_authorized': False,
+                    'ledger_yields_authorized': domain_diag[
+                        'ledger_yields_authorized'
+                    ],
                     'framing': domain_diag['framing'],
                     'knudsen_number': domain_diag['knudsen_number'],
                     'model_domain': domain_diag['model_domain'],
+                    'process_regime': domain_diag.get('process_regime'),
+                    'campaign_name': domain_diag.get('campaign_name'),
+                    'asking_site': domain_diag.get('asking_site'),
                 }
             )
         return diagnostic

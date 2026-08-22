@@ -463,6 +463,101 @@ def test_transport_formula_refusals_are_named(call, expected_category):
 
     assert exc_info.value.category == expected_category
     assert exc_info.value.reason == expected_category
+    assert exc_info.value.stage is None
+    assert exc_info.value.asking_site is None
+
+
+@pytest.mark.parametrize(
+    ("campaign_name", "expected"),
+    [
+        ("C0", tr.ProcessRegime.STAGE0_BAKEOUT),
+        ("C0B", tr.ProcessRegime.STAGE0_BAKEOUT),
+        ("C0b_p_cleanup", tr.ProcessRegime.STAGE0_BAKEOUT),
+        ("C2A", tr.ProcessRegime.PYROLYSIS_EXTRACTION),
+        ("C2A_staged", tr.ProcessRegime.PYROLYSIS_EXTRACTION),
+        ("C4", tr.ProcessRegime.PYROLYSIS_EXTRACTION),
+        ("C7_CA_ALUMINOTHERMIC", tr.ProcessRegime.PYROLYSIS_EXTRACTION),
+        ("C5", tr.ProcessRegime.ELECTROLYSIS),
+        ("IDLE", tr.ProcessRegime.IDLE),
+        (None, tr.ProcessRegime.UNKNOWN),
+        ("", tr.ProcessRegime.UNKNOWN),
+        ("not_a_campaign", tr.ProcessRegime.UNKNOWN),
+    ],
+)
+def test_resolve_process_regime_maps_campaigns(campaign_name, expected):
+    assert tr.resolve_process_regime(campaign_name) is expected
+
+
+def test_continuum_transport_is_load_bearing_except_stage0_bakeout():
+    assert tr.continuum_transport_is_load_bearing(
+        tr.ProcessRegime.PYROLYSIS_EXTRACTION
+    )
+    assert tr.continuum_transport_is_load_bearing(tr.ProcessRegime.UNKNOWN)
+    assert tr.continuum_transport_is_load_bearing(tr.ProcessRegime.ELECTROLYSIS)
+    assert tr.continuum_transport_is_load_bearing(tr.ProcessRegime.IDLE)
+    assert not tr.continuum_transport_is_load_bearing(
+        tr.ProcessRegime.STAGE0_BAKEOUT
+    )
+
+
+def test_assess_continuum_validity_marks_bakeout_and_refuses_pyrolysis():
+    bakeout = tr.assess_continuum_formula_validity(
+        0.1,
+        campaign_name="C0",
+        asking_site="tests.bakeout",
+    )
+    pyrolysis = tr.assess_continuum_formula_validity(
+        0.1,
+        campaign_name="C4",
+        asking_site="tests.pyrolysis",
+    )
+    missing = tr.assess_continuum_formula_validity(
+        0.1,
+        asking_site="tests.missing_stage",
+    )
+    viscous = tr.assess_continuum_formula_validity(
+        0.001,
+        campaign_name="C4",
+        asking_site="tests.viscous",
+    )
+
+    assert bakeout.action is tr.ContinuumValidityAction.MARK
+    assert bakeout.note["zero_because"] == "out_of_domain_marked"
+    assert bakeout.note["doctrine_category"] == 2
+    assert bakeout.stage == "C0"
+
+    assert pyrolysis.action is tr.ContinuumValidityAction.REFUSE
+    assert pyrolysis.note["doctrine_category"] == 1
+    assert pyrolysis.stage == "C4"
+
+    assert missing.action is tr.ContinuumValidityAction.REFUSE
+    assert missing.process_regime is tr.ProcessRegime.UNKNOWN
+
+    assert viscous.action is tr.ContinuumValidityAction.OK
+    assert viscous.in_domain is True
+
+
+def test_refuse_continuum_formula_if_load_bearing_names_stage():
+    bakeout = tr.refuse_continuum_formula_if_load_bearing(
+        0.1,
+        campaign_name="C0",
+        asking_site="tests.bakeout_guard",
+    )
+    assert bakeout.action is tr.ContinuumValidityAction.MARK
+
+    with pytest.raises(tr.TransportRegimeRefusal) as exc_info:
+        tr.refuse_continuum_formula_if_load_bearing(
+            0.1,
+            campaign_name="C4",
+            asking_site="tests.pyrolysis_guard",
+        )
+    assert exc_info.value.category == "continuum_formula_out_of_domain"
+    assert exc_info.value.stage == "C4"
+    assert exc_info.value.asking_site == "tests.pyrolysis_guard"
+    assert exc_info.value.process_regime == (
+        tr.ProcessRegime.PYROLYSIS_EXTRACTION.value
+    )
+    assert "stage=C4" in str(exc_info.value)
 
 
 def test_kr_epsilon_over_k_exact_anchor():

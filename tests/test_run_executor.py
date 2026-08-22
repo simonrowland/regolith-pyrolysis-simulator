@@ -441,33 +441,6 @@ def test_pyrolysis_run_completes_with_band_adjustment_provenance():
     assert "refusal_diagnostic" not in payload["run_metadata"]
 
 
-# t-385 (2026-07-21): mass-balance class measured 1302.6 s standalone
-# (subset-junit-3); ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group
-# pins the MAGEMin full-run family to one gateway.
-# Nightly (2026-08-02 CI tiering): executor partial path (~247 s junit).
-@pytest.mark.nightly
-@pytest.mark.xdist_group("magemin_fullrun_a")
-@pytest.mark.timeout(1800)
-def test_run_executor_long_path_refuses_at_transitional_kn():
-    run = _run(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=500,
-        additives_kg={},
-    )
-
-    execution = RunExecutor().execute(run._session_config())
-
-    assert execution.status == "refused"
-    assert execution.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert execution.error_message == execution.reason
-    assert execution.simulator.melt.hour == 14
-    diagnostic = execution.refusal_diagnostic
-    assert diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert diagnostic["evaporation_flux_kg_hr"] is None
-    assert 0.01 <= diagnostic["knudsen_number"] < 10.0
-
-
 def test_run_executor_final_budget_pending_decision_is_partial(monkeypatch):
     snapshot = SimpleNamespace()
     simulator = SimpleNamespace(
@@ -509,84 +482,6 @@ def test_run_executor_final_budget_pending_decision_is_partial(monkeypatch):
 
     assert execution.status == "partial"
     assert execution.reason == "pending_decision"
-
-
-@pytest.mark.parametrize(
-    "feedstock_id",
-    (
-        "lunar_mare_low_ti",
-        "targeted_super_kreep_ore",
-    ),
-)
-def test_run_executor_refuses_before_stage0_exit_in_transitional_kn(
-    feedstock_id: str,
-) -> None:
-    config = replace(
-        PyrolysisRun(
-            feedstock_id=feedstock_id,
-            campaign="C0",
-            hours=500,
-            allow_fallback_vapor=True,
-            allow_unmeasured_alpha_fallback=True,
-            run_metadata_overrides={
-                "started_at_utc": "2026-06-17T00:00:00Z",
-                "kernel_commit_sha": "stage0-stop-test",
-            },
-        )._session_config(),
-        stop_at_stage0_exit=True,
-    )
-
-    execution = RunExecutor().execute(config)
-
-    assert execution.status == "refused"
-    assert execution.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert execution.error_message == execution.reason
-    assert execution.simulator.melt.campaign is CampaignPhase.C0
-    assert execution.simulator.melt.hour == 14
-    diagnostic = execution.refusal_diagnostic
-    assert diagnostic["commanded_pressure_mbar"] == 0.0
-    assert diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert diagnostic["evaporation_flux_kg_hr"] is None
-    assert 0.01 <= diagnostic["knudsen_number"] < 10.0
-
-
-def test_stage0_transitional_refusal_rolls_back_to_completed_hour_prefix() -> None:
-    config = replace(
-        PyrolysisRun(
-            feedstock_id="lunar_mare_low_ti",
-            campaign="C0",
-            hours=500,
-            allow_fallback_vapor=True,
-            allow_unmeasured_alpha_fallback=True,
-            run_metadata_overrides={
-                "started_at_utc": "2026-06-17T00:00:00Z",
-                "kernel_commit_sha": "stage0-stop-parity",
-            },
-        )._session_config(),
-        stop_at_stage0_exit=True,
-    )
-    execution = RunExecutor().execute(config)
-    actual = _ledger_mol_by_account(execution.simulator)
-    prefix = RunExecutor().execute(
-        replace(
-            config,
-            hours=int(execution.simulator.melt.hour),
-            stop_at_stage0_exit=False,
-        )
-    )
-    expected = _ledger_mol_by_account(prefix.simulator)
-
-    assert execution.status == "refused"
-    assert execution.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert prefix.status == "ok"
-    assert actual == expected
-    assert len(execution.simulator.atom_ledger.transitions) == len(
-        prefix.simulator.atom_ledger.transitions
-    )
-    assert (
-        execution.simulator.atom_ledger.element_atom_drift_report()
-        == prefix.simulator.atom_ledger.element_atom_drift_report()
-    )
 
 
 def test_backend_status_aggregation_preserves_recovered_domain_edges():
@@ -1019,6 +914,10 @@ def test_c4_transitional_flux_refusal_is_visible_and_preserves_ledger_closure():
     assert 0.01 <= diagnostic["knudsen_number"] < 10.0
     assert diagnostic["commanded_pressure_mbar"] == pytest.approx(0.2)
     assert "Mg" in diagnostic["affected_species"]
+    assert diagnostic["campaign_name"] == "C4"
+    assert diagnostic["process_regime"] == "pyrolysis_extraction"
+    assert diagnostic["asking_site"] == "engines.builtin.evaporation_flux"
+    assert diagnostic["stage"] == "C4"
 
     assert _ledger_mol_by_account(sim) == ledger_before
     assert tuple(sim.atom_ledger.transitions) == transitions_before
