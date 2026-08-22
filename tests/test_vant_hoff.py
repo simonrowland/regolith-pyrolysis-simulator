@@ -16,6 +16,7 @@ import pytest
 from benchmarks.gibbs_duhem import mole_fractions_from_wt
 from benchmarks.vant_hoff import (
     GAS_CONSTANT_J_MOL_K,
+    NONLINEARITY_REL_FLOOR,
     VantHoffReport,
     vant_hoff,
 )
@@ -72,10 +73,12 @@ def test_athermal_gamma_is_disclosed():
 
 
 def test_curvature_is_reported_not_flagged():
-    """B/T^2 curvature: half-window fitted slopes drift by
-    ~(u_hi-u_lo)/(2 u_mid), measured 0.118 on this window — detectable where
-    a plain fit-rms metric measured only ~1% (the miscalibration this test
-    originally caught)."""
+    """B/T^2 curvature: the shipped estimator normalises by the centroid
+    separation and re-multiplies by the full window, so the drift is
+    (u_hi-u_lo)/u_mid, measured 0.236 on this window — detectable where a
+    plain fit-rms metric measured only ~1% (the miscalibration this test
+    originally caught). The 0.118 this docstring used to quote was the
+    pre-normalisation estimator (SC-130 sweep, VH-3)."""
 
     report = vant_hoff(_curved, "SiO2", COMP, T_NODES, engine_name="synthetic")
     assert report.verdict == "nonlinear_T_dependence"
@@ -239,10 +242,90 @@ def test_report_serializes_complete_key_set():
     payload = report.as_dict()
     assert set(payload) == {
         "schema", "engine", "component", "composition_wt_pct", "T_nodes_K",
-        "n_usable", "implied_H_ex_J_mol", "slope_drift_rel", "ln_gamma_span",
+        "fitted_window_K", "n_usable", "implied_H_ex_J_mol", "slope_drift_rel", "ln_gamma_span",
         "slope_drift_H_J_mol", "activity_basis", "verdict", "notes",
     }
     assert payload["activity_basis"] == "formula_unit"
     assert payload["engine"] == "synthetic"
     assert payload["verdict"] == "vant_hoff_linear"
     assert payload["slope_drift_H_J_mol"] is not None
+
+
+# ---------------------------------------------------------------------------
+# SC-130 sweep (2026-08-22): VH-1, VH-2
+# ---------------------------------------------------------------------------
+
+def test_partial_refusal_discloses_the_window_actually_fitted():
+    """VH-1: the report declared the caller's REQUESTED grid while the fit ran
+    on whatever survived engine refusals. Measured consequence — the same
+    requested grid and the same n_usable=3 produced implied H_ex values 16.6%
+    apart depending on which nodes were refused, with no note and, on the
+    linear branch, no notes at all."""
+
+    grid = [1500.0, 1540.0, 1580.0, 1700.0, 1800.0, 1900.0]
+
+    def refuse_above(limit):
+        def fn(wt, T_K):
+            if T_K > limit:
+                return None
+            return _regular_solution_T(wt, T_K)
+        return fn
+
+    hi_cut = vant_hoff(refuse_above(1580.0), "SiO2", COMP, grid, engine_name="s")
+    lo_cut_grid = list(grid)
+
+    def refuse_below(wt, T_K):
+        if T_K < 1700.0:
+            return None
+        return _regular_solution_T(wt, T_K)
+
+    lo_cut = vant_hoff(refuse_below, "SiO2", COMP, lo_cut_grid, engine_name="s")
+
+    # both survive with 3 nodes and declare the same requested grid ...
+    assert hi_cut.n_usable == lo_cut.n_usable == 3
+    assert hi_cut.T_nodes_K == lo_cut.T_nodes_K
+    # ... so the fitted window is the only thing that distinguishes them
+    assert hi_cut.fitted_window_K != lo_cut.fitted_window_K
+    assert hi_cut.fitted_window_K == (1500.0, 1580.0)
+    assert lo_cut.fitted_window_K == (1700.0, 1900.0)
+    for r in (hi_cut, lo_cut):
+        assert any("were dropped" in n and "NOT the requested" in n for n in r.notes)
+
+
+def test_full_grid_reports_the_window_and_emits_no_shrink_note():
+    r = vant_hoff(_regular_solution_T, "SiO2", COMP, T_NODES, engine_name="s")
+    assert r.fitted_window_K == (min(T_NODES), max(T_NODES))
+    assert not any("were dropped" in n for n in r.notes)
+
+
+def test_non_finite_composition_weight_refuses(monkeypatch):
+    """VH-2: a NaN weight poisoned the whole normalisation (nan <= 0 is False,
+    total <= 0 is False), every verdict predicate became a False NaN
+    comparison, and control fell through to the bare else — stamping the
+    module's STRONGEST PASS with an empty notes tuple and NaN everywhere.
+
+    Closed by the shared refusal added to mole_fractions_from_wt (ea7134e4);
+    pinned here because this module is the one that failed open."""
+
+    from benchmarks.gibbs_duhem import GibbsDuhemInapplicable
+
+    with pytest.raises(GibbsDuhemInapplicable, match="non-finite weight"):
+        vant_hoff(
+            _regular_solution_T,
+            "SiO2",
+            {"SiO2": float("nan"), "CaO": 40.0},
+            T_NODES,
+            engine_name="s",
+        )
+
+
+def test_nonlinearity_floor_derivation_matches_the_shipped_estimator():
+    """VH-3: the derivation described the pre-fix raw half-slope estimator and
+    was wrong by exactly 2x. The shipped drift is (u_hi - u_lo)/u_mid."""
+
+    r = vant_hoff(_curved, "SiO2", COMP, T_NODES, engine_name="s")
+    u = [1.0 / t for t in T_NODES]
+    predicted = (max(u) - min(u)) / (sum(u) / len(u))
+    assert r.slope_drift_rel == pytest.approx(predicted, rel=0.02)
+    # and the margin the comment now claims
+    assert r.slope_drift_rel / NONLINEARITY_REL_FLOOR == pytest.approx(4.7, rel=0.1)

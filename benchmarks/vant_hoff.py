@@ -33,20 +33,43 @@ from benchmarks.gibbs_duhem import mole_fractions_from_wt
 
 #: |H_ex| below this reads athermal. 1 kJ/mol is 1-2 orders below any real
 #: silicate mixing enthalpy this project would act on, and far above the
-#: numerical noise of a two-decade 1/T fit on float64 activities.
+#: numerical noise of a fit over THIS project's window. The noise claim, with
+#: the arithmetic it rests on (an earlier revision said "two-decade 1/T fit",
+#: which would need a temperature RATIO of 100; the actual 1500-1900 K window
+#: spans 0.103 decades, and the same file says so five lines below):
+#: u_span = 1.40e-4 K^-1, so float64 ln-gamma error eps ~ 1e-16 gives slope
+#: noise ~ R*eps/u_span ~ 1e-11 J/mol — measured 1.1e-11 to 1.2e-8 J/mol on
+#: exactly-linear models (ln gamma = S/T, S = 1e3..1e6 K), i.e. 11-14 orders
+#: below this floor.
 ATHERMAL_H_FLOOR_J_MOL = 1.0e3
 
 #: Relative drift between the low-T-half and high-T-half fitted slopes, above
 #: which the T-dependence is reported nonlinear. Why slope DRIFT and not fit
-#: rms: over a realistic window (e.g. 1500-1900 K) 1/T spans only ~±12%, so
+#: rms: over a realistic window (e.g. 1500-1900 K) 1/T spans only ~+-12%, so
 #: even a strongly curved ln gamma ~ B/T^2 fits a straight line to ~1% rms —
-#: rms has no power there (measured while certifying this module). Each
-#: half-window FITTED slope represents the local slope at its half's midpoint,
-#: so the halves' separation is half the window: for ln gamma = B u^2
-#: (u = 1/T) the drift is ~ (u_hi - u_lo)/(2 u_mid) — measured 0.118 on the
-#: certification window — while a truly linear-in-1/T model drifts < 1e-6
-#: (pure float noise). 0.05 sits a factor ~2.4 under the curved case and
-#: orders of magnitude above the linear one.
+#: rms has no power there (measured while certifying this module).
+#:
+#: DERIVATION FOR THE SHIPPED ESTIMATOR. Each half-window FITTED slope is the
+#: local slope at its half's u-CENTROID, and the estimator below divides the
+#: half-slope difference by that centroid separation and re-multiplies by the
+#: FULL window span, so the half-window separation CANCELS. For ln gamma =
+#: B u^2 (u = 1/T) the half slopes are 2 B u_cen, giving
+#: delta_b_window = 2 B u_span against a full-window slope 2 B u_mid, i.e.
+#:      drift = (u_hi - u_lo) / u_mid
+#: — dimensionless, as a relative drift must be. Measured 0.236 on the
+#: certification window (algebraic prediction 0.235; u_span = 1.4035e-4 K^-1,
+#: u_mid = 5.9649e-4 K^-1), while a truly linear-in-1/T model drifts < 1e-6
+#: (pure float noise). 0.05 therefore sits a factor ~4.7 under the curved case
+#: and orders of magnitude above the linear one.
+#:
+#: An earlier revision of this comment reasoned from the RAW half-slope
+#: difference — "the halves' separation is half the window ... measured 0.118
+#: ... a factor ~2.4 under the curved case". That describes the estimator as
+#: it stood BEFORE the grid-invariant normalisation landed one commit later;
+#: 0.118 is exactly half of 0.236 and reproduces the pre-fix code path to
+#: three digits. The constant did not need retuning (0.05 sits below both), so
+#: nothing caught the drift between the code and the derivation that justifies
+#: it (SC-130 sweep 2026-08-22).
 NONLINEARITY_REL_FLOOR = 0.05
 
 GAS_CONSTANT_J_MOL_K = 8.31446261815324
@@ -58,7 +81,18 @@ class VantHoffReport:
     engine: str = ""
     component: str = ""
     composition_wt_pct: tuple[tuple[str, float], ...] = ()
+    #: The grid the CALLER REQUESTED. Not necessarily what was fitted.
     T_nodes_K: tuple[float, ...] = ()
+    #: The window actually fitted, after engine refusals and reciprocal
+    #: dedup: (min, max) of the surviving nodes. Every quantity in this report
+    #: is window-determined — a least-squares line over ln gamma = B u^2
+    #: returns the local slope at the window's u-CENTROID, so H_ex depends on
+    #: window POSITION and not merely on how many nodes survived. Reporting
+    #: only the requested grid let a silent shrink change the answer while the
+    #: report affirmatively mis-stated the window it came from (SC-130 sweep
+    #: 2026-08-22: the same requested grid and the same n_usable=3 produced
+    #: H_ex values 16.6% apart depending on WHICH nodes the engine refused).
+    fitted_window_K: tuple[float, float] | None = None
     n_usable: int = 0
     #: R * (slope of ln gamma vs 1/T): the implied partial molar excess
     #: enthalpy, J/mol of the FORMULA UNIT the activity_fn reports on.
@@ -85,6 +119,9 @@ class VantHoffReport:
             "component": self.component,
             "composition_wt_pct": dict(self.composition_wt_pct),
             "T_nodes_K": list(self.T_nodes_K),
+            "fitted_window_K": (
+                list(self.fitted_window_K) if self.fitted_window_K else None
+            ),
             "n_usable": self.n_usable,
             "implied_H_ex_J_mol": self.implied_H_ex_J_mol,
             "slope_drift_rel": self.slope_drift_rel,
@@ -153,24 +190,38 @@ def vant_hoff(
         a_c = None if activities is None else activities.get(component)
         if a_c is None or not math.isfinite(float(a_c)) or float(a_c) <= 0.0:
             continue
-        pairs.append((1.0 / T, math.log(float(a_c) / x_c)))
+        pairs.append((1.0 / T, math.log(float(a_c) / x_c), T))
     pairs.sort()  # ascending 1/T, i.e. HIGH temperature first (review P3-1)
     # distinct RECIPROCALS, not just distinct T floats: adjacent-ulp T values
     # collapse in 1/T and zero a half-window variance (codex P2).
-    deduped: list[tuple[float, float]] = []
-    for u, g in pairs:
+    deduped: list[tuple[float, float, float]] = []
+    for u, g, T in pairs:
         if not deduped or u != deduped[-1][0]:
-            deduped.append((u, g))
+            deduped.append((u, g, T))
     pairs = deduped
-    inv_T = [u for u, _ in pairs]
-    ln_g = [g for _, g in pairs]
+    inv_T = [u for u, _, _ in pairs]
+    ln_g = [g for _, g, _ in pairs]
+    # The surviving TEMPERATURES themselves: reconstructing them as 1/u would
+    # round-trip through a reciprocal and hand callers 1700.0000000000002.
+    fitted_T = [T for _, _, T in pairs]
 
     notes: list[str] = []
+    requested_unique = len({float(t) for t in T_nodes_K})
+    if inv_T and len(inv_T) < requested_unique:
+        dropped = requested_unique - len(inv_T)
+        notes.append(
+            f"{dropped} of {requested_unique} requested temperature nodes were "
+            f"dropped (engine refusal or reciprocal collapse); the fit ran on "
+            f"[{min(fitted_T):.1f}, {max(fitted_T):.1f}] K, NOT the requested "
+            "span. Every quantity here is window-determined, so compare "
+            "fitted_window_K before comparing two reports."
+        )
     base = dict(
         engine=engine_name,
         component=component,
         composition_wt_pct=tuple(sorted(composition_wt_pct.items())),
         T_nodes_K=tuple(sorted(T_nodes_K)),
+        fitted_window_K=((min(fitted_T), max(fitted_T)) if fitted_T else None),
         n_usable=len(inv_T),
     )
     if len(inv_T) < 3:
