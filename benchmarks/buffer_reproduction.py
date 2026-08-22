@@ -51,9 +51,11 @@ WINDOW DISCIPLINE. Every comparison happens ONLY inside the intersection of the
 published fit's validity range and the engine's own fit range. Comparing outside
 a fit's window measures extrapolation, not agreement. This is not hypothetical:
 the first run of this instrument carried an NNO upper bound 100 K above Frost's
-and produced a headline "entropy disagrees" verdict that DISSOLVED once the
-window was corrected — the instrument's own stated failure mode, committed by
-the instrument.
+and produced a headline `temperature_dependence_disagrees` verdict whose RESIDUAL
+FAILURE dissolved once the window was corrected (0.218 -> 0.193 dex). Note what
+did NOT dissolve: NNO's implied enthalpy and entropy are still each outside
+tolerance, and now pass only by cancelling — see the compensating-errors
+disclosure. The instrument committed its own stated failure mode.
 
 SEGMENTED ENGINE DATA. A two-parameter fit assumes one (dH, dS) across the
 window. Where the engine's data is piecewise — the Ellingham Fe rail changes
@@ -77,10 +79,13 @@ GAS_CONSTANT_J_MOL_K = 8.314462618
 LN10 = math.log(10.0)
 
 #: THE one policy number. Residual tolerance in log10 fO2 units ("dex").
-#: Published buffer fits from different laboratories disagree with each other by
-#: order 0.1-0.2 dex over their common range, so a model inside 0.2 dex cannot
-#: be meaningfully separated from the spread of the anchors themselves. This is
-#: a stated project choice, not an externally certified uncertainty limit.
+#: This is a DECLARED PROJECT THRESHOLD, chosen as the smallest buffer
+#: disagreement this project would act on. It is deliberately NOT justified by
+#: an inter-laboratory spread figure: an earlier revision asserted one
+#: ("0.1-0.2 dex between published fits") with no comparison dataset behind it
+#: and no uncertainty propagated, and review 2026-08-22 rightly refused it.
+#: Substantiating a number here needs a named multi-source comparison, which
+#: this module does not have; until then it is a policy choice and says so.
 RESIDUAL_TOLERANCE_DEX = 0.20
 
 #: DERIVED, not asserted: the entropy error that produces exactly
@@ -312,6 +317,39 @@ def log10_fo2_from_delta_g(delta_g_J_per_mol_O2: float, T_K: float) -> float:
     return delta_g_J_per_mol_O2 / (LN10 * GAS_CONSTANT_J_MOL_K * float(T_K))
 
 
+class _EngineEvaluationFailed(Exception):
+    """A delta_g_fn call that raised, or returned a non-finite value."""
+
+    def __init__(self, T_K: float, detail: str):
+        super().__init__(detail)
+        self.T_K = float(T_K)
+        self.detail = detail
+
+
+def _safe_log10_fo2(
+    delta_g_fn: Callable[[str, float], float], species: str, T_K: float
+) -> float:
+    """Every engine call in this module goes through here.
+
+    Review 2026-08-22 (not-fixed pass): the finiteness guard was added to the
+    global sampling loop only, and the segment sub-fits — added by the SAME
+    repair — called the engine again unguarded, so a NaN at a sub-fit node
+    still published NaN thermodynamics inside a passing report. A callback
+    that RAISED also escaped with no report at all. One guarded path is the
+    only shape that cannot regrow either hole.
+    """
+
+    try:
+        g = delta_g_fn(species, T_K)
+    except Exception as exc:  # noqa: BLE001 - any engine failure is a refusal
+        raise _EngineEvaluationFailed(
+            T_K, f"{type(exc).__name__}: {exc}"
+        ) from exc
+    if not math.isfinite(float(g)):
+        raise _EngineEvaluationFailed(T_K, f"non-finite dG {g!r}")
+    return log10_fo2_from_delta_g(float(g), T_K)
+
+
 def _implied_thermo(temps: list[float], ours: list[float]) -> tuple[float, float]:
     """(dH, dS) implied by a log10 fO2 curve, inverting the fit-form
     substitution: A = dH/(ln10 R) and B = -dS/(ln10 R)."""
@@ -390,25 +428,21 @@ def buffer_reproduction(
         raise ValueError("need at least 3 nodes to separate slope from intercept")
 
     temps = [lo + (hi - lo) * i / (n_nodes - 1) for i in range(n_nodes)]
-    ours: list[float] = []
-    for T in temps:
-        g = delta_g_fn(pub.ellingham_species, T)
-        if not math.isfinite(float(g)):
-            # Fail-closed: a non-finite dG must not become a scientific verdict
-            # with NaN thermodynamics attached (review 2026-08-22).
-            return BufferReproductionReport(
-                **base,
-                window_K=(lo, hi),
-                n_nodes=n_nodes,
-                verdict="not_evaluable",
-                notes=(
-                    f"engine returned a non-finite dG ({g!r}) at {T:.1f} K; a "
-                    "curve that cannot be evaluated cannot be scored, and "
-                    "fitting through it would publish NaN thermodynamics as a "
-                    "typed result",
-                ),
-            )
-        ours.append(log10_fo2_from_delta_g(float(g), T))
+    try:
+        ours = [_safe_log10_fo2(delta_g_fn, pub.ellingham_species, T) for T in temps]
+    except _EngineEvaluationFailed as exc:
+        return BufferReproductionReport(
+            **base,
+            window_K=(lo, hi),
+            n_nodes=n_nodes,
+            verdict="not_evaluable",
+            notes=(
+                f"engine evaluation failed at {exc.T_K:.1f} K ({exc.detail}); a "
+                "curve that cannot be evaluated cannot be scored, and fitting "
+                "through it would publish meaningless thermodynamics as a typed "
+                "result",
+            ),
+        )
 
     residuals = [o - pub.log10_fo2(T) for o, T in zip(ours, temps)]
     dH_ours, dS_ours = _implied_thermo(temps, ours)
@@ -419,22 +453,58 @@ def buffer_reproduction(
     max_abs = max(abs(r) for r in residuals)
     mean_res = sum(residuals) / len(residuals)
     span = max(residuals) - min(residuals)
-    T_mid = 0.5 * (lo + hi)
-    dH_tol = enthalpy_tolerance_J_mol_O2(T_mid)
+    # The enthalpy term is d(dH)/(ln10 R T), LARGEST at the cold end, so the
+    # tolerance is evaluated at `lo` — the temperature where a given enthalpy
+    # error does the most damage inside this window. Review 2026-08-22 caught
+    # the midpoint choice as both unargued and non-conservative.
+    dH_tol = enthalpy_tolerance_J_mol_O2(lo)
 
     # Phase-pure sub-fits wherever the engine changes basis inside the window.
-    inner = sorted(b for b in map(float, segment_boundaries_K) if lo < b < hi)
+    # Review 2026-08-22 (not-fixed pass) closed three holes here:
+    #  * duplicate boundaries produced a zero-width sub-window and CRASHED the
+    #    fit, so boundaries are deduplicated;
+    #  * a boundary exactly AT `hi` was not counted as contamination even
+    #    though the top node lands on the next segment (engine segments are
+    #    half-open and select the NEXT segment at an exact boundary), so
+    #    detection uses `lo < b <= hi` while only strictly-interior boundaries
+    #    can split the window;
+    #  * synthesized sub-fit nodes included both endpoints, putting a node
+    #    exactly ON the boundary and pulling the LOWER segment's fit toward
+    #    the upper segment's value (measured: 1.9 kJ/mol O2 and 1.7 J/mol/K of
+    #    error at n_nodes<=5). Sub-fit nodes are now drawn from the OPEN
+    #    interior.
+    unique_bounds = sorted({float(b) for b in segment_boundaries_K})
+    contaminating = [b for b in unique_bounds if lo < b <= hi]
+    inner = [b for b in unique_bounds if lo < b < hi]
     seg_fits: list[SegmentFit] = []
-    for a, b in zip([lo] + inner, inner + [hi]):
-        sub = [T for T in temps if a <= T <= b]
-        if len(sub) < 3:
-            sub = [a + (b - a) * i / 4 for i in range(5)]
-        sub_ours = [
-            log10_fo2_from_delta_g(float(delta_g_fn(pub.ellingham_species, T)), T)
-            for T in sub
-        ]
-        s_dH, s_dS = _implied_thermo(sub, sub_ours)
-        seg_fits.append(SegmentFit(a, b, s_dH - dH_pub, s_dS - dS_pub))
+    try:
+        for a, b in zip([lo] + inner, inner + [hi]):
+            width = b - a
+            if width <= 0.0:
+                continue
+            sub = [T for T in temps if a <= T < b] or []
+            if len(sub) < 3:
+                # Open-interior sampling: never place a node on either edge, so
+                # a half-open engine segment cannot leak the neighbouring basis
+                # into this fit.
+                sub = [a + width * (i + 1) / 6.0 for i in range(5)]
+            sub_ours = [
+                _safe_log10_fo2(delta_g_fn, pub.ellingham_species, T) for T in sub
+            ]
+            s_dH, s_dS = _implied_thermo(sub, sub_ours)
+            seg_fits.append(SegmentFit(a, b, s_dH - dH_pub, s_dS - dS_pub))
+    except _EngineEvaluationFailed as exc:
+        return BufferReproductionReport(
+            **base,
+            window_K=(lo, hi),
+            n_nodes=n_nodes,
+            verdict="not_evaluable",
+            notes=(
+                f"engine evaluation failed at {exc.T_K:.1f} K during segment "
+                f"sub-fitting ({exc.detail}); a partial report here would "
+                "publish meaningless per-segment thermodynamics",
+            ),
+        )
 
     notes: list[str] = []
     if pub.provenance != PROVENANCE_VERIFIED:
@@ -450,53 +520,89 @@ def buffer_reproduction(
         f"[{pub.T_min_K:.1f}, {pub.T_max_K:.1f}] and engine "
         f"[{engine_window_K[0]:.1f}, {engine_window_K[1]:.1f}] windows"
     )
-    if inner:
+    if contaminating:
         notes.append(
-            f"the engine changes basis at {', '.join(f'{b:.0f} K' for b in inner)} "
+            f"the engine changes basis at "
+            f"{', '.join(f'{b:.0f} K' for b in contaminating)} "
             "inside this window, so the global (dH, dS) pair is a "
             "SAMPLING-WEIGHTED REGRESSION SUMMARY, not a reaction enthalpy and "
             "entropy; read segment_fits for the phase-pure values"
         )
 
+    entropy_off_pass = abs(d_dS) > ENTROPY_TOLERANCE_J_MOL_K
+    enthalpy_off_pass = abs(d_dH) > dH_tol
+
     if max_abs <= RESIDUAL_TOLERANCE_DEX:
         verdict = "reproduces_within_tolerance"
         notes.append(
-            f"max |residual| {max_abs:.3f} dex is inside {RESIDUAL_TOLERANCE_DEX} "
-            "dex, the spread between published fits themselves — this model "
-            "cannot be distinguished from the anchor over this window"
+            f"max |residual| {max_abs:.3f} dex is inside the declared "
+            f"{RESIDUAL_TOLERANCE_DEX} dex project threshold over this window. "
+            "That threshold is a project policy choice, not a certified "
+            "measurement uncertainty, so this is 'no difference this project "
+            "would act on', not 'agreement within experimental error'."
         )
-        # A pass can be produced by two LARGE errors of opposite sign that
-        # cancel inside the window (the 1/T enthalpy term against the constant
-        # entropy term). That agreement is arithmetic, not thermodynamic, and
-        # it decays the moment the window is left — which matters because the
-        # engine's own fit range usually extends past the anchor's.
-        if abs(d_dS) > ENTROPY_TOLERANCE_J_MOL_K or abs(d_dH) > dH_tol:
-            beyond = max(
-                abs(d_dH / (LN10 * GAS_CONSTANT_J_MOL_K * T)
-                    - d_dS / (LN10 * GAS_CONSTANT_J_MOL_K))
-                for T in (float(engine_window_K[0]), float(engine_window_K[1]))
-            )
+        # A pass can be produced by two errors of opposite sign that cancel
+        # inside the window (the 1/T enthalpy term against the constant
+        # entropy term). That agreement is arithmetic, not thermodynamic.
+        #
+        # Review 2026-08-22 (not-fixed pass) deleted the number this note used
+        # to quote. It extrapolated the FITTED PAIR to the edge of the
+        # engine's own range and announced 0.299 dex where the live engine
+        # gives 0.177 — because the engine changes phase basis at 1728 K,
+        # outside the fitted window. It also evaluated the published anchor
+        # past its validity limit. Both are the exact errors this module
+        # exists to prevent, committed inside a warning about extrapolation.
+        # The disclosure now states the STRUCTURE, which the fit does support,
+        # and refuses to quantify a residual outside the compared window.
+        if entropy_off_pass or enthalpy_off_pass:
+            outside = []
+            if enthalpy_off_pass:
+                outside.append(
+                    f"enthalpy {abs(d_dH)/dH_tol:.2f}x its tolerance"
+                )
+            if entropy_off_pass:
+                outside.append(
+                    f"entropy {abs(d_dS)/ENTROPY_TOLERANCE_J_MOL_K:.2f}x its tolerance"
+                )
             notes.append(
-                "COMPENSATING ERRORS: it passes inside the window while the "
-                f"implied enthalpy ({d_dH/1000.0:+.2f} kJ/mol O2) and entropy "
-                f"({d_dS:+.2f} J/mol/K) BOTH sit outside their tolerances "
-                f"({dH_tol/1000.0:.2f} kJ/mol O2, "
-                f"{ENTROPY_TOLERANCE_J_MOL_K:.2f} J/mol/K). The 1/T and "
-                "constant terms are cancelling here, so the agreement is "
-                "arithmetic rather than thermodynamic; extrapolated to the "
-                f"edges of the engine's own range the residual reaches "
-                f"{beyond:.3f} dex. Do not read this pass as a licence to use "
-                "the couple outside the compared window."
+                "COMPENSATING ERRORS: it passes inside the window while "
+                + " and ".join(outside)
+                + ". The 1/T and constant terms are cancelling here, so the "
+                "agreement is arithmetic rather than thermodynamic, and the "
+                "cancellation is a property of THIS window only. No "
+                "extrapolated residual is quoted: the published anchor is not "
+                "valid outside the compared window, and the engine may change "
+                "basis outside it, so any number here would be doubly "
+                "unsupported. Do not read this pass as a licence to use the "
+                "couple outside the compared window."
             )
+
     else:
-        entropy_off = abs(d_dS) > ENTROPY_TOLERANCE_J_MOL_K
-        enthalpy_off = abs(d_dH) > dH_tol
+        entropy_off, enthalpy_off = entropy_off_pass, enthalpy_off_pass
         if entropy_off and enthalpy_off:
             verdict = "enthalpy_and_entropy_disagree"
         elif entropy_off:
             verdict = "entropy_disagrees"
-        else:
+        elif enthalpy_off:
             verdict = "enthalpy_disagrees"
+        else:
+            # Both components inside their own tolerances, yet their SUM
+            # breaches the residual gate — the two terms add rather than
+            # cancel across this window. Naming either quantity here would
+            # accuse a coefficient the instrument itself calls acceptable
+            # (review 2026-08-22 built the closed-form case: each component at
+            # 0.9 of tolerance, combined residual 0.39 dex, previously
+            # reported as `enthalpy_disagrees` with no explanation emitted).
+            verdict = "disagrees_by_combination"
+            notes.append(
+                f"the combined residual reaches {max_abs:.3f} dex while BOTH "
+                f"components stay inside tolerance (enthalpy "
+                f"{abs(d_dH)/dH_tol:.2f}x, entropy "
+                f"{abs(d_dS)/ENTROPY_TOLERANCE_J_MOL_K:.2f}x of their limits): "
+                "the 1/T and constant terms are adding, not cancelling, across "
+                "this window. No single coefficient is accountable — attributing "
+                "this to one of them would be a fabricated diagnosis."
+            )
         if entropy_off:
             notes.append(
                 f"ENTROPY differs by {d_dS:+.2f} J/mol/K (tolerance "
@@ -507,7 +613,8 @@ def buffer_reproduction(
         if enthalpy_off:
             notes.append(
                 f"ENTHALPY differs by {d_dH/1000.0:+.2f} kJ/mol O2 (tolerance "
-                f"{dH_tol/1000.0:.2f} at the {T_mid:.0f} K midpoint), which is a "
+                f"{dH_tol/1000.0:.2f}, evaluated at the {lo:.0f} K cold end "
+                "where the enthalpy term is largest), which is a "
                 "1/T-shaped residual — largest at the cold end of the window and "
                 "shrinking as temperature rises"
             )
@@ -526,7 +633,7 @@ def buffer_reproduction(
         delta_dH_J_mol_O2=d_dH,
         delta_dS_J_mol_K_O2=d_dS,
         enthalpy_tolerance_J_mol_O2=dH_tol,
-        global_fit_is_regression_summary=bool(inner),
+        global_fit_is_regression_summary=bool(contaminating),
         segment_fits=tuple(seg_fits),
         verdict=verdict,
         notes=tuple(notes),

@@ -404,3 +404,188 @@ def test_live_ellingham_produces_a_typed_report_smoke():
             "not_evaluable",
             "not_expressible",
         )
+
+
+# ---------------------------------------------------------------------------
+# NOT-FIXED round (review 2026-08-22): each test below is keyed to the
+# reviewer's own measured counterexample against the FIRST repair attempt.
+# ---------------------------------------------------------------------------
+
+def test_segment_subfit_route_cannot_publish_nan_thermodynamics():
+    """NOT-FIXED #5: the finiteness guard covered the global sampling loop
+    only, and the segment sub-fits — added by the same repair — called the
+    engine again unguarded. The reviewer produced a passing report carrying
+    serialized segment fits with dH=NaN, dS=NaN."""
+
+    good = _exact_fn("IW")
+
+    def nan_at_subfit_node(species, T_K):
+        # The lower sub-window [1100, 1184) gets five OPEN-INTERIOR synthesized
+        # nodes; none of the three global nodes (1100, 1286.6, 1473.2) lies in
+        # this band, so only the sub-fit route reaches it.
+        if 1110.0 < T_K < 1180.0:
+            return float("nan")
+        return good(species, T_K)
+
+    r = buffer_reproduction(
+        nan_at_subfit_node,
+        "IW",
+        engine_window_K=(1100.0, 2600.0),
+        engine_name="synthetic",
+        n_nodes=3,
+        segment_boundaries_K=(1184.0,),
+    )
+    assert r.verdict == "not_evaluable"
+    for sf in r.segment_fits:
+        assert math.isfinite(sf.delta_dH_J_mol_O2)
+        assert math.isfinite(sf.delta_dS_J_mol_K_O2)
+
+
+def test_raising_callback_becomes_a_refusal_not_a_crash():
+    """NOT-FIXED #5: a callback that raised escaped the function entirely and
+    produced no report at all."""
+
+    def boom(species, T_K):
+        raise RuntimeError("boom")
+
+    r = buffer_reproduction(
+        boom, "NNO", engine_window_K=ENGINE_WINDOW, engine_name="synthetic"
+    )
+    assert r.verdict == "not_evaluable"
+    assert any("boom" in n for n in r.notes)
+
+
+def test_duplicate_segment_boundaries_do_not_crash():
+    """NOT-FIXED #4: duplicates created a zero-width sub-window and crashed
+    the fit with `degenerate temperature grid`."""
+
+    r = buffer_reproduction(
+        _exact_fn("IW"),
+        "IW",
+        engine_window_K=(1100.0, 2600.0),
+        engine_name="synthetic",
+        segment_boundaries_K=(1184.0, 1184.0, 1184.0),
+    )
+    assert r.verdict != "not_evaluable"
+    assert len(r.segment_fits) == 2
+
+
+def test_subfit_nodes_avoid_the_boundary_on_a_piecewise_engine():
+    """NOT-FIXED #4: synthesized sub-fit nodes included both endpoints, so at
+    n_nodes<=5 a node sat exactly ON the boundary. Engine segments are
+    half-open and select the NEXT segment there, dragging the LOWER sub-fit
+    toward the upper segment (measured error 1.9 kJ/mol O2, 1.7 J/mol/K).
+
+    Uses a genuinely PIECEWISE callback — the earlier segment test used one
+    unsegmented straight line and therefore could not detect this at all."""
+
+    pub = PUBLISHED_BUFFERS["IW"]
+    boundary = 1184.0
+    lower_dH, lower_dS = pub.A_K * SCALE - 14_000.0, -pub.B * SCALE + 1.5
+    upper_dH, upper_dS = pub.A_K * SCALE - 12_000.0, -pub.B * SCALE + 3.0
+
+    def piecewise(species, T_K):
+        # half-open like the real engine: the boundary belongs to the UPPER leg
+        if T_K < boundary:
+            return lower_dH - T_K * lower_dS
+        return upper_dH - T_K * upper_dS
+
+    for n in (3, 4, 5, 13):
+        r = buffer_reproduction(
+            piecewise,
+            "IW",
+            engine_window_K=(1100.0, 2600.0),
+            engine_name="synthetic",
+            n_nodes=n,
+            segment_boundaries_K=(boundary,),
+        )
+        lo_fit = r.segment_fits[0]
+        # the lower sub-fit must recover the LOWER leg, uncontaminated
+        assert lo_fit.delta_dH_J_mol_O2 == pytest.approx(-14_000.0, abs=1.0), n
+        assert lo_fit.delta_dS_J_mol_K_O2 == pytest.approx(1.5, abs=0.01), n
+
+
+def test_boundary_at_the_window_edge_is_still_contamination():
+    """NOT-FIXED #4: a boundary exactly at `hi` was excluded from detection,
+    yet the top global node evaluates on the next engine segment. The two
+    edges were asymmetric."""
+
+    r = buffer_reproduction(
+        _exact_fn("IW"),
+        "IW",
+        engine_window_K=(1100.0, 1184.0),
+        engine_name="synthetic",
+        segment_boundaries_K=(1184.0,),
+    )
+    assert r.window_K == (1100.0, 1184.0)
+    assert r.global_fit_is_regression_summary is True
+
+
+def test_residual_failure_with_both_components_inside_is_not_blamed_on_one():
+    """NOT-FIXED #3: when the combined residual failed but NEITHER component
+    exceeded its tolerance, the final else still returned `enthalpy_disagrees`
+    and emitted no explanation. Reviewer's closed-form case, adapted to the
+    cold-end tolerance evaluation."""
+
+    lo = 1100.0
+    dH = 0.9 * RESIDUAL_TOLERANCE_DEX * SCALE * lo
+    dS = -0.9 * RESIDUAL_TOLERANCE_DEX * SCALE
+    r = buffer_reproduction(
+        _exact_fn("NNO", dH_shift_J=dH, dS_shift_J=dS),
+        "NNO",
+        engine_window_K=(lo, 2000.0),
+        engine_name="synthetic",
+    )
+    assert r.max_abs_residual_dex > RESIDUAL_TOLERANCE_DEX
+    assert abs(r.delta_dH_J_mol_O2) <= r.enthalpy_tolerance_J_mol_O2
+    assert abs(r.delta_dS_J_mol_K_O2) <= ENTROPY_TOLERANCE_J_MOL_K
+    assert r.verdict == "disagrees_by_combination"
+    assert any("No single coefficient is accountable" in n for n in r.notes)
+
+
+def test_enthalpy_tolerance_is_evaluated_at_the_cold_end():
+    """NOT-FIXED #6: the tolerance was evaluated at the window midpoint, which
+    is neither argued nor conservative — the enthalpy term is largest at `lo`."""
+
+    r = buffer_reproduction(
+        _exact_fn("NNO"), "NNO", engine_window_K=(1100.0, 1400.0)
+    )
+    assert r.enthalpy_tolerance_J_mol_O2 == pytest.approx(
+        enthalpy_tolerance_J_mol_O2(r.window_K[0]), rel=1e-12
+    )
+
+
+def test_compensating_note_quotes_no_extrapolated_residual():
+    """NOT-FIXED #8: the note extrapolated the fitted pair past a phase
+    boundary AND past the anchor's validity limit, announcing 0.299 dex where
+    the live engine gives 0.177. It must now describe the structure without
+    quoting a number outside the compared window, and must name only the
+    components actually outside tolerance."""
+
+    lo = 1100.0
+    # residual = dH/(S*T) - dS/S, so cancellation needs the SAME sign on both.
+    # Entropy 1.1x outside tolerance, enthalpy well inside it, and the two
+    # terms subtract to <= 0.19 dex across the window: a PASS carrying one
+    # out-of-tolerance component, which is what must trigger the disclosure.
+    dS = 1.1 * RESIDUAL_TOLERANCE_DEX * SCALE
+    dH = 0.2 * RESIDUAL_TOLERANCE_DEX * SCALE * lo
+    r = buffer_reproduction(
+        _exact_fn("NNO", dH_shift_J=dH, dS_shift_J=dS),
+        "NNO",
+        engine_window_K=(lo, 1473.15),
+        engine_name="synthetic",
+    )
+    note = next((n for n in r.notes if "COMPENSATING ERRORS" in n), None)
+    assert note is not None
+    assert "dex" not in note.split("COMPENSATING ERRORS")[1].split(".")[0]
+    # only the component actually outside tolerance may be named
+    assert "entropy" in note
+    assert "enthalpy" not in note
+
+
+def test_every_buffer_has_the_expected_provenance_tag():
+    """NOT-FIXED #7 coverage gap: the tests asserted only that provenance was
+    non-empty, so a silent downgrade would not have been caught."""
+
+    for key in ("IW", "NNO", "QFM", "WM"):
+        assert PUBLISHED_BUFFERS[key].provenance == PROVENANCE_VERIFIED, key
