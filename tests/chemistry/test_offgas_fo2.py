@@ -22,6 +22,8 @@ import math
 import pytest
 
 from simulator.chemistry.offgas_fo2 import (
+    _COUPLE_RECORDS,
+    _effective_domain_K,
     CO_COUPLE_ONLY,
     COMPUTED_ASSUMPTION_UNVERIFIED,
     COMPUTED_NO_RECONCILIATION,
@@ -122,11 +124,22 @@ def test_couple_disagreement_equals_two_log_q_over_k(polys):
 
 
 def test_gap_and_extent_change_sign_together_at_the_crossover(polys):
-    """Below ~1100 K the shift runs forward and the CO couple is more reducing.
+    """The couple gap and the shift extent must change sign at the same point.
 
-    Above it, both reverse. They must flip together -- a sign disagreement would
-    mean the extent solver and the fO2 inversion disagree about which way the
-    reaction goes.
+    What sets the direction is sign(K_wgs - Q), NOT temperature. T enters only
+    through K_wgs, so a fixed gas turns over where K_wgs crosses ITS OWN Q --
+    for this fixture (Q = 0.898) at 1128.6 K, where a bisection on the extent
+    sign and a bisection on K_wgs = Q agree to six figures. That is NOT the
+    1095.7 K point at which K_wgs crosses unity; the two coincide only for a gas
+    that happens to sit near Q = 1, which is why an earlier version of this
+    docstring read as a temperature law ("below ~1100 K the shift runs forward")
+    and was wrong for every gas but this one. Gases that never flip at all
+    across the same span, pinned in the companion test below: Q = 2e4 runs
+    reverse at both 700 K and 1873 K, Q = 2e-6 forward at both.
+
+    What this test asserts is the AGREEMENT, not the threshold: a sign
+    disagreement would mean the extent solver and the fO2 inversion disagree
+    about which way the reaction goes.
     """
 
     gas = {"H2": 2.0, "H2O": 0.35, "CO": 1.4, "CO2": 0.22}
@@ -137,6 +150,72 @@ def test_gap_and_extent_change_sign_together_at_the_crossover(polys):
     assert low.extent_mol > 0.0
     assert high.raw_couple_disagreement_dex > 0.0
     assert high.extent_mol < 0.0
+
+
+def test_shift_direction_follows_q_versus_k_not_temperature(polys):
+    """Direction is sign(K_wgs - Q); temperature alone decides nothing.
+
+    The regression this guards: a reader who takes "below ~1100 K it runs
+    forward" as the law will mis-predict every gas whose Q is not near 1, and
+    will read a correct result as a bug. Both gases below straddle the 1095.7 K
+    unity point and the 1100 K figure, and neither changes direction.
+
+    K_wgs falls monotonically with T over this span (9.40 at 700 K, 0.244 at
+    1873 K), so a gas held far above that range is reverse throughout and one
+    held far below is forward throughout.
+    """
+
+    strongly_shifted = {"H2": 10.0, "H2O": 0.05, "CO": 0.05, "CO2": 5.0}
+    barely_shifted = {"H2": 0.01, "H2O": 5.0, "CO": 10.0, "CO2": 0.01}
+
+    for T_K in (700.0, 1873.15):
+        high_q = imposed_fo2(strongly_shifted, T_K, polys)
+        assert high_q.log10_Q_over_K > 0.0, f"Q > K expected at {T_K} K"
+        assert high_q.extent_mol < 0.0, (
+            f"Q = 2e4 must run REVERSE at {T_K} K; a temperature law would "
+            "predict forward below ~1100 K"
+        )
+
+        low_q = imposed_fo2(barely_shifted, T_K, polys)
+        assert low_q.log10_Q_over_K < 0.0, f"Q < K expected at {T_K} K"
+        assert low_q.extent_mol > 0.0, (
+            f"Q = 2e-6 must run FORWARD at {T_K} K; a temperature law would "
+            "predict reverse above ~1100 K"
+        )
+
+
+def test_fixture_crossover_tracks_q_not_the_unity_point(polys):
+    """The fixture gas turns over at K_wgs = Q, not at K_wgs = 1.
+
+    These two temperatures differ by ~33 K for this gas, which is what makes the
+    coincidence detectable at all: near Q = 1 they are close enough that the
+    wrong explanation still predicts the right answer.
+    """
+
+    gas = {"H2": 2.0, "H2O": 0.35, "CO": 1.4, "CO2": 0.22}
+
+    def bisect(f, lo, hi):
+        for _ in range(80):
+            mid = 0.5 * (lo + hi)
+            if f(lo) * f(mid) <= 0.0:
+                hi = mid
+            else:
+                lo = mid
+        return 0.5 * (lo + hi)
+
+    extent_flip = bisect(lambda T: imposed_fo2(gas, T, polys).extent_mol, 400.0, 3000.0)
+    q_crossing = bisect(lambda T: imposed_fo2(gas, T, polys).log10_Q_over_K, 400.0, 3000.0)
+    unity = bisect(lambda T: water_gas_shift_log10_K(polys, T), 400.0, 3000.0)
+
+    assert extent_flip == pytest.approx(q_crossing, abs=1e-3), (
+        "the extent must turn over exactly where Q crosses K"
+    )
+    assert extent_flip == pytest.approx(1128.6, abs=0.5)
+    assert unity == pytest.approx(1095.7, abs=0.5)
+    assert abs(extent_flip - unity) > 25.0, (
+        "if these collapsed together the test could no longer tell the correct "
+        "explanation from the temperature-law one"
+    )
 
 
 def test_equilibrated_fo2_lies_between_the_raw_couples(polys):
@@ -475,3 +554,383 @@ def test_full_gas_reports_the_assumption_it_made(polys):
     assert r.coupling == WGS_EQUILIBRATED
     assert any("water-gas-shift equilibrium" in n for n in r.notes)
     assert r.as_dict()["log10_Q_over_K"] is not None
+
+
+def test_unusable_temperature_refuses_in_this_module_s_own_type(polys):
+    """An unusable T_K must raise OffgasFO2Unavailable, not a foreign type.
+
+    "Unusable" and not "every bad", deliberately: control-flow signals
+    (KeyboardInterrupt, SystemExit, GeneratorExit) raised by a caller's
+    __float__ still propagate untouched, by the policy argued in _safe_repr.
+
+    Before the guard, T_K was unvalidated and travelled into the CEA
+    polynomials, which raise NasaCeaDomainError (<- NasaCeaError <- ValueError)
+    while this module's own refusal is OffgasFO2Unavailable (<- Exception).
+    The hierarchies are disjoint, so no single exception TYPE covers both, and
+    every input below escaped as a foreign one. "Every input below" is the honest
+    scope -- an earlier docstring said every bad T_K, which was false while the
+    conversion guard caught only a three-type tuple; a __float__ raising an
+    ordinary RuntimeError leaked. The guard now catches Exception, and the
+    re-entrant/hostile cases are pinned by the tests that follow. (A caller CAN write one clause,
+    ``except (OffgasFO2Unavailable, NasaCeaError):`` -- but only by knowing the
+    second type is reachable from here, which is the coupling this guard removes.)
+
+    NaN is listed deliberately, but not for the reason an earlier version of
+    this docstring gave. The module's range test is NEGATED -- ``not (lo <= T
+    <= hi)`` -- so NaN already fails it: the chained comparison is False and its
+    negation raises. The separate finite check exists to make the message say
+    "non-finite temperature" rather than describe NaN as lying outside a numeric
+    interval. (The un-negated form, ``if T < lo or T > hi``, is the one that
+    admits NaN; the CEA evaluator uses exactly that form at
+    simulator/vapour_rail/nasa_cea.py:373 -- ``if T < T_min_K or T > T_max_K``,
+    both False for NaN -- which is why NaN there falls through the segment walk
+    and emerges as "not covered by any segment (internal gap after
+    construction?)", blaming the data for the caller's input. Tracked as b-223 in
+    the goal-flight task store, which lives outside this checkout; the sentence
+    above is written to stand alone if that reference cannot be resolved.)
+    """
+
+    gas = {"H2": 1.0, "H2O": 1.0, "CO": 1.0, "CO2": 1.0}
+    # Unusable for EVERY couple: not a finite number, or outside even the CO
+    # couple's 200-20000 K records. Temperatures between 6000 and 20000 K are
+    # deliberately NOT here -- they are unusable only for couples that read H2O,
+    # and pinning them as universally unusable would re-assert the very
+    # over-restriction that per-couple domains exist to remove. That case is
+    # covered by test_a_co_only_gas_is_not_refused_for_a_constant_it_never_uses.
+    unusable = [
+        float("nan"),
+        float("inf"),
+        float("-inf"),
+        0.0,
+        -5.0,
+        100.0,
+        199.9,
+        20000.1,
+        1e6,
+        "hot",
+        None,
+        [1500],
+        10**10000,  # float() raises OverflowError, not ValueError
+    ]
+
+    # Every gas SHAPE, not just one. Each constant is now computed lazily, so a
+    # single-gas check would prove only that the shape it happens to use
+    # validates -- and the refusal would hold by reachability rather than by
+    # construction. These six shapes cover both single-couple branches, the
+    # shift branch, and the partnerless cases that reach neither couple.
+    shapes = [
+        gas,
+        {"CO": 1.0, "CO2": 1.0},
+        {"H2": 1.0, "H2O": 1.0},
+        {"H2": 1.0, "CO2": 1.0},
+        {"H2O": 1.0, "CO": 1.0},
+        {"H2": 1.0, "CO2": 1.0, "H2O": 1.0},
+    ]
+
+    for T_K in unusable:
+        with pytest.raises(OffgasFO2Unavailable):
+            water_gas_shift_log10_K(polys, T_K)
+        for shape in shapes:
+            with pytest.raises(OffgasFO2Unavailable):
+                imposed_fo2(shape, T_K, polys)
+
+    # Between the two ceilings the refusal is couple-specific, not global: the
+    # shift and any H2-bearing gas refuse, a CO-only gas computes.
+    for T_K in (6000.1, 7000.0, 19999.0):
+        with pytest.raises(OffgasFO2Unavailable):
+            water_gas_shift_log10_K(polys, T_K)
+        for shape in shapes:
+            if "H2" in shape or "H2O" in shape:
+                with pytest.raises(OffgasFO2Unavailable):
+                    imposed_fo2(shape, T_K, polys)
+            else:
+                assert math.isfinite(imposed_fo2(shape, T_K, polys).log10_fO2)
+
+
+def test_usable_domain_is_computed_from_the_records_a_couple_actually_reads(polys):
+    """The window is the intersection over that couple's OWN three records.
+
+    This test moves the bounds rather than asserting the shipped ones, because
+    an implementation hardcoded to (200, 6000) passes any test that only checks
+    today's numbers -- which is what the previous version of this test did, and
+    why it could not fail when the advertised computed-intersection behaviour
+    was broken.
+    """
+
+    import dataclasses
+
+    def narrowed(name, lo, hi):
+        """Same record, segments clipped to [lo, hi]."""
+        base = polys[name]
+        segs = tuple(
+            dataclasses.replace(
+                s,
+                T_min_K=max(s.T_min_K, lo),
+                T_max_K=min(s.T_max_K, hi),
+            )
+            for s in base.segments
+            if s.T_min_K < hi and s.T_max_K > lo
+        )
+        return dataclasses.replace(base, segments=segs)
+
+    # Clip ONE record of the CO couple and confirm the ceiling follows it.
+    clipped = dict(polys)
+    clipped["CO2"] = narrowed("CO2", 200.0, 3000.0)
+    assert _effective_domain_K(clipped, _COUPLE_RECORDS["CO"]) == (200.0, 3000.0)
+    # ...while the H2 couple, which does not read CO2, is untouched.
+    assert _effective_domain_K(clipped, _COUPLE_RECORDS["H2"]) == (200.0, 6000.0)
+
+    # Clip the floor of an O2 record, shared by both couples: both move.
+    raised = dict(polys)
+    raised["O2"] = narrowed("O2", 500.0, 20000.0)
+    assert _effective_domain_K(raised, _COUPLE_RECORDS["CO"])[0] == 500.0
+    assert _effective_domain_K(raised, _COUPLE_RECORDS["H2"])[0] == 500.0
+
+    # ...and clip a record that is NOT currently binding. This is the case that
+    # gives the test teeth. Clipping only CO2 (today's binding ceiling) and O2
+    # (today's binding floor) is still passed by an implementation that hardcodes
+    # WHICH record binds -- e.g. one returning (O2.T_min, CO2.T_max) directly. CO
+    # is the non-binding record of the CO couple, so an implementation that does
+    # not genuinely intersect all three will not follow it down.
+    non_binding = dict(polys)
+    non_binding["CO"] = narrowed("CO", 200.0, 2500.0)
+    assert _effective_domain_K(non_binding, _COUPLE_RECORDS["CO"]) == (200.0, 2500.0), (
+        "the ceiling must follow whichever record is lowest, not a remembered one"
+    )
+    # H2 does not read CO, so its window must be unmoved.
+    assert _effective_domain_K(non_binding, _COUPLE_RECORDS["H2"]) == (200.0, 6000.0)
+
+
+def test_refusal_names_a_temperature_that_round_trips(polys):
+    """The refused value must not print as a value inside the interval.
+
+    At a representational boundary a %g format rounds the temperature INTO the
+    range it is being refused for: nextafter(20000.0, +inf) is 20000.000000000004
+    and printed as "20000", so the message read "20000 K is outside [200, 20000]
+    K" -- while the exact boundary 20000.0 really is evaluable. The message
+    contradicted itself for precisely the reader who hit the edge.
+    """
+
+    just_over = math.nextafter(20000.0, math.inf)
+    assert just_over != 20000.0
+
+    # The exact boundary is evaluable, which is what makes the rounding a lie.
+    assert math.isfinite(imposed_fo2({"CO": 1.0, "CO2": 1.0}, 20000.0, polys).log10_fO2)
+
+    with pytest.raises(OffgasFO2Unavailable) as excinfo:
+        imposed_fo2({"CO": 1.0, "CO2": 1.0}, just_over, polys)
+    message = str(excinfo.value)
+    assert repr(just_over) in message, message
+    assert "20000 K is outside" not in message, message
+
+
+def test_a_message_builder_survives_ordinary_hostility(polys):
+    """_safe_repr must survive values engineered to break the message path.
+
+    Named for what is actually promised. The contract is deliberately NOT "cannot
+    raise": BaseException still propagates, because swallowing a KeyboardInterrupt
+    to finish formatting an error message would be the worse bug. The previous
+    name claimed the absolute and the code never delivered it.
+
+    Error-construction code runs only on inputs nobody tests, which is exactly
+    the input set a fail-closed guard is about. An earlier version guarded only
+    repr(); len() and the slice sat outside the try, so a str subclass with a
+    raising __len__ escaped past it as a foreign OverflowError -- reopening the
+    hole the guard exists to close, inside the guard.
+    """
+
+    class EvilStr(str):
+        def __len__(self):
+            raise OverflowError("len overflow")
+
+    class EvilRepr:
+        def __float__(self):
+            raise OverflowError("float overflow")
+
+        def __repr__(self):
+            return EvilStr("evil")
+
+    with pytest.raises(OffgasFO2Unavailable):
+        water_gas_shift_log10_K(polys, EvilRepr())
+    with pytest.raises(OffgasFO2Unavailable):
+        imposed_fo2({"CO": 1.0, "CO2": 1.0}, EvilRepr(), polys)
+
+
+def test_both_couples_are_evaluated_at_the_same_temperature(polys):
+    """A stateful temperature must not yield a cross-temperature subtraction.
+
+    water_gas_shift_log10_K used to hand the caller's raw object to each couple
+    evaluation separately. A float-like returning 1000 K then 2000 K produced
+    log10 K_wgs = 6.675 -- an equilibrium constant at neither temperature, since
+    the fixed-T values are 0.157 and -0.661. It is a subtraction across two
+    different states, returned as a thermodynamic quantity.
+    """
+
+    class Drifting:
+        def __init__(self, *values):
+            self._values = list(values)
+
+        def __float__(self):
+            return float(self._values.pop(0) if len(self._values) > 1 else self._values[0])
+
+    result = water_gas_shift_log10_K(polys, Drifting(1000.0, 2000.0))
+    at_1000 = water_gas_shift_log10_K(polys, 1000.0)
+    assert result == pytest.approx(at_1000, abs=1e-12), (
+        "the first conversion must fix the temperature for both couples"
+    )
+
+
+def test_shipped_extract_windows_are_what_the_module_documents(polys):
+    """Pin today's data separately from the computation that reads it.
+
+    H2O is the binding record for the H2 couple and for the shift; the CO couple
+    reaches far higher. The module's comments name these numbers, so they are
+    asserted here rather than left to a reader to trust.
+    """
+
+    assert _effective_domain_K(polys, _COUPLE_RECORDS["H2"]) == (200.0, 6000.0)
+    assert _effective_domain_K(polys, _COUPLE_RECORDS["CO"]) == (200.0, 20000.0)
+
+    for T_K in (200.0, 6000.0):
+        assert math.isfinite(water_gas_shift_log10_K(polys, T_K))
+
+    for T_K in (math.nextafter(200.0, 0.0), math.nextafter(6000.0, math.inf)):
+        with pytest.raises(OffgasFO2Unavailable, match="outside the shared domain"):
+            water_gas_shift_log10_K(polys, T_K)
+
+
+def test_a_co_only_gas_is_not_refused_for_a_constant_it_never_uses(polys):
+    """Above H2O's ceiling the CO couple is still an evaluation, not a guess.
+
+    K2 reads CO2/CO/O2, all of which span 200-20000 K on the shipped extract. A
+    gas carrying only that couple has no use for K1, so refusing it at 7000 K
+    would reject a computable answer -- and the refusal said "K1 and K2 there
+    would be extrapolations", which is false of K2 by 14000 K.
+
+    The temperature is far outside anything this furnace reaches; the point is
+    the contract, not the operating point. What must NOT happen is refusing a
+    quantity the records support, with a reason that is untrue.
+    """
+
+    result = imposed_fo2({"CO": 1.0, "CO2": 1.0}, 7000.0, polys)
+    assert math.isfinite(result.log10_fO2)
+    # 2 * (log10(1/1) - log10 K2), and log10 K2 at 7000 K is -2.16234846764.
+    assert result.log10_fO2 == pytest.approx(2.0 * 2.16234846764, abs=1e-6)
+
+    # The H2 couple genuinely IS out of domain there, and asking for it refuses.
+    with pytest.raises(OffgasFO2Unavailable, match="outside the shared domain"):
+        water_gas_shift_log10_K(polys, 7000.0)
+
+
+def test_refusal_survives_a_hostile_exception_type_name(polys):
+    """The CAUGHT exception is rendered too, and that lookup can also raise.
+
+    type(exc).__name__ looks total and is not. The value-rendering hole was
+    closed first, and this is the same shape one argument to the right: a float-
+    like whose __float__ raises a ValueError subclass whose metaclass raises when
+    __name__ is read. The conversion exception is caught, the VALUE renders
+    safely, and the message then dies describing the exception.
+    """
+
+    class ExplodingName(type):
+        @property
+        def __name__(cls):  # noqa: N805
+            raise RuntimeError("exception name exploded")
+
+    class HostileError(ValueError, metaclass=ExplodingName):
+        pass
+
+    class Hostile:
+        def __float__(self):
+            raise HostileError("nope")
+
+    for call in (
+        lambda: water_gas_shift_log10_K(polys, Hostile()),
+        lambda: imposed_fo2({"CO": 1.0, "CO2": 1.0}, Hostile(), polys),
+    ):
+        with pytest.raises(OffgasFO2Unavailable):
+            call()
+
+
+def test_the_callers_object_is_converted_once_per_successful_call(polys):
+    """Pins the structural claim in _coerce_T_K's docstring, which no test held.
+
+    Counted on the CALLER'S OBJECT, not on float() calls inside the module --
+    the module coerces again per couple, idempotently and on purpose. A claim
+    about code structure that nothing asserts is maintained by nothing; this
+    module has carried five such claims that rotted or were false on the day.
+    """
+
+    class Counted:
+        def __init__(self, value):
+            self.value = value
+            self.calls = 0
+
+        def __float__(self):
+            self.calls += 1
+            return self.value
+
+    for gas in (
+        None,
+        {"CO": 1.0, "CO2": 1.0},
+        {"H2": 1.0, "H2O": 1.0, "CO": 1.0, "CO2": 1.0},
+    ):
+        obj = Counted(1500.0)
+        if gas is None:
+            water_gas_shift_log10_K(polys, obj)
+        else:
+            imposed_fo2(gas, obj, polys)
+        assert obj.calls == 1, f"caller object converted {obj.calls}x for {gas}"
+
+
+def test_a_hostile_returned_type_name_cannot_break_the_refusal(polys):
+    """Guarding the LOOKUP is not enough; the returned object gets formatted.
+
+    A metaclass may return from __name__ something that is not a plain str -- or a
+    str subclass whose __format__ raises. That object was then interpolated at the
+    call site, outside the helper's try, so the refusal died one frame further out
+    than the guard reached. Distinct from the raising-__name__ case: there the
+    lookup fails, here it succeeds and hands back a bomb.
+    """
+
+    class FormatBomb(str):
+        def __format__(self, spec):
+            raise RuntimeError("name formatting exploded")
+
+    class ExplodingName(type):
+        @property
+        def __name__(cls):  # noqa: N805
+            return FormatBomb("boom")
+
+    class HostileError(ValueError, metaclass=ExplodingName):
+        pass
+
+    class Hostile:
+        def __float__(self):
+            raise HostileError("nope")
+
+    with pytest.raises(OffgasFO2Unavailable):
+        water_gas_shift_log10_K(polys, Hostile())
+    with pytest.raises(OffgasFO2Unavailable):
+        imposed_fo2({"CO": 1.0, "CO2": 1.0}, Hostile(), polys)
+
+
+def test_any_ordinary_conversion_failure_refuses_in_type(polys):
+    """A caller's __float__ may raise anything; all of it must refuse in-type.
+
+    The guard once caught only (TypeError, ValueError, OverflowError). A
+    __float__ raising an ordinary RuntimeError therefore leaked that RuntimeError
+    from both public APIs -- the exact catch-disjointness the guard exists to
+    remove, surviving in the guard's own except clause.
+    """
+
+    for exc_type in (RuntimeError, KeyError, ZeroDivisionError, AttributeError):
+
+        class Raising:
+            def __float__(self, _e=exc_type):
+                raise _e("conversion exploded")
+
+        with pytest.raises(OffgasFO2Unavailable):
+            water_gas_shift_log10_K(polys, Raising())
+        with pytest.raises(OffgasFO2Unavailable):
+            imposed_fo2({"CO": 1.0, "CO2": 1.0}, Raising(), polys)

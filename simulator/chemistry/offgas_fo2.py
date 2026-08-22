@@ -93,7 +93,7 @@ from __future__ import annotations
 import math
 import pathlib
 from dataclasses import dataclass, field
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 import yaml
 
@@ -283,10 +283,271 @@ def load_buffer_polynomials(
     return polynomials
 
 
+#: Which CEA records each couple's log10 K actually reads. Domain validation is
+#: per-couple because the couples do NOT share a window: on the shipped extract
+#: H2O stops at 6000 K while CO, CO2 and O2 reach 20000 K, so K2 stays a genuine
+#: evaluation in a band where K1 would be an extrapolation. Intersecting all five
+#: records would refuse a CO-only gas at 7000 K for the unusability of a constant
+#: that gas never needs -- and would say so in a message that is false about K2.
+_COUPLE_RECORDS: Mapping[str, tuple[str, ...]] = {
+    "H2": ("H2O", "H2", "O2"),
+    "CO": ("CO2", "CO", "O2"),
+}
+
+
+def _effective_domain_K(
+    polynomials: Mapping[str, NasaCeaPolynomial], records: Sequence[str]
+) -> tuple[float, float]:
+    """The temperature window in which every record in ``records`` is valid.
+
+    One couple's log10 K is a sum over three species' records, so it is defined
+    only where ALL THREE are: the usable window is the INTERSECTION of those
+    records' domains, [max(T_min), min(T_max)] -- never any single record's
+    range, and never the intersection over records the caller does not need.
+
+    That distinction matters for the message as much as for the bound, though
+    less uniformly than an earlier version of this docstring claimed. The
+    underlying evaluator names whichever species it reached first. Through
+    ``water_gas_shift_log10_K`` the CO couple goes first, so an out-of-domain
+    call at 100 K reported "[200, 20000] K" -- true of CO2, false of the quantity
+    requested. Through ``imposed_fo2`` the H2 couple goes first and H2O is always
+    the binding record there, so the same call reported "[200, 6000] K": the
+    right interval, reached for the wrong reason, and only by luck of evaluation
+    order.
+
+    Computed rather than hardcoded, so a re-extract that widens or narrows any
+    record moves this bound with it instead of silently disagreeing.
+    """
+
+    return (
+        max(polynomials[name].T_min_K for name in records),
+        min(polynomials[name].T_max_K for name in records),
+    )
+
+
+def _safe_type_name(obj: object) -> str:
+    """The type name of ``obj`` as a plain str, or a placeholder.
+
+    Raises nothing ORDINARY; BaseException still propagates, deliberately (see
+    the policy note in the body). "Never raises" would be the easier sentence and
+    the false one.
+
+    ``type(x).__name__`` looks total and is not: a metaclass can raise on the
+    attribute. Message construction reached for it directly on the CAUGHT
+    EXCEPTION, so a value whose conversion raised could still break the refusal
+    path while it was being described -- the same shape as the value-rendering
+    hole, one argument to the right, and not covered by the tests written for
+    that one.
+    """
+
+    # Exception, NOT BaseException -- the same policy _safe_repr argues for below,
+    # and for the same reason. An earlier revision caught BaseException here,
+    # which meant _safe_repr's fallback (which calls this) would swallow a
+    # KeyboardInterrupt after all: two adjacent helpers with opposite policies on
+    # one question, the rationale written on only one.
+    #
+    # "".join() rather than a bare return, because guarding the LOOKUP is not
+    # enough. A metaclass may return a non-str, or a str subclass whose __format__
+    # raises; that object then gets formatted at the call site, OUTSIDE this try,
+    # and the refusal dies there instead. join() both validates (a non-str raises
+    # TypeError, caught here) and produces a plain str, which f-string formatting
+    # cannot make fail.
+    try:
+        return "".join(type(obj).__name__)
+    except Exception:  # noqa: BLE001 - ordinary failures must not break a message
+        return "<unnameable>"
+
+
+def _safe_repr(value: object, limit: int = 120) -> str:
+    """repr() that will not raise an ordinary exception, for error messages.
+
+    Building a refusal must not fail for an ordinary reason. Two separate defects
+    got here, and merging them into one sentence -- as an earlier revision did --
+    loses the second lesson:
+
+      1. The first guard caught only (TypeError, ValueError), so on a
+         10000-digit int the OverflowError from float() escaped uncaught.
+      2. The revision that ADDED the OverflowError catch then interpolated the
+         value directly, and repr() raised ValueError on that same input
+         ("exceeds the limit (4300 digits) for integer string conversion") --
+         so the refusal path threw a foreign exception one line inside the fix
+         for foreign exceptions.
+
+    Missing catch, then message construction that can itself raise. This module's
+    documented defect class is inaccurate self-history, so the archaeology is
+    kept exact on purpose.
+
+    "Ordinary" is load-bearing and is not a hedge: see the scope note in the body.
+    """
+
+    # EVERYTHING is inside the try, including len() and the slice. An earlier
+    # version guarded only repr(), so a str subclass whose __len__ raises escaped
+    # straight past -- re-opening the exact hole the caller uses this to close.
+    #
+    # SCOPE, stated exactly rather than absolutely: this catches Exception, not
+    # BaseException. KeyboardInterrupt, SystemExit and GeneratorExit still
+    # propagate, and that is deliberate -- swallowing an interrupt to finish
+    # formatting an error message would be a worse bug than the one being
+    # reported. An earlier revision of this docstring claimed the function
+    # "cannot itself raise" for "ANY value"; that was an overclaim of exactly the
+    # kind this module is under audit for, so the contract is narrowed here to
+    # what the code delivers instead of the code being widened to a promise it
+    # should not make.
+    try:
+        # "".join for the same reason as _safe_type_name: repr() may hand back a
+        # str SUBCLASS whose __format__ raises, and that would detonate at the
+        # call site rather than here. join() yields a plain str.
+        text = "".join(repr(value))
+        return (
+            text if len(text) <= limit else f"{text[:limit]}... ({len(text)} chars)"
+        )
+    except Exception:  # noqa: BLE001 - ordinary failures must not break a message
+        return f"<unrepresentable {_safe_type_name(value)}>"
+
+
+def _coerce_T_K(T_K: float) -> float:
+    """Normalise a caller's temperature to a finite float, or refuse.
+
+    Split out from the domain check because the two have different scopes. This
+    part is caller-shaped and couple-independent -- a temperature that is not a
+    finite number is unusable for ANY couple -- so it can run once at entry. The
+    domain check is couple-DEPENDENT (the CO couple's records reach 20000 K
+    while the H2 couple's stop at 6000 K), so it must stay next to the constant
+    being evaluated.
+
+    Idempotent on a float, which is what lets the entry point and the per-couple
+    path both call it without the second call reconverting the caller's original
+    object. That matters: ``imposed_fo2`` used to hold the RAW T_K and re-run
+    ``float()`` on it when building its result, so the refusal contract held only
+    because validation happened to run first on every REACHABLE path -- an
+    argument that a later branch could silently invalidate. It now holds
+    structurally, at BOTH public entry points: ``imposed_fo2`` rebinds T_K and
+    ``water_gas_shift_log10_K`` binds a local ``T``, each to the coerced value,
+    before either branches; the three result constructions that used to re-call
+    ``float()`` now pass that value straight through.
+
+    Be precise about WHAT is converted once, because two reviewers instrumented
+    this and each read it a different wrong way. It is the CALLER'S OBJECT: its
+    ``__float__`` runs once per SUCCESSFUL public call -- measured at 1 for the
+    shift, for a CO-only gas and for a two-couple gas. On a REFUSAL it may run
+    again, because the message renders the offending value and a re-entrant
+    ``__repr__`` is free to call ``float(self)``; that was measured at 2 and is
+    harmless, since the call still ends in OffgasFO2Unavailable. It is NOT the
+    number of ``float()`` calls in the
+    module -- ``_validate_T_K`` coerces again per evaluated couple, so with a
+    built-in float as input you will count two or three. Those later calls
+    receive an already-normalised float and are idempotent no-ops; they are kept
+    deliberately, so that this function's guarantee does not depend on every
+    future caller of ``_log10_K_couple`` remembering to normalise first. That
+    reachability argument is exactly what failed here once already.
+
+    Why it matters beyond tidiness: a stateful float-like handed separately to
+    two evaluations produced an equilibrium constant belonging to neither
+    temperature.
+    """
+
+    try:
+        T = float(T_K)
+    except Exception as exc:  # noqa: BLE001 - see the note below on breadth
+        # Exception, not a (TypeError, ValueError, OverflowError) tuple. A
+        # caller's __float__ may raise anything at all -- an ordinary
+        # RuntimeError from one leaked out of both public APIs under the narrow
+        # tuple. Whatever it raises, the conclusion is identical: this object
+        # cannot serve as a temperature, which is precisely what this module's
+        # refusal type means. Narrowing here would trade a true statement about
+        # the input for a foreign exception in the caller's lap. BaseException
+        # still propagates.
+        # OverflowError belongs with the other two: float(10**10000) raises it,
+        # and an ordinary Python int is not a caller error exotic enough to
+        # deserve escaping the refusal contract this module exists to hold.
+        raise OffgasFO2Unavailable(
+            f"melt temperature is not convertible to a float "
+            f"({_safe_repr(T_K)}): {_safe_type_name(exc)}"
+        ) from exc
+    if not math.isfinite(T):
+        raise OffgasFO2Unavailable(
+            f"melt temperature is {T!r}; the offgas fO2 coupling has no "
+            "equilibrium constant at a non-finite temperature"
+        )
+    return T
+
+
+def _validate_T_K(
+    polynomials: Mapping[str, NasaCeaPolynomial],
+    T_K: float,
+    records: Sequence[str],
+    quantity: str,
+) -> float:
+    """Refuse an unusable temperature in THIS module's own exception type.
+
+    Without this guard an unvalidated T_K travels into the CEA polynomials and
+    surfaces as NasaCeaDomainError (<- NasaCeaError <- ValueError), while every
+    other refusal in this module is OffgasFO2Unavailable (<- Exception). Those
+    two hierarchies are disjoint, so no single exception TYPE covers both. (Not
+    "no single except clause" -- ``except (OffgasFO2Unavailable, NasaCeaError):``
+    is one clause and does cover both; it just requires the caller to know that
+    the second type exists and is reachable from here.) The consequence is the
+    same: a caller handling OffgasFO2Unavailable takes the foreign ValueError as
+    a crash, and one catching ValueError swallows a genuine refusal as an
+    arithmetic complaint. Verified escaping before this
+    guard: nan, 0.0, -5.0, 100.0, 7000.0, 1e6, inf, and 10**10000.
+
+    Note on NaN, corrected after review: the range test below is NEGATED, so it
+    already rejects NaN -- ``lo <= nan <= hi`` is False and ``not False`` raises.
+    The explicit finite check is not what prevents NaN from reaching the
+    evaluator; it is what makes the refusal say "non-finite temperature" instead
+    of misreporting NaN as a value lying outside a numeric interval. Both are
+    worth having, for different reasons.
+
+    (An earlier revision of this docstring claimed the range test ADMITS NaN.
+    It does not. That claim was itself an instance of the class this module was
+    being audited for -- prose contradicting the algebra directly beneath it --
+    written into the repair for that very class.)
+    """
+
+    T = _coerce_T_K(T_K)
+    lo, hi = _effective_domain_K(polynomials, records)
+    if not (lo <= T <= hi):
+        raise OffgasFO2Unavailable(
+            # repr(), not :g. At a representational boundary :g rounds the
+            # temperature INTO the interval it is being refused for --
+            # nextafter(20000.0, inf) printed as "20000 K is outside
+            # [200, 20000] K", while the exact boundary 20000.0 is genuinely
+            # evaluable. The message then contradicted itself for the one reader
+            # who most needed it. repr() round-trips, so the displayed value is
+            # the value that was rejected.
+            f"melt temperature {T!r} K is outside the shared domain of the CEA "
+            f"records {quantity} reads ({', '.join(records)}): "
+            f"[{lo!r}, {hi!r}] K. {quantity} there would be an extrapolation of "
+            "a fit that was never valid at that temperature rather than an "
+            "evaluation of one that was."
+        )
+    return T
+
+
 def _log10_K_couple(
     polynomials: Mapping[str, NasaCeaPolynomial], couple: str, T_K: float
 ) -> float:
-    """log10 K for H2 + 1/2 O2 <-> H2O ('H2') or CO + 1/2 O2 <-> CO2 ('CO')."""
+    """log10 K for H2 + 1/2 O2 <-> H2O ('H2') or CO + 1/2 O2 <-> CO2 ('CO').
+
+    Every temperature that reaches an EQUILIBRIUM CONSTANT funnels through here,
+    so this is where the per-couple DOMAIN is checked -- rather than a domain
+    guard per public entry point that the next entry point can forget to repeat.
+
+    Not a universal chokepoint, though an earlier version of this sentence said
+    so: ``imposed_fo2({"H2": 1.0}, 1500.0)`` coerces and refuses on the
+    partnerless gas without calling this function at all. The architecture is
+    finite-coercion at entry plus per-couple domain validation here, which is two
+    guards with different scopes, not one.
+    """
+
+    try:
+        records = _COUPLE_RECORDS[couple]
+    except KeyError:
+        raise ValueError(
+            f"unknown couple {couple!r}; expected 'H2' or 'CO'"
+        ) from None
+    T_K = _validate_T_K(polynomials, T_K, records, f"log10 K({couple})")
 
     if couple == "H2":
         terms = [
@@ -294,14 +555,12 @@ def _log10_K_couple(
             (-1.0, polynomials["H2"].evaluate(T_K)),
             (-0.5, polynomials["O2"].evaluate(T_K)),
         ]
-    elif couple == "CO":
+    else:  # "CO"; _COUPLE_RECORDS lookup above rejected anything else
         terms = [
             (+1.0, polynomials["CO2"].evaluate(T_K)),
             (-1.0, polynomials["CO"].evaluate(T_K)),
             (-0.5, polynomials["O2"].evaluate(T_K)),
         ]
-    else:
-        raise ValueError(f"unknown couple {couple!r}; expected 'H2' or 'CO'")
     return math.log10(reaction_equilibrium_constant(terms, T_K=T_K))
 
 
@@ -317,8 +576,15 @@ def water_gas_shift_log10_K(
     crosses unity (log10 K = 0) near ~1100 K. Both are asserted in the tests.
     """
 
-    return _log10_K_couple(polynomials, "CO", T_K) - _log10_K_couple(
-        polynomials, "H2", T_K
+    # Coerce ONCE, here, then hand both couples the same built-in float. Passing
+    # the caller's raw object to each evaluation separately let a stateful
+    # float-like return 1000 K to one call and 2000 K to the other; the result
+    # was a cross-temperature subtraction returned as an equilibrium constant at
+    # neither temperature (observed: 6.675 where the two fixed-T values are
+    # 0.157 and -0.661). Every public entry point normalises before it branches.
+    T = _coerce_T_K(T_K)
+    return _log10_K_couple(polynomials, "CO", T) - _log10_K_couple(
+        polynomials, "H2", T
     )
 
 
@@ -423,6 +689,11 @@ def imposed_fo2(
     """
 
     polys = polynomials if polynomials is not None else load_buffer_polynomials()
+    # Normalise the temperature ONCE, here, and use this value everywhere below.
+    # The per-couple DOMAIN check stays inside _log10_K_couple, because the two
+    # couples do not share a window and this function must not refuse a CO-only
+    # gas for K1's narrower records.
+    T_K = _coerce_T_K(T_K)
 
     def amount(name: str) -> float:
         """Moles of one species, refusing corrupt records rather than zeroing.
@@ -486,18 +757,28 @@ def imposed_fo2(
             "A one-sided couple imposes an unbounded fO2 and must refuse."
         )
 
-    log10_K1 = _log10_K_couple(polys, "H2", T_K)
-    log10_K2 = _log10_K_couple(polys, "CO", T_K)
+    # Each couple's constant is computed ON DEMAND, and only for a couple this
+    # gas actually carries. The two couples do not share a temperature domain
+    # (see _COUPLE_RECORDS), so evaluating both up front would refuse a CO-only
+    # gas anywhere above H2O's 6000 K ceiling because of a constant that gas
+    # never uses. The single-couple branches below return before log10_K_wgs,
+    # which is the one place that legitimately needs both.
+    _K_cache: dict[str, float] = {}
+
+    def log10_K(couple: str) -> float:
+        if couple not in _K_cache:
+            _K_cache[couple] = _log10_K_couple(polys, couple, T_K)
+        return _K_cache[couple]
 
     def fo2_h2(h2: float, h2o: float) -> float | None:
         if h2 <= 0.0 or h2o <= 0.0:
             return None
-        return 2.0 * (math.log10(h2o / h2) - log10_K1)
+        return 2.0 * (math.log10(h2o / h2) - log10_K("H2"))
 
     def fo2_co(co: float, co2: float) -> float | None:
         if co <= 0.0 or co2 <= 0.0:
             return None
-        return 2.0 * (math.log10(co2 / co) - log10_K2)
+        return 2.0 * (math.log10(co2 / co) - log10_K("CO"))
 
     raw_h2 = fo2_h2(n_H2, n_H2O)
     raw_co = fo2_co(n_CO, n_CO2)
@@ -515,7 +796,7 @@ def imposed_fo2(
             )
         return OffgasFO2(
             coupling=H2_COUPLE_ONLY,
-            T_K=float(T_K),
+            T_K=T_K,  # already coerced at entry
             log10_fO2=raw_h2,
             log10_Q_over_K=None,
             extent_mol=None,
@@ -539,7 +820,7 @@ def imposed_fo2(
             )
         return OffgasFO2(
             coupling=CO_COUPLE_ONLY,
-            T_K=float(T_K),
+            T_K=T_K,  # already coerced at entry
             log10_fO2=raw_co,
             log10_Q_over_K=None,
             extent_mol=None,
@@ -557,7 +838,7 @@ def imposed_fo2(
             ),
         )
 
-    log10_K_wgs = log10_K2 - log10_K1
+    log10_K_wgs = log10_K("CO") - log10_K("H2")
     K_wgs = 10.0 ** log10_K_wgs
 
     log10_Q_over_K: float | None = None
@@ -638,7 +919,7 @@ def imposed_fo2(
 
     return OffgasFO2(
         coupling=WGS_EQUILIBRATED,
-        T_K=float(T_K),
+        T_K=T_K,  # already coerced at entry
         log10_fO2=value,
         log10_Q_over_K=log10_Q_over_K,
         extent_mol=extent,
