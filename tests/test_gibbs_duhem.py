@@ -17,6 +17,7 @@ Synthetic ground truth, derived:
 
 from __future__ import annotations
 
+import inspect
 import math
 
 import pytest
@@ -423,7 +424,12 @@ def test_verdict_thresholds_are_overridable_and_defaults_asserted():
         _consistent_activities, START, END, T_K=1673.15, engine_name="synthetic"
     )
     assert battery_verdict(report) == "consistent_on_this_path"
-    assert battery_verdict(report, index_threshold=-1.0) == "inconsistent"
+    # A hostile threshold still moves the verdict off the clean pass, so the
+    # knob is live. Since SC-130/GD-1 the token is `discretisation_limited`
+    # rather than `inconsistent`, and that IS the repair working: this model's
+    # residual shrinks ~4x on step halving, so the instrument now declines to
+    # call it a violation however hostile the index threshold is.
+    assert battery_verdict(report, index_threshold=-1.0) == "discretisation_limited"
     # Floor raised above this path's real TV: material becomes immaterial.
     assert (
         battery_verdict(report, materiality_floor_ln=report.total_variation * 2)
@@ -490,7 +496,11 @@ def test_verdict_keys_on_closed_segments_not_usable_nodes():
     )
     assert adjacent_pair.closed_segments == 1
     assert adjacent_pair.total_variation > 1e-3
-    assert battery_verdict(adjacent_pair) == "inconsistent"
+    # Refusals suppress the doubled-resolution pass, so discretisation cannot
+    # be ruled out here; since GD-1 the verdict says exactly that instead of
+    # asserting a violation it cannot support.
+    assert adjacent_pair.residual_at_double_resolution is None
+    assert battery_verdict(adjacent_pair) == "inconsistent_resolution_unverified"
 
 
 def test_verdict_never_crashes_on_hand_built_reports():
@@ -526,3 +536,151 @@ def test_zero_segments_note_replaces_trivial_wording():
     joined = " ".join(report.notes)
     assert "never integrated" in joined
     assert "satisfied trivially" not in joined
+
+
+# ---------------------------------------------------------------------------
+# SC-130 sweep (2026-08-22): findings GD-1..GD-4, each keyed to the reviewer's
+# own measured counterexample.
+# ---------------------------------------------------------------------------
+
+from benchmarks.gibbs_duhem import (  # noqa: E402
+    BATTERY_DISCRETISATION_SHRINK_MIN,
+    mole_fractions_from_wt as _mfw,
+)
+
+
+def _rk2_wide(wt):
+    """The suite's own GD-consistent-by-construction Redlich-Kister model."""
+
+    x = _mfw(wt)
+    x1, x2 = x["SiO2"], x["CaO"]
+    A, B = 2.0, 1.0
+    return {
+        "SiO2": x1 * math.exp(x2**2 * (A + B * (4 * x1 - 1))),
+        "CaO": x2 * math.exp(x1**2 * (A - B * (4 * x2 - 1))),
+    }
+
+
+def test_consistent_model_on_a_coarse_grid_is_not_convicted():
+    """GD-1: `battery_verdict` read `rectified_index` alone, so a model that is
+    GD-consistent BY CONSTRUCTION scored 0.149 at n_nodes=3 on a wide path and
+    was reported `inconsistent` — while the report's own
+    `residual_at_double_resolution` showed a 4.00x shrink, the unambiguous
+    discretisation signature. The verdict now consults that discriminator."""
+
+    wide_start, wide_end = {"SiO2": 2.0, "CaO": 98.0}, {"SiO2": 98.0, "CaO": 2.0}
+    coarse = gibbs_duhem_residual(
+        _rk2_wide, wide_start, wide_end, T_K=1673.15, n_nodes=3
+    )
+    assert coarse.rectified_index > 0.1  # still over the bare threshold
+    ratio = abs(coarse.integrated_residual) / abs(coarse.residual_at_double_resolution)
+    assert ratio == pytest.approx(4.0, rel=0.15)  # second-order convergence
+    assert battery_verdict(coarse) == "discretisation_limited"
+
+    # and it converges to a clean pass as the grid refines
+    for n in (5, 7, 21):
+        r = gibbs_duhem_residual(_rk2_wide, wide_start, wide_end, T_K=1673.15, n_nodes=n)
+        assert battery_verdict(r) == "consistent_on_this_path", n
+
+
+def test_a_real_inconsistency_still_convicts_at_every_resolution():
+    """The other half of GD-1: the repair must not blunt real detection."""
+
+    for n in (3, 21, 101):
+        r = gibbs_duhem_residual(
+            _inconsistent_activities, START, END, T_K=1673.15, n_nodes=n
+        )
+        assert r.rectified_index == pytest.approx(1.0, abs=1e-6), n
+        assert battery_verdict(r) == "inconsistent", n
+
+
+def test_unavailable_discriminator_does_not_convict():
+    """GD-1: the doubled-resolution pass is skipped whenever a node is refused,
+    so discretisation cannot be ruled out and the verdict must say so rather
+    than assert a violation."""
+
+    def refuses_one_node(wt):
+        x = _mfw(wt)
+        if 0.49 < x["SiO2"] < 0.51:
+            return None
+        return _inconsistent_activities(wt)
+
+    r = gibbs_duhem_residual(refuses_one_node, START, END, T_K=1673.15, n_nodes=21)
+    assert r.residual_at_double_resolution is None
+    assert r.skipped_nodes
+    assert battery_verdict(r) == "inconsistent_resolution_unverified"
+
+
+def test_negative_weight_refuses_instead_of_being_silently_dropped():
+    """GD-2, the most silent defect found: a negative weight was dropped and
+    the survivors renormalised, so the checker scored the caller's activities
+    against a DIFFERENT melt. Measured consequence — an adapter that is
+    GD-consistent by construction on its own basis scored rectified_index
+    0.9999999999999998 and verdict `inconsistent`, with zero notes, zero
+    skipped nodes and no other tell."""
+
+    with pytest.raises(GibbsDuhemInapplicable, match="negative weight"):
+        mole_fractions_from_wt({"SiO2": 60.0, "CaO": 45.0, "MgO": -5.0})
+
+    # the whole path must refuse, not just the helper
+    def raw_basis(wt):
+        mol = {k: v / 60.0 for k, v in wt.items()}
+        tot = sum(mol.values())
+        return {k: v / tot for k, v in mol.items()}
+
+    with pytest.raises(GibbsDuhemInapplicable):
+        gibbs_duhem_residual(
+            raw_basis,
+            {"SiO2": 60.0, "CaO": 45.0, "MgO": -5.0},
+            {"SiO2": 40.0, "CaO": 85.0, "MgO": -25.0},
+            T_K=1673.15,
+        )
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_weight_refuses(bad):
+    """GD-4: a non-finite weight passed every guard (`nan <= 0` is False,
+    `total <= 0` is False) and minted a fully-populated NaN report that
+    positively asserted clean integration — closed_segments=8, skipped=[],
+    notes=[] — plus a fabricated `max_segment_residual = 0.0` from
+    `max(0.0, nan)`."""
+
+    with pytest.raises(GibbsDuhemInapplicable, match="non-finite weight"):
+        mole_fractions_from_wt({"SiO2": 60.0, "CaO": bad})
+
+
+def test_zero_weight_is_still_a_legitimate_absent_component():
+    """The refusal must not catch exactly-0.0, which is a real absent oxide and
+    whose birth/death across a path is handled separately."""
+
+    x = mole_fractions_from_wt({"SiO2": 60.0, "CaO": 40.0, "MgO": 0.0})
+    assert set(x) == {"SiO2", "CaO"}
+    assert sum(x.values()) == pytest.approx(1.0)
+
+
+def test_convergence_order_is_documented_as_second_order():
+    """GD-3: the field doc said the consistent-model index is ~O(h) while the
+    module docstring two dozen lines up said it shrinks ~4x per halving. The
+    measurement settles it: second order."""
+
+    import benchmarks.gibbs_duhem as mod
+
+    assert "O(h^2)" in mod.GibbsDuhemReport.__doc__ or "O(h^2)" in inspect.getsource(mod)
+    # NOT the regular solution: its quadratic ln-gamma cancels algebraically to
+    # machine zero at every grid, so it carries no discretisation error to
+    # measure. rk2 does.
+    prev = None
+    for n in (51, 501):
+        r = gibbs_duhem_residual(
+            _rk2_wide, {"SiO2": 2.0, "CaO": 98.0}, {"SiO2": 98.0, "CaO": 2.0},
+            T_K=1673.15, n_nodes=n,
+        )
+        if prev is not None:
+            # 10x the nodes must shrink the residual ~100x (second order),
+            # not ~10x (first order)
+            assert prev / max(abs(r.integrated_residual), 1e-300) > 30.0
+        prev = abs(r.integrated_residual)
+
+
+def test_discretisation_shrink_threshold_sits_between_the_two_regimes():
+    assert 1.0 < BATTERY_DISCRETISATION_SHRINK_MIN < 4.0

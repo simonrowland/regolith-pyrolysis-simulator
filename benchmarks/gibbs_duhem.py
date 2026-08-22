@@ -122,9 +122,12 @@ class GibbsDuhemReport:
     #: and residual_at_double_resolution, never alone.
     consistency_index: float | None = None
     #: sum_k |r_k| / TV — immune to sign cancellation between segments. A
-    #: consistent model gives ~O(h) (discretisation only, shrinks with
-    #: resolution); a sign-changing inconsistency stays O(1) here even when
-    #: the signed index cancels to ~0.
+    #: consistent model gives ~O(h^2): the midpoint rule is second order, so
+    #: this is pure discretisation and shrinks ~4x per halving of h (measured
+    #: 100x per 10x in n). A sign-changing inconsistency stays O(1) here even
+    #: when the signed index cancels to ~0. An earlier revision said O(h),
+    #: contradicting this module's own 4x-shrink statement two dozen lines up
+    #: — in the same passage that justified the battery threshold.
     rectified_index: float | None = None
     #: Same integrated residual at 2x nodes: discretisation error shrinks ~4x,
     #: a real inconsistency persists.
@@ -173,7 +176,30 @@ def mole_fractions_from_wt(
     moles: dict[str, float] = {}
     for name, wt in composition_wt_pct.items():
         wt = float(wt)
-        if wt <= 0.0:
+        # A NEGATIVE or NON-FINITE weight is a data error, not an absent
+        # component, and dropping it is the exact fabricated closure the
+        # docstring above forbids. Measured consequence of the old
+        # `if wt <= 0.0: continue` (sweep 2026-08-22, GD-2): the checker
+        # renormalised the survivors while the caller's adapter kept the raw
+        # composition, so the residual was formed across TWO DIFFERENT
+        # composition bases. An adapter that is GD-consistent by construction
+        # (a_i = x_i on its own basis) then scored rectified_index
+        # 0.9999999999999998 -> `inconsistent`, with zero notes, zero skipped
+        # nodes and no other tell: a maximal false accusation of thermodynamic
+        # inconsistency, silently manufactured by the drop.
+        if not math.isfinite(wt):
+            raise GibbsDuhemInapplicable(
+                f"{name}: non-finite weight {wt!r}; a composition that cannot "
+                "be evaluated must refuse rather than be silently reshaped"
+            )
+        if wt < 0.0:
+            raise GibbsDuhemInapplicable(
+                f"{name}: negative weight {wt!r}. This is invalid input, not an "
+                "absent component: dropping it would renormalise the remaining "
+                "oxides into a melt the caller never supplied, and score the "
+                "caller's activities against that different melt."
+            )
+        if wt == 0.0:
             continue
         if name in _REDOX_OPEN_SPECIES:
             raise GibbsDuhemInapplicable(
@@ -374,25 +400,46 @@ def gibbs_duhem_residual(
     )
 
 
-#: Two-condition battery verdict thresholds, ratified by the first
-#: commissioning runs (t-706, 2026-08-19). A scale-free index alone screams
-#: 1.0 on near-trivial paths (measured: internal_analytic shell-adjacent rows
-#: at rectified 1.0 over TV 7e-8..8e-6 ln units — true violations of no
-#: physical consequence), so the battery flags only when BOTH hold:
-#: rectified_index above threshold AND total variation above materiality.
-#: Materiality floor 1e-3 ln units: five orders above the 1e-9 float-noise
-#: TV floor, at the bottom of the gamma effects this project acts on.
-#: Index threshold 0.1: measured consistent engines sit at 1e-4..4e-3
-#: (internal_analytic substantive paths; IMCC in-domain) and measured true
-#: violations at 1.0 — an order-of-magnitude gap on either side of 0.1.
+#: Battery verdict thresholds, ratified by the first commissioning runs
+#: (t-706, 2026-08-19) and made RESOLUTION-AWARE after the SC-130 sweep
+#: (2026-08-22). A scale-free index alone screams 1.0 on near-trivial paths
+#: (measured: internal_analytic shell-adjacent rows at rectified 1.0 over TV
+#: 7e-8..8e-6 ln units), so the battery also requires material variation.
+#: Materiality floor 1e-3 ln units: six orders above the 1e-9 float-noise TV
+#: floor, at the bottom of the gamma effects this project acts on.
+#: Index threshold 0.1: measured consistent engines sit at 1e-4..4e-3 and
+#: measured true violations at 1.0.
 BATTERY_INDEX_THRESHOLD = 0.1
 BATTERY_MATERIALITY_FLOOR_LN = 1e-3
+
+#: Minimum step-halving shrink for a residual to be called DISCRETISATION.
+#: Derivation: the midpoint rule is second order, so halving h shrinks a
+#: consistent model's residual by 2^2 = 4 (measured exactly 4.00x on this
+#: module's own certification models). A genuine O(1) inconsistency does not
+#: shrink at all — ratio ~1 (measured: an independent-per-species-gamma model
+#: holds 1.0000 at n = 5, 21, 101, 1001). 2.0 is the geometric mean of those
+#: two regimes, a clean factor-2 margin either side.
+#:
+#: WHY THE VERDICT NEEDS THIS AT ALL (sweep 2026-08-22, GD-1). rectified_index
+#: for a CONSISTENT model is a pure discretisation quantity, so any fixed
+#: threshold on it is a statement about grid resolution, not about the model.
+#: Measured: this suite's own Redlich-Kister model — introduced in the tests
+#: precisely because it is GD-consistent BY CONSTRUCTION — scores 0.031 on the
+#: tests' narrow path and 0.149 on a wide one at the same n_nodes=3, crossing
+#: the 0.1 threshold and being convicted `inconsistent`, while its step-halving
+#: ratio is exactly 4.00x, the unambiguous discretisation signature. The report
+#: had ALREADY computed that disproof in `residual_at_double_resolution` and
+#: the verdict ignored it — while GibbsDuhemReport's own docstring warned that
+#: this index "can false-alarm a consistent model" and "must never be read
+#: alone".
+BATTERY_DISCRETISATION_SHRINK_MIN = 2.0
 
 def battery_verdict(
     report: GibbsDuhemReport,
     *,
     index_threshold: float = BATTERY_INDEX_THRESHOLD,
     materiality_floor_ln: float = BATTERY_MATERIALITY_FLOOR_LN,
+    discretisation_shrink_min: float = BATTERY_DISCRETISATION_SHRINK_MIN,
 ) -> str:
     """Two-condition commissioning verdict for one GD path report.
 
@@ -419,10 +466,19 @@ def battery_verdict(
       there, it is not evidence of consistency OR of actionable
       inconsistency.
     - ``inconsistent``: rectified index above threshold on material
-      variation — the flag condition, requiring BOTH. Not path-suffixed on
-      purpose: one integrated counterexample falsifies model consistency
-      globally (existential claim), where consistency is only ever
-      established path-by-path (universal claim).
+      variation AND the residual fails to shrink under step halving, so the
+      excess is not discretisation. Not path-suffixed on purpose: one
+      integrated counterexample falsifies model consistency globally
+      (existential claim), where consistency is only ever established
+      path-by-path (universal claim).
+    - ``discretisation_limited``: index above threshold, but the residual
+      shrinks ~4x when the step halves, which is the signature of the
+      quadrature rather than the model. Refine the grid and re-run; this is
+      NOT a finding against the engine.
+    - ``inconsistent_resolution_unverified``: index above threshold and the
+      doubled-resolution pass could not run (it is skipped whenever a node was
+      refused), so discretisation could not be ruled out. Report it, do not
+      cite it as a violation.
     - ``consistent_on_this_path``: the identity closes on material
       variation. Path-scoped on purpose: consistency elsewhere, and
       correctness anywhere, are not established (GD is a wrong-shape
@@ -433,20 +489,35 @@ def battery_verdict(
         return "not_evaluable"
     if report.total_variation <= materiality_floor_ln:
         return "immaterial_variation"
-    # rectified_index is None below the 1e-9 triviality floor, which the
-    # materiality branch normally absorbs — but hostile floor overrides and
-    # hand-built/deserialized reports can reach here with None or NaN. A
-    # crash is the wrong shape for a public classifier; an unreadable index
-    # on a material path is not evidence either way (review P2-1).
     index = report.rectified_index
     if index is None or not math.isfinite(index):
         return "not_evaluable"
-    if index > index_threshold:
-        return "inconsistent"
-    return "consistent_on_this_path"
+    if index <= index_threshold:
+        return "consistent_on_this_path"
+
+    # Over threshold. Before convicting, run the discriminator the report
+    # already carries: a consistent model's residual shrinks ~4x when the step
+    # is halved, an inconsistency holds flat. Convicting without this check
+    # convicts the GRID (sweep 2026-08-22, GD-1).
+    coarse = abs(report.integrated_residual)
+    fine = report.residual_at_double_resolution
+    if fine is None:
+        # The doubled-resolution pass is skipped when any node was refused, so
+        # the discriminator is unavailable rather than negative. Saying
+        # `inconsistent` here would assert something this run cannot support.
+        return "inconsistent_resolution_unverified"
+    fine = abs(fine)
+    if fine <= 0.0:
+        # Residual vanished entirely on refinement: discretisation by any
+        # reading (an O(1) inconsistency cannot converge to zero).
+        return "discretisation_limited"
+    if coarse / fine >= discretisation_shrink_min:
+        return "discretisation_limited"
+    return "inconsistent"
 
 
 __all__ = [
+    "BATTERY_DISCRETISATION_SHRINK_MIN",
     "BATTERY_INDEX_THRESHOLD",
     "BATTERY_MATERIALITY_FLOOR_LN",
     "TRIVIAL_TOTAL_VARIATION_FLOOR",
