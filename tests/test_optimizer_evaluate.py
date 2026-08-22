@@ -3167,6 +3167,12 @@ def test_real_backend_missing_backend_status_aborts_as_backend_unavailable() -> 
 
 
 def test_real_backend_unavailable_backend_status_aborts_as_backend_unavailable() -> None:
+    """Production engine-absence carriers emit ``unavailable`` and must abort.
+
+    This intentionally fails if the absence path becomes lenient or substitutes
+    a correct-but-different token: ``unavailable`` is the closed-vocabulary
+    report for an absent real backend, not an honest infeasible engine answer.
+    """
     real_profile = {
         **PROFILE,
         "run": {**PROFILE["run"], "backend_name": "alphamelts"},
