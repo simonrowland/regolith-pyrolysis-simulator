@@ -4,8 +4,9 @@ THE PROBLEM. A reducing offgas does not debit oxygen from the melt; it IMPOSES a
 oxygen fugacity through its ratios, exactly as an H2/H2O or CO/CO2 mix is used to
 impose fO2 in the laboratory. Inverting either couple is elementary (see
 ``docs-private/research/2026-08-18-b203-buffer/probe_buffer_fo2.py``, which
-validates the inversion against the Frost 1991 iron-wustite buffer to 0.003 dex at
-1873 K and independently reproduces the ~1100 K crossover):
+sanity-checks the inversion against the Frost 1991 iron-wustite buffer and
+independently reproduces the ~1100 K CO2/CO-vs-H2O/H2 crossover, computed at
+1095.7 K):
 
     H2 + 1/2 O2 <-> H2O    log10 fO2 = 2 * [ log10(p_H2O/p_H2) - log10 K1 ]
     CO + 1/2 O2 <-> CO2    log10 fO2 = 2 * [ log10(p_CO2/p_CO) - log10 K2 ]
@@ -37,8 +38,11 @@ linked by the water-gas shift, which is just their difference:
 
     (substitute both inversions and collect; the K1, K2 terms combine into
     K2/K1 = K_wgs). A gas AT water-gas-shift equilibrium has Q = K_wgs and the two
-    couples agree identically. The 6.7 dex spread is a measure of how far the raw
-    offgas sits from that equilibrium -- nothing more exotic.
+    couples agree identically. The raw couples can disagree by many dex, and
+    that gap DIVERGES as either couple's partner goes to zero -- measured +4 dex
+    per decade of vanishing CO -- so no bounded figure belongs here. It is
+    reported per call as ``raw_couple_disagreement_dex``, and is None when a
+    couple is one-sided.
 
 So: equilibrate the offgas via the shift at melt temperature, then read one fO2.
 
@@ -60,8 +64,25 @@ rule on whether it holds for this furnace. Do not fit your way past it.
 two couples return the same fO2 to numerical precision. That is ALGEBRAICALLY
 GUARANTEED by the construction above -- setting Q = K_wgs forces it -- so it tests
 that this module's solver converged and its algebra is coded right. It is NOT
-independent evidence that the physics is correct. The non-circular check is the
-probe's iron-wustite comparison, which uses no part of this reconciliation.
+independent evidence that the physics is correct.
+
+The non-circular check is the PUBLISHED-K_wgs comparison in
+``tests/chemistry/test_offgas_fo2.py`` (external K_wgs at 800 and 1200 K,
+in-domain and externally anchored). NOT the iron-wustite comparison: an earlier
+version of this header headlined that probe's 0.003 dex agreement at 1873 K,
+which is exactly 400 K ABOVE Frost's 1473.15 K validity ceiling. Recomputed
+INSIDE the window the residual is 0.99 dex at 838 K, 0.53 at 1100 and 0.19 at
+1473 K -- an in-window max ~5x this project's own 0.20 dex tolerance, and 64x to
+330x worse than the headline. The near-zero at 1873 K is a CURVE CROSSING, not
+agreement: fitting the in-window residual gives a +29.4 kJ/mol O2 enthalpy gap
+against a +16.5 J/mol/K entropy gap, crossing zero near 1781 K -- verbatim the
+compensating-errors artifact benchmarks/buffer_reproduction.py warns about, and
+the same 0.2-1.1 dex band Hirschmann (2021) predicts for a JANAF-refit rail. The
+module's own test had ALREADY retracted this claim and restricted itself to the
+window with a deliberately loose < 1.0 dex bound; this header had not followed
+(SC-130 sweep, OG-3). Read the IW comparison as a coarse sanity check good to
+~0.2-1.0 dex over 838-1473 K -- enough to catch a sign flip or a wrong reaction,
+not an accuracy certificate.
 
 STATUS: computation + diagnostic only. This module imposes nothing. Wiring it to
 move melt fO2 is golden-affecting and is a separate, owner-gated step.
@@ -149,18 +170,34 @@ class OffgasFO2:
     #: neither of which is an input here.
     equilibrium_assumption_verified: bool = False
     equilibrated_mol: dict[str, float] = field(default_factory=dict)
-    #: Redox-active species present in the input that this module does not model
-    #: (CH4, H2S, free O2, ...). Reported, never silently dropped.
+    #: Species this module does NOT equilibrate: CH4, H2S, COS, N2 and any
+    #: other inventory outside the two water-gas-shift couples. They are
+    #: FROZEN — they enter no equation here (not the couple inversions, not
+    #: log10_Q_over_K, not the shift extent, not the strain).
     #:
-    #: WHAT THEIR PRESENCE MEANS, stated precisely because it is easy to get
-    #: wrong in both directions. Under this module's OWN equilibrium assumption
-    #: they change nothing: an internally equilibrated gas has its CH4, H2S and
-    #: O2 already consistent with the same fO2 the H2/H2O and CO/CO2 ratios
-    #: imply, so reading it off one couple is not an approximation. To exactly
-    #: the extent that assumption FAILS, they are unaccounted reducing (or
-    #: oxidising) capacity that the couple ratios cannot see. So the honest
-    #: reading is: these matter in proportion to `assumption_strain_dex`, and
-    #: the two fields must be read together.
+    #: READ THIS BEFORE JUDGING THE ASSUMPTION SAFE (SC-130 sweep, OG-1). An
+    #: earlier version of this comment, and the runtime note beside it, said
+    #: these species "change nothing" under the equilibrium assumption and
+    #: "unmodelled species (CH4/H2S/COS/N2) are FROZEN: they enter no equation here. This is WGS-only equilibrium, not full internal equilibrium, and assumption_strain_dex is structurally blind to steam-methane reforming -- a small strain is NOT evidence that CH4 is harmless (measured: strain 0.00 exactly while CH4 moves true equilibrium 0.85 dex, same direction every time -- CH4 makes the truth MORE reducing than this value)". Both halves are wrong,
+    #: and the second is INVERTED. The equivocation: "internally equilibrated
+    #: gas" is true of FULL internal equilibrium, but what this module
+    #: computes is WGS-ONLY equilibrium with CH4 frozen. assumption_strain_dex
+    #: measures only the WGS deviation and is structurally blind to the
+    #: steam-methane-reforming component, which is exactly where CH4 lives.
+    #:
+    #: Measured against an independent solver built from this module's own CEA
+    #: records: fO2 and strain are BIT-IDENTICAL for CH4 = 0, 1.2, 100 and 1e6
+    #: mol, up to 99.9996 mol% CH4. A gas sitting exactly at WGS equilibrium
+    #: reports strain 0.00 EXACTLY while 8.9 mol% CH4 moves true internal
+    #: equilibrium by 0.85 dex; another well-posed case shows a 1.18 dex error
+    #: against a reported strain of 0.061, ~20x. A quantity identically zero
+    #: cannot be a proportionality constant for a 0.85 dex effect.
+    #:
+    #: So: a SMALL STRAIN IS NOT EVIDENCE THAT CH4 IS HARMLESS. Observed sign
+    #: — CH4 makes true equilibrium MORE REDUCING, and this module returns the
+    #: less-reducing value. This matters because the designed input is
+    #: CH4-bearing and CO-free (organics_pyrolysis emits H2/CH4/H2O/CO2/N2/
+    #: H2S/COS with CO forced to zero).
     unmodelled_species_mol: dict[str, float] = field(default_factory=dict)
     notes: tuple[str, ...] = ()
 
@@ -551,6 +588,9 @@ def imposed_fo2(
 
     # Placeholder; computed below once the equilibrated value exists.
     strain: float | None = None
+    # "the shift ran" = an extent was solved, i.e. the module committed to a
+    # post-shift answer rather than reporting the raw gas.
+    shift_ran = extent is not None
 
     # How far equilibration actually moved the answer. Prefer the H2 couple as
     # the reference when both exist; either raw couple is a valid "what you
@@ -558,6 +598,20 @@ def imposed_fo2(
     raw_reference = raw_h2 if raw_h2 is not None else raw_co
     if raw_reference is not None:
         strain = abs(value - raw_reference)
+    elif shift_ran:
+        # FAIL-OPEN CLOSED (SC-130 sweep, OG-2). Both couples one-sided clears
+        # the composition gate, so the shift runs and produces a confident
+        # finite fO2 while no PRE-shift reference exists to measure movement
+        # against. Leaving strain None there made the obvious caller guard
+        #     if strain is not None and strain > threshold: reject
+        # accept the worst case and reject benign ones. Measured continuity
+        # probe on {CO, H2O} with a vanishing H2 trace, fO2 bit-identical
+        # throughout: 1e-3 -> 5.61 dex, 1e-9 -> 17.61, 1e-20 -> 39.61,
+        # 1e-30 -> 59.61, and exactly 0.0 -> None. The limit is not "unknown",
+        # it DIVERGES, and the module's own rationale for refusing a single
+        # one-sided couple is that it "imposes an unbounded fO2". Infinity is
+        # the truthful value and it makes the natural guard fail closed.
+        strain = math.inf
 
     notes: list[str] = [
         "fO2 read after assuming the offgas reaches water-gas-shift equilibrium "
