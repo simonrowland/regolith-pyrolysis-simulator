@@ -637,6 +637,81 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
     )
 
 
+@pytest.mark.parametrize(
+    "input_name",
+    ("temperature_K", "pO2_bar", "oxide_activity"),
+)
+@pytest.mark.parametrize(
+    "invalid_value",
+    (0.0, -1.0, float("nan"), float("inf"), float("-inf")),
+)
+def test_c5_ellingham_voltage_refuses_degenerate_nernst_inputs(
+    input_name,
+    invalid_value,
+):
+    sim = _sim({"campaigns": {}})
+    inputs = {
+        "temperature_K": mre_ladder.MRE_REFERENCE_TEMPERATURE_K,
+        "pO2_bar": 1.0,
+        "oxide_activity": 1.0,
+    }
+    inputs[input_name] = invalid_value
+
+    result = sim._c5_ellingham_derived_decomposition_voltage("FeO", **inputs)
+
+    assert result == (None, "Fe", None, False, f"invalid_{input_name}")
+
+
+@pytest.mark.parametrize("input_name", ("pO2_bar", "oxide_activity"))
+def test_c5_ellingham_voltage_preserves_positive_log_floor(input_name):
+    sim = _sim({"campaigns": {}})
+    inputs = {
+        "temperature_K": mre_ladder.MRE_REFERENCE_TEMPERATURE_K,
+        "pO2_bar": 1.0,
+        "oxide_activity": 1.0,
+    }
+    inputs[input_name] = 1e-40
+    floored_inputs = dict(inputs)
+    floored_inputs[input_name] = 1e-30
+
+    result = sim._c5_ellingham_derived_decomposition_voltage("FeO", **inputs)
+    floored_result = sim._c5_ellingham_derived_decomposition_voltage(
+        "FeO",
+        **floored_inputs,
+    )
+
+    assert result == floored_result
+
+
+def test_c5_ellingham_diagnostic_marks_non_finite_input_non_authoritative():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 3},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim.melt.temperature_C = 1600.0
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    _seed_cleaned_melt_kg(sim, {"FeO": 10.0})
+
+    diagnostic = sim._build_c5_ellingham_ladder_diagnostic(
+        step_info={"species": ("FeO",)},
+        declared_rung_V=0.75,
+        pO2_bar=float("nan"),
+    )
+
+    feo = diagnostic["species"]["FeO"]
+    assert feo["derived_Ed_V"] is None
+    assert feo["voltage_authoritative"] is False
+    assert feo["status"] == "invalid_pO2_bar"
+    assert diagnostic["non_authoritative_voltage_by_oxide"]["FeO"]["status"] == (
+        "invalid_pO2_bar"
+    )
+
+
 def test_c5_ladder_summary_records_non_authoritative_voltage_fallback():
     setpoints = {
         "campaigns": {},

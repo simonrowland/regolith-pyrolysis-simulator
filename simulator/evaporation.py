@@ -117,8 +117,10 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
     safety gate and NOT a coating gate. Returns a typed diagnostic payload
     when Kn is transitional at nonzero overhead (viscous Poiseuille P_bulk
-    out of domain); returns None when the operating point is in-domain
-    (viscous continuum, free-molecular, true vacuum, or non-finite Kn).
+    out of domain) or when Kn is NaN or non-positive. Returns None only for
+    established in-domain states: viscous continuum, free-molecular flow, and
+    true vacuum (Kn = +inf), which is a determined state rather than an invalid
+    input.
 
     The authoritative provider returns this payload with ``status=refused``;
     direct hard-refusal consumers may call
@@ -134,16 +136,72 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     if overhead_pressure_pa <= 0.0:
         return None
     kn = float(knudsen_number)
+    # NaN and non-positive Kn are invalid input. POSITIVE INFINITY IS NOT.
+    #
+    # Kn = lambda / L, so Kn -> +inf is the mean free path dwarfing the pipe:
+    # true vacuum, the free-molecular limit, and the operating regime this whole
+    # simulator exists to model. HEAD handled it explicitly
+    # (`if math.isinf(kn) or ...` under the comment "Free-molecular / true
+    # vacuum"). A 2026-08-22 fix for a real fail-open -- NaN silently returning
+    # None, i.e. no refusal -- widened the guard to `not math.isfinite(kn)` and
+    # swept +inf in with NaN, so a true-vacuum operating point began refusing as
+    # `invalid_knudsen_number`. That broke three C7 transport tests and would
+    # have refused to compute in the mandate's own baseline regime.
+    #
+    # NaN is missing information; +inf is a determined physical state. The two
+    # are both "non-finite" to float(), and only one of them is invalid.
+    # Nothing further is needed for +inf below: `inf < VISCOUS_KNUDSEN_MAX` is
+    # False, and `inf >= FREE_MOLECULAR_KNUDSEN_MIN` is True, so it returns None
+    # through the free-molecular branch exactly as it did before.
+    if math.isnan(kn) or kn <= 0.0:
+        commanded_pa = (
+            float(overhead_pressure_pa)
+            if commanded_pressure_pa is None
+            else max(0.0, float(commanded_pressure_pa))
+        )
+        return {
+            "status": "refused",
+            "authority_class": "diagnostic-limited",
+            "authority_reason": "invalid_knudsen_number",
+            "reason": "invalid_knudsen_number",
+            "p_bulk_transport_domain": "invalid_input",
+            "ledger_yields_authorized": False,
+            "detail": (
+                "Kn must be finite and greater than zero at nonzero "
+                f"overhead pressure; received {kn!r}"
+            ),
+            "knudsen_number": kn if math.isfinite(kn) else None,
+            "knudsen_number_input_repr": repr(kn),
+            "model_domain": (
+                "finite Kn > 0; true vacuum is represented by "
+                "overhead_pressure_pa <= 0"
+            ),
+            "VISCOUS_KNUDSEN_MAX": VISCOUS_KNUDSEN_MAX,
+            "FREE_MOLECULAR_KNUDSEN_MIN": FREE_MOLECULAR_KNUDSEN_MIN,
+            "overhead_pressure_pa": float(overhead_pressure_pa),
+            "overhead_pressure_mbar": float(overhead_pressure_pa) / 100.0,
+            "commanded_pressure_pa": commanded_pa,
+            "commanded_pressure_mbar": commanded_pa / 100.0,
+            "pipe_diameter_m": float(pipe_diameter_m),
+            "gas_temperature_K": float(gas_temperature_K),
+            "gas_temperature_C": float(gas_temperature_K) - 273.15,
+            "carrier_gas": str(carrier_gas),
+            "affected_species": tuple(
+                sorted(str(species) for species in affected_species)
+            ),
+            "framing": (
+                "transport_model_validity_domain"
+                ";invalid_transport_input;not_coating_gate"
+            ),
+            "evaporation_flux_status": "not_evaluated",
+            "evaporation_flux_kg_hr": None,
+        }
     # Viscous continuum: Poiseuille P_bulk is in-domain.
-    if math.isfinite(kn) and kn < VISCOUS_KNUDSEN_MAX:
+    if kn < VISCOUS_KNUDSEN_MAX:
         return None
-    # Free-molecular / true vacuum: local R_g=0 and the HKL upper bound on
-    # Δp is reconstructible without a transitional film coefficient.
-    if math.isinf(kn) or (
-        math.isfinite(kn) and kn >= FREE_MOLECULAR_KNUDSEN_MIN
-    ):
-        return None
-    if not math.isfinite(kn):
+    # Finite free-molecular flow: local R_g=0 and the HKL upper bound on Δp
+    # is reconstructible without a transitional film coefficient.
+    if kn >= FREE_MOLECULAR_KNUDSEN_MIN:
         return None
     # Transitional band: continuum film is off but Poiseuille still evolves
     # P_bulk — out-of-domain for ledger-authoritative yields until t-379.
@@ -204,9 +262,10 @@ def refuse_viscous_p_bulk_out_of_domain(
 
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
     safety gate and NOT a coating gate. Hard-raises when the diagnostic helper
-    reports transitional out-of-domain. The authoritative provider returns a
-    refused result from the same payload; bounded C7/native-Fe consumers apply
-    their own explicitly tagged diagnostic-limited policy.
+    reports transitional out-of-domain transport or an invalid Kn input. The
+    authoritative provider returns a refused result from the same payload;
+    bounded C7/native-Fe consumers apply their own explicitly tagged
+    diagnostic-limited policy.
     """
     diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
         knudsen_number=knudsen_number,
@@ -217,10 +276,11 @@ def refuse_viscous_p_bulk_out_of_domain(
     )
     if diagnostic is None:
         return
-    raise EvaporationFluxRefusal(
-        "viscous_p_bulk_transport_out_of_domain",
-        diagnostic,
+    reason = str(
+        diagnostic.get("reason")
+        or "viscous_p_bulk_transport_out_of_domain"
     )
+    raise EvaporationFluxRefusal(reason, diagnostic)
 
 
 # NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
@@ -994,16 +1054,20 @@ class EvaporationMixin:
                         0.0,
                         float(residual_capacity_mol),
                     ) * fe_molar_mass
-                    # Native-pool Fe has activity ~1; dilute melt FeO-derived
-                    # Fe has lower activity, so the shared surface/gas transport
-                    # budget is allocated to the pool first and melt Fe gets the
-                    # residual capacity.
+                    # Explicit scheduling policy, not an activity calculation:
+                    # native-pool Fe claims the shared transport capacity first,
+                    # then melt-derived Fe is capped at the residual molar
+                    # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
+                    # melt activity is an operand here. Limiting cases: zero
+                    # residual gives zero melt-derived Fe; residual >= raw
+                    # rate/M_Fe leaves the raw melt-derived rate unchanged.
                     original_gated_rate = gated_rate_kg_hr
                     gated_rate_kg_hr = min(gated_rate_kg_hr, residual_capacity_kg_hr)
                     diagnostic['native_fe_capacity_allocation'] = {
                         'rule': 'pool_first_residual',
                         'native_pool_activity_argument': (
-                            'a_Fe(pool) ~= 1 outcompetes dilute melt FeO activity'
+                            'not modeled; allocation is an explicit pool-first '
+                            'scheduling policy'
                         ),
                         'melt_fe_raw_kg_hr': float(original_gated_rate),
                         'melt_fe_residual_capacity_kg_hr': float(
@@ -1031,13 +1095,17 @@ class EvaporationMixin:
     ) -> dict[str, Any]:
         """Estimate partial-melt alkali vapor undercount without changing flux.
 
-        Diagnostic-only grounding:
-        DeMaria et al. 1971 measured Na/K vapor below the Apollo 12022
-        liquidus, and the phase-engine result classes document
-        ``liquid_fraction`` plus ``liquid_composition_wt_pct`` as the preferred
-        source when available.  If a backend supplies only F(T), use the
-        documented batch-partition fallback
-        ``C_liquid/C_bulk = 1 / (D + F * (1 - D))`` at WARN tier.
+        DeMaria et al. 1971 grounds only the existence of Na/K vapor below the
+        Apollo 12022 liquidus. It does not establish the fallback partition
+        coefficients or their composition, phase, temperature, or pressure
+        validity domain. Phase-engine ``liquid_composition_wt_pct`` is preferred;
+        when only F(T) exists, the WARN-tier estimate uses
+        ``C_liquid/C_bulk = 1 / (D + F * (1 - D))``: bulk balance gives
+        ``C_bulk = F*C_liquid + (1-F)*C_solid`` and
+        ``D = C_solid/C_liquid``, so division by ``C_bulk`` yields that
+        dimensionless ratio. Sanity checks: F=1 gives ratio 1, while D=0 gives
+        1/F. The estimate remains explicitly uncertified; the correct numerical
+        D values and validity windows are unestablished here.
         """
         fraction = self._partial_melt_fraction_diagnostic(equilibrium)
         liquid_comp, liquid_comp_source = (
@@ -1427,9 +1495,8 @@ class EvaporationMixin:
             return curve
 
         # Opt-in caller-owned memo for workflows that build fresh simulator
-        # instances for equivalent rows. The full composition/P/fO2 key is
-        # load-bearing: pressure and redox state are liquidus inputs, so only
-        # an exact physical-key match may reuse a curve.
+        # instances for equivalent rows. Reuse is based on the quantized
+        # composition/P/fO2 key below, not exact physical-input identity.
         shared_curve_cache = getattr(
             self,
             '_freeze_gate_shared_curve_cache',
@@ -1604,9 +1671,15 @@ class EvaporationMixin:
             round(float(fO2_log) / _FREEZE_GATE_FO2_LOG_QUANTUM)
             * _FREEZE_GATE_FO2_LOG_QUANTUM
         )
-        # Pressure is bucketed at 0.01 bar and fO2 at 1 log unit: coarse
-        # enough to absorb per-tick float noise, fine enough to split
-        # overhead-pressure and campaign/redox control changes.
+        # Quantized equivalence key, not exact identity. For a quantity y and
+        # quantum q, y_bucket = q * round(y/q): composition q=1e-4 is
+        # dimensionless, pressure q=0.01 bar retains bar, and fO2 q=1 retains
+        # log10 units. Sanity checks: 0.010 and 0.014 bar both map to 0.01 bar;
+        # fO2 -9.1 and -8.6 both map to -9.0 under Python rounding. Only a
+        # midpoint crossing splits a control state; sub-cutoff composition
+        # components are omitted before this arithmetic. No physical-
+        # equivalence error bound for these pressure/fO2 quanta is established
+        # here.
         return (
             'oxide_mol_fraction_p_fO2_v3',
             round(pressure_bucket, 6),
@@ -2071,16 +2144,14 @@ class EvaporationMixin:
 
         These three maps are everything the kernel provider needs that
         cannot be derived from the request DTOs alone: the
-        ``vapor_pressures.yaml`` payload + the simulator's stoich
-        validation (which raises ``AccountingError`` -- a caller-owned
-        surface that does NOT belong inside the stateless provider).
+        ``vapor_pressures.yaml`` payload plus the simulator's stoichiometric
+        validation.
 
-        Side effects: This method intentionally invokes
-        :meth:`_evaporation_stoich` for each species, which raises
-        AccountingError on missing/inconsistent metadata. Preserving
-        that error surface in the caller (not the provider) matches the
-        legacy behaviour exactly -- the parity tests would otherwise
-        observe a different error class.
+        Side effects: This method invokes :meth:`_evaporation_stoich` for each
+        species and raises ``AccountingError`` on missing or inconsistent
+        metadata. ``_evaporation_flux_control_inputs`` maps that internal
+        validation error to the module's typed terminal physics refusal before
+        it can escape the evaporation boundary.
         """
 
         molar_masses_kg_mol: dict[str, float] = {}
@@ -2440,6 +2511,20 @@ class EvaporationMixin:
             live_reporting = dict(
                 getattr(equilibrium, 'vapor_pressures_Pa', {}) or {}
             )
+        # An AccountingError from here PROPAGATES, deliberately. A 2026-08-22 fix
+        # re-raised it as EvaporationFluxRefusal('invalid_evaporation_auxiliary_inputs')
+        # so the run executor would recognise it as a typed physics refusal, and
+        # that broke four tests which passed before it: the accounting error is
+        # the specific, actionable one ("vapor species 'Fe' requires parent_oxide
+        # metadata before evaporation"), and re-typing it here discards that for a
+        # generic transport reason. test_vapor_species_without_parent_oxide_fails_
+        # before_flux exists to assert exactly this ordering.
+        #
+        # The concern behind that change is real and is NOT fixed here: AccountingError
+        # is absent from run_executor._ALL_TYPED_PHYSICS_REFUSALS while
+        # EvaporationFluxRefusal is present. The right repair is to register the type
+        # there, not to launder it at one call site — a local re-type cannot know
+        # which distant contracts depend on the original. Tracked in t-728.
         (
             molar_masses_kg_mol,
             stoich_by_species,
@@ -2747,8 +2832,9 @@ class EvaporationMixin:
         Species condense preferentially in stages where the stage
         temperature is well below the species' condensation temperature.
 
-        The oxygen component of each evaporated metal oxide is
-        released as O2 and credited to terminal oxygen storage.
+        For elemental-metal evaporation from a parent oxide, the oxygen
+        coproduct is credited to ``reservoir.fo2_buffer``. That redox buffer is
+        not a terminal stored-oxygen product account.
 
         CONDENSATION_ROUTE intent -- kernel-authoritative.
 
@@ -2781,14 +2867,12 @@ class EvaporationMixin:
         coupled transition was rejected at the numerical floor; the caller
         uses that committed flux for reporting, transport, and energy.
 
-        End-of-tick ledger state is identical to the pre-flip behaviour:
-        between the two kernel commits the vapor passes through
-        overhead_gas, but the final per-account balances match the
-        legacy single-step EVAPORATION_TRANSITION exactly (verified by
-        the parametrised parity test in
-        ``tests/chemistry/test_builtin_condensation_route_provider.py``).
-        Per the goal spec, the shadow comparator was removed at flip
-        time (the parity test owns the regression surface from now on).
+        Between the two kernel commits the vapor passes through overhead_gas.
+        ``tests/chemistry/test_builtin_condensation_route_provider.py`` checks
+        current split-path mass closure, nonzero deposition, and wall-deposit
+        goldens, but contains no pre-flip operand and therefore does not prove
+        exact legacy single-step end-state parity. The shadow comparator was
+        removed at flip time, so that exact parity is currently unestablished.
         """
         phase_scalar = self._record_phase_context_diagnostic(
             'condensation_feed', scalar_liquid_fraction=1.0)

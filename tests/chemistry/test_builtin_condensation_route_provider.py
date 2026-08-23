@@ -2982,7 +2982,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
 
 
 # ---------------------------------------------------------------------------
-# 7. Account-flow parity: legacy single-step matches split-step end-state
+# 7. Split-step account-flow invariants
 # ---------------------------------------------------------------------------
 
 
@@ -2996,8 +2996,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
 def test_split_path_end_state_matches_pre_flip_account_balances(
     full_builtin_provider_run,
 ):
-    """End-of-batch account balances must match what the pre-flip
-    single-step EVAPORATION_TRANSITION path produced.
+    """Check split-path end-state invariants without claiming legacy parity.
 
     Strategy: drive C0 -> C6, then sum per-account masses across
     every condense + evaporate transition and verify:
@@ -3005,13 +3004,14 @@ def test_split_path_end_state_matches_pre_flip_account_balances(
     * Sum of evaporate transitions' overhead_gas credit = full vapor
       mass + O2 (i.e. EVAPORATION_TRANSITION now routes ALL vapor to
       overhead, not just the uncondensed portion).
-    * Sum of condense transitions' condensation_train credit = the
-      original "credited_condensed_kg" the pre-flip path produced.
+    * Condense transitions debit no more overhead vapor than evaporation
+      credited.
     * Net (sum of evap debits = full melt removal) is unchanged.
-    * Final condensation_train balance per-species matches the legacy
-      single-step path within numerical tolerance.
+    * Condensation-train and wall-deposit current-state checks remain nonzero
+      and mass-balanced.
 
-    This is the end-state parity check that justifies the split.
+    No pre-flip operand is available in this test, so it cannot establish exact
+    legacy single-step end-state parity.
     """
 
     feedstock_key, additives_kg, sim = full_builtin_provider_run

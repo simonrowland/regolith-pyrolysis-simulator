@@ -729,25 +729,31 @@ def _feedstock_surface_pressure_mbar(feedstock: Mapping[str, Any]) -> float:
     environment = feedstock.get('environment', {}) or {}
     surface_pressure = feedstock.get('surface_pressure_mbar')
     environment_surface_pressure = environment.get('surface_pressure_mbar')
+
+    def _validated_surface_pressure(value: Any, field: str) -> float:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError(f"{field} must be numeric")
+        pressure_mbar = float(value)
+        if not math.isfinite(pressure_mbar) or pressure_mbar < 0.0:
+            raise ValueError(f"{field} must be finite and nonnegative")
+        return pressure_mbar
+
+    validated_surface_pressure = None
     if surface_pressure not in (None, ''):
-        if not is_declared_real_scalar(
+        validated_surface_pressure = _validated_surface_pressure(
             surface_pressure,
-            allow_numeric_str=True,
-        ):
-            raise TypeError("surface_pressure_mbar must be numeric")
+            'surface_pressure_mbar',
+        )
+    validated_environment_pressure = None
     if environment_surface_pressure not in (None, ''):
-        if not is_declared_real_scalar(
+        validated_environment_pressure = _validated_surface_pressure(
             environment_surface_pressure,
-            allow_numeric_str=True,
-        ):
-            raise TypeError("environment.surface_pressure_mbar must be numeric")
-    return max(
-        0.0,
-        float(
-            surface_pressure
-            or environment_surface_pressure
-            or 0.0
-        ),
+            'environment.surface_pressure_mbar',
+        )
+    return float(
+        validated_surface_pressure
+        or validated_environment_pressure
+        or 0.0
     )
 
 
@@ -4888,12 +4894,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # fail-open: skipped terms are recorded as refusal, never as success. The graded
             # range/saturation refusals below still apply ABOVE the floor (C_m > NOOP_MOL), where
             # a real capacity meets an out-of-range or non-finite demand.
-            # Physical rationale (owner-confirmed 2026-07-08): in this project's default vacuum regime
-            # the O2 tied to a floored term sits below lunar-atmosphere pressure (~1e-15 bar) — the
-            # free-molecular / pure-ballistic-escape regime — so it leaves the system without
-            # re-equilibrating with the melt. Applying vs refusing the tiny redox term therefore does
-            # not change the physics: that oxygen escapes ballistically either way, so the floor is
-            # moot (hence correct) precisely where it fires.
+            # The refusal follows from the denominator, not from a pressure claim. The
+            # update would be delta(ln fO2) = n_O2eq / C_m: mol divided by
+            # (mol per unit ln fO2) is a dimensionless log increment. Therefore
+            # C_m <= NOOP_MOL says the melt has no resolvable differential capacity;
+            # it places no upper bound on the independent source term n_O2eq. Sanity
+            # check: n_O2eq = 1 mol and C_m = 0 enters this branch, so neither
+            # "tiny oxygen" nor a ~1e-15 bar ballistic regime follows. Refusal is
+            # correct because division by a zero/numerically meaningless capacity
+            # cannot yield an authoritative redox state; the skipped source term is
+            # retained in the diagnostic rather than reinterpreted as pressure.
             skip_reason = 'no_melt_redox_capacity'
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
             skip_reason = 'below_threshold'
@@ -6427,8 +6437,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if temperature_K is not None
             else float(self.melt.temperature_C) + 273.15
         )
-        if T_K <= 0.0:
-            return math.log10(self._vacuum_floor_bar())
+        if not math.isfinite(T_K) or T_K <= 0.0:
+            raise ValueError('temperature_K must be finite and greater than zero')
         comp = self._melt_oxide_wt_pct()
         feo = max(0.0, float(comp.get('FeO', 0.0)))
         fe2o3 = max(0.0, float(comp.get('Fe2O3', 0.0)))
@@ -6467,9 +6477,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # ~20x too weak, and it is handed a WEIGHT ratio where Kress91 takes a
         # MOLAR one (factor 71.844/159.688 = 0.4499). Do NOT "fix" it by
         # swapping the constant: on a ledger Fe2O3 that never equilibrated,
-        # inverting Kress91 is a category error, not a correction. The IW fit
-        # itself is sound -- within 0.083 dex of Frost 1991 (-27489/T + 6.702)
-        # across 1273-2273 K -- so leave it alone.
+        # inverting Kress91 is a category error, not a correction.
+        #
+        # Numerical proximity to Frost 1991 does not validate this IW fit over
+        # the claimed 1273-2273 K interval. Subtracting Frost's Table 1 form
+        # from this expression gives
+        #
+        #   (-27215/T + 6.57) - (-27489/T + 6.702)
+        #       = 274 K/T - 0.132 dex.
+        #
+        # T is in kelvin, so K/T is dimensionless and the difference is in
+        # log10-fugacity units. It is +0.083 dex at 1273 K and -0.011 dex at
+        # 2273 K, which explains the numerical closeness but not physical
+        # validity. Frost Table 1 limits IW to 565-1200 degC
+        # (838.15-1473.15 K), while NIST-JANAF FeO(cr,l) records the
+        # crystal-liquid transition at 1650 K. Thus the old comparison extended
+        # 800 degC beyond Frost's upper limit and crossed a phase boundary.
+        # The correct replacement outside the published window is unestablished;
+        # do not alter the coefficient without the gated SSO-R replacement.
+        # Sources: Frost 1991, doi:10.2138/rmg.1991.25.1, Table 1;
+        # NIST-JANAF FeO(cr,l), https://janaf.nist.gov/tables/Fe-020.html.
         # Evidence: docs-private/research/2026-08-18-t655-fo2-gap/.
         #
         # SSO-R task #41 is the intended grounded replacement (explicit
@@ -6707,7 +6734,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pressure_bar: float,
         fO2_log: float,
     ) -> Dict[str, Any]:
-        fe3 = min(1.0, max(0.0, float(fe3_over_sigma_fe)))
+        fe3 = float(fe3_over_sigma_fe)
+        if not math.isfinite(fe3) or not 0.0 <= fe3 <= 1.0:
+            raise ValueError(
+                'fe3_over_sigma_fe must be finite and within [0, 1]'
+            )
         ferrous_available = max(0.0, 1.0 - fe3)
         if ferrous_available <= 0.0 or self._feot_equivalent_wt_pct(comp) <= 0.0:
             return {
@@ -8741,8 +8772,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         legacy internal analytical path) produces an EquilibriumResult.
 
         Behaviour:
-          - Below 400 K both the legacy path and the kernel return an
-            empty vapor-pressure dict; we leave the result untouched.
+          - Below 400 K this method returns before kernel dispatch and preserves
+            whatever backend vapor-pressure surface it received. It does not
+            establish that either the backend or kernel surface is empty; that
+            is a separate provider contract.
           - When the kernel returns a populated ``vapor_pressures_Pa``
             it replaces the equilibrium-result dict in place. For
             ThermoEngine-sourced species whose backend value agrees with

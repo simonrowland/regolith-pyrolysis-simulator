@@ -30,6 +30,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.overhead import (
     DEFAULT_INITIAL_THROAT_AREA_M2,
     DEFAULT_PIPE_M_AVG_KG_MOL,
+    OverheadConfigurationError,
     OverheadGasModel,
     _mean_molar_mass_kg_mol,
 )
@@ -421,6 +422,45 @@ def test_pipe_conductance_negative_pressure_clamps_to_zero():
     assert result == 0.0
 
 
+@pytest.mark.parametrize(
+    ("p_upstream_Pa", "temperature_C", "p_downstream_Pa"),
+    [
+        (float("nan"), 1500.0, 0.0),
+        (float("inf"), 1500.0, 0.0),
+        (1000.0, float("nan"), 0.0),
+        (1000.0, float("inf"), 0.0),
+        (1000.0, 1500.0, float("nan")),
+        (1000.0, 1500.0, float("inf")),
+    ],
+)
+def test_pipe_conductance_nonfinite_inputs_fail_closed(
+    p_upstream_Pa,
+    temperature_C,
+    p_downstream_Pa,
+):
+    model = _make_model()
+
+    result = model._pipe_conductance(
+        p_upstream_Pa,
+        temperature_C,
+        p_downstream_Pa=p_downstream_Pa,
+    )
+
+    assert result == 0.0
+    assert math.isfinite(result)
+
+
+@pytest.mark.parametrize("geometry_field", ["pipe_length_m", "pipe_diameter_m"])
+def test_pipe_conductance_nonfinite_geometry_fails_closed(geometry_field):
+    model = _make_model()
+    setattr(model, geometry_field, float("nan"))
+
+    result = model._pipe_conductance(1000.0, 1500.0)
+
+    assert result == 0.0
+    assert math.isfinite(result)
+
+
 def test_pipe_conductance_legal_inputs_match_compressible_closed_form():
     model = _make_model()
     # Reference value computed manually:
@@ -461,6 +501,87 @@ def test_estimate_transport_state_threads_evap_flux_species_through():
     ratio = state_fe["pipe_conductance_kg_hr"] / state_na["pipe_conductance_kg_hr"]
     expected = MOLAR_MASS["Fe"] / MOLAR_MASS["Na"]
     assert ratio == pytest.approx(expected, rel=1e-6)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("temperature_C", float("nan"), "melt.temperature_C must be finite"),
+        ("temperature_C", float("inf"), "melt.temperature_C must be finite"),
+        ("temperature_C", -273.15, "above absolute zero"),
+        ("p_total_mbar", float("nan"), "melt.p_total_mbar must be finite"),
+        ("p_total_mbar", float("inf"), "melt.p_total_mbar must be finite"),
+        ("p_total_mbar", -1.0, "melt.p_total_mbar values must be finite and >= 0"),
+    ],
+)
+def test_estimate_transport_state_refuses_invalid_melt_state(
+    field,
+    value,
+    message,
+):
+    model = _make_model()
+    melt = MeltState()
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 10.0
+    setattr(melt, field, value)
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+
+    with pytest.raises(OverheadConfigurationError, match=message):
+        model.estimate_transport_state(flux, melt)
+
+
+@pytest.mark.parametrize("total_kg_hr", [float("nan"), float("inf"), -1.0])
+def test_estimate_transport_state_refuses_invalid_evaporation_total(total_kg_hr):
+    model = _make_model()
+    melt = MeltState()
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 10.0
+    flux = EvaporationFlux(
+        species_kg_hr={"SiO": 1.0},
+        total_kg_hr=total_kg_hr,
+    )
+
+    with pytest.raises(
+        OverheadConfigurationError,
+        match="evap_flux.total_kg_hr",
+    ):
+        model.estimate_transport_state(flux, melt)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("downstream_pressure_bar", float("nan")),
+        ("downstream_pressure_bar", float("inf")),
+        ("downstream_pressure_bar", -1.0),
+        ("effective_capacity_kg_hr", float("nan")),
+        ("effective_capacity_kg_hr", float("inf")),
+        ("effective_capacity_kg_hr", -1.0),
+    ],
+)
+def test_estimate_transport_state_refuses_invalid_effective_capacity(
+    field,
+    value,
+):
+    model = _make_model()
+    melt = MeltState()
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 10.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+    capacity = SimpleNamespace(
+        downstream_pressure_bar=0.0,
+        effective_capacity_kg_hr=1.0,
+        saturation=1.0,
+        binding_cause="test",
+    )
+    setattr(capacity, field, value)
+
+    with pytest.raises(OverheadConfigurationError, match=field):
+        model.estimate_transport_state(
+            flux,
+            melt,
+            effective_transport_capacity=capacity,
+        )
 
 
 def test_default_throat_area_reproduces_12_cm_diameter():
@@ -719,6 +840,34 @@ def test_vapor_pressure_matches_closed_form_known_case():
     assert actual_mbar == pytest.approx(expected_mbar, rel=1e-12)
     assert math.isfinite(actual_mbar)
     assert actual_mbar > 0.0
+
+
+@pytest.mark.parametrize(
+    ("flow_kg_s", "temperature_C", "p_downstream_bar"),
+    [
+        (float("nan"), 1200.0, 0.0),
+        (float("inf"), 1200.0, 0.0),
+        (0.003, float("nan"), 0.0),
+        (0.003, float("inf"), 0.0),
+        (0.003, 1200.0, float("nan")),
+        (0.003, 1200.0, float("inf")),
+    ],
+)
+def test_vapor_pressure_nonfinite_inputs_fail_closed(
+    flow_kg_s,
+    temperature_C,
+    p_downstream_bar,
+):
+    model = _make_model()
+
+    pressure_mbar = model._vapor_pressure_mbar_from_flux(
+        flow_kg_s,
+        temperature_C,
+        p_downstream_bar=p_downstream_bar,
+    )
+
+    assert pressure_mbar == 0.0
+    assert math.isfinite(pressure_mbar)
 
 
 def test_vapor_pressure_inverse_matches_forward_capacity_at_operating_point():

@@ -303,6 +303,17 @@ def test_load_batch_seeds_melt_fO2_log_from_intrinsic_value() -> None:
     assert sim.melt.oxygen_reservoir.reference_T_K is None
 
 
+def test_intrinsic_melt_fo2_refuses_invalid_temperature() -> None:
+    sim = _make_sim()
+
+    for temperature_K in (math.nan, math.inf, -math.inf, 0.0, -1.0):
+        with pytest.raises(
+            ValueError,
+            match="temperature_K must be finite and greater than zero",
+        ):
+            sim._compute_intrinsic_melt_fO2(temperature_K)
+
+
 def test_load_batch_resets_hot_reference_temperature_on_reload() -> None:
     sim = _make_sim()
     sim._overhead_headspace_config["enabled"] = False
@@ -2589,6 +2600,22 @@ def test_native_fe_saturation_uses_upstream_total_pressure(
     )
 
     assert seen_pressure_bar == pytest.approx([0.005, 0.005])
+
+
+def test_native_fe_saturation_refuses_invalid_ferric_fraction() -> None:
+    sim = _make_sim()
+
+    for fe3_over_sigma_fe in (math.nan, math.inf, -math.inf, -0.01, 1.01):
+        with pytest.raises(
+            ValueError,
+            match=r"fe3_over_sigma_fe must be finite and within \[0, 1\]",
+        ):
+            sim._compute_native_fe_saturation_extent(
+                fe3_over_sigma_fe=fe3_over_sigma_fe,
+                T_K=1873.15,
+                pressure_bar=0.001,
+                fO2_log=-9.0,
+            )
 
 
 def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:

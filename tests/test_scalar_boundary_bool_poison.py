@@ -1238,6 +1238,31 @@ def test_hard_boundaries_keep_honest_numeric_inputs(case: HardCase) -> None:
         case.call(raw)
 
 
+@pytest.mark.parametrize(
+    "feedstock",
+    [
+        {"surface_pressure_mbar": None},
+        {"environment": {"surface_pressure_mbar": None}},
+    ],
+    ids=["top_level", "environment"],
+)
+@pytest.mark.parametrize(
+    "raw",
+    [np.nan, np.inf, -np.inf, -1.0, "nan", "inf", "-inf", "-1"],
+)
+def test_surface_pressure_refuses_nonfinite_and_negative_values(
+    feedstock: dict[str, Any],
+    raw: Any,
+) -> None:
+    if "surface_pressure_mbar" in feedstock:
+        feedstock["surface_pressure_mbar"] = raw
+    else:
+        feedstock["environment"]["surface_pressure_mbar"] = raw
+
+    with pytest.raises(ValueError, match="finite and nonnegative"):
+        _feedstock_surface_pressure_mbar(feedstock)
+
+
 @dataclass(frozen=True)
 class SoftCase:
     id: str

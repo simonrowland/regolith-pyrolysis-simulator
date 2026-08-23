@@ -44,9 +44,12 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
+    EvaporationFluxRefusal,
     _legacy_evaporation_shadow_pressure_map,
     _load_evaporation_alpha_by_species,
     _pre_rg_effective_pressure_source,
+    refuse_viscous_p_bulk_out_of_domain,
+    viscous_p_bulk_out_of_domain_diagnostic,
 )
 from simulator.state import (
     MOLAR_MASS,
@@ -552,6 +555,128 @@ def test_evaporation_aux_fails_loud_without_molar_mass_metadata(
 
     with pytest.raises(AccountingError, match="Mystery.*molar_mass_g_mol"):
         sim._build_evaporation_aux_maps({"Mystery": 1.0})
+
+
+@pytest.mark.xdist_group("serial")
+def test_evaporation_aux_validation_surfaces_the_accounting_error(
+    feedstocks_data, setpoints_data
+):
+    """A missing-metadata AccountingError must PROPAGATE, not be re-typed.
+
+    An earlier revision converted it here to
+    EvaporationFluxRefusal('invalid_evaporation_auxiliary_inputs') so the run
+    executor would recognise a typed physics refusal. That discarded the
+    specific, actionable message and broke three tests in other files,
+    including one named test_vapor_species_without_parent_oxide_fails_before_flux
+    whose whole subject is this ordering.
+
+    The concern behind that change is real and unfixed: AccountingError is
+    absent from run_executor._ALL_TYPED_PHYSICS_REFUSALS. The repair belongs in
+    that registry, not at this call site -- a local re-type cannot know which
+    distant contracts depend on the original type. Tracked in t-728.
+    """
+
+    vapor_pressure_data = {
+        "metals": {
+            "Mystery": {
+                "parent_oxide": "FeO",
+                "stoich_oxide_per_vapor": 1.0,
+                "stoich_O2_per_vapor": 0.0,
+            },
+        },
+        "oxide_vapors": {},
+    }
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    with pytest.raises(AccountingError) as exc_info:
+        sim._evaporation_flux_control_inputs(
+            SimpleNamespace(vapor_pressures_Pa={}),
+            overhead_partials_Pa={},
+            vapour_batch_flux_pressures_Pa={"Mystery": 1.0},
+        )
+
+    # The message must name the species and the missing metadata: that
+    # specificity is what a generic transport reason threw away.
+    message = str(exc_info.value)
+    assert "Mystery" in message, message
+    assert "molar_mass_g_mol" in message or "parent_oxide" in message, message
+
+
+def test_true_vacuum_is_in_domain_not_invalid_input():
+    """Kn = +inf is the free-molecular limit, not a bad number.
+
+    Kn = lambda / L, so Kn -> +inf means the mean free path dwarfs the pipe:
+    true vacuum. That is the lunar baseline this project exists to model, and
+    the diagnostic must return None (in-domain) rather than refusing.
+
+    This test exists because the regression actually happened: a fix for a real
+    NaN fail-open widened its guard from `math.isnan(kn)` to
+    `not math.isfinite(kn)`, sweeping +inf in with NaN. Both are "non-finite"
+    to float() and only one of them is missing information. Three C7 transport
+    tests caught it only once five module patches were run together.
+    """
+
+    kwargs = {
+        "overhead_pressure_pa": 100.0,
+        "pipe_diameter_m": 0.12,
+        "gas_temperature_K": 1873.15,
+    }
+
+    assert viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=math.inf, **kwargs
+    ) is None
+    # and it must not raise through the refusal wrapper either
+    refuse_viscous_p_bulk_out_of_domain(knudsen_number=math.inf, **kwargs)
+
+    # A large finite Kn is the same free-molecular branch; inf must not be
+    # special-cased into a different verdict from its own limit.
+    assert viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=1.0e6, **kwargs
+    ) is None
+
+
+@pytest.mark.parametrize("knudsen_number", [-1.0, 0.0, math.nan])
+def test_invalid_knudsen_number_refuses_at_nonzero_overhead(knudsen_number):
+    """NaN and non-positive Kn are invalid input and must refuse.
+
+    math.inf is deliberately NOT in this list. See the companion test below:
+    Kn = +inf is true vacuum, a determined physical state, and an earlier
+    revision of this parametrisation included it -- which made the module
+    refuse to compute in the regime the whole simulator is built to model.
+    """
+
+    kwargs = {
+        "knudsen_number": knudsen_number,
+        "overhead_pressure_pa": 100.0,
+        "pipe_diameter_m": 0.12,
+        "gas_temperature_K": 1873.15,
+    }
+
+    diagnostic = viscous_p_bulk_out_of_domain_diagnostic(**kwargs)
+
+    assert diagnostic is not None
+    assert diagnostic["reason"] == "invalid_knudsen_number"
+    assert diagnostic["ledger_yields_authorized"] is False
+    assert diagnostic["evaporation_flux_status"] == "not_evaluated"
+    with pytest.raises(EvaporationFluxRefusal) as exc_info:
+        refuse_viscous_p_bulk_out_of_domain(**kwargs)
+    assert exc_info.value.reason == "invalid_knudsen_number"
+
+
+def test_true_vacuum_accepts_infinite_knudsen_limit():
+    diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=math.inf,
+        overhead_pressure_pa=0.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=1873.15,
+    )
+
+    assert diagnostic is None
 
 
 @pytest.mark.xdist_group("serial")

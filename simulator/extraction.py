@@ -1012,8 +1012,8 @@ class ExtractionMixin:
     # ``data/setpoints.yaml § mre_voltage_sequence.sequence`` block
     # documented the same data but was never read — operators
     # tweaking the YAML saw zero effect. B5 wires the YAML through,
-    # so this list is now the fallback / golden ground truth, NOT
-    # the only source-of-truth.
+    # so this alias is now the canonical runtime fallback, NOT an
+    # independent golden or ground-truth data source.
     _MRE_VOLTAGE_LADDER_FALLBACK = mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK
 
     # Default ``min_hold_hours`` per species used when YAML doesn't
@@ -1103,6 +1103,23 @@ class ExtractionMixin:
         if n_electrons <= 0.0:
             return None, str(metal_species), None, False, 'invalid_electron_count'
 
+        validated_inputs: dict[str, float] = {}
+        for name, raw_value in (
+            ('temperature_K', temperature_K),
+            ('pO2_bar', pO2_bar),
+            ('oxide_activity', oxide_activity),
+        ):
+            try:
+                value = float(raw_value)
+            except (TypeError, ValueError):
+                return None, str(metal_species), None, False, f'invalid_{name}'
+            if not math.isfinite(value) or value <= 0.0:
+                return None, str(metal_species), None, False, f'invalid_{name}'
+            validated_inputs[name] = value
+
+        temperature_K = validated_inputs['temperature_K']
+        pO2_bar = validated_inputs['pO2_bar']
+        oxide_activity = validated_inputs['oxide_activity']
         reference = mre_ladder.mre_decomposition_voltage_reference(
             oxide,
             temperature_K=temperature_K,
@@ -1110,21 +1127,30 @@ class ExtractionMixin:
         if reference is None:
             return None, str(metal_species), None, False, 'decomposition_voltage_unavailable'
         standard_Ed_V = reference.voltage
-        activity = max(float(oxide_activity), 1e-30)
-        pO2 = max(float(pO2_bar), 1e-30)
+        activity = max(oxide_activity, 1e-30)
+        pO2 = max(pO2_bar, 1e-30)
         o2_mol_per_oxide = float(n_oxy) / 2.0
         nernst_V = (
-            -((GAS_CONSTANT * float(temperature_K)) / (n_electrons * FARADAY))
+            -((GAS_CONSTANT * temperature_K) / (n_electrons * FARADAY))
             * math.log(activity)
-            + ((GAS_CONSTANT * float(temperature_K)) / (n_electrons * FARADAY))
+            + ((GAS_CONSTANT * temperature_K) / (n_electrons * FARADAY))
             * o2_mol_per_oxide
             * math.log(pO2)
         )
+        derived_Ed_V = standard_Ed_V + nernst_V
+        if not math.isfinite(derived_Ed_V):
+            return (
+                None,
+                reference.ellingham_species or str(metal_species),
+                reference.authority,
+                False,
+                'non_finite_decomposition_voltage',
+            )
         status = None
         if not reference.authoritative:
             status = f'{reference.authority}:{reference.status}'
         return (
-            standard_Ed_V + nernst_V,
+            derived_Ed_V,
             reference.ellingham_species or str(metal_species),
             reference.authority,
             reference.authoritative,
@@ -1361,9 +1387,12 @@ class ExtractionMixin:
                                  selectivity filter (the EvalSpec target step);
                                  Nernst + the voltage cap already govern
                                  which species are physically reducible.
-                                 Electrode life 5-10× longer than full MRE.
+                                 This module has no electrode-life model, so it
+                                 cannot derive a lifetime multiplier for C5.
 
-            MRE_BASELINE:        Stepped holds at each Ellingham threshold (0.75->2.5 V).
+            MRE_BASELINE:        Stepped holds at each voltage returned by
+                                 ``_build_mre_voltage_sequence`` (YAML-derived,
+                                 with the graph-derived canonical fallback).
                                  Each species substantially extracted before advancing.
                                  Higher current (3000 A) for faster throughput.
 
@@ -2173,8 +2202,9 @@ class ExtractionMixin:
         Any K/Na that happened to condense in earlier campaigns
         (evaporated from the melt's own Na₂O/K₂O during C0/C2) is
         also collected as a bonus — checked across ALL condenser stages
-        since Na/K may condense in Stage 4 (200-350°C) rather than
-        Stage 3 (350-700°C) depending on the condensation model.
+        even though canonical routing sends both species to Stage 4
+        (350-700°C).  The all-stage scan remains defensive against
+        legacy or externally supplied condenser state.
 
         Called once at the start of C3_K and C3_NA phases.
         """
@@ -2420,12 +2450,13 @@ class ExtractionMixin:
         # and positive Na/Fe reduction margin. Method: bisect both governing
         # curves to their boundary knots, add the liquid-fraction curve's own
         # sample knots, then let the provider accept/refuse and score each row.
-        # Tolerance: 1e-9 C is an accepted residual floor; a narrower feasible
-        # window may be reported empty, but is physically meaningless against
-        # whole-degree thermal-control granularity. Sanity: for (1100, 0),
-        # (1181.2, 0), (1181.4, 0.1), this samples the real sub-degree window
-        # below the ~1181.4948 C Na/Fe crossover instead of falsely returning
-        # na_fe_hold_window_empty.
+        # Numerical resolution: bisection shrinks a bracket of width W0 by
+        # W_n = W0 / 2**n, so 1e-9 C is only the stop width for locating each
+        # boundary (degrees C divided by a dimensionless power stays degrees C).
+        # It is not a furnace-control threshold; candidates remain unquantized.
+        # Sanity: the test curve (1100, 0), (1181.2, 0), (1181.4, 0.1) retains
+        # its real sub-degree feasible window below the ~1181.4948 C Na/Fe
+        # crossover instead of falsely returning na_fe_hold_window_empty.
         for temperature_C in candidate_temperatures_C:
             margin = margin_at(temperature_C)
             liquid_fraction = liquid_fraction_at(temperature_C)
@@ -2543,17 +2574,18 @@ class ExtractionMixin:
         The C3 campaign alternates between injection and bakeout sub-phases
         on a 6-hour cycle (3 hrs inject, 3 hrs bakeout):
 
-        **Injection** (T ~1200-1350°C):                          [THERMO-5]
+        **Injection** (default campaign targets: C3_K 820°C, C3_NA 1150°C): [THERMO-5]
             K phase:  2K(g) + FeO(melt) → K₂O(melt) + Fe(l)
-                      4K(g) + SiO₂(melt) → 2K₂O(melt) + Si(l)  [conditioning]
-            Na phase: 2Na(g) + TiO₂(melt) → Na₂O(melt, spent residue) + Ti(l)
+                      plus a companion Na → FeO cleanup dispatch
+            Na phase: either Na → FeO cleanup (staged path), or
+                      4Na(g) + TiO₂(melt) → 2Na₂O(melt, spent residue) + Ti(l)
                       6Na(g) + Cr₂O₃(melt) → 3Na₂O(melt, spent residue) + 2Cr(l)
 
         **Bakeout** (T ~1520-1680°C, pO₂ 0.5-1.5 mbar):        [THERMO-6]
             K₂O(melt) → 2K(g) + ½O₂(g)
             Na₂O(melt) → 2Na(g) + ½O₂(g)
             Recovery: 75-92% per cycle.
-            K/Na vapor recondenses in Stage 3 → recycled.
+            K/Na vapor recondenses in canonical Stage 4 → recycled.
 
         The normal evaporation model handles bakeout (K/Na have vapor
         pressure >> pO₂ at 1600°C).  This method handles the injection
@@ -2657,7 +2689,7 @@ class ExtractionMixin:
 
     def _shuttle_inject_K(self, *, liquid_fraction=None):
         """
-        K-shuttle injection: reduce FeO (primary) + condition SiO₂.
+        K-shuttle injection: reduce FeO.  This dispatch has no SiO₂ reaction.
 
         Reaction:  2K + FeO → K₂O + Fe(l)                      [THERMO-5]
         Stoichiometry:
@@ -2981,11 +3013,13 @@ class ExtractionMixin:
         Primary reaction:                                       [THERMO-7]
             3Mg(l) + Al₂O₃(melt) → 3MgO(slag) + 2Al(l)
 
-        Stoichiometry:
-            72.93 g Mg + 101.96 g Al₂O₃ → 120.90 g MgO + 53.96 g Al
-            1 kg Mg → 1.398 kg Al₂O₃ reduced
-                    → 1.657 kg MgO produced
-                    → 0.740 kg Al produced
+        Stoichiometry (current ``MOLAR_MASS`` values):
+            72.915 g Mg + 101.960 g Al₂O₃ → 120.912 g MgO + 53.963 g Al
+            1 kg Mg → M(Al₂O₃)/(3 M(Mg)) = 1.398342 kg Al₂O₃ reduced
+                    → M(MgO)/M(Mg) = 1.658260 kg MgO produced
+                    → 2 M(Al)/(3 M(Mg)) = 0.740082 kg Al produced
+            Unit check: each g/mol ratio is dimensionless, hence kg/kg.
+            Sanity: 72.915 + 101.960 = 120.912 + 53.963 = 174.875 g.
 
         Back-reduction cascade (when Al contacts residual SiO₂): [THERMO-8]
             4Al(l) + 3SiO₂(melt) → 2Al₂O₃(melt) + 3Si(l)
@@ -2993,8 +3027,14 @@ class ExtractionMixin:
             Net effect: limited total Al yield from high-SiO₂ melts.
             We model ~30% of freshly produced Al back-reacting with SiO₂.
 
+        Thermochemistry (298 K standard-state check):
+            Repository NIST-JANAF Chase 1998 values give
+            ΔH = +1675.69 + 3(-601.60) = -129.11 kJ/mol Al₂O₃:
+            Al₂O₃ dissociation plus formation of three MgO.  Both terms are
+            kJ per reaction mole of Al₂O₃; the negative sum confirms only that
+            this standard-state reaction is exothermic, not its hot-melt rate.
+
         Kinetics:
-            The thermite reaction is fast (exothermic, ΔH ≈ -1350 kJ/mol Al₂O₃).
             Rate limited by Mg delivery (liquid Mg injected into hot melt)
             and mass transport in the increasingly MgO-rich slag.
             Modelled as consuming a fraction of available Mg per hour,

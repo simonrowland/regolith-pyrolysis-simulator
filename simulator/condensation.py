@@ -20,11 +20,13 @@ Train topology (metals train, active C2A onward):
              Stage 4 alkali/Mg carryover continues to receive more SiO
              than Stage 3 in absolute terms (a routing trade-off
              documented in the 0.5.3 CHANGELOG "Known limitation"
-             section; operators raise ``stir_state.radial`` above 1.0
-             to amplify the gas-side cold-wall mass transport into
-             Stage 3, or retune Stage 3 temperatures down to widen the
-             cold-wall ΔP). The absolute total capture remains
-             rate-cap-driven by ``_pressure_isolated_capture_budget_kg``.
+             section). ``stir_state.radial`` is mapped to a heuristic
+             Sherwood multiplier, but that multiplier does not guarantee
+             Stage-3 capture: the route still passes SiO through when its
+             saturation-pressure contract is unavailable. Retuning Stage 3
+             temperatures changes the sampled cold-wall driving pressure.
+             The absolute total capture remains rate-cap-driven by
+             ``_pressure_isolated_capture_budget_kg``.
              Sub-laminar ``stir_state.axial`` or pO₂ hold suppresses
              Stage 3 capture and passes SiO downstream (silica fume)
              or holds it in the melt.
@@ -37,22 +39,27 @@ A separate volatiles train handles C0/C0b products and is sealed
 by a gate valve after devolatilisation.
 
 Key physics:
-    Condensation efficiency per species per stage:             [COND-1]
-        η = 1 - exp(-t_res / τ_cond)
-    where:
-        t_res   = residence time in the stage (s)
-        τ_cond  = characteristic condensation time (s)
-              = f(T_stage, T_cond_species, surface_area, α_stick)
+    Live stage efficiency averages 33 series-resistance deposition-flux
+    samples over the stage temperature band, then computes:             [COND-1]
+        n_capture = J_band * A_stage * t_res
+        η_stage = clip(n_capture / n_available, 0, 1)
+    Premise: J_band is mol m^-2 s^-1. Unit check:
+    (mol m^-2 s^-1)(m^2)(s) = mol, and mol/mol makes η dimensionless.
+    Sanity: no configured stage area means no physical capture area, so
+    η_stage = 0; enough area or residence time saturates at η_stage = 1.
 
-    If T_stage << T_condense → τ_cond is very small → η → 1
-    If T_stage ≈ T_condense → τ_cond is large → η → 0
+    A separate total-capture regularizer uses
+    ``1 - exp(-t_res / tau_s)``. It allocates a capture budget and is not
+    the live per-stage flux efficiency above.
 
-The Fe → SiO separation (Stage 1 → Stage 2):
+The Fe → SiO separation (Stage 1 → Stage 3):
     Stage 1 at 1200-1400°C: Fe condenses as liquid, SiO passes through
     (SiO condensation T is 900-1200°C, below Stage 1 operating T).
     Chevron separator at Stage 1 exit catches entrained Fe droplets.
     Sharp T boundary (radiation gap) prevents early SiO condensation.
-    Impurity: ~0.1-1% Fe passes to Stage 2; ~0.5-2% SiO condenses in Stage 1.
+    Capture and impurity fractions are outputs of flux, physical area,
+    residence time, pressure, and inlet rate; this module does not impose
+    fixed Fe-carryover or early-SiO percentages.
 """
 
 from __future__ import annotations
@@ -159,10 +166,11 @@ LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 #
 #    1/k_total = 1/(alpha_s*k_HKL) + (1 - f)/k_MT
 #
-# So at Kn -> 0 (deep viscous) the boundary-layer mass-transfer resistance
-# dominates; at Kn -> inf (free molecular) the mass-transfer resistance
-# drops out and HKL surface uptake applies. The transition regime is a
-# smooth resistance handoff.
+# So at Kn -> 0 (deep viscous) the boundary-layer resistance participates at
+# full weight; whichever of the gas-side and HKL coefficients is smaller
+# controls the series rate. At Kn -> inf (free molecular) the mass-transfer
+# resistance drops out and HKL surface uptake applies. The transition regime
+# is a smooth resistance handoff.
 #
 # Sherwood number for laminar pipe flow with constant wall concentration
 # (Bird/Stewart/Lightfoot 2007 "Transport Phenomena" 2nd ed., Eq 14.4-9):
@@ -191,6 +199,15 @@ DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
 GAS_CONSTANT_J_MOL_K = 8.314462618
 
 
+def _finite_nonnegative_value(value: Any, *, label: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise ValueError(f'{label} must be finite and non-negative')
+    numeric = float(value)
+    if not math.isfinite(numeric) or numeric < 0.0:
+        raise ValueError(f'{label} must be finite and non-negative')
+    return numeric
+
+
 def _carrier_collision_diameter_angstrom(species: str) -> float:
     return round(COLLISION_DIAMETERS_M[species] * 1e10, 3)
 
@@ -214,10 +231,11 @@ def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
 # Primary source: Bird/Stewart/Lightfoot "Transport Phenomena" 2nd ed.
 # Table E.1 for noble gases + Na/K/Ca; remaining species use the Svehla
 # 1962 (NASA TR R-132) or Hirschfelder/Curtiss/Bird canonical estimates.
-# Vapor-phase Fe/Cr/Mn/Al/Ti are estimates from atomic radii + Lennard-
-# Jones rule-of-thumb (σ ≈ 1.18 × r_vdW, ε/k_B ≈ 1.3 × T_boiling) since
-# direct kinetic-theory measurements for transition-metal vapor are
-# sparse. The Chapman-Enskog result is moderately sensitive to σ (Ω_D
+# Vapor-phase Fe/Cr/Mn/Al/Ti are proxy estimates because direct kinetic-
+# theory measurements for transition-metal vapor are sparse. Their exact
+# derivation is not established here: in particular, the stored epsilon/k_B
+# rows do not reproduce ``1.3 * T_boiling`` and must not be described as if
+# they do. The Chapman-Enskog result is moderately sensitive to sigma (Ω_D
 # ~constant in the high-T limit, D_AB ∝ 1/σ_AB²) and weakly sensitive
 # to ε (collision integral Ω_D varies <30% across the simulator's T
 # range). At the typical C2A operating point (10 mbar, 1973 K) the
@@ -1342,22 +1360,19 @@ def _stirring_enhanced_sherwood(
 
     For an unstirred, fully-developed laminar pipe flow with constant
     wall concentration the asymptotic Sherwood number is 3.66 (Bird/
-    Stewart/Lightfoot Eq 14.4-9). Induction stirring on the melt
-    creates surface waves + vigorous convection in the gas just above
-    the melt, which enhances bulk-to-wall mass transfer. Without
-    stirring (factor=1) the laminar value applies. With operator
-    stirring (factor 4-8 per `setpoints.yaml §C2A induction_stirring`),
-    Sh increases by the rough square-root of the factor — a mild
-    forced-convection correction in the Frössling style
+    Stewart/Lightfoot Eq 14.4-9). The implementation treats the radial
+    stir factor as an operator-controlled proxy and increases Sh by its
+    square root. It does not model an EM field, vortex, gas velocity, or
+    Reynolds number, so it does not establish a causal stirring mechanism.
+    The mapping is a mild forced-convection correction in the Frössling style
     (`Sh = 2 + 0.6 Re^0.5 Sc^0.33`) without committing to a particular
     pipe-vs-tank correlation (the geometry is hybrid).
 
     0.5.3 Phase B (2-axis stirring) — which axis drives Sh:
 
-    The Sherwood enhancement reads the RADIAL stirring axis (in-plane
-    EM stirring drives the gas-side boundary-layer vortex, which is
-    what reduces the bulk-to-wall mass-transport resistance). The
-    axial axis drives a different consumer (the H-K-L linear
+    The Sherwood enhancement reads the RADIAL stirring axis as the
+    configured gas-side transport proxy. The axial axis drives a different
+    consumer (the H-K-L linear
     multiplier in ``engines/builtin/evaporation_flux.py``) — it
     represents vertical melt-side surface renewal, not gas-side
     boundary-layer transport. Mixing them up would double-count the
@@ -1410,8 +1425,8 @@ def _stirring_enhanced_sherwood(
     - factor = 1 (no radial stir): Sh = 3.66 (matches)
     - factor = 6 (legacy C2A scalar default): Sh ≈ 9.0
     - factor = 10 (operator ceiling): Sh ≈ 11.6
-    - factor = 100 or NaN: clamped/sanitised at the operator boundary,
-      then Sh = 3.66 (defensive baseline)
+    - factor = 100: clamped to 10, then Sh ≈ 11.6
+    - factor = NaN: sanitised to 0, then Sh = 3.66 (defensive baseline)
     """
     # Precedence: explicit ``radial_stir_factor`` wins over the legacy
     # positional ``stir_factor``. Both None → no-stir baseline (1.0).
@@ -1654,7 +1669,7 @@ def _transport_parameter_notice(
 
 
 class KnudsenRegimeRefusal(RuntimeError):
-    """Raised when viscous-flow condensation assumptions are invalid."""
+    """Module-owned refusal for invalid Knudsen diagnostic inputs."""
 
     reason = KNUDSEN_REFUSAL_REASON
 
@@ -1665,7 +1680,32 @@ class KnudsenRegimeRefusal(RuntimeError):
             or self.diagnostic.get('reason')
             or KNUDSEN_REFUSAL_REASON
         )
-        super().__init__(self.reason)
+        detail = str(self.diagnostic.get('detail') or '').strip()
+        message = self.reason if not detail else f'{self.reason}: {detail}'
+        super().__init__(message)
+
+
+def _knudsen_input_refusal(
+    *,
+    reason: str,
+    field: str,
+    value: Any,
+    detail: str,
+) -> KnudsenRegimeRefusal:
+    try:
+        diagnostic_value = float(value)
+    except (TypeError, ValueError):
+        diagnostic_value = None
+    if diagnostic_value is not None and not math.isfinite(diagnostic_value):
+        diagnostic_value = None
+    return KnudsenRegimeRefusal({
+        'status': 'refused',
+        'reason': reason,
+        'reason_refused': reason,
+        'field': field,
+        'value': diagnostic_value,
+        'detail': detail,
+    })
 
 
 # Condensation temperatures at ~1 mbar partial pressure (°C).
@@ -1994,10 +2034,10 @@ class CondensationModel:
         snapshots it alongside ``radial_stir_factor``).
 
         ``radial_stir_factor`` (when provided, 0.5.3 Phase B): canonical
-        2-axis input. Drives the series-resistance flux's Sherwood
-        enhancement (gas-side in-plane vortex mixing → reduced bulk-
-        to-wall transport resistance). Defaults to ``1.0`` (no-stir
-        laminar baseline, ``Sh = 3.66``) when unset; recipes wire
+        2-axis input. Drives the series-resistance flux's heuristic
+        Sherwood multiplier; the route does not resolve a gas-side vortex
+        or establish an EM-field-to-mass-transfer mechanism. Defaults to
+        ``1.0`` (no-stir laminar baseline, ``Sh = 3.66``) when unset; recipes wire
         ``melt.stir_state.radial`` through
         ``core._configure_condensation_operating_conditions``. The
         AXIAL axis lives on ``melt.stir_state.axial`` and drives a
@@ -2596,6 +2636,12 @@ class CondensationModel:
         collection dictionaries are UI projections and are updated only after
         the simulator commits the matching ledger transition.
         """
+        for species, raw_rate_kg_hr in evap_flux.species_kg_hr.items():
+            _finite_nonnegative_value(
+                raw_rate_kg_hr,
+                label=f'evaporated mass flow for {species}',
+            )
+
         remaining_by_species = {}
         retained_in_source_by_species: Dict[str, float] = {}
         condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
@@ -5986,8 +6032,8 @@ def _series_resistance_deposition_flux_mol_m2_s(
       * so even with the regime-factor weight of ~3×10⁻⁴ the resulting flux
         was dominated by HKL leakage (~95% of blended flux per the codex
         worked example),
-      * which is wrong physics — in the viscous boundary-layer limit the
-        rate-limiting step IS gas-phase diffusion through the boundary layer.
+      * which bypassed the required series composition: both gas-side and
+        surface-uptake resistances must be traversed.
 
     The series-resistance form is the canonical mass-transfer composition:
     a flux must pass through both resistances sequentially, so the slower
@@ -5998,12 +6044,13 @@ def _series_resistance_deposition_flux_mol_m2_s(
 
       * Free-molecular (Kn ≫ 0.01, f → 1): MT resistance → 0,
         ``1/k_total → 1/k_HKL``, ``J → J_HKL`` (correct: no boundary layer).
-      * Viscous (Kn ≪ 0.01, f → 0): k_MT ≪ k_HKL, ``1/k_total → 1/k_MT``,
-        ``J → J_MT`` (correct: boundary layer rate-limits).
-      * Transition: smooth, with both resistances active. Operationally F3
-        refuses pure transition regime, so callers don't actually evaluate
-        deep in this band; the smoothness is a safety property, not a
-        recipe regime.
+      * Viscous (Kn ≪ 0.01, f → 0): both terms retain full weight,
+        ``1/k_total → 1/k_HKL + 1/k_MT``. The smaller coefficient controls
+        the rate; low sticking can make HKL surface uptake slower than gas
+        diffusion.
+      * Transition: smooth, with both resistances active. The Knudsen
+        diagnostic marks this band as a warning and callers evaluate the
+        continuity correction rather than refusing it.
 
     The canonical 0.5.3 path enhances the Sherwood number through the
     ``radial_stir_factor`` axis, which drives gas-side bulk-to-wall
@@ -6106,8 +6153,8 @@ def _series_resistance_deposition_flux_mol_m2_s(
     # k_MT per Pa: Sh_eff × D_AB / (L_pipe × R × T_gas). T_gas (bulk) sets
     # the ideal-gas denominator; T_surface (wall) sets the saturation
     # pressure (already consumed by the driving_pressure_pa above).
-    # 0.5.3 Phase B: Sh enhancement reads the RADIAL stirring axis
-    # (in-plane EM stirring drives gas-side bulk-to-wall transport).
+    # 0.5.3 Phase B: Sh enhancement reads the RADIAL stirring axis as a
+    # configured gas-side transport proxy; no EM/vortex field is solved here.
     # Backward-compat: if the caller passes only the legacy positional
     # ``stir_factor`` (pre-Phase-B path, or a unit test exercising the
     # BSL Sh relation directly), the helper treats it as the radial
@@ -6229,6 +6276,27 @@ def minimum_pressure_mbar_for_knudsen(
 ) -> dict[str, Any]:
     """Return the total-pressure floor set by the controlling pipe diameter."""
 
+    if not is_declared_real_scalar(
+        gas_temperature_C,
+        allow_numeric_str=True,
+    ):
+        raise _knudsen_input_refusal(
+            reason='invalid_knudsen_gas_temperature',
+            field='gas_temperature_C',
+            value=gas_temperature_C,
+            detail='gas_temperature_C must be finite and above absolute zero',
+        )
+    gas_temperature_C = float(gas_temperature_C)
+    if (
+        not math.isfinite(gas_temperature_C)
+        or gas_temperature_C <= -CELSIUS_TO_KELVIN_OFFSET
+    ):
+        raise _knudsen_input_refusal(
+            reason='invalid_knudsen_gas_temperature',
+            field='gas_temperature_C',
+            value=gas_temperature_C,
+            detail='gas_temperature_C must be finite and above absolute zero',
+        )
     ceiling = float(knudsen_ceiling)
     if not math.isfinite(ceiling) or ceiling <= 0.0:
         raise ValueError('knudsen_ceiling must be finite and positive')
@@ -6251,7 +6319,7 @@ def minimum_pressure_mbar_for_knudsen(
         key=lambda item: item[1],
     )
     temperature_K = max(
-        float(gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+        gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
         1.0,
     )
     collision = _carrier_collision_diameter_diagnostic(carrier_gas)
@@ -6277,7 +6345,7 @@ def minimum_pressure_mbar_for_knudsen(
         'minimum_pressure_pa': minimum_pressure_pa,
         'minimum_pressure_mbar': minimum_pressure_pa / 100.0,
         'knudsen_ceiling': ceiling,
-        'gas_temperature_C': float(gas_temperature_C),
+        'gas_temperature_C': gas_temperature_C,
         'carrier_gas': str(carrier_gas),
         'carrier_collision_diameter_m': collision_diameter_m,
         'controlling_segment': controlling_name,
@@ -6351,9 +6419,56 @@ def knudsen_regime_diagnostic(
     regime_factor: float | None = None,
     carrier_gas: str = DEFAULT_CARRIER_GAS,
 ) -> dict[str, Any]:
-    pressure_pa = max(0.0, float(overhead_pressure_mbar)) * 100.0
+    if not is_declared_real_scalar(
+        overhead_pressure_mbar,
+        allow_numeric_str=True,
+    ):
+        raise _knudsen_input_refusal(
+            reason='invalid_knudsen_overhead_pressure',
+            field='overhead_pressure_mbar',
+            value=overhead_pressure_mbar,
+            detail=(
+                'overhead_pressure_mbar must be finite and non-negative'
+            ),
+        )
+    overhead_pressure_mbar = float(overhead_pressure_mbar)
+    if (
+        not math.isfinite(overhead_pressure_mbar)
+        or overhead_pressure_mbar < 0.0
+    ):
+        raise _knudsen_input_refusal(
+            reason='invalid_knudsen_overhead_pressure',
+            field='overhead_pressure_mbar',
+            value=overhead_pressure_mbar,
+            detail=(
+                'overhead_pressure_mbar must be finite and non-negative'
+            ),
+        )
+    if not is_declared_real_scalar(
+        gas_temperature_C,
+        allow_numeric_str=True,
+    ):
+        raise _knudsen_input_refusal(
+            reason='invalid_knudsen_gas_temperature',
+            field='gas_temperature_C',
+            value=gas_temperature_C,
+            detail='gas_temperature_C must be finite and above absolute zero',
+        )
+    gas_temperature_C = float(gas_temperature_C)
+    if (
+        not math.isfinite(gas_temperature_C)
+        or gas_temperature_C <= -CELSIUS_TO_KELVIN_OFFSET
+    ):
+        raise _knudsen_input_refusal(
+            reason='invalid_knudsen_gas_temperature',
+            field='gas_temperature_C',
+            value=gas_temperature_C,
+            detail='gas_temperature_C must be finite and above absolute zero',
+        )
+
+    pressure_pa = overhead_pressure_mbar * 100.0
     gas_temperature_K = max(
-        float(gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+        gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
         1.0,
     )
     carrier_diagnostic = _carrier_collision_diameter_diagnostic(carrier_gas)
@@ -6738,6 +6853,7 @@ def cold_spot_diagnostic(
 ) -> dict[str, Any]:
     """Flag pipe segments colder than a flowing species' landing threshold."""
 
+    margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
     upstream_hot_wall_findings: list[dict[str, Any]] = []
     hot_wall_threshold_C = (
@@ -6746,7 +6862,10 @@ def cold_spot_diagnostic(
         else float(upstream_hot_wall_min_C)
     )
     for species, raw_kg_hr in vapor_species_kg_hr.items():
-        kg_hr = float(raw_kg_hr)
+        kg_hr = _finite_nonnegative_value(
+            raw_kg_hr,
+            label=f'vapor flow for {species}',
+        )
         if kg_hr <= 1e-15:
             continue
         target_stage_number = designated_stage_number(species)
@@ -6757,7 +6876,7 @@ def cold_spot_diagnostic(
             temps=temps,
             vapor_pressure_data=vapor_pressure_data,
         )
-        threshold_C = condensation_T_C - float(margin_C)
+        threshold_C = condensation_T_C - margin_C
         for segment in pipe_segments:
             downstream_number = _segment_stage_number(segment.downstream_stage)
             if downstream_number is None:
@@ -6793,7 +6912,7 @@ def cold_spot_diagnostic(
                 'kg_hr': kg_hr,
                 'wall_temperature_C': wall_T_C,
                 'condensation_temperature_C': condensation_T_C,
-                'margin_C': float(margin_C),
+                'margin_C': margin_C,
                 'target_stage_number': target_stage_number,
                 'warning': (
                     f'cold spot {segment.name}: {species} sees '
@@ -6809,7 +6928,7 @@ def cold_spot_diagnostic(
     ]
     return {
         'has_cold_spot': bool(findings),
-        'margin_C': float(margin_C),
+        'margin_C': margin_C,
         'warnings': warnings,
         'findings': findings,
         'has_upstream_hot_wall_violation': bool(upstream_hot_wall_findings),
@@ -6827,18 +6946,24 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         stage_number = int(stage.stage_number)
         stage_key = STAGE_KEY_BY_NUMBER.get(
             stage_number, f'stage_{stage_number}')
+        collected_kg = {
+            species: _finite_nonnegative_value(
+                raw_kg,
+                label=f'stage {stage_number} inventory for {species}',
+            )
+            for species, raw_kg in stage.collected_kg.items()
+        }
         accepted_species = accepted_species_for_stage_number(stage_number)
         coproduct_species = coproduct_species_for_stage_number(stage_number)
         designated_species_kg: dict[str, float] = {}
         coproduct_species_kg: dict[str, float] = {}
         impurity_species_kg: dict[str, float] = {}
         activity = {
-            species: float(stage.collected_kg[species]) > 1e-12
+            species: collected_kg[species] > 1e-12
             for species in sorted(accepted_species)
-            if species in stage.collected_kg
+            if species in collected_kg
         }
-        for species, kg in sorted(stage.collected_kg.items()):
-            kg = float(kg)
+        for species, kg in sorted(collected_kg.items()):
             if abs(kg) <= 1e-12:
                 continue
             if species in coproduct_species:
