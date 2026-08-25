@@ -236,6 +236,39 @@ def test_temperature_outside_domain_fails_loudly() -> None:
         poly.evaluate(9000.0)
 
 
+def test_nan_temperature_is_named_not_blamed_on_the_extract() -> None:
+    """NaN must be reported as NaN, not as an internal coverage gap.
+
+    The domain check is `T < T_min or T > T_max`, and BOTH comparisons are False
+    for NaN, so NaN used to pass it, match no segment and no shared breakpoint,
+    and fall through to the bottom refusal: "not covered by any segment
+    (internal gap after construction?)". That sent the reader hunting a coverage
+    bug in the shipped extract over a value the caller supplied.
+
+    Note +/-inf deliberately is NOT part of this fix: inf compares normally and
+    is already reported correctly as outside the domain. NaN is the only value
+    the range test cannot place.
+    """
+
+    poly = _o2_poly()
+
+    with pytest.raises(NasaCeaDomainError) as excinfo:
+        poly.evaluate(math.nan)
+    message = str(excinfo.value)
+    assert "NaN" in message, message
+    assert "internal gap" not in message, message
+
+    # The genuine-gap message must survive for the case it was written for, and
+    # the ordinary out-of-domain path must be untouched.
+    for bad in (math.inf, -math.inf, 50.0, 9000.0):
+        with pytest.raises(NasaCeaDomainError, match="outside domain"):
+            poly.evaluate(bad)
+
+    # Valid temperatures, including both inclusive endpoints, still evaluate.
+    for good in (poly.T_min_K, 1000.0, poly.T_max_K):
+        assert poly.evaluate(good).T_K == good
+
+
 def test_nasa7_vs_nasa9_family_segment_mismatch_fails() -> None:
     with pytest.raises(NasaCeaConventionError, match="Nasa9Segment"):
         NasaCeaPolynomial(

@@ -370,6 +370,21 @@ class NasaCeaPolynomial:
 
     def segment_for(self, T_K: float) -> Segment:
         T = float(T_K)
+        # NaN needs its own test BEFORE the range check, because the range check
+        # cannot reject it: `T < lo` and `T > hi` are both False for NaN, so it
+        # passes, then matches no segment and no shared breakpoint, and lands on
+        # the "internal gap after construction?" refusal at the bottom of this
+        # method -- which sends the reader hunting a coverage bug in the extract
+        # that is not there. The construction-time validator guarantees the
+        # segments are contiguous; a caller's NaN is the only way to reach that
+        # message. +/-inf does NOT need this, since inf compares normally and is
+        # correctly reported as outside the domain.
+        if math.isnan(T):
+            raise NasaCeaDomainError(
+                f"{self.name}: T is NaN, which is not a temperature. The domain "
+                f"is [{self.T_min_K}, {self.T_max_K}] K, but no comparison "
+                "against NaN can place it inside or outside that interval."
+            )
         if T < self.T_min_K or T > self.T_max_K:
             raise NasaCeaDomainError(
                 f"{self.name}: T={T} K outside domain "
