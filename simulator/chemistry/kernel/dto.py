@@ -124,8 +124,26 @@ _DECLARED_REAL_SCALAR_CONTROL_INPUTS = frozenset(
 )
 
 
-def _validate_control_input_booleans(data: Mapping[str, Any]) -> None:
-    """Reject booleans for controls the provider schema declares numeric."""
+def _validate_control_input_real_scalars(data: Mapping[str, Any]) -> None:
+    """Reject any non-real-scalar for controls the schema declares numeric.
+
+    Named for what it does. It was `_validate_control_input_booleans`, and its
+    docstring said "Reject booleans", but the predicate is
+    `not is_declared_real_scalar(..., allow_numeric_str=True)` -- which rejects
+    strings, sequences and every other non-numeric type, not only bools. The
+    name and docstring described a narrower function than the algebra.
+
+    "is missing" in the message is DELIBERATE and load-bearing, not loose
+    wording: a value of the wrong type where a number is declared is treated as
+    MISSING INPUT, this project's fail-closed category (1), which refuses rather
+    than computing. tests/test_scalar_boundary_bool_poison.py pins that
+    classification (`match="is missing"`).
+
+    Scope boundary, for callers wondering why -1.0/nan/inf do NOT raise here:
+    this validates TYPE. Value validity -- negative, non-finite, out-of-domain --
+    belongs to the provider, which refuses those with a typed result. None is
+    allowed through deliberately; absence is not a type error.
+    """
 
     for field_name, value in (data or {}).items():
         if field_name not in _DECLARED_REAL_SCALAR_CONTROL_INPUTS:
@@ -134,9 +152,13 @@ def _validate_control_input_booleans(data: Mapping[str, Any]) -> None:
             value,
             allow_numeric_str=True,
         ):
+            # Report the type actually supplied. The old message hardcoded
+            # "got boolean" for every rejection, so a string like "invalid" was
+            # reported as a boolean -- a false statement about the caller's own
+            # input, in the one message whose job is to tell them what they got.
             raise TypeError(
                 f"control_inputs.{field_name} is missing: "
-                "expected a declared real scalar, got boolean"
+                f"expected a declared real scalar, got {type(value).__name__}"
             )
 
 
@@ -348,7 +370,7 @@ class IntentRequest:
                 raise TypeError("fO2_log must be numeric")
             object.__setattr__(self, "fO2_log", float(self.fO2_log))
         object.__setattr__(self, "fe_redox_policy", str(self.fe_redox_policy))
-        _validate_control_input_booleans(self.control_inputs)
+        _validate_control_input_real_scalars(self.control_inputs)
         object.__setattr__(self, "control_inputs", _freeze_str_any(self.control_inputs))
 
 

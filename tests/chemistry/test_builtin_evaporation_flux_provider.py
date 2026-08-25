@@ -1225,14 +1225,49 @@ def _w3_dispatch_with_stir(stir_control) -> dict:
     return result.diagnostic['evaporation_series_resistance']['Na']
 
 
-@pytest.mark.parametrize("area", [-1.0, float("nan"), float("inf"), "invalid"])
+@pytest.mark.parametrize("area", [-1.0, float("nan"), float("inf")])
 @pytest.mark.xdist_group("serial")
 def test_provider_refuses_invalid_melt_surface_area(area):
+    """VALUE validity: numeric but physically impossible areas refuse here.
+
+    The string "invalid" used to be a fourth parameter of this test and failed,
+    because it is a TYPE error, not a value error. The two are handled at
+    different layers by design -- see the companion test below. Asserting a
+    provider refusal for a DTO type rejection was conflating them; the case was
+    moved rather than dropped.
+    """
+
     result = _w3_result_with_controls(1.0, melt_surface_area_m2=area)
 
     assert result.status == "refused"
     assert result.diagnostic["evaporation_flux_kg_hr"] == {}
     assert result.diagnostic["reason"] == "invalid_melt_surface_area_m2"
+
+
+@pytest.mark.parametrize("area", ["invalid", True, [1.0]])
+@pytest.mark.xdist_group("serial")
+def test_wrong_typed_melt_surface_area_is_rejected_at_the_dto_boundary(area):
+    """TYPE validity: a non-real-scalar is refused before the provider sees it.
+
+    This is the home of the case moved out of the value-refusal test above. The
+    layering, confirmed by execution: -1.0/nan/inf/None/"3.5" all pass the DTO
+    and are decided by the provider, while a bool, a string or a sequence is
+    stopped at the DTO as MISSING INPUT -- this project's fail-closed category
+    (1), which refuses rather than computing on a value it cannot trust.
+
+    The message must name the type actually supplied. It used to hardcode "got
+    boolean" for every rejection, so a string was reported as a boolean: a false
+    statement about the caller's input, in the one message whose entire job is
+    telling them what they passed.
+    """
+
+    from simulator.chemistry.kernel.dto import (
+        _validate_control_input_real_scalars,
+    )
+
+    with pytest.raises(TypeError, match="is missing") as excinfo:
+        _validate_control_input_real_scalars({"melt_surface_area_m2": area})
+    assert type(area).__name__ in str(excinfo.value), str(excinfo.value)
 
 
 @pytest.mark.xdist_group("serial")
