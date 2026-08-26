@@ -296,12 +296,47 @@ def estimate_subambient_pump_cost(
     duration_s = _float_or_nan(duration_s)
     gas_temperature_K = _float_or_nan(gas_temperature_K)
 
-    if (
-        not math.isfinite(offgas_mol_per_s)
-        or not math.isfinite(duration_s)
-        or offgas_mol_per_s <= 0.0
-        or duration_s <= 0.0
-    ):
+    # b-259. This branch used to answer TWO of the three fail-closed categories
+    # with one return, and they need opposite answers:
+    #
+    #   MISSING INPUT (non-finite) -> REFUSE. A NaN offgas rate means "we do not
+    #       know the rate", not "there is no offgas". cost_ledger.py calls this
+    #       as _finite(raw_row.get("offgas_mol_per_s"), math.nan), so a ledger
+    #       row with the key ABSENT arrives here as NaN by construction -- the
+    #       caller is using NaN as its missing sentinel and is entitled to be
+    #       told, not answered with a success.
+    #
+    #   PROVEN ZERO (<= 0.0) -> KEEP THE ZERO. No offgas, or no duration,
+    #       genuinely needs no pumping, and vent-free at zero cost is correct.
+    #
+    # Reporting the first as the second makes an unrecorded offgas rate look
+    # FREE and feasible=True, so it outranks recipes that honestly reported
+    # their pumping load -- wrong in the flattering direction, on a number the
+    # optimizer ranks by. Note the eight sibling checks in this function all
+    # use _infeasible_degenerate; this branch was the lone outlier.
+    #
+    # The siblings fold finiteness and magnitude into one refusal because a
+    # non-positive PRESSURE is itself meaningless. That does not transfer here:
+    # a non-positive offgas rate is a physically real "nothing to pump", which
+    # is why this branch splits instead of refusing wholesale.
+    # THREE outcomes, not two. A first version of this split drew the line at
+    # finiteness alone and left `<= 0.0` as the proven zero, which quietly
+    # ratified a NEGATIVE molar flow as "nothing to pump". A negative flow rate
+    # is not a small amount of pumping; it is an impossible measurement, and
+    # calling it a proven zero widens category (3) to swallow invalid input --
+    # the same conflation this fix exists to remove, one boundary over. The
+    # codebase already knew better: the snapshot path refuses a negative
+    # physical flow as `invalid-o2-vented-flow`, so treating it as free here
+    # made two parts of the same file disagree about the same number.
+    #
+    #   non-finite  -> MISSING, we do not know          -> refuse
+    #   negative    -> INVALID, cannot be a real rate    -> refuse
+    #   exactly 0.0 -> PROVEN ZERO, nothing to pump      -> free vent
+    if not math.isfinite(offgas_mol_per_s) or offgas_mol_per_s < 0.0:
+        return _infeasible_degenerate("invalid-offgas-rate")
+    if not math.isfinite(duration_s) or duration_s < 0.0:
+        return _infeasible_degenerate("invalid-duration")
+    if offgas_mol_per_s == 0.0 or duration_s == 0.0:
         return SubambientPumpCost("vent-free", 0.0, 0.0, 0.0, 1.0, True)
     if not math.isfinite(target_pressure_pa) or target_pressure_pa <= 0.0:
         return _infeasible_degenerate("invalid-target-pressure")
