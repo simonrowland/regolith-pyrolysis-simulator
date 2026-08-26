@@ -473,12 +473,8 @@ class RunExecutor:
             backend_status = _aggregate_backend_status(
                 getattr(sim, "_backend_status_history", ()),
                 latest_backend_status,
+                exception_status=_backend_status_from_honest_exception(failure_exc),
             )
-            honest_backend_status = _backend_status_from_honest_exception(
-                failure_exc
-            )
-            if honest_backend_status is not None:
-                backend_status = honest_backend_status
             backend_authoritative = bool(
                 getattr(sim, "_backend_authoritative", True)
             )
@@ -532,14 +528,10 @@ class RunExecutor:
                 lambda: _aggregate_backend_status(
                     getattr(sim, "_backend_status_history", ()),
                     latest_backend_status,
+                    exception_status=_backend_status_from_honest_exception(failure_exc),
                 ),
                 "unavailable",
             )
-            honest_backend_status = _backend_status_from_honest_exception(
-                failure_exc
-            )
-            if honest_backend_status is not None:
-                backend_status = honest_backend_status
             backend_authoritative = _safe_bool(
                 lambda: getattr(sim, "_backend_authoritative", False),
                 False,
@@ -680,20 +672,47 @@ def _safe_bool(builder: Any, default: bool) -> bool:
         return default
 
 
-def _aggregate_backend_status(history: Any, latest: str) -> str:
-    """Rank a run's history plus its latest token down to one backend_status.
+def _aggregate_backend_status(
+    history: Any,
+    latest: str,
+    *,
+    exception_status: str | None = None,
+) -> str:
+    """Rank a run's history, its latest token, and any typed failure down to one.
 
     The precedence rule itself lives with the vocabulary it ranks
     (`simulator.chemistry.kernel.dto.select_backend_status`); this function only
     assembles the candidate list. It used to restate the ordering inline, which
     is how the two optimizer copies drifted to a transposed order without
     anything noticing.
+
+    ★ `exception_status` is a CANDIDATE, not an override. Both call sites used
+    to do this:
+
+        backend_status = _aggregate_backend_status(history, latest)
+        if honest is not None:
+            backend_status = honest        # <- selection discarded
+
+    which computed the owner's answer and then threw it away, so a run whose
+    history said `unavailable` reported `out_of_domain` after a domain-typed
+    exception and `not_converged` after a timeout. That is the exact
+    transposition the owner's derivation says must not happen: engine absence
+    became a permanent physics claim about the recipe. Feeding the typed failure
+    IN as one more candidate keeps one decision point, so precedence applies to
+    it like anything else.
+
+    It is appended LAST deliberately. The owner falls back to the final value
+    when no ranked token is present, so a typed failure carrying an unranked
+    token (`refused`) still wins over an unremarkable history of `ok`, while a
+    ranked history token still outranks it.
     """
     try:
         statuses = [str(status) for status in history]
     except TypeError:
         statuses = []
     statuses.append(str(latest))
+    if exception_status is not None:
+        statuses.append(str(exception_status))
     selected = select_backend_status(statuses)
     # `statuses` always carries at least str(latest), and str() never yields
     # None, so the owner always ranks something; this narrows `str | None` to

@@ -216,6 +216,13 @@ _HONEST_NON_OK_BACKEND_STATUSES = frozenset(
         "out_of_domain",
     }
 )
+# Statuses that mean THE ENGINE ACTUALLY ANSWERED. Derived from the grouping
+# above rather than restated, so the two cannot drift apart: `ok` plus every
+# honest non-ok answer. `unavailable` is deliberately absent -- it is the token
+# `_abort_on_non_authoritative_backend_status` treats as engine absence and
+# routes to retry.
+_ENGINE_ANSWERED_BACKEND_STATUSES = frozenset({"ok"}) | _HONEST_NON_OK_BACKEND_STATUSES
+
 _TYPED_ABSENCE_EXCEPTION_CLASSES = (
     BackendUnavailableError,
     EngineWorkerUnavailable,
@@ -5779,8 +5786,47 @@ def _has_out_of_domain_backend_signal(
     *,
     backend_status: str | None = None,
 ) -> bool:
+    """Did this run actually leave the declared domain?
+
+    ★ CRASH EVIDENCE CORROBORATES A STATUS THE ENGINE PRODUCED. IT CANNOT
+    MANUFACTURE ONE THE ENGINE NEVER PRODUCED.
+
+    This branch runs at the top of the evaluator, BEFORE every status-based
+    decision -- before the `not_attempted` bug-abort, before the honest
+    non-ok return, and before `_abort_on_non_authoritative_backend_status`
+    turns `unavailable` into a retry. It used to consult a retained crash
+    point regardless of the selected status, so it preempted all of them.
+
+    The consequence was reproduced three times independently: a run whose
+    selected status was `unavailable` was pruned as OUT_OF_DOMAIN while the
+    stored RunReference still read `unavailable` -- the candidate disposition
+    and the artifact disagreeing about the same run. And because
+    `_last_out_of_domain_diagnostics` is written only on an out-of-domain
+    result and never cleared by a later `unavailable` one, the crash point
+    driving that verdict can outlive the status that produced it. Varying only
+    its temperature flipped the outcome between a FEASIBLE candidate eligible
+    for ranking and a permanent physics prune -- opposite errors from one
+    stale field, selected by a temperature the candidate never ran at.
+
+    So the crash clause now applies only when the engine actually answered.
+    Note this is NOT an equality test against `unavailable`: that would be a
+    guard at the callsite, drifting the moment the vocabulary grows a token.
+    It asks the vocabulary instead, via a set derived from the existing
+    `_HONEST_NON_OK_BACKEND_STATUSES` grouping.
+
+    A status of None -- no engine answer at all -- is likewise not something
+    crash evidence may promote into a physics verdict.
+
+    Ordering note: moving this branch later instead would NOT work. Its first
+    clause is also the `out_of_domain` dispatch, so after the abort call an
+    out-of-domain run would fall through (that token is an honest non-ok, so
+    the abort returns without raising) and its result would simply be lost.
+    The branch does two jobs; only the second one needed gating.
+    """
     if backend_status == "out_of_domain":
         return True
+    if backend_status not in _ENGINE_ANSWERED_BACKEND_STATUSES:
+        return False
     diagnostics = _out_of_domain_diagnostics(run_execution)
     return _crash_point_from_diagnostics(diagnostics) is not None
 

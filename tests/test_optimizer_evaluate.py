@@ -4806,3 +4806,75 @@ def test_empty_placeholder_does_not_mask_a_populated_alias() -> None:
     assert extracted is not None
     assert extracted.get("temperature_C") == 1400.0
     assert extracted != {}
+
+
+# --- b-264: the status owner is authoritative, not advisory -------------------
+
+_B264_CRASH = {
+    "temperature_C": 1400.0,
+    "pressure_bar": 0.01,
+    "fO2_log": -9.0,
+    "composition_mol": {"SiO2": 1.0},
+}
+
+
+def test_unavailable_is_not_overruled_by_a_retained_crash_point() -> None:
+    """A missing engine must route to retry, not to a permanent physics verdict.
+
+    Reproduced independently by three reviews before the fix: with a top-level
+    status of `unavailable` and diagnostics carrying `out_of_domain` plus a
+    POPULATED crash point, evaluate() pruned the candidate as OUT_OF_DOMAIN
+    while the stored RunReference still read `unavailable` -- the candidate
+    disposition and the artifact disagreeing about the same run.
+
+    It matters because the prune is permanent and silent. `out_of_domain` is a
+    verdict about the RECIPE, so the candidate leaves the search space and is
+    never revisited once the engine is fixed; `unavailable` is a verdict about
+    the TOOLING and deserves a retry. And the crash point driving it can be
+    STALE -- core writes `_last_out_of_domain_diagnostics` only on an
+    out-of-domain result and never clears it on a later `unavailable` one, so
+    the evidence outlives the status that produced it.
+    """
+    with pytest.raises(BackendUnavailableAbort):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                _execution(
+                    backend_status="unavailable",
+                    backend_authoritative=True,
+                    backend_diagnostics={
+                        "backend_status": "out_of_domain",
+                        "out_of_domain_crash_point": dict(_B264_CRASH),
+                    },
+                )
+            ),
+        )
+
+
+def test_a_real_domain_excursion_is_still_reported() -> None:
+    """The other direction, so the gate cannot pass by silencing the signal.
+
+    Without this, gating the crash clause on "did the engine answer" could be
+    satisfied by never firing it at all, and real excursions would stop being
+    reported. Same carrier as above; only the whole-run status differs.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": dict(_B264_CRASH),
+                },
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is not None

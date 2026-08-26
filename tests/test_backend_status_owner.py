@@ -307,3 +307,96 @@ def test_runner_aggregation_survives_a_non_iterable_history() -> None:
     from simulator.run_executor import _aggregate_backend_status
 
     assert _aggregate_backend_status(7, "ok") == "ok"
+
+
+def test_runner_does_not_overrule_the_owner_with_a_typed_failure() -> None:
+    """A typed failure is a CANDIDATE for the ranking, not a replacement for it.
+
+    Both runner call sites used to compute the owner's answer and then discard
+    it whenever a typed exception carried a status:
+
+        backend_status = _aggregate_backend_status(history, latest)
+        if honest is not None:
+            backend_status = honest
+
+    so a run whose history said `unavailable` reported `out_of_domain` after a
+    domain-typed exception and `not_converged` after a timeout -- engine absence
+    becoming a permanent physics claim about the recipe, which is the exact
+    transposition the owner's derivation says must not happen.
+    """
+    from simulator.run_executor import _aggregate_backend_status
+
+    # the defect: absence must survive a typed failure of lower precedence
+    assert _aggregate_backend_status(
+        ["unavailable"], "ok", exception_status="out_of_domain"
+    ) == "unavailable"
+    assert _aggregate_backend_status(
+        ["unavailable"], "ok", exception_status="not_converged"
+    ) == "unavailable"
+
+    # ...without muting typed failures over an unremarkable history
+    assert _aggregate_backend_status(
+        ["ok"], "ok", exception_status="not_converged"
+    ) == "not_converged"
+
+    # ...and an UNRANKED token still wins, via the owner's last-value fallback.
+    # This is why the candidate is appended last rather than first.
+    assert _aggregate_backend_status(["ok"], "ok", exception_status="refused") == "refused"
+
+    # no typed failure at all changes nothing
+    assert _aggregate_backend_status(["ok"], "ok", exception_status=None) == "ok"
+
+
+def test_no_call_site_overrides_the_aggregate_after_selecting_it() -> None:
+    """Neither runner call site may assign over the owner's answer.
+
+    ★ THIS IS STRUCTURAL BECAUSE THE BEHAVIOURAL TEST CANNOT REACH BOTH SITES.
+    `run_executor` aggregates in two places -- the primary path and the
+    degraded-envelope path -- and a bare failing session only exercises the
+    second. Verified the hard way: reverting the PRIMARY site to its old
+    post-selection override left every test green, including the behavioural
+    b-264 test in test_run_executor.py, which only went red when the
+    DEGRADED-ENVELOPE site was reverted. So one of the two sites had no
+    behavioural coverage at all and a regression there would have landed
+    silently.
+
+    Rather than hunt for a fixture that reaches the primary path, the shape is
+    matched. The predicate had to be narrowed once: a first version flagged any
+    assignment to `backend_status` whose value tree CONTAINED a call to
+    `_backend_status_from_honest_exception`, and that fired on the FIXED code,
+    because the fix passes exactly that call as a keyword argument inside the
+    aggregating call. A guard that flags the correct shape is worse than no
+    guard.
+
+    So it inspects the assigned value DIRECTLY rather than walking it: a bare
+    rebind (`backend_status = honest_backend_status`) or an assignment straight
+    from the honest-exception call is an override. The same call nested as an
+    ARGUMENT is the fix, and is left alone.
+    """
+    source = (REPO_ROOT / "simulator" / "run_executor.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+
+    offenders: list[str] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        targets = {t.id for t in node.targets if isinstance(t, ast.Name)}
+        if "backend_status" not in targets:
+            continue
+        value = node.value
+        # `backend_status = _backend_status_from_honest_exception(...)` -- the
+        # assigned value IS the override. Nested-as-an-argument is the fix.
+        if (
+            isinstance(value, ast.Call)
+            and isinstance(value.func, ast.Name)
+            and value.func.id == "_backend_status_from_honest_exception"
+        ):
+            offenders.append(f"run_executor.py:{node.lineno} (direct override)")
+        # `backend_status = honest_backend_status` -- the original shape
+        if isinstance(value, ast.Name) and value.id.endswith("backend_status"):
+            offenders.append(f"run_executor.py:{node.lineno} (rebind {value.id})")
+
+    assert offenders == [], (
+        "a runner call site assigns over the aggregated backend_status; the "
+        f"typed failure must be passed INTO the selection instead: {offenders}"
+    )

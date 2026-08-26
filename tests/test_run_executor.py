@@ -1036,3 +1036,58 @@ def test_provider_projection_raises_on_uncertified_melt_resistance():
                 dict(result.diagnostic),
             )
     assert ei.value.reason == "uncertified_melt_resistance_model"
+
+
+def test_typed_failure_does_not_overrule_a_recorded_unavailable(monkeypatch):
+    """b-264: a typed failure is a candidate for the ranking, not a replacement.
+
+    ★ THIS TEST EXISTS AT THE CALL SITE ON PURPOSE. The defect lived in the
+    caller --
+
+        backend_status = _aggregate_backend_status(history, latest)
+        if honest is not None:
+            backend_status = honest        # selection discarded
+
+    -- so a unit test on `_aggregate_backend_status` alone could pin the new
+    contract but could never have caught the original bug. The sibling
+    envelope tests above do not catch it either: they use a bare simulator
+    whose history is empty, where the typed token wins under precedence too,
+    so the override and the candidate are indistinguishable. A RECORDED
+    `unavailable` in the history is what separates them.
+
+    Direction that matters: `out_of_domain` prunes the candidate permanently as
+    a physics verdict about the recipe, while `unavailable` means the engine
+    was missing and the candidate deserves a retry. Overruled, a broken install
+    became a permanent conclusion about the process being designed.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    ood = ThermoEngineOutOfDomainError(
+        ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+        requested=-9.0,
+    )
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise ood
+
+    monkeypatch.setattr("simulator.run_executor.drive_session", fail_drive_session)
+
+    session = type(
+        "AbsentEngineSession",
+        (),
+        {
+            "simulator": SimpleNamespace(
+                _backend_status_history=("unavailable",),
+                _last_backend_status="unavailable",
+            )
+        },
+    )()
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.failure_exception is ood
+    assert execution.backend_status == "unavailable"
+    assert execution.backend_status != "out_of_domain"
