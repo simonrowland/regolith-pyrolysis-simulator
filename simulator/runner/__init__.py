@@ -2464,9 +2464,12 @@ def build_per_hour_summary(
     mass_balance_pct = (
         None if raw_mass_balance_pct is None else float(raw_mass_balance_pct)
     )
+    # ``mass_balance_pct`` is already a percentage, not a fraction.  The
+    # mandate requires closure within 5e-12 %, so no factor-of-100 conversion
+    # belongs between this value and the named percent-domain limit.
     if (
         mass_balance_pct is not None
-        and abs(mass_balance_pct) <= 5e-12
+        and abs(mass_balance_pct) <= RUNNER_MASS_BALANCE_LIMIT_PCT
         and getattr(sim.campaign_mgr, "last_pO2_enforcement", None) is not None
     ):
         mass_balance_pct = 0.0

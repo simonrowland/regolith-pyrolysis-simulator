@@ -11,6 +11,7 @@ import pytest
 import yaml
 
 import app as app_module
+import simulator.runner as runner_module
 from web import events as web_events
 from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
@@ -4251,31 +4252,48 @@ def test_per_tick_backend_resolution_never_promotes_selection_authority(
 def test_web_mass_balance_threshold_matches_kernel_abort_invariant():
     from simulator.optimize.evaluate import MASS_BALANCE_ABORT_PCT
 
-    runner_source = (
-        _REPO_ROOT / "simulator/runner/__init__.py"  # t-421 package move
-    ).read_text()
-    state_source = (_REPO_ROOT / "simulator/state.py").read_text()
-
-    assert _MASS_BALANCE_ERROR_BREACH_PCT == pytest.approx(
-        MASS_BALANCE_ABORT_PCT
+    # Production owns three percent-domain constants plus the runner's public
+    # alias.  The snapshot quantity is percent, not fraction, and the mandate
+    # fixes its closure bound at 5e-12 %, so no factor-of-100 conversion applies.
+    # Exact equality intentionally fails if any surface moves, even if that
+    # surface remains internally self-consistent at a different boundary.
+    assert runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT == 5.0e-12
+    assert (
+        runner_module.SIO_TSWEEP_MASS_BALANCE_LIMIT_PCT
+        == runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT
     )
-    assert MASS_BALANCE_ABORT_PCT == pytest.approx(5e-12)
-    assert "<= 5e-12" in runner_source
-    assert "≤5e-12" in state_source
+    assert MASS_BALANCE_ABORT_PCT == runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT
+    assert (
+        _MASS_BALANCE_ERROR_BREACH_PCT
+        == runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT
+    )
 
 
 @pytest.mark.parametrize(
     ("error_pct", "expected_breached"),
     [
-        (4.99e-12, False),
-        (5.01e-12, True),
+        (
+            runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT * (1.0 - 1.0e-6),
+            False,
+        ),
+        (runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT, False),
+        (
+            runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT * (1.0 + 1.0e-6),
+            True,
+        ),
     ],
 )
-def test_web_mass_balance_breach_numeric_boundary(
+def test_mass_balance_surfaces_enforce_numeric_boundary(
     error_pct,
     expected_breached,
 ):
+    from simulator.optimize.evaluate import (
+        EngineBugAbort,
+        _abort_on_mass_balance_breach,
+    )
+
     sim, snapshot = _sim_with_mass_balance_snapshot(error_pct)
+    sim.campaign_mgr.last_pO2_enforcement = object()
 
     payload = _tick_payload(
         sim=sim,
@@ -4285,9 +4303,58 @@ def test_web_mass_balance_breach_numeric_boundary(
         backend_authoritative=False,
     )
 
-    assert payload["mass_balance_error_pct"] == pytest.approx(error_pct)
+    # Production emits the snapshot's percent value and a breach flag, the
+    # runner zero-normalizes only in-bound percent dust after pO2 enforcement,
+    # and the optimizer aborts only out of bounds.  These checks fail if any
+    # live gate moves or disappears, even when the numeric payload stays valid.
+    assert payload["mass_balance_error_pct"] == error_pct
     assert payload["mass_balance_error_category"] is None
     assert payload["mass_balance_error_breached"] is expected_breached
+
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+    assert summary["mass_balance_pct"] == (
+        error_pct if expected_breached else 0.0
+    )
+
+    abort_args = {
+        "run_execution": SimpleNamespace(snapshots=(snapshot,)),
+        "patch": SimpleNamespace(),
+        "candidate_id": "mass-balance-boundary-test",
+        "eval_spec": SimpleNamespace(),
+        "key": "mass-balance-boundary-test",
+    }
+    if expected_breached:
+        with pytest.raises(EngineBugAbort, match="mass balance breach"):
+            _abort_on_mass_balance_breach(**abort_args)
+    else:
+        _abort_on_mass_balance_breach(**abort_args)
+
+
+def test_runner_summary_uses_named_mass_balance_limit(monkeypatch):
+    original_limit = runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT
+    observed_pct = original_limit * 0.75
+    monkeypatch.setattr(
+        runner_module,
+        "RUNNER_MASS_BALANCE_LIMIT_PCT",
+        original_limit * 0.5,
+    )
+    sim, snapshot = _sim_with_mass_balance_snapshot(observed_pct)
+    sim.campaign_mgr.last_pO2_enforcement = object()
+
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    # Production emits the nonzero percent because it exceeds the patched
+    # named limit.  This fails under correct-but-different old-literal behavior,
+    # proving the live comparison depends on the named owner rather than 5e-12.
+    assert summary["mass_balance_pct"] == observed_pct
 
 
 def test_web_mass_balance_category_breaches_with_small_numeric_error():
