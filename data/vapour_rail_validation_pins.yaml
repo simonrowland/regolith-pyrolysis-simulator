@@ -349,6 +349,23 @@ species:
         # DeMaria 1971 KEMS Na(g) partial-pressure series over Apollo 12
         # lunar basalt 12022/12065. pO2 recovered from the companion Table 1
         # O2 series on the same extract (unit conversion atm→bar only).
+        #
+        # ★ INTERPRETATION (t-743, resolved APPARATUS 2026-08-26 — full
+        # evidence docs-private/research/2026-08-26-na-sample-split/):
+        # the 2.044 dex headline is the coldest 12065 (passivated-Re) point,
+        # NOT a 100x Na-model error. At matched T=1428.57 K, same instrument,
+        # measured p_Na(12022)/p_Na(12065) = 31.6 (1.500 dex) while Na2O
+        # differs 1.33x (0.125 dex) and Table 1 pO2 points the WRONG way for
+        # the pO2^(-1/4) lever (-0.042 dex); Henry+pO2 leave 1.42 dex
+        # unexplained, measured-vs-measured, no engine involved. The same
+        # ~1.5 dex split appears independently on K (Fig. 2) with K2O
+        # essentially equal. Digitisation verified against the printed
+        # figure. The authors themselves except Na and K from their
+        # factor-of-2 calibration envelope. Believe 12022 as the
+        # model-vs-measurement comparison (max 0.59 dex, sign-flip at
+        # 1379 K); treat 12065 as a second KEMS series that does not
+        # constrain the Na vapour model. Both series STAY pinned; do not
+        # drop 12065, re-baseline, or retune.
         # Class = silicate_melt. Form is untyped on the extract (paper does
         # not tabulate solidus/liquidus); the psat path does not apply the
         # α form gate. Residual IS the result: max 2.043550129219774 dex at
