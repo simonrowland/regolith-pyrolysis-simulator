@@ -1,0 +1,443 @@
+schema_version: literature_extract.v1
+source_id: yam1983
+source:
+  citation: >-
+    Yamaguchi, S., Imai, A. & Goto, K.S. (1983), "Measurement of Activity of
+    Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid Electrolyte"
+    / 「β-アルミナ固体電解質を用いた Na2O-SiO2 系融体中の Na2O の活量の測定」,
+    J. Japan Inst. Metals (日本金属学会誌) 47(9), 736-742.
+  doi: 10.2320/jinstmet1952.47.9_736
+  url: https://doi.org/10.2320/jinstmet1952.47.9_736
+  year: 1983
+extraction:
+  method: >-
+    Manual visual transcription from PDF page images of
+    docs/references/pdfs/99-kems-langmuir/yam1983.pdf (Japanese body + English
+    abstract/table captions). Table 1 and Table 2 coefficients read from the
+    printed tables, not from Fig. 5/6. Japanese standard-state wording
+    translated alongside the original.
+  date: '2026-08-26'
+  worker: t745-na2o-extracts
+review_status: draft
+species:
+  Na2O:
+    observations:
+    - observation_id: yam1983_na2o_table1_minus_log10_a_AT_B
+      type: activity_coefficient
+      locator:
+        page: 3
+        published_page: 738
+        pdf_page_index: 3
+        table: '1'
+        figure: '5'
+        equation: '-log a_Na2O = A/T + B'
+        note: >-
+          Table 1 caption (English in source): "Coefficients of lines for
+          -log a_Na2O = A/T + B." Column headers: X_Na2O, 10^{-4}·A,
+          10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so
+          A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing reference melt,
+          not a binary X_Na2O.
+      T_range_K:
+      - 1173.0
+      - 1673.0
+      phase: Na2O-SiO2_binary_melt
+      standard_state: >-
+        Pure liquid Na2O. Paper p.737 (PDF p.2): 「なお，Na2O の活量の基準状態には
+        すべて液体をとった。」 = "The standard state for the activity of Na2O
+        was taken as the liquid in all cases." Confirmed by p.738:
+        「参照融体中の Na2O の液体基準の活量」 = "liquid-standard activity of
+        Na2O in the reference melt." The EMF cell (a_Na2CO3 = 1, pure Na2CO3
+        melt under fixed pO2 and pCO2) is an electrode convention used only
+        to place a_Na2O* of the reference melt onto that liquid-Na2O scale
+        via JANAF ΔGf°(Na2O) and ΔGf°(Na2CO3) (eqs. 4–5). Reported a_Na2O
+        is the component activity, not a cell-relative ratio.
+      regime: emf_beta_alumina_concentration_cell
+      units: dimensionless a (log10); Raoultian γ = a/X
+      uncertainty:
+        note: >-
+          Table 1 δA and δB are the least-squares coefficient errors.
+          Propagated σ(log10 a) = sqrt((δA/T)^2 + (δB)^2) as the authors
+          describe around eq. (9). Do not invent additional uncertainty.
+      values:
+        quantity: activity_and_raoultian_gamma
+        oxide_formula_as_published: Na2O
+        composition_basis: mole_fraction_Na2O_in_Na2O-SiO2
+        log_base: 10
+        equation_as_printed: -log a_Na2O = A/T + B
+        equation: '-log10(a_Na2O) = A/T + B'
+        T_in_equation: kelvin
+        gamma_definition: >-
+          Papers publish a_Na2O, not γ_Na2O. Raoultian
+          γ_Na2O = a_Na2O / X_Na2O follows from the liquid/Raoultian
+          standard. Conversion shown on each evaluated binary row.
+        cell_convention_is_not_the_reported_standard: >-
+          Concentration cell measures a_Na2O / a_Na2O* (eq. 3, pO2 terms
+          cancel when pO2 = pO2*). a_Na2O* itself was determined against
+          pure liquid Na2CO3 (a_Na2CO3=1) and converted with JANAF 1971
+          ΔGf° to liquid Na2O. Do not treat the Na2CO3 electrode as the
+          activity standard state.
+        reference_melt_mole_fraction:
+          Na2O: 0.395
+          SiO2: 0.526
+          Fe2O3: 0.079
+        reference_melt_as_printed: 0.395Na2O-0.526SiO2-0.079Fe2O3
+        sample_compositions_are_batch_values:
+          relative_error_pct_range:
+          - 2.0
+          - 3.0
+          note: >-
+            Authors used batch (配含) compositions because weight-change vs
+            thermobalance relative error was 2–3% (p.737).
+        rows:
+        - label: reference_melt
+          X_Na2O: null
+          table_1e_minus_4_A: 1.022
+          table_1e_minus_4_delta_A: 0.013
+          A_K: 10220.0
+          delta_A_K: 130.0
+          B: -0.36
+          delta_B: 0.101
+          B_as_printed: -0.360
+          evaluated:
+          - T_K: 1373.0
+            minus_log10_activity: 7.0836
+            activity: 8.249844e-08
+          - T_K: 1473.0
+            minus_log10_activity: 6.5782
+            activity: 2.641063e-07
+          - T_K: 1573.0
+            minus_log10_activity: 6.1371
+            activity: 7.292237e-07
+        - X_Na2O: 0.205
+          table_1e_minus_4_A: 1.502
+          table_1e_minus_4_delta_A: 0.044
+          A_K: 15020.0
+          delta_A_K: 440.0
+          B: -1.048
+          delta_B: 0.281
+          evaluated:
+          - T_K: 1373.0
+            activity: 1.283665e-10
+            gamma: 6.261779e-10
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1473.0
+            activity: 7.097786e-10
+            gamma: 3.462334e-09
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1573.0
+            activity: 3.157671e-09
+            gamma: 1.540327e-08
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+        - X_Na2O: 0.298
+          table_1e_minus_4_A: 1.175
+          table_1e_minus_4_delta_A: 0.019
+          A_K: 11750.0
+          delta_A_K: 190.0
+          B: 0.173
+          delta_B: 0.144
+          evaluated:
+          - T_K: 1373.0
+            activity: 1.858222e-09
+            gamma: 6.235644e-09
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1473.0
+            activity: 7.080797e-09
+            gamma: 2.376106e-08
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1573.0
+            activity: 2.27613e-08
+            gamma: 7.63802e-08
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+        - X_Na2O: 0.356
+          table_1e_minus_4_A: 1.143
+          table_1e_minus_4_delta_A: 0.016
+          A_K: 11430.0
+          delta_A_K: 160.0
+          B: -0.235
+          delta_B: 0.117
+          evaluated:
+          - T_K: 1373.0
+            activity: 8.131373e-09
+            gamma: 2.284093e-08
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1473.0
+            activity: 2.987623e-08
+            gamma: 8.392201e-08
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1573.0
+            activity: 9.30315e-08
+            gamma: 2.613244e-07
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+        - X_Na2O: 0.4
+          table_1e_minus_4_A: 1.085
+          table_1e_minus_4_delta_A: 0.04
+          A_K: 10850.0
+          delta_A_K: 400.0
+          B: -0.606
+          delta_B: 0.262
+          evaluated:
+          - T_K: 1373.0
+            activity: 5.053549e-08
+            gamma: 1.263387e-07
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1473.0
+            activity: 1.738121e-07
+            gamma: 4.345304e-07
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1573.0
+            activity: 5.109192e-07
+            gamma: 1.277298e-06
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+        - X_Na2O: 0.429
+          table_1e_minus_4_A: 1.075
+          table_1e_minus_4_delta_A: 0.016
+          A_K: 10750.0
+          delta_A_K: 160.0
+          B: -0.859
+          delta_B: 0.121
+          evaluated:
+          - T_K: 1373.0
+            activity: 1.070113e-07
+            gamma: 2.494436e-07
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1473.0
+            activity: 3.638889e-07
+            gamma: 8.482258e-07
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1573.0
+            activity: 1.059071e-06
+            gamma: 2.468696e-06
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+        - X_Na2O: 0.5
+          table_1e_minus_4_A: 0.942
+          table_1e_minus_4_delta_A: 0.036
+          A_K: 9420.0
+          delta_A_K: 360.0
+          B: -0.866
+          delta_B: 0.254
+          evaluated:
+          - T_K: 1373.0
+            activity: 1.011839e-06
+            gamma: 2.023678e-06
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1473.0
+            activity: 2.95725e-06
+            gamma: 5.914499e-06
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1573.0
+            activity: 7.541246e-06
+            gamma: 1.508249e-05
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+        - X_Na2O: 0.601
+          table_1e_minus_4_A: 0.805
+          table_1e_minus_4_delta_A: 0.079
+          A_K: 8050.0
+          delta_A_K: 790.0
+          B: -1.39
+          delta_B: 0.565
+          B_as_printed: -1.390
+          two_liquid_note: >-
+            Phase diagram shows two-liquid separation at X_Na2O=0.601;
+            authors observed no activity kink and fitted a single line
+            (p.740).
+          evaluated:
+          - T_K: 1373.0
+            activity: 3.364546e-05
+            gamma: 5.598246e-05
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1473.0
+            activity: 8.413228e-05
+            gamma: 1.399872e-04
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+          - T_K: 1573.0
+            activity: 1.872364e-04
+            gamma: 3.115415e-04
+            arithmetic: a=10**(-(A/T+B)); γ=a/X_Na2O
+        pin_X0205_table_1e_minus_4_A: 1.502
+        pin_X0205_B: -1.048
+        pin_1473K_X0400_activity: 1.738121e-07
+        pin_1473K_X0400_gamma: 4.345304e-07
+      equipment:
+        cell_material:
+          value: >-
+            β-alumina solid electrolyte (Toshiba ceramics closed-end tubes,
+            φ10×φ8×100 mm and φ16×φ14×200 mm); Pt electrodes; Na2CO3
+            standard electrode in a Pt crucible
+          locator:
+            page: 2
+            published_page: 737
+            figure: '1'
+            paragraph: 2. 試料および電解質 / 3. 起電力測定
+    - observation_id: yam1983_na2o_prose_activity_range
+      type: activity_coefficient
+      locator:
+        page: 1
+        published_page: 736
+        pdf_page_index: 1
+        paragraph: English abstract + 結言 (p.741)
+      T_range_K:
+      - 1173.0
+      - 1673.0
+      phase: Na2O-SiO2_binary_melt
+      standard_state: >-
+        Pure liquid Na2O (same as yam1983_na2o_table1_minus_log10_a_AT_B).
+        Abstract also states "extremely large negative deviation from
+        Raoult's law".
+      regime: emf_beta_alumina_concentration_cell
+      units: dimensionless a as published (order-of-magnitude span)
+      values:
+        quantity: activity_range
+        activity_range:
+        - 1.0e-10
+        - 0.001
+        X_Na2O_range:
+        - 0.2
+        - 0.6
+        original_english_abstract: >-
+          The activity of sodium oxide measured showed an extremely large
+          negative deviation from Raoult's law with the values of 10^{-10}
+          to 10^{-3} depending upon temperature and composition.
+        original_japanese_conclusion: >-
+          Na2O の活量は、Raoult 則より大きく負に偏移し、X_Na2O=0.2 では
+          10^{-10}〜10^{-8}、X_Na2O=0.6 においても 10^{-5}〜10^{-3} という値を示した。
+        gamma_range_note: >-
+          Authors do not tabulate γ. Using γ=a/X on the conclusion endpoints
+          gives roughly 5e-10–5e-8 at X=0.2 and 2e-5–2e-3 at X=0.6
+          (order-of-magnitude only; prefer Table 1 evaluations).
+        temperatures_K:
+        - 1173.0
+        - 1673.0
+  SiO2:
+    observations:
+    - observation_id: yam1983_sio2_table2_minus_log10_a_AT_B
+      type: activity_coefficient
+      locator:
+        page: 5
+        published_page: 740
+        pdf_page_index: 5
+        table: '2'
+        equation: "-log a_SiO2 = A'/T + B'"
+        note: >-
+          Gibbs-Duhem of Table 1 a_Na2O; tridymite standard. Table 2 caption:
+          "Coefficients of least square lines for -log a_SiO2 = A'/T + B'."
+          Column headers: X_Na2O, 10^{-4}·A', 10^{-4}·δA', B', δB'.
+      T_range_K:
+      - 1373.0
+      - 1773.0
+      phase: Na2O-SiO2_binary_melt
+      standard_state: >-
+        Pure solid tridymite. Paper p.740: Gibbs-Duhem integration starts at
+        the SiO2 liquidus, "1143〜1740 K の範囲で安定な Tridymite を基準とした固体基準の活量".
+        At 1773 K cristobalite is stable; authors applied no correction
+        because the tridymite–cristobalite enthalpy of transition is
+        considered very small.
+      units: dimensionless a_SiO2 (tridymite)
+      values:
+        quantity: activity_gibbs_duhem_from_Na2O
+        log_base: 10
+        equation: "-log10(a_SiO2,tridymite) = A_prime/T + B_prime"
+        derived_from: yam1983_na2o_table1_minus_log10_a_AT_B
+        rows:
+        - X_Na2O: 0.205
+          X_SiO2: 0.795
+          table_1e_minus_4_A_prime: -0.0593
+          table_1e_minus_4_delta_A_prime: 0.0026
+          A_prime_K: -593.0
+          B_prime: 0.435
+          delta_B_prime: 0.017
+        - X_Na2O: 0.298
+          X_SiO2: 0.702
+          table_1e_minus_4_A_prime: 0.0612
+          table_1e_minus_4_delta_A_prime: 0.0057
+          A_prime_K: 612.0
+          B_prime: -0.028
+          delta_B_prime: 0.037
+        - X_Na2O: 0.356
+          X_SiO2: 0.644
+          table_1e_minus_4_A_prime: 0.0967
+          table_1e_minus_4_delta_A_prime: 0.0143
+          A_prime_K: 967.0
+          B_prime: 0.078
+          delta_B_prime: 0.092
+        - X_Na2O: 0.4
+          X_SiO2: 0.6
+          table_1e_minus_4_A_prime: 0.114
+          table_1e_minus_4_delta_A_prime: 0.014
+          A_prime_K: 1140.0
+          B_prime: 0.369
+          delta_B_prime: 0.088
+        - X_Na2O: 0.429
+          X_SiO2: 0.571
+          table_1e_minus_4_A_prime: 0.132
+          table_1e_minus_4_delta_A_prime: 0.021
+          A_prime_K: 1320.0
+          B_prime: 0.476
+          delta_B_prime: 0.137
+        - X_Na2O: 0.5
+          X_SiO2: 0.5
+          table_1e_minus_4_A_prime: 0.235
+          table_1e_minus_4_delta_A_prime: 0.008
+          A_prime_K: 2350.0
+          B_prime: 0.59
+          delta_B_prime: 0.05
+          B_prime_as_printed: 0.590
+        - X_Na2O: 0.601
+          X_SiO2: 0.399
+          table_1e_minus_4_A_prime: 0.399
+          table_1e_minus_4_delta_A_prime: 0.018
+          A_prime_K: 3990.0
+          B_prime: 1.291
+          delta_B_prime: 0.109
+        pin_X0205_A_prime_coeff: -0.0593
+        pin_X0205_B_prime: 0.435
+fidelity_samples:
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: yam1983_na2o_table1_minus_log10_a_AT_B
+  field: pin_X0205_table_1e_minus_4_A
+  value: 1.502
+  locator:
+    page: 3
+    published_page: 738
+    table: '1'
+    note: Table 1 10^{-4}·A at X_Na2O=0.205
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: yam1983_na2o_table1_minus_log10_a_AT_B
+  field: pin_X0205_B
+  value: -1.048
+  locator:
+    page: 3
+    published_page: 738
+    table: '1'
+    note: Table 1 B at X_Na2O=0.205
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: yam1983_na2o_table1_minus_log10_a_AT_B
+  field: pin_1473K_X0400_activity
+  value: 1.738121e-07
+  locator:
+    page: 3
+    published_page: 738
+    table: '1'
+    note: Table 1 X_Na2O=0.400 evaluated at 1473 K (liquid Na2O standard)
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: yam1983_na2o_table1_minus_log10_a_AT_B
+  field: pin_1473K_X0400_gamma
+  value: 4.345304e-07
+  locator:
+    page: 3
+    published_page: 738
+    table: '1'
+    note: Raoultian γ=a/X at X_Na2O=0.400, 1473 K
+- species: SiO2
+  observable: activity_coefficient
+  observation_id: yam1983_sio2_table2_minus_log10_a_AT_B
+  field: pin_X0205_A_prime_coeff
+  value: -0.0593
+  locator:
+    page: 5
+    published_page: 740
+    table: '2'
+    note: Table 2 10^{-4}·A' at X_Na2O=0.205 (tridymite)

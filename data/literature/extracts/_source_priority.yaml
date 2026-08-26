@@ -39,6 +39,21 @@ source_priority:
   activity_coefficient:
     - sossi-fegley-2018
     - fedkin-grossman-ghiorso-2006
+    # 2026-08-26 (t-745): two INDEPENDENT primary measurements of a(Na2O)
+    # against pure liquid Na2O — Tsukihashi & Sano 1985 (chemical
+    # equilibration) and Yamaguchi, Imai & Goto 1983 (beta-alumina EMF,
+    # placed on an absolute scale via a pure-Na2CO3 electrode and JANAF-1971).
+    # Appended, NOT promoted: for SiO2 they must not displace the existing
+    # winners, and appending changes no existing group's outcome. For Na2O
+    # activity_coefficient they are the ONLY sources (verified: no competing
+    # source has that observable), so listing them is what makes an
+    # uncontested measurement visible to the merge at all.
+    # Why this matters beyond bookkeeping: the engine's Na2O coefficient is
+    # parameterized from Sossi 2019 / cross-checked against Sossi & Fegley
+    # 2018 Table 2 — the first-precedence source here. These two are the only
+    # a(Na2O) evidence independent of that fit.
+    - ts1985
+    - yam1983
   alpha:
     # Dual-regime Fe: KEMS and Langmuir are different regimes (not ordered as
     # conflicts). Within a single regime, primary measurement wins.
