@@ -378,6 +378,60 @@ class IntentResultStatusError(ValueError):
         )
 
 
+# ---------------------------------------------------------------------------
+# Whole-run status precedence — ONE owner, and the order is not arbitrary.
+# ---------------------------------------------------------------------------
+
+#: Most-severe-first precedence for reducing several per-probe statuses to one
+#: whole-run status.
+#:
+#: DERIVATION — the order follows from WHAT WAS LEARNED, not from a severity
+#: ranking picked by feel, and the tie between the first two is decided by the
+#: asymmetry of being wrong:
+#:
+#:   unavailable    the engine was not there. We learned NOTHING about the
+#:                  physics of this run.
+#:   out_of_domain  the engine WAS there and said this composition/temperature
+#:                  lies outside its calibration. That is a physics claim.
+#:   not_converged  the engine was there, attempted the solve, and failed to
+#:                  converge. Also a claim, but a weaker one.
+#:
+#: `unavailable` must outrank `out_of_domain` because of what each causes
+#: downstream. Reporting `out_of_domain` makes the optimizer prune the candidate
+#: as PHYSICALLY INFEASIBLE — a permanent verdict about the recipe. Reporting
+#: `unavailable` routes to retry — a verdict about the tooling. Being wrong the
+#: first way permanently discards a possibly-good recipe on evidence that was
+#: never gathered; being wrong the second way costs a retry. So a run that lost
+#: its engine partway MUST NOT be allowed to make a physics claim about itself.
+#:
+#: ★ DO NOT REORDER THIS TUPLE without re-deriving the above. It previously
+#: existed as three separate implementations — two in the optimizer sharing the
+#: transposed order `(out_of_domain, unavailable, not_converged)`, and one in the
+#: runner with the correct order. Two agreed with each other and disagreed with
+#: the third, which is what happens when a rule is COPIED rather than IMPORTED.
+BACKEND_STATUS_PRECEDENCE: tuple[str, ...] = (
+    "unavailable",
+    "out_of_domain",
+    "not_converged",
+)
+
+
+def select_backend_status(statuses) -> str | None:
+    """Reduce many per-probe statuses to one whole-run status.
+
+    Returns the most severe member of :data:`BACKEND_STATUS_PRECEDENCE` present,
+    else the last status seen, else ``None`` for an empty input. Callers that
+    need "the latest" rather than "the most severe" want a different function —
+    this one deliberately does not preserve ordering information beyond the
+    fallback.
+    """
+    values = tuple(str(status) for status in statuses if status is not None)
+    for status in BACKEND_STATUS_PRECEDENCE:
+        if status in values:
+            return status
+    return values[-1] if values else None
+
+
 @dataclass(frozen=True)
 class IntentResult:
     """Provider response to an :class:`IntentRequest`.

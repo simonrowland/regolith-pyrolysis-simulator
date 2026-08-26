@@ -24,6 +24,7 @@ from simulator.accounting.formulas import (
 )
 from simulator.state import OXIDE_SPECIES
 
+from simulator.chemistry.kernel import BACKEND_STATUS_PRECEDENCE
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
 
 
@@ -73,7 +74,10 @@ _MAGEMIN_BULK_SUM_DATABASES = frozenset({"ig", "igad"})
 _VERDICT_B_HARD_FAIL_BACKEND_STATUSES = frozenset(
     {"unavailable", "out_of_domain", "not_converged"}
 )
-_BACKEND_STATUS_PRECEDENCE = ("unavailable", "out_of_domain", "not_converged")
+# The ORDER has one owner (kernel dto); this module keeps its own selection
+# STRATEGY because it ranks signal objects and prefers one carrying a reason,
+# which is a different return type from the token-ranking owner.
+_BACKEND_STATUS_PRECEDENCE = BACKEND_STATUS_PRECEDENCE
 
 # Per-contaminant effect rows sourced from CONTAMINANT-WARNING-DOC + evidence-E5.
 # Intervals are literature-imported, NOT simulator-measured.

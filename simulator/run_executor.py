@@ -43,6 +43,7 @@ from simulator.trace import PhysicsTrace
 from simulator.transport_regime import TransportRegimeRefusal
 
 
+from simulator.chemistry.kernel import select_backend_status
 _TYPED_PHYSICS_REFUSALS = (
     VaporPressureRangeError,
     CertifiedPointRefusedError,
@@ -680,15 +681,24 @@ def _safe_bool(builder: Any, default: bool) -> bool:
 
 
 def _aggregate_backend_status(history: Any, latest: str) -> str:
+    """Rank a run's history plus its latest token down to one backend_status.
+
+    The precedence rule itself lives with the vocabulary it ranks
+    (`simulator.chemistry.kernel.dto.select_backend_status`); this function only
+    assembles the candidate list. It used to restate the ordering inline, which
+    is how the two optimizer copies drifted to a transposed order without
+    anything noticing.
+    """
     try:
         statuses = [str(status) for status in history]
     except TypeError:
         statuses = []
     statuses.append(str(latest))
-    for status in ("unavailable", "out_of_domain", "not_converged"):
-        if status in statuses:
-            return status
-    return str(latest)
+    selected = select_backend_status(statuses)
+    # `statuses` always carries at least str(latest), and str() never yields
+    # None, so the owner always ranks something; this narrows `str | None` to
+    # `str` for the declared return type rather than guarding a reachable case.
+    return selected if selected is not None else str(latest)
 
 
 def _backend_status_from_honest_exception(

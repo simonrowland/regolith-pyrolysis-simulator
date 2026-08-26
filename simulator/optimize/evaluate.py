@@ -131,6 +131,14 @@ from simulator.run_executor import RunExecutor
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError
 from simulator.transport_regime import TransportRegimeRefusal
+from simulator.optimize.backend_status import (
+    crash_point_from_carrier,
+    backend_statuses_from_carrier as _backend_statuses_from_carrier,
+    carrier_has_crash_point as _carrier_has_crash_point,
+    latest_backend_status as _latest_backend_status,
+    latest_backend_status_from_sequence as _latest_backend_status_from_sequence,
+    select_backend_status as _select_backend_status,
+)
 
 
 MASS_BALANCE_ABORT_PCT = 5e-12
@@ -5067,10 +5075,27 @@ def _out_of_domain_diagnostics(run_execution: Any) -> Mapping[str, Any]:
 def _crash_point_from_diagnostics(
     diagnostics: Mapping[str, Any],
 ) -> Mapping[str, Any] | None:
-    raw = diagnostics.get("out_of_domain_crash_point")
+    """Extract the crash point for this module's consumers.
+
+    The RULE for what counts as a crash point lives in backend_status; this is
+    only the local projection of it (JSON-compacting for the callers here).
+    It used to restate the rule and accepted an empty mapping, so
+    _has_out_of_domain_backend_signal turned a content-free placeholder into a
+    permanent out-of-domain prune while the carrier walker said there was no
+    evidence at all. Review r1, reproduced through evaluate().
+
+    _compact_jsonable stays on this side: backend_status must not import from
+    evaluate (evaluate already imports IT), and compaction is a serialisation
+    concern of these callers rather than part of the rule.
+
+    The other consumer, at the rump-terminal path, gets a bonus correction: an
+    empty placeholder now yields None and therefore the truthful reason
+    "missing_crash_point", where it previously proceeded and reported
+    "incomplete_crash_point_controls" -- an answer about the CONTROLS when the
+    real problem was that there was no crash point at all.
+    """
+    raw = crash_point_from_carrier(diagnostics)
     if raw is None:
-        raw = diagnostics.get("crash_point")
-    if not isinstance(raw, MappingABC):
         return None
     return _compact_jsonable(raw)
 
@@ -5730,10 +5755,6 @@ def _abort_on_non_authoritative_backend_status(
         )
 
 
-def _latest_backend_status(run_execution: Any) -> str | None:
-    return _select_backend_status(_backend_statuses_from_run_execution(run_execution))
-
-
 def _latest_backend_status_reason(run_execution: Any) -> str | None:
     return _select_backend_status_reason(
         _backend_status_reasons_from_run_execution(run_execution)
@@ -5774,31 +5795,6 @@ def _backend_authoritative_from_carrier(carrier: Any) -> bool | None:
     return bool(raw) if raw is not None else None
 
 
-def _latest_backend_status_from_sequence(value: Any) -> str | None:
-    if not isinstance(value, (list, tuple)) or not value:
-        return None
-    return _select_backend_status(
-        status
-        for item in value
-        for status in _backend_statuses_from_carrier(item)
-    )
-
-
-def _backend_statuses_from_run_execution(run_execution: Any) -> tuple[str, ...]:
-    sim = getattr(run_execution, "simulator", None)
-    carriers = (
-        run_execution,
-        getattr(run_execution, "trace", None),
-        getattr(sim, "_last_backend_diagnostics", None),
-        getattr(sim, "_last_out_of_domain_diagnostics", None),
-    )
-    return tuple(
-        status
-        for carrier in carriers
-        for status in _backend_statuses_from_carrier(carrier)
-    )
-
-
 def _backend_status_reasons_from_run_execution(run_execution: Any) -> tuple[str, ...]:
     sim = getattr(run_execution, "simulator", None)
     carriers = (
@@ -5812,35 +5808,6 @@ def _backend_status_reasons_from_run_execution(run_execution: Any) -> tuple[str,
         for carrier in carriers
         for reason in _backend_status_reasons_from_carrier(carrier)
     )
-
-
-def _backend_statuses_from_carrier(carrier: Any) -> tuple[str, ...]:
-    if carrier is None:
-        return ()
-    statuses: list[str] = []
-    if isinstance(carrier, MappingABC):
-        raw = carrier.get("backend_status")
-        if raw is not None:
-            statuses.append(str(raw))
-        if _carrier_has_crash_point(carrier):
-            statuses.append("out_of_domain")
-        for key in ("per_hour", "hours"):
-            status = _latest_backend_status_from_sequence(carrier.get(key))
-            if status is not None:
-                statuses.append(status)
-        for key in ("trace", "backend_diagnostics", "diagnostics"):
-            statuses.extend(_backend_statuses_from_carrier(carrier.get(key)))
-        return tuple(statuses)
-    raw = getattr(carrier, "backend_status", None)
-    if raw is not None:
-        statuses.append(str(raw))
-    for attr in ("per_hour", "hours"):
-        status = _latest_backend_status_from_sequence(getattr(carrier, attr, None))
-        if status is not None:
-            statuses.append(status)
-    for attr in ("trace", "backend_diagnostics", "diagnostics"):
-        statuses.extend(_backend_statuses_from_carrier(getattr(carrier, attr, None)))
-    return tuple(statuses)
 
 
 def _backend_status_reasons_from_carrier(carrier: Any) -> tuple[str, ...]:
@@ -5874,21 +5841,6 @@ def _backend_status_reasons_from_carrier(carrier: Any) -> tuple[str, ...]:
     return tuple(reasons)
 
 
-def _carrier_has_crash_point(carrier: Mapping[Any, Any]) -> bool:
-    return any(
-        isinstance(carrier.get(key), MappingABC) and bool(carrier.get(key))
-        for key in ("out_of_domain_crash_point", "crash_point")
-    )
-
-
-def _select_backend_status(statuses: Iterable[str]) -> str | None:
-    values = tuple(str(status) for status in statuses if status is not None)
-    for status in ("out_of_domain", "unavailable", "not_converged"):
-        if status in values:
-            return status
-    if values:
-        return values[-1]
-    return None
 
 
 def _select_backend_status_reason(reasons: Iterable[str]) -> str | None:

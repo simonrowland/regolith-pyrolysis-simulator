@@ -39,6 +39,7 @@ from simulator.fidelity_vocabulary import (
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.optimize.evaluate import (
+    _crash_point_from_diagnostics,
     BackendUnavailableAbort,
     EngineBugAbort,
     EvaluationAbort,
@@ -4706,3 +4707,102 @@ def test_run_reference_unknown_backend_status_fails_closed() -> None:
             status="failed",
             trace={"backend_status": "opaque-status"},
         )
+def test_empty_production_named_crash_point_does_not_prune_the_recipe() -> None:
+    """The production field name, through the real evaluator path.
+
+    The sibling test above covers the "crash_point" ALIAS. This one covers
+    "out_of_domain_crash_point", which is the name every producer actually
+    writes (diagnostic_helpers/alphamelts_volatility.py,
+    melt_backend/alphamelts.py, engines/alphamelts/provider.py) and the name
+    the direct predicate keys on first.
+
+    Before the fix this returned feasible=False with
+    failure_category=OUT_OF_DOMAIN while backend_status stayed "ok" -- a
+    permanent prune of the candidate, justified by a mapping containing
+    nothing. An empty placeholder is not evidence of a domain excursion.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": {},
+                },
+            )
+        ),
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "ok"
+    assert "melts_domain_out_of_domain" not in result.notes
+
+
+def test_populated_crash_point_still_marks_the_recipe_out_of_domain() -> None:
+    """The other direction, so the fix cannot pass by disabling the signal.
+
+    Without this, a change that made the predicate always return None would
+    satisfy the test above and silently stop reporting REAL domain excursions.
+    A guard that only checks the permissive direction is half a guard.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": {
+                        "temperature_C": 1400.0,
+                        "pressure_bar": 0.01,
+                        "fO2_log": -9.0,
+                        "composition_mol": {"SiO2": 1.0},
+                    },
+                },
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is not None
+
+
+def test_empty_placeholder_does_not_mask_a_populated_alias() -> None:
+    """The one deliberate behaviour change in the P1-a fix, pinned where it shows.
+
+    The old extractor fell back from the canonical key to the alias only when
+    the canonical key was literally ABSENT. So a carrier holding an empty
+    canonical key beside a populated alias returned the EMPTY one -- a
+    placeholder masking a real excursion recorded one key over. Skipping
+    empties at each key fixes that.
+
+    ★ THIS IS A UNIT ASSERTION ON PURPOSE, and the reason is worth stating.
+    A first draft tested it through evaluate() and asserted feasible is False.
+    That test PASSED BOTH BEFORE AND AFTER the fix, because both versions
+    prune -- the old one on the empty placeholder, the new one on the real
+    alias evidence. Same verdict, different reason, so the integration path
+    cannot see the change at all. A test that cannot fail against the defect
+    it names is decorative, so it asserts on the extractor, which is where the
+    two versions actually differ:
+
+        old -> {}                                  (the empty canonical key)
+        new -> {"temperature_C": ..., ...}         (the populated alias)
+    """
+    populated = {"temperature_C": 1400.0, "pressure_bar": 0.01}
+    masked_carrier = {
+        "out_of_domain_crash_point": {},
+        "crash_point": populated,
+    }
+
+    extracted = _crash_point_from_diagnostics(masked_carrier)
+
+    assert extracted is not None
+    assert extracted.get("temperature_C") == 1400.0
+    assert extracted != {}
