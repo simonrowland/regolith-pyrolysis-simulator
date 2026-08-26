@@ -1091,3 +1091,53 @@ def test_typed_failure_does_not_overrule_a_recorded_unavailable(monkeypatch):
     assert execution.failure_exception is ood
     assert execution.backend_status == "unavailable"
     assert execution.backend_status != "out_of_domain"
+
+
+def test_unclassifiable_exception_does_not_mint_engine_absence(monkeypatch):
+    """Failing to CLASSIFY an exception must not be reported as a missing engine.
+
+    `_backend_status_from_honest_exception` stringifies the exception to
+    classify it. An exception whose `__str__` itself raises therefore breaks the
+    classifier -- and if that call sits inside the degraded envelope's
+    `_safe_str(..., "unavailable")` boundary, the failure is swallowed and the
+    run reports the FACTUAL token `unavailable` with no absence evidence behind
+    it. The optimizer then raises BackendUnavailableAbort, cancels the batch and
+    leaves the candidate for retry, when the real event was an unclassified
+    programming failure that should stay loud.
+
+    ★ NOTE THE EXCEPTION TYPE. The sibling
+    test_run_executor_failure_envelope_uses_safe_exception_text raises
+    RuntimeError, which the ThermoEngine membership helpers catch themselves --
+    so it never reaches the classifier and cannot see this path. A non-RuntimeError
+    is required, which is why this test exists separately rather than as another
+    case of that one.
+    """
+
+    class _BadStr(Exception):
+        def __str__(self) -> str:
+            raise ValueError("stringifying this exception fails")
+
+    boom = _BadStr()
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise boom
+
+    monkeypatch.setattr("simulator.run_executor.drive_session", fail_drive_session)
+
+    session = type(
+        "HealthyHistorySession",
+        (),
+        {
+            "simulator": SimpleNamespace(
+                _backend_status_history=("ok",),
+                _last_backend_status="ok",
+            )
+        },
+    )()
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    # the run failed, and says so
+    assert execution.status == "failed"
+    # ...but the engine was never absent, and must not be reported as such
+    assert execution.backend_status != "unavailable"

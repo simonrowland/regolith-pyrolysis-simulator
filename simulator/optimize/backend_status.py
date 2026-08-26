@@ -137,8 +137,27 @@ def backend_statuses_from_carrier(carrier: Any) -> tuple[str, ...]:
         raw = carrier.get("backend_status")
         if raw is not None:
             statuses.append(str(raw))
-        if carrier_has_crash_point(carrier):
-            statuses.append("out_of_domain")
+        # NOTE: crash-point content is deliberately NOT synthesised into a
+        # status here. It used to be, and that made the status walker answer a
+        # question it is not entitled to answer.
+        #
+        # The optimizer gates crash evidence on "did the engine actually
+        # answer?" -- but it asked that of _latest_backend_status(), which was
+        # itself appending `out_of_domain` whenever a crash point existed. So
+        # the gate was handed an answer already manufactured from the evidence
+        # it was supposed to be judging, and its first clause
+        # (`status == "out_of_domain" -> True`) fired before the gate ran. It
+        # was dead code on every crash-bearing carrier: `refused` became
+        # OUT_OF_DOMAIN instead of PHYSICS_REFUSED, `not_converged` instead of
+        # TIMEOUT, `not_attempted` instead of its bug-abort, and a status of
+        # None became a physics verdict the commit had explicitly forbidden.
+        # Only `unavailable` survived, and only because it OUTRANKS the
+        # synthesised token -- not because the gate worked.
+        #
+        # This walker now reports what the ENGINE SAID. Whether crash evidence
+        # amounts to an out-of-domain verdict is decided in exactly one place,
+        # `evaluate._has_out_of_domain_backend_signal`, which reads the crash
+        # point directly and gates it. One question, one answerer.
         for key in ("per_hour", "hours"):
             status = latest_backend_status_from_sequence(carrier.get(key))
             if status is not None:

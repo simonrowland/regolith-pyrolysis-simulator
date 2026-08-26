@@ -216,12 +216,25 @@ _HONEST_NON_OK_BACKEND_STATUSES = frozenset(
         "out_of_domain",
     }
 )
-# Statuses that mean THE ENGINE ACTUALLY ANSWERED. Derived from the grouping
-# above rather than restated, so the two cannot drift apart: `ok` plus every
-# honest non-ok answer. `unavailable` is deliberately absent -- it is the token
-# `_abort_on_non_authoritative_backend_status` treats as engine absence and
-# routes to retry.
-_ENGINE_ANSWERED_BACKEND_STATUSES = frozenset({"ok"}) | _HONEST_NON_OK_BACKEND_STATUSES
+# The only whole-run status that crash evidence may PROMOTE into an
+# out-of-domain verdict.
+#
+# A first version of this was `{"ok"} | _HONEST_NON_OK_BACKEND_STATUSES`, on the
+# reasoning that crash evidence should corroborate any status the engine
+# actually answered with. That is too wide, and a review demonstrated why:
+# `refused` and `not_converged` ARE engine answers, and each already has its own
+# branch below producing PHYSICS_REFUSED and TIMEOUT respectively. Letting a
+# crash point promote them replaces a verdict the engine gave with one it did
+# not, which is the same overreach in the opposite direction.
+#
+# `ok` is the one case where crash evidence adds something: the run reported
+# success while its diagnostics record leaving the declared domain, and that
+# contradiction is exactly what the synthesis is for. Every other status already
+# says what happened, and the branches below say what to do about it.
+#
+# `out_of_domain` is not listed because it never reaches the set -- the first
+# clause returns True for it directly.
+_STATUSES_CRASH_EVIDENCE_MAY_PROMOTE = frozenset({"ok"})
 
 _TYPED_ABSENCE_EXCEPTION_CLASSES = (
     BackendUnavailableError,
@@ -5825,7 +5838,7 @@ def _has_out_of_domain_backend_signal(
     """
     if backend_status == "out_of_domain":
         return True
-    if backend_status not in _ENGINE_ANSWERED_BACKEND_STATUSES:
+    if backend_status not in _STATUSES_CRASH_EVIDENCE_MAY_PROMOTE:
         return False
     diagnostics = _out_of_domain_diagnostics(run_execution)
     return _crash_point_from_diagnostics(diagnostics) is not None

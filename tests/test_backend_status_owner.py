@@ -263,8 +263,25 @@ def test_empty_crash_point_is_not_evidence_of_out_of_domain() -> None:
     for module in (evaluate_module, objective_module):
         assert module._carrier_has_crash_point(placeholder) is False
         assert module._carrier_has_crash_point(populated) is True
+
+    # ★ THE WALKER NO LONGER SYNTHESISES A STATUS FROM CRASH CONTENT, and this
+    # assertion was deliberately changed when that moved. It previously read
+    #     assert "out_of_domain" in _backend_statuses_from_carrier(populated)
+    # which pinned the walker as the thing that turns crash evidence into a
+    # verdict. That is precisely what made the optimizer's gate dead code: the
+    # gate asks "may crash evidence promote this status?" of a status the
+    # walker had ALREADY promoted, so its first clause fired and the gate never
+    # ran. Only `unavailable` escaped, and only because it outranks the
+    # synthesised token.
+    #
+    # The walker now reports what the engine SAID. Whether crash evidence
+    # amounts to an out-of-domain verdict is decided in one gated place. So the
+    # populated carrier must NOT produce a status here -- the predicate above
+    # is what still sees it.
+    for module in (evaluate_module, objective_module):
         assert "out_of_domain" not in module._backend_statuses_from_carrier(placeholder)
-        assert "out_of_domain" in module._backend_statuses_from_carrier(populated)
+        assert "out_of_domain" not in module._backend_statuses_from_carrier(populated)
+        assert module._backend_statuses_from_carrier(populated) == ("ok",)
 
 
 def test_both_optimizer_modules_share_the_owner_objects() -> None:

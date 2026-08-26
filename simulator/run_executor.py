@@ -524,11 +524,34 @@ class RunExecutor:
                 ),
                 "unavailable",
             )
+            # ★ CLASSIFY OUTSIDE THE "unavailable" FALLBACK BOUNDARY.
+            #
+            # A first version of this fix put the classifier call inside the
+            # _safe_str(..., "unavailable") lambda. That looked tidier and was a
+            # new fail-open: _backend_status_from_honest_exception stringifies
+            # the exception to classify it, so an exception whose __str__ itself
+            # raises made the classifier fail, _safe_str swallowed it, and the
+            # run reported the FACTUAL token `unavailable` with no absence
+            # evidence behind it. The optimizer then raises
+            # BackendUnavailableAbort, cancels the batch and leaves the
+            # candidate for retry -- an unclassified programming failure
+            # rewritten as missing tooling.
+            #
+            # `unavailable` must never be the fallback for FAILING TO CLASSIFY.
+            # An unclassifiable exception contributes NO candidate, so the
+            # aggregate stands on the evidence that does exist rather than on a
+            # token invented by the error path.
+            try:
+                honest_exception_status = _backend_status_from_honest_exception(
+                    failure_exc
+                )
+            except Exception:
+                honest_exception_status = None
             backend_status = _safe_str(
                 lambda: _aggregate_backend_status(
                     getattr(sim, "_backend_status_history", ()),
                     latest_backend_status,
-                    exception_status=_backend_status_from_honest_exception(failure_exc),
+                    exception_status=honest_exception_status,
                 ),
                 "unavailable",
             )
