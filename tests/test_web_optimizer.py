@@ -83,7 +83,18 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "mass_kg": 1000.0,
         "additives_kg": {"CaO": 1.5},
         "track": "pyrolysis",
-        "backend_name": "stub",
+        # ★ A REAL BACKEND, because these fixtures STORE FEASIBLE RESULTS.
+        # The result store admits a feasible result only if it could be
+        # certified, and the analytical backend denies authority BY DESIGN
+        # (backend_name_denies_authority('stub') has always been True). These
+        # fixtures previously supplied NO backend_name at all, and the empty
+        # token used to FAIL OPEN and grant authority -- the hole b-175 closed.
+        # So there is no honest provenance for an analytical fixture that
+        # permits the write; a fixture that needs a cached feasible result must
+        # model a backend that could actually be certified.
+        # Tests asserting the analytical badge build their payloads directly and
+        # do not go through here.
+        "backend_name": "alphamelts",
         "runtime_campaign_overrides": {"C0": {"hold_time_h": 1.0}},
     }
     data.update(overrides)
@@ -151,8 +162,19 @@ def _scored(
     trace: Mapping[str, object] | None = None,
     backend_status: str | None = "ok",
     backend_authoritative: bool | None = True,
+    backend_name: str | None = None,
+    evidence_class: str | None = None,
 ) -> ScoredResult:
     result_objectives = objectives or _objectives(oxygen, energy)
+    # Provenance is attached only when authority is actually CLAIMED, and its
+    # values match _base_spec's backend. Copying the conditional from
+    # tests/test_optimizer_study.py; the values follow the scenario, not the
+    # precedent -- an earlier attempt pasted that suite's melts values onto an
+    # analytical spec and the fidelity vocabulary rejected the contradiction
+    # outright.
+    if backend_authoritative is True:
+        backend_name = backend_name or "alphamelts"
+        evidence_class = evidence_class or "melts"
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -178,6 +200,8 @@ def _scored(
             ),
             backend_status=backend_status,
             backend_authoritative=backend_authoritative,
+            backend_name=backend_name,
+            evidence_class=evidence_class,
         ),
         notes=("stored",),
     )
