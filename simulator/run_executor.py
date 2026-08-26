@@ -746,10 +746,28 @@ def _aggregate_backend_status(
 def _backend_status_from_honest_exception(
     exc: BaseException | None,
 ) -> str | None:
-    """Map a typed engine answer to backend_status. None is not a status.
+    """Map a typed engine answer to backend_status. None means UNCLASSIFIABLE.
 
-    Type-driven. ImportError / EngineWorkerUnavailable are absence, not
-    an honest non-ok token, and must not be rewritten here.
+    Type-driven, and it distinguishes three things that are not the same:
+
+      TYPED ABSENCE (ImportError / EngineWorkerUnavailable /
+        BackendUnavailableError) -> "unavailable". The engine was not there,
+        and that IS the honest answer, so it is stated.
+      A TYPED ENGINE ANSWER (timeout, refusal, out-of-domain) -> its own token.
+      ANYTHING ELSE -> None, meaning we could not classify it. None is not a
+        status and must never become one.
+
+    ★ ABSENCE USED TO RETURN None, on the reasoning that absence "is not an
+    honest non-ok token and must not be rewritten here". The first half was
+    right and the conclusion was not: declining to state absence does not leave
+    the field empty, it leaves whatever the run already had -- and for a bare
+    session that is the default `ok`. So a genuine missing library was
+    serialized by the runner as `backend_status="ok"` while the optimizer,
+    inspecting the exception separately, correctly aborted as unavailable. Two
+    surfaces, one run, opposite claims.
+
+    Refusing to relabel absence as `not_converged` or `out_of_domain` is
+    correct. Refusing to name it at all is how the flattering default wins.
     """
     if exc is None:
         return None
@@ -767,7 +785,7 @@ def _backend_status_from_honest_exception(
     if isinstance(
         exc, (ImportError, EngineWorkerUnavailable, BackendUnavailableError)
     ):
-        return None
+        return "unavailable"
     timeout = thermoengine_timeout_cause_from_exception(exc)
     if timeout is not None:
         return STATUS_BY_TIMEOUT_CAUSE[timeout]

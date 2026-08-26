@@ -649,10 +649,19 @@ def test_run_executor_ood_envelope_keeps_honest_exception(monkeypatch):
 
 
 def test_run_executor_importerror_envelope_is_still_absence(monkeypatch):
-    """Genuine missing library through the envelope is still absence.
+    """Genuine missing library through the envelope is REPORTED as absence.
 
-    Invert: map ImportError onto not_converged in the envelope helper
-    and backend_status becomes not_converged.
+    ★ THIS GUARD USED TO PROVE ONLY THE NEGATIVE. It asserted
+        backend_status != "not_converged"
+        backend_status != "out_of_domain"
+    which forbids RELABELLING absence as an honest engine answer -- correct as
+    far as it goes -- but never REQUIRED `unavailable`. So the flattering
+    default `ok` passed a test written to prevent exactly this, and a genuine
+    missing library was serialized by the runner as a healthy engine.
+
+    A guard that proves what a value is NOT, and never what it IS, leaves the
+    default as an unchecked answer. The positive assertion is the one that
+    matters.
     """
     missing = ImportError("No module named 'thermoengine'")
 
@@ -668,6 +677,8 @@ def test_run_executor_importerror_envelope_is_still_absence(monkeypatch):
 
     assert execution.status == "failed"
     assert execution.failure_exception is missing
+    assert execution.backend_status == "unavailable"
+    # kept: absence must still never be relabelled as an honest engine answer
     assert execution.backend_status != "not_converged"
     assert execution.backend_status != "out_of_domain"
 
