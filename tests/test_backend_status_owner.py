@@ -417,3 +417,61 @@ def test_no_call_site_overrides_the_aggregate_after_selecting_it() -> None:
         "a runner call site assigns over the aggregated backend_status; the "
         f"typed failure must be passed INTO the selection instead: {offenders}"
     )
+
+
+def test_the_operator_facing_view_agrees_with_the_engine() -> None:
+    """The web badge must not issue a clean bill on evidence the engine aborts on.
+
+    ★ THE FOURTH CONSUMER, and the one that showed the census was the wrong
+    question. `web/routes._latest_backend_status` was an independent resolver:
+    it returned the FIRST token it found, applied no precedence, and walked a
+    different carrier set -- it never looked at `backend_diagnostics`, which the
+    optimizer's walker does, while it did look at `result_blob`, which the
+    optimizer's does not. Neither set contained the other.
+
+    So one body of evidence produced three answers: the runner aborted the
+    study, the optimizer pruned the candidate, and this view -- which feeds the
+    operator's backend badge AND `certification_allowed` -- reported `ok`.
+
+    Note what that means for the anti-drift guards above: they hunt for
+    RESTATEMENTS of the rule, and this function restated nothing. It ignored
+    the rule. A divergent ANSWER needs no divergent COPY, so "how many places
+    restate this rule" is not the same question as "how many places answer it".
+    That is why this test is behavioural rather than another AST sweep.
+    """
+    web_routes = importlib.import_module("web.routes")
+
+    # ★ EXPLICIT EXPECTATIONS, NOT AGREEMENT WITH A HELPER THIS FIX ADDED.
+    # A first draft compared web's answer against web's OWN new candidate
+    # helper. Against the pre-fix module that test died on AttributeError --
+    # red, but for the wrong reason: it would have passed for anyone who
+    # reverted the behaviour while keeping the helper. The expected values are
+    # written out instead, so the test fails on the DEFECT and not on a missing
+    # symbol.
+    cases = [
+        # the reproduction: the disagreeing token sits where only the owner looks.
+        # Pre-fix this returned 'ok' -- a clean bill on evidence the runner
+        # aborts the study on and the optimizer prunes the candidate on.
+        (
+            {
+                "per_hour": [{"backend_status": "ok"}],
+                "backend_diagnostics": {"backend_status": "unavailable"},
+            },
+            "unavailable",
+        ),
+        # ranking, not order-of-arrival
+        (
+            {"per_hour": [{"backend_status": "unavailable"}, {"backend_status": "ok"}]},
+            "unavailable",
+        ),
+        # a carrier key only the web side knows about must still be ranked
+        (
+            {"result_blob": {"backend_status": "unavailable"}, "backend_status": "ok"},
+            "unavailable",
+        ),
+        # the ordinary healthy case is unchanged
+        ({"per_hour": [{"backend_status": "ok"}]}, "ok"),
+    ]
+
+    for carrier, expected in cases:
+        assert web_routes._latest_backend_status(carrier) == expected, carrier
