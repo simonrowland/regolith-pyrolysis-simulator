@@ -802,14 +802,40 @@ def test_verdict_b_does_not_hard_fail_stripping_induced_low_oxide_sum():
     ("unavailable", "out_of_domain", "not_converged"),
 )
 def test_verdict_b_hard_gate_comes_from_backend_status(backend_status):
+    """The gate blocks on backend status; the Layer-A STATE reports Layer A.
+
+    ★ THIS TEST PREVIOUSLY PINNED A CONFLATION AS CORRECT, and it did so while
+    asserting both halves of the contradiction two lines apart:
+
+        assert verdict.layer_a_state == "out_of_domain"
+        assert verdict.stripped_domain_valid is True
+
+    i.e. the melt's domain is valid AND the Layer-A state is out-of-domain. That
+    is not an internal inconsistency anyone could shrug at, because
+    `layer_a_state` is printed to an operator under the heading "domain status"
+    (simulator/stage0_foulant_report_markdown.py:152-168). A run whose engine was
+    merely ABSENT told a person the melt was out of domain.
+
+    Changing a passing test is the right move here and should not read as
+    loosening one. `hard_gate_failed` is still asserted True for all three
+    statuses -- THE GATE IS UNCHANGED and still blocks. What changed is the
+    label: Layer A is a stripped-silicate composition check, evaluated by a pure
+    function that never consults the backend, so it always has its own answer.
+    Here that answer is `stripped_then_in_domain` -- the NaCl was stripped and
+    the remaining silicate is valid -- and the backend's own state is carried
+    beside it in `backend_status`, where an operator can see both facts without
+    either overwriting the other.
+    """
     cleaned = {
         **_basalt_oxide_kg(999.0),
         "NaCl": 1.0,
     }
     verdict = evaluate_verdict_b(cleaned, backend_status, "alphamelts")
-    assert verdict.layer_a_state == "out_of_domain"
-    assert verdict.offending_species == tuple(sorted(verdict.stripped_oxide_wt_pct))
+    # the Layer-A answer, unaffected by what the backend did
+    assert verdict.layer_a_state == "stripped_then_in_domain"
+    assert verdict.offending_species == ("NaCl",)
     assert verdict.stripped_domain_valid is True
+    # ...and the gate still blocks, on the backend status, exactly as before
     assert verdict.hard_gate_failed is True
     assert verdict.backend_status == backend_status
     if backend_status == "unavailable":

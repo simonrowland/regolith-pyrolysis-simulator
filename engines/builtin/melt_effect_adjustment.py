@@ -1807,7 +1807,36 @@ def evaluate_verdict_b(
     )
     if not stripped_valid and status_reason is None:
         status_reason = reason_value(stripped_reason)
-    if hard_gate_failed or not stripped_valid:
+    # ★ layer_a_state REPORTS THE LAYER-A CHECK, AND NOTHING ELSE.
+    #
+    # It used to be `if hard_gate_failed or not stripped_valid`, so ANY
+    # hard-fail backend status -- `unavailable`, `not_converged`, or the
+    # engine's own `out_of_domain` -- forced `out_of_domain` here even when the
+    # Layer-A gate had passed.
+    #
+    # That is not an internal mislabel. This value is printed to an operator
+    # under the heading "domain status"
+    # (simulator/stage0_foulant_report_markdown.py:152-168), so a run whose
+    # engine was merely ABSENT told a human being THE MELT IS OUT OF DOMAIN --
+    # in the same record that reports stripped_domain_valid=True, contradicting
+    # it one field away.
+    #
+    # Two distinct domains were also being conflated: Layer A is a stripped-
+    # silicate COMPOSITION check, while the backend's `out_of_domain` is about
+    # the ENGINE's own applicability envelope. They can disagree, and when they
+    # do, this field answers the first one.
+    #
+    # A first version of this fix introduced a `not_evaluated` state for the
+    # hard-fail cases. That was also wrong: `gate.validate_with_reason` is a
+    # pure function of the stripped composition and does not consult the
+    # backend, so LAYER A IS ALWAYS EVALUATED. There is no state to invent --
+    # the field simply reports its own check.
+    #
+    # `hard_gate_failed` is untouched and still blocks on all three statuses;
+    # the gate was never the problem. An operator reading in_domain beside
+    # hard_gate_failed=True and backend_status=unavailable is being told exactly
+    # what happened: the melt is fine, the engine was not there.
+    if not stripped_valid:
         layer_a_state = "out_of_domain"
         offending_species = tuple(sorted(stripped.oxide_wt_pct))
     elif stripped.stripped_mass_kg > 0.0:
