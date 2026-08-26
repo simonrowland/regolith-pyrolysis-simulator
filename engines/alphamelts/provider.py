@@ -100,18 +100,6 @@ _DECLARED_ACCOUNT = 'process.cleaned_melt'
 # Note attached to the ControlAudit for every dispatch (checklist 6).
 _DIAGNOSTIC_AUDIT_NOTE = 'diagnostic, not enforced'
 
-# Closed result vocabulary. Unrecognised backend_status raises; it
-# must not collapse to the absence token.
-KERNEL_RESULT_STATUSES = frozenset({
-    'ok',
-    'not_converged',
-    'out_of_domain',
-    'unavailable',
-    'refused',
-    'not_attempted',
-})
-
-
 class AlphaMELTSProvider(ChemistryProvider):
     """Diagnostic-only provider for AlphaMELTS via the kernel.
 
@@ -286,26 +274,16 @@ class AlphaMELTSProvider(ChemistryProvider):
         diagnostics = _with_backend_status_reason(diagnostics)
 
         backend_status = diagnostics.backend_status
-        # Closed kernel vocabulary. An unrecognised backend status
-        # raises — it must not become the absence token, and it must
-        # not silently become refused either. `refused` and
-        # `not_attempted` are first-class members so a typed row-local
-        # refusal cannot collapse to unavailable.
-        extra_warnings: tuple[str, ...] = ()
-        if backend_status not in KERNEL_RESULT_STATUSES:
-            raise RuntimeError(
-                f'unrecognised backend_status {backend_status!r}; '
-                f'kernel accepts {tuple(sorted(KERNEL_RESULT_STATUSES))}'
-            )
-        kernel_status = backend_status
-
+        # IntentResult owns the closed kernel vocabulary. An unrecognised
+        # backend status raises there; it must not become the absence token or
+        # silently become refused.
         return IntentResult(
             intent=request.intent,
-            status=kernel_status,
+            status=backend_status,
             transition=None,  # Diagnostic-only -- checklist item 5.
             control_audit=control_audit,
             diagnostic=diagnostics.as_diagnostic(),
-            warnings=tuple(diagnostics.backend_warnings) + extra_warnings,
+            warnings=tuple(diagnostics.backend_warnings),
         )
 
     # ------------------------------------------------------------------

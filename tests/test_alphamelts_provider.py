@@ -51,7 +51,10 @@ from simulator.chemistry.kernel import (
     IntentRequest,
     ProviderRegistry,
 )
-from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.chemistry.kernel.dto import (
+    IntentResultStatusError,
+    ProviderAccountView,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -1358,13 +1361,18 @@ def test_provider_raises_on_unrecognised_backend_status():
         equilibrium=_build_equilibrium_for_basalt(status='totally_unknown'),
     )
     provider = AlphaMELTSProvider(backend=backend)
-    with pytest.raises(RuntimeError, match='unrecognised backend_status'):
+    # Production projects the adapter's backend_status directly into an
+    # IntentResult. This must fail on the exact unknown token; accepting it or
+    # substituting any correct-but-different legal token would fail this test.
+    with pytest.raises(IntentResultStatusError) as raised:
         provider.dispatch(
             _make_request(
                 ChemistryIntent.SILICATE_EQUILIBRIUM,
                 composition_mol=_basalt_species_mol(),
             )
         )
+    assert raised.value.status == 'totally_unknown'
+    assert raised.value.status != 'unavailable'
 
 
 def test_provider_raises_on_nonfinite_ec_liquid_fraction():

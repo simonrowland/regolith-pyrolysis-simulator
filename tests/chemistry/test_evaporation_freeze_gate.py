@@ -335,9 +335,18 @@ def test_native_fe_error_without_transition_refuses_before_vapor_mutation(
         'native_fe_vapor_mol': 0.25,
         'native_fe_vapor_capacity_mol_hr': 1.0,
     }
+    # `not_converged`, not `error`: the scenario is "engine answered without a
+    # usable result", and `error` is not in the kernel status vocabulary
+    # (INTENT_RESULT_STATUSES) so IntentResult now rejects it at construction.
+    # Behaviour under test is unchanged -- core.py maps split_commit_status
+    # == 'refused' to the refusal event and EVERYTHING ELSE to 'no_commit', so
+    # any legal non-refused token drives the same branch this test asserts.
+    # Deliberately NOT 'refused' (the sibling test at :190 covers that path) and
+    # deliberately NOT 'unavailable', which would mean the engine was absent
+    # rather than dispatched-and-inconclusive.
     sim._dispatch_only = lambda *a, **k: IntentResult(
         intent=ChemistryIntent.NATIVE_FE_SATURATION,
-        status='error',
+        status='not_converged',
         transition=None,
         diagnostic={'reason': 'test_engine_error'},
     )
@@ -358,7 +367,11 @@ def test_native_fe_error_without_transition_refuses_before_vapor_mutation(
     assert diagnostic['native_fe_event_status'] == 'no_commit'
     assert diagnostic['native_fe_event_reason'] == 'test_engine_error'
     partition = diagnostic['native_fe_partition']
-    assert partition['native_fe_split_commit_status'] == 'error'
+    # Echoes whatever non-refusal token the engine returned; see the dispatch
+    # stub above for why that is `not_converged` and not `error`. The BEHAVIOUR
+    # this test guards is unchanged and is pinned by the two asserts above:
+    # native_fe_event_status stays 'no_commit' and no ledger mutation occurs.
+    assert partition['native_fe_split_commit_status'] == 'not_converged'
     assert partition['native_fe_vapor_route_status'] == (
         'suppressed_no_committed_split'
     )

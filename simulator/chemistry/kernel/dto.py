@@ -352,6 +352,32 @@ class IntentRequest:
         object.__setattr__(self, "control_inputs", _freeze_str_any(self.control_inputs))
 
 
+INTENT_RESULT_STATUSES = frozenset(
+    {
+        "ok",
+        "refused",
+        "not_converged",
+        "out_of_domain",
+        "unavailable",
+        "unsupported",
+        "not_attempted",
+        "non_authoritative",
+    }
+)
+
+
+class IntentResultStatusError(ValueError):
+    """An :class:`IntentResult` carried an unrecognised status token."""
+
+    def __init__(self, status: str) -> None:
+        self.status = status
+        self.allowed_statuses = INTENT_RESULT_STATUSES
+        super().__init__(
+            f"unrecognised IntentResult.status {status!r}; expected one of "
+            f"{tuple(sorted(self.allowed_statuses))}"
+        )
+
+
 @dataclass(frozen=True)
 class IntentResult:
     """Provider response to an :class:`IntentRequest`.
@@ -361,9 +387,10 @@ class IntentResult:
     metadata for trace and UI (phases present, liquidus margin, parity
     deltas, ...).  ``status`` follows the planner-level vocabulary:
     ``ok`` / ``refused`` / ``not_converged`` / ``out_of_domain`` /
-    ``unavailable`` / ``unsupported``.  ``refused`` is a policy refusal:
-    dispatch met the provider, but the request violates a physics/regime gate
-    (for example, reductant margin <= 0).
+    ``unavailable`` / ``unsupported`` / ``not_attempted`` /
+    ``non_authoritative``.  ``refused`` is a policy refusal: dispatch met the
+    provider, but the request violates a physics/regime gate (for example,
+    reductant margin <= 0).
     """
 
     intent: ChemistryIntent
@@ -376,6 +403,9 @@ class IntentResult:
     def __post_init__(self) -> None:
         if not isinstance(self.intent, ChemistryIntent):
             raise TypeError("IntentResult.intent must be a ChemistryIntent")
-        object.__setattr__(self, "status", str(self.status))
+        status = str(self.status)
+        if status not in INTENT_RESULT_STATUSES:
+            raise IntentResultStatusError(status)
+        object.__setattr__(self, "status", status)
         object.__setattr__(self, "diagnostic", _freeze_str_any(self.diagnostic))
         object.__setattr__(self, "warnings", tuple(str(w) for w in self.warnings))
