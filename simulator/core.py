@@ -23,8 +23,15 @@ The Oxygen Shuttle extracts metals + O₂ from regolith in six campaigns:
 
 Two condensation trains branch from the crucible:
     Volatiles train (C0/C0b) — sealed by gate valve after devolatilisation
-    Metals train (C2A onward) — linear 8-stage: hot duct → Fe → Cr oxide →
-        SiO → alkali/Mg cyclone → vortex filter → turbine → O₂ accumulator
+    Metals train (C2A onward) — linear 8-stage default from
+        CondensationTrain.create_default(), used by this module's
+        PyrolysisSimulator.__init__ and load_batch:
+        0 Hot Duct (IR) → 1 Fe Condenser → 2 Cr Oxide Harvester →
+        3 SiO Zone → 4 Alkali/Mg Cyclone → 5 Vortex Dust Filter →
+        6 Turbine-Compressor → 7 Turbine Outlet Monitor.
+        Stage 7 of that default train has no target species. The O₂
+        accumulator in the units list is OverheadGas.O2_stored_kg, not
+        a condensation stage of that default train.
 
 Units:
     Temperature     °C
@@ -669,17 +676,30 @@ STAGE0_FOULANT_PHASE2_TEMP_C = 1350.0
 STAGE0_FOULANT_PHASE2_OVERHEAD_BAR = 0.001
 DEFAULT_CARBONACEOUS_MELT_KG_PER_TONNE = 725.0
 
-# Atomic mass of sulfur (g/mol) used by the SulfSat gate when projecting
-# Stage 0 sulfide / sulfate inventories onto a per-million melt-mass
-# concentration. Kept local to avoid importing the periodic-table mass
-# table at module load.
+# Local sulfur atomic mass (g/mol) used as the numerator of the Stage 0
+# S_input_ppm carrier fractions below. This is a five-significant-figure
+# conventional value 32.065. It is not the project's already-loaded
+# NIST/CIAAW-abridged table: ATOMIC_WEIGHTS_G_PER_MOL["S"] is 32.06
+# (simulator.accounting.formulas; pinned by
+# tests/test_physics_ground_truth.py at 32.06 ± 0.01). The previous
+# "kept local to avoid importing the periodic-table mass table at
+# module load" rationale is not a load constraint of this module: this
+# file already imports simulator.accounting, which exports that table.
+# CIAAW's current Ar(S) is the interval [32.059, 32.076] (since 2009);
+# both 32.065 and 32.06 sit inside it.
+#
+# Premise: S_input_ppm is an order-of-magnitude seed for the SulfSat
+# gate; S_frac = M_S / M_carrier.
+# Algebra (this local M_S): SO3=32.065/80.063, SO4=32.065/96.062,
+#   FeS=32.065/87.911, CaS=32.065/72.143, elemental S=1.
+# Units: (g/mol) / (g/mol) = dimensionless mass fraction.
+# Sanity: FeS=0.36474 (~= 0.36); SO3=0.40050 (~= 32/80 = 0.40).
+# Denominators vs ATOMIC_WEIGHTS O=15.999, Fe=55.845, Ca=40.078 plus
+# this local M_S: CaS matches 72.143 exactly; SO3/SO4/FeS sit 0.001
+# g/mol above the derived sums 80.062 / 96.061 / 87.910. The 0.001
+# remainder is unestablished.
+# The fractions dict hardcodes 32.065 rather than reading this name.
 _SULFUR_ATOMIC_MASS_G_PER_MOL = 32.065
-# Sulfur mass fraction of the common sulfate / sulfide carriers Stage 0
-# tracks: SO3 (S/SO3 = 32/80), FeS / oldhamite-style sulfides (S/FeS
-# ~= 0.36, close enough for an order-of-magnitude S_input_ppm). These
-# are blended into a single S_input_ppm estimate; the gate itself
-# normalises composition and is insensitive to small errors in this
-# starting concentration.
 _SULFUR_FRACTION_BY_CARRIER = {
     'SO3': 32.065 / 80.063,
     'SO4': 32.065 / 96.062,

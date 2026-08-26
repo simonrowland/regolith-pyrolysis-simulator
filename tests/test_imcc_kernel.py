@@ -559,6 +559,93 @@ def test_p2_7_total_displacement() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# SC-130 production-sweep regressions (kernel-codex findings 1–3, 8)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.parametrize(
+    "tol",
+    [float("inf"), float("-inf"), float("nan"), 0.0, -1.0],
+)
+def test_sc130_tol_non_positive_or_nonfinite_refused(tol: float) -> None:
+    pack = make_ab_datapack()
+    parent = np.array([0.5, 0.5])
+    with pytest.raises(ValueError, match="tol must be a positive finite"):
+        solve_imcc_sf04(parent, 1000.0, pack, tol=tol)
+
+
+@pytest.mark.parametrize("max_iter", [float("inf"), float("-inf"), float("nan")])
+def test_sc130_max_iter_nonfinite_refused(max_iter: float) -> None:
+    pack = make_ab_datapack()
+    parent = np.array([0.5, 0.5])
+    with pytest.raises(ValueError, match="max_iter must be a finite"):
+        solve_imcc_sf04(parent, 1000.0, pack, max_iter=max_iter)
+
+
+@pytest.mark.parametrize(
+    "window",
+    [
+        (float("nan"), float("nan")),
+        (float("nan"), 2000.0),
+        (1000.0, float("nan")),
+        (float("inf"), float("inf")),
+        (float("-inf"), float("inf")),
+        (float("-inf"), 2000.0),
+        (1000.0, float("inf")),
+    ],
+)
+def test_sc130_nonfinite_domain_window_refused(
+    window: tuple[float, float],
+) -> None:
+    with pytest.raises(ValueError, match="finite Kelvin"):
+        ImccDatapack(
+            reactions=("AB",),
+            nu=np.array([[1.0], [1.0]]),
+            A=np.array([0.0]),
+            B=np.array([0.0]),
+            domains=[window],
+            version="sc130-bad-domain",
+            parent_oxides=("A", "B"),
+        )
+
+
+def test_sc130_domain_window_must_be_a_pair() -> None:
+    with pytest.raises(ValueError, match="must be a \\(T_low, T_high\\) pair"):
+        ImccDatapack(
+            reactions=("AB",),
+            nu=np.array([[1.0], [1.0]]),
+            A=np.array([0.0]),
+            B=np.array([0.0]),
+            domains=[(0.0, 1.0e6, 2.0e6)],  # type: ignore[list-item]
+            version="sc130-bad-domain-shape",
+            parent_oxides=("A", "B"),
+        )
+
+
+def test_sc130_zero_stoichiometry_column_refused() -> None:
+    with pytest.raises(ValueError, match="at least one positive coefficient"):
+        ImccDatapack(
+            reactions=("ghost",),
+            nu=np.array([[0.0]]),
+            A=np.array([-1.0]),
+            B=np.array([0.0]),
+            domains=[(0.0, 1.0e6)],
+            version="sc130-ghost",
+            parent_oxides=("A",),
+        )
+    with pytest.raises(ValueError, match="at least one positive coefficient"):
+        ImccDatapack(
+            reactions=("ghost", "AB"),
+            nu=np.array([[0.0, 1.0], [0.0, 1.0]]),
+            A=np.array([-1.0, 0.0]),
+            B=np.array([0.0, 0.0]),
+            domains=[(0.0, 1.0e6), (0.0, 1.0e6)],
+            version="sc130-ghost-ab",
+            parent_oxides=("A", "B"),
+        )
+
+
+# --------------------------------------------------------------------------- #
 # Rung-3 regression: real workbook compositions that refused with the original
 # ideal-fraction start (31/70 sheet-T melt solves).  Each vector is the 8-oxide
 # wt% feed recorded in docs-private/.../rung3/workings.json, with Fe2O3 already

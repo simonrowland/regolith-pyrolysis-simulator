@@ -12,9 +12,21 @@ Standard MRE Baseline (root branch alternative).
 
     Physics:
     Nernst equation:                                         [NERNST-1]
-        E = E° + (RT / nF) × ln(a_O2^νO2 / a_oxide)
-    Adjusts standard decomposition voltages for actual melt
-    activities, evolved-O₂ backpressure, and temperature.
+        On nernst_voltage(), parent-oxide decomposition is
+            M_c O_y → c M + (y/2) O₂
+            Q = a_M^c · pO2^{y/2} / a_parent
+        Melt activity is single-cation a_MOx, so a_parent = a_MOx^c
+        and
+            ln(Q) = c ln(a_M) + (y/2) ln(pO2) - c ln(a_MOx)
+        with a_M = metal fugacity (bar / 1 bar) only when the
+        Ellingham product phase is gas; condensed products omit
+        the metal term (standard-state a_M = 1). Then
+            E = E°(T) + (RT / nF) ln(Q)
+        The first-power form E = E° + (RT/nF) ln(pO2^{νO2} / a_oxide)
+        is not the equation nernst_voltage() evaluates: it drops the
+        gas-metal fugacity term and the cation exponent on oxide
+        activity. Derivation, units, and sanity cases live on
+        nernst_voltage().
 
     Faraday's law:                                           [FARADAY-1]
         m = (I × t × M) / (n × F)
@@ -22,26 +34,45 @@ Standard MRE Baseline (root branch alternative).
 
     Current efficiency:                                      [CE-1]
         bounded FeO/electronic-loss band with saturating dV response
-    Grounded heuristic: high-FeO melts stay in the 0.30-0.60 CE
-    loss band, low-FeO melts can reach >=0.85, and post-Fe/low
-    electronic-conduction operation approaches but does not exceed 0.995.
+    Uncited heuristic implemented in this module: high-FeO melts
+    stay in the 0.30-0.60 CE band, low-FeO melts can reach >=0.85,
+    and post-Fe/low electronic-conduction operation approaches but
+    does not exceed 0.995. step_hour() diagnostics label the same
+    source as not_certified / uncertified_current_partition; this
+    module cites no external grounding source for the band numbers.
 
     Species selectivity:                                     [SEL-1]
-        At overlapping voltage windows, current partitions
-        between species proportional to their exchange current
-        densities (approximated here by concentration and
-        voltage proximity).
+        Inside step_hour(), a reducible row's weight is
+            w = a * exp(min(max(dV, 0) / (RT/F), 3))
+        with dV = applied_V - E_nernst (positive overvoltage).
+        Larger overvoltage increases weight; that is not voltage
+        proximity. On that same step_hour() path, more than one
+        oxide_to_metal target is not partitioned: the method returns
+        reason_refused=uncertified_multi_oxide_current_partition
+        and applies no Faraday reduction. A ferric_to_ferrous row
+        is not counted as an oxide_to_metal target by that detector.
 
-Standard decomposition voltages at ~1873 K / ~1600 C (per mol O2):
+DECOMP_VOLTAGES fallback anchors (imported; not the live 1873 K ladder):
     NiO:   0.39 V   Na2O:  0.5 V    K2O:    0.5 V
     FeO:   0.75 V   Cr2O3:  0.95 V  MnO:    1.05 V
     Fe2O3: 0.90 V reference only; not a live MRE full-reduction rung
     SiO2:  1.45 V   TiO2:  1.70 V   Al2O3:  1.95 V
     MgO:   2.2 V    CaO:   2.5 V
+nernst_voltage() in this module does not read self.decomp_voltages.
+It calls mre_decomposition_voltage_reference(oxide, temperature_K=T_K).
+Reproduced at 1873.15 K against that helper (rounded): K2O 0.02346 V,
+FeO 0.80434 V, Cr2O3 1.11887 V, MnO 1.25473 V, TiO2 1.57552 V,
+MgO 1.79260 V, Al2O3 1.85732 V, CaO 2.20832 V. The fallback table's
+Al < Mg ordering is reversed on that live ladder.
 
-Source posture: raw-thermo where cited; otherwise legacy/status-marked.
-The MRE ladder is North-Star-optional diagnostic output, not certification
-evidence.
+Source posture: step_hour() copies authority/authoritative/status from
+the reference object into diagnostics. nernst_voltage() and
+get_reduction_sequence() return only a float or (oxide, voltage)
+tuples and discard that status, so an unmarked fallback can appear
+on those two methods (MgO at 1000 K and 3000 K returns 2.2 V with
+no extrapolation-refusal flag). Certification denylist still applies
+to step_hour() diagnostics. The MRE ladder is North-Star-optional
+diagnostic output, not certification evidence.
 """
 
 from __future__ import annotations
@@ -105,10 +136,14 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
 class MREElectrolysisRefusal(RuntimeError):
     """Typed terminal refusal for a classified MRE physics limitation.
 
-    The refusal is terminal for the requested run, but not a simulator fault.
-    ``core.step`` uses ``terminal_refusal`` to restore the whole attempted hour
-    instead of poisoning a simulator that already committed an earlier
-    transition during that hour.
+    Constructed for the classified reasons in
+    ``MRE_TERMINAL_PHYSICS_REFUSAL_REASONS``. ``core.step`` uses
+    ``terminal_refusal`` to restore the attempted hour instead of poisoning
+    a simulator that already committed an earlier transition during that
+    hour. ElectrolysisModel.nernst_voltage() and step_hour() raise
+    ValueError/TypeError for invalid controls on the paths checked in this
+    module (non-finite T/activity/voltage/current, unknown oxide, pO2,
+    fugacity mapping); those paths do not raise this type.
     """
 
     terminal_refusal = True
@@ -121,6 +156,39 @@ class MREElectrolysisRefusal(RuntimeError):
 
 class MRECurrentPartitionRefusal(MREElectrolysisRefusal):
     """Typed terminal refusal for an uncertified MRE current partition."""
+
+
+def _require_finite_real(
+    name: str,
+    value,
+    *,
+    minimum: float | None = None,
+    exclusive_minimum: float | None = None,
+) -> float:
+    """Coerce a real scalar or refuse it as a non-result.
+
+    Booleans, non-numeric values, NaN, and inf are not physical controls.
+    Passing them through arithmetic produced voltages and kWh figures that
+    looked like answers. Zero may be a valid depleted-species or idle-cell
+    input; callers that need a floor pass ``minimum=0``.
+    """
+
+    if isinstance(value, bool) or not is_declared_real_scalar(
+        value,
+        allow_numeric_str=True,
+    ):
+        raise ValueError(f"{name} must be a real scalar")
+    try:
+        result = float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{name} is not numeric") from exc
+    if not math.isfinite(result):
+        raise ValueError(f"{name} must be finite")
+    if minimum is not None and result < minimum:
+        raise ValueError(f"{name} must be >= {minimum}")
+    if exclusive_minimum is not None and result <= exclusive_minimum:
+        raise ValueError(f"{name} must be > {exclusive_minimum}")
+    return result
 
 
 def min_decomposition_voltage(*, temperature_K: float | None = None) -> float:
@@ -251,13 +319,27 @@ def mre_selectivity_weight(
     overvoltage_V: float,
     temperature_K: float,
 ) -> float:
-    """Return the dimensionless SEL-1 current-partition weight."""
+    """Return the dimensionless SEL-1 current-partition weight.
+
+    Weight increases with positive overvoltage, not with proximity to
+    threshold. Non-finite T/activity/overvoltage, T_K <= 0, or negative
+    activity raise rather than returning 0 or NaN as a fake weight.
+    """
 
     # Premise: one electron crossing dV gains F*dV J/mol; thermal energy is
     # R*T J/mol. Algebra: exponent=F*dV/(R*T)=dV/(R*T/F). Unit check:
-    # (C/mol*J/C)/(J/mol/K*K)=1. Sanity: dV=0 gives no voltage multiplier;
-    # the existing cap still prevents runaway dominance far above threshold.
-    thermal_voltage_V = GAS_CONSTANT * float(temperature_K) / FARADAY
+    # (C/mol*J/C)/(J/mol/K*K)=1. Sanity: dV=0 gives no voltage multiplier
+    # (weight=activity); at 1873.15 K, dV=0.1 V → weight≈1.858 and
+    # dV=0.5 V hits the exp(3) cap → 20.086, a 10.8× increase away from
+    # the threshold, not toward it.
+    activity = _require_finite_real("activity", activity, minimum=0.0)
+    overvoltage_V = _require_finite_real("overvoltage_V", overvoltage_V)
+    temperature_K = _require_finite_real(
+        "temperature_K",
+        temperature_K,
+        exclusive_minimum=0.0,
+    )
+    thermal_voltage_V = GAS_CONSTANT * temperature_K / FARADAY
     if not math.isfinite(thermal_voltage_V) or thermal_voltage_V <= 0.0:
         return 0.0
     exponent = min(
@@ -419,25 +501,42 @@ class ElectrolysisModel:
         """
         Nernst-adjusted decomposition voltage.
 
-        E = E° + (RT / nF) × ln(a_O2^νO2 / a_oxide)        [NERNST-1]
+        Premise: parent-oxide half-reaction M_c O_y → c M + (y/2) O₂
+        on standard-state ratios, with melt activity reported per
+        single-cation MOx so a_parent = a_MOx^c. Algebra:
+            ln(Q) = c ln(a_M) + (y/2) ln(pO2) - c ln(a_MOx)
+            E = E°(T) + (RT / nF) ln(Q)
+        a_M is metal fugacity only when the Ellingham product phase is
+        gas; condensed products drop that term. Units: every
+        activity/fugacity is relative to its 1-bar or Raoultian
+        standard state, so ln(Q) is dimensionless and (RT/nF) ln(Q)
+        is volts. Sanity on this function at 1600 °C, unit oxide
+        activity, 1 bar O₂: Mg (gas) fugacity 1 → 0.01 bar shifts E
+        by −0.37167 V; Al2O3 (c=2) activity 1 → 0.01 raises E by
+        0.24778 V, twice the first-power (c=1, n=6) shift of
+        0.12389 V. Depleted activity (lower a_MOx) raises E; lower
+        pO2 lowers E for O₂-producing reactions.
 
-        Lower oxide activity (depleted species) → higher voltage
-        needed for reduction. Lower evolved-O2 activity lowers the
-        decomposition threshold for reactions producing O2.
+        This method returns a float. It does not propagate the
+        reference object's authoritative/status fields; those stay on
+        the reference object and on step_hour() diagnostics.
 
         Args:
-            oxide:    Oxide species key (e.g., 'SiO2')
-            T_C:      Temperature (°C)
-            activity: Oxide activity in the melt (0-1)
+            oxide:    Oxide species key in ELECTRONS_PER_OXIDE
+            T_C:      Temperature (°C), finite and above absolute zero
+            activity: Single-cation oxide activity, finite and >= 0
             pO2_bar:  Evolved-O2 activity, referenced to 1 bar
             metal_fugacity_bar: Gas-product fugacity relative to 1 bar;
                 omitted values use the 1-bar standard state
-
-        Returns:
-            Adjusted decomposition voltage (V)
         """
-        n = ELECTRONS_PER_OXIDE.get(oxide, 2)
+        if oxide not in ELECTRONS_PER_OXIDE:
+            raise ValueError(f"unknown MRE oxide: {oxide}")
+        T_C = _require_finite_real("T_C", T_C)
         T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
+        if T_K <= 0.0:
+            raise ValueError("T_C must be above absolute zero")
+        activity = _require_finite_real("activity", activity, minimum=0.0)
+        n = ELECTRONS_PER_OXIDE[oxide]
         reference = mre_decomposition_voltage_reference(oxide, temperature_K=T_K)
         E0 = 2.5 if reference is None else reference.voltage
 
@@ -463,7 +562,16 @@ class ElectrolysisModel:
     def ferric_to_ferrous_voltage(self, T_C: float, activity: float,
                                   pO2_bar: float = 1.0,
                                   feo_activity: float = 1.0) -> float:
-        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
+        T_C = _require_finite_real("T_C", T_C)
+        T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
+        if T_K <= 0.0:
+            raise ValueError("T_C must be above absolute zero")
+        activity = _require_finite_real("activity", activity, minimum=0.0)
+        feo_activity = _require_finite_real(
+            "feo_activity",
+            feo_activity,
+            minimum=0.0,
+        )
         # Fe2O3 -> 2 FeO + 0.5 O2: Q=a_FeO^2*pO2^0.5/a_Fe2O3.
         # Both ferric and ferrous melt activities use a single-cation basis,
         # so a_Fe2O3=(a_FeO1.5)^2. All log arguments are dimensionless;
@@ -488,15 +596,20 @@ class ElectrolysisModel:
         """
         Simulate one hour of electrolysis.
 
-        For each oxide species whose Nernst voltage is below the
-        applied voltage, calculate the fraction of current going
-        to that species and apply Faraday's law.
+        Inside this method, each oxide whose Nernst voltage is below
+        the applied voltage is collected as a reducible row. If more
+        than one oxide_to_metal target is in that set, the method
+        returns reason_refused=uncertified_multi_oxide_current_partition,
+        bills V×I/1000 kWh, and applies no Faraday reduction. A single
+        oxide_to_metal target (optionally plus a ferric_to_ferrous row,
+        which the detector does not count) is weighted by SEL-1 and
+        reduced by Faraday's law.
 
         Args:
             melt_state: Current melt composition
-            voltage_V:  Applied cell voltage (V)
-            current_A:  Total cell current (A)
-            T_C:        Cell temperature (°C)
+            voltage_V:  Applied cell voltage (V), finite
+            current_A:  Total cell current (A), finite and >= 0
+            T_C:        Cell temperature (°C), finite, above absolute zero
 
         Returns:
             Dict with keys:
@@ -505,6 +618,11 @@ class ElectrolysisModel:
                 O2_produced_kg:     float
                 energy_kWh:         float
         """
+        voltage_V = _require_finite_real("voltage_V", voltage_V)
+        current_A = _require_finite_real("current_A", current_A, minimum=0.0)
+        T_C = _require_finite_real("T_C", T_C)
+        if T_C + CELSIUS_TO_KELVIN_OFFSET <= 0.0:
+            raise ValueError("T_C must be above absolute zero")
         comp = melt_state.composition_wt_pct()
         gas_product_fugacity_bar = coerce_gas_product_fugacity_bar(
             gas_product_fugacity_bar
@@ -705,7 +823,8 @@ class ElectrolysisModel:
             return result
 
         # Partition current among reducible species            [SEL-1]
-        # Weight by: concentration × exp(overvoltage)
+        # Weight = activity × exp(positive overvoltage / (RT/F)),
+        # capped at exp(3). Larger dV increases weight.
         weights = {}
         billable_current_A = 0.0
         any_capped = False
@@ -826,9 +945,16 @@ class ElectrolysisModel:
         """
         Return oxide species in order of increasing Nernst voltage.
 
-        Useful for showing the operator what will reduce first
-        at the current melt composition and temperature.
+        This method returns unmarked (oxide, voltage) tuples; it does
+        not surface the reference object's authoritative/status fields.
+        The order is the Nernst ranking at the supplied composition and
+        T. It is not a promise that step_hour() will partition or
+        execute that sequence: overlapping oxide_to_metal targets are
+        refused there.
         """
+        T_C = _require_finite_real("T_C", T_C)
+        if T_C + CELSIUS_TO_KELVIN_OFFSET <= 0.0:
+            raise ValueError("T_C must be above absolute zero")
         melt_account_mol = melt_account_mol_from_kg(melt_state.composition_kg)
         gas_product_fugacity_bar = coerce_gas_product_fugacity_bar(
             gas_product_fugacity_bar
@@ -861,10 +987,27 @@ class ElectrolysisModel:
         """
         Estimate total electrical energy to process to a target voltage.
 
-        Rough estimate by summing Faraday energy for all species
-        below the target voltage, divided by estimated efficiency.
+        Inside this method the inclusion test is the temperature-
+        dependent reference E0 from mre_decomposition_voltage_reference,
+        not this module's Nernst voltage at live melt activity. Species
+        with E0 above max_voltage_V are skipped. Energy for each
+        included species is
+            V_avg * n * F * moles / (eta * 1000 * 3600) kWh
+        with eta fixed at 0.5 (not current_efficiency()) and
+        V_avg = (E0 + max_voltage_V) / 2. Premise: electrical work
+        W = qV with q = n F moles. Algebra: W_J = V n F n_mol;
+        W_kWh = W_J / (1000 * 3600); divide by eta. Units:
+        V * (electrons/formula) * (C/mol-e) * mol = J. Sanity: 1 kg FeO
+        (n=2) at 1600 °C with max_voltage_V=0.85 V returns 1.234 kWh
+        for both a pure-FeO melt (Nernst 0.804 V, below target) and
+        FeO diluted in 99 kg SiO2 (Nernst 1.190 V, above target),
+        because live Nernst and the CE model are not consulted.
         """
+        max_voltage_V = _require_finite_real("max_voltage_V", max_voltage_V)
+        T_C = _require_finite_real("T_C", T_C)
         T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
+        if T_K <= 0.0:
+            raise ValueError("T_C must be above absolute zero")
         total_energy = 0.0
 
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:

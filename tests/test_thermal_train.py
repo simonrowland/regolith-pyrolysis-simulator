@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import ast
+import json
+import math
 from pathlib import Path
 
 import pytest
@@ -31,6 +33,7 @@ from simulator.thermal_train import (
     oxygen_cp_shomate_j_per_mol_k,
     oxygen_saturation_pressure_pa,
     orifice_diameter_for_C,
+    report_from_recorded_series,
     segmented_radiator_area_m2,
     solid_oxygen_cp_j_per_mol_k,
     thermal_train_overflow_kg_hr,
@@ -451,3 +454,83 @@ def test_thermal_train_imports_only_public_latent_accessor_and_no_optimizer() ->
         for module, names in imports
     )
     assert not any("_LATENT_VAPORIZATION_KJ_PER_MOL" in names for _module, names in imports)
+
+
+def _setpoints() -> dict:
+    return yaml.safe_load(Path("data/setpoints.yaml").read_text(encoding="utf-8"))
+
+
+def test_observed_upstream_diagnostics_refuse_nonfinite_and_negative() -> None:
+    setpoints = _setpoints()
+    closed = report_from_recorded_series(
+        [{}],
+        [1.0],
+        [1500.0],
+        setpoints=setpoints,
+        observed_transport_saturation_pct=[12.0, 3.0],
+        observed_o2_vented_kg_hr=[0.25, 0.5],
+    )
+    assert closed["status"] == "closed"
+    assert closed["observed_upstream_state"]["transport_saturation_peak_pct"] == 12.0
+    assert closed["observed_upstream_state"]["O2_vented_peak_kg_hr"] == 0.5
+    json.dumps(closed, allow_nan=False)
+
+    empty = report_from_recorded_series([{}], [1.0], [1500.0], setpoints=setpoints)
+    assert empty["observed_upstream_state"]["transport_saturation_peak_pct"] == 0.0
+    assert empty["observed_upstream_state"]["O2_vented_peak_kg_hr"] == 0.0
+
+    with pytest.raises(ValueError, match="observed_transport_saturation_pct"):
+        report_from_recorded_series(
+            [{}],
+            [1.0],
+            [1500.0],
+            setpoints=setpoints,
+            observed_transport_saturation_pct=[float("nan")],
+        )
+    with pytest.raises(ValueError, match="observed_o2_vented_kg_hr"):
+        report_from_recorded_series(
+            [{}],
+            [1.0],
+            [1500.0],
+            setpoints=setpoints,
+            observed_o2_vented_kg_hr=[float("inf")],
+        )
+    with pytest.raises(ValueError, match="observed_transport_saturation_pct"):
+        report_from_recorded_series(
+            [{}],
+            [1.0],
+            [1500.0],
+            setpoints=setpoints,
+            observed_transport_saturation_pct=[-1.0],
+        )
+
+
+@pytest.mark.parametrize("rate", [float("nan"), float("inf"), -1.0, "bad"])
+def test_invalid_hot_species_rate_returns_incomplete_report(rate) -> None:
+    report = report_from_recorded_series(
+        [{"Na": rate}],
+        [0.0],
+        [1500.0],
+        setpoints=_setpoints(),
+    )
+    assert report["status"] == "incomplete"
+    assert report["train_closes_for_run"] is False
+    excluded = report["excluded_species"]["Na"]
+    assert excluded["heat_load_status"] == "unavailable_invalid_entry_rate"
+    assert excluded["peak_kg_hr"] is None
+    assert math.isfinite(report["peaks"]["hot_total_vapor_kg_hr"])
+    json.dumps(report, allow_nan=False)
+
+
+def test_unknown_species_with_finite_rate_still_projects_recorded_peak() -> None:
+    report = report_from_recorded_series(
+        [{"Mystery": 1.5}],
+        [0.0],
+        [1500.0],
+        setpoints=_setpoints(),
+    )
+    assert report["status"] == "incomplete"
+    excluded = report["excluded_species"]["Mystery"]
+    assert excluded["heat_load_status"] == "unavailable_invalid_entry_rate"
+    assert excluded["peak_kg_hr"] == 1.5
+    assert report["peaks"]["hot_species_kg_hr"]["Mystery"] == 1.5

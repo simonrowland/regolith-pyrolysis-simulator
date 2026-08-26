@@ -9,10 +9,12 @@ extrapolated rows as status-bearing / non-authoritative.
 Published formula (HT-PLAN r2 §H2 — authoritative)::
 
     sigma_mu(T)          = S_ex_bound * max(0, T - T_calib_max_K)   [J/mol]
-    sigma_log10P_i(T)   ~= sigma_mu(T) / (ln(10) * R * T)           [dex]
+    sigma_log10P_i(T)    = sigma_mu(T) / (ln(10) * R * T)           [dex]
 
 R = 8.314462618 J mol⁻¹ K⁻¹.  S_ex_bound and T_calib_max_K are versioned
-constants (no per-species knobs).
+constants (no per-species knobs). The log10-P line is exactly the melt-μ
+projection the instrument computes; it is not a residual after subtracting
+a gas-side Gibbs error (this module has no gas-G error term).
 
 -----------------------------------------------------------------------
 Derivation (premise → algebra → unit check → sanity check)
@@ -27,35 +29,51 @@ Premise
     mark (HT1-audit §2.1–2.2; HT-PLAN H2).
 
 Algebra
-    Neglecting excess heat capacity, a first-order bound on the excess
+    Neglecting excess heat capacity, a first-order estimate of the excess
     chemical-potential error for a T-independent-W liquid is
 
-        |δμ_i^{ex}|  ≲  |S_i^{ex}| · max(0, T − T_calib,max)
+        |δμ_i^{ex}|  ≈  |S_i^{ex}| · max(0, T − T_calib,max)
 
-    Versioned surrogate |S^{ex}| → S_ex_bound (init 5 J mol⁻¹ K⁻¹).
-    Ideal-gas projection of μ-error into log10 partial pressure
-    (melt-μ error dominates gas-G error at superliquidus T):
+    Versioned surrogate |S^{ex}| → S_ex_bound = 5 J mol⁻¹ K⁻¹
+    (HT-PLAN r2 §H2 init). That 5 is the lower end of the HT1-audit §2.2
+    silicate excess-mixing scale quoted as 5–15 J mol⁻¹ K⁻¹. It is the
+    slope of σ_μ = S_ex_bound · ΔT, not an upper bound on |S^{ex}|.
+    An inequality-≲ bound on the module's own 5–15 scale would use 15,
+    which would triple σ_μ and σ_log10P at every extrapolated T. The
+    registered slope is the HT-PLAN init of 5.
 
-        δ ln p_i  ≈  δμ_i / (R T)
+    Ideal-gas projection of that melt-μ term into log10 partial pressure:
+
+        δ ln p_i  =  δμ_i / (R T)
         δ log10 p_i = δ ln p_i / ln(10)
                     = δμ_i / (ln(10) · R · T)
+
+    This instrument has no gas-side Gibbs-error input, model, or residual.
+    Setting an omitted gas term to zero cannot establish that melt-μ error
+    dominates gas-G error; that comparison is unestablished here.
 
 Unit check
     [S]·[ΔT] = (J mol⁻¹ K⁻¹)·K = J mol⁻¹  ✓  (energy / mol)
     σ_μ / (R T ln 10): (J/mol) / ((J mol⁻¹ K⁻¹)·K · 1) = dimensionless dex  ✓
 
-Sanity check (worked numbers; pure arithmetic of the two formulas)
-    (1) At T = T_calib_max + 250 K with S_ex_bound = 5 J mol⁻¹ K⁻¹:
+Sanity check (live envelope points for MELTS-v1.0: T_calib=1700 K, S=5)
+    ln(10) = 2.302585092994046… ; R = 8.314462618 J mol⁻¹ K⁻¹
+    (1) T = 1950 K = T_calib + 250 K:
             σ_μ = 5 · 250 = 1250 J/mol
-    (2) Projection of that 1250 J/mol at T = 2200 K:
-            ln(10) = 2.302585092994046…  (use 2.302585 for hand check)
-            denom  = 2.302585 · 8.314462618 · 2200
-                   = 2.302585 · 18291.8177596
-                   ≈ 42118.47
-            σ_log10P = 1250 / (ln(10) · R · 2200)
-                     = 1250 / (2.302585092994046 · 8.314462618 · 2200)
-                     ≈ 0.029678 ≈ 0.0297 dex
-    Both checks are locked by tests/test_melt_envelope.py.
+            denom = ln(10) · R · 1950 ≈ 37332.28 J/mol
+            σ_log10P = 1250 / denom ≈ 0.033483 dex
+    (2) T = 2200 K = T_calib + 500 K:
+            σ_μ = 5 · 500 = 2500 J/mol
+            denom = ln(10) · R · 2200 ≈ 42118.47 J/mol
+            σ_log10P = 2500 / denom ≈ 0.059356 dex
+    (3) Limiting case T → ∞:
+            σ_log10P → S_ex_bound / (ln(10) · R) ≈ 5 / 19.14476 ≈ 0.26117 dex
+            (asymptote; does not reverse)
+    Detached identity, not a live MELTS-v1.0 point: 1250 J/mol at 2200 K
+    would be σ_log10P ≈ 0.029678 dex, which is the 1950 K numerator over
+    a 2200 K denominator. The live 2200 K instrument uses σ_μ = 2500 J/mol.
+    Live points (1)–(2) and the detached identity are locked by
+    tests/test_melt_envelope.py.
 -----------------------------------------------------------------------
 """
 
@@ -96,10 +114,13 @@ class MeltModelConstants(TypedDict):
 #   build pinned in this repo (per melt_model_id tag).
 #
 # S_ex_bound_J_molK provenance:
-#   HT-PLAN r2 §H2 init = 5 J mol⁻¹ K⁻¹ (lower end of HT1-audit §2.2
-#   silicate excess-mixing scale 5–15 J mol⁻¹ K⁻¹). Surrogate bound only —
-#   not a calorimetry-grounded |S^{ex}| measurement. Replace only with
-#   calorimetry-grounded evidence (HT-PLAN decision point); do not retune W.
+#   HT-PLAN r2 §H2 init = 5 J mol⁻¹ K⁻¹, the lower end of the HT1-audit
+#   §2.2 silicate excess-mixing scale quoted as 5–15 J mol⁻¹ K⁻¹. This is
+#   a versioned surrogate SLOPE for σ_μ = S_ex_bound · ΔT, not an
+#   upper-bound |S^{ex}|. An inequality-≲ envelope on that 5–15 scale
+#   would use 15 J mol⁻¹ K⁻¹ (3× this slope). Not a calorimetry-grounded
+#   |S^{ex}| measurement. Replace only with calorimetry-grounded evidence
+#   (HT-PLAN decision point); do not retune W.
 MELT_ENVELOPE_CONSTANTS: Dict[str, MeltModelConstants] = {
     "MELTS-v1.0": {
         "T_calib_max_K": 1700.0,
@@ -145,7 +166,12 @@ class UnknownMeltModelIdError(KeyError):
 
 
 class MeltEnvelopeValidationError(ValueError):
-    """Persisted H2 envelope is missing, partial, or internally inconsistent."""
+    """H2 envelope input or persisted record failed semantic validation.
+
+    Raised from melt_extrapolation_envelope, melt_extrapolation_diagnostic,
+    and consume_melt_extrapolation_envelope for unparseable T_K and for
+    missing, partial, or internally inconsistent persisted fields.
+    """
 
 
 @dataclass(frozen=True)
@@ -172,6 +198,46 @@ def _lookup_constants(melt_model_id: str) -> MeltModelConstants:
         raise UnknownMeltModelIdError(melt_model_id) from exc
 
 
+def _parse_evaluation_temperature_K(
+    value: Any,
+    field: str = "T_K",
+) -> float:
+    """Coerce an evaluation temperature to float.
+
+    bool is rejected before float() because bool is a subclass of int and
+    float(True) == 1.0 would otherwise be classified as 1 K. Other
+    unparseable values raise MeltEnvelopeValidationError from this helper;
+    finite non-positive and non-finite floats are returned for the caller
+    to classify as out_of_domain.
+    """
+    if isinstance(value, bool):
+        raise MeltEnvelopeValidationError(
+            f"{field} must be a real temperature in kelvin, not a boolean"
+        )
+    try:
+        return float(value)
+    except (TypeError, ValueError) as exc:
+        raise MeltEnvelopeValidationError(
+            f"{field} must be a real temperature in kelvin"
+        ) from exc
+
+
+def _out_of_domain_envelope(
+    melt_model_id: str,
+    t_calib: float,
+    version: str,
+) -> MeltExtrapolationEnvelope:
+    return MeltExtrapolationEnvelope(
+        melt_model_id=melt_model_id,
+        T_calib_max_K=t_calib,
+        melt_model_extrapolation_K=0.0,
+        melt_extrap_sigma_mu_J_mol=0.0,
+        melt_extrap_sigma_log10_P=0.0,
+        melt_extrap_status="out_of_domain",
+        constants_version=version,
+    )
+
+
 def melt_extrapolation_envelope(
     T_K: float,
     melt_model_id: str,
@@ -181,7 +247,9 @@ def melt_extrapolation_envelope(
     Parameters
     ----------
     T_K:
-        Absolute temperature in kelvin.
+        Absolute temperature in kelvin. Must be coercible to float (bool
+        is refused). Finite T_K > 0 K is evaluated; non-finite and
+        non-positive T_K are ``out_of_domain``.
     melt_model_id:
         Key into :data:`MELT_ENVELOPE_CONSTANTS`. Unknown ids raise
         :class:`UnknownMeltModelIdError` (no silent default).
@@ -193,26 +261,22 @@ def melt_extrapolation_envelope(
 
     Notes
     -----
-    status is ``\"in_calibration\"`` when T_K <= T_calib_max_K, else
-    ``\"extrapolated\"``. Non-finite inputs fail closed as ``\"out_of_domain\"``.
-    Both σ fields are exactly 0.0 inside calibration and out of domain.
+    On the path through this function, status is ``\"in_calibration\"``
+    when 0 < T_K <= T_calib_max_K, ``\"extrapolated\"`` when T_K >
+    T_calib_max_K and the σ fields stay finite, and ``\"out_of_domain\"``
+    when T_K is non-finite, T_K <= 0, or the σ arithmetic overflows to
+    inf/nan. Unparseable T_K (non-numeric types, bool) raises
+    :class:`MeltEnvelopeValidationError`. Both σ fields are exactly 0.0
+    inside calibration and out of domain.
     """
     consts: Mapping[str, object] = _lookup_constants(melt_model_id)
     t_calib = float(consts["T_calib_max_K"])
     s_ex = float(consts["S_ex_bound_J_molK"])
     version = str(consts["constants_version"])
 
-    temperature_K = float(T_K)
-    if not math.isfinite(temperature_K):
-        return MeltExtrapolationEnvelope(
-            melt_model_id=melt_model_id,
-            T_calib_max_K=t_calib,
-            melt_model_extrapolation_K=0.0,
-            melt_extrap_sigma_mu_J_mol=0.0,
-            melt_extrap_sigma_log10_P=0.0,
-            melt_extrap_status="out_of_domain",
-            constants_version=version,
-        )
+    temperature_K = _parse_evaluation_temperature_K(T_K)
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        return _out_of_domain_envelope(melt_model_id, t_calib, version)
 
     extrap_k = max(0.0, temperature_K - t_calib)
     sigma_mu = s_ex * extrap_k
@@ -222,10 +286,18 @@ def melt_extrapolation_envelope(
         sigma_log10_p = 0.0
     else:
         status = "extrapolated"
-        # Projection: σ_log10P = σ_μ / (ln(10) · R · T).  T_K is above
-        # T_calib_max (1700 K for MELTS-v1.0), so T_K > 0 is guaranteed for
-        # any registered model; keep the division explicit.
+        # Projection: σ_log10P = σ_μ / (ln(10) · R · T).
+        # This branch has extrap_k > 0, so temperature_K > t_calib.
+        # The gate above already required finite temperature_K > 0, so
+        # ln(10)*R*T is finite and nonzero on this path.
         sigma_log10_p = sigma_mu / (_LN10 * R_J_MOL_K * temperature_K)
+
+    if not (
+        math.isfinite(extrap_k)
+        and math.isfinite(sigma_mu)
+        and math.isfinite(sigma_log10_p)
+    ):
+        return _out_of_domain_envelope(melt_model_id, t_calib, version)
 
     return MeltExtrapolationEnvelope(
         melt_model_id=melt_model_id,
@@ -242,7 +314,13 @@ def melt_extrapolation_diagnostic(
     T_K: float,
     melt_model_id: str,
 ) -> dict[str, Any]:
-    """Build and self-validate the persisted H2 diagnostic projection."""
+    """Build the persisted H2 diagnostic projection and consume it.
+
+    Unparseable T_K raises MeltEnvelopeValidationError from
+    melt_extrapolation_envelope (bool / non-numeric types). Non-finite
+    and non-positive T_K become an out_of_domain envelope, which
+    consume_melt_extrapolation_envelope then accepts.
+    """
 
     envelope = melt_extrapolation_envelope(T_K, melt_model_id)
     diagnostic = asdict(envelope)
@@ -264,7 +342,15 @@ def consume_melt_extrapolation_envelope(
     temperature_K: float | None = None,
     require_instrument_status: bool = True,
 ) -> MeltExtrapolationEnvelope:
-    """Parse and semantically validate every persisted H2 envelope field."""
+    """Parse and semantically validate each persisted H2 envelope field.
+
+    Fields checked are those in MELT_EXTRAPOLATION_ENVELOPE_FIELDS, plus
+    instrument_status when require_instrument_status is true. When
+    temperature_K is supplied, it is parsed by the same T_K helper as
+    melt_extrapolation_envelope; unparseable values raise
+    MeltEnvelopeValidationError on this path (None still means "derive
+    comparison T from the persisted status fields").
+    """
 
     present = {
         field
@@ -328,7 +414,10 @@ def consume_melt_extrapolation_envelope(
         else:
             comparison_temperature_K = numeric["T_calib_max_K"]
     else:
-        comparison_temperature_K = float(temperature_K)
+        comparison_temperature_K = _parse_evaluation_temperature_K(
+            temperature_K,
+            field="temperature_K",
+        )
     expected = melt_extrapolation_envelope(comparison_temperature_K, model_id)
     expected_values = asdict(expected)
     for field in MELT_EXTRAPOLATION_ENVELOPE_FIELDS:

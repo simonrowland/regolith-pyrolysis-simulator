@@ -1378,3 +1378,74 @@ def test_na_composites_base_matches_lh_monatomic_and_pins() -> None:
             assert live == pytest.approx(
                 float(point["pinned_pressure_Pa"]), rel=1.0e-6, abs=0.0
             )
+
+
+def test_nested_scalar_alpha_citation_cannot_bypass_vaporock_denial() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    alpha = payload["families"]["metals_na_family"]["vaporisation_coefficients"][
+        "evaporation_alpha"
+    ]
+    alpha["value"] = {
+        "form": "scalar",
+        "value": 0.5,
+        "citation": "VapoRock fitted alpha",
+    }
+
+    with pytest.raises(
+        CatalogCompileError,
+        match=r"evaporation_alpha\.value\.citation:.*VapoRock",
+    ):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+@pytest.mark.parametrize(
+    "pO2_bar",
+    [math.nan, math.inf, 0.0, -1.0, "bad"],
+)
+def test_degenerate_pO2_evaluate_raises_catalog_compile_error(pO2_bar) -> None:
+    evaluator = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    ).evaluator_for("AlO2")
+
+    with pytest.raises(CatalogCompileError):
+        evaluator.evaluate(1800.0, source_activity=1.0, pO2_bar=pO2_bar)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("activity_exponent", "bad"),
+        ("pO2_exponent", []),
+        ("reference_pressure_Pa", "bad"),
+    ],
+)
+def test_malformed_catalog_numerics_raise_catalog_compile_error(
+    field, value
+) -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    payload["families"]["oxide_vapors_alo2_family"]["physical_properties"][
+        "species"
+    ]["AlO2"]["pressure_models"][0][field] = value
+
+    with pytest.raises(CatalogCompileError, match=field):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+@pytest.mark.parametrize(
+    "anchor_refs",
+    [[None], [""], ["   "], [1], [None, "kems-001"]],
+)
+def test_validated_row_rejects_junk_anchor_refs(anchor_refs) -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    payload["families"]["metals_na_family"]["physical_properties"]["species"][
+        "Na"
+    ]["validation"] = {
+        "status": "validated",
+        "anchor_refs": list(anchor_refs),
+    }
+
+    with pytest.raises(
+        CatalogCompileError,
+        match=r"validation\.anchor_refs",
+    ):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)

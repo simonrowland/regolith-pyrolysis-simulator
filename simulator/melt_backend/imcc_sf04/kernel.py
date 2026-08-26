@@ -185,10 +185,41 @@ class ImccDatapack:
         # Fractional stoichiometries are allowed; negative coefficients are not.
         if np.any(nu < 0.0):
             raise ValueError("nu must be non-negative")
+        # An all-zero column has no required parents, so the later
+        # ``np.any((nu > 0) & inactive_parent)`` test would mark it active
+        # vacuously and mass action would emit x_j = K_j (empty product = 1).
+        # That is a composition-independent mole fraction, not a complex.
+        # Sanity: one-parent nu=[[0]], log10(K)=-1 previously returned
+        # complex_x=[0.1], D=0.9 with status="converged".
+        if np.any(np.all(nu == 0.0, axis=0)):
+            raise ValueError(
+                "each complex column of nu must contain at least one "
+                "positive coefficient"
+            )
         if not np.all(np.isfinite(A)) or not np.all(np.isfinite(B)):
             raise ValueError("A and B must be finite")
+        domains_out = []
+        for idx, window in enumerate(self.domains):
+            try:
+                low_raw, high_raw = window
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"domains[{idx}] must be a (T_low, T_high) pair"
+                ) from exc
+            low = float(low_raw)
+            high = float(high_raw)
+            # T < nan and T > nan are both False, so a NaN/NaN window was
+            # treated as in-domain and extrapolated stayed False. Same silent
+            # pass for (-inf, inf). Refuse non-finite endpoints here; inverted
+            # finite windows still fail-loud later at the T gate.
+            if not (math.isfinite(low) and math.isfinite(high)):
+                raise ValueError(
+                    f"domains[{idx}] endpoints must be finite Kelvin values, "
+                    f"got ({low_raw!r}, {high_raw!r})"
+                )
+            domains_out.append((low, high))
         object.__setattr__(self, "reactions", tuple(self.reactions))
-        object.__setattr__(self, "domains", tuple(self.domains))
+        object.__setattr__(self, "domains", tuple(domains_out))
         object.__setattr__(self, "parent_oxides", tuple(self.parent_oxides))
         object.__setattr__(self, "nu", nu)
         object.__setattr__(self, "A", A)
@@ -352,9 +383,14 @@ def label_research_datapack(
 ) -> ImccDatapack:
     """Return a non-published raw pack with explicit research provenance.
 
-    This is the supported construction path for research scripts that build
-    ``ImccDatapack`` directly. Published identity and coverage are refused;
-    only ``load_datapack()`` can earn those labels from the frozen manifest.
+    This function refuses ``model_id == IMCC-SF04`` and any coverage
+    value equal to ``A-published-imcc``. It does not hash arrays or read a
+    manifest. Published labels are attached by ``_label_loaded_datapack``
+    when the caller supplies ``published_manifest_sha256`` equal to
+    ``_PUBLISHED_DATAPACK_SHA256`` and the species/coverage/shape checks
+    in ``_datapack_with_identity`` pass; adapter ``load_datapack()`` hashes
+    the JSON manifest before calling that helper. Tests in this repository
+    also import the private helper directly.
     """
     coverage_values = (
         (coverage,) if isinstance(coverage, str) else tuple(coverage.values())
@@ -377,7 +413,18 @@ def _label_loaded_datapack(
     coverage: Mapping[str, str],
     published_manifest_sha256: str | None = None,
 ) -> ImccDatapack:
-    """Attach loader-proven identity after adapter manifest validation."""
+    """Attach caller-supplied identity to an in-memory datapack.
+
+    When the caller claims published IMCC identity or coverage,
+    ``_datapack_with_identity`` checks that the supplied
+    ``published_manifest_sha256`` string equals ``_PUBLISHED_DATAPACK_SHA256``
+    and that species, coverage, and shape constraints match. This helper
+    does not hash the in-memory ``nu``/``A``/``B`` arrays or re-read a
+    manifest file; a matching digest string is sufficient to pass the
+    published-identity gate on the paths in this function. Adapter
+    ``load_datapack()`` hashes the JSON manifest and then calls this
+    helper.
+    """
     return _datapack_with_identity(
         datapack,
         model_id=model_id,
@@ -527,14 +574,21 @@ def _solve_active(
     Solver robustness
     -----------------
     The ideal-fraction start ``x_i* = x_i`` (i.e. ``y = ln x``) is the correct
-    solution in the no-complexing limit (K -> 0).  For strongly associated
-    melts, however, the trust-region solver can be attracted to a flat residual
-    basin where one or more unbound fractions are driven toward the log-space
-    lower bound; the solver then terminates on ftol/xtol while the parent-
-    balance residual remains orders of magnitude above the requested tolerance.
-    The rung-3 workbook regression (31/70 melt solves refusing) showed exactly
-    this pattern: residual floors of 3e-3 to 1.4e-1 with final y values parked
-    near the bound.
+    solution in the no-complexing limit (K -> 0).  Direct-start stalls on this
+    path are diagnosed from the retained fields: final ``y``, residual norms,
+    displacement, SciPy ``nfev``, and SciPy's termination message.  Those
+    fields do not measure residual-surface flatness, do not retain the
+    Jacobian or gradient, and do not distinguish an active bound from a
+    basin.  The same residual-above-tol + y-near-bound + xtol pattern also
+    occurs when the physical root lies outside the imposed ``[-200, 100]``
+    box.  Sanity case established here: one-parent ``nu=0.5``,
+    ``log10(K)=50`` has asymptotic root ``y = -2 ln(K) ≈ -230.26``, below
+    the lower bound; the solver parked at ``y ≈ -200`` with SciPy xtol,
+    ``residual_inf ≈ 3.72e6``, 200 evaluations, and ``|J| ≈ 1.86e6`` at
+    that point (not a flat residual).  The rung-3 workbook regression
+    (31/70 melt solves refusing) showed residual floors of 3e-3 to 1.4e-1
+    with final y values parked near the bound; that pattern alone does not
+    identify the cause.
 
     If the direct solve stalls, association-strength continuation supplies a
     physically connected start.  Multiplying every equilibrium constant by
@@ -749,9 +803,20 @@ def solve_imcc_sf04(
         ``ImccFerricInputUnsupportedError``; other positive components trigger
         ``ImccComponentOutsideDomainError``.
     tol:
-        Infinity-norm residual convergence tolerance.
+        Positive finite infinity-norm residual convergence tolerance. SciPy
+        ``least_squares`` receives this value as ``ftol``, ``xtol``, and
+        ``gtol``. Non-finite or non-positive ``tol`` is refused before the
+        solve: ``residual_inf <= inf`` is true for every finite residual, so
+        ``tol=inf`` previously labelled an unmoved initial guess as
+        ``status="converged"``.
     max_iter:
-        Newton iteration ceiling.
+        Positive scale used inside ``_solve_active`` to build the SciPy
+        ``max_nfev`` budget as ``max(10, max_iter * (n_active + 1))``. The
+        solver is trust-region reflective least-squares, not Newton. The
+        returned ``ImccConvergence.iterations`` field is SciPy ``nfev``,
+        not a Newton step count. Because of the floor of ten,
+        ``max_iter=1`` does not impose a one-evaluation ceiling on the
+        paths in ``_solve_active``.
 
     Returns
     -------
@@ -770,7 +835,12 @@ def solve_imcc_sf04(
     ImccComponentOutsideDomainError
         Unexpected components in ``extra_mol`` or parent vector length mismatch.
     ImccNonconvergenceError
-        Newton iteration failed to converge.
+        Parent-balance residual did not meet ``tol`` inside the function-
+        evaluation budget, the solve produced non-finite residuals, or
+        ``max_iter <= 0`` so the solve did not run.
+    ValueError
+        ``tol`` is not a positive finite number, or ``max_iter`` is not
+        finite.
     """
     # --- Input validation ----------------------------------------------------
     parent_mol = np.asarray(parent_mol, dtype=float)
@@ -841,20 +911,46 @@ def solve_imcc_sf04(
                 f"component {species} is outside the IMCC-SF04 parent basis"
             )
 
-    # --- Normalized analytical parent fractions ------------------------------
+    if not math.isfinite(float(tol)) or float(tol) <= 0.0:
+        raise ValueError(
+            f"tol must be a positive finite residual tolerance, got {tol!r}"
+        )
+    try:
+        max_iter_f = float(max_iter)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f"max_iter must be a finite number, got {max_iter!r}"
+        ) from exc
+    if not math.isfinite(max_iter_f):
+        raise ValueError(
+            f"max_iter must be a finite number, got {max_iter!r}"
+        )
+
+    # --- Analytical parent fractions on the declared basis -------------------
+    # x_i = parent_mol_i / basis. This equals n_i / sum_k n_k only when
+    # basis is exactly the parent-mol sum. The acceptance slack at
+    # |sum(parent_mol) - basis| <= 1e-6 * basis is not renormalized, so
+    # accepted x need not sum to 1. Unit check: moles / moles, dimensionless.
+    # Sanity: parent_mol=[0.50000025, 0.50000025], basis=1.0 is inside the
+    # slack (5e-7 < 1e-6) and yields sum(x)=1.0000005.
     x = parent_mol / basis
 
     # --- Active parent/complex subset ----------------------------------------
     # A parent with zero analytical moles cannot supply a complex.
     active_parent = x > 0.0
-    # A complex is active only if all of its required parents are active.
+    # A complex is inactive on this path if any parent with nu_ij > 0 is
+    # inactive. ImccDatapack refuses all-zero columns, so every complex has
+    # at least one required parent; a missing required parent inactivates
+    # the complex. Parents with nu_ij == 0 are not required.
     inactive_complex = np.any(
         (datapack.nu > 0.0) & (~active_parent[:, None]), axis=0
     )
     active_complex = ~inactive_complex
 
     # Temperature-domain check (per-row, fail-loud default). Only active
-    # (consumed) complexes need their declared T domains honored.
+    # complexes (those that consume at least one present parent) have their
+    # declared T domains honored on this path. Domain endpoints are finite
+    # by ImccDatapack construction.
     extrapolated = False
     active_indices = np.flatnonzero(active_complex)
     for idx in active_indices:
@@ -895,10 +991,22 @@ def solve_imcc_sf04(
     # Activity = unbound parent mole fraction on the total-species basis.
     parent_activity = parent_x_star.copy()
 
-    # gamma_i = x_i* / x_i. The two denominators are DIFFERENT: x_i* is on the
-    # 46-species total basis, while x_i is the analytical 8-oxide basis.
-    # Complex formation shrinks the total-species denominator, so gamma_i can
-    # exceed 1 for a weakly complexed parent in a heavily complexed melt.
+    # gamma_i = x_i* / x_i. Different bases: x_i* is unbound parent on the
+    # total-species (N_total) basis; x_i is analytical parent on the
+    # declared-basis vector above (n_i / basis).
+    #
+    # From (2): D = 1 + sum_j (S_j - 1) x_j, and sum_i n_i = N_total * D
+    # when x is n / sum(n). Then D = n_analytical / N_total.
+    # Unit check: S_j and x_j are dimensionless, so D is dimensionless.
+    # Sign of (D - 1) follows (S_j - 1) for each contributing complex:
+    #   S_j > 1 (association, e.g. B2): D > 1, N_total shrinks vs n_analytical
+    #   S_j = 1: that complex does not change D
+    #   S_j < 1 (fractional stoichiometry, allowed by this datapack): D < 1,
+    #            N_total grows vs n_analytical
+    # For a parent with nu_ij = 0 for every active j, (3) gives gamma_i = D,
+    # so gamma_i > 1 on that inert-parent path requires D > 1 (net S > 1).
+    # Sanity: B2 (S=2) has gamma_A > 1; one-parent S=0.5, K=1 gives
+    # D ≈ 0.691 < 1 and gamma ≈ 0.382.
     with np.errstate(divide="ignore", invalid="ignore"):
         parent_gamma = np.where(x > 0.0, parent_x_star / x, 0.0)
 

@@ -1,30 +1,47 @@
 """Chemical-potential channel map (t-571 Phase 1).
 
-A channel is one state-specific value of
-``mu_q - mu0_q = R T ln(f_q / f0_q)`` for a named gas species, standard
-state, and reaction plane.  Phase 1 admits the full vocabulary and makes
-``gas.O2.ideal_1bar.v1`` the first runtime citizen: the existing
+A channel identity in this vocabulary is a named gas species, a standard
+state, and a reaction plane.  A :class:`GasChannelPotential` stores those
+fields plus an optional ``state_fingerprint``.  The reduced potential is
+``mu_q - mu0_q = R T ln(f_q / f0_q)``.  Phase 1 admits the full vocabulary
+and makes ``gas.O2.ideal_1bar.v1`` the first runtime citizen: the existing
 ``source_activity`` + ``pO2_bar`` evaluator path becomes the O2 channel
 under this interface with bit-identical pressure evaluation.
+
+Composition in this module matches on ``channel_id`` only.
+:func:`channel_log10_contribution` compares ``potential.channel_id`` to
+``term.input_id``; it does not compare ``term.required_plane`` to
+``potential.reaction_plane``.  :class:`ReactionThermoInputs` ``__post_init__``
+freezes the activity and channel mappings; it does not compare the
+container ``state_fingerprint`` to each potential's fingerprint.
 
 Non-O2 channels (H2, F2, Cl2, Br2, I2, S2, N2) have no runtime owners yet.
 Resolving them yields typed refusals that name both the missing channel and
 the missing melt-side owner (t-568 Rev 3 halide / sulfur coupling).  No new
 carrier admissions are unlocked in this chunk.
 
-Construction owner gate (design §1/§3): ``GasChannelPotential`` cannot be
-constructed directly — every instance is minted by a typed runtime owner
-factory in this module (the O2 legacy adapter, registered as the Phase-1
-owner, or the Phase-1 resolver for refusal-only outcomes).  A bare
-``GasChannelPotential(...)`` call raises :class:`TypeError` (the grant is a
-required keyword-only field — there is no unbound default), and any grant
-that was not minted by this module's factories raises
-:class:`ChannelConstructionError`; free-floating fugacity is closed by
-construction, not by review.  The grant itself is sealed: it can only be
-minted with a module-private token, is bound to one channel, and is
-accepted only if it *is* the registered object for its (channel, owner,
-source-kind, refusal-only) key — a field-perfect look-alike fails the
-identity check.
+Construction owner gate (design §1/§3), as implemented in this module:
+
+- ``GasChannelPotential`` requires keyword-only ``_owner_grant``.  Omitting
+  it raises ``TypeError`` at the dataclass signature (no unbound default).
+- ``_OwnerGrant.__init__`` accepts a call only when ``_mint_token is
+  _GRANT_MINT_TOKEN``.  The token is a module-level ``object()``.  Python
+  name privacy is conventional: ``_mint_grant`` and ``_GRANT_MINT_TOKEN``
+  are ordinary importable module attributes.
+- ``_mint_grant`` registers one grant object per
+  ``(channel_id, owner_id, source_kind, refusal_only)`` key.  It does not
+  consult ``CHANNEL_REGISTRY`` or ``entry.runtime_owner``.
+- ``GasChannelPotential.__post_init__`` accepts a grant when it is the
+  identity-registered object for its key, the grant ``channel_id`` matches
+  the potential, ``source_kind`` matches, and a ``refusal_only`` grant is
+  paired only with ``verdict=REFUSAL``.  A field-perfect look-alike that
+  is not the registered object fails that identity check.
+- ``_grant_for_registered_owner`` refuses a numeric grant when
+  ``entry.runtime_owner is None`` or disagrees with ``owner_id``.
+  ``o2_potential_from_pO2_bar`` uses that path.  A Point potential is
+  therefore proof of construction through a registered grant object for
+  that key, not proof that the key's owner is the registry-declared
+  runtime owner.
 
 Ownership invariants (design §3) — hard boundaries:
 
@@ -217,8 +234,10 @@ class CompiledReactionTerm:
 
     Derivation (design §6; project rule: algebra + units in comments)
     ----------------------------------------------------------------
-    Premise: signed stoichiometric coefficients ``nu_i`` (negative reactants,
-    positive products).  Equilibrium at constant T gives
+    Premise: finite signed stoichiometric coefficients ``nu_i`` (negative
+    reactants, positive products).  Non-finite ``nu_i`` or ``nu_g`` is not
+    a reaction coefficient; ``derived_exponent`` and this type refuse them.
+    Equilibrium at constant T gives
 
         0 = ΔG°_rxn/(R T) + Σ_i nu_i ln(a_i)
 
@@ -254,11 +273,20 @@ class CompiledReactionTerm:
     required_plane: str | None = None  # channels only
 
     def __post_init__(self) -> None:
-        if self.target_nu <= 0.0:
+        if not math.isfinite(self.target_nu) or self.target_nu <= 0.0:
             raise ValueError(
-                f"target_nu must be positive; got {self.target_nu}"
+                f"target_nu must be finite and positive; got {self.target_nu}"
+            )
+        if not math.isfinite(self.signed_nu):
+            raise ValueError(
+                f"signed_nu must be finite; got {self.signed_nu}"
             )
         expected = -self.signed_nu / self.target_nu
+        if not math.isfinite(self.derived_exponent) or not math.isfinite(expected):
+            raise ValueError(
+                f"derived_exponent {self.derived_exponent} is not a finite "
+                f"-signed_nu/target_nu (expected {expected})"
+            )
         if not math.isclose(
             self.derived_exponent, expected, rel_tol=0.0, abs_tol=1.0e-12
         ):
@@ -278,10 +306,17 @@ class CompiledReactionTerm:
 
 
 def derived_exponent(signed_nu: float, target_nu: float) -> float:
-    """``e_i = -nu_i / nu_g`` (design §6)."""
+    """``e_i = -nu_i / nu_g`` (design §6) for finite coefficients.
 
-    if target_nu <= 0.0:
-        raise ValueError(f"target_nu must be positive; got {target_nu}")
+    ``math.isclose(+inf, +inf)`` is true, so an infinite ``nu_i`` would
+    otherwise compile to an infinite exponent and look like a reaction
+    term.  Zero ``nu_i`` is admitted (the species does not participate).
+    """
+
+    if not math.isfinite(target_nu) or target_nu <= 0.0:
+        raise ValueError(f"target_nu must be finite and positive; got {target_nu}")
+    if not math.isfinite(signed_nu):
+        raise ValueError(f"signed_nu must be finite; got {signed_nu}")
     return -signed_nu / target_nu
 
 
@@ -390,8 +425,7 @@ SOURCE_KIND_LEGACY_SCALAR_ADAPTER = "legacy_scalar_adapter"
 SOURCE_KIND_RUNTIME_OWNER = "runtime_owner"
 SOURCE_KIND_REFUSED = "refused"
 
-# Phase-1 resolver identity: the only owner permitted to mint REFUSAL
-# potentials for unowned channels.
+# Phase-1 resolver owner_id used by _grant_for_resolver_refusal.
 RESOLVER_OWNER_PHASE1 = "phase1_resolver"
 
 
@@ -410,11 +444,11 @@ class ChannelEvaluationError(ValueError):
     """A channel contribution could not be composed into a pressure term."""
 
 
-# Module-private mint token for :class:`_OwnerGrant`.  Only code physically
-# inside this module can reference this object through the mint helpers
-# below; the token itself is never exported (absent from ``__all__`` and
-# from the package ``__init__`` re-export surface).  The grant constructor
-# refuses any call that does not present this exact object.
+# Mint token for :class:`_OwnerGrant`.  ``_OwnerGrant.__init__`` accepts a
+# call only when ``_mint_token is`` this object.  The name is absent from
+# ``__all__`` and from the package ``__init__`` re-export surface, but it
+# remains an ordinary module attribute: Python name privacy is conventional,
+# so an importer of this module can still present this exact object.
 _GRANT_MINT_TOKEN = object()
 
 # Live-grant registry keyed to real runtime sources:
@@ -429,25 +463,28 @@ _MINTED_OWNER_GRANTS: dict[tuple[str, str, str, bool], "_OwnerGrant"] = {}
 
 
 class _OwnerGrant:
-    """Module-private construction grant for :class:`GasChannelPotential`.
+    """Construction grant for :class:`GasChannelPotential`.
 
-    Only the owner factories in this module mint grants:
+    Intended mint paths in this module:
 
-    - :func:`o2_potential_from_pO2_bar` — the registered Phase-1 runtime
-      owner for ``gas.O2.ideal_1bar.v1`` (``legacy_pO2_adapter``);
-    - :func:`resolve_channel_potential` — the Phase-1 resolver, which may
-      mint **refusal** potentials only (no numeric potential without an
-      owner).
+    - :func:`o2_potential_from_pO2_bar` via :func:`_grant_for_registered_owner`
+      — the registry-declared Phase-1 runtime owner for
+      ``gas.O2.ideal_1bar.v1`` (``legacy_pO2_adapter``);
+    - :func:`resolve_channel_potential` via :func:`_grant_for_resolver_refusal`
+      — refusal potentials only.
 
-    Sealed construction: the constructor requires the module-private
-    ``_GRANT_MINT_TOKEN`` and every minted grant is registered under its
-    ``(channel_id, owner_id, source_kind, refusal_only)`` key by the mint
-    helpers.  ``GasChannelPotential.__post_init__`` demands that the
-    presented grant *be* the registered object for its key and that the
-    grant's ``channel_id`` match the potential's — so a grant cannot be
-    forged from outside this module, and a genuine grant cannot be lifted
-    onto a different channel.  A potential object is therefore proof that
-    construction flowed through a typed owner source for that channel.
+    What this type actually checks, in ``__init__``: ``_mint_token is
+    _GRANT_MINT_TOKEN``.  :func:`_mint_grant` is the helper that presents
+    that token and identity-registers the object under
+    ``(channel_id, owner_id, source_kind, refusal_only)``.  ``_mint_grant``
+    does not consult ``CHANNEL_REGISTRY`` or ``runtime_owner``.
+    ``GasChannelPotential.__post_init__`` then requires that the presented
+    grant *be* the registered object for its key and that ``channel_id``
+    match.  A look-alike built with a stolen token therefore fails; a
+    grant minted through ``_mint_grant`` for an unowned channel (H2, ...)
+    with ``refusal_only=False`` is accepted.  A Point potential is proof
+    of construction through a registered grant object for that key, not
+    proof that the key's owner is the registry-declared runtime owner.
     """
 
     __slots__ = ("channel_id", "owner_id", "source_kind", "refusal_only")
@@ -463,9 +500,9 @@ class _OwnerGrant:
     ) -> None:
         if _mint_token is not _GRANT_MINT_TOKEN:
             raise ChannelConstructionError(
-                "_OwnerGrant cannot be constructed outside the channels "
-                "module; mint one via a registered runtime-owner factory "
-                "(free-floating fugacity is forbidden by design §1/§3)"
+                "_OwnerGrant requires the module mint token "
+                "(_GRANT_MINT_TOKEN); a call without that exact object "
+                "is rejected"
             )
         self.channel_id = channel_id
         self.owner_id = owner_id
@@ -480,7 +517,11 @@ def _mint_grant(
     source_kind: str,
     refusal_only: bool,
 ) -> _OwnerGrant:
-    """Return the registered grant for the key, minting it on first use."""
+    """Return the registered grant for the key, minting it on first use.
+
+    This helper does not consult ``CHANNEL_REGISTRY`` or ``runtime_owner``.
+    The owner check lives in :func:`_grant_for_registered_owner`.
+    """
 
     key = (channel_id, owner_id, source_kind, bool(refusal_only))
     grant = _MINTED_OWNER_GRANTS.get(key)
@@ -538,9 +579,13 @@ class GasChannelPotential:
     """Canonical gas-side exchange potential (design §7.1).
 
     The canonical numeric is the natural-log reduced potential
-    ``(μ-μ0)/(R T) = ln(f/f0)``.  ``delta_mu_J_per_mol`` is derived at the
-    recorded temperature and constructor-checked; neither field may be
-    independently tuned on finite-center verdicts.
+    ``(μ-μ0)/(R T) = ln(f/f0)``.  Finite-center verdicts (Point,
+    StatusBearingValue) require both ``reduced_potential_ln`` and
+    ``delta_mu_J_per_mol``, a finite positive ``temperature_K``, finite
+    values in both numeric fields, and the RT product checked in
+    ``__post_init__``.  ``dataclasses.replace`` re-runs ``__post_init__``,
+    so an inconsistent pair is rejected; a consistent finite retune is
+    not blocked here.
     """
 
     channel_id: str
@@ -619,10 +664,9 @@ class GasChannelPotential:
         )
         if _MINTED_OWNER_GRANTS.get(registry_key) is not grant:
             raise ChannelConstructionError(
-                "owner grant is not the module-minted registry object for "
-                f"{registry_key}; grants are minted only by the owner "
-                "factories in channels.py (forgery fails by identity, not "
-                "by field matching)"
+                "owner grant is not the identity-registered object for "
+                f"{registry_key} in _MINTED_OWNER_GRANTS; a field-perfect "
+                "look-alike fails this identity check"
             )
         if grant.source_kind != self.source_kind:
             raise ChannelConstructionError(
@@ -694,21 +738,43 @@ class GasChannelPotential:
                     )
             return
 
-        # Finite-center verdicts require both fields and the R T invariant.
+        # Finite-center verdicts (Point, StatusBearingValue).
+        #
+        # Premise: ideal-gas exchange potential μ − μ0 = R T ln(f/f0) at
+        # the recorded temperature.
+        # Algebra: delta_mu_J_per_mol = GAS_CONSTANT * temperature_K
+        #          * reduced_potential_ln
+        # Units: (J mol^-1 K^-1) * K * 1 = J mol^-1
+        # Sanity: f = f0 ⇒ reduced = 0 ⇒ delta = 0.  At T = 1800 K and
+        # reduced = 1, delta = GAS_CONSTANT * 1800
+        # = 8.31446261815324 * 1800 = 14966.032712675832 J mol^-1.
+        # math.isclose(+inf, +inf) is True, so finiteness is checked
+        # before the product; an infinite pair would otherwise pass as a
+        # certifying Point.  NaN fails isclose (isclose(nan, nan) is
+        # False) and is also refused by the isfinite gate.
         if self.reduced_potential_ln is None or self.delta_mu_J_per_mol is None:
             raise ValueError(
                 f"{self.verdict.value} requires reduced_potential_ln and "
                 "delta_mu_J_per_mol"
             )
-        if self.temperature_K is None or self.temperature_K <= 0.0:
+        if (
+            self.temperature_K is None
+            or not math.isfinite(self.temperature_K)
+            or self.temperature_K <= 0.0
+        ):
             raise ValueError(
-                "finite-center potentials require positive temperature_K"
+                "finite-center potentials require finite positive temperature_K"
             )
-        expected_delta = (
-            GAS_CONSTANT * float(self.temperature_K) * float(self.reduced_potential_ln)
-        )
+        reduced = float(self.reduced_potential_ln)
+        delta = float(self.delta_mu_J_per_mol)
+        if not math.isfinite(reduced) or not math.isfinite(delta):
+            raise ValueError(
+                "finite-center potentials require finite reduced_potential_ln "
+                "and finite delta_mu_J_per_mol"
+            )
+        expected_delta = GAS_CONSTANT * float(self.temperature_K) * reduced
         if not math.isclose(
-            float(self.delta_mu_J_per_mol),
+            delta,
             expected_delta,
             rel_tol=0.0,
             abs_tol=1.0e-9 * max(1.0, abs(expected_delta)),
@@ -733,7 +799,14 @@ class GasChannelPotential:
 
 @dataclass(frozen=True)
 class ReactionThermoInputs:
-    """Typed handoff into :meth:`CompiledPressureEvaluator.evaluate` (design §7.2)."""
+    """Container for activities and channel potentials (design §7.2).
+
+    ``__post_init__`` freezes ``activities`` and ``channels`` as
+    ``MappingProxyType``.  It does not compare ``state_fingerprint`` to
+    each potential's ``state_fingerprint``, and it does not compare
+    ``reaction_id`` to anything on the potentials.  Those fields are
+    carried, not validated, in this class.
+    """
 
     reaction_id: str | None
     state_fingerprint: str | None
@@ -872,6 +945,12 @@ def channel_log10_contribution(
     O2 + legacy adapter uses the bit-identical ratio form
     ``e · log10(p / p_ref)``.  All other finite-center potentials use the
     general natural-log form ``e · reduced_potential_ln / ln(10)``.
+
+    Identity check in this function: ``potential.channel_id == term.input_id``.
+    This function does not compare ``term.required_plane`` with
+    ``potential.reaction_plane`` and does not read ``state_fingerprint``.
+    A finite-center potential for the matching ``channel_id`` produces a
+    numeric contribution even when those other identity fields disagree.
     """
 
     if term.role is not ReactionTermRole.EXCHANGE_CHANNEL:
@@ -1007,14 +1086,23 @@ def resolve_channel_potential(
     sulfur channels refuse with the melt-side owner code even if a measured
     pX2 were hypothetically available — adoption is coupled to t-568 melt
     ownership by design (see :class:`ChannelRegistryEntry.missing_melt_owner_code`).
+
+    ``channel_id`` not in ``CHANNEL_REGISTRY`` raises ``ValueError`` from
+    this function (it is not converted to :class:`ChannelCompositionRefusal`
+    here).  A ``reaction_plane`` outside the registry entry's
+    ``required_planes`` returns ``REFUSAL_CHANNEL_PLANE_UNSUPPORTED``.
+    O2's entry admits both members of ``REACTION_PLANES``; this function
+    does not rewrite an unknown plane string to ``transport_headspace``.
     """
 
     entry = CHANNEL_REGISTRY.get(channel_id)
     if entry is None:
         raise ValueError(f"unknown channel_id {channel_id!r}")
 
-    if reaction_plane not in entry.required_planes and channel_id != CHANNEL_O2:
-        # O2 admits both planes; others require melt_interface in Phase 1.
+    if reaction_plane not in entry.required_planes:
+        # Each registry entry lists admitted planes in required_planes.
+        # O2 admits both REACTION_PLANES; Phase-1 halogen / H / S / N
+        # entries admit melt_interface only.
         return _refusal_potential(
             entry,
             reaction_plane=reaction_plane,
@@ -1047,13 +1135,10 @@ def resolve_channel_potential(
                 detail="O2 channel requires temperature_K",
                 state_fingerprint=state_fingerprint,
             )
-        plane = reaction_plane
-        if plane not in REACTION_PLANES:
-            plane = REACTION_PLANE_TRANSPORT_HEADSPACE
         return o2_potential_from_pO2_bar(
             pO2_bar=pO2_bar,
             temperature_K=temperature_K,
-            reaction_plane=plane,
+            reaction_plane=reaction_plane,
             pO2_reference_bar=pO2_reference_bar,
             state_fingerprint=state_fingerprint,
             authority=authority,
@@ -1189,6 +1274,11 @@ _PATHWAY_CHANNEL_TAGS: Mapping[str, frozenset[str]] = MappingProxyType(
     }
 )
 
+# Token hunt, not a Hill-system element parse.  Unlike _H/_S/_N_FORMULA_RE,
+# there is no (?<![A-Z]) / (?![a-z]) boundary.  The F alternative therefore
+# matches the leading F of Fe, Fr, Fm, Fl (and FeO, FeCl2, ...).  The I
+# alternative matches In and Ir the same way.  Cl and Br are two-letter
+# tokens and do not prefix a different element symbol.
 _HALOGEN_FORMULA_RE = re.compile(
     r"(?P<el>F|Cl|Br|I)(?P<n>\d*)"
 )
@@ -1259,14 +1349,17 @@ def infer_required_channels_from_carrier(
     if pathway == "base_x_hydrogen_exchange":
         channels.add(CHANNEL_H2)
     if pathway and "halogen" in pathway:
-        # Formula-driven halogen detection below fills the specific X2.
+        # No pathway-level X2 is added here; the formula scan below is
+        # what selects F2/Cl2/Br2/I2, including the F-prefix matches.
         pass
     if pathway == "related_binary_condensed" and "S" in carrier:
         # Sulfur-bearing related binaries.
         if re.search(r"(?<![A-Z])S\d*(?![a-z])", carrier):
             channels.add(CHANNEL_S2)
 
-    # Formula-driven halogen / H / S / N presence.
+    # Formula scan: halogen regex as compiled above; H/S/N use
+    # element-token boundaries.  This is not a chemically correct
+    # element tokenizer for F.
     for match in _HALOGEN_FORMULA_RE.finditer(carrier):
         el = match.group("el")
         channels.add(_HALOGEN_TO_CHANNEL[el])
@@ -1285,7 +1378,9 @@ def infer_required_channels_from_carrier(
     if "C?" in text or "carbon" in text.lower():
         pass  # carbon-side is not a gas channel
 
-    # BaF canonical: F in formula → F2.
+    # Substring fallback when the regex produced nothing.  ``"F" in
+    # carrier`` is true for Fe, so this path is not an independent
+    # chemical check.
     if not channels and any(ch in carrier for ch in ("F", "Cl", "Br", "I")):
         for match in _HALOGEN_FORMULA_RE.finditer(carrier):
             channels.add(_HALOGEN_TO_CHANNEL[match.group("el")])
@@ -1307,11 +1402,17 @@ def attempt_channel_composition(
 ) -> ChannelCompositionRefusal | Mapping[str, GasChannelPotential]:
     """Attempt to resolve every required channel for a carrier composition.
 
-    On any missing owner / runtime channel, returns a
-    :class:`ChannelCompositionRefusal` naming the missing channel IDs **and**
-    the missing melt-side owners.  BaF is the canonical test case: requires
-    ``gas.F2.ideal_1bar.v1`` and refuses with
-    ``refused_halide_reservoir_owner_missing``.
+    For each ID in ``required_channels`` (or inferred from the carrier),
+    this function calls :func:`resolve_channel_potential`.  A registered
+    but unowned channel returns a :class:`ChannelCompositionRefusal`
+    naming the missing channel IDs and the missing melt-side owners.
+    BaF is the canonical test case: requires ``gas.F2.ideal_1bar.v1`` and
+    refuses with ``refused_halide_reservoir_owner_missing``.
+
+    An ID that is not in ``CHANNEL_REGISTRY`` is not converted to a
+    composition refusal here: :func:`resolve_channel_potential` raises
+    ``ValueError`` and that exception propagates.  Empty inference and
+    carbon-side ledger text still return :class:`ChannelCompositionRefusal`.
     """
 
     channels = tuple(required_channels) if required_channels is not None else (
@@ -1544,17 +1645,19 @@ def reconstruct_878_pathway_cohort(
     for entry in entries:
         missing = str(entry.get("missing") or "")
         if not _NEEDS_CHANNEL_PREFIX.search(missing):
-            # Some 878 rows may use pathway labels without the NEEDS-CHANNEL
-            # prefix in older ledger snapshots; still count by pathway when
-            # the free-text carries the design's pathway token.
+            # No-op.  Absence of a leading NEEDS-CHANNEL prefix does not
+            # skip the row and does not, by itself, admit it.  Counting
+            # below still requires a pathway= token, then the per-label
+            # filters in this loop.
             pass
         pathway_match = _PATHWAY_RE.search(missing)
         if pathway_match is None:
             continue
         pathway = pathway_match.group(1)
         if pathway == "halide_condensed_family":
-            # Design §2.2: only the "changed total-halogen ratio only" subset
-            # (107).  Ledger marks these as NEEDS-CHANNEL with ratio mismatch.
+            # Design §2.2: the "changed total-halogen ratio only" subset
+            # (107).  Counted when the free-text contains "NEEDS-CHANNEL"
+            # or "ratio mismatch" (the prefix itself is not required).
             if "NEEDS-CHANNEL" in missing or "ratio mismatch" in missing:
                 counts["halide_condensed_family"] += 1
                 halide_ratio_mismatch += 1
@@ -1567,8 +1670,9 @@ def reconstruct_878_pathway_cohort(
                 "base_x_hydrogen_exchange",
                 "related_binary_condensed",
             }:
-                # Count NEEDS-CHANNEL pathway rows; related_binary may also
-                # carry C? without NEEDS-CHANNEL in some snapshots.
+                # related_binary_condensed: counted whenever the pathway
+                # token is present.  The other four labels in this set:
+                # counted only when "NEEDS-CHANNEL" is in the free-text.
                 if "NEEDS-CHANNEL" in missing or pathway == "related_binary_condensed":
                     counts[pathway] += 1
 

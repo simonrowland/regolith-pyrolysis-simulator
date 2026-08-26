@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from simulator.melt_backend.imcc_sf04.gas import (
@@ -542,3 +543,54 @@ def test_gas_layer_uses_imcc_activities() -> None:
     # positive alkali partial pressures.
     assert pressures["Na"] > 0.0
     assert pressures["K"] > 0.0
+
+
+# --------------------------------------------------------------------------- #
+# Fail-closed on non-finite T, fO2, and consumed oxide activity
+# --------------------------------------------------------------------------- #
+
+
+def _unread_gas_pack() -> ImccGasDatapack:
+    """Empty tables; evaluate_gas must refuse before reading them."""
+    return ImccGasDatapack(
+        gas_df=pd.DataFrame(),
+        oxide_df=pd.DataFrame(),
+        gas_path=Path("."),
+        oxide_path=Path("."),
+    )
+
+
+@pytest.mark.parametrize("T_K", [float("nan"), float("inf"), float("-inf")])
+def test_evaluate_gas_refuses_nonfinite_temperature(T_K: float) -> None:
+    with pytest.raises(ValueError, match="finite and positive"):
+        evaluate_gas(
+            {"Na2O": 1.0},
+            T_K,
+            1.0,
+            datapack=_unread_gas_pack(),
+            gas_species=("Na",),
+        )
+
+
+@pytest.mark.parametrize("fO2", [float("nan"), float("inf"), float("-inf")])
+def test_evaluate_gas_refuses_nonfinite_fo2(fO2: float) -> None:
+    with pytest.raises(ValueError, match="finite and positive"):
+        evaluate_gas(
+            {"Na2O": 1.0},
+            2000.0,
+            fO2,
+            datapack=_unread_gas_pack(),
+            gas_species=("Na",),
+        )
+
+
+@pytest.mark.parametrize("activity", [float("nan"), float("inf"), float("-inf")])
+def test_evaluate_gas_refuses_nonfinite_activity(activity: float) -> None:
+    with pytest.raises(ValueError, match="finite and >= 0"):
+        evaluate_gas(
+            {"Na2O": activity},
+            2000.0,
+            1.0,
+            datapack=_unread_gas_pack(),
+            gas_species=("Na",),
+        )

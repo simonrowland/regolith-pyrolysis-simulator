@@ -779,6 +779,17 @@ class OverheadGasModel:
             )  # percent — load / capacity at allowed upstream pressure
         else:
             pipe_capacity_used_pct = math.inf
+        # Premise: PIPE-1 mass flow is C * max(P_up^2 - P_down^2, 0) with C
+        # independent of pressure. The value below is that capacity at the
+        # allowed upstream pressure (the p_mean_Pa compatibility key in this
+        # dict) and the resolved downstream pressure.
+        # Algebra: treating the arithmetic mean as if it were P_up, with
+        # P_down=0, substitutes P_up/2 and yields C*(P_up/2)^2 = C*P_up^2/4.
+        # Unit check: C is kg/(s·Pa^2); times Pa^2 is kg/s. The number is a
+        # mass-flow capacity, not a per-pressure coefficient (the
+        # conductance_kg_s_per_bar alias is the same kg/s value).
+        # Sanity: vacuum downstream, default geometry, 1500 °C, P_up=1000 Pa
+        # vs 500 Pa returns exactly 4x.
         return {
             'pipe_temperature_C': pipe_temperature_C,  # °C — active pipe/liner wall temperature
             'conductance_temperature_C': conductance_temperature_C,  # °C — gas temperature used for conductance
@@ -789,7 +800,7 @@ class OverheadGasModel:
             'stage_area_geometry_provenance_notice': (
                 self.stage_area_geometry_provenance_notice()
             ),
-            'conductance_kg_s': conductance,  # kg/s — pipe mass-flow capacity at p_mean; NOT per-pressure
+            'conductance_kg_s': conductance,  # kg/s — PIPE-1 capacity at allowed upstream and downstream pressures, not at the arithmetic mean
             'conductance_kg_s_per_bar': conductance,  # kg/s — deprecated compatibility alias; not per-bar
             'pipe_conductance_kg_hr': pipe_conductance_kg_hr,  # kg/hr — pipe mass-flow capacity
             'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used

@@ -374,9 +374,24 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         },
     )
 
+    payload = run.run()
+    # b-238 (2026-08-26): melt_redox_gate_floor_fallback_engagement counts
+    # _melt_redox_liquidus_floor_fallback engagements, and that count depends
+    # on whether _freeze_gate_curve() hits its cross-run cache — measured
+    # total_count 14 (cold) vs 0 (warm) from the SAME tree in back-to-back
+    # processes. A byte-identity pin over a cache-sensitive counter flaps red
+    # and green with zero code change, so the block is asserted by SHAPE here
+    # and excluded from the hash; the hash keeps pinning everything else.
+    engagement = payload.pop("melt_redox_gate_floor_fallback_engagement")
+    assert set(engagement) == {"engaged", "total_count", "by_hour"}
+    assert isinstance(engagement["engaged"], bool)
+    assert isinstance(engagement["total_count"], int)
+    assert engagement["total_count"] >= 0
+    assert engagement["engaged"] == (engagement["total_count"] > 0)
+
     actual_bytes = (
         json.dumps(
-            run.run(),
+            payload,
             indent=2,
             sort_keys=False,
             allow_nan=False,
@@ -412,8 +427,17 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # question -- raise pN2 before Kn crosses -- not a golden question, and it
     # is tracked separately. This pin records what the code does; it does not
     # bless the recipe.
+    #   sc130 wave 2 (2026-08-26) — THIRD intentional mover, prose-only.
+    #     1487 string leaves changed and ZERO numeric leaves (verified by a
+    #     typed structural diff of the full 6 MB payload, base vs wave-2):
+    #     melt_activity.py bucket-A citation/limitation corrections flow into
+    #     reported_activity_provenance / evidence_ref strings in this
+    #     serialization. Same run, same physics, same numbers. The hash also
+    #     changes shape here because the cache-sensitive engagement block
+    #     moved out of the hashed payload (b-238, above).
+    #     Recomputed on the CI machine class (mac-studio-256-1, ci-jobs tree).
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "9a1a0c27f7e2aeb3a138dea12c5476813b2bf5fef6d0e99ed3a2ba0539ffa6df"
+        "368c71334cd96c450ae82171eb07dc5064addad0637ccbf83bbabe7eede839a8"
     )
 
 

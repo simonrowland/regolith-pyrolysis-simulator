@@ -1,20 +1,30 @@
 """Bulk-organic source term: primary pyrolysis, char fate, tar fate.
 
-Pure functions. No ledger writes. Callers commit through ``commit_batch``.
+Pure functions. This module does not import a ledger writer or mutate
+``AtomLedger``; it returns records.
 
 Three stages:
 
 1. PRIMARY PYROLYSIS (empirical, class-level): bulk OM -> gas + tar + char.
-   CO is not a primary product (Voropaev 2023 / REF-059: CO is char
-   gasification).
+   Primary CO is forced to 0.0 on the paths in this module (configured
+   yield row ``status=proven_zero``, then dropped). Voropaev Table 2
+   reports nonzero bulk CO from 300 C; this module does not split that
+   bulk measurement into primary vs char-gasification channels.
 2. CHAR FATE (empirical class placement + Boudouard limiter): surviving
    char is the logistic/Boudouard remainder. Ellingham a_C and the CCO
    buffer are diagnostics; they do not enter surviving_char_mol.
 3. TAR FATE (kinetic, least certain): crack / coke / coat on the existing
    wall-deposit path.
 
-Mass closes on C, H, N, O, S. Unknown is never converted to zero:
-missing S -> H2S/COS are proven-zero; missing coefficient -> refusal.
+Mass closes on C, H, N, O, S against the CHONS inventory returned by
+``_atom_dict``. Non-finite or negative atom amounts, and temperatures
+that are non-finite or at/below 0 K, are refused. Finite missing S
+(key absent or 0) is typed proven-zero for H2S/COS on the primary
+path. Missing Voropaev curves return a refusal record from
+``voropaev_release_fraction``; ``primary_pyrolysis`` currently turns a
+``None`` fraction into 0.0 via ``or 0.0`` and does not propagate that
+refusal. Missing class-coefficient keys fall back to the embedded
+defaults in this module.
 """
 
 from __future__ import annotations
@@ -76,13 +86,49 @@ _C_TO_CO2_DS_KJ_PER_K_PER_MOL_O2 = 0.00291
 
 
 def _finite(value: Any, default: float = 0.0) -> float:
+    """Coerce a coefficient, or return ``default`` when the value is absent.
+
+    Unparseable values (``None``, non-numeric strings) take ``default``.
+    A value that parses as NaN or inf is refused rather than replaced.
+    """
     try:
         number = float(value)
     except (TypeError, ValueError):
         return default
     if not math.isfinite(number):
-        return default
+        raise ValueError(f"non-finite coefficient {value!r}")
     return number
+
+
+def _require_finite(
+    value: Any,
+    *,
+    name: str,
+    minimum: float | None = None,
+    minimum_exclusive: float | None = None,
+) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be a finite number, got {value!r}") from exc
+    if not math.isfinite(number):
+        raise ValueError(f"{name} must be a finite number, got {value!r}")
+    if minimum is not None and number < minimum:
+        raise ValueError(f"{name} must be >= {minimum}, got {number}")
+    if minimum_exclusive is not None and number <= minimum_exclusive:
+        raise ValueError(f"{name} must be > {minimum_exclusive}, got {number}")
+    return number
+
+
+def _require_physical_celsius(value: Any, *, name: str) -> float:
+    temperature_C = _require_finite(value, name=name)
+    temperature_K = temperature_C + CELSIUS_TO_KELVIN
+    if temperature_K <= 0.0:
+        raise ValueError(
+            f"{name} must be above absolute zero, got {temperature_C} C "
+            f"({temperature_K} K)"
+        )
+    return temperature_C
 
 
 def load_organics_pyrolysis_params(
@@ -97,11 +143,27 @@ def load_organics_pyrolysis_params(
 def _interp_cumulative(temperature_C: float, xs: list[float], ys: list[float]) -> float:
     """Linear interpolation of a cumulative % curve.
 
-    Below the first knot the value is the first knot (do not invent a
-    sub-200 C release). Above the last knot the value holds at the last
-    knot: the 800 C '100%' is a run-end normalization, not complete
-    release, so we refuse to extrapolate past it.
+    Hold, not a new slope, at both tabulated ends. Below the first knot
+    the returned fraction is ``ys[0]/100``, including when that first
+    knot is nonzero. Above the last knot the returned fraction is
+    ``ys[-1]/100``.
+
+    On the shipped Voropaev table the first knot is 200 C with CH4=12.4
+    and CO2=4.8, so T < 200 C currently returns those 200 C fractions
+    (CH4=0.124, CO2=0.048 before any population split). That is a hold
+    of the first knot, not a zero sub-200 C release, and not a claim
+    that the experiment measured those fractions below 200 C.
+
+    The last knot's 800 C 100% is a run-end normalization, not a
+    complete-release claim. Holding it still returns 1.0; this
+    function does not refuse T above the last knot.
+
+    Non-finite T is refused. NaN fails every comparison
+    (``NaN <= xs[0]`` and ``NaN >= xs[-1]`` are both False, and no
+    knot interval contains NaN), so the previous fallthrough returned
+    ``ys[-1]/100`` with a scientific-looking fraction.
     """
+    temperature_C = _require_finite(temperature_C, name="temperature_C")
     if temperature_C <= xs[0]:
         return ys[0] / 100.0
     if temperature_C >= xs[-1]:
@@ -123,8 +185,12 @@ def voropaev_release_fraction(
 ) -> dict[str, Any]:
     """Return the Voropaev 2023 cumulative release fraction at T.
 
-    Shape only. The 800 C column is marked as run-end, not complete.
+    Shape only. The 800 C column is marked ``run_end_is_complete_release=False``.
+    T at or above the last knot still returns the last-knot fraction
+    (1.0 on the shipped table) with ``status='partly_grounded'``; this
+    function does not refuse T above the tabulated run end.
     """
+    temperature_C = _require_physical_celsius(temperature_C, name="temperature_C")
     cfg = (params or load_organics_pyrolysis_params()).get("voropaev_2023_release") or {}
     temps = [float(t) for t in cfg.get("temperature_C") or ()]
     curves = dict(cfg.get("cumulative_pct") or {})
@@ -137,12 +203,12 @@ def voropaev_release_fraction(
             "detail": f"no Voropaev curve for {species!r}",
         }
     ys = [float(v) for v in curves[species]]
-    fraction = _interp_cumulative(float(temperature_C), temps, ys)
+    fraction = _interp_cumulative(temperature_C, temps, ys)
     run_end = float(cfg.get("run_end_C") or 800.0)
     return {
         "fraction": fraction,
         "status": "partly_grounded",
-        "run_end_normalization": float(temperature_C) >= run_end - 1e-9,
+        "run_end_normalization": temperature_C >= run_end - 1e-9,
         "run_end_is_complete_release": False,
         "source": cfg.get("source"),
         "use": cfg.get("use"),
@@ -160,6 +226,7 @@ def organic_co2_release_fraction(
     path. The organic population is the Voropaev CO2 curve renormalized
     to the 53.2% that is out by 500 C.
     """
+    temperature_C = _require_physical_celsius(temperature_C, name="temperature_C")
     payload = params or load_organics_pyrolysis_params()
     populations = dict(payload.get("co2_populations") or {})
     organic = dict(populations.get("organic_decarboxylation") or {})
@@ -167,9 +234,21 @@ def organic_co2_release_fraction(
     raw = voropaev_release_fraction("CO2", temperature_C, payload)
     if raw.get("fraction") is None:
         return raw
-    # Above 500 C the organic population is exhausted; further Voropaev
-    # CO2 is the carbonate second maximum.
-    if float(temperature_C) >= 500.0:
+    # Model split, not a carrier-resolved measurement. At T >= 500 C
+    # this function saturates organic CO2 to 1.0. 500 C is the
+    # configured organic_decarboxylation band end
+    # (co2_populations.organic_decarboxylation.band_C); 0.532 is
+    # Voropaev Table 2 cumulative CO2 at that knot.
+    # Algebra below 500 C: fraction = min(1, voropaev_CO2(T) / denom)
+    # with denom = 0.532 on the shipped table.
+    # Unit check: numerator and denominator are cumulative fractions,
+    # so the ratio is dimensionless.
+    # Sanity: T=500 C -> 0.532/0.532 = 1.0; T=200 C -> 0.048/0.532 ≈ 0.090.
+    # Voropaev attributes the 700 C CO2 *peak* to carbonates; this clamp
+    # is a model choice that assigns the entire post-500 C tail to the
+    # carbonate path. It is not a proof that organic decarboxylation is
+    # exhausted at 500 C.
+    if temperature_C >= 500.0:
         fraction = 1.0
     else:
         fraction = min(1.0, float(raw["fraction"]) / max(denom, 1e-12))
@@ -198,7 +277,8 @@ def boudouard_lg_kp(temperature_K: float, params: Mapping[str, Any] | None = Non
     ) or {}
     a = _finite(cfg.get("lg_Kp_A"), -9001.0)
     b = _finite(cfg.get("lg_Kp_B"), 9.28)
-    t_k = max(float(temperature_K), 1.0)
+    t_k = _require_finite(temperature_K, name="temperature_K", minimum_exclusive=0.0)
+    t_k = max(t_k, 1.0)
     return a / t_k + b
 
 
@@ -217,17 +297,19 @@ def boudouard_crossover_K(params: Mapping[str, Any] | None = None) -> float:
 
 def carbon_delta_g_co_kj_per_mol_o2(temperature_K: float) -> float:
     """ΔG(2 C + O2 -> 2 CO) per mol O2. Falls with T."""
+    temperature_K = _require_finite(temperature_K, name="temperature_K")
     return (
         _C_TO_CO_DH_KJ_PER_MOL_O2
-        - float(temperature_K) * _C_TO_CO_DS_KJ_PER_K_PER_MOL_O2
+        - temperature_K * _C_TO_CO_DS_KJ_PER_K_PER_MOL_O2
     )
 
 
 def carbon_delta_g_co2_kj_per_mol_o2(temperature_K: float) -> float:
     """ΔG(C + O2 -> CO2) per mol O2. Nearly flat."""
+    temperature_K = _require_finite(temperature_K, name="temperature_K")
     return (
         _C_TO_CO2_DH_KJ_PER_MOL_O2
-        - float(temperature_K) * _C_TO_CO2_DS_KJ_PER_K_PER_MOL_O2
+        - temperature_K * _C_TO_CO2_DS_KJ_PER_K_PER_MOL_O2
     )
 
 
@@ -250,9 +332,10 @@ def carbon_activity(
     a_C >= 1 means graphite is stable; a_C << 1 means it wants to gasify.
     Extent is still oxidant-limited — see ``char_fate``.
     """
-    t_k = max(float(temperature_K), 1.0)
-    p_o2 = max(float(pO2_bar), 1e-30)
-    p_gas = max(float(p_gas_bar), 1e-30)
+    t_k = _require_finite(temperature_K, name="temperature_K", minimum_exclusive=0.0)
+    t_k = max(t_k, 1.0)
+    p_o2 = max(_require_finite(pO2_bar, name="pO2_bar", minimum=0.0), 1e-30)
+    p_gas = max(_require_finite(p_gas_bar, name="p_gas_bar", minimum=0.0), 1e-30)
     rt = GAS_CONSTANT_J_PER_MOL_K * t_k
 
     dG_co = carbon_delta_g_co_kj_per_mol_o2(t_k)
@@ -277,11 +360,16 @@ def carbon_activity(
 
 
 def _atom_dict(atoms: Mapping[str, float]) -> dict[str, float]:
+    """Return a CHONS inventory.
+
+    Absent keys stay 0.0 (the typed empty-inventory path). An explicit
+    non-finite or negative amount is refused rather than clamped to 0.
+    """
     out = {"C": 0.0, "H": 0.0, "O": 0.0, "N": 0.0, "S": 0.0}
     for key, value in dict(atoms).items():
         symbol = str(key).strip()
         if symbol in out:
-            out[symbol] = max(0.0, _finite(value))
+            out[symbol] = _require_finite(value, name=f"atom[{symbol}]", minimum=0.0)
     return out
 
 
@@ -399,8 +487,13 @@ def primary_pyrolysis(
 ) -> PrimaryPyrolysisResult:
     """Split bulk organic atoms into gas + tar + nascent char.
 
-    CO is forced to zero (proven-zero as a primary product).
+    Primary CO is forced to 0.0 on the paths in this function: the
+    configured CO yield row is ``status=proven_zero``, ``gas_mol['CO']``
+    is set to 0.0, and the key is dropped after a proven-zero note.
+    This function does not isolate Voropaev bulk-CO provenance into
+    primary vs char-gasification channels.
     """
+    temperature_C = _require_physical_celsius(temperature_C, name="temperature_C")
     payload = params or load_organics_pyrolysis_params()
     available = _atom_dict(atoms)
     notes: list[dict[str, Any]] = []
@@ -536,7 +629,11 @@ def primary_pyrolysis(
             ZeroBecause.PROVEN_BELOW_THRESHOLD,
             site="organics_pyrolysis.primary.CO",
             species="CO",
-            detail="CO is char gasification (Voropaev 2023), not a primary product",
+            detail=(
+                "primary CO forced to 0 by configuration "
+                "(primary_gas_yields_of_mobilized_C.CO); this function does "
+                "not split Voropaev bulk CO into primary vs Boudouard channels"
+            ),
             doctrine_category=CATEGORY_PROVEN_ZERO,
         ).as_dict()
     )
@@ -564,7 +661,7 @@ def primary_pyrolysis(
         notes=tuple(notes),
         status="status_bearing_non_authoritative",
         f_char_C=f_char,
-        temperature_C=float(temperature_C),
+        temperature_C=temperature_C,
         evolved_gas=evolved,
     )
 
@@ -620,10 +717,12 @@ def char_fate(
     """Whether nascent char survives at (pO2, T).
 
     What actually sets ``surviving_char_mol`` is the oxidant-limited
-    pO2/lance branch plus the Boudouard limiter
-    ``ξ / min(n_C, n_CO2) = Kp / (1 + Kp)``. Ellingham ``a_C`` and the
-    CCO ``pO2`` line are computed as diagnostics and are not inputs to
-    the remainder.
+    pO2/lance branch plus the Boudouard *placement* limiter
+    ``ξ / min(n_C, n_CO2) = Kp / (1 + Kp)``. That drive is a monotone
+    map of Kp onto (0, 1), not the closed-system 1-bar root of the
+    module's ``Kp = pCO^2 / pCO2`` definition. Ellingham ``a_C`` and
+    the CCO ``pO2`` line are computed as diagnostics and are not
+    inputs to the remainder.
 
     Boudouard Kp is Voropaev's 1-bar relation (REF-059). The ~697 C
     crossover is Kp=1 at 1 bar; the model has no total-pressure argument,
@@ -639,11 +738,12 @@ def char_fate(
     payload = params or load_organics_pyrolysis_params()
     fate_cfg = dict(payload.get("char_fate") or {})
     notes: list[dict[str, Any]] = []
-    n_char = max(0.0, float(char_c_mol))
-    n_co2 = max(0.0, float(co2_mol))
-    n_o2 = max(0.0, float(o2_lance_mol))
-    t_k = float(temperature_C) + CELSIUS_TO_KELVIN
-    p_o2 = max(float(pO2_bar), 1e-30)
+    n_char = _require_finite(char_c_mol, name="char_c_mol", minimum=0.0)
+    n_co2 = _require_finite(co2_mol, name="co2_mol", minimum=0.0)
+    n_o2 = _require_finite(o2_lance_mol, name="o2_lance_mol", minimum=0.0)
+    temperature_C = _require_physical_celsius(temperature_C, name="temperature_C")
+    t_k = temperature_C + CELSIUS_TO_KELVIN
+    p_o2 = max(_require_finite(pO2_bar, name="pO2_bar", minimum=0.0), 1e-30)
 
     a_c = carbon_activity(t_k, p_o2)
     try:
@@ -697,8 +797,18 @@ def char_fate(
     # Lance / pO2 oxidation product is CO2 (existing t-325 default basis).
     produced_co2 = pO2_extent
 
-    # Boudouard equilibrium limiter: ξ / min(C, CO2) = Kp / (1 + Kp).
-    # Below crossover this is small; above it it approaches 1.
+    # Boudouard placement limiter, not the 1-bar equilibrium extent.
+    # Premise: map Kp onto a fraction of the stoichiometric cap
+    # n_lim = min(n_C remaining, n_CO2) so the branch is idle at
+    # Kp -> 0 and saturates the cap at Kp -> inf.
+    # Algebra of the code: drive = Kp/(1+Kp); ξ = n_lim * drive.
+    # Unit check: Voropaev Kp is dimensionless (1-bar standard state);
+    # drive is in [0, 1]; ξ is mol.
+    # Sanity at Kp=1: drive=0.5. Closed-system 1-bar, 1 mol CO2, excess
+    # C, zero initial CO would instead solve Kp = 4ξ²/(1-ξ²) =>
+    # ξ = sqrt(Kp/(4+Kp)) = 1/sqrt(5) ≈ 0.447 (Qp=4ξ²/(1-ξ²) equals
+    # Kp only at that root). The two numbers differ; this limiter is
+    # a heuristic, not that equilibrium. Total pressure is unmodelled.
     boud_drive = kp / (1.0 + kp)
     boudouard_extent = min(remaining, n_co2) * boud_drive
     remaining = max(0.0, remaining - boudouard_extent)
@@ -790,6 +900,10 @@ def tar_fate(
     """
     payload = params or load_organics_pyrolysis_params()
     cfg = dict(payload.get("tar") or {})
+    temperature_C = _require_physical_celsius(temperature_C, name="temperature_C")
+    wall_temperature_C = _require_physical_celsius(
+        wall_temperature_C, name="wall_temperature_C"
+    )
     notes: list[dict[str, Any]] = [
         {
             "site": "organics_pyrolysis.tar_fate",
@@ -799,7 +913,10 @@ def tar_fate(
             or "tar fate is kinetic and the least certain leg",
         }
     ]
-    atoms = {k: max(0.0, float(v)) for k, v in dict(tar_atoms).items() if float(v) > 1e-18}
+    raw_atoms = dict(tar_atoms)
+    for key, value in raw_atoms.items():
+        _require_finite(value, name=f"tar_atoms[{key}]", minimum=0.0)
+    atoms = {k: float(v) for k, v in raw_atoms.items() if float(v) > 1e-18}
     if not atoms:
         return TarFateResult(
             remaining_tar_atoms={},
@@ -838,8 +955,8 @@ def tar_fate(
     coke_lo = _finite(
         dict(cfg.get("coke_frac_below_coke_T") or {}).get("value"), 0.40
     )
-    t = float(temperature_C)
-    wall = float(wall_temperature_C)
+    t = temperature_C
+    wall = wall_temperature_C
 
     coat_frac = 1.0 if wall <= dew else 0.0
     if t >= crack_t:
@@ -969,6 +1086,12 @@ def apply_organics_source(
     params: Mapping[str, Any] | None = None,
 ) -> OrganicsSourceResult:
     """Run the three stages and prove atom closure on the result."""
+    temperature_C = _require_physical_celsius(temperature_C, name="temperature_C")
+    _require_finite(pO2_bar, name="pO2_bar", minimum=0.0)
+    wall_temperature_C = _require_physical_celsius(
+        wall_temperature_C, name="wall_temperature_C"
+    )
+    _require_finite(o2_lance_mol, name="o2_lance_mol", minimum=0.0)
     payload = params or load_organics_pyrolysis_params()
     available = _atom_dict(atoms)
     primary = primary_pyrolysis(available, temperature_C, payload)

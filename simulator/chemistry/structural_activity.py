@@ -4,6 +4,10 @@ This module is intentionally diagnostic-only. It computes NBO/T, optical
 basicity, a coarse liquidus flag, and provisional reference activity
 coefficients for later comparison against literature and engine sweeps. It
 does not provide authoritative vapor-pressure activities.
+
+Public temperature paths require finite T > 0 K. Inventory amounts that
+are non-finite, non-numeric, or below-dust-floor negative raise
+ValueError from normalize_formula_unit_moles rather than being dropped.
 """
 
 from __future__ import annotations
@@ -134,18 +138,39 @@ _REFERENCE_STRUCTURAL_STATE = {
 # description is intact. Past this ceiling the log-linear gamma surface is
 # out of domain (see structural_gamma_domain_verdict).
 NBO_T_ORTHOSILICATE_CEILING = 4.0
-# Pre-existing diagnostic display envelope, now applied in log10 space so
-# 10**x is never evaluated on an overflowing argument (t-717).
+# Inherited diagnostic display envelope, applied in log10 space so 10**x
+# is not evaluated on an overflowing argument (t-717).
+#
+# Premise: the previous contract was min(1.0, max(1e-12, 10**x)). That is
+# a display clamp, not an overflow identity. 10**x overflows a C double
+# only for x > log10(DBL_MAX) ≈ 308.2547.
+# Algebra: comparing x to log10(envelope) first makes the pow a no-op
+# outside (-12, 0) and finite inside it. x >= 0 still returns 1.0 even
+# when 10**x is a finite number above 1.
+# Unit check: log10(gamma) is dimensionless dex; 10**dex = gamma.
+# Sanity, this module at the 12022 intercept: 1600 K MgO raw
+# 10**(0.0005*100) = 1.1220184543; this clamp returns 1.0. Sossi &
+# Fegley 2018 Table 2 MgO ≈0.25-4 at 1873 K includes gamma>1; the cap
+# maps that above-unity band to 1.0 on this function's path.
 _LOG10_GAMMA_DISPLAY_MIN = -12.0  # gamma = 1e-12
 _LOG10_GAMMA_DISPLAY_MAX = 0.0  # gamma = 1.0
+# Signed ledger dust on a depleted parent can be ~1e-15 mol (see
+# melt_activity.single_cation_mole_fractions). This module is called on
+# the same account_view; treat [-dust, 0] as absent.
+_INVENTORY_NUMERICAL_DUST_MOL = 1.0e-12
 
 _GAMMA_MODEL = {
     "NaO0.5": {
         # DeMaria-inverted lunar-basalt anchor from local volatility grounding:
         # gamma_NaO0.5 ~= 4.5e-3 at 1500 K.
         "anchor_gamma_at_1500K": 4.5e-3,
-        # DeMaria-inverted 1300->1500 K slope:
-        # log10(4.5e-3 / 1.8e-4) / 200 K.
+        # Two-point DeMaria slope from 1300 K (1.8e-4) and 1500 K (4.5e-3):
+        # log10(4.5e-3 / 1.8e-4) / 200 K. This function applies that slope
+        # at whatever finite temperature_K it receives.
+        # structural_gamma_domain_verdict checks NBO/T and optical basicity
+        # only (that function's body has no T or phase test). Sossi &
+        # Fegley 2018 printed p. 412-413: 12022 liquidus ≈1573 K and the
+        # DeMaria Na/K gamma endpoints are 1300 and 1500 K, sub-liquidus.
         "temperature_slope_dex_per_K": math.log10(4.5e-3 / 1.8e-4) / 200.0,
         # Optical-basicity response calibrated against the CMS/Abdelouhab series
         # (COMPILED-ACTIVITY-KEMS.md Axis 3): log10(gamma) ~ 4.5 +/- 1.0 per
@@ -156,9 +181,20 @@ _GAMMA_MODEL = {
         # alkali-silicate ladder (COMPILED-ACTIVITY-KEMS.md Axis 1):
         # log10(gamma_NaO0.5) ~ (-8.5 +/- 1.5) + (2.8 +/- 0.6) * NBO/T at
         # ~1473 K; scatter +/-1.5 dex across EMF/KEMS/transpiration families.
-        # NOTE: Lambda and NBO/T are correlated axes; both slopes are fitted
-        # marginals, not independent — consumers should use ONE axis at a time
-        # until a joint Toop-Samis/MQM calibration lands. UNCERTIFIED.
+        #
+        # On this function's log-linear surface both structural terms are
+        # always added, so the Na factor is their product:
+        #   10**(lambda_slope * dLambda + nbo_t_slope * dNBO/T)
+        #   = 10**(lambda_slope * dLambda) * 10**(nbo_t_slope * dNBO/T).
+        # Premise: Lambda and NBO/T are correlated composition axes; the
+        # tabulated slopes are fitted marginals, not a joint Toop-Samis/MQM
+        # calibration. Adding both therefore double-counts shared structure.
+        # Unit check: slopes are dex per Lambda and dex per NBO/T; the
+        # product of two 10**dex factors is dimensionless gamma.
+        # Sanity (this function, 1500 K, 12022 intercept): dLambda=0.05 and
+        # dNBO/T=0.5 give 10**(4.5*0.05)=1.678804, 10**(2.8*0.5)=25.118864,
+        # product 42.169650; live Na gamma / 4.5e-3 equals that product.
+        # This function has no one-axis mode. UNCERTIFIED.
         "nbo_t_slope_dex": 2.8,
     },
     "KO0.5": {
@@ -166,10 +202,12 @@ _GAMMA_MODEL = {
         # source.md line ~350, Fig. 5): gamma_KO0.5 = 3.5e-5 at 1500 K.
         # Replaces the provisional 6.0e-3 (was ~170x high vs the primary).
         "anchor_gamma_at_1500K": 3.5e-5,
-        # K thermal slope from the same primary: 3.5e-5 @1500 K vs 7.2e-5
+        # Two-point K slope from the same primary: 3.5e-5 @1500 K vs 7.2e-5
         # @1300 K — gamma RISES on cooling (opposite sign to Na, weak).
         # log10(3.5e-5 / 7.2e-5) / 200 ~= -1.57e-3 dex/K. Sign-ambiguous in
-        # the literature (K3/K4 lanes disagree); UNCERTIFIED.
+        # the literature (K3/K4 lanes disagree); UNCERTIFIED. Same as Na:
+        # this function applies the slope at any finite T it is given;
+        # structural_gamma_domain_verdict does not test T or phase.
         "temperature_slope_dex_per_K": math.log10(3.5e-5 / 7.2e-5) / 200.0,
         # Same calibrated structural axes as Na (K binary ladder parallels Na
         # with slightly lower gamma at fixed NBO/T; Axis 1 slope 3.0 +/- 0.6).
@@ -177,11 +215,18 @@ _GAMMA_MODEL = {
         "nbo_t_slope_dex": 3.0,
     },
     "CaO": {
-        # Aligned to the chemistry-provenance registry choice for CaO
-        # (gamma ~ 1.2e-2, envelope 1e-3..0.15; Sossi & Fegley 2018 Table 2 /
-        # Beckett 2002 CMAS basicity band). Was 0.45 (above the envelope).
+        # Sossi & Fegley 2018 Table 2 (printed p. 409), Beckett 2002 CMAS
+        # row: CaO gamma ≈0.001-0.15 at 1873 K, 0.55 < basicity < 0.65.
+        # The table text says use as a guide; values vary with composition,
+        # T, and fO2. This module stores 1.2e-2 as anchor_gamma_at_1500K,
+        # 373 K below the table isotherm. The 5.0e-4 dex/K T slope below
+        # is local and provisional, not a Table 2 fit.
+        # structural_gamma_domain_verdict does not test CMAS membership
+        # or the 0.55-0.65 basicity band.
         "anchor_gamma_at_1500K": 1.2e-2,
-        # Small positive T slope: major-oxide gamma tends toward unity as T rises.
+        # Local provisional T slope, not a Table 2 derivative. Positive so
+        # unclamped gamma increases with T; the display cap at 1 still
+        # applies (see reference_activity_coefficients).
         "temperature_slope_dex_per_K": 5.0e-4,
         # Weak provisional basicity response for CaO.
         "lambda_slope_dex": 1.0,
@@ -189,10 +234,16 @@ _GAMMA_MODEL = {
         "nbo_t_slope_dex": 0.10,
     },
     "MgO": {
-        # Aligned to the registry choice for MgO (gamma = 1.0 ideal; Sossi &
-        # Fegley 2018 Table 2 / Beckett 2002 MgO ~0.25-4 straddles unity).
+        # Sossi & Fegley 2018 Table 2 (printed p. 409), Beckett 2002 CMAS
+        # row: MgO gamma ≈0.25-4 at 1873 K, 0.55 < basicity < 0.65, so the
+        # table band straddles unity. This module stores 1.0 as
+        # anchor_gamma_at_1500K (373 K below that row) with the same local
+        # 5.0e-4 dex/K T slope. The inherited display cap at gamma=1 maps
+        # any above-unity MgO result back to 1.0 on this function's path.
         "anchor_gamma_at_1500K": 1.0,
-        # Small positive T slope: major-oxide gamma tends toward unity as T rises.
+        # Local provisional T slope, not a Table 2 derivative. Positive so
+        # unclamped gamma increases with T; the display cap at 1 still
+        # applies (see reference_activity_coefficients).
         "temperature_slope_dex_per_K": 5.0e-4,
         # Weak provisional basicity response for MgO.
         "lambda_slope_dex": 0.8,
@@ -202,8 +253,11 @@ _GAMMA_MODEL = {
 }
 
 _LIQUIDUS_MODEL = {
-    # Sossi & Fegley 2018 OCR/compiled corpus: lunar basalt 12022 liquidus
-    # ~= 1300 C = 1573 K. This is the only hard anchor in the fallback.
+    # Sossi & Fegley 2018 printed p. 412: lunar basalt 12022 liquidus
+    # ≈ 1300 C = 1573 K (Green et al. 1971). estimate_liquidus_flag uses
+    # that as the intercept of an affine plane. Four composition slopes
+    # are asserted, not identified: one point cannot determine four
+    # independent coefficients.
     "anchor_temperature_K": 1573.0,
     # Sossi 12022 proxy formula-unit mole fractions derived from the local
     # fixture; they place the liquidus correlation at the anchor composition.
@@ -211,9 +265,13 @@ _LIQUIDUS_MODEL = {
     "anchor_x_al2o3": 0.0851862831590699,
     "anchor_x_alkali": 0.004835284857031333,
     "anchor_x_basic_modifier": 0.4176332580741079,
-    # Provisional slopes: Si/Al raise liquidus; alkali and basic modifiers
-    # lower it. Chosen conservative, monotone, and anchored to 12022 until a
-    # phase engine or calibrated liquidus regression is wired.
+    # Provisional slopes: Si/Al raise the plane; alkali and basic
+    # modifiers lower it. They were chosen to be conservative and
+    # monotone about 12022. estimate_liquidus_flag applies this one
+    # global plane to every mapping it is given, including empty and
+    # single-oxide compositions, then clamps to [950, 2300] K. That
+    # function has no melt-class, composition-distance, or phase-field
+    # gate.
     "sio2_slope_K_per_mole_fraction": 800.0,
     "al2o3_slope_K_per_mole_fraction": 250.0,
     "alkali_slope_K_per_mole_fraction": -700.0,
@@ -221,7 +279,8 @@ _LIQUIDUS_MODEL = {
     # Guard rails for a fallback estimate, not physical phase-equilibrium bounds.
     "min_temperature_K": 950.0,
     "max_temperature_K": 2300.0,
-    # Explicit wide error bar: the flag is the deliverable, not a calibrated Tliq.
+    # Explicit wide error bar. sub_liquidus is T_K < estimated_K on this
+    # plane, not a calibrated phase-boundary crossing.
     "uncertainty_K": 150.0,
 }
 
@@ -253,6 +312,12 @@ class StructuralActivityFeatures:
 
 
 def _positive_float(value: Any) -> float:
+    """Map non-positive / non-numeric values to 0.0.
+
+    Inventory admission for ``normalize_formula_unit_moles`` is
+    ``_require_finite_nonnegative_inventory_mol``, not this helper.
+    """
+
     try:
         if not is_declared_real_scalar(value, allow_numeric_str=True):
             raise TypeError
@@ -264,16 +329,65 @@ def _positive_float(value: Any) -> float:
     return candidate
 
 
+def _require_finite_positive_temperature_K(value: Any) -> float:
+    """Refuse non-numeric, non-finite, or non-positive kelvin.
+
+    Scoped to the three functions in this module that take
+    ``temperature_K``. Finite T > 0 K, including values outside the
+    1300-1500 K alkali-anchor interval, still pass.
+    """
+
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise ValueError(
+            f"temperature_K must be a finite number > 0 K, got {value!r}"
+        )
+    temperature_K = float(value)
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        raise ValueError(
+            f"temperature_K must be a finite number > 0 K, got {value!r}"
+        )
+    return temperature_K
+
+
+def _require_finite_nonnegative_inventory_mol(species: str, value: Any) -> float:
+    """Refuse non-numeric, non-finite, or below-dust-floor negative moles."""
+
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise ValueError(
+            f"melt inventory for {species!r} must be finite and non-negative"
+        )
+    mol = float(value)
+    if not math.isfinite(mol):
+        raise ValueError(
+            f"melt inventory for {species!r} must be finite and non-negative"
+        )
+    if mol < 0.0:
+        if mol >= -_INVENTORY_NUMERICAL_DUST_MOL:
+            return 0.0
+        raise ValueError(
+            f"melt inventory for {species!r} must be finite and non-negative"
+        )
+    return mol
+
+
 def normalize_formula_unit_moles(
     oxide_mol_by_species: Mapping[str, float],
 ) -> tuple[dict[str, float], tuple[str, ...]]:
-    """Return positive oxide formula-unit moles plus ignored species names."""
+    """Return positive oxide formula-unit moles plus ignored species names.
+
+    Ignored names are species not in ``_OXIDE_COMPONENTS`` or
+    ``_FORMULA_UNIT_ALIASES`` whose amounts are finite and non-negative.
+    Non-finite, non-numeric, or below-dust-floor negative amounts raise
+    ``ValueError`` rather than being dropped. Finite zero, and signed dust
+    in ``[-1e-12, 0]``, is treated as absent. An empty mapping still
+    returns an empty basis.
+    """
 
     formula_mol: dict[str, float] = {}
     unsupported: list[str] = []
     for raw_species, raw_mol in dict(oxide_mol_by_species or {}).items():
         species = str(raw_species)
-        mol = _positive_float(raw_mol)
+        mol = _require_finite_nonnegative_inventory_mol(species, raw_mol)
         if mol <= 0.0:
             continue
         if species in _OXIDE_COMPONENTS:
@@ -413,6 +527,9 @@ def structural_gamma_domain_verdict(
     6. Sanity: silica NBO/T = 0; sodium disilicate NBO/T = 1; Ca2SiO4
        (2 CaO + 1 SiO2) NBO/T = 4, in-domain inclusive; 2 wt% SiO2 in CaO
        has NBO/T ~ 105, out of domain.
+
+    This function does not test temperature or phase. Those checks, if
+    any, live in the callers that take ``temperature_K``.
     """
 
     if nbo_t is None:
@@ -453,23 +570,32 @@ def reference_activity_coefficients(
     """Return provisional log-linear structural gamma_MOx values.
 
     Out of the NBO/T domain the surface returns empty rather than a
-    clamped number. In-domain, the diagnostic envelope [1e-12, 1] is
-    applied in log10 space so ``10**x`` is never attempted on an
+    clamped number. In-domain, the inherited display envelope [1e-12, 1]
+    is applied in log10 space so ``10**x`` is not attempted on an
     overflowing argument.
 
     Derivation (in-domain log-space envelope)
     -----------------------------------------
-    1. Premise: the UNCERTIFIED display envelope is gamma in [1e-12, 1]
-       (the previous ``min(1.0, max(1e-12, 10**x))`` contract).
-    2. Algebra: 10**x overflows a C double for x > log10(DBL_MAX) ≈
-       308.2547. Comparing x to log10(envelope) first makes the pow a
-       no-op outside (-12, 0) and finite inside it.
+    1. Premise: the previous contract was ``min(1.0, max(1e-12, 10**x))``.
+       That is a display clamp, not an overflow-derived physical ceiling.
+       Overflow of ``10**x`` requires x > log10(DBL_MAX) ≈ 308.2547.
+    2. Algebra: comparing x to log10(envelope) first makes the pow a
+       no-op outside (-12, 0) and finite inside it. Values with x >= 0
+       are returned as 1.0 even when ``10**x`` is a finite number above 1.
     3. Unit check: log10(gamma) is dimensionless dex; 10**dex = gamma
        dimensionless.
-    4. Sanity: at the 12022 / 1500 K intercept, every delta is 0 so
-       gamma_NaO0.5 = 4.5e-3 (inside the envelope, unclamped).
+    4. Sanity, this function at the 12022 intercept:
+       - 1500 K: every delta is 0 so gamma_NaO0.5 = 4.5e-3 (inside the
+         envelope, unclamped).
+       - 1600 K: MgO raw ``10**(0.0005*100)`` = 1.1220184543; this clamp
+         returns 1.0.
+
+    On this function's path both Lambda and NBO/T terms are always
+    added (see ``_GAMMA_MODEL`` NaO0.5). ``temperature_K`` must be finite
+    and > 0 K; this function has no 1300-1500 K calibration-window gate.
     """
 
+    temperature_K = _require_finite_positive_temperature_K(temperature_K)
     status, _reason = structural_gamma_domain_verdict(nbo_t, optical_basicity)
     if status != "ok":
         return {}
@@ -504,8 +630,15 @@ def estimate_liquidus_flag(
     formula_unit_mole_fractions: Mapping[str, float],
     temperature_K: float,
 ) -> dict[str, Any]:
-    """Return a coarse liquidus estimate and sub-liquidus flag."""
+    """Return a coarse liquidus estimate and sub-liquidus flag.
 
+    On this function's path the estimate is the 12022-anchored affine
+    plane, clamped to the rails in ``_LIQUIDUS_MODEL``. Missing oxide
+    keys contribute 0 mole fraction. ``temperature_K`` must be finite
+    and > 0 K. ``sub_liquidus`` is ``T_K < estimated_K`` on that plane.
+    """
+
+    temperature_K = _require_finite_positive_temperature_K(temperature_K)
     x_sio2 = float(formula_unit_mole_fractions.get("SiO2", 0.0))
     x_al2o3 = float(formula_unit_mole_fractions.get("Al2O3", 0.0))
     x_alkali = float(formula_unit_mole_fractions.get("Na2O", 0.0)) + float(
@@ -534,10 +667,10 @@ def estimate_liquidus_flag(
         max(float(_LIQUIDUS_MODEL["min_temperature_K"]), estimated_K),
     )
     return {
-        "temperature_K": float(temperature_K),
+        "temperature_K": temperature_K,
         "estimated_liquidus_K": estimated_K,
         "uncertainty_K": float(_LIQUIDUS_MODEL["uncertainty_K"]),
-        "sub_liquidus": float(temperature_K) < estimated_K,
+        "sub_liquidus": temperature_K < estimated_K,
         "model": "anchored_linear_12022_uncertified_v0",
         "status": "UNCERTIFIED_PARAMETERIZED_ESTIMATE",
     }
@@ -548,8 +681,14 @@ def structural_activity_diagnostic(
     *,
     temperature_K: float,
 ) -> dict[str, Any]:
-    """Build the run diagnostic payload for structural gamma tuning."""
+    """Build the run diagnostic payload for structural gamma tuning.
 
+    ``temperature_K`` must be finite and > 0 K. Known-oxide (and alias)
+    amounts that are non-finite, non-numeric, or below-dust-floor
+    negative raise ``ValueError`` via ``normalize_formula_unit_moles``.
+    """
+
+    temperature_K = _require_finite_positive_temperature_K(temperature_K)
     features = structural_activity_features(oxide_mol_by_species)
     gamma_status, gamma_reason = structural_gamma_domain_verdict(
         features.nbo_t, features.optical_basicity

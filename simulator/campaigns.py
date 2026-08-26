@@ -9,7 +9,8 @@ for each campaign phase.
 Each campaign has:
     - Temperature target(s) and ramp rate (°C/hr)
     - Atmosphere settings (vacuum, pO₂, pN₂)
-    - Endpoint criteria (IR signal decay, current decay, self-termination)
+    - Endpoint criteria (duration caps, armed kg/hr or current decay,
+      C6 composition threshold — not IR peak fractions)
     - Next-campaign logic (may require operator decision)
 """
 
@@ -63,6 +64,9 @@ C2A_STAGED_PN2_BAND_REFUSAL_REASON = (
 )
 C6_HOLD_TARGET_INVALID_REFUSAL_REASON = 'c6_hold_target_nonfinite'
 C6_HOLD_ACQUISITION_REFUSAL_REASON = 'c6_hold_target_not_acquired'
+CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON = (
+    'campaign_depletion_signal_invalid'
+)
 C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON = 'c4_target_window_not_acquired'
 C4_PROCESS_WINDOW_LOST_REFUSAL_REASON = 'c4_process_window_lost'
 C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
@@ -94,7 +98,14 @@ class CampaignPressureSetpointRefusal(ValueError):
 
 
 class CampaignHoldTargetRefusal(ValueError):
-    """Typed refusal when C6 cannot establish a finite hold comparison."""
+    """Typed refusal for a provided C6 hold target or temperature that is
+    not a finite real.
+
+    ``CampaignManager.c6_at_hold_target`` raises this class when a
+    non-None argument fails ``float(...)`` or is non-finite. A missing
+    target (``hold_target_C is None``) returns False from that helper
+    rather than raising; it is not covered by this exception.
+    """
 
     reason = C6_HOLD_TARGET_INVALID_REFUSAL_REASON
     terminal_refusal = True
@@ -232,8 +243,12 @@ class CampaignManager:
             or self.furnace_max_T_C < FURNACE_MAX_T_BOUNDS_C[0]
             or self.furnace_max_T_C > FURNACE_MAX_T_BOUNDS_C[1]
         ):
-            # Grounding: docs-private/research/
-            # 2026-06-18-furnace-max-temp/findings.md
+            # Envelope is the imported FURNACE_MAX_T_BOUNDS_C pair
+            # (1200 C, 2000 C) from simulator.furnace_materials. This
+            # module does not derive those bounds. The previously cited
+            # path docs-private/research/2026-06-18-furnace-max-temp/
+            # findings.md is not in this repository; a literature
+            # derivation is unestablished here.
             raise ValueError(
                 'furnace_max_T_C must be finite and within '
                 f'[{FURNACE_MAX_T_BOUNDS_C[0]:.0f}, {FURNACE_MAX_T_BOUNDS_C[1]:.0f}]'
@@ -878,10 +893,27 @@ class CampaignManager:
         hold_target_C: object,
         temperature_C: object,
     ) -> bool:
+        """Whether a finite C6 hold pair is within 0.1 C.
+
+        ``hold_target_C is None`` returns False (no target to acquire).
+        A provided target or temperature that is not convertible to a
+        finite real raises ``CampaignHoldTargetRefusal``. Finite pairs
+        use ``abs(target - temperature) < 0.1``.
+        """
         if hold_target_C is None:
             return False
-        target = float(hold_target_C)
-        temperature = float(temperature_C)
+        try:
+            target = float(hold_target_C)
+            temperature = float(temperature_C)
+        except (TypeError, ValueError) as exc:
+            raise CampaignHoldTargetRefusal({
+                'hold_target_C': hold_target_C,
+                'temperature_C': temperature_C,
+                'detail': (
+                    'C6 hold target and melt temperature must be '
+                    'numeric and finite'
+                ),
+            }) from exc
         if not math.isfinite(target) or not math.isfinite(temperature):
             raise CampaignHoldTargetRefusal({
                 'hold_target_C': target,
@@ -1348,7 +1380,10 @@ class CampaignManager:
     def configure_campaign(self, melt: MeltState, campaign: CampaignPhase):
         """
         Set gas-side atmosphere and process parameters for a campaign.
-        ``melt.fO2_log`` is engine-computed from melt composition per tick.
+
+        This method does not compute or write ``melt.fO2_log``. On the
+        paths reachable from here it stamps atmosphere, pO2 / p_total,
+        carrier, stir, and campaign-local override state.
 
         Called when starting a new campaign phase.
         """
@@ -1576,7 +1611,14 @@ class CampaignManager:
 
         Returns:
             (target_T_C, ramp_rate_C_per_hr)
-            target_T is None for isothermal holds or MRE campaigns.
+
+        ``target_T is None`` is the fallback of ``_get_base_temp_target``
+        when no lab schedule, thermal window, or handled campaign branch
+        supplied a target (IDLE returns (None, 0.0) on that path). It is
+        not the representation of isothermal holds or MRE: on the default
+        setpoint path C0B returns (1250.0, 30.0), C5 a finite hold
+        (1575.0 or a materialized target, 5.0), C6 a finite hold and
+        ramp, and MRE_BASELINE (1575.0, 20.0).
         """
         result = self._get_base_temp_target(campaign, campaign_hour, melt)
         target_T, ramp_rate = self._apply_ramp_override(campaign, result[0], result[1])
@@ -1706,10 +1748,11 @@ class CampaignManager:
                 return (bakeout_target, ramp_rate)  # bakeout phase
 
         elif campaign == CampaignPhase.C4:
-            # Mg pyrolysis at 1580 up to user-configurable max T
-            # Higher T → more Mg extraction but risk of freezing
-            # refractory-enriched melt (liquidus rises as composition
-            # becomes more aluminous/calcic after Fe/Ti/SiO₂ removal)
+            # Selects hold_temp_C from the C4 override, else
+            # c4_max_temp_C, and returns ramp 10.0 C/hr. This branch
+            # does not compute Mg extraction, liquidus, or a freeze
+            # risk; those live outside this method. A T-versus-freezing
+            # trade through evolving composition is unestablished here.
             ovr = self._campaign_overrides(campaign)
             target = self._float(
                 ovr.get('hold_temp_C', ovr.get('hold_temperature_C')),
@@ -1920,7 +1963,12 @@ class CampaignManager:
         *,
         current_rate: float,
     ) -> bool:
-        """True only after an authorized sample exceeds the soft threshold."""
+        """True when current_rate or a same-campaign snapshot kg/hr exceeds threshold.
+
+        This helper compares magnitude only. It does not read
+        ``EvaporationFlux.carrier_authority_by_species`` or any other
+        authority field. The current-rate path has no authority argument.
+        """
         if float(current_rate) > float(threshold_kg_hr):
             return True
         for snapshot in record.snapshots:
@@ -1943,7 +1991,12 @@ class CampaignManager:
         *,
         current_rate: float,
     ) -> bool:
-        """True only after an authorized species sample exceeds threshold."""
+        """True when current_rate or a same-campaign species kg/hr exceeds threshold.
+
+        This helper compares magnitude only. It does not read
+        ``EvaporationFlux.carrier_authority_by_species`` or any other
+        authority field. The current-rate path has no authority argument.
+        """
         if float(current_rate) > float(threshold_kg_hr):
             return True
         for snapshot in record.snapshots:
@@ -1991,6 +2044,56 @@ class CampaignManager:
                 return True
         return False
 
+    @staticmethod
+    def _require_finite_nonnegative_depletion_signal(
+        value: object,
+        *,
+        name: str,
+        unit: str,
+    ) -> float:
+        """Refuse a live depletion signal that is not a finite x >= 0.
+
+        Premise: a depletion/current-decay endpoint is
+        ``0 <= x < threshold`` after arming. EvaporationFlux stores
+        kg/hr with positive = leaving the melt; MRE current is Faradaic
+        amperes. A negative sample is not "more depleted than zero";
+        NaN/inf are not comparable rates.
+
+        Algebra: convert with float(value); if that fails, or
+        ``not (isfinite(x) and x >= 0)``, raise CampaignEndpointRefusal.
+        The caller then evaluates ``x < threshold`` on the surviving x.
+
+        Unit: ``unit`` is kg/hr for evaporation or A for current.
+
+        Sanity: x = 0 is a valid empty-flux / zero-current sample and
+        is not refused; x = -1 and ±inf/NaN are refused. Scoped to the
+        C2A/C2B/C4/C5 soft-depletion comparisons in check_endpoint that
+        read the live signal after arming.
+        """
+        try:
+            number = float(value)
+        except (TypeError, ValueError) as exc:
+            raise CampaignEndpointRefusal({
+                'reason_refused': (
+                    CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON
+                ),
+                'signal': name,
+                'unit': unit,
+                'value': value,
+                'detail': f'{name} must be a finite {unit} >= 0',
+            }) from exc
+        if not math.isfinite(number) or number < 0.0:
+            raise CampaignEndpointRefusal({
+                'reason_refused': (
+                    CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON
+                ),
+                'signal': name,
+                'unit': unit,
+                'value': number,
+                'detail': f'{name} must be a finite {unit} >= 0',
+            })
+        return number
+
     def check_endpoint(self, melt: MeltState,
                        evap_flux: EvaporationFlux,
                        train: CondensationTrain,
@@ -2001,18 +2104,29 @@ class CampaignManager:
         """
         Check if the current campaign has reached its endpoint.
 
-        Endpoints are defined by:
-        - C0:   IR signal decay < 5% of peak (volatile emission stops)
-        - C0b:  P-species IR decay < 5% of peak
-        - C2A:  Na/K/Fe/SiO all decay to < 5% peak
-        - C2B:  Fe signal decays to < 5% peak
-        - C3:   pO₂ returns to setpoint, holds 30 min
-        - C4:   Mg signal decays to background
-        - C5:   Current decays to < 10 A at target voltage
-        - C6:   Self-terminating (liquidus > 1700°C)
-
-        For the simulator, we approximate these with simpler checks
-        based on evaporation rate thresholds and duration limits.
+        Runtime completion on the paths in this function (not IR peak
+        fractions; numeric thresholds come from setpoints.yaml
+        ``soft_endpoint`` / ``endpoint`` / ``composition_endpoint``):
+        - C0: temperature >= configured min after min hold, else max_hold
+        - C0B: max_hold only
+        - C2A: armed total kg/hr below configured threshold after min
+          hold, else max_hold
+        - C2A_STAGED: per-stage log-slope or legacy flux-decay, else
+          duration / max_hold
+        - C2B: armed species kg/hr below configured threshold after min
+          hold, else max_hold
+        - C3_K / C3_NA: path-dependent duration
+        - C4: in-window armed species kg/hr below configured threshold
+          after min window hours, else max_hold or a typed window refusal
+        - C5: ladder complete, or armed current below configured
+          threshold_A for consecutive_hours on the final rung, else
+          max_hold
+        - C6: at hold target and configured refractory wt% below
+          threshold_wt_pct, else max hold after acquisition; no liquidus
+          input
+        - C7_CA_ALUMINOTHERMIC: max_hold
+        - MRE_BASELINE: armed current below configured threshold after
+          min voltage, else max_hold
 
         Returns True if the campaign should end.
         """
@@ -2075,12 +2189,14 @@ class CampaignManager:
                 threshold_kg_hr,
                 current_rate=total_rate,
             )
-            if (
-                signal_armed
-                and melt.campaign_hour >= min_hold_hr
-                and total_rate < threshold_kg_hr
-            ):
-                return True
+            if signal_armed and melt.campaign_hour >= min_hold_hr:
+                total_rate = self._require_finite_nonnegative_depletion_signal(
+                    total_rate,
+                    name='C2A.total_kg_hr',
+                    unit='kg/hr',
+                )
+                if total_rate < threshold_kg_hr:
+                    return True
             if completed_campaign_hour >= max_hold_hr:
                 return True
 
@@ -2236,12 +2352,14 @@ class CampaignManager:
                 threshold_kg_hr,
                 current_rate=rate,
             )
-            if (
-                signal_armed
-                and melt.campaign_hour >= min_hold_hr
-                and rate < threshold_kg_hr
-            ):
-                return True
+            if signal_armed and melt.campaign_hour >= min_hold_hr:
+                rate = self._require_finite_nonnegative_depletion_signal(
+                    rate,
+                    name=f'C2B.{species}_kg_hr',
+                    unit='kg/hr',
+                )
+                if rate < threshold_kg_hr:
+                    return True
             if completed_campaign_hour >= max_hold_hr:
                 return True
 
@@ -2430,17 +2548,22 @@ class CampaignManager:
                 current_in_window
                 and signal_armed
                 and completed_window_hr >= min_hold_hr
-                and rate < threshold_kg_hr
             ):
-                self.last_c4_termination = {
-                    'outcome': 'mg_signal_depleted',
-                    'species': species,
-                    'rate_kg_hr': float(rate),
-                    'threshold_kg_hr': threshold_kg_hr,
-                    'completed_window_hr': completed_window_hr,
-                    'process_elapsed_hr': process_elapsed_hr,
-                }
-                return True
+                rate = self._require_finite_nonnegative_depletion_signal(
+                    rate,
+                    name=f'C4.{species}_kg_hr',
+                    unit='kg/hr',
+                )
+                if rate < threshold_kg_hr:
+                    self.last_c4_termination = {
+                        'outcome': 'mg_signal_depleted',
+                        'species': species,
+                        'rate_kg_hr': float(rate),
+                        'threshold_kg_hr': threshold_kg_hr,
+                        'completed_window_hr': completed_window_hr,
+                        'process_elapsed_hr': process_elapsed_hr,
+                    }
+                    return True
             if current_in_window and completed_window_hr >= max_hold_hr:
                 self.last_c4_termination = {
                     'outcome': (
@@ -2539,8 +2662,16 @@ class CampaignManager:
                     getattr(melt, 'mre_declared_rung_V', 0.0) or 0.0
                 ),
             )
-            if at_cap and melt.mre_current_A < threshold_A and signal_armed:
-                melt.mre_low_current_hours += 1
+            if at_cap and signal_armed:
+                current_A = self._require_finite_nonnegative_depletion_signal(
+                    melt.mre_current_A,
+                    name='C5.mre_current_A',
+                    unit='A',
+                )
+                if current_A < threshold_A:
+                    melt.mre_low_current_hours += 1
+                else:
+                    melt.mre_low_current_hours = 0
             else:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:

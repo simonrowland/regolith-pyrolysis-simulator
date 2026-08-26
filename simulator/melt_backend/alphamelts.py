@@ -16,9 +16,13 @@ PetThermoTools 0.4.5 schema verified from installed source:
   composition tables, and ``<phase>_prop`` tables.
 * ``fO2_offset`` is a delta from ``fO2_buffer``. The simulator's absolute
   ``fO2_log`` is not passed as an offset.
-* MELTS/ThermoEngine chemical-potential output must be converted to
-  thermodynamic activity as ``a_i = exp((mu_i - mu_i0) / RT)``. Activity is
-  absent when the live path does not supply both ``mu`` and ``mu0``.
+* When a result supplies both ``mu`` and ``mu0``, convert to activity as
+  ``a_i = exp((mu_i - mu_i0) / RT)`` via ``activity_from_chem_potential``.
+  ``_extract_activity_mapping`` also returns activity from
+  ``melt_oxide_activities``, liquid activity tables, ``activity_coefficients``
+  times oxide mole fraction, or liquid ``*_prop`` activity fields; the
+  ``mu``/``mu0`` converter in ``_extract_activities_from_chemical_potentials``
+  runs only after those paths return empty.
 """
 
 from __future__ import annotations
@@ -176,20 +180,26 @@ ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS = 6
 # IEEE-754 binary32 unit in the last place:
 #   ulp(T) = 2^(floor(log2(|T|)) - 23)
 # Furnace domain is |T| < 2^12 = 4096 C, so the coarsest ulp is
-#   ulp_max = 2^(11 - 23) = 2^-12 ≈ 2.44140625e-4 C.
-# Bound = 2 * ulp_max ≈ 4.8828125e-4 C. Checks:
-#   - after binary32 quantization the contract IS the engine storage form,
-#     so residual of a matching execution is 0; the bound remains for
-#     parser / print-path noise around that identity
-#   - a genuine 0.5 C engine mismatch still fails by ~1000x margin
-#   - this is NOT the old 0.01 hand-wave; it is the representation bound of
-#     the binary32 determinant after channel string round-trip
-# The guard can now distinguish: binary32-identical residuals pass;
-# engine-disobedient T (wrong setpoint) refuse.
+#   ulp_max = 2^(11 - 23) = 2^-12 = 2.44140625e-4 C.
+# Bound = 2 * ulp_max = 4.8828125e-4 C.
+# Premise: after binary32 quantization the contract is the engine storage
+# form, so a matching execution residual is 0; the bound is for parser /
+# print-path noise around that identity, not a per-bucket identity test.
+# Algebra: near 952 C, exponent floor(log2(952)) = 9, so
+#   ulp(952 C) = 2^(9-23) = 2^-14 = 6.103515625e-5 C.
+# Unit check: abs_tol is in C; executed and contract T are in C.
+# Sanity: contract 952.3773803710938 and the next binary32 value
+# 952.37744140625 differ by one ulp (6.103515625e-5 C) and still pass
+# math.isclose under 2*ulp_max. A 0.5 C mismatch still fails by ~1000x.
+# The predicate therefore refuses large setpoint disobedience, not every
+# distinct binary32 bucket.
 ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 2.0 * (2.0 ** (11 - 23))
 # System_main_tbl.txt prints Temperature to 2 decimal places (observed:
-# executed 952.377380 → table cell "952.38"). Table-vs-stdout consistency
-# uses that print quantum, not the float32 residual bound above.
+# executed 952.377380 → table cell "952.38"). The abs_tol below is the
+# full 0.01 C print quantum, not the 0.005 C half-quantum nearest-rounding
+# bound. math.isclose(..., abs_tol=0.01) can accept a table cell that is
+# not the two-decimal rendering of stdout (952.371 vs 952.38: rounding
+# of 952.371 is 952.37; delta 0.009 C still passes).
 ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C = 0.01
 # System_main_tbl.txt prints fO2(absolute) to 3 decimal places. Nearest-value
 # rounding therefore loses up to 0.5e-3 log10 units; the extra 1e-7 clears the
@@ -303,7 +313,12 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
 
 
 class AlphaMELTSSubprocessContractError(MeltBackendError):
-    """Typed failure for subprocess request/output contract violations."""
+    """Typed failure raised by ``_alphamelts_backend_failure_error``.
+
+    ``_parse_liquidus_C`` and ``_parse_executed_temperatures_C`` wrap
+    unparseable or non-finite regex tokens with this type. Other parsers
+    in this module are not covered by that wrap.
+    """
 
 
 class AlphaMELTSConfigurationError(ValueError):
@@ -586,6 +601,30 @@ def _alphamelts_backend_failure_error(reason_code: str,
     return error
 
 
+def _float_engine_numeric_token(token: str, *, context: str) -> float:
+    """Parse one engine stdout token captured by a numeric regex.
+
+    The liquidus and executed-T regexes admit any string of ``[0-9.+-Ee]``,
+    including tokens that are not IEEE floats (``...``) and tokens that
+    overflow to inf (``1e999``). A bare ``float()`` on those paths leaked
+    ``ValueError`` or returned a non-finite value. Scope: this helper, used
+    by ``_parse_liquidus_C`` and ``_parse_executed_temperatures_C``.
+    """
+    try:
+        value = float(token)
+    except ValueError as exc:
+        raise _alphamelts_backend_failure_error(
+            ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
+            f'unparseable engine numeric token {token!r} ({context})',
+        ) from exc
+    if not math.isfinite(value):
+        raise _alphamelts_backend_failure_error(
+            ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
+            f'non-finite engine numeric token {token!r} ({context})',
+        )
+    return value
+
+
 def _normalize_subprocess_run_mode(
     value: AlphaMELTSSubprocessRunMode | str | None,
 ) -> AlphaMELTSSubprocessRunMode:
@@ -637,7 +676,12 @@ def _run_petthermotools_worker(
 
 
 def _bootstrap_petthermotools_worker(model_code: int):
-    """Import PTT and construct one reusable native MELTS payload."""
+    """Import PetThermoTools and retain the ``MELTSdynamic`` loader.
+
+    This bootstrap does not construct a payload. ``_handle_petthermotools_request``
+    constructs one ``MELTSdynamic`` per ``equilibrate_MELTS`` / ``findLiq_MELTS``
+    call.
+    """
     try:
         module = importlib.import_module('petthermotools')
     except ImportError:
@@ -658,13 +702,21 @@ def _bootstrap_petthermotools_worker(model_code: int):
 
 
 def _handle_petthermotools_request(resource, request, _errlog):
-    """Run one operation after rebuilding all native/Python call state."""
+    """Run one PetThermoTools operation from a warm-worker resource.
+
+    For ``equilibrate_MELTS`` and ``findLiq_MELTS``, construct a new
+    ``MELTSdynamic`` via ``resource['loader']`` for this call. Other
+    operations pass through without that construction. This function does
+    not compare reused-versus-fresh payloads, so payload mutation is not an
+    established cause of request-order dependence here.
+    """
     operation = str(request['operation'])
     call_kwargs = dict(request.get('kwargs') or {})
     if operation in {'equilibrate_MELTS', 'findLiq_MELTS'}:
-        # PetThermoTools mutates the MELTSdynamic payload. Reusing that object
-        # makes warm output request-order dependent, violating grind cache
-        # identity. Keep imports resident but reconstruct the per-call model.
+        # Keep imports resident; construct a fresh MELTSdynamic for this
+        # operation. This module has no reused-versus-fresh A/B of
+        # PetThermoTools output, so reconstruction is the implemented
+        # isolation, not a measured counterfactual.
         call_kwargs['melts'] = resource['loader'](resource['model_code'])
     function = getattr(resource['module'], operation)
     return function(*tuple(request.get('args') or ()), **call_kwargs)
@@ -946,8 +998,10 @@ class _MELTSBackendSupport(MeltBackend):
             warnings.warn(
                 'VapoRock vapor-melt library unavailable; alphaMELTS vapor '
                 'pressures fall back to activity x Antoine rows; '
-                'vapor_pressures_source distinguishes pure-component '
-                'first-principles rows from backsolved VapoRock curve-fit rows.',
+                'vapor_pressures_source records per-species Antoine-row '
+                'provenance via vapor_pressure_source_label; '
+                'fit_target=pure_component_psat is a fit target, not a '
+                'first-principles evidence class.',
                 stacklevel=2,
             )
             self._vaporock_unavailable_logged = True
@@ -1234,7 +1288,10 @@ class _MELTSBackendSupport(MeltBackend):
 
     def get_vapor_species(self) -> List[str]:
         if self._vaporock_available:
-            # VapoRock provides 34 species
+            # This wrapper returns this fixed 22-name list when
+            # _vaporock_available is true. It is not
+            # VapoRockBackend.get_vapor_species() (42 names on current
+            # VapoRockBackend) and does not track that delegate's vocabulary.
             return [
                 'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
                 'SiO', 'FeO', 'MgO', 'CaO', 'AlO', 'TiO', 'NaO', 'KO',
@@ -2285,11 +2342,12 @@ class _MELTSBackendSupport(MeltBackend):
                     _h2_melt_envelope_diagnostics(temperature_C)
                 )
             else:
-                # Use activity x Antoine fallback rows only when the
-                # chemical-potential convention supplied real activities.
-                # Only pure_component_psat rows are pure-component /
-                # first-principles; pseudo rows are backsolved VapoRock
-                # curve-fit fallbacks.
+                # Activity x Antoine fallback when VapoRock is unavailable.
+                # Activities here are whatever _parse_petthermotools_result
+                # extracted (direct tables, gamma*x, phase fields, or mu/mu0).
+                # fit_target=pure_component_psat is a fit target, not a
+                # first-principles evidence class; pseudo rows are backsolved
+                # VapoRock curve-fit fallbacks.
                 projection = self._activities_times_antoine_or_fail(
                     temperature_C,
                     eq.activity_coefficients,
@@ -3005,7 +3063,10 @@ class _MELTSBackendSupport(MeltBackend):
         )
         if match is None:
             return None
-        return float(match.group(1))
+        return _float_engine_numeric_token(
+            match.group(1),
+            context='liquidus_C',
+        )
 
     def _parse_executed_temperatures_C(self, output: str) -> list[float]:
         matches = re.finditer(
@@ -3020,10 +3081,21 @@ class _MELTSBackendSupport(MeltBackend):
         for match in matches:
             started = match.group('started')
             if started is not None:
-                temperatures.append(float(started))
+                temperatures.append(
+                    _float_engine_numeric_token(
+                        started,
+                        context='executed temperature_C',
+                    )
+                )
                 continue
-            pressure_bar = float(match.group('failed_pressure'))
-            failed_temperature_C = float(match.group('failed'))
+            pressure_bar = _float_engine_numeric_token(
+                match.group('failed_pressure'),
+                context='failed-calculation pressure',
+            )
+            failed_temperature_C = _float_engine_numeric_token(
+                match.group('failed'),
+                context='failed-calculation temperature_C',
+            )
             # alphaMELTS 2.3.1 emits its internal reset state as 0 bar, 0 K.
             # -273.15 C is therefore not an executed thermodynamic state.
             if pressure_bar == 0.0 and failed_temperature_C == -273.15:
@@ -3679,9 +3751,10 @@ class _MELTSBackendSupport(MeltBackend):
         if run_mode is AlphaMELTSSubprocessRunMode.ISOTHERMAL:
             # Compare executed vs the binary32-contract request (the engine
             # determinant; string form is ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS).
-            # Tolerance is the float32 representation bound — not a
-            # hand-widened window. Distinguishes: (pass) engine stored the
-            # contract T in binary32; (refuse) engine ran a different T.
+            # abs_tol is 2*ulp_max over |T|<4096 C (see
+            # ALPHAMELTS_EXECUTED_T_TOLERANCE_C). Adjacent binary32 buckets
+            # near 952 C still pass; this refuses large disobedience, not
+            # every distinct float32 setpoint.
             mismatches = [
                 value for value in executed_temperatures_C
                 if not math.isclose(
@@ -3710,6 +3783,8 @@ class _MELTSBackendSupport(MeltBackend):
                 float(table_temperature_C),
                 executed_temperature_C,
                 rel_tol=0.0,
+                # Full 0.01 C print quantum; not the 0.005 C half-quantum
+                # rounding bound. See ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C.
                 abs_tol=ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C,
             )
         ):
@@ -3813,9 +3888,14 @@ class _MELTSBackendSupport(MeltBackend):
             system_mass_kg,
             rel_tol=1.0e-6,
             # Phase_main_tbl prints each phase mass to 0.001 g while
-            # System_main_tbl retains more digits. Allow half one printed unit
-            # per displayed phase, the tightest aggregate closure tolerance
-            # justified by the engine-owned text.
+            # System_main_tbl retains more digits. abs_tol is half one printed
+            # unit per displayed phase (0.0005 g → kg). math.isclose also
+            # uses rel_tol=1e-6, which on a 1 kg solver basis allows ~0.001 g,
+            # wider than that half-quantum abs_tol. Accepted closure is the
+            # OR of those two terms, not the print-rounding bound alone.
+            # Sanity: 1 kg basis, 0.00075 g gap, one displayed phase: half-
+            # quantum abs_tol is 0.0005 g, but isclose still returns True via
+            # rel_tol.
             abs_tol=max(1.0e-9, phase_mass_rounding_tolerance_kg),
         ):
             raise _alphamelts_backend_failure_error(
@@ -4065,7 +4145,8 @@ class _MELTSBackendSupport(MeltBackend):
                 }
         if not activity_coefficients:
             result_warnings.append(
-                'PetThermoTools chemical potentials absent; '
+                'PetThermoTools activity mapping empty (no direct table, '
+                'gamma*x, phase field, or mu/mu0 path); '
                 'activity-scaled Antoine fallback skipped'
             )
         return self._emit_equilibrium_result(
@@ -4753,8 +4834,9 @@ class _MELTSBackendSupport(MeltBackend):
             warnings.warn(
                 'VapoRock returned no usable vapor pressures '
                 f'({detail}); using activity x Antoine fallback rows '
-                '(pure-component only when fit_target=pure_component_psat; '
-                'pseudo rows are backsolved VapoRock curve-fits).',
+                '(fit_target=pure_component_psat is a fit target, not a '
+                'first-principles evidence class; pseudo rows are backsolved '
+                'VapoRock curve-fits).',
                 stacklevel=2,
             )
             projection = self._activities_times_antoine_or_fail(
@@ -4955,20 +5037,44 @@ class _MELTSBackendSupport(MeltBackend):
                                     *,
                                     pO2_bar: float | None = None) -> Dict[str, float]:
         """
-        Compute vapor pressures as thermodynamic activity x Antoine-row P(T).
+        Project vapor pressure from a loaded Antoine-row P_reference(T) and an
+        activity. Fallback when VapoRock is not available.
 
-        Fallback when VapoRock is not available. Uses Antoine equation rows
-        from vapor_pressures.yaml. Only fit_target=pure_component_psat rows
-        are pure-component / first-principles. Rows with
+        Premise: each loaded row stores log10(P_reference / Pa) =
+        A - B / (T_K + C). Algebra: P_reference_i(T) =
+        10 ** (A - B / (T_K + C)). Unit check: A, B, C are the stored
+        Antoine coefficients for P in Pa; T_K is kelvin; the exponent is
+        dimensionless; P_reference_i is Pa.
+
+        For fit_target != standard_reaction_term:
+            P_i = a_i * P_reference_i(T)
+        that is activity-linear scaling of the stored reference pressure.
+
+        For fit_target == standard_reaction_term:
+            P_i = a_i ** n_a * P_reference_i(T)
+                  * (pO2 / pO2_reference) ** n_p
+        where n_a is oxide_activity_exponent (the code treats a missing or
+        zero-like value as 1.0) and n_p is pO2_exponent (default 0). pO2 and
+        pO2_reference are in bar. If n_p is nonzero and pO2_bar is omitted,
+        this helper raises RuntimeError rather than dropping the pO2 term.
+
+        Sanity (Na row, T=1500 C, a_Na2O=0.5): n_p = -0.25, so dropping pO2
+        from 1 bar to 1e-4 bar multiplies P_Na by 10; a pO2-free
+        a_i * P_ref formula predicts no change.
+
+        fit_target=pure_component_psat identifies the fit target, not a
+        first-principles evidence class. vapor_pressure_source_label reserves
+        pure_component_first_principles for a derivation from physical
+        constants; loaded pure-component rows include source-published
+        empirical equations. Rows with
         fit_target=pseudo_psat_backsolved_from_vaporock are backsolved
         VapoRock fallbacks (curve-fits), with residual_dex/confidence_tier
-        metadata. Activities must already be pure-endmember-referenced
-        values from
-        ``activity_from_chem_potential(mu, mu0, T_K)``.
+        metadata.
 
-        P_i = a_i x P_reference_i(T)
-
-        If activities are unavailable, no pressure is emitted.
+        This helper does not require activities to have come from
+        ``activity_from_chem_potential``. Callers pass whatever mapping they
+        extracted (direct tables, gamma*x, phase fields, or mu/mu0). If that
+        mapping is empty, no pressure is emitted.
         Missing activity for a melt-present precursor is a hard refusal of the
         whole projection (via ``_activities_times_antoine_or_fail``); this
         helper records partial omissions so the outer gate can refuse rather

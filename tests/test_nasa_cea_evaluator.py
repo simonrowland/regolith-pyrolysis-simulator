@@ -2,8 +2,10 @@
 
 VR-4 / t-425. Ground-truth: closed-form hand evaluation of published CEA
 coefficients (not simulator self-parity). Continuity residuals at shared
-segment breakpoints must sit at floating-point noise for continuous source
-records. Segment gap/overlap and missing standard-state convention fail loud.
+segment breakpoints are signed (higher-segment minus lower-segment).
+Published decimal coefficients can already disagree at a join; that residual
+is source rounding, not evaluator roundoff. Segment gap/overlap and missing
+standard-state convention fail loud.
 """
 
 from __future__ import annotations
@@ -20,9 +22,12 @@ from simulator.vapour_rail.nasa_cea import (
     Nasa9Segment,
     NasaCeaConventionError,
     NasaCeaDomainError,
+    NasaCeaError,
     NasaCeaPolynomial,
     NasaCeaSegmentError,
+    ThermoState,
     continuity_residuals,
+    reaction_equilibrium_constant,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -141,7 +146,9 @@ def test_nasa9_continuity_at_segment_breakpoint() -> None:
     poly = _o2_poly()
     residuals = continuity_residuals(poly, 1000.0)
     assert residuals is not None
-    # Continuous source records agree far below any engineering threshold.
+    # O2 tpis89 printed coefficients already differ by 1.585e-9 in Cp/R at
+    # 1000 K in high-precision decimal (source rounding). Ceiling is an
+    # engineering bound, not a machine-epsilon claim.
     assert abs(residuals["d_cp_over_R"]) < 1e-8
     assert abs(residuals["d_h_over_RT"]) < 1e-8
     assert abs(residuals["d_s_over_R"]) < 1e-8
@@ -289,3 +296,128 @@ def test_fixture_thermo_subset_exists() -> None:
     assert "O2" in text
     assert "Na" in text
     assert "H2O(cr)" in text
+
+
+def _const_cp_nasa7(
+    T_min: float, T_max: float, a1: float = 3.5
+) -> Nasa7Segment:
+    return Nasa7Segment(T_min, T_max, (a1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+
+
+def test_segment_zero_or_negative_T_bounds_fail() -> None:
+    with pytest.raises(NasaCeaSegmentError, match="T_min_K > 0"):
+        Nasa7Segment(0.0, 1000.0, (3.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    with pytest.raises(NasaCeaSegmentError, match="T_min_K > 0"):
+        Nasa7Segment(-10.0, 1000.0, (3.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    with pytest.raises(NasaCeaSegmentError, match="T_min_K > 0"):
+        Nasa9Segment(0.0, 1000.0, (0.0, 0.0, 3.5, 0.0, 0.0, 0.0, 0.0), 0.0, 0.0)
+
+
+def test_segment_nonfinite_T_bounds_fail() -> None:
+    with pytest.raises(NasaCeaSegmentError, match="finite"):
+        Nasa7Segment(300.0, math.inf, (3.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    with pytest.raises(NasaCeaSegmentError, match="finite"):
+        Nasa7Segment(-math.inf, 1000.0, (3.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    with pytest.raises(NasaCeaSegmentError, match="finite"):
+        Nasa7Segment(math.nan, 1000.0, (3.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+
+
+def test_nonfinite_coefficients_fail_at_construction() -> None:
+    with pytest.raises(NasaCeaSegmentError, match="finite"):
+        Nasa7Segment(300.0, 1000.0, (math.nan, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    with pytest.raises(NasaCeaSegmentError, match="finite"):
+        Nasa7Segment(300.0, 1000.0, (3.5, math.inf, 0.0, 0.0, 0.0, 0.0, 0.0))
+    with pytest.raises(NasaCeaSegmentError, match="finite"):
+        Nasa9Segment(
+            200.0, 1000.0, (0.0, 0.0, 3.5, 0.0, 0.0, 0.0, 0.0), math.nan, 0.0
+        )
+
+
+def test_evaluate_ratios_refuses_nonpositive_or_nonfinite_T() -> None:
+    seg7 = _const_cp_nasa7(300.0, 1000.0)
+    seg9 = Nasa9Segment(
+        200.0, 1000.0, (0.0, 0.0, 3.5, 0.0, 0.0, 0.0, 0.0), 0.0, 0.0
+    )
+    for seg in (seg7, seg9):
+        for bad in (0.0, -1.0, math.nan, math.inf, -math.inf):
+            with pytest.raises(NasaCeaDomainError):
+                seg.evaluate_ratios(bad)
+            with pytest.raises(NasaCeaError):
+                seg.evaluate_ratios(bad)
+    # Valid T inside the interval is unchanged (constant Cp/R = 3.5).
+    assert seg7.evaluate_ratios(500.0)[0] == pytest.approx(3.5, abs=0.0)
+
+
+def test_continuity_residuals_are_signed() -> None:
+    poly = NasaCeaPolynomial(
+        name="jump",
+        family="nasa_cea_7",
+        standard_state="gas",
+        segments=(
+            _const_cp_nasa7(300.0, 1000.0, a1=2.0),
+            _const_cp_nasa7(1000.0, 2000.0, a1=1.0),
+        ),
+    )
+    residuals = continuity_residuals(poly, 1000.0)
+    assert residuals is not None
+    assert residuals["d_cp_over_R"] == pytest.approx(-1.0, abs=0.0)
+    assert residuals["d_h_over_RT"] == pytest.approx(-1.0, abs=0.0)
+    assert residuals["d_s_over_R"] == pytest.approx(-math.log(1000.0), rel=0, abs=1e-12)
+
+
+def test_reaction_equilibrium_constant_refuses_nonfinite_and_mixed_T() -> None:
+    with pytest.raises(NasaCeaError, match="finite"):
+        reaction_equilibrium_constant([(1.0, math.nan)], T_K=300.0)
+    with pytest.raises(NasaCeaError, match="finite"):
+        reaction_equilibrium_constant([(math.inf, 1.0)], T_K=300.0)
+    mixed = [
+        (+1.0, ThermoState(300.0, 2.0, 2.0, 2.0, 2.0)),
+        (-1.0, ThermoState(3000.0, 1.0, 1.0, 1.0, 1.0)),
+    ]
+    with pytest.raises(NasaCeaDomainError, match="300"):
+        reaction_equilibrium_constant(mixed, T_K=-5.0)
+    # Same-T ThermoState path still returns exp(−Σ ν G/RT).
+    same = [
+        (+1.0, ThermoState(1000.0, 2.5, 2.5, 0.0, 2.0)),
+        (-1.0, ThermoState(1000.0, 3.0, 3.0, 0.0, 0.0)),
+    ]
+    assert reaction_equilibrium_constant(same, T_K=1000.0) == pytest.approx(
+        math.exp(-2.0), rel=0, abs=1e-12
+    )
+
+
+def test_reaction_equilibrium_constant_overflow_is_nasa_cea_error() -> None:
+    with pytest.raises(NasaCeaError, match="overflows") as excinfo:
+        reaction_equilibrium_constant([(-1.0, 1e300)], T_K=300.0)
+    assert not isinstance(excinfo.value, OverflowError)
+    assert isinstance(excinfo.value.__cause__, OverflowError)
+
+
+def test_pure_psat_overflow_is_nasa_cea_error() -> None:
+    # G/RT = a1 − a1 ln T − a7. Large positive a7 on the gas and large
+    # negative a7 on the condensed make −(G_gas − G_cond) overflow exp.
+    gas = NasaCeaPolynomial(
+        name="X(g)",
+        family="nasa_cea_7",
+        standard_state="gas",
+        formula="X",
+        segments=(
+            Nasa7Segment(
+                300.0, 2000.0, (2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 800.0)
+            ),
+        ),
+    )
+    cond = NasaCeaPolynomial(
+        name="X(cr)",
+        family="nasa_cea_7",
+        standard_state="condensed_solid",
+        formula="X",
+        segments=(
+            Nasa7Segment(
+                300.0, 2000.0, (3.0, 0.0, 0.0, 0.0, 0.0, 0.0, -800.0)
+            ),
+        ),
+    )
+    with pytest.raises(NasaCeaError, match="overflows") as excinfo:
+        gas.pure_psat_over_Pstd(cond, 1000.0)
+    assert isinstance(excinfo.value.__cause__, OverflowError)

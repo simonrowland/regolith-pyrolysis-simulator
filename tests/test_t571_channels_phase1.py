@@ -40,10 +40,13 @@ from simulator.vapour_rail.channels import (
     ChannelConstructionError,
     ChannelEvaluationError,
     ChannelVerdictKind,
+    CompiledReactionTerm,
     GasChannelPotential,
     REACTION_PLANE_MELT_INTERFACE,
     REACTION_PLANE_TRANSPORT_HEADSPACE,
+    REFUSAL_CHANNEL_PLANE_UNSUPPORTED,
     REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING,
+    ReactionTermRole,
     ReactionThermoInputs,
     attempt_channel_composition,
     channel_linear_mass_action_factor,
@@ -904,6 +907,100 @@ def test_channel_linear_mass_action_factor_typed_errors():
         channel_linear_mass_action_factor(f2_term, o2_point)  # channel mismatch
     with pytest.raises(ChannelEvaluationError):
         channel_linear_mass_action_factor(o2_term, refused)  # verdict not Point
+
+
+def test_finite_center_point_refuses_nonfinite_reduced_delta_and_temperature():
+    """Inf/NaN reduced potential is not a certifying Point (degenerate input)."""
+
+    point = o2_potential_from_pO2_bar(
+        pO2_bar=1.0e-6,
+        temperature_K=1800.0,
+        reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+        authority=True,
+    )
+    assert point.may_certify() is True
+    assert math.isfinite(point.reduced_potential_ln)
+    assert math.isfinite(point.delta_mu_J_per_mol)
+    for val in (math.inf, -math.inf):
+        with pytest.raises(ValueError, match="finite reduced_potential_ln"):
+            dataclasses.replace(
+                point,
+                reduced_potential_ln=val,
+                delta_mu_J_per_mol=val,
+            )
+    with pytest.raises(ValueError):
+        dataclasses.replace(
+            point,
+            reduced_potential_ln=math.nan,
+            delta_mu_J_per_mol=math.nan,
+        )
+    with pytest.raises(ValueError, match="finite positive temperature_K"):
+        dataclasses.replace(
+            point,
+            temperature_K=math.inf,
+            delta_mu_J_per_mol=(
+                GAS_CONSTANT * math.inf * float(point.reduced_potential_ln)
+            ),
+        )
+
+
+def test_compile_o2_channel_term_refuses_nonfinite_stoichiometry():
+    """Infinite reaction coefficients are not compiled exponents."""
+
+    with pytest.raises(ValueError, match="signed_nu must be finite"):
+        compile_o2_channel_term(
+            signed_nu_o2=math.inf,
+            target_nu=1.0,
+            reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+        )
+    with pytest.raises(ValueError, match="signed_nu must be finite"):
+        compile_o2_channel_term(
+            signed_nu_o2=-math.inf,
+            target_nu=1.0,
+            reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+        )
+    with pytest.raises(ValueError, match="target_nu must be finite"):
+        compile_o2_channel_term(
+            signed_nu_o2=1.0,
+            target_nu=math.inf,
+            reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+        )
+    with pytest.raises(ValueError, match="signed_nu must be finite"):
+        derived_exponent(math.inf, 1.0)
+    with pytest.raises(ValueError, match="signed_nu must be finite"):
+        CompiledReactionTerm(
+            participant_formula="O2",
+            role=ReactionTermRole.EXCHANGE_CHANNEL,
+            input_id=CHANNEL_O2,
+            signed_nu=math.inf,
+            target_nu=1.0,
+            derived_exponent=-math.inf,
+            standard_state_id="gas.ideal.O2.1bar.v1",
+            required_plane=REACTION_PLANE_MELT_INTERFACE,
+        )
+
+
+def test_o2_resolver_unknown_plane_is_typed_refusal():
+    """Unknown O2 plane is not rewritten to transport_headspace."""
+
+    pot = resolve_channel_potential(
+        CHANNEL_O2,
+        temperature_K=1800.0,
+        reaction_plane="not_a_plane",
+        pO2_bar=1.0e-6,
+    )
+    assert pot.verdict is ChannelVerdictKind.REFUSAL
+    assert pot.refusal_code == REFUSAL_CHANNEL_PLANE_UNSUPPORTED
+    assert pot.may_certify() is False
+    assert pot.reaction_plane == "not_a_plane"
+    owned = resolve_channel_potential(
+        CHANNEL_O2,
+        temperature_K=1800.0,
+        reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+        pO2_bar=1.0e-6,
+    )
+    assert owned.verdict is ChannelVerdictKind.POINT
+    assert owned.reaction_plane == REACTION_PLANE_TRANSPORT_HEADSPACE
 
 
 # ---------------------------------------------------------------------------

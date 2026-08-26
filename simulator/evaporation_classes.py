@@ -75,10 +75,16 @@ class EvidenceRow:
     are retained as *negative evidence* / fences and never enter residual
     scoring for the production melt carrier.
 
-    ``alpha`` is the numeric extract pin when the store carries a scalar (or a
-    well-defined range mid used only for band-coverage checks). Fence rows may
-    omit it. Band coverage for comparable non-fence rows with a numeric alpha
-    is enforced by :func:`assert_evidence_rows_present`.
+    ``alpha`` is the numeric pin this table uses for band-coverage checks.
+    When the named ``(source_id, observation_id)`` carries a scalar, or a
+    well-defined range mid, that is the usual source. It is not always a
+    same-observation extract pin: the SiO Fedkin Langmuir placeholder
+    ``fedkin_2006_sio_hashimoto_langmuir_table3`` stores 0.17 here while
+    its named extract row has ``values.alpha is None`` (the 0.17 scalar
+    lives on the same-source ``complete_b1`` observation and the declared
+    mirror). Fence rows may omit it. Band coverage for comparable
+    non-fence rows with a numeric alpha is enforced by
+    :func:`assert_evidence_rows_present`.
     """
 
     source_id: str
@@ -161,7 +167,11 @@ _SIO_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha_note="Hashimoto Langmuir series 0.12-0.21",
         comparable=True,
         role="grounding",
-        alpha=0.17,  # series mid (matches table3 pin)
+        # 0.17 is Fedkin Table 3 SiO at 2073 K (per-T 0.12/0.17/0.20/0.21
+        # at 1973–2273 K). Named observation values.alpha is None (OCR
+        # placeholder). Same-source complete_b1 (supersedes this id) and
+        # the fedkin-grossman-ghiorso-2006 mirror carry the 0.17 scalar.
+        alpha=0.17,
     ),
     EvidenceRow(
         source_id="fedkin-grossman-ghiorso-2006",
@@ -453,9 +463,16 @@ _MARKED_IDEAL_FENCES: tuple[EvidenceRow, ...] = (
 # Band: every grounded α ∈ {0.02, 0.24, 0.27, 0.04} must lie in
 #   [α_c · 10^{-σ}, α_c · 10^{+σ}].
 #   max_i |log10(α_i / 0.084)| = |log10(0.02/0.084)| = 0.623 → residual 0.63 dex.
-#   (Programme 0.5-dex pin is a floor, not a ceiling: Fe pole-to-pole ~1.08 dex
-#   is irreducible without Motzfeldt; residual widens to cover, not split, until
-#   a comparable Motzfeldt-corrected Fe row lands.)
+#   Programme 0.5-dex pin is a floor, not a ceiling. Fe poles 0.02 and 0.24
+#   differ by log10(0.24/0.02) = 1.079 dex, but those two rows also differ in
+#   condensed phase (solid_solution_olivine / kems_effusion vs silicate_melt /
+#   langmuir_free_evaporation), material, and T window (Costa ~1700–1800 K
+#   vs Fedkin 1973–2273 K). This comment block does not isolate Motzfeldt
+#   geometry as the cause of that spread: Costa's extract records a
+#   Whitman–Motzfeld multi-cell path with missing numeric orifices; Fedkin
+#   is free-evaporation (not Knudsen). Residual 0.63 dex is coverage of the
+#   stored poles, not a Motzfeldt-corrected split. A unique-cause
+#   decomposition of the Fe spread is unestablished here.
 #
 # Unit check: α dimensionless; gmean and 10^{±σ} dimensionless. ✔
 # Limiting cases: σ→0 collapses to a point estimate (false precision here);
@@ -469,8 +486,16 @@ _REDOX_RESIDUAL_DEX: Final[float] = 0.63
 # max |log10(α/0.04)| over {0.010392, 0.17} ≈ 0.628 → 0.63 dex.
 _SIO_RESIDUAL_DEX: Final[float] = 0.63
 
-# Na/K: regime poles 0.13 / 0.26 / 1.0 around central 0.30.
-# max |log10(α/0.30)| = log10(1.0/0.30) ≈ 0.523 → 0.53 dex (band_high caps at 1).
+# Na/K: 0.30 is a programme central, not a log-middle of the stored poles.
+# Unique stored poles {0.13, 0.26, 1.0}:
+#   gmean(0.13, 1.0) = √0.13 = 0.3606
+#   gmean(0.13, 0.26, 1.0) = 0.3233
+#   gmean of all seven stored rows = 0.3799
+# None equals 0.30. The correct aggregator across vacuum Langmuir and
+# open-furnace apparent poles is unestablished here (Sossi 2019 marks
+# α=1.0 as analytical_upper_bound with semantics
+# competing_observation_do_not_average). Residual 0.53 dex is coverage
+# of the 1.0 pole: log10(1.0/0.30) ≈ 0.523 → 0.53 dex (band_high caps at 1).
 _MODIFIER_RESIDUAL_DEX: Final[float] = 0.53
 
 
@@ -519,9 +544,12 @@ EVAPORATION_CLASSES: Final[dict[str, EvaporationClass]] = {
         species=("Na", "Na2", "Na2O_gas", "K", "K2", "K2O_gas"),
         evidence=_MODIFIER_EVIDENCE,
         notes=(
-            "Log-middle of vacuum (0.13-0.26) and open-furnace (~1.0) poles. "
-            "Residual 0.53 dex covers the open-furnace 1.0 pole. Promotion "
-            "trigger: mbar-inert measurement that splits regime."
+            "0.30 is a programme central, not a log-middle of vacuum "
+            "(0.13, 0.26) and open-furnace (1.0) poles. Residual 0.53 dex "
+            "covers the 1.0 pole. Sossi 2019 labels α=1.0 "
+            "analytical_upper_bound / competing_observation_do_not_average; "
+            "this table still stores it as a regime pole. Promotion trigger: "
+            "mbar-inert measurement that splits regime."
         ),
     ),
     "oxide_condensed_congruent": EvaporationClass(
@@ -622,8 +650,12 @@ class ClassMembership:
 class SpeciesClassDiagnostic:
     """Per-species diagnostic: class + runtime α + interface share.
 
-    ``alpha_runtime`` is what the flux path uses today (from vapor_pressures).
-    ``alpha_class`` is the class-model value (not applied to flux in this chunk).
+    ``alpha_runtime`` is the vapor_pressures scalar when one exists.
+    ``alpha_class`` is the class-model value. On the path in
+    :func:`report_species_class_diagnostics`, a missing runtime α with a
+    central class still feeds ``alpha_class`` into the series diagnostic
+    (note suffix ``+class_alpha_fallback_for_s``). That is a diagnostic
+    fallback in that function, not a production-flux write.
     """
 
     membership: ClassMembership
@@ -909,7 +941,10 @@ def gate_production_alpha_source(
     Parameters
     ----------
     species:
-        Runtime species id (used for structurally-zero / membership context).
+        Runtime species id. Present for caller symmetry with
+        :func:`classify_species` / :func:`report_species_class_diagnostics`.
+        On the path inside this function the verdict is computed from
+        ``source_metadata`` only; structurally-zero membership is not read.
     source_metadata:
         Current production α source metadata — typically the
         ``evaporation_alpha`` mapping from ``vapor_pressures.yaml`` (with
@@ -935,7 +970,6 @@ def gate_production_alpha_source(
     consult this gate before accepting a production source as class evidence.
     """
 
-    _ = classify_species(species)  # membership available for future refinements
     blob = _metadata_blob(source_metadata)
     if not blob:
         return "no_data"
@@ -1004,7 +1038,20 @@ def interface_resistance_share(
 
     Premise / algebra / units: see design.md §2. Uses the authoritative
     ``_series_resistance_evaporation_flux_kg_m2_s`` helper so diagnostics
-    cannot drift from production physics.
+    share that helper's physics.
+
+    This wrapper raises ``ValueError`` when ``alpha``, ``T_K``,
+    ``molar_mass_kg_mol``, ``overhead_pressure_pa``, ``pipe_diameter_m``,
+    ``p_eq_pa``, ``p_bulk_pa``, or ``radial_stir_factor`` is non-finite, when
+    ``alpha`` / ``T_K`` / ``molar_mass_kg_mol`` / ``pipe_diameter_m`` is
+    not positive, or when ``overhead_pressure_pa`` or
+    ``radial_stir_factor`` is negative. Those inputs otherwise reach the
+    helper, which coerces non-finite overhead to 0 Pa (vacuum / HKL-only,
+    ``s=1``), non-finite diameter to the helper default 0.12 m, and
+    non-finite ``P_eq`` to a typed zero-flux series. ``overhead_pressure_pa
+    == 0`` is the vacuum case the helper already treats as ``r_gas=0``.
+    Finite ``p_eq_pa`` is still floored at 1.0 Pa so a caller that only
+    wants ``s`` has a defined driving force.
     """
 
     if not math.isfinite(alpha) or alpha <= 0.0:
@@ -1014,6 +1061,24 @@ def interface_resistance_share(
     if not math.isfinite(molar_mass_kg_mol) or molar_mass_kg_mol <= 0.0:
         raise ValueError(
             f"molar_mass_kg_mol must be finite and > 0, got {molar_mass_kg_mol!r}"
+        )
+    if not math.isfinite(overhead_pressure_pa) or overhead_pressure_pa < 0.0:
+        raise ValueError(
+            "overhead_pressure_pa must be finite and >= 0, "
+            f"got {overhead_pressure_pa!r}"
+        )
+    if not math.isfinite(pipe_diameter_m) or pipe_diameter_m <= 0.0:
+        raise ValueError(
+            f"pipe_diameter_m must be finite and > 0, got {pipe_diameter_m!r}"
+        )
+    if not math.isfinite(p_eq_pa):
+        raise ValueError(f"p_eq_pa must be finite, got {p_eq_pa!r}")
+    if not math.isfinite(p_bulk_pa):
+        raise ValueError(f"p_bulk_pa must be finite, got {p_bulk_pa!r}")
+    if not math.isfinite(radial_stir_factor) or radial_stir_factor < 0.0:
+        raise ValueError(
+            "radial_stir_factor must be finite and >= 0, "
+            f"got {radial_stir_factor!r}"
         )
 
     # Ensure a positive driving force so resistances are well-defined even
@@ -1054,11 +1119,23 @@ def flux_band_factors(s: float, residual_dex: float) -> tuple[float, float]:
 
     Premise: local elasticity E = s, so a ±σ dex move in α scales ln J by
     ±s·σ·ln(10). Factors are 10^{±s·σ}.
-    Unit check: s and σ dimensionless → factor dimensionless. ✔
-    Limiting cases: s→0 → (1,1); s→1 → (10^{-σ}, 10^{+σ}).
+    Unit check: s and σ dimensionless → factor dimensionless.
+    Limiting cases on s ∈ [0, 1]: s=0 → (1, 1); s=1 → (10^{-σ}, 10^{+σ}).
+    Sanity: s=0.5, σ=0.5 → (10^{-0.25}, 10^{0.25}) ≈ (0.5623, 1.778).
+    Inside this function, s>1 is clamped to 1 (same factors as s=1).
+    Non-finite s or residual_dex, and s<0, raise ValueError: those inputs
+    have no flux-band interpretation here. Negative residual_dex is taken
+    as magnitude (same as before).
     """
 
-    s = min(max(float(s), 0.0), 1.0)
+    if not math.isfinite(s) or not math.isfinite(residual_dex):
+        raise ValueError(
+            "s and residual_dex must be finite, "
+            f"got s={s!r}, residual_dex={residual_dex!r}"
+        )
+    if s < 0.0:
+        raise ValueError(f"s must be >= 0, got {s!r}")
+    s = min(float(s), 1.0)
     sigma = abs(float(residual_dex))
     expo = s * sigma
     return (10.0 ** (-expo), 10.0 ** expo)
@@ -1105,10 +1182,19 @@ def _scalar_runtime_alpha(raw: Any) -> tuple[float | None, str]:
 
 
 def _default_molar_mass_kg_mol(species: str) -> float:
-    """Best-effort molar mass for diagnostic share; never used in flux path."""
+    """Default molar mass for diagnostic share in this module.
 
-    # Local proxies for common rail species (kg/mol). Matches LJ proxy masses
-    # in engines/builtin/evaporation_flux.py where available.
+    Used on the path in :func:`report_species_class_diagnostics` when
+    ``molar_mass_kg_mol`` is omitted.
+    """
+
+    # Partial local table of diagnostic molar masses (kg/mol) for species
+    # this function is commonly called with. It is not a complete match of
+    # the LJ proxy masses in engines/builtin/evaporation_flux.py
+    # (_EVAPORATION_LJ_PROXY_PARAMS). Mapped production species that have
+    # an LJ proxy mass there but are omitted here, and therefore take the
+    # 0.050 kg/mol fallback: Al2, Al2O, Al2O2, Al2O3_gas, AlO, AlO2, Ca2,
+    # CrO, CrO2, CrO3, TiO, TiO2_gas.
     table = {
         "Fe": 0.055845,
         "Mg": 0.024305,
@@ -1134,8 +1220,10 @@ def _default_molar_mass_kg_mol(species: str) -> float:
     }
     if species in table:
         return table[species]
-    # Fallback: 50 g/mol — diagnostic only; share is weakly mass-dependent
-    # through k_HKL vs k_g (both ∝ √M or M), so relative s is still informative.
+    # Fallback: 0.050 kg/mol — diagnostic only. k_HKL ∝ √M and k_g ∝ M, so
+    # s = r_i/(r_i+r_g) is mass-dependent. Substituting the omitted LJ
+    # proxies at 2000 K / 1000 Pa moved interface share by ~7–42 % relative
+    # for those twelve species (largest on Al2O3_gas and CrO3).
     return 0.050
 
 
@@ -1152,11 +1240,19 @@ def report_species_class_diagnostics(
 ) -> SpeciesClassDiagnostic:
     """Classify ``species`` and optionally compute interface share at conditions.
 
-    When ``T_K`` and ``overhead_pressure_pa`` are both provided, the series-
-    resistance diagnostic is evaluated with the **runtime** α (or
-    ``alpha_override``) so ``interface_share_s`` reflects current conditions.
-    Class α is reported alongside but is **not** applied to the series call
-    unless the caller passes it as ``alpha_override``.
+    When ``T_K`` and ``overhead_pressure_pa`` are both provided, this
+    function evaluates the series-resistance diagnostic with, in order:
+
+    1. ``alpha_override`` if the caller passed one,
+    2. else the runtime α from ``vapor_pressure_data``,
+    3. else, when ``membership.alpha_form == "central"``,
+       ``membership.alpha_class`` (tagged on ``alpha_runtime_note`` as
+       ``+class_alpha_fallback_for_s``).
+
+    Upper-bound classes without a runtime α skip the series call
+    (``alpha_for_s`` stays ``None``). The fallback is a diagnostic in this
+    function. It does not write the production α map
+    (``_load_evaporation_alpha_by_species`` in ``simulator/evaporation.py``).
     """
 
     membership = classify_species(species)
@@ -1291,13 +1387,21 @@ def assert_evidence_rows_present(
 ) -> dict[str, Any]:
     """Probe the extract store: every class evidence row must resolve.
 
+    Resolution order on each EvidenceRow: exact ``(source_id,
+    observation_id)``, else a unique ``observation_id`` under any
+    ``source_id`` in the index. The unique-id fallback does not check that
+    the alternate source is a pilot/kems- mirror of the requested
+    ``source_id``. ``resolved_via`` is ``source_id+observation_id`` or
+    ``observation_id_unique``; the latter is an ID-only match.
+
     Also asserts **band coverage** for every central class: each comparable
     non-fence evidence row that carries a numeric ``alpha`` must satisfy
     ``band_low <= alpha <= band_high`` (P2 / b-153).
 
     Returns a structured report. Raises ``FileNotFoundError`` if any
-    observation_id is missing from the store, or ``AssertionError`` if a
-    numeric alpha falls outside its class residual band.
+    observation_id is missing from the store after that fallback, or
+    ``AssertionError`` if a numeric alpha falls outside its class residual
+    band.
     """
 
     index = _index_extract_observation_ids(extracts_dir)
@@ -1315,8 +1419,9 @@ def assert_evidence_rows_present(
             key = (row.source_id, row.observation_id)
             hit = index.get(key)
             if hit is None:
-                # Accept same observation_id under a different source stem
-                # (pilot vs kems- mirror) if unique.
+                # Pair miss: if this observation_id exists under exactly one
+                # source_id in the index, accept that hit. ID uniqueness
+                # only — not a verified pilot/kems- mirror check.
                 alts = [k for k in index if k[1] == row.observation_id]
                 if len(alts) == 1:
                     hit = index[alts[0]]
@@ -1418,10 +1523,21 @@ def e_down_from_s(s: float, delta_dex: float = 0.5) -> float:
     """Closed-form chord elasticity from interface share (EC2 / design §2.3).
 
     Premise: E_down(δ) = log10(1 + s(10^δ − 1)) / δ
-    Unit check: dimensionless. ✔
-    Limiting cases: s→0 ⇒ E→0; s→1 ⇒ E→1.
+    Unit check: dimensionless.
+    Limiting cases on s ∈ [0, 1]: s=0 ⇒ E=0; s=1 ⇒ E=1.
+    Sanity: s=0.5, δ=0.5 → log10(1 + 0.5(√10 − 1)) / 0.5 ≈ 0.6366.
+    Inside this function, non-finite s or delta_dex, and s<0, raise
+    ValueError. s>1 is still evaluated (returns E>1); the physical share
+    domain s≤1 is not enforced here. Negative delta_dex is taken as
+    magnitude (same as before). delta_dex == 0 still raises.
     """
 
+    if not math.isfinite(s) or not math.isfinite(delta_dex):
+        raise ValueError(
+            f"s and delta_dex must be finite, got s={s!r}, delta_dex={delta_dex!r}"
+        )
+    if s < 0.0:
+        raise ValueError(f"s must be >= 0, got {s!r}")
     d = abs(float(delta_dex))
     if d == 0.0:
         raise ValueError("delta_dex must be non-zero")

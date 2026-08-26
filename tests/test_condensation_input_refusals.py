@@ -140,3 +140,53 @@ def test_stage_purity_report_refuses_invalid_inventory(inventory_kg):
         ),
     ):
         condensation.stage_purity_report(train)
+
+
+def _efficiency_stage(model):
+    return next(stage for stage in model.train.stages if stage.stage_number == 1)
+
+
+@pytest.mark.parametrize("residence_s", [math.nan, math.inf, -math.inf])
+def test_condensation_efficiency_refuses_nonfinite_residence(residence_s):
+    model = _configured_model()
+    with pytest.raises(ValueError, match="residence_s must be finite"):
+        model._condensation_efficiency(
+            stage=_efficiency_stage(model),
+            species="Fe",
+            T_cond_C=1250.0,
+            residence_s=residence_s,
+            available_kg=1.0,
+            alpha_s_value=0.5,
+        )
+
+
+@pytest.mark.parametrize("alpha_s_value", [math.nan, math.inf, -math.inf])
+def test_condensation_efficiency_refuses_nonfinite_alpha(alpha_s_value):
+    model = _configured_model()
+    with pytest.raises(ValueError, match="alpha_s_value must be finite"):
+        model._condensation_efficiency(
+            stage=_efficiency_stage(model),
+            species="Fe",
+            T_cond_C=1250.0,
+            residence_s=5.0,
+            available_kg=1.0,
+            alpha_s_value=alpha_s_value,
+        )
+
+
+def test_condensation_efficiency_refuses_nonfinite_eta(monkeypatch):
+    model = _configured_model()
+    monkeypatch.setattr(
+        condensation,
+        "_series_resistance_deposition_flux_mol_m2_s",
+        lambda *args, **kwargs: math.inf,
+    )
+    with pytest.raises(ValueError, match="condensation efficiency for Fe in stage 1 is not finite"):
+        model._condensation_efficiency(
+            stage=_efficiency_stage(model),
+            species="Fe",
+            T_cond_C=1250.0,
+            residence_s=5.0,
+            available_kg=1.0,
+            alpha_s_value=0.5,
+        )

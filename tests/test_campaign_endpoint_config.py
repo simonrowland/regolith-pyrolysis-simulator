@@ -8,7 +8,9 @@ import pytest
 import yaml
 
 from simulator.campaigns import (
+    CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON,
     CampaignC4EndpointRefusal,
+    CampaignEndpointRefusal,
     CampaignHoldAcquisitionRefusal,
     CampaignHoldTargetRefusal,
     CampaignManager,
@@ -1146,3 +1148,153 @@ def test_c4_permanent_transport_hold_trips_held_hours_wall() -> None:
         "c4_preheat_wall_clock_exhausted"
     )
     assert excinfo.value.diagnostic["acquisition_opportunity_hr"] == 0.0
+
+
+def test_c6_at_hold_target_none_is_not_at_hold() -> None:
+    assert CampaignManager.c6_at_hold_target(None, 1400.0) is False
+
+
+@pytest.mark.parametrize(
+    "hold_target_C, temperature_C",
+    [("bad", 1400.0), (1400.0, "bad"), (object(), 1400.0)],
+)
+def test_c6_nonnumeric_hold_comparison_is_typed_refusal(
+    hold_target_C: object,
+    temperature_C: object,
+) -> None:
+    with pytest.raises(CampaignHoldTargetRefusal, match="c6_hold_target_nonfinite"):
+        CampaignManager.c6_at_hold_target(hold_target_C, temperature_C)
+
+
+def _assert_depletion_signal_refused(exc: CampaignEndpointRefusal, name: str) -> None:
+    assert exc.reason == CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON
+    assert exc.diagnostic["signal"] == name
+
+
+def test_c2a_armed_negative_rate_is_typed_refusal_not_depletion() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[HourSnapshot(campaign=CampaignPhase.C2A, evap_flux=_flux(0.5))]
+    )
+    with pytest.raises(CampaignEndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C2A, 18),
+            _flux(-1.0),
+            CondensationTrain(),
+            record,
+        )
+    _assert_depletion_signal_refused(refusal.value, "C2A.total_kg_hr")
+
+
+def test_c2a_armed_zero_rate_still_depletes() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[HourSnapshot(campaign=CampaignPhase.C2A, evap_flux=_flux(0.5))]
+    )
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C2A, 18),
+        _flux(0.0),
+        CondensationTrain(),
+        record,
+    ) is True
+
+
+@pytest.mark.parametrize("bad_rate", [float("nan"), float("inf"), float("-inf")])
+def test_c2a_armed_nonfinite_rate_is_typed_refusal(bad_rate: float) -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[HourSnapshot(campaign=CampaignPhase.C2A, evap_flux=_flux(0.5))]
+    )
+    with pytest.raises(CampaignEndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C2A, 18),
+            _flux(bad_rate),
+            CondensationTrain(),
+            record,
+        )
+    _assert_depletion_signal_refused(refusal.value, "C2A.total_kg_hr")
+
+
+def test_c2a_unarmed_negative_rate_does_not_soft_complete() -> None:
+    manager = CampaignManager(_setpoints())
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C2A, 18),
+        _flux(-1.0),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+
+
+def test_c2b_armed_negative_fe_rate_is_typed_refusal_not_depletion() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[HourSnapshot(campaign=CampaignPhase.C2B, evap_flux=_flux(Fe=0.2))]
+    )
+    with pytest.raises(CampaignEndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C2B, 8),
+            _flux(Fe=-1.0),
+            CondensationTrain(),
+            record,
+        )
+    _assert_depletion_signal_refused(refusal.value, "C2B.Fe_kg_hr")
+
+
+def test_c4_armed_negative_mg_rate_is_typed_refusal_not_depletion() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[
+            _c4_snapshot(temperature_C=1580.0, mg_rate=1.0) for _ in range(5)
+        ]
+    )
+    with pytest.raises(CampaignEndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 5, temperature_C=1580.0),
+            _flux(Mg=-1.0),
+            CondensationTrain(),
+            record,
+        )
+    _assert_depletion_signal_refused(refusal.value, "C4.Mg_kg_hr")
+
+
+def test_c4_armed_zero_mg_rate_still_depletes() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        snapshots=[
+            _c4_snapshot(temperature_C=1580.0, mg_rate=1.0) for _ in range(5)
+        ]
+    )
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 5, temperature_C=1580.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        record,
+    ) is True
+    assert manager.last_c4_termination["outcome"] == "mg_signal_depleted"
+
+
+def test_c5_armed_negative_current_is_typed_refusal_not_depletion() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(
+        branch="two",
+        snapshots=[
+            HourSnapshot(
+                campaign=CampaignPhase.C5,
+                mre_voltage_V=1.6,
+                mre_declared_rung_V=1.45,
+                mre_current_A=20.0,
+            )
+        ],
+    )
+    melt = _melt(
+        CampaignPhase.C5,
+        10,
+        voltage_V=1.6,
+        current_A=-1.0,
+        low_current_hours=0,
+    )
+    melt.mre_c5_on_final_rung = True
+    melt.mre_declared_rung_V = 1.45
+    with pytest.raises(CampaignEndpointRefusal) as refusal:
+        manager.check_endpoint(melt, _flux(), CondensationTrain(), record)
+    _assert_depletion_signal_refused(refusal.value, "C5.mre_current_A")

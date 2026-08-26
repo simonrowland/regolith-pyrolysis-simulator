@@ -9,22 +9,30 @@ Each stage operates at a fixed temperature range and preferentially
 collects species whose condensation temperature falls within that range.
 
 Train topology (metals train, active C2A onward):
-    Stage 0  Hot duct (>1400°C)      — IR spectroscopy, no condensation
-    Stage 1  Fe condenser (1100-1400°C) — liquid Fe drains to sump
+    Stage 0  Hot duct (>1400°C)      — IR spectroscopy. ``route()`` still
+             walks this stage through ``_condensation_efficiency``. The
+             default area map (``STAGE_AREA_KEY_BY_STAGE_NUMBER`` /
+             setpoints ``stage_area_ratios``) names stages 1-4 and
+             terminal, so Stage 0 has no configured capture area and
+             eta takes the no-area zero. A configured Stage-0 area
+             admits species whose routing temperature sits in the
+             default 1400-1600°C band (Ti at 1500°C in
+             ``CONDENSATION_TEMPS_C``).
+    Stage 1  Fe condenser (1100-1400°C) — designated Fe stage. This
+             module does not model Fe phase or a sump. Elemental Fe
+             melts at 1538°C (1811 K), above this window.
     Stage 2  Cr oxide harvester (1100-1300°C) — Cr2O3 product cartridge
     Stage 3  SiO zone (900-1200°C)   — fused silica on removable baffles.
-             SiO capture here is *operator-controlled*. Under default
-             0.5.3 conditions with ``StirState(axial=6.0, radial=1.0)``
-             — the axial axis drives evaporation H-K-L surface renewal
-             and the radial axis drives gas-side Sherwood enhancement —
-             Stage 4 alkali/Mg carryover continues to receive more SiO
-             than Stage 3 in absolute terms (a routing trade-off
-             documented in the 0.5.3 CHANGELOG "Known limitation"
-             section). ``stir_state.radial`` is mapped to a heuristic
+             SiO capture here is *operator-controlled*.
+             ``stir_state.radial`` is mapped to a heuristic
              Sherwood multiplier, but that multiplier does not guarantee
              Stage-3 capture: the route still passes SiO through when its
-             saturation-pressure contract is unavailable. Retuning Stage 3
-             temperatures changes the sampled cold-wall driving pressure.
+             saturation-pressure contract is unavailable. On the current
+             SiO catalog row that contract is unavailable on the stage
+             path, so Stage 3 and Stage 4 both collect zero there
+             (1 kg/h SiO at 10 mbar with configured areas). Retuning
+             Stage 3 temperatures changes the sampled cold-wall driving
+             pressure only when that P_sat contract exists.
              The absolute total capture remains rate-cap-driven by
              ``_pressure_isolated_capture_budget_kg``.
              Sub-laminar ``stir_state.axial`` or pO₂ hold suppresses
@@ -53,10 +61,17 @@ Key physics:
     the live per-stage flux efficiency above.
 
 The Fe → SiO separation (Stage 1 → Stage 3):
-    Stage 1 at 1200-1400°C: Fe condenses as liquid, SiO passes through
-    (SiO condensation T is 900-1200°C, below Stage 1 operating T).
-    Chevron separator at Stage 1 exit catches entrained Fe droplets.
-    Sharp T boundary (radiation gap) prevents early SiO condensation.
+    Default Stage 1 window is 1100-1400°C; Stage 3 is 900-1200°C
+    (``CondensationTrain.create_default``). Stage 2 is the Cr/CrO2/Mn
+    harvester and isolates non-Cr species
+    (``_cr_stage_isolation_blocks``); SiO's designated destination is
+    Stage 3, not Stage 2.
+    This module does not model Fe melting, a sump, a chevron droplet
+    separator, or a radiation-gap thermal break.
+    The SiO routing-temperature band 900-1200°C overlaps Stage 1
+    1100-1400°C by 100 K. The live gate is the point routing
+    temperature plus the per-sample P_sat contract, not a claim that
+    the SiO band sits entirely below Stage 1.
     Capture and impurity fractions are outputs of flux, physical area,
     residence time, pressure, and inlet rate; this module does not impose
     fixed Fe-carryover or early-SiO percentages.
@@ -185,11 +200,17 @@ LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 #     J_mass = k_c * (P_local - P_sat) / (R * T_gas)   (mol/m^2/s)
 #
 # D_AB (binary diffusion coefficient of vapor A in carrier gas B) is
-# pressure-inverse and weakly T-dependent. For SiO/Na/K vapor in N2
-# at 10 mbar, 1700 C, Chapman-Enskog gives D_AB ~ 1.0e-2 m^2/s. The
-# default below uses 1.0e-2 m^2/s as the order-of-magnitude anchor
-# and documents the regime; species-specific refinements are open
-# work (tickler §5 follow-on).
+# pressure-inverse and weakly T-dependent. Premise: Chapman-Enskog
+# D_AB ∝ T^{1.5}/P. At the C2A point used as the historical fallback
+# anchor (10 mbar = 1000 Pa, 1700 C = 1973.15 K, N2 carrier), this
+# module's ``_chapman_enskog_d_ab_m2_s`` returns D_AB = 0.0497 (SiO),
+# 0.0430 (Na), 0.0341 (K) m^2/s — several times
+# DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2 m^2/s. Unit check: the helper
+# returns m^2/s. Sanity: 100x drop from 1 bar to 10 mbar scales a
+# ~1e-4 m^2/s atmospheric diffusivity to ~1e-2 m^2/s; the live
+# species-specific result at this T is several times that scaled
+# anchor. The 1.0e-2 constant is the legacy fallback when Chapman-
+# Enskog is not used, not a recomputed CE value.
 DEFAULT_SHERWOOD_LAMINAR = 3.66
 # Per-species Chapman-Enskog diffusion is preferred when pressure and collision
 # data produce a finite positive value. This constant remains the live fallback
@@ -238,10 +259,11 @@ def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
 # they do. The Chapman-Enskog result is moderately sensitive to sigma (Ω_D
 # ~constant in the high-T limit, D_AB ∝ 1/σ_AB²) and weakly sensitive
 # to ε (collision integral Ω_D varies <30% across the simulator's T
-# range). At the typical C2A operating point (10 mbar, 1973 K) the
-# computed D_AB for SiO/N2 is ~0.042 m²/s vs the legacy 0.01 constant
-# (4× higher) -- bringing the viscous-MT term into a more honest
-# absolute magnitude.
+# range). At the typical C2A operating point (10 mbar = 1000 Pa,
+# 1973.15 K) ``_chapman_enskog_d_ab_m2_s('SiO', ...)`` returns
+# 0.0497 m²/s vs the legacy 0.01 constant (about 5×). The previously
+# quoted ~0.042 m²/s is the same formula at 1773 K (1500 C), not at
+# 1973 K.
 _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     # (sigma Angstrom, eps/k_B K, M g/mol)
     # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
@@ -1486,9 +1508,18 @@ def gram_lab_exposed_melt_area_bridge(
 def _neufeld_collision_integral_omega_d(T_star: float) -> float:
     """Neufeld 1972 correlation for the dimensionless collision integral
     ``Ω_D`` as a function of the reduced temperature
-    ``T* = k_B * T / ε_AB``. Accurate to ≲0.3% across the typical
-    pyrolysis temperature range (T* ~3-50 for transition-metal vapor in
-    N2 at 1500-2000 K).
+    ``T* = k_B * T / ε_AB``.
+
+    Premise: ``T* = T / sqrt((ε_A/k_B)(ε_B/k_B))`` with this module's
+    ``_LENNARD_JONES_PARAMS`` and N2 ``ε/k_B = 71.4 K``. At 1500-2000 K
+    that gives T* ≈ 2.3-3.1 for Fe/Cr/Ti, ≈ 3.2-4.3 for Al, ≈ 5.4-7.1
+    for Mn, and 21-28 for SiO. T* = 50 is unreachable on this table
+    (would need ε_AB/k_B ≈ 30-40 K, below N2's own 71.4 K).
+
+    The Neufeld, Janzen & Aziz (1972) correlation interval is
+    ``0.3 <= T* <= 100`` (J. Chem. Phys. 57, 1100), with probable error
+    below 0.1% inside that interval. This helper still evaluates T* <= 0
+    as 1.0 and does not refuse out-of-interval T*.
 
     Reference: Neufeld, P.D., Janzen, A.R., Aziz, R.A.,
     "Empirical equations to calculate 16 of the transport collision
@@ -1516,16 +1547,32 @@ def _chapman_enskog_d_ab_m2_s(
     """Binary diffusion coefficient ``D_AB`` for ``species`` in
     ``carrier`` gas at ``T_K``, ``pressure_pa``. Returns m²/s.
 
-    Standard kinetic-theory form (Bird/Stewart/Lightfoot Eq 17.3-10):
+    The algebra evaluated here is:
 
         D_AB [cm²/s] = 0.00266 * T^1.5 / (P[atm] * M_AB^0.5 * σ_AB² * Ω_D)
+        P[atm] = P[Pa] / 101325
+        D_AB [m²/s] = D_AB [cm²/s] * 1e-4
 
     where:
         T in Kelvin
-        P in atmospheres (1 atm = 101325 Pa)
         M_AB = 2 / (1/M_A + 1/M_B)   (reduced molecular mass, g/mol)
         σ_AB = (σ_A + σ_B) / 2       (collision diameter, Angstrom)
-        Ω_D  = Neufeld collision integral at T* = T * k_B / ε_AB
+        Ω_D  = Neufeld collision integral at T* = T / ε_AB
+
+    This is not Bird/Stewart/Lightfoot Eq 17.3-10. BSL's working
+    equation is ``D_AB = 0.0018583 * T^{3/2} * sqrt(1/M_A + 1/M_B)
+    / (P[atm] * σ² * Ω_D)``. With this function's M_AB definition,
+    sqrt(1/M_A + 1/M_B) = √2 / sqrt(M_AB), so the BSL prefactor is
+    0.0018583 * √2 = 0.002628. The 0.00266 prefactor is the
+    Marrero-Mason / Reid form written for P in bar (Reid, Prausnitz &
+    Poling, *The Properties of Gases and Liquids*, Eq 11-3.2). Pairing
+    0.00266 with P in atm overstates D_AB by 0.00266/0.002628 ≈ 1.22%
+    vs BSL-equivalent, and by 101325/100000 ≈ 1.325% vs the bar form
+    used with bar. The prefactor is left unchanged here.
+
+    Sanity at SiO/N2, 1973.15 K, 1000 Pa: this helper returns
+    0.049693 m²/s; the BSL-equivalent prefactor on the same LJ
+    inputs returns 0.049096 m²/s.
 
     ``species_params`` lets a caller supply a path-local proxy without adding
     it to the shared condensation table. Returns 0 on unknown species (caller
@@ -1719,11 +1766,15 @@ def _knudsen_input_refusal(
 #     condensation_temperature_sources`` (operator-tuned for the
 #     pressure-vessel-internal pipe-geometry against published P_sat
 #     vs T curves).
-#   - SiO 1050 °C is the conservative gas-phase disproportionation
-#     onset for SiO(g) → 0.5 SiO2(s) + 0.5 Si(s) at low pO₂ per
-#     Schick (1960) / Nuth-Donn (1982) thermodynamic re-analysis; the
-#     1 mbar partial pressure level is the Stage-3 condenser operating
-#     point in `data/setpoints.yaml`.
+#   - SiO 1050 °C is the engineering midpoint of the documented
+#     900-1200 °C Stage 3 SiO zone, not a literature-derived T_cond.
+#     A 2026-05-28 corpus scan (Cardiff 2007 / Matchett 2006 /
+#     Tsuchiyama 1998 / Sesko 2022 / Schaefer-Fegley 2004) found no
+#     paper independently pinning 1050 °C. The earlier Schick (1960) /
+#     Nuth-Donn (1982) attribution in this block was a recalled
+#     literature claim; it is not the source of the number. See the
+#     inline comment on the SiO row and
+#     ``data/setpoints.yaml § condensation_temperature_sources.SiO``.
 #   - Future agents: prefer `data/setpoints.yaml` overrides when
 #     adjusting these per recipe. This dict is the in-process default
 #     when an individual species has no setpoints override.
@@ -2627,7 +2678,8 @@ class CondensationModel:
         """
         Route all evaporated species through the train.
 
-        For each species, walk through stages 0→6.  At each stage,
+        For each species, walk every stage in ``self.train.stages``
+        (the default metals train is stages 0 through 7).  At each stage,
         calculate condensation fraction η.  Whatever condenses is
         added to that stage's collected_kg; the remainder passes
         to the next stage.
@@ -4069,10 +4121,15 @@ class CondensationModel:
         stage T-band. Chunk C replaces the constant regime factor with
         pressure/Knudsen coupling.
 
-        VR-11 / B3: the three early zero-efficiency exits mint typed
-        pass-through outcomes into ``efficiency_outcomes`` (when provided)
-        rather than returning a silent 0.0 with no consumer channel.
-        Numeric eta is unchanged (golden-neutral).
+        VR-11 / B3: the finite early-zero exits (non-positive residence
+        or alpha, missing Antoine Psat, nonpositive local pressure,
+        nonpositive reference flux) mint typed pass-through outcomes
+        into ``efficiency_outcomes`` (when provided) rather than
+        returning a silent 0.0 with no consumer channel. Non-finite
+        ``residence_s`` or ``alpha_s_value`` raise; a later
+        available_kg / molar-mass non-finite or non-positive check
+        returns 0.0 without minting. Numeric eta for finite valid
+        inputs is unchanged (golden-neutral).
         """
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
@@ -4088,6 +4145,11 @@ class CondensationModel:
                 record.update(detail)
                 efficiency_outcomes.append(record)
             return 0.0
+
+        if not math.isfinite(float(residence_s)):
+            raise ValueError('residence_s must be finite')
+        if not math.isfinite(float(alpha_s_value)):
+            raise ValueError('alpha_s_value must be finite')
 
         if residence_s <= 0.0 or alpha_s_value <= 0.0:
             return _mint_zero(
@@ -4263,6 +4325,11 @@ class CondensationModel:
             # s^-1 invents a rate constant. Sanity: leave vapor un-baffled
             # rather than create synthetic capture.
             eta = 0.0
+        if not math.isfinite(eta):
+            raise ValueError(
+                f'condensation efficiency for {species} in stage '
+                f'{int(getattr(stage, "stage_number", -1))} is not finite'
+            )
         return max(0.0, min(1.0, eta))
 
 
@@ -5386,12 +5453,14 @@ def _local_species_pressure_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
-    """Local stage pressure for capture efficiency, or 0.0 on typed refusal.
+    """Local stage pressure from the Antoine/catalog helper, or 0.0 on
+    typed refusal.
 
-    Refused / uncovered Antoine temperatures return 0.0 so
-    ``_condensation_efficiency`` mints a status-bearing pass-through via
-    ``_mint_zero`` (folded into ``condensation_refusals_by_species``). A
-    fabricated ~1 mbar (100 Pa) is never returned (b-127).
+    Refused / uncovered Antoine temperatures return 0.0. This helper
+    returns 0.0 rather than a fabricated 100 Pa (b-127). It is not
+    called from ``_condensation_efficiency``; that method inlines
+    ``_try_antoine_psat_pa`` and mints its own pass-through via
+    ``_mint_zero``.
     """
     P_local_pa, refused = _try_antoine_psat_pa(
         species,

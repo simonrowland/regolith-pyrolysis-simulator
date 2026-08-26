@@ -16,8 +16,9 @@ from typing import Any
 ALPHAMELTS_CROSS_CHECK_STATUS = "inconclusive_no_activities"
 MELT_OXIDE_ACTIVITY_TIER = "UNCERTIFIED"
 MELT_OXIDE_IDEAL_ASSERTION_TIER = "ASSUMED_IDEAL_SOLUTION"
-# Constant table gamma for mid-range composition, with a thin pure-endmember
-# continuity shell. The one-parameter pseudo-binary regular solution
+# Constant table gamma for mid-range composition, with a pure-endmember
+# continuity shell that starts at the asserted blend_start below. The
+# one-parameter pseudo-binary regular solution
 # (ln gamma = ln(gamma*)*(T*/T)*(1-X)^2) is intentionally NOT used: monkeypatch
 # bisection (docs-private/research/2026-08-05-chemact-root/findings.md) proved
 # that mid-range (1-X)^2 term alone caused the Ca median regression (+0.418 dex
@@ -25,22 +26,28 @@ MELT_OXIDE_IDEAL_ASSERTION_TIER = "ASSUMED_IDEAL_SOLUTION"
 MELT_OXIDE_TABLE_GAMMA_MODEL = "constant_gamma_table_with_endmember_continuity"
 MELT_OXIDE_IDEAL_SOLUTION_MODEL = "declared_ideal_solution"
 MELT_OXIDE_ACTIVITY_LIMITATION = (
-    "constant_gamma_table_value with local pure-endmember continuity shell; "
-    "gamma is the cited table coefficient for mid-range composition; no "
-    "one-parameter pseudo-binary mid-range regular solution and no A*T*/T "
-    "temperature scaling of gamma (held for multi-component G^E / MC-5); as "
-    "X approaches 1 a thin composition shell enforces Raoultian a->1 "
-    "continuously so the former gamma*X to a=1 step (31.1x for Cr) is absent; "
-    "outside a declared gamma temperature domain the numeric value remains "
-    "flux-driving but status-bearing"
+    "constant_gamma_table_value with endmember continuity shell starting at "
+    "asserted X=0.99; gamma is a shipped mid-range constant (CaO/Al2O3/SiO2/"
+    "TiO2/Cr2O3/MgO/MnO: rounded geometric midpoint of the Sossi & Fegley 2018 "
+    "Table 2 printed envelope, not a cited point coefficient; Na2O/K2O: cited "
+    "point anchors); no one-parameter pseudo-binary mid-range regular solution "
+    "and no A*T*/T temperature scaling of gamma (held for multi-component G^E / "
+    "MC-5); as X approaches 1 the shell enforces Raoultian a->1 continuously so "
+    "the former gamma*X to a=1 step (31.1x for Cr) is absent; when "
+    "valid_range_K is set, a temperature outside that interval remains "
+    "flux-driving and status-bearing; when valid_range_K is unset, this module "
+    "attaches no in_domain/out_of_gamma_domain payload"
 )
 MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
     "single_cation_Raoultian_pure_liquid_reference"
 )
-# Single-cation mole fraction at which the pure-endmember continuity shell
-# begins. Below this floor, gamma_eff is exactly the table gamma (constant-
-# gamma baseline; lunar-mare X_Ca ~0.12 is far below). Above it, ln(gamma) is
-# reparameterized so gamma->1 as X->1. See table_gamma_effective.
+# Asserted single-cation mole fraction at which the pure-endmember continuity
+# shell begins. This cutoff is not derived from an error budget, activity
+# tolerance, composition-domain boundary, or literature datum: any blend_start
+# in (0, 1) satisfies the endpoint algebra in table_gamma_effective (value-
+# continuous at X_blend; a -> 1 as X -> 1). Lunar-mare X_Ca ~0.12 sits below
+# 0.99, so the shipped mid-range path is the constant table gamma. Changing
+# the number would move activities for X in the seam; do not retune it here.
 MELT_OXIDE_ENDMEMBER_CONTINUITY_BLEND_START = 0.99
 R_KJ_PER_MOL_K = 8.31446261815324e-3
 
@@ -59,9 +66,24 @@ class MeltOxideActivityCoefficient:
 # provenance: gamma_alkali_melt_activity
 # Values are Raoultian, single-cation MO_x components. Sossi & Fegley 2018
 # RMG 84 Table 2 pp. 409-410, Eq. 24-25 pp. 413, DOI 10.2138/rmg.2018.84.11
-# gives the basis and component rows. Na chosen value comes from Sossi et al.
-# 2019 GCA 260:204-231 Tables 3-4, DOI 10.1016/j.gca.2019.06.021, as recorded
-# in docs/chemistry-provenance.yaml::gamma_alkali_melt_activity.
+# gives the basis and printed envelopes (verified against
+# data/literature/extracts/kems-041-sossi-fegley-2018.yaml and
+# tests/fixtures/corpus/sossi-fegley-2018-volatility/benchmark-fixture.yaml).
+# Na chosen value is a cited point from Sossi et al. 2019 GCA 260:204-231
+# Tables 3-4, DOI 10.1016/j.gca.2019.06.021. K is a cited DeMaria/Sossi-Fegley
+# point. CaO, Al2O3, SiO2, TiO2, Cr2O3, MgO, and MnO runtime scalars are
+# rounded geometric midpoints of the printed Table 2 ranges, not single
+# cited coefficients:
+#   premise: Table 2 prints [gamma_lo, gamma_hi], often composition- and
+#            T-dependent guide ranges, not a point measurement.
+#   algebra: geometric midpoint = sqrt(gamma_lo * gamma_hi) (log-space
+#            centre of a multiplicative envelope).
+#   units: gamma dimensionless; sqrt of a product of gammas is dimensionless.
+#   sanity: CaO sqrt(0.001*0.15)=0.012247 -> 0.012; AlO1.5 sqrt(0.28*0.37)
+#           =0.321870 -> 0.322; CrO1.5 sqrt(23*42)=31.080541 -> 31.1.
+# Table 2 temperature support is recorded in each citation; it is not
+# copied into valid_range_K for those seven rows (that would start attaching
+# domain-authority payloads on currently unlabeled temperatures).
 MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
     "Na2O": MeltOxideActivityCoefficient(
         "Na2O",
@@ -92,50 +114,70 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "CaO",
         1.0,
         1.2e-2,
-        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11 "
-        "(CaO envelope 1e-3..0.15)",
+        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11; "
+        "runtime 0.012 is the rounded geometric midpoint of the printed CaO "
+        "range ~0.001-0.15 at 1873 K (CMAS basicity 0.55-0.65; Beckett 2002), "
+        "not a single Table 2 coefficient",
     ),
     "Al2O3": MeltOxideActivityCoefficient(
         "Al2O3",
         "AlO1.5",
         2.0,
         0.322,
-        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11; "
+        "runtime 0.322 is the rounded geometric midpoint of the printed "
+        "AlO1.5 range 0.28-0.37 at 1573-1773 K (CMAS An-Di; Ghiorso & Sack "
+        "1995), not a single Table 2 coefficient",
     ),
     "SiO2": MeltOxideActivityCoefficient(
         "SiO2",
         "SiO2",
         1.0,
         1.0,
-        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11; "
+        "runtime 1.0 is the rounded geometric midpoint of the printed SiO2 "
+        "range 0.9-1.1 at 1573-1773 K (CMAS An-Di; Ghiorso & Sack 1995), not "
+        "a single Table 2 coefficient",
     ),
     "TiO2": MeltOxideActivityCoefficient(
         "TiO2",
         "TiO2",
         1.0,
         1.60,
-        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11; "
+        "runtime 1.60 is the rounded geometric midpoint of the printed TiO2 "
+        "range 1.5-1.7 at 1573-1773 K (CMAS; Ghiorso & Sack 1995), not a "
+        "single Table 2 coefficient",
     ),
     "Cr2O3": MeltOxideActivityCoefficient(
         "Cr2O3",
         "CrO1.5",
         2.0,
         31.1,
-        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11; "
+        "runtime 31.1 is the rounded geometric midpoint of the printed "
+        "CrO1.5 range 23-42 at 1773 K (CAS; Pretorius & Muan 1992), not a "
+        "single Table 2 coefficient",
     ),
     "MgO": MeltOxideActivityCoefficient(
         "MgO",
         "MgO",
         1.0,
         1.0,
-        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11; "
+        "runtime 1.0 is the geometric midpoint of the printed MgO range "
+        "~0.25-4 at 1873 K (CMAS basicity 0.55-0.65; Beckett 2002), not a "
+        "single Table 2 coefficient",
     ),
     "MnO": MeltOxideActivityCoefficient(
         "MnO",
         "MnO",
         1.0,
         1.90,
-        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+        "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11; "
+        "runtime 1.90 is the rounded geometric midpoint of the printed CAS "
+        "MnO range 0.5-7.2 at 1873 K (Ohta & Suito 1995), not the FCMS(P) "
+        "row 0.7-3.5 at 1823-1923 K and not a single Table 2 coefficient",
     ),
 }
 
@@ -253,12 +295,15 @@ class MeltOxideActivity:
 
 # AtomLedger keeps sub-tolerance signed dust rather than pruning it
 # (ledger.py). Multi-carrier parent debits (e.g. Cr / CrO / CrO2 / CrO3
-# against Cr2O3) can therefore leave residual mol of order 1e-15 after a
-# near-zero parent is fully consumed — not a mass-balance breach (HI-2
-# stays closed). Activity reads must treat that dust as empty inventory
-# rather than hard-fail the vapour batch. Raise only on true negatives
-# outside the dust floor. (b-145: Cr2O3 = -1.76e-15 mol after physical-
-# composite OOR changed the Cr-family branch schedule on the web full run.)
+# against Cr2O3) can leave residual mol of order 1e-15 after a near-zero
+# parent is fully consumed (b-145: Cr2O3 = -1.76e-15 mol). The cutoff
+# below is an asserted species-independent mol floor, not derived from
+# that residual (1e-12 / 1.76e-15 ≈ 568) and not equivalent to ledger kg
+# tolerances (DEFAULT_BALANCE_TOLERANCE_KG,
+# DEFAULT_BALANCE_RELATIVE_TOLERANCE). Inside this function, values in
+# [-floor, 0) are treated as empty inventory; values below -floor raise.
+# The correct derived floor is unestablished; do not retune the number
+# here.
 _MELT_INVENTORY_NUMERICAL_DUST_MOL = 1.0e-12
 
 
@@ -291,11 +336,27 @@ def single_cation_mole_fractions(
         if mol_value == 0.0:
             continue
         cation_value = mol_value * cations
+        if not math.isfinite(cation_value):
+            raise ValueError(
+                f"melt inventory for {parent_oxide!r} overflowed the "
+                "single-cation mole-fraction projection"
+            )
         cation_mol[str(parent_oxide)] = cation_value
         total += cation_value
+    if not math.isfinite(total):
+        raise ValueError(
+            "single-cation mole-fraction total overflowed"
+        )
     if total <= 0.0:
         return {}
-    return {oxide: cations / total for oxide, cations in cation_mol.items()}
+    fractions = {
+        oxide: cations / total for oxide, cations in cation_mol.items()
+    }
+    if any(not math.isfinite(value) for value in fractions.values()):
+        raise ValueError(
+            "single-cation mole fractions must be finite after normalization"
+        )
+    return fractions
 
 
 def melt_oxide_activity_coefficient(
@@ -325,12 +386,26 @@ def melt_oxide_gamma_domain_authority(
     *,
     gamma: float | None = None,
 ) -> dict[str, Any] | None:
-    """Return the shared temperature-domain verdict for a gamma anchor."""
+    """Return the temperature-domain verdict for a gamma anchor.
 
+    Inside this function, a component with no ``valid_range_K`` returns
+    ``None`` at every finite positive temperature (no ``in_domain`` /
+    ``out_of_gamma_domain`` payload). Non-finite or non-positive
+    ``temperature_K`` raises ``ValueError``. On a component that has
+    ``valid_range_K``, a supplied non-finite or non-positive ``gamma``
+    also raises rather than wrapping that scalar in a typed authority
+    verdict.
+    """
+
+    temperature = float(temperature_K)
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise ValueError("temperature_K must be finite and positive")
     coeff = melt_oxide_activity_coefficient(component_id)
     if coeff is None or coeff.valid_range_K is None:
         return None
-    temperature = float(temperature_K)
+    resolved_gamma = float(coeff.gamma if gamma is None else gamma)
+    if not math.isfinite(resolved_gamma) or resolved_gamma <= 0.0:
+        raise ValueError("gamma must be finite and positive")
     low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
     payload: dict[str, Any] = {
         "authority_status": (
@@ -340,7 +415,7 @@ def melt_oxide_gamma_domain_authority(
         ),
         "gamma_domain_K": (low, high),
         "temperature_K": temperature,
-        "gamma": float(coeff.gamma if gamma is None else gamma),
+        "gamma": resolved_gamma,
     }
     if payload["authority_status"] == "out_of_gamma_domain":
         payload["anchor_T_K"] = coeff.anchor_T_K
@@ -368,8 +443,12 @@ def table_gamma_effective(
     Derivation
     ----------
     1. Premise: Raoultian pure-liquid reference requires ``a(X=1) = 1``.
-    2. Premise: table ``gamma*`` is a dilute/measured mid-composition anchor,
-       not a composition-independent identity on the full ``[0, 1]`` range.
+    2. Premise: table ``gamma*`` is the shipped mid-range constant, not a
+       composition-independent identity on the full ``[0, 1]`` range. For
+       CaO, Al2O3, SiO2, TiO2, Cr2O3, MgO, and MnO that constant is a
+       rounded geometric midpoint of a Sossi & Fegley 2018 Table 2 printed
+       envelope, not a single cited table coefficient. Na2O and K2O are
+       cited point anchors. The shell does not derive ``gamma*``.
     3. The one-parameter pseudo-binary
        ``ln gamma = ln(gamma*) * (T*/T) * (1-X)^2`` enforces (1) globally but
        invents mid-range curvature. Monkeypatch bisection against stored
@@ -443,7 +522,18 @@ def melt_oxide_activity(
         cation_mol_fraction = single_cation_mole_fractions(account_mol)
     if not cation_mol_fraction:
         return None
-    x_single_cation = cation_mol_fraction.get(parent, 0.0)
+    x_single_cation = float(cation_mol_fraction.get(parent, 0.0))
+    # The optional mapping bypasses single_cation_mole_fractions. Inside this
+    # function the looked-up parent fraction must be a real mole fraction:
+    # negative values previously fell through the x <= 0 zero-inventory
+    # branch as a=0 with in-domain status. NaN/inf and X > 1 already fail
+    # later on the coefficient path via table_gamma_effective; refuse them
+    # here so the zero-inventory branch cannot rewrite garbage to zero.
+    if not math.isfinite(x_single_cation) or x_single_cation < 0.0 or x_single_cation > 1.0:
+        raise ValueError(
+            "cation_mol_fraction for "
+            f"{parent!r} must be finite and within [0, 1]"
+        )
 
     # b-133 owns a temperature-qualified P2O5 activity for the real carrier
     # rail. Legacy equilibrium callers do not supply temperature; silently
@@ -566,7 +656,13 @@ def na_reductant_activity_shift_kj_per_mol_o2(
     temperature_K: float,
     account_mol: Mapping[str, float] | None = None,
 ) -> float:
-    """Na2O Ellingham-row shift from a_NaO0.5 on the per-mol-O2 basis."""
+    """Na2O Ellingham-row shift from a_NaO0.5 on the per-mol-O2 basis.
+
+    ``account_mol is None`` is the explicit no-composition path: the
+    shipped Na table gamma is used as the activity. A provided mapping
+    that does not resolve a Na2O activity (empty inventory, or no
+    recognized parent oxides) is not treated as that fallback.
+    """
 
     temperature = float(temperature_K)
     if not math.isfinite(temperature) or temperature <= 0.0:
@@ -578,7 +674,12 @@ def na_reductant_activity_shift_kj_per_mol_o2(
         resolved = melt_oxide_activity(
             "Na2O", account_mol, temperature_K=temperature
         )
-        activity = gamma if resolved is None else resolved.activity
+        if resolved is None:
+            raise ValueError(
+                "account_mol was provided but did not resolve a Na2O "
+                "activity; pass None to use the table-gamma activity fallback"
+            )
+        activity = resolved.activity
     if activity <= 0.0:
         return float("-inf")
 

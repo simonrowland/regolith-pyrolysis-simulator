@@ -135,8 +135,18 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
     # Na premise: Chase 1998 JANAF Na-014 rows 1100-2600 K, split at Na
     # boil 1156.1 K and Na2O beta->alpha 1243.15 K, alpha->liquid 1405.2 K.
     # Fit: dH/dS are least-squares for each row span below; max residual
-    # 0.442 kJ/mol O2. Unit check: dS is kJ/mol/K/mol O2. Sanity:
-    # dG(2200 K) = -7.33 vs grid -7.772 kJ/mol O2. Boil kink: above Tb
+    # 0.442 kJ/mol O2. Unit check: dS is kJ/mol/K/mol O2.
+    # Sanity at the 2200 K shared breakpoint, where ellingham_segment_for_temperature
+    # selects the next segment (2200, 2600) with dH=-985.0724, dS=-0.444394:
+    #   dG = dH - T*dS = -985.0724 - 2200*(-0.444394) = -7.4056 kJ/mol O2
+    # which is the public ellingham_delta_g_kj_per_mol_o2("Na", 2200) value.
+    # JANAF Na-014 (Na2O cr,l) 2200 K fG° = -3.886 kJ/mol Na2O; the table
+    # reaction at this T is 4 Na(g)+O2 -> 2 Na2O(l), so grid dG/mol O2 =
+    # 2 * fG° = -7.772 kJ/mol O2. Residual = -7.4056 - (-7.772) = +0.366
+    # kJ/mol O2, inside the 0.442 kJ max-residual headline.
+    # The (1800, 2200) segment at its excluded upper edge is
+    # -1020.2496 - 2200*(-0.460416) = -7.3344 kJ/mol O2; that is not the
+    # public 2200 K value. Boil kink: above Tb
     # the metal standard state is gas; gaseous metal is a higher-energy
     # reactant, so oxide-formation dG becomes less negative above T_b and
     # the slope changes instead of false-flattening the Na line. The
@@ -415,9 +425,24 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
     # the two fits therefore do not join exactly at the runtime boundary.
     # Fit max residual
     # 0.457 kJ/mol O2; dS unit is kJ/mol/K/mol O2. Sanity: dG(2600 K)
-    # = -398.384 vs grid -398.744. Boil kink: Mg(g) is a higher-energy
-    # reactant than Mg(l), so post-boil oxide-formation dG is less negative
-    # and must use the steeper gaseous-metal JANAF slope. The 1300-1366 K
+    # = -398.384 vs grid -398.744.
+    # Boil-kink sign on these two coefficient pairs, not a general Mg claim:
+    # liquid (1300, 1366) dH_l=-1229.485036627, dS_l=-0.240695156636;
+    # gas (1366, 2000) dH_g=-1463.2445, dS_g=-0.411822143.
+    # Premise: both fits are constrained to the same 1366 K endpoint
+    # dG(1366 K) = -900.695453 kJ/mol O2. Algebra of the signed difference:
+    #   dG_g - dG_l = (dH_g - dH_l) - T (dS_g - dS_l)
+    #     = -233.759463373 + T * 0.171126986364
+    # Zero at T = 233.759463373 / 0.171126986364 = 1366 K (the join).
+    # Sign on this pair: dG_g - dG_l < 0 for T < 1366 K (gas more negative)
+    # and > 0 for T > 1366 K (gas less negative). The usual "post-boil dG
+    # is less negative because Mg(g) is the higher-energy reactant" statement
+    # therefore holds only above the 1366 K coefficient join, not on the
+    # 2.85 K back-extrapolated runtime slice 1363.15 <= T < 1366, where the
+    # selector already uses the gas rail. Unit check: kJ/mol O2 minus
+    # K * kJ/(mol K mol O2) = kJ/mol O2. Sanity: at T_b=1363.15 K,
+    # gas-liquid = -0.4877 kJ/mol O2; at 1370 K, +0.6845 kJ/mol O2.
+    # The 1300-1366 K
     # rowless connector is constrained to the post-boil shared endpoint
     # dG(1366 K) = -900.695453 kJ/mol O2.
     "Mg": (
@@ -591,8 +616,16 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
     # Si premise: Chase 1998 JANAF O-039 rows 1100-2600 K. Split at Si
     # melt 1685 K and the JANAF SiO2 II->liquid transition 1696 K (not the
     # classical cristobalite melt often quoted near 1996 K). Fit max residual
-    # 0.478 kJ/mol O2; dS unit is kJ/mol/K/mol O2. Sanity:
-    # dG(2200 K) = -512.402 vs grid -512.672.
+    # 0.478 kJ/mol O2; dS unit is kJ/mol/K/mol O2.
+    # Sanity on the active 1696-2500 K segment (dH=-933.753006,
+    # dS=-0.191277833), which is the segment ellingham_segment_for_temperature
+    # selects at 2200 K (interior point, not a shared breakpoint):
+    #   dG = dH - T*dS
+    #   dG(2200 K) = -933.753006 - 2200*(-0.191277833) = -512.941773 kJ/mol O2
+    # JANAF O-039 2200 K fG°(SiO2) = -512.672 kJ/mol; the table reaction is
+    # Si(l)+O2->SiO2(l), so that fG° is already per mol O2.
+    # Residual = -512.941773 - (-512.672) = -0.270 kJ/mol O2, inside the
+    # 0.478 kJ fit budget. Unit check: kJ/mol O2 - K * kJ/(mol K mol O2).
     "Si": (
         EllinghamFitSegment(
             -902.442943,
@@ -631,6 +664,18 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
             "Chase 1998 NIST-JANAF O-039; confidence: primary-refit",
         ),
     ),
+    # Evidence status of the t-548 CEA rows below (Zr, Rb, Cs, P), scoped to
+    # these constructors and to the currently checked-in extract
+    # data/literature/extracts/nasa-cea-thermo.yaml: review_status is draft,
+    # provenance_path ends in DRAFT, and nasa-cea-thermo is still on the
+    # pre-policy allowlist. These four constructors omit authority_status, so
+    # they inherit the EllinghamFitSegment default "authoritative", and each
+    # janaf_anchor string says "confidence: primary-refit". That default is
+    # the runtime tag this table currently carries; it is not a statement
+    # that this extract has graduated OCR/source review. Changing
+    # authority_status on in-range queries would change
+    # ellingham_authority_limit from None to a limit record and is left to a
+    # gated regrind.
     # Zr premise (t-548): NASA CEA thermo.inp condensed polynomials for
     # Zr(a)/Zr(b)/Zr(L) and ZrO2(III)/ZrO2(II). Reaction Zr + O2 -> ZrO2
     # (n_M=n_ox=1). Phase boundaries are the CEA phase-domain edges
@@ -853,9 +898,22 @@ def ellingham_fit_range_K(species: str) -> tuple[float, float]:
 
 
 def _finite_temperature_K(temperature_K: float) -> float:
+    # Premise: the temperature-taking functions listed below evaluate
+    # dG = dH - T*dS with T as a thermodynamic temperature on the kelvin
+    # abscissa of the fit segments. Algebra: a non-finite or nonpositive T_K
+    # still produces a float from that line, but that float is not a
+    # formation dG.
+    # Unit check: range_K and the fit abscissa are kelvin.
+    # Sanity (this helper): NaN/inf already raised; 0 K and -1 K previously
+    # returned a numeric Na dG plus authority_status="extrapolation_limited".
+    # Scope: this helper, which is the temperature gate for
+    # ellingham_segment_for_temperature / ellingham_delta_g_kj_per_mol_o2 /
+    # ellingham_fit_extrapolation / ellingham_authority_limit.
     T_K = float(temperature_K)
     if not math.isfinite(T_K):
         raise ValueError("Ellingham temperature_K must be finite")
+    if T_K <= 0.0:
+        raise ValueError("Ellingham temperature_K must be > 0 K")
     return T_K
 
 

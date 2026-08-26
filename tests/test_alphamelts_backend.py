@@ -40,6 +40,7 @@ from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_NO_CONVERGENCE,
     ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED,
+    ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
     ALPHAMELTS_REASON_SUBPROCESS_DIED,
     ALPHAMELTS_REASON_TIMEOUT,
     ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
@@ -1559,6 +1560,52 @@ def test_alphamelts_subprocess_failure_line_rejects_temperature_mismatch():
             system_output='',
             fO2_constraint={'path': 'Absolute', 'offset': -9.0},
         )
+
+
+def test_parse_liquidus_C_refuses_unparseable_engine_token():
+    backend = AlphaMELTSBackend()
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='unparseable engine numeric token',
+    ) as excinfo:
+        backend._parse_liquidus_C('Found the liquidus at T = ... (C)')
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING
+    )
+
+
+def test_parse_liquidus_C_refuses_nonfinite_engine_token():
+    backend = AlphaMELTSBackend()
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='non-finite engine numeric token',
+    ) as excinfo:
+        backend._parse_liquidus_C('Found the liquidus at T = 1e999 (C)')
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING
+    )
+
+
+def test_parse_single_point_stdout_unparseable_T_is_typed_contract_error():
+    backend = AlphaMELTSBackend()
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='unparseable engine numeric token',
+    ) as excinfo:
+        backend._parse_single_point_stdout(
+            'Initial alphaMELTS calculation at: bogus T ... (C)',
+            requested_temperature_C=1500.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            total_input_kg=0.1,
+            run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+            system_output='',
+            fO2_constraint={},
+        )
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING
+    )
+    assert type(excinfo.value) is AlphaMELTSSubprocessContractError
 
 
 def test_alphamelts_reset_sentinel_is_not_an_executed_temperature():

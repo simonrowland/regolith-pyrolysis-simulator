@@ -519,7 +519,7 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
     assert result.pressure_bar == pytest.approx(42.0)
     assert result.diagnostics["pressure_control_authoritative"] is False
     assert result.diagnostics["requested_pressure_bar"] == pytest.approx(42.0)
-    assert any("eval_gas_abundances ignores total pressure" in w for w in result.warnings)
+    assert any("without the optional P argument" in w for w in result.warnings)
 
 
 def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch):
@@ -1313,12 +1313,11 @@ def test_sum_pressure_sanity_refuses_probe_scale_garbage(monkeypatch):
 
 
 def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch):
-    """HI-8 regression: 10000 K fabricates ~8.3e5 bar total; we refuse.
+    """HI-8: 10000 K is refused by the T gate before any engine call.
 
-    The probe (findings.md) measured zero typed refusals from upstream at
-    10000 K with sum_P_bar ≈ 8.3e5. Our external T gate must refuse before
-    the engine is invoked so the fabrication never enters diagnostics as a
-    successful speciation.
+    The 2026-07-31 probe stored sum_P_bar ≈ 8.3e5 as a fixture. Tests
+    replay that literal through a fake System; they do not recompute it
+    against the current installed engine.
     """
     from simulator.melt_backend.vaporock import VAPOROCK_PROBE_10000K_SUM_P_BAR
 
@@ -1350,7 +1349,7 @@ def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch)
         OutOfDomainReason.TEMPERATURE_RANGE.value
     )
     assert result.diagnostics["temperature_K"] == pytest.approx(10000.0)
-    # Fixture anchor remains documented for the sum-pressure gate.
+    # Stored 2026-07-31 fixture identity, not a live-engine recompute.
     assert VAPOROCK_PROBE_10000K_SUM_P_BAR == pytest.approx(8.323344495585738e5)
 
 
@@ -2071,10 +2070,11 @@ def test_empty_speciation_tokens_are_closed_and_reasons_are_unique():
         EmptySpeciationCause.PAYLOAD_ABSENT,
         EmptySpeciationCause.NO_FINITE_VALUES,
         EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE,
+        EmptySpeciationCause.NONFINITE_PRESSURE,
         EmptySpeciationCause.CAUSE_NOT_REPORTED,
     }
     reasons = [empty_speciation_reason(cause) for cause in EmptySpeciationCause]
-    assert len(reasons) == 5
+    assert len(reasons) == 6
     assert len(reasons) == len(set(reasons))
     pairs = [
         (left, right)
@@ -2598,4 +2598,230 @@ def test_provider_keeps_proven_empty_zero_pressure():
     assert diagnostics.vaporock_full_speciation_Pa["Cr"] == 0.0
     payload = diagnostics.as_diagnostic()
     assert "silent_zero_notes" not in payload
+
+
+def test_degenerate_pressure_bar_is_refused_before_engine(monkeypatch):
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_):
+        calls["n"] += 1
+        return {"SiO": 1.0}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize(
+        {"warm_worker": False, "vapor_pressure_units": "Pa"}
+    )
+
+    for pressure_bar in (float("nan"), float("inf"), 0.0, -1.0):
+        calls["n"] = 0
+        result = backend.equilibrate(
+            1600.0,
+            composition_mol={"SiO2": 1.0},
+            fO2_log=-8.0,
+            pressure_bar=pressure_bar,
+        )
+        assert result.status == "out_of_domain", pressure_bar
+        assert result.diagnostics["backend_status_reason"] == (
+            "invalid_pressure_bar"
+        )
+        assert calls["n"] == 0
+        assert vaporock_module.vaporock_speciation_is_live(
+            result.status,
+            result.diagnostics,
+            getattr(result, "vaporock_full_speciation_Pa", {}) or {},
+        ) is False
+
+    result_ok = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+    assert result_ok.status == "non_authoritative"
+    assert calls["n"] == 1
+
+
+def test_degenerate_fo2_log_is_refused_before_engine(monkeypatch):
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_):
+        calls["n"] += 1
+        return {"SiO": 1.0}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize(
+        {"warm_worker": False, "vapor_pressure_units": "Pa"}
+    )
+
+    for fO2_log in (float("nan"), float("inf"), float("-inf")):
+        calls["n"] = 0
+        result = backend.equilibrate(
+            1600.0,
+            composition_mol={"SiO2": 1.0},
+            fO2_log=fO2_log,
+            pressure_bar=1e-6,
+        )
+        assert result.status == "out_of_domain", fO2_log
+        assert result.diagnostics["backend_status_reason"] == "invalid_fo2_log"
+        assert calls["n"] == 0
+
+    result_ok = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=0.0,
+        pressure_bar=1e-6,
+    )
+    assert result_ok.status == "non_authoritative"
+    assert calls["n"] == 1
+
+
+def test_nonfinite_candidate_pressure_is_not_a_completed_speciation(monkeypatch):
+    from simulator.melt_backend.vaporock import (
+        EmptySpeciationCause,
+        vaporock_speciation_is_live,
+        vaporock_sum_pressure_sane,
+    )
+
+    def inf_pressures(**_):
+        return {"SiO": float("inf")}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=inf_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize(
+        {"warm_worker": False, "vapor_pressure_units": "Pa"}
+    )
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+    assert result.status == "not_converged"
+    assert result.diagnostics.get("empty_speciation_cause") == (
+        EmptySpeciationCause.NONFINITE_PRESSURE.value
+    )
+    full = getattr(result, "vaporock_full_speciation_Pa", {}) or {}
+    assert full == {}
+    assert vaporock_speciation_is_live(
+        result.status, result.diagnostics, full
+    ) is False
+
+    ok, _sum_bar = vaporock_sum_pressure_sane({"SiO": float("inf")})
+    assert ok is False
+
+
+def test_speciation_is_live_requires_finite_positive_pressure():
+    from simulator.melt_backend.vaporock import vaporock_speciation_is_live
+
+    diag = {"pressure_control_authoritative": False}
+    assert vaporock_speciation_is_live(
+        "non_authoritative", diag, {"SiO": float("inf")}
+    ) is False
+    assert vaporock_speciation_is_live(
+        "non_authoritative", diag, {"SiO": float("nan")}
+    ) is False
+    assert vaporock_speciation_is_live(
+        "non_authoritative", diag, {"SiO": 0.0}
+    ) is False
+    assert vaporock_speciation_is_live(
+        "non_authoritative", diag, {"SiO": -1.0}
+    ) is False
+    assert vaporock_speciation_is_live(
+        "non_authoritative", diag, {"Na": 1000.0}
+    ) is True
+    assert vaporock_speciation_is_live(
+        "non_authoritative", diag, {"Na": 1000.0, "Cr": 0.0}
+    ) is True
+
+
+def test_parent_oxide_nonfinite_is_not_proven_empty():
+    from simulator.melt_backend.vaporock import _parent_oxide_is_empty
+
+    assert _parent_oxide_is_empty({"Na2O": float("nan")}, "Na2O") is False
+    assert _parent_oxide_is_empty({"Na2O": float("inf")}, "Na2O") is False
+    assert _parent_oxide_is_empty({"Na2O": object()}, "Na2O") is False
+    assert _parent_oxide_is_empty({"Na2O": 0.0}, "Na2O") is True
+    assert _parent_oxide_is_empty({"SiO2": 50.0}, "Na2O") is True
+    assert _parent_oxide_is_empty(None, "Na2O") is True
+
+
+def test_nonfinite_composition_is_refused_not_proven_empty(monkeypatch):
+    calls = {"n": 0}
+
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            calls["n"] += 1
+            self.composition = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            calls["n"] += 1
+            return {"SiO(g)": -4.0, "Na(g)": float("-inf")}
+
+    _install_fake_import(monkeypatch, types.SimpleNamespace(System=FakeSystem))
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+
+    for label, kg in (
+        ("nan", {"SiO2": 50.0, "Na2O": float("nan")}),
+        ("inf", {"SiO2": 50.0, "Na2O": float("inf")}),
+    ):
+        calls["n"] = 0
+        result = backend.equilibrate(
+            1600.0,
+            composition_kg=kg,
+            fO2_log=-8.0,
+            pressure_bar=1e-6,
+        )
+        assert result.status == "out_of_domain", label
+        assert result.diagnostics["backend_status_reason"] == (
+            "non_finite_composition"
+        )
+        assert "Na2O" in result.diagnostics["non_finite_composition_keys"]
+        assert calls["n"] == 0
+        notes = result.diagnostics.get("silent_zero_notes") or []
+        assert notes == []
+        full = getattr(result, "vaporock_full_speciation_Pa", {}) or {}
+        assert full == {} or result.vapor_pressures_Pa == {}
+
+
+def test_initialize_refuses_nonfinite_warm_pool_size():
+    class _Sub(VapoRockBackend):
+        def _import_vaporock(self):
+            return types.SimpleNamespace(System=object)
+
+    for value in (float("nan"), float("inf"), float("-inf"), "1e9999"):
+        backend = _Sub()
+        assert backend.initialize(
+            {"warm_worker": False, "warm_pool_size": value}
+        ) is False
+        assert backend._last_error is not None
+        assert "warm_pool_size" in backend._last_error
+
+    backend_ok = _Sub()
+    assert backend_ok.initialize(
+        {"warm_worker": False, "warm_pool_size": 2}
+    ) is True
+    assert backend_ok._warm_pool_size == 2
+
+
+def test_strip_gas_suffix_passthrough_collides_with_oxides():
+    from simulator.state import OXIDE_SPECIES
+
+    assert VapoRockBackend._strip_gas_suffix("SiO2(g)") == "SiO2_gas"
+    assert VapoRockBackend._strip_gas_suffix("FeO(g)") == "FeO_gas"
+    assert VapoRockBackend._strip_gas_suffix("SiO2") == "SiO2"
+    assert VapoRockBackend._strip_gas_suffix("FeO") == "FeO"
+    assert "SiO2" in OXIDE_SPECIES
+    assert "FeO" in OXIDE_SPECIES
 

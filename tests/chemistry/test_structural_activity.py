@@ -11,6 +11,8 @@ from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.chemistry.structural_activity import (
     NBO_T_ORTHOSILICATE_CEILING,
+    estimate_liquidus_flag,
+    normalize_formula_unit_moles,
     reference_activity_coefficients,
     structural_activity_diagnostic,
     structural_activity_features,
@@ -181,6 +183,37 @@ def test_reference_gamma_nbo_t_slope_hand_check() -> None:
     assert gamma["NaO0.5"] == pytest.approx(expected, rel=1e-12)
 
 
+def test_reference_gamma_applies_lambda_and_nbo_t_product() -> None:
+    """Both structural terms are added in log space on this function's path."""
+
+    features = structural_activity_features(_mol_from_wt_pct(_LUNAR_12022_WT_PCT))
+    d_lambda = 0.05
+    d_nbo_t = 0.5
+    gamma = reference_activity_coefficients(
+        nbo_t=features.nbo_t + d_nbo_t,
+        optical_basicity=features.optical_basicity + d_lambda,
+        temperature_K=1500.0,
+    )
+    expected_factor = 10.0 ** (4.5 * d_lambda + 2.8 * d_nbo_t)
+    assert gamma["NaO0.5"] / 4.5e-3 == pytest.approx(expected_factor, rel=1e-12)
+    assert gamma["NaO0.5"] / 4.5e-3 == pytest.approx(
+        10.0 ** (4.5 * d_lambda) * 10.0 ** (2.8 * d_nbo_t),
+        rel=1e-12,
+    )
+
+
+def test_mgo_display_cap_still_maps_1600k_raw_above_unity_to_one() -> None:
+    features = structural_activity_features(_mol_from_wt_pct(_LUNAR_12022_WT_PCT))
+    raw = 10.0 ** (5.0e-4 * 100.0)
+    assert raw == pytest.approx(1.1220184543019633)
+    gamma = reference_activity_coefficients(
+        nbo_t=features.nbo_t,
+        optical_basicity=features.optical_basicity,
+        temperature_K=1600.0,
+    )
+    assert gamma["MgO"] == 1.0
+
+
 def test_absent_network_former_is_typed_dilute_refusal() -> None:
     features = structural_activity_features({"CaO": 1.0})
     assert features.nbo_t is None
@@ -254,6 +287,61 @@ def test_builtin_vapor_pressure_exposes_structural_reference_diagnostic_only(
     ] == pytest.approx(
         consumed_na_activity.activity
     )
+
+
+@pytest.mark.parametrize(
+    "temperature_K",
+    [float("nan"), float("inf"), float("-inf"), 0.0, -1.0, True, False, "bad"],
+)
+def test_structural_paths_refuse_invalid_temperature(temperature_K) -> None:
+    features = structural_activity_features(_mol_from_wt_pct(_LUNAR_12022_WT_PCT))
+    with pytest.raises(ValueError, match="temperature_K must be a finite number > 0 K"):
+        reference_activity_coefficients(
+            nbo_t=features.nbo_t,
+            optical_basicity=features.optical_basicity,
+            temperature_K=temperature_K,
+        )
+    with pytest.raises(ValueError, match="temperature_K must be a finite number > 0 K"):
+        estimate_liquidus_flag(
+            formula_unit_mole_fractions=features.formula_unit_mole_fractions,
+            temperature_K=temperature_K,
+        )
+    with pytest.raises(ValueError, match="temperature_K must be a finite number > 0 K"):
+        structural_activity_diagnostic(
+            _mol_from_wt_pct(_LUNAR_12022_WT_PCT),
+            temperature_K=temperature_K,
+        )
+
+
+@pytest.mark.parametrize(
+    "amount",
+    [float("nan"), float("inf"), float("-inf"), -1.0, True, False, None, "bad"],
+)
+def test_normalize_refuses_corrupt_known_oxide_inventory(amount) -> None:
+    with pytest.raises(ValueError, match="must be finite and non-negative"):
+        normalize_formula_unit_moles({"SiO2": amount})
+    with pytest.raises(ValueError, match="must be finite and non-negative"):
+        structural_activity_features({"SiO2": 1.0, "Na2O": amount})
+    with pytest.raises(ValueError, match="must be finite and non-negative"):
+        structural_activity_diagnostic({"SiO2": amount}, temperature_K=1500.0)
+
+
+def test_normalize_treats_signed_dust_and_zero_as_absent() -> None:
+    formula_mol, unsupported = normalize_formula_unit_moles(
+        {"SiO2": 0.0, "CaO": -1.0e-15, "UnobtaniumO": 1.0}
+    )
+    assert formula_mol == {}
+    assert unsupported == ("UnobtaniumO",)
+
+
+def test_empty_inventory_still_returns_uncertified_liquidus_plane() -> None:
+    diagnostic = structural_activity_diagnostic({}, temperature_K=1500.0)
+    assert diagnostic["oxygen_mol"] == 0.0
+    assert diagnostic["unsupported_species"] == []
+    assert diagnostic["liquidus"]["estimated_liquidus_K"] == pytest.approx(
+        1223.9939792205735
+    )
+    assert diagnostic["liquidus"]["status"] == "UNCERTIFIED_PARAMETERIZED_ESTIMATE"
 
 
 def test_builtin_vapor_pressure_survives_dilute_silica_structural_ood(

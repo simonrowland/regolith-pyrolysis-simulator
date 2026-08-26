@@ -6,21 +6,38 @@ Adapter around VapoRock for equilibrium vapor speciation over silicate melts.
 
 Canonical upstream package metadata uses package/import name ``vaporock``
 and exposes ``vaporock.System().set_melt_comp(...)`` plus
-``eval_gas_abundances(T, logfO2)``.  The optional ``[vapor]`` extra pins
-the GitLab v0.1 source tag because PyPI has no ``vaporock`` release and
-the historical ``https://github.com/cwolfe/VapoRock`` target was not
-available during the 2026-05-14 probe.
+``eval_gas_abundances(T, logfO2, P=1e-10, ...)``.  This project does not
+declare a ``[vapor]`` extra; VapoRock is provisioned by
+``install-engines.py`` as a sibling editable clone (installed
+distribution 1.0.0). The historical GitLab v0.1 source tag is not an
+installable pin after the upstream ``src/`` restructure.
 
 VapoRock combines the MELTS thermodynamic model with JANAF tables to
-compute partial pressures for ~34 vapor species in the
+compute equilibrium gas partial pressures for ~34 vapor species in the
 Si-Mg-Fe-Al-Ca-Na-K-Ti-Cr-O system over silicate melts.  It is the
-preferred vapor-side source when alphaMELTS / MELTS is the chosen
-silicate engine because it consumes the same activity model and so
-produces internally consistent γ_i × x_i × P_pure_i fluxes.
+preferred vapor-side *diagnostic* when alphaMELTS / MELTS is the chosen
+silicate engine because both consume MELTS liquid chemical potentials.
 
-License: see upstream VapoRock repository (Wolfe et al.).  Cite:
-    Wolfe C. A. et al., "VapoRock: A vapor-melt equilibrium model
-    for silicate vapor speciation over magma oceans," (paper).
+It does not implement a per-species ``γ_i × x_i × P_pure_i`` identity
+and it does not compute Hertz-Knudsen flux. Installed activity-path
+algebra (``System._calc_gas_species_abundances``, ``method='activity'``):
+
+    ln a = [ln fO2, Δμ_oxides / RT]
+    ln K = ΔG° / RT
+    ln P = −ln K + rxn_coefs · ln a
+    log10(P/bar) = ln P × log10(e)
+
+Unit check: ``ln P`` is the natural log of a pressure whose standard
+state is bar; ``10**log10(P/bar)`` is bar; this adapter multiplies by
+``1e5`` to report Pa. Sanity: the empty-inventory mask overwrites
+``log10(P/bar)`` to ``-inf`` (P = 0) when a parent oxide is 0 wt%.
+This adapter emits ``vapor_pressures_Pa``. Evaporation flux stays with
+the builtin engine.
+
+License: see upstream VapoRock repository (ENKI-portal/vaporock). Cite:
+    Wolf, A. S., Jäggi, N., Sossi, P. A., and Bower, D. J.,
+    "VapoRock: Thermodynamics of vaporized silicate melts for modeling
+    volcanic outgassing and magma ocean atmospheres," arXiv:2208.09582.
 
 Intended call sites
 -------------------
@@ -78,14 +95,14 @@ Species-name normalization
 The installed VapoRock build (``vaporock.System().eval_gas_abundances``)
 returns every gas species with a ``(g)`` phase suffix — ``Na(g)``,
 ``SiO(g)``, ``O2(g)``, ``SiO2(g)``, ``Al2O(g)``, etc.
-``_strip_gas_suffix`` reconciles these onto a vocabulary that is
-provably disjoint from the condensed melt oxides: a gas species whose
-bare spelling collides with an ``OXIDE_SPECIES`` member is namespaced
-with ``_gas`` (``SiO2(g) -> SiO2_gas``, ``FeO(g) -> FeO_gas``); every
-other gas species is returned bare (``Na(g) -> Na``).  Without this a
-downstream vapor consumer keying ``vapor_pressures_Pa`` by species would
-conflate gaseous SiO2 with melt SiO2 and break the atom-explicit
-``SiO2 -> SiO + 1/2 O2`` stoichiometry.
+``_strip_gas_suffix`` namespaces a ``(g)``-marked name whose bare
+spelling is in ``OXIDE_SPECIES`` (``SiO2(g) -> SiO2_gas``,
+``FeO(g) -> FeO_gas``) and returns every other ``(g)``-marked name
+bare (``Na(g) -> Na``). Names with no ``(g)`` marker are returned
+unchanged, so a bare ``SiO2`` key still collides with melt ``SiO2``.
+The System path is ``(g)``-marked on the installed build; the retained
+candidate-function fallback can emit colliding keys if a candidate
+returns bare oxide names.
 """
 
 from __future__ import annotations
@@ -132,22 +149,27 @@ from simulator.scalar_boundary import is_declared_real_scalar
 # ---------------------------------------------------------------------------
 # Load-bearing gate: the 2026-07-31 probe
 # (docs-private/research/2026-07-31-vaporock-probe/findings.md) found zero
-# typed refusals from 1200 K through 10000 K. At 10000 K the engine returned
-# smooth finite fabrications with total finite partial pressure ~8.3e5 bar.
-# A finite provider return is therefore no evidence of domain validity.
+# typed refusals from 1200 K through 10000 K. The checked-in
+# ~8.3e5 bar figure is that probe's stored finite-sum fixture, replayed
+# by tests through a fake System. It is not recomputed against the
+# current installed engine. A finite provider return is therefore no
+# evidence of domain validity.
 VAPOROCK_T_MIN_K = 1350.0
 VAPOROCK_T_MAX_K = 1950.0
 _MELT_MODEL_ID = 'MELTS-v1.0'
 # In-domain mare totals are ≪ 1 bar even at 1950 K / reducing fO2. Ten bar
-# is a conservative sum-pressure sanity ceiling well below the probe's
-# 10000 K garbage (~8.3e5 bar) and well above any admitted-grid total.
+# is a conservative sum-pressure sanity ceiling well below the 2026-07-31
+# probe fixture (~8.3e5 bar) and well above any admitted-grid total.
+# The fixture value is historical; the ceiling (10 bar) is the gate.
 VAPOROCK_MAX_SUM_PRESSURE_BAR = 10.0
 # First-order liquid gate (DESIGN-REV5 §5.2): when a caller supplies a
 # liquid_fraction from the melt backend, refuse sub-liquid cells rather
 # than fabricating vapor over a mostly-solid assemblage.
 VAPOROCK_MIN_LIQUID_FRACTION = 0.95
 # Probe fixture (findings.md / raw_results.json range_behaviour T=10000):
-# sum_P_bar_finite ≈ 8.323e5 bar. Used only as a regression anchor.
+# sum_P_bar_finite ≈ 8.323e5 bar as stored on 2026-07-31. Tests inject
+# this literal through a fake System to pin the sum-pressure gate; they
+# do not re-evaluate the installed engine at 10000 K.
 VAPOROCK_PROBE_10000K_SUM_P_BAR = 8.323344495585738e5
 
 VAPOROCK_WARM_CALL_TIMEOUT_S = 60.0
@@ -174,6 +196,7 @@ class EmptySpeciationCause(str, enum.Enum):
     PAYLOAD_ABSENT = 'payload_absent'
     NO_FINITE_VALUES = 'no_finite_values'
     FINITE_BUT_NONPOSITIVE_PRESSURE = 'finite_but_nonpositive_pressure'
+    NONFINITE_PRESSURE = 'nonfinite_pressure'
     CAUSE_NOT_REPORTED = 'cause_not_reported'
 
 
@@ -190,6 +213,9 @@ EMPTY_SPECIATION_REASON_BY_CAUSE: Mapping[EmptySpeciationCause, str] = {
     EmptySpeciationCause.FINITE_BUT_NONPOSITIVE_PRESSURE: (
         'VapoRock speciation finite log10_bar values all yielded '
         'non-positive Pa'
+    ),
+    EmptySpeciationCause.NONFINITE_PRESSURE: (
+        'VapoRock speciation contains a non-finite partial pressure'
     ),
     EmptySpeciationCause.CAUSE_NOT_REPORTED: (
         'VapoRock worker did not report an empty-speciation cause'
@@ -223,10 +249,8 @@ _GAS_SUFFIX_RE = re.compile(r'\s*\(\s*g\s*\)\s*$', re.IGNORECASE)
 
 # Suffix appended to a normalized gas-species name whose bare spelling
 # would otherwise collide with a condensed melt oxide in OXIDE_SPECIES
-# (e.g. gaseous SiO2 vs. melt SiO2).  Keeping the gas vocabulary disjoint
-# from the oxide basis stops a downstream vapor consumer from conflating
-# "SiO2(g)" with melt SiO2 and breaking the atom-explicit
-# SiO2 -> SiO + 1/2 O2 stoichiometry.
+# (e.g. gaseous SiO2 vs. melt SiO2). Applied only when the incoming name
+# carries an explicit (g) marker; bare SiO2 is not rewritten.
 _GAS_NAMESPACE_SUFFIX = '_gas'
 
 # Gas species whose bare name collides with a condensed melt oxide.  Only
@@ -340,6 +364,54 @@ def vaporock_liquid_fraction_admitted(
     return value >= VAPOROCK_MIN_LIQUID_FRACTION
 
 
+def vaporock_pressure_bar_admitted(pressure_bar: Any) -> bool:
+    """True when *pressure_bar* is a finite positive total pressure.
+
+    Total pressure is in bar. P > 0 because a thermodynamic cell
+    coordinate cannot be zero or negative: vacuum is approached by a
+    small positive P (this adapter's default is 1e-6 bar). Non-finite
+    values are not a pressure. Applied on the ``equilibrate`` entry
+    path; this helper does not wrap other callers.
+    """
+    try:
+        value = float(pressure_bar)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(value) and value > 0.0
+
+
+def vaporock_fo2_log_admitted(fO2_log: Any) -> bool:
+    """True when *fO2_log* is a finite real log10(fO2).
+
+    log10 of a positive oxygen fugacity may be zero or negative
+    (typical IW-buffered melts around -8 to -12). Non-finite values
+    are not a redox coordinate. Applied on the ``equilibrate`` entry
+    path; this helper does not wrap other callers.
+    """
+    try:
+        value = float(fO2_log)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(value)
+
+
+def _nonfinite_numeric_keys(
+    mapping: Optional[Mapping[str, Any]],
+) -> tuple[str, ...]:
+    """Return sorted keys whose values parse as non-finite floats."""
+    if not mapping:
+        return ()
+    bad: list[str] = []
+    for key, raw in mapping.items():
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(value):
+            bad.append(str(key))
+    return tuple(sorted(bad))
+
+
 def vaporock_sum_pressure_bar(
     pressures_Pa: Mapping[str, float],
 ) -> float:
@@ -360,7 +432,22 @@ def vaporock_sum_pressure_sane(
     *,
     max_sum_bar: float = VAPOROCK_MAX_SUM_PRESSURE_BAR,
 ) -> tuple[bool, float]:
-    """Return ``(admitted, sum_bar)`` for the sum-pressure sanity gate."""
+    """Return ``(admitted, sum_bar)`` for the sum-pressure sanity gate.
+
+    ``vaporock_sum_pressure_bar`` sums only finite positive Pa, so a map
+    of ``{SiO: inf}`` would otherwise report ``0.0 bar`` and pass a 10 bar
+    ceiling. This gate refuses any map that contains a non-finite or
+    unparseable value, then applies the finite-sum ceiling. Negative and
+    zero entries are ignored by the sum (they are not a total-pressure
+    overflow); ``vaporock_speciation_is_live`` is the live-cell predicate.
+    """
+    for value in pressures_Pa.values():
+        try:
+            pressure = float(value)
+        except (TypeError, ValueError):
+            return False, float('nan')
+        if not math.isfinite(pressure):
+            return False, pressure
     sum_bar = vaporock_sum_pressure_bar(pressures_Pa)
     if not math.isfinite(sum_bar):
         return False, sum_bar
@@ -461,10 +548,14 @@ def _parent_oxide_is_empty(
     composition_wt_pct: Optional[Mapping[str, float]],
     oxide: str,
 ) -> bool:
-    """True when the parent oxide is absent or exactly 0 wt%.
+    """True when the parent oxide is absent or a finite 0 wt%.
 
     ``None`` composition means the caller has only the engine's -inf
     token; that token is itself the inventory mask, so treat as empty.
+    A missing key is the same a=0 limit. Non-finite and unparseable
+    values are not empty inventory: this helper returns False, and
+    ``equilibrate`` refuses those compositions on its entry path rather
+    than emitting ``proven_empty_inventory``.
     """
     if composition_wt_pct is None:
         return True
@@ -473,9 +564,9 @@ def _parent_oxide_is_empty(
     try:
         wt = float(composition_wt_pct[oxide])
     except (TypeError, ValueError):
-        return True
+        return False
     if not math.isfinite(wt):
-        return True
+        return False
     return wt == 0.0
 
 
@@ -651,15 +742,17 @@ def vaporock_speciation_is_live(
     diagnostics: Optional[Mapping[str, Any]],
     pressures: Optional[Mapping[str, Any]],
 ) -> bool:
-    """True only when a VapoRock result is a live speciation cell.
+    """True when this result is a live speciation cell.
+
+    Predicate on the arguments passed in (not a claim about every
+    consumer): status is ``ok`` or ``non_authoritative``, diagnostics
+    do not mark the table hollow, every supplied pressure parses as a
+    finite float, and at least one pressure is finite and > 0 Pa.
 
     ``non_authoritative`` is the System-path *pressure-authority* token
-    (eval_gas_abundances ignores total P). It is not evidence that any
-    species arrived. Rail consumers that treat ``{ok, non_authoritative}``
-    as live must call this instead: hollowness is ``empty_speciation_cause``
-    (plus ``finite_prediction is False`` / an empty resolved pressure
-    dict). ``not_converged`` on a hollow producer result is what keeps
-    those consumers from walking an empty dict as a success.
+    (this adapter omits total P; see ``_call_vaporock``). It is not
+    evidence that any species arrived. Zero, negative, NaN, and inf
+    maps are not live cells.
     """
     diag = diagnostics or {}
     if diag.get('empty_speciation_cause'):
@@ -668,9 +761,17 @@ def vaporock_speciation_is_live(
         return False
     if status not in {'ok', 'non_authoritative'}:
         return False
-    if not (pressures or {}):
-        return False
-    return True
+    saw_positive_finite = False
+    for value in (pressures or {}).values():
+        try:
+            pressure = float(value)
+        except (TypeError, ValueError):
+            return False
+        if not math.isfinite(pressure):
+            return False
+        if pressure > 0.0:
+            saw_positive_finite = True
+    return saw_positive_finite
 
 
 def _log10_bar_maps_equivalent(
@@ -712,8 +813,10 @@ def _eval_system_log10_bar(
     set_melt_comp = getattr(system, 'set_melt_comp')
     eval_gas_abundances = getattr(system, 'eval_gas_abundances')
     set_melt_comp(dict(composition_wt_pct))
-    # Upstream accepts optional P but our adapter never passes total
-    # pressure (diagnostic-only; vaporock.py historically ignored it).
+    # Installed System.eval_gas_abundances(T, logfO2, P=1e-10, ...) uses P
+    # in _calc_liquid_chempot. This helper calls (T, logfO2) only, so
+    # upstream stays at its default. Passing P is a golden-affecting
+    # change and is not done here.
     logP = eval_gas_abundances(float(temperature_K), float(fO2_log))
     return _serialize_log10_bar_pressures(logP)
 
@@ -760,10 +863,13 @@ def _bootstrap_vaporock_worker(
     """Import VapoRock inside the killable child; own the System lifecycle.
 
     Fresh ``System`` per request is the default (``reuse_system=False``).
-    Reuse is only enabled after equivalence against fresh-System evaluation
-    over the admitted grid has been proven (DESIGN-REV5 §5.5). Even when
-    the bootstrap flag is True, the handler re-probes reused-vs-fresh on
-    the first N reuse hits and latches fresh-per-request on any mismatch.
+    Reuse is enabled from the boolean ``reuse_system`` config at bootstrap;
+    this function records no proof artifact and does not cover temperature
+    × fO2 × composition space. When the flag is True, the handler compares
+    reused-vs-fresh on the first
+    ``VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT`` reuse hits and latches
+    fresh-per-request on any mismatch. Hits after that prefix are reused
+    without comparison. The integer 20 is a probe budget, not a grid proof.
     """
     module = None
     errors: list[str] = []
@@ -1131,8 +1237,16 @@ class VapoRockBackend(MeltBackend):
         Lazy-import VapoRock and stash configuration.
 
         Returns True only if the upstream library imports cleanly.
-        Never raises — a missing library is a normal "not available"
-        outcome.
+
+        A missing library is a normal "not available" outcome: this
+        method returns False and records ``_last_error``. Non-numeric or
+        non-finite ``warm_pool_size`` follows the same False/_last_error
+        refusal as the timeout options rather than letting ``int()``
+        raise ValueError/OverflowError.
+
+        This method is not a total exception shield. ``close()`` runs
+        first, and warm-pool startup can still raise after a valid
+        pool size.
 
         When ``warm_worker`` is True the import is owned by an isolated
         warm worker and the parent keeps only a thin transport. Default
@@ -1192,7 +1306,26 @@ class VapoRockBackend(MeltBackend):
             self._last_error = 'VapoRock warm_pool_size must be numeric'
             self._warnings.append(self._last_error)
             return False
-        pool_size = int(raw_pool_size)
+        try:
+            pool_size_float = float(raw_pool_size)
+        except (TypeError, ValueError):
+            self._last_error = 'VapoRock warm_pool_size must be numeric'
+            self._warnings.append(self._last_error)
+            return False
+        if not math.isfinite(pool_size_float) or pool_size_float <= 0.0:
+            self._last_error = (
+                'VapoRock warm_pool_size must be finite and positive'
+            )
+            self._warnings.append(self._last_error)
+            return False
+        try:
+            pool_size = int(raw_pool_size)
+        except (TypeError, ValueError, OverflowError):
+            self._last_error = (
+                'VapoRock warm_pool_size must be a finite integer'
+            )
+            self._warnings.append(self._last_error)
+            return False
         if pool_size <= 0:
             self._last_error = 'VapoRock warm_pool_size must be positive'
             self._warnings.append(self._last_error)
@@ -1393,11 +1526,17 @@ class VapoRockBackend(MeltBackend):
         refuse outside 1350–1950 K, on liquid-fraction failure when a
         fraction is supplied, on projection/non-basis failure, and on
         sum-pressure sanity failure after the engine returns. Upstream
-        fabricates smooth finite garbage at extreme T (probe: ~8.3e5 bar
-        total at 10000 K) and never self-refuses.
+        fabricates smooth finite garbage at extreme T (historical
+        2026-07-31 probe fixture ~8.3e5 bar total at 10000 K; that
+        number is not a current-engine recompute) and does not
+        self-refuse.
 
-        ``pressure_bar`` remains diagnostic-only: the System path does not
-        pass total pressure through to the engine.
+        ``pressure_bar`` remains diagnostic-only: the System path in this
+        adapter does not pass total pressure through to the engine
+        (upstream accepts optional ``P``; this adapter omits it).
+        Non-finite, zero, or negative ``pressure_bar``, and non-finite
+        ``fO2_log``, are refused on this entry path before any engine
+        call.
 
         ``EquilibriumResult.ledger_transition`` is left ``None`` and no
         phase assemblage is reported: VapoRock holds no ``AtomLedger``
@@ -1512,6 +1651,65 @@ class VapoRockBackend(MeltBackend):
                 diagnostics=diagnostics,
             )
 
+        if not vaporock_pressure_bar_admitted(pressure_bar):
+            try:
+                pressure_diag: Any = float(pressure_bar)
+                if not math.isfinite(pressure_diag):
+                    pressure_diag = repr(pressure_bar)
+            except (TypeError, ValueError):
+                pressure_diag = repr(pressure_bar)
+            diagnostics = {
+                **melt_envelope_diagnostics,
+                'backend_status_reason': 'invalid_pressure_bar',
+                'temperature_K': float(temperature_K),
+                'requested_pressure_bar': pressure_diag,
+                'pressure_control_authoritative': False,
+            }
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
+                phase_assemblage_available=False,
+                status='out_of_domain',
+                warnings=[
+                    'VapoRock refused pressure_bar='
+                    f'{pressure_bar!r} (need finite P > 0 bar; '
+                    'degenerate total pressure is not a completed cell)'
+                ],
+                diagnostics=diagnostics,
+            )
+
+        if not vaporock_fo2_log_admitted(fO2_log):
+            try:
+                fo2_diag: Any = float(fO2_log)
+                if not math.isfinite(fo2_diag):
+                    fo2_diag = repr(fO2_log)
+            except (TypeError, ValueError):
+                fo2_diag = repr(fO2_log)
+            diagnostics = {
+                **melt_envelope_diagnostics,
+                'backend_status_reason': 'invalid_fo2_log',
+                'temperature_K': float(temperature_K),
+                'requested_pressure_bar': float(pressure_bar),
+                'fO2_log': fo2_diag,
+                'pressure_control_authoritative': False,
+            }
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
+                phase_assemblage_available=False,
+                status='out_of_domain',
+                warnings=[
+                    'VapoRock refused fO2_log='
+                    f'{fO2_log!r} (need a finite log10(fO2); '
+                    'degenerate redox is not a completed cell)'
+                ],
+                diagnostics=diagnostics,
+            )
+
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, tuple[str, ...]] = {}
         if composition_mol_by_account is not None:
@@ -1551,6 +1749,32 @@ class VapoRockBackend(MeltBackend):
             **melt_envelope_diagnostics,
             **projection_diagnostics,
         }
+        nonfinite_keys = tuple(dict.fromkeys((
+            *_nonfinite_numeric_keys(composition_kg),
+            *_nonfinite_numeric_keys(composition_mol),
+            *_nonfinite_numeric_keys(comp_wt),
+        )))
+        if nonfinite_keys:
+            diagnostics = dict(projection_diagnostics)
+            diagnostics['backend_status_reason'] = 'non_finite_composition'
+            diagnostics['temperature_K'] = float(temperature_K)
+            diagnostics['non_finite_composition_keys'] = nonfinite_keys
+            diagnostics['pressure_control_authoritative'] = False
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
+                phase_assemblage_available=False,
+                status='out_of_domain',
+                warnings=[
+                    *prior_warnings,
+                    'VapoRock refused non-finite melt composition for '
+                    f'{", ".join(nonfinite_keys)}; NaN/inf is not proven '
+                    'empty inventory',
+                ],
+                diagnostics=diagnostics,
+            )
         if (
             projection.dropped_mass_kg_by_species
             or dropped_accounts
@@ -1656,8 +1880,10 @@ class VapoRockBackend(MeltBackend):
                     f'VapoRock refused sum partial pressure '
                     f'{sum_bar:g} bar above sanity ceiling '
                     f'{VAPOROCK_MAX_SUM_PRESSURE_BAR:g} bar '
-                    '(external sum-pressure domain gate; probe anchor '
-                    f'~{VAPOROCK_PROBE_10000K_SUM_P_BAR:.3g} bar at 10000 K)',
+                    '(external sum-pressure domain gate; historical '
+                    '2026-07-31 probe fixture '
+                    f'~{VAPOROCK_PROBE_10000K_SUM_P_BAR:.3g} bar at '
+                    '10000 K, not a current-engine recompute)',
                 ],
                 diagnostics=diagnostics,
             )
@@ -1706,11 +1932,13 @@ class VapoRockBackend(MeltBackend):
         # Hollow speciation did not produce a usable result. Status is
         # not_converged (documented: "ran but did not produce one"), not
         # non_authoritative. non_authoritative is the pressure-authority
-        # outcome of a *completed* speciation and remains in diagnostics
-        # / warnings via pressure_control_authoritative=False. Rail
-        # consumers treat only {ok, non_authoritative} as live cells;
-        # this status is what stops evaluate_cell / engine_crosscheck
-        # walking a hollow dict as a live success.
+        # outcome of a speciation that produced at least one finite
+        # positive Pa (the adapter omitted total P). Degenerate
+        # independent variables and non-finite pressure maps are
+        # refused before this branch. Rail consumers treat only
+        # {ok, non_authoritative} as live cells; this status is what
+        # stops evaluate_cell / engine_crosscheck walking a hollow dict
+        # as a live success.
         if not vaporock_full_speciation_Pa:
             result_status = 'not_converged'
         elif pressure_authority_warning:
@@ -1757,7 +1985,10 @@ class VapoRockBackend(MeltBackend):
         Lazy import of the upstream VapoRock library.
 
         Returns None if the import fails (the caller treats this as
-        "backend not available").  Never raises.
+        "backend not available"). Exceptions raised by
+        ``import_module`` on the ``_IMPORT_CANDIDATES`` loop in this
+        method are caught and converted to that None/_last_error
+        outcome. This method does not wrap ``warnings.warn``.
         """
         errors: List[str] = []
         for module_name in _IMPORT_CANDIDATES:
@@ -1826,7 +2057,10 @@ class VapoRockBackend(MeltBackend):
         the second half of this method).  The candidate-name loop is
         retained as a defensive fallback for historical 0.1.x installs
         that exposed top-level functions instead of the ``System``
-        class — it is a no-op on the current build but harmless.
+        class. On a build that exposes only ``System``, the loop does
+        not run. If a candidate function is present and returns bare
+        oxide keys, ``_normalize_vapor_pressures`` keeps those keys
+        (they are not collision-free).
         """
         self._last_pressure_authority_warning = None
         self._clear_empty_speciation()
@@ -1897,8 +2131,9 @@ class VapoRockBackend(MeltBackend):
         system_cls = getattr(module, 'System', None)
         if callable(system_cls):
             try:
-                # Fresh System per request (in-process path). Reuse is only
-                # admitted inside the warm worker after grid equivalence.
+                # Fresh System per request (in-process path). Reuse is an
+                # opt-in warm-worker flag with a finite reused-vs-fresh
+                # prefix probe, not a proven admitted-grid equivalence.
                 system = system_cls()
                 set_melt_comp = getattr(system, 'set_melt_comp')
                 eval_gas_abundances = getattr(system, 'eval_gas_abundances')
@@ -1909,10 +2144,12 @@ class VapoRockBackend(MeltBackend):
                 set_melt_comp(composition_wt_pct)
                 logP = eval_gas_abundances(temperature_K, fO2_log)
                 self._last_pressure_authority_warning = (
-                    'VapoRock System.eval_gas_abundances ignores total '
-                    'pressure; requested pressure_bar is diagnostic-only '
-                    'and this vapor result is non-authoritative for '
-                    'pressure-sensitive transport.'
+                    'This adapter calls System.eval_gas_abundances without '
+                    'the optional P argument, so upstream evaluates liquid '
+                    'chemical potentials at its default P (installed '
+                    'source: P=1e-10 bar) rather than the requested '
+                    'pressure_bar. The vapor result is non-authoritative '
+                    'for pressure-sensitive transport.'
                 )
                 # log10(bar) result is unit-unambiguous; convert directly
                 # without the declared-unit dict path.
@@ -1957,10 +2194,12 @@ class VapoRockBackend(MeltBackend):
                 f'{type(payload)!r}'
             )
         self._last_pressure_authority_warning = (
-            'VapoRock System.eval_gas_abundances ignores total '
-            'pressure; requested pressure_bar is diagnostic-only '
-            'and this vapor result is non-authoritative for '
-            'pressure-sensitive transport.'
+            'This adapter calls System.eval_gas_abundances without '
+            'the optional P argument, so upstream evaluates liquid '
+            'chemical potentials at its default P (installed '
+            'source: P=1e-10 bar) rather than the requested '
+            'pressure_bar. The vapor result is non-authoritative '
+            'for pressure-sensitive transport.'
         )
         if 'log10_bar' not in payload:
             self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
@@ -2058,13 +2297,21 @@ class VapoRockBackend(MeltBackend):
                 EmptySpeciationCause.NO_FINITE_VALUES, stats
             )
             return {}
+        if any(not math.isfinite(value) for value in float_values):
+            # inf > 0 is True, so a {SiO: inf} map would otherwise be
+            # retained as a live Pa dict. NaN/inf is not a partial
+            # pressure; refuse the whole candidate table.
+            self._latch_empty_speciation(
+                EmptySpeciationCause.NONFINITE_PRESSURE, stats
+            )
+            return {}
 
         # Scale by the explicitly-declared output unit; never guess.
         scale = 1e5 if self._vapor_pressure_units == 'bar' else 1.0
         pressures: Dict[str, float] = {}
         for species, value in raw.items():
             pressure = float(value) * scale
-            if pressure > 0.0:
+            if math.isfinite(pressure) and pressure > 0.0:
                 pressures[self._strip_gas_suffix(species)] = pressure
         if not pressures:
             self._latch_empty_speciation(
@@ -2129,9 +2376,10 @@ class VapoRockBackend(MeltBackend):
         VapoRock's ``eval_gas_abundances`` returns a pandas DataFrame
         indexed by ``species_name`` (one column, the temperature) whose
         values are log10(partial pressure / bar).  Species names carry a
-        ``(g)`` phase suffix; ``_strip_gas_suffix`` maps them onto the
-        simulator's collision-free vocabulary (oxide-colliding gas names
-        namespaced with ``_gas``, the rest bare).
+        ``(g)`` phase suffix; ``_strip_gas_suffix`` namespaces
+        oxide-colliding ``(g)``-marked names with ``_gas`` and returns
+        other ``(g)``-marked names bare. Names with no ``(g)`` marker
+        are unchanged and can still collide with ``OXIDE_SPECIES``.
 
         ``-inf`` is an explicit inventory mask: after evaluating every
         gas, VapoRock overwrites any species whose formation reaction
@@ -2197,31 +2445,32 @@ class VapoRockBackend(MeltBackend):
     @staticmethod
     def _strip_gas_suffix(species: Any) -> str:
         """
-        Map a VapoRock gas-species name onto a collision-free simulator
-        vocabulary.
+        Map a VapoRock gas-species name onto the simulator vocabulary.
 
-        VapoRock labels every gas species with a ``(g)`` phase suffix
-        (``Na(g)``, ``SiO(g)``, ``O2(g)``, ``SiO2(g)``, ``Al2O(g)``...).
-        Naively stripping the suffix would map ``SiO2(g)`` and
-        ``Fe2O3(g)`` onto ``SiO2`` / ``Fe2O3`` — the *exact* strings used
-        for the condensed melt oxides in ``OXIDE_SPECIES``.  A downstream
-        consumer keying ``vapor_pressures_Pa`` by species would then
-        conflate gaseous SiO2 with melt SiO2 and silently break the
-        atom-explicit ``SiO2 -> SiO + 1/2 O2`` stoichiometry.
+        VapoRock labels System-path gas species with a ``(g)`` phase
+        suffix (``Na(g)``, ``SiO(g)``, ``O2(g)``, ``SiO2(g)``,
+        ``Al2O(g)``...). Naively stripping the suffix would map
+        ``SiO2(g)`` and ``Fe2O3(g)`` onto ``SiO2`` / ``Fe2O3`` — the
+        exact strings used for condensed melt oxides in
+        ``OXIDE_SPECIES``. A downstream consumer keying
+        ``vapor_pressures_Pa`` by species would then conflate gaseous
+        SiO2 with melt SiO2 and silently break the atom-explicit
+        ``SiO2 -> SiO + 1/2 O2`` stoichiometry.
 
-        To keep the gas vocabulary provably disjoint from the oxide
-        basis, a species that arrives with the explicit ``(g)`` marker
-        AND whose bare spelling is a member of ``OXIDE_SPECIES`` is
+        A species that arrives with the explicit ``(g)`` marker AND
+        whose bare spelling is a member of ``OXIDE_SPECIES`` is
         namespaced with ``_gas`` (``SiO2(g) -> SiO2_gas``,
-        ``FeO(g) -> FeO_gas``).  Every other gas species — ``Na``,
-        ``SiO``, ``O2``, ``Al2O``, ... — is already disjoint from the
-        oxide basis and is returned bare, so the builtin Antoine path
-        and the VapoRock path still share keys for the shared volatiles.
+        ``FeO(g) -> FeO_gas``). Other ``(g)``-marked names — ``Na``,
+        ``SiO``, ``O2``, ``Al2O``, ... — are already disjoint from the
+        oxide basis and are returned bare, so the builtin Antoine path
+        and the VapoRock System path still share keys for the shared
+        volatiles.
 
         A name with no ``(g)`` marker is returned unchanged (stripped of
-        surrounding whitespace only): the marker is VapoRock's explicit
-        "this is a gas" signal, so mocked / legacy result dicts that
-        already use bare names are passed through untouched.
+        surrounding whitespace only). That passthrough is not
+        collision-free: ``SiO2`` stays ``SiO2``. The marker is
+        VapoRock's explicit "this is a gas" signal; mocked / legacy
+        result dicts that already use bare names are passed through.
         """
         raw = str(species)
         stripped = _GAS_SUFFIX_RE.sub('', raw).strip()

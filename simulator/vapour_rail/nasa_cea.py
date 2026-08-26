@@ -13,7 +13,7 @@ NASA SP-273 / Chemkin 7-coeff):
   ``T^{-2}, T^{-1}, T^0, T, T^2, T^3, T^4`` with two integration constants
   ``b1, b2`` for enthalpy and entropy.
 
-  Algebra (dimensionless):
+  Algebra (dimensionless ratios; ``T`` is the numerical value in kelvin):
     ``Cp0/R = a1 T^{-2} + a2 T^{-1} + a3 + a4 T + a5 T^2 + a6 T^3 + a7 T^4``
     ``H0/(R T) = -a1 T^{-2} + a2 ln(T)/T + a3 + a4 T/2 + a5 T^2/3
                  + a6 T^3/4 + a7 T^4/5 + b1/T``
@@ -21,13 +21,23 @@ NASA SP-273 / Chemkin 7-coeff):
              + a6 T^3/3 + a7 T^4/4 + b2``
     ``G0/(R T) = H0/(R T) - S0/R``
 
-  Units: ``T`` in K; ``R`` is the molar gas constant; ``Cp0`` in energy/(mol·K);
-  ``H0, G0`` in energy/mol; ``S0`` in energy/(mol·K). Coefficients are
-  dimensionless as published for the ratio forms above.
+  Units: ``T`` is the numerical value of temperature in kelvin; ``R`` is the
+  molar gas constant; ``Cp0`` in energy/(mol·K); ``H0, G0`` in energy/mol;
+  ``S0`` in energy/(mol·K). The tabulated ``a_i`` and ``b1, b2`` are bare
+  numbers for that kelvin unit choice. They are not all dimensionless: each
+  coefficient carries the power of kelvin that makes its term in the
+  dimensionless ratio dimensionless,
+    ``[a1]=K², [a2]=K, [a3]=1, [a4]=K⁻¹, [a5]=K⁻², [a6]=K⁻³, [a7]=K⁻⁴``,
+    ``[b1]=K``, ``[b2]=1``.
+  Treating every coefficient as dimensionless while ``T`` is in kelvin would
+  add unlike dimensions.
 
   Sanity: monatomic ideal gas has ``Cp/R → 2.5``; O2 at 298.15 K yields
-  ``Cp ≈ 29.4 J/(mol·K)``; adjacent segments must agree at the shared
-  breakpoint within floating-point noise when the source is continuous.
+  ``Cp ≈ 29.4 J/(mol·K)``. Adjacent source segments of a published CEA record
+  can disagree at a shared breakpoint before any binary evaluation: O2
+  (tpis89) low vs mid printed coefficients differ by ``1.585e-9`` in
+  ``Cp/R`` at 1000 K under 60-digit decimal arithmetic. That residual is
+  source tabulation/rounding, not evaluator roundoff.
 
 **NASA-7 (classical seven-coefficient, ``nasa_cea_7``)**
   Premise: heat-capacity polynomial in non-negative powers only
@@ -39,15 +49,24 @@ NASA SP-273 / Chemkin 7-coeff):
     ``S0/R = a1 ln(T) + a2 T + a3 T^2/2 + a4 T^3/3 + a5 T^4/4 + a7``
     ``G0/(R T) = H0/(R T) - S0/R``
 
-  Units / sanity: same conventions as NASA-9. Constant-``Cp`` monatomic test
-  species with ``a1=2.5`` (or 3.5 for diatomic classical) recovers
-  ``Cp/R = a1`` exactly for all T.
+  Units / sanity: same kelvin-number convention as NASA-9. Coefficient
+  dimensions with ``T`` in K:
+    ``[a1]=1, [a2]=K⁻¹, [a3]=K⁻², [a4]=K⁻³, [a5]=K⁻⁴, [a6]=K, [a7]=1``.
+  Constant-``Cp`` monatomic test species with ``a1=2.5`` (or 3.5 for diatomic
+  classical) recovers ``Cp/R = a1`` exactly for all T in the segment.
 
 Segment contracts:
 - Intervals must form a contiguous, non-overlapping cover (shared endpoints OK).
-- A gap or interior overlap raises :class:`NasaCeaSegmentError`.
+- A gap, interior overlap, empty list, non-finite or non-positive bound, or
+  non-finite coefficient raises :class:`NasaCeaSegmentError`.
 - Missing standard-state convention raises :class:`NasaCeaConventionError`.
-- Temperature outside the declared domain raises :class:`NasaCeaDomainError`.
+- On :meth:`NasaCeaPolynomial.evaluate` / :meth:`NasaCeaPolynomial.segment_for`,
+  temperature outside the declared domain raises :class:`NasaCeaDomainError`.
+- On :meth:`Nasa7Segment.evaluate_ratios` and
+  :meth:`Nasa9Segment.evaluate_ratios`, a temperature that is not finite and
+  ``> 0`` K raises :class:`NasaCeaDomainError` before ``1/T`` or ``log(T)``.
+  Those two methods do not, in this module, test whether ``T`` lies inside
+  ``[T_min_K, T_max_K]``.
 """
 
 from __future__ import annotations
@@ -72,7 +91,7 @@ class NasaCeaError(ValueError):
 
 
 class NasaCeaSegmentError(NasaCeaError):
-    """Segment gap, overlap, or empty segment list."""
+    """Segment gap, overlap, empty list, or non-finite/non-positive payload."""
 
 
 class NasaCeaConventionError(NasaCeaError):
@@ -80,7 +99,59 @@ class NasaCeaConventionError(NasaCeaError):
 
 
 class NasaCeaDomainError(NasaCeaError):
-    """Temperature outside the declared segment domain."""
+    """T outside a declared segment domain, or T is not finite and > 0 K."""
+
+
+def _require_finite_number(
+    value: float,
+    *,
+    what: str,
+    err: type[NasaCeaError] = NasaCeaError,
+) -> float:
+    """Return ``float(value)``; raise ``err`` if the result is not finite."""
+    x = float(value)
+    if not math.isfinite(x):
+        raise err(f"{what} must be a finite float; got {value!r}")
+    return x
+
+
+def _require_positive_finite_T(
+    value: float,
+    *,
+    what: str = "T_K",
+    err: type[NasaCeaError] = NasaCeaDomainError,
+) -> float:
+    """Gate ``log(T)`` / ``1/T``: T must be finite and > 0 K.
+
+    Premise: NASA-7/9 ratio algebra uses ``log(T)`` and ``1/T`` (NASA-9 also
+    ``T^{-2}``). Those operations are defined for finite T > 0 K.
+    Algebra: this helper does not evaluate coefficients; it only rejects T
+    that would make those operations undefined or non-finite.
+    Units: kelvin.
+    Sanity: 298.15 K passes; 0 K, −1 K, NaN, and ±inf raise ``err``.
+    """
+    T = _require_finite_number(value, what=what, err=err)
+    if T <= 0.0:
+        raise err(f"{what} must be > 0 K; got {value!r}")
+    return T
+
+
+def _exp_neg_delta_g_over_RT(delta_g_over_RT: float, *, what: str) -> float:
+    """``K = exp(−ΔG°/RT)`` with a finite-input gate on this path.
+
+    Inside this function a non-finite ``ΔG°/RT`` raises :class:`NasaCeaError`
+    before ``math.exp``. A float64 overflow of ``math.exp`` is raised as
+    :class:`NasaCeaError` (the original ``OverflowError`` is ``__cause__``).
+    """
+    x = _require_finite_number(
+        delta_g_over_RT, what=f"{what}: ΔG°/RT", err=NasaCeaError
+    )
+    try:
+        return math.exp(-x)
+    except OverflowError as exc:
+        raise NasaCeaError(
+            f"{what}: exp(-ΔG°/RT) overflows float64 for ΔG°/RT={x}"
+        ) from exc
 
 
 @dataclass(frozen=True)
@@ -124,7 +195,17 @@ class Nasa7Segment:
     coefficients: tuple[float, float, float, float, float, float, float]
 
     def __post_init__(self) -> None:
-        if not (self.T_min_K < self.T_max_K):
+        t_min = _require_finite_number(
+            self.T_min_K, what="NASA-7 T_min_K", err=NasaCeaSegmentError
+        )
+        t_max = _require_finite_number(
+            self.T_max_K, what="NASA-7 T_max_K", err=NasaCeaSegmentError
+        )
+        if t_min <= 0.0:
+            raise NasaCeaSegmentError(
+                f"NASA-7 segment requires T_min_K > 0 K; got {self.T_min_K}"
+            )
+        if not (t_min < t_max):
             raise NasaCeaSegmentError(
                 f"NASA-7 segment requires T_min < T_max; got "
                 f"[{self.T_min_K}, {self.T_max_K}]"
@@ -133,6 +214,10 @@ class Nasa7Segment:
             raise NasaCeaSegmentError(
                 f"NASA-7 segment requires exactly 7 coefficients; "
                 f"got {len(self.coefficients)}"
+            )
+        for i, c in enumerate(self.coefficients, start=1):
+            _require_finite_number(
+                c, what=f"NASA-7 a{i}", err=NasaCeaSegmentError
             )
 
     def contains(self, T_K: float, *, include_max: bool) -> bool:
@@ -152,11 +237,17 @@ class Nasa7Segment:
         Entropy integration: S/R = ∫ (Cp/R)/T dT + const
           ⇒ S/R = a1 ln T + a2 T + a3 T^2/2 + a4 T^3/3 + a5 T^4/4 + a7.
         Gibbs: G = H − T S ⇒ G/(R T) = H/(R T) − S/R.
-        Units: T in K; ratios dimensionless; multiply by R (J/(mol·K)) for SI.
+        Units: T is the numerical value in kelvin; ratios dimensionless.
+        With T in K the tabulated coefficients carry
+          [a1]=1, [a2]=K⁻¹, [a3]=K⁻², [a4]=K⁻³, [a5]=K⁻⁴, [a6]=K, [a7]=1
+        so each addend of Cp/R, H/(RT), and S/R is dimensionless. Multiply
+        Cp/R and S/R by R (J/(mol·K)) and H/(RT), G/(RT) by R·T for SI.
         Sanity: a2=…=a5=0 ⇒ Cp/R = a1 constant; monatomic ideal gas a1=2.5.
+        On this method, T that is not finite and > 0 K raises NasaCeaDomainError
+        before 1/T or log(T). This method does not test [T_min_K, T_max_K].
         """
         a1, a2, a3, a4, a5, a6, a7 = self.coefficients
-        T = float(T_K)
+        T = _require_positive_finite_T(T_K, what="NASA-7 T_K")
         T2 = T * T
         T3 = T2 * T
         T4 = T3 * T
@@ -193,7 +284,17 @@ class Nasa9Segment:
     exponents: tuple[float, ...] = NASA9_DEFAULT_EXPONENTS
 
     def __post_init__(self) -> None:
-        if not (self.T_min_K < self.T_max_K):
+        t_min = _require_finite_number(
+            self.T_min_K, what="NASA-9 T_min_K", err=NasaCeaSegmentError
+        )
+        t_max = _require_finite_number(
+            self.T_max_K, what="NASA-9 T_max_K", err=NasaCeaSegmentError
+        )
+        if t_min <= 0.0:
+            raise NasaCeaSegmentError(
+                f"NASA-9 segment requires T_min_K > 0 K; got {self.T_min_K}"
+            )
+        if not (t_min < t_max):
             raise NasaCeaSegmentError(
                 f"NASA-9 segment requires T_min < T_max; got "
                 f"[{self.T_min_K}, {self.T_max_K}]"
@@ -203,6 +304,12 @@ class Nasa9Segment:
                 f"NASA-9 segment requires exactly 7 a-coefficients; "
                 f"got {len(self.coefficients)}"
             )
+        for i, c in enumerate(self.coefficients, start=1):
+            _require_finite_number(
+                c, what=f"NASA-9 a{i}", err=NasaCeaSegmentError
+            )
+        _require_finite_number(self.b1, what="NASA-9 b1", err=NasaCeaSegmentError)
+        _require_finite_number(self.b2, what="NASA-9 b2", err=NasaCeaSegmentError)
         if len(self.exponents) < 7:
             raise NasaCeaSegmentError(
                 f"NASA-9 segment requires at least 7 exponents; "
@@ -237,15 +344,22 @@ class Nasa9Segment:
                 + a6 T^3/3 + a7 T^4/4 + b2
           G/(R T) = H/(R T) − S/R
 
-        Units: T in K; ratios dimensionless. SI: multiply Cp/R and S/R by R;
+        Units: T is the numerical value in kelvin; ratios dimensionless.
+        With T in K the tabulated coefficients carry
+          [a1]=K², [a2]=K, [a3]=1, [a4]=K⁻¹, [a5]=K⁻², [a6]=K⁻³, [a7]=K⁻⁴,
+          [b1]=K, [b2]=1
+        so each addend is dimensionless. SI: multiply Cp/R and S/R by R;
         multiply H/(R T) and G/(R T) by R·T.
 
-        Sanity: O2 (tpis89) at 298.15 K → Cp ≈ 29.38 J/(mol·K); low/mid
-        segments of continuous thermo.inp records agree at the 1000 K
-        breakpoint to ~1e-9 relative in the ratio forms.
+        Sanity: O2 (tpis89) at 298.15 K → Cp ≈ 29.38 J/(mol·K). The printed
+        O2 low/mid coefficients already differ by 1.585e-9 in Cp/R at 1000 K
+        in 60-digit decimal arithmetic (source rounding, not evaluator
+        roundoff). On this method, T that is not finite and > 0 K raises
+        NasaCeaDomainError before 1/T or log(T). This method does not test
+        [T_min_K, T_max_K].
         """
         a1, a2, a3, a4, a5, a6, a7 = self.coefficients
-        T = float(T_K)
+        T = _require_positive_finite_T(T_K, what="NASA-9 T_K")
         T2 = T * T
         T3 = T2 * T
         T4 = T3 * T
@@ -326,7 +440,12 @@ class NasaCeaPolynomial:
     delta_f_H_298_15_J_per_mol: float | None = None
     citation: str | None = None
     source_ref_code: str | None = None
-    reference_pressure_Pa: float = 100_000.0  # CEA / JANAF standard state P°
+    # Default 1 bar (1e5 Pa) for every standard_state, including condensed_*.
+    # This class does not switch condensed records to 1 atm. Ratio evaluators
+    # in this module do not read the field; it is stored metadata.
+    # NASA/TP-2002-211556 mixed convention (as encoded by tools/vp_cea_ingest.py):
+    # ideal-gas standard state 1 bar; pure condensed reference substances 1 atm.
+    reference_pressure_Pa: float = 100_000.0
 
     def __post_init__(self) -> None:
         if self.family not in ("nasa_cea_7", "nasa_cea_9"):
@@ -442,18 +561,23 @@ class NasaCeaPolynomial:
         condensed: "NasaCeaPolynomial",
         T_K: float,
     ) -> float:
-        """``P_sat / P° = exp(−(G_gas − G_cond)/(R T))`` for pure-component vaporization.
+        """``exp(−(G_gas − G_cond)/(R T))`` from the two records as passed.
 
         Derivation
         ----------
-        Premise: equilibrium ``M(cond) ⇌ M(g)`` with standard states at P°.
-        ΔG°_vap = G°_gas − G°_cond; K = P_sat/P° = exp(−ΔG°_vap / (R T)).
+        Premise: for equilibrium ``M(cond) ⇌ M(g)`` at standard pressure P°,
+        ΔG°_vap = G°_gas − G°_cond and K = P_sat/P° = exp(−ΔG°_vap / (R T)).
         Algebra: ΔG°/(R T) = G_gas/(R T) − G_cond/(R T) from the ratio forms.
-        Units: dimensionless pressure ratio; multiply by ``reference_pressure_Pa``
-        (default 1e5 Pa, CEA/JANAF) for absolute P_sat.
-        Sanity: at the normal boiling point of a pure substance under 1 atm,
-        P_sat ≈ 101325 Pa when both phases and the standard pressure are
-        consistent — not asserted here because CEA P° is 1 bar.
+        Units: dimensionless pressure ratio; multiply by a standard pressure
+        (this method does not read ``reference_pressure_Pa``) for absolute
+        P_sat.
+        Sanity: when both records are the same component and the standard
+        pressures are consistent, K is P_sat/P°. This method does not compare
+        ``formula`` or ``name``; on this path the construction-time checks are
+        that ``self.standard_state == "gas"`` and
+        ``condensed.standard_state != "gas"``. A Gibbs difference between
+        unrelated substances is therefore exponentiated as if it were
+        vaporization.
         """
         if self.standard_state != "gas":
             raise NasaCeaConventionError(
@@ -468,14 +592,21 @@ class NasaCeaPolynomial:
             )
         g_gas = self.evaluate(T_K).g_over_RT
         g_cond = condensed.evaluate(T_K).g_over_RT
-        return math.exp(-(g_gas - g_cond))
+        return _exp_neg_delta_g_over_RT(
+            g_gas - g_cond, what="pure_psat_over_Pstd"
+        )
 
 
 def continuity_residuals(
     poly: NasaCeaPolynomial,
     T_K: float,
 ) -> dict[str, float] | None:
-    """Absolute residuals of Cp/R, H/(RT), S/R across an interior breakpoint."""
+    """Signed residuals (higher-segment minus lower-segment) at an interior breakpoint.
+
+    Returns ``hi - lo`` for each ratio, including ``G/(RT)``. Negative jumps
+    stay negative; this function does not take ``abs()``. Compare with a
+    two-sided ceiling, or wrap the values in ``abs()`` at the call site.
+    """
     pair = poly.evaluate_at_breakpoint_pair(T_K)
     if pair is None:
         return None
@@ -494,43 +625,71 @@ def reaction_equilibrium_constant(
     *,
     T_K: float | None = None,
 ) -> float:
-    """``K(T) = exp(−ΔG°_rxn / (R T))`` from per-species standard Gibbs terms.
+    """``K = exp(−Σ ν_i G°_i/(R T))`` from the supplied Gibbs terms.
 
     Derivation
     ----------
-    Premise: ideal-gas / standard-state equilibrium for a balanced reaction
-    ``0 = Σ ν_i M_i`` (ν > 0 products, ν < 0 reactants). Each species carries
-    a standard molar Gibbs free energy ``G°_i(T)`` from a NASA-7/9, Shomate,
-    or other thermo family that exposes ``G°/(R T)``.
+    Premise: if the terms are a balanced reaction ``0 = Σ ν_i M_i``
+    (ν > 0 products, ν < 0 reactants) evaluated at one T, then
+    ΔG°_rxn(T) = Σ ν_i G°_i(T) and K(T) = exp(−ΔG°_rxn / (R T)).
+    This function sums and exponentiates the numbers it is given; it does
+    not look up species, check atom balance, or know whether a value came
+    from JANAF, CEA, or a synthetic coefficient.
 
     Algebra::
 
-      ΔG°_rxn(T) = Σ_i ν_i G°_i(T)
       ΔG°_rxn / (R T) = Σ_i ν_i (G°_i / (R T))
-      K(T) = exp(−ΔG°_rxn / (R T))
+      K = exp(−ΔG°_rxn / (R T))
 
-    Units: ``G°/(R T)`` dimensionless; ``K`` dimensionless in the standard-
-    state convention of the input polynomials (CEA/JANAF ``P° = 1 bar`` when
-    the records use that reference). Absolute ``G°`` never needed — only the
-    dimensionless ratio form.
+    Units: ``G°/(R T)`` dimensionless; ``K`` dimensionless in whatever
+    standard-state convention the supplied terms already used. Absolute
+    ``G°`` is not needed — only the dimensionless ratio form.
 
-    Sanity: for pure vaporization ``M(cond) ⇌ M(g)`` with ν_gas = +1,
-    ν_cond = −1, ``K = P_sat / P°`` recovers the same ratio as
-    :meth:`NasaCeaPolynomial.pure_psat_over_Pstd`. Against JANAF tables for
-    a simple dissociation (e.g. O₂ ⇌ 2 O near 3000 K) ``K`` sits within the
-    table's order of magnitude once both sides use the same segment source.
+    Sanity: for vaporization ``M(cond) ⇌ M(g)`` with ν_gas = +1,
+    ν_cond = −1 and both records the same component, ``K`` matches
+    :meth:`NasaCeaPolynomial.pure_psat_over_Pstd`. A synthetic constant-Cp
+    NASA-7 whose ``G°/(R T)`` is built from a JANAF ΔfG° recovers that same
+    K; that checks this sum/exponent, not independent source polynomials
+    against JANAF.
+
+    On this path: non-finite ν or G°/(R T) raises :class:`NasaCeaError`;
+    ``ThermoState`` terms with non-finite or disagreeing ``T_K`` raise
+    :class:`NasaCeaDomainError`. Float G°/(R T) terms have no temperature
+    to compare. An empty ``terms`` sequence sums to 0, so K = 1; this
+    function does not require a non-empty reaction. ``T_K`` is accepted for
+    call-site documentation and is not used in the exponent.
     """
     delta_g_over_RT = 0.0
+    seen_T: float | None = None
     for nu, state in terms:
+        nu_f = _require_finite_number(nu, what="reaction ν", err=NasaCeaError)
         if isinstance(state, ThermoState):
-            g_over_RT = state.g_over_RT
+            t = _require_positive_finite_T(
+                state.T_K, what="reaction ThermoState.T_K"
+            )
+            if seen_T is None:
+                seen_T = t
+            elif t != seen_T:
+                raise NasaCeaDomainError(
+                    "reaction_equilibrium_constant received ThermoState "
+                    f"objects at {seen_T} K and {t} K; ΔG°/RT is only "
+                    "defined at one T"
+                )
+            g_over_RT = _require_finite_number(
+                state.g_over_RT, what="reaction G°/RT", err=NasaCeaError
+            )
         else:
-            g_over_RT = float(state)
-        delta_g_over_RT += float(nu) * g_over_RT
-    # T_K is accepted for call-site documentation / future checks; the ratio
-    # form already cancels R T, so evaluation does not re-scale by T.
+            g_over_RT = _require_finite_number(
+                state, what="reaction G°/RT", err=NasaCeaError
+            )
+        delta_g_over_RT += nu_f * g_over_RT
+    # T_K is accepted for call-site documentation; the ratio form already
+    # cancels R T, so evaluation does not re-scale by T and does not compare
+    # T_K to ThermoState.T_K.
     del T_K
-    return math.exp(-delta_g_over_RT)
+    return _exp_neg_delta_g_over_RT(
+        delta_g_over_RT, what="reaction_equilibrium_constant"
+    )
 
 
 __all__ = [

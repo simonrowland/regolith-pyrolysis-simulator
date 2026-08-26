@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import sys
 
 import pytest
 
@@ -60,11 +61,11 @@ def test_worked_numeric_check_sigma_mu_at_plus_250K():
 
 
 def test_worked_numeric_check_sigma_log10P_projection_at_2200K():
-    """Projection algebra: 1250 J/mol at 2200 K → σ_log10P ≈ 0.0297 dex.
+    """Live envelope points plus a detached projection identity.
 
-    Hand check from HT-C3 brief / module derivation comment::
-
-        1250 / (2.302585 * 8.314462618 * 2200) ≈ 0.029678 ≈ 0.0297
+    Detached identity (not a live MELTS-v1.0 point): 1250 J/mol at 2200 K
+    → σ_log10P ≈ 0.029678 dex. Live 1950 K uses that 1250 J/mol numerator
+    at T=1950; live 2200 K uses σ_μ=2500 J/mol.
     """
     sigma_mu = 1250.0
     t = 2200.0
@@ -72,16 +73,15 @@ def test_worked_numeric_check_sigma_log10P_projection_at_2200K():
     assert expected == pytest.approx(0.029678, abs=5e-7)
     assert expected == pytest.approx(0.0297, abs=5e-5)
 
-    # Live instrument at the T that produces σ_μ = 1250 for the registered model
-    # (T = T_calib + 250). Projection uses that T, not a fixed 2200 K — the
-    # 2200 K figure above is the pure algebra check of the projection formula.
     env_at_plus_250 = melt_extrapolation_envelope(_T_CALIB + 250.0, _MODEL)
     assert env_at_plus_250.melt_extrap_sigma_mu_J_mol == pytest.approx(1250.0)
+    assert env_at_plus_250.melt_extrap_sigma_log10_P == pytest.approx(
+        1250.0 / (math.log(10.0) * R_J_MOL_K * (_T_CALIB + 250.0))
+    )
+    assert env_at_plus_250.melt_extrap_sigma_log10_P == pytest.approx(
+        0.033483, abs=5e-7
+    )
 
-    # If T_calib is 1950, plus-250 lands on 2200 and matches the hand figure
-    # exactly; with T_calib=1700 the live σ_log10P at 2200 uses σ_μ=2500.
-    # Always assert the projection formula identity at T=2200 via direct call
-    # when the registered model places 2200 above calibration (it does).
     env_2200 = melt_extrapolation_envelope(2200.0, _MODEL)
     assert env_2200.melt_extrap_status == "extrapolated"
     dT = 2200.0 - _T_CALIB
@@ -89,6 +89,7 @@ def test_worked_numeric_check_sigma_log10P_projection_at_2200K():
     assert env_2200.melt_extrap_sigma_log10_P == pytest.approx(
         (_S_EX * dT) / (math.log(10.0) * R_J_MOL_K * 2200.0)
     )
+    assert env_2200.melt_extrap_sigma_log10_P == pytest.approx(0.059356, abs=5e-7)
 
 
 def test_status_transitions_at_calib_boundary():
@@ -198,3 +199,84 @@ def test_typed_consumer_classifies_marker_only_envelope_as_partial():
 
 def test_r_constant_matches_ht_plan():
     assert R_J_MOL_K == 8.314462618
+
+
+def _assert_out_of_domain_zeros(envelope: MeltExtrapolationEnvelope) -> None:
+    assert envelope.melt_extrap_status == "out_of_domain"
+    assert envelope.melt_model_extrapolation_K == 0.0
+    assert envelope.melt_extrap_sigma_mu_J_mol == 0.0
+    assert envelope.melt_extrap_sigma_log10_P == 0.0
+    assert all(
+        math.isfinite(value)
+        for value in (
+            envelope.T_calib_max_K,
+            envelope.melt_model_extrapolation_K,
+            envelope.melt_extrap_sigma_mu_J_mol,
+            envelope.melt_extrap_sigma_log10_P,
+        )
+    )
+
+
+@pytest.mark.parametrize("temperature_K", [0.0, -1.0, -273.15, -1000.0])
+def test_nonpositive_temperature_is_out_of_domain(temperature_K: float) -> None:
+    _assert_out_of_domain_zeros(
+        melt_extrapolation_envelope(temperature_K, _MODEL)
+    )
+
+
+@pytest.mark.parametrize("temperature_K", [sys.float_info.max, 1e308])
+def test_overflow_temperature_is_out_of_domain(temperature_K: float) -> None:
+    _assert_out_of_domain_zeros(
+        melt_extrapolation_envelope(temperature_K, _MODEL)
+    )
+
+
+@pytest.mark.parametrize("temperature_K", ["", None, [], {}, "abc"])
+def test_unparseable_temperature_raises_typed_validation_error(
+    temperature_K: object,
+) -> None:
+    with pytest.raises(MeltEnvelopeValidationError, match="temperature"):
+        melt_extrapolation_envelope(temperature_K, _MODEL)
+    with pytest.raises(MeltEnvelopeValidationError, match="temperature"):
+        melt_extrapolation_diagnostic(temperature_K, _MODEL)
+
+
+@pytest.mark.parametrize("temperature_K", [True, False])
+def test_boolean_temperature_raises_typed_validation_error(
+    temperature_K: bool,
+) -> None:
+    with pytest.raises(MeltEnvelopeValidationError, match="boolean"):
+        melt_extrapolation_envelope(temperature_K, _MODEL)
+    with pytest.raises(MeltEnvelopeValidationError, match="boolean"):
+        melt_extrapolation_diagnostic(temperature_K, _MODEL)
+
+
+@pytest.mark.parametrize("temperature_K", ["", [], "abc", True, False])
+def test_consumer_rejects_unparseable_comparison_temperature(
+    temperature_K: object,
+) -> None:
+    diagnostic = melt_extrapolation_diagnostic(_T_CALIB, _MODEL)
+    with pytest.raises(MeltEnvelopeValidationError, match="temperature"):
+        consume_melt_extrapolation_envelope(
+            diagnostic,
+            temperature_K=temperature_K,
+        )
+
+
+def test_consumer_none_comparison_temperature_still_derives_from_fields() -> None:
+    diagnostic = melt_extrapolation_diagnostic(_T_CALIB, _MODEL)
+    consumed = consume_melt_extrapolation_envelope(
+        diagnostic,
+        temperature_K=None,
+    )
+    assert consumed == melt_extrapolation_envelope(_T_CALIB, _MODEL)
+
+
+def test_nonpositive_temperature_roundtrips_as_out_of_domain() -> None:
+    diagnostic = melt_extrapolation_diagnostic(0.0, _MODEL)
+    assert diagnostic["melt_extrap_status"] == "out_of_domain"
+    consumed = consume_melt_extrapolation_envelope(
+        diagnostic,
+        temperature_K=0.0,
+    )
+    assert consumed == melt_extrapolation_envelope(0.0, _MODEL)

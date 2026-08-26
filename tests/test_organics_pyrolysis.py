@@ -13,6 +13,7 @@ from simulator.chemistry.organics_pyrolysis import (
     apply_organics_source,
     boudouard_crossover_K,
     boudouard_kp,
+    boudouard_lg_kp,
     carbon_activity,
     carbon_delta_g_co_kj_per_mol_o2,
     char_fate,
@@ -20,6 +21,7 @@ from simulator.chemistry.organics_pyrolysis import (
     load_organics_pyrolysis_params,
     organic_co2_release_fraction,
     primary_pyrolysis,
+    tar_fate,
     voropaev_release_fraction,
 )
 from simulator.core import CHAR_SPECIES, PyrolysisSimulator
@@ -336,3 +338,127 @@ def test_ci_hydrocarbons_vacuum_pyrolysis_reaches_source_term_when_mass_present(
     assert spec is not None
     assert spec["reaction_family"] == REACTION_FAMILY_ORGANIC_SOURCE_TERM
     assert spec["species"] == "hydrocarbons"
+
+
+NONFINITE = (float("nan"), float("inf"), float("-inf"))
+
+
+@pytest.mark.parametrize("temperature_C", [*NONFINITE, -273.15, -300.0])
+def test_voropaev_release_fraction_refuses_nonphysical_temperature(
+    temperature_C: float,
+) -> None:
+    with pytest.raises(ValueError, match="temperature_C"):
+        voropaev_release_fraction("CH4", temperature_C)
+
+
+@pytest.mark.parametrize("temperature_C", [*NONFINITE, -273.15])
+def test_organic_co2_release_fraction_refuses_nonphysical_temperature(
+    temperature_C: float,
+) -> None:
+    with pytest.raises(ValueError, match="temperature_C"):
+        organic_co2_release_fraction(temperature_C)
+
+
+@pytest.mark.parametrize("temperature_C", [*NONFINITE, -273.15])
+def test_primary_pyrolysis_refuses_nonphysical_temperature(temperature_C: float) -> None:
+    with pytest.raises(ValueError, match="temperature_C"):
+        primary_pyrolysis({"C": 1.0, "H": 1.0}, temperature_C)
+
+
+@pytest.mark.parametrize(
+    "atoms",
+    [
+        {"C": float("nan"), "H": 4.0},
+        {"C": float("inf"), "H": 4.0},
+        {"C": float("-inf"), "H": 4.0},
+        {"C": -1.0, "H": 4.0},
+    ],
+)
+def test_apply_organics_source_refuses_nonfinite_and_negative_atoms(
+    atoms: dict[str, float],
+) -> None:
+    with pytest.raises(ValueError, match=r"atom\[C\]"):
+        apply_organics_source(atoms, 800.0, 1e-12, 1500.0)
+
+
+def test_apply_organics_source_accepts_zero_inventory() -> None:
+    result = apply_organics_source({"C": 0.0, "H": 0.0}, 800.0, 1e-12, 1500.0)
+    assert result.closed
+    assert result.final_char_c_mol == pytest.approx(0.0)
+    assert result.final_gas_mol == {}
+
+
+@pytest.mark.parametrize("bad_C", [*NONFINITE, -1.0])
+def test_tar_fate_refuses_nonfinite_and_negative_atoms(bad_C: float) -> None:
+    with pytest.raises(ValueError, match=r"tar_atoms\[C\]"):
+        tar_fate({"C": bad_C}, 800.0, 1500.0)
+
+
+@pytest.mark.parametrize("temperature_C", [*NONFINITE, -273.15])
+def test_tar_fate_refuses_nonphysical_temperature(temperature_C: float) -> None:
+    with pytest.raises(ValueError, match="temperature_C"):
+        tar_fate({"C": 1.0, "H": 0.8}, temperature_C, 1500.0)
+
+
+@pytest.mark.parametrize("wall_temperature_C", [*NONFINITE, -273.15])
+def test_tar_fate_refuses_nonphysical_wall_temperature(
+    wall_temperature_C: float,
+) -> None:
+    with pytest.raises(ValueError, match="wall_temperature_C"):
+        tar_fate({"C": 1.0, "H": 0.8}, 800.0, wall_temperature_C)
+
+
+def test_tar_fate_empty_inventory_is_still_proven_zero() -> None:
+    result = tar_fate({}, 800.0, 1500.0)
+    assert result.status == "proven_zero"
+    assert result.coke_c_mol == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize("temperature_C", [*NONFINITE, -273.15])
+def test_char_fate_refuses_nonphysical_temperature(temperature_C: float) -> None:
+    with pytest.raises(ValueError, match="temperature_C"):
+        char_fate(1.0, temperature_C, 1e-12, co2_mol=0.4)
+
+
+@pytest.mark.parametrize("pO2_bar", [*NONFINITE, -1.0])
+def test_char_fate_refuses_nonfinite_and_negative_po2(pO2_bar: float) -> None:
+    with pytest.raises(ValueError, match="pO2_bar"):
+        char_fate(1.0, 800.0, pO2_bar, co2_mol=0.4)
+
+
+@pytest.mark.parametrize("char_c_mol", [*NONFINITE, -1.0])
+def test_char_fate_refuses_nonfinite_and_negative_char(char_c_mol: float) -> None:
+    with pytest.raises(ValueError, match="char_c_mol"):
+        char_fate(char_c_mol, 800.0, 1e-12, co2_mol=0.4)
+
+
+def test_char_fate_accepts_zero_po2_and_zero_char() -> None:
+    zero_po2 = char_fate(1.0, 800.0, 0.0, co2_mol=0.4)
+    assert 0.0 <= zero_po2.survive_fraction <= 1.0
+    zero_char = char_fate(0.0, 800.0, 1e-12, co2_mol=0.4)
+    assert zero_char.survive_fraction == pytest.approx(1.0)
+    assert zero_char.gasified_char_mol == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize("temperature_K", [*NONFINITE, 0.0, -1.0])
+def test_boudouard_lg_kp_refuses_nonphysical_kelvin(temperature_K: float) -> None:
+    with pytest.raises(ValueError, match="temperature_K"):
+        boudouard_lg_kp(temperature_K)
+
+
+@pytest.mark.parametrize("pO2_bar", [*NONFINITE, -1.0])
+def test_carbon_activity_refuses_nonfinite_and_negative_po2(pO2_bar: float) -> None:
+    with pytest.raises(ValueError, match="pO2_bar"):
+        carbon_activity(1000.0, pO2_bar)
+
+
+@pytest.mark.parametrize("temperature_K", [*NONFINITE, 0.0, -1.0])
+def test_carbon_activity_refuses_nonphysical_kelvin(temperature_K: float) -> None:
+    with pytest.raises(ValueError, match="temperature_K"):
+        carbon_activity(temperature_K, 1e-12)
+
+
+def test_carbon_activity_accepts_zero_po2() -> None:
+    result = carbon_activity(1000.0, 0.0)
+    assert result["pO2_bar"] == pytest.approx(1e-30)
+    assert result["a_C_binding"] > 0.0

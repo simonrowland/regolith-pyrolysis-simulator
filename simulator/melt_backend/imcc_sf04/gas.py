@@ -11,6 +11,7 @@ claims.  It is a diagnostic shadow, consistent with the IMCC-SF04 spec r2.1.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping, Sequence
@@ -29,7 +30,13 @@ R_J_MOL_K = 8.314462618
 """Molar gas constant, J / (mol K)."""
 
 BAR = 1.0
-"""Standard-state pressure in bar; partial pressures returned in bar."""
+"""Numerical value of the JANAF gas standard pressure p° = 1 bar.
+
+``evaluate_gas`` stores each gas pressure as the dimensionless ratio
+``p_i / p°``. With p° = 1 bar that ratio equals the pressure in bar, so
+the mass-action algebra uses the stored floats directly and does not
+divide by this constant.
+"""
 
 
 # --------------------------------------------------------------------------- #
@@ -282,20 +289,34 @@ def _janaf_gibbs(T: float, row: pd.Series) -> float:
 
     Derivation
     ----------
-    The JANAF tables in VapoRock give the NASA/Shomate 7-coefficient form for
-    each gas species.  With t = T/1000 K:
+    Premise: the VapoRock JANAF CSV stores NIST Shomate coefficients in
+    columns A–H with ``t = T/1000`` (T in K). This function uses A–G only,
+    matching VapoRock ``_janaf_dH`` / ``_janaf_S`` / ``_janaf_G``. It is not
+    the NASA Glenn seven-coefficient family (NASA/TP-2002-211556), which
+    writes ``Cp°/R``, ``H°/(RT)``, and ``S°/R`` as polynomials in T (K) with
+    integration constants ``a1…a7``.
 
-        H°(t) = A t + B/2 t^2 + C/3 t^3 + D/4 t^4 - E/t + F   (kJ/mol)
-        S°(t) = A ln(t) + B t + C/2 t^2 + D/3 t^3 - E/(2 t^2) + G   (J/mol/K)
-        G°(T) = H°(T) * 1000 - T * S°(T)                         (J/mol)
+    NIST WebBook Shomate enthalpy includes a ``− H`` term so that
+    ``H°(T) − H°_298.15`` is ~0 at 298.15 K on a segment that covers 298.15 K.
+    VapoRock's ``_janaf_dH`` omits that ``− H`` term (their comment: H removed
+    because the F offset already reproduces the LAMOR/JANAF scale). This
+    function follows that transcription:
 
-    Reference state: ideal gas at 1 bar, elements in their 298 K standard
-    states.  All species in the VapoRock JANAF table share this single reference,
-    so reference states cancel when forming a reaction ΔG°.
+        dH(t) = A t + B/2 t^2 + C/3 t^3 + D/4 t^4 − E/t + F        (kJ/mol)
+        S(t)  = A ln(t) + B t + C/2 t^2 + D/3 t^3 − E/(2 t^2) + G  (J/mol/K)
+        G°(T) = dH(t) * 1000 − T * S(t)                            (J/mol)
 
-    Unit check: H in kJ/mol * 1000 -> J/mol; T * S (K * J/mol/K) -> J/mol.
-    Sanity case: O2(g), the oxygen reference, has H°(298)=0 and S°(298)≈205
-    J/mol/K, giving G°(298)≈-61 kJ/mol; the function reproduces this sign.
+    Column H is present on the CSV row and is unused here. Reference state
+    on the VapoRock table is ideal gas at 1 bar, elements in their 298 K
+    standard states, so those baselines cancel in a reaction ΔG° assembled
+    from these rows.
+
+    Unit check: dH in kJ/mol * 1000 → J/mol; T * S (K * J/mol/K) → J/mol.
+    Sanity (in-domain): O2(g) 700–2000 K row at T = 2000 K gives
+    G° ≈ −478320.38 J/mol. Sign is negative; −T S dominates
+    (S ≈ 268.75 J/mol/K, T S ≈ 537.5 kJ/mol). 298.15 K is below that row's
+    T_min = 700 K, so this function does not claim a 298.15 K JANAF match
+    from these coefficients.
     """
     t = T / 1000.0
     dH = (
@@ -353,15 +374,23 @@ def _lamor_gibbs(T: float, row: pd.Series) -> float:
 def _nearest_interval_row(
     df: pd.DataFrame, species: str, T: float, allow_extrapolation: bool = False
 ) -> pd.Series:
-    """Select the thermodynamic interval closest to T.
+    """Select one thermodynamic interval for ``species`` at temperature ``T``.
 
-    VapoRock's JANAF evaluation extends the lowest interval downward and the
-    highest interval upward so that a single-T evaluation does not fail when the
-    caller's temperature lies slightly outside the fitted range.  We replicate
-    that selection rule, but by default we refuse when the selected interval does
-    not actually contain T; extrapolation is allowed only when
-    ``allow_extrapolation=True`` is passed explicitly.  This matches the V2
+    Selection inside this function: among rows with ``T_min <= T``, take the
+    one with the largest ``T_min``. If every ``T_min`` is ``> T``, take
+    ``rows.iloc[0]`` (first row of that species in the loaded frame). Then,
+    unless ``allow_extrapolation=True``, raise
+    ``ImccGasTemperatureOutsideDomainError`` when ``T`` is outside that
+    selected row's ``[T_min, T_max]``. That default refusal is the V2
     refusal-semantics contract in the IMCC-SF04 spec §2.
+
+    This is not VapoRock ``_calc_gibbs_species_JANAF_singleT`` interval
+    parity. That path, after replacing the lowest ``T_min`` with 0 and the
+    highest ``T_max`` with 1e8, masks with ``(T > T_min) & (T <= T_max)``.
+    At a shared breakpoint ``T = T_max(i) = T_min(i+1)`` that mask selects
+    the lower interval; this function selects the upper interval. On the
+    current ``JANAF-vapor-data-full.csv`` those shared breakpoints include
+    AlO 2000 K, AlO2 1000 K, K 1800 K, Mg 2200 K, O2 2000 K, and SiO 1100 K.
     """
     rows = df.loc[df.index == species]
     if rows.empty:
@@ -369,8 +398,8 @@ def _nearest_interval_row(
             f"no JANAF G(T) row for gas species {species!r}"
         )
     t_mins = rows["T_min"].astype(float).to_numpy()
-    # Largest T_min that is <= T; fallback to the first (lowest-T) row if T is
-    # below every interval.
+    # Largest T_min that is <= T; fallback to rows.iloc[0] if T is below every
+    # T_min in the loaded frame.
     valid = t_mins <= T
     if np.any(valid):
         idx = int(np.argmax(t_mins * valid))  # argmax of masked mins gives largest <= T
@@ -433,28 +462,34 @@ def evaluate_gas(
         vector aligned with ``parent_oxides`` (default IMCC order).  Activities
         are relative to the pure liquid oxide standard state.
     T_K:
-        Temperature in Kelvin.
+        Temperature in Kelvin. Must be finite and positive on this path.
     fO2:
-        Oxygen partial pressure in bar (pinned by the caller; no internal fO2
-        model is applied).
+        Oxygen fugacity, stored as the numerical value of p_O2 / p° with
+        p° = 1 bar (pinned by the caller; no internal fO2 model is applied).
+        Must be finite and positive on this path.
     datapack:
         Loaded JANAF + condensate thermodynamic tables.
     parent_oxides:
         Ordered parent-oxide names.  Defaults to the IMCC-SF04 8-oxide basis.
     allow_extrapolation:
-        If False (default), raise ``ImccGasTemperatureOutsideDomainError`` when
-        T falls outside the declared G(T) interval for any species consumed by
-        the reaction set.  If True, select the nearest interval and evaluate
-        silently (legacy run_gate.py behavior).
+        If False (default), raise ``ImccGasTemperatureOutsideDomainError``
+        when a finite T falls outside the declared G(T) interval of the
+        interval selected by ``_nearest_interval_row`` for any species
+        consumed by the reaction set.  If True, evaluate at that finite T
+        even when it lies outside the selected row (legacy run_gate.py
+        behavior).  Non-finite or non-positive T and fO2 raise
+        ``ValueError`` before this flag is consulted.
     gas_species:
-        Optional retained-species subset.  The default evaluates every available
-        channel.  A subset permits channel-specific diagnostics and preserves
-        the same typed domain refusal semantics.
+        Optional retained-species subset.  The default evaluates every
+        available channel.  A subset permits channel-specific diagnostics
+        and preserves the same typed domain refusal semantics.
 
     Returns
     -------
     dict[str, float]
-        Partial pressure of each retained gas species in bar.
+        Partial pressure of each retained gas species, reported in bar
+        because p° = 1 bar makes p_i / p° numerically equal to p_i / bar
+        (see Derivation).
 
     Derivation
     ----------
@@ -469,30 +504,41 @@ def evaluate_gas(
 
         ΔG°(T) = n_gas * G°(gas, T) + n_O2 * G°(O2, T) - G°(oxide, T)   (2)
 
-    Both gas and condensate tables share the same elemental reference state
-    (elements in their 298 K standard states), so the reference-state bookkeeping
-    cancels exactly in (2).  The equilibrium constant is
+    Both tables are authored against the same elemental reference (elements
+    in their 298 K standard states), so that baseline cancels in (2).  The
+    standard equilibrium constant is
 
-        Kp = exp(-ΔG°(T) / (R T))                                    (3)
+        K° = exp(-ΔG°(T) / (R T))                                    (3)
 
-    with R in J/(mol K), ΔG° in J/mol, T in K; Kp is therefore dimensionless.
-    The mass-action expression for reaction (1), with the oxide activity a_oxide
-    and gas pressures in bar, is
+    with R in J/(mol K), ΔG° in J/mol, T in K; K° is dimensionless.
+    Gas standard states are ideal gas at p° = 1 bar, so IUPAC K° uses
+    dimensionless activities p_i / p° (IUPAC Recommendations 1994, eq. 49),
+    not pressures with units of bar:
 
-        Kp = (p_gas^n_gas * p_O2^n_O2) / a_oxide                     (4)
+        K° = ((p_gas / p°)^n_gas * (p_O2 / p°)^n_O2) / a_oxide       (4)
 
-    Solving for p_gas at the caller-pinned p_O2 = fO2:
+    This function stores each gas pressure as the float ``p̃_i = p_i / p°``.
+    With p° = 1 bar, ``p̃_i`` equals the numerical value of p_i in bar, and
+    (4) is implemented as
 
-        p_gas = (Kp * a_oxide / fO2^n_O2)^(1 / n_gas)              (5)
+        K° = (p̃_gas^n_gas * p̃_O2^n_O2) / a_oxide                    (4')
 
-    For the special retained species O2, p_O2 = fO2 by definition.  For
-    non-O2-producing vaporization (n_O2 = 0), (5) reduces to p_gas = Kp * a_oxide.
+    without dividing by the ``BAR`` constant.  Solving for p̃_gas at the
+    caller-pinned p̃_O2 = fO2:
 
-    Unit check: ΔG° in J/mol; R*T in J/mol; Kp dimensionless.  p_gas in bar.
-    Sanity case: ΔG° -> +infinity gives Kp -> 0 and p_gas -> 0 (vaporization
-    forbidden); a_oxide -> 0 gives p_gas -> 0 (no oxide to vaporize); fO2 -> 0
-    for an O2-producing reaction drives p_gas -> infinity as expected because
-    equilibrium is pulled to the right.
+        p̃_gas = (K° * a_oxide / fO2^n_O2)^(1 / n_gas)               (5)
+
+    The returned dict reports those p̃_gas values as bar.  For the special
+    retained species O2, p̃_O2 = fO2 by definition.  For n_O2 = 0, (5)
+    reduces to p̃_gas = K° * a_oxide.
+
+    Unit check: ΔG° / (R T) is dimensionless, so K° is dimensionless;
+    p̃_i is dimensionless; the bar label on the return value is the p° = 1
+    bar identification, not a leftover unit on K°.
+    Sanity on this path: ΔG° → +∞ gives K° → 0 and p̃_gas → 0; a_oxide → 0
+    gives p̃_gas → 0. For n_O2 > 0, decreasing a finite positive fO2 raises
+    p̃_gas as fO2^(-n_O2/n_gas). fO2 = 0 is refused (non-positive), so
+    that limit is not a returned result.
     """
     if parent_oxides is None:
         parent_oxides = IMCC_PARENT_OXIDES
@@ -512,10 +558,10 @@ def evaluate_gas(
 
     T = float(T_K)
     p_O2 = float(fO2)
-    if T <= 0.0:
-        raise ValueError(f"temperature must be positive, got {T_K}")
-    if p_O2 <= 0.0:
-        raise ValueError(f"fO2 must be positive, got {fO2}")
+    if not math.isfinite(T) or T <= 0.0:
+        raise ValueError(f"temperature must be finite and positive, got {T_K}")
+    if not math.isfinite(p_O2) or p_O2 <= 0.0:
+        raise ValueError(f"fO2 must be finite and positive, got {fO2}")
 
     if isinstance(activities, Mapping):
         act = {name: float(activities.get(name, 0.0)) for name in parent_oxides}
@@ -527,6 +573,15 @@ def evaluate_gas(
                 f"{len(parent_oxides)} parent oxides"
             )
         act = {name: float(arr[i]) for i, name in enumerate(parent_oxides)}
+
+    for _gas_name, (oxide, _n_gas, _n_O2) in reactions:
+        if not oxide:
+            continue
+        a_used = act[oxide]
+        if not math.isfinite(a_used) or a_used < 0.0:
+            raise ValueError(
+                f"activity of {oxide!r} must be finite and >= 0, got {a_used}"
+            )
 
     # G°(O2, T) is needed for every O2-producing reaction.
     O2_row = _nearest_interval_row(
@@ -563,9 +618,6 @@ def evaluate_gas(
         # Reaction (1): oxide(l) -> n_gas * gas(g) + n_O2 * O2(g)
         dG = n_gas * G_gas + n_O2 * G_O2 - G_oxide
         Kp = np.exp(-dG / (R_J_MOL_K * T))
-
-        if a_oxide < 0.0:
-            raise ValueError(f"activity of {oxide!r} is negative: {a_oxide}")
 
         p_gas = (Kp * a_oxide / (p_O2**n_O2)) ** (1.0 / n_gas)
         result[gas_name] = float(p_gas)

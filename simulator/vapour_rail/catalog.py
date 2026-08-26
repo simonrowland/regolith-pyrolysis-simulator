@@ -821,7 +821,16 @@ _LEGACY_FIELD_ORDER: Mapping[str, tuple[str, ...]] = {
 
 
 class CatalogCompileError(ValueError):
-    """Raised when schema-v2 data cannot be compiled without inference."""
+    """Typed refusal raised by this module's compile and evaluate paths.
+
+    Compile paths in this file raise it when schema-v2 data is malformed or
+    would require inference. ``CompiledPressureEvaluator.evaluate()`` also
+    raises it for inputs that path already intercepts (non-finite/non-positive
+    temperature, missing or non-positive activity, and pO2 values this
+    method wraps). Other vapour-rail modules may still raise their own types
+    on paths this file does not wrap; catching only ``CatalogCompileError``
+    is not a complete boundary around every helper this module calls.
+    """
 
 
 class HotTrainInapplicable(CatalogCompileError):
@@ -983,6 +992,9 @@ class CompiledPressureEvaluator:
         log10_pressure = log10_reference
         if self.activity_exponent:
             if reaction_inputs is not None and reaction_inputs.activities:
+                # First coercible mapping value in insertion order. This method
+                # does not match keys to a compiled activity component, and it
+                # does not read reaction_inputs.reaction_id or state_fingerprint.
                 activity_value = None
                 for _component_id, activity_obj in reaction_inputs.activities.items():
                     if hasattr(activity_obj, "as_pressure_activity"):
@@ -1027,12 +1039,19 @@ class CompiledPressureEvaluator:
             if reaction_inputs is not None and CHANNEL_O2 in reaction_inputs.channels:
                 o2_potential = reaction_inputs.channels[CHANNEL_O2]
             elif pO2_bar is not None:
-                o2_potential = o2_potential_from_pO2_bar(
-                    pO2_bar=pO2_bar,
-                    temperature_K=temperature_K,
-                    reaction_plane=plane,
-                    pO2_reference_bar=self.pO2_reference_bar,
-                )
+                try:
+                    o2_potential = o2_potential_from_pO2_bar(
+                        pO2_bar=pO2_bar,
+                        temperature_K=temperature_K,
+                        reaction_plane=plane,
+                        pO2_reference_bar=self.pO2_reference_bar,
+                    )
+                except (TypeError, ValueError) as exc:
+                    if isinstance(exc, CatalogCompileError):
+                        raise
+                    raise CatalogCompileError(
+                        f"{self.species_id}: {exc}"
+                    ) from exc
             else:
                 raise CatalogCompileError(
                     f"{self.species_id}: oxygen-dependent evaluator requires "
@@ -1285,8 +1304,8 @@ class CompiledPressureEvaluator:
         b-145 composites + t-538 non-composites):
 
         1. **Physical composite** (``physical_composite_ood``): evaluate the
-           composite thermo at the actual T (CEA K_ex in-domain × base
-           Antoine as van 't Hoff 1/(T+C) of the fitted base dH).
+           compiled composite at the requested T. Constituent polynomial
+           families and domains are row-specific (not a single CEA window).
 
         2. **Direct van 't Hoff** (Antoine / standard_reaction_term ref with
            C = 0; pure thermo families while polys are in-domain): the
@@ -1294,28 +1313,33 @@ class CompiledPressureEvaluator:
            thermo surface itself). Evaluate at the actual T — no invented
            slope change.
 
-        3. **1/T-tangent from the domain edge** (Antoine C ≠ 0; tabulated
-           equilibrium edge cells; thermo when polys themselves are OOR):
-           continue log10 P as linear in 1/T from the boundary tangent
-           (van 't Hoff local form). Replaces the prior attenuated linear-T
-           slope that invented multi-dex low-T pressure.
+        3. **1/T continuation from the domain edge** (Antoine C ≠ 0 uses the
+           analytic tangent of A−B/(T+C); tabulated_equilibrium uses a 1/T
+           chord through the two edge cells; thermo when polys themselves
+           are OOR uses a finite-difference 1/T slope). Replaces the prior
+           attenuated linear-T slope that invented multi-dex low-T pressure.
         """
         if self.reference_model.physical_composite_ood:
             # Premise: for composite carrier V, log10 P_V°(T) =
             #   (1/ν) log10 K_ex(T) + (m/ν) log10 P_base°(T) + O2 term
             # (see _log10_from_composite). Algebra: K_ex(T)=exp(-ΔG_ex°/RT)
-            # from CEA gas polys (valid 300–6000 K at any campaign T);
-            # P_base° is the liquid-reservoir Antoine
+            # from whatever gas polynomials this row compiled — NASA CEA
+            # segments for some carriers (TiO2_gas), IVTAN-derived Shomate
+            # for others (MnO_gas / CoO_gas target gas). This branch does
+            # not first intersect those constituent domains, so "CEA
+            # 300–6000 K at any campaign T" is not a property of the
+            # branch. P_base° is the liquid-reservoir Antoine
             #   log10 P_base = A − B/(T+C)
             # which is van't Hoff / Clausius–Clapeyron in 1/(T+C) with the
-            # fitted reaction dH (B ∝ ΔH/R ln10). Composing at the actual T
-            # therefore continues each physical factor on its own domain
-            # rather than log-linearly continuing the composed surface.
+            # fitted reaction dH (B ∝ ΔH/R ln10). Composing at the requested
+            # T therefore evaluates each compiled factor at that T.
             # Unit check: K_ex and every p/P° ratio are dimensionless;
-            # log10 P is log10(Pa). Sanity: at the domain floor T=T_low the
-            # physical composite reproduces the in-domain edge value exactly
-            # (no cliff); 1922/1923/1924 K are smooth; unit-a TiO2_gas at
-            # 1350 K lands within ~0.2 dex of VapoRock (b-145 base_compare).
+            # log10 P is log10(Pa). Sanity: at T=T_low the composite
+            # reproduces the in-domain edge value when every constituent
+            # polynomial accepts T_low (no cliff). MnO_gas / CoO_gas target
+            # Shomate cover [1000, 3000] K; T below that floor raises
+            # ShomateDomainError from the polynomial module rather than a
+            # typed catalog continuation.
             return float(self.reference_model.log10_pressure(temperature_K))
 
         mode = self._physical_oor_continuation_mode()
@@ -1386,16 +1410,24 @@ class CompiledPressureEvaluator:
             s = dL/d(1/T)|_Tb = (dL/dT)|_Tb · (−Tb²).
         Then
             L(T) = L(Tb) + s · (1/T − 1/Tb).
-        For tabulated_equilibrium the two edge cells define the unique
-        linear-in-1/T line (chord ≡ constant-ΔH fit through those points).
-        For Antoine A−B/(T+C) the analytic derivative is used:
+        For Antoine A−B/(T+C) the analytic derivative of that form is used:
             dL/dT = B/(T+C)² ⇒ s = −B · Tb² / (Tb+C)².
-        Units: L is log10(Pa); s has units log10(Pa)·K; 1/T is K⁻¹.
-        Sanity: at T=Tb, L matches the in-domain edge exactly (no cliff);
-        dL/d(1/T) matches by construction; for pure van 't Hoff (C=0)
-        L=A−B/T the tangent *is* the function (bit-identity with direct
-        eval). Below-floor Stage-0 T (~400 K) therefore continues the
-        physical slope, not an attenuated linear-T invention.
+        For tabulated_equilibrium the two edge cells are refit as a chord
+        linear in 1/T (constant-ΔH through those two points). That chord is
+        not the tangent of the in-domain interpolant: in-domain
+        ``_interpolate_log_pressure`` is linear in T, so the value is
+        continuous at Tb while dL/dT generally is not. Derivation of the
+        high-boundary slope ratio: in-domain
+            dL/dT = (L1−L0)/(T1−T0);
+        OOR chord
+            L(T)=L0+(L1−L0)·(1/T−1/T0)/(1/T1−1/T0)
+        has
+            dL/dT|_T1 = (L1−L0)·(T0/T1)/(T1−T0),
+        so (dL/dT)_OOR / (dL/dT)_in = T0/T1. At a low boundary the ratio is
+        T1/T0. Units: L is log10(Pa); s has units log10(Pa)·K; 1/T is K⁻¹;
+        T0/T1 is dimensionless. Sanity: T0=1000 K, T1=2000 K → ratio 1/2;
+        at T=Tb, L matches the in-domain edge (no cliff); for pure van 't
+        Hoff (C=0) L=A−B/T the Antoine tangent *is* that function.
         """
         low, high = self.valid_temperature_K
         boundary = low if temperature_K < low else high
@@ -1458,7 +1490,8 @@ class CompiledPressureEvaluator:
             log0 = math.log10(p0)
             log1 = math.log10(p1)
             # Linear-in-1/T through the two edge cells; evaluate at T.
-            # (Chord through edge cells ≡ constant-ΔH van 't Hoff fit.)
+            # This is a 1/T chord, not the tangent of the in-domain linear-T
+            # interpolant (see _reciprocal_T_tangent_log10).
             return log0 + (log1 - log0) * ((1.0 / temperature_K) - inv0) / d_inv
 
         # General / thermo fallback: finite-difference dL/dT just inside the
@@ -2044,12 +2077,7 @@ def compile_vapour_rail_catalog(
                 )
             validation = _mapping(row.get("validation"), f"{species_id}.validation")
             status = _validation_status(validation, species_id)
-            raw_anchors = validation.get("anchor_refs") or []
-            if not isinstance(raw_anchors, list):
-                raise CatalogCompileError(
-                    f"{species_id}: validation.anchor_refs must be a list"
-                )
-            anchor_refs = tuple(str(a) for a in raw_anchors)
+            anchor_refs = _anchor_refs_from_validation(validation, species_id)
             pressure_models = row.get("pressure_models")
             if not isinstance(pressure_models, Sequence) or isinstance(
                 pressure_models, (str, bytes)
@@ -2365,11 +2393,20 @@ def _compile_evaluator(
     species_basis = _required_string(
         model.get("species_basis"), f"{species_id}.species_basis"
     )
-    activity_exponent = float(model.get("activity_exponent", 0.0) or 0.0)
+    _activity_raw = model.get("activity_exponent", 0.0)
+    if _activity_raw is None or _activity_raw == "":
+        activity_exponent = 0.0
+    else:
+        activity_exponent = _finite_real(
+            _activity_raw, f"{species_id}.activity_exponent"
+        )
     # Track whether pO2_exponent was explicitly declared (vs omitted default 0).
     _pO2_raw = model.get("pO2_exponent", None)
     pO2_exponent_declared = _pO2_raw is not None and _pO2_raw != ""
-    pO2_exponent = float(_pO2_raw if pO2_exponent_declared else 0.0)
+    if pO2_exponent_declared:
+        pO2_exponent = _finite_real(_pO2_raw, f"{species_id}.pO2_exponent")
+    else:
+        pO2_exponent = 0.0
     pO2_reference = _finite_positive(
         model.get("pO2_reference_bar", 1.0),
         f"{species_id}.pO2_reference_bar",
@@ -2449,8 +2486,11 @@ def _compile_evaluator(
     # t-571 Phase 1: emit the O2 channel term from the scalar exponent.
     # e_O2 = -nu_O2 / nu_g  ⇒  with nu_g = 1, nu_O2 = -e_O2.
     # When a balanced source reaction is later available with multi-channel
-    # bindings, the compiler will replace this with the full term set; the
-    # scalar pO2_exponent must still agree bit-for-bit within 1e-9.
+    # bindings, the compiler will replace this with the full term set. The
+    # declared scalar pO2_exponent must then agree with the derived exponent
+    # under math.isclose(rel_tol=0, abs_tol=1e-9). That is an absolute
+    # tolerance, not bit identity; this module does not derive 1e-9 from a
+    # pressure-error policy.
     reaction_terms: tuple[CompiledReactionTerm, ...] = ()
     if pO2_exponent != 0.0:
         plane = LEGACY_FO2_PLANE.get(
@@ -2505,12 +2545,20 @@ def _compile_source_reaction_activity(
     evaluator: CompiledPressureEvaluator | None,
     source_account: str,
 ) -> tuple[str | None, ActivityInputDeclaration | None]:
-    """Compile the exact activity declaration consumed by one pressure model.
+    """Compile the activity-input declaration stored on one compiled species.
 
-    An activity-dependent model may never inherit ``a=1`` from an evaluator
-    default.  Its selected source reaction must declare the component,
-    standard state, and missing-evidence policy explicitly.  This keeps a
-    pure-component point distinct from a Henrian unity upper bound.
+    This function reads the selected source reaction and builds
+    ``ActivityInputDeclaration`` (component, standard state, missing-evidence
+    policy). It does not evaluate pressure. On the
+    ``CompiledPressureEvaluator.evaluate()`` path reachable from that
+    evaluator, a numeric activity is taken as the first coercible
+    ``reaction_inputs.activities`` value in insertion order; that path does
+    not match mapping keys to this declaration's ``component_id`` and does
+    not read ``reaction_id`` or ``state_fingerprint``.
+    ``CompiledPressureEvaluator.evaluate_typed_shadow()`` is the path that
+    compares component / standard-state / fingerprint against expected
+    values. An activity-dependent model still may not inherit ``a=1`` from
+    an evaluator default on either path.
     """
 
     reaction_id_raw = model.get("source_reaction_id")
@@ -2865,13 +2913,10 @@ def _compile_thermo_reference_model(
                 f"{pressure_kind!r} without source_reaction_id"
             )
 
-    Pstd = float(
-        model.get("reference_pressure_Pa", _THERMO_REFERENCE_PRESSURE_PA)
+    Pstd = _finite_positive(
+        model.get("reference_pressure_Pa", _THERMO_REFERENCE_PRESSURE_PA),
+        f"{species_id}.reference_pressure_Pa",
     )
-    if not math.isfinite(Pstd) or Pstd <= 0.0:
-        raise CatalogCompileError(
-            f"{species_id}: reference_pressure_Pa must be finite and positive"
-        )
 
     if has_source_reaction:
         reaction_id = _required_string(
@@ -3123,9 +3168,12 @@ def _compile_thermo_reference_model(
                 # to 0 in linear products even though the true log10 P is finite
                 # (~−200). The outer CompiledPressureEvaluator still clamps to
                 # the float range; only the intermediate arithmetic changes.
-                # Units: returns log10(Pa). Sanity: bit-matches the prior linear
-                # path wherever both are representable (TiO2_gas @ 1350–2200 K);
-                # Si3 @ 448.15 K now returns a finite physical log instead of
+                # Units: returns log10(Pa). Sanity: algebraically equivalent to
+                # the prior linear products when every intermediate is
+                # representable; IEEE-754 bit identity after rearranging through
+                # log/pow is unestablished (TiO2_gas @ 1350–2200 K is a
+                # representable window, not a bit-identity proof). Si3 @
+                # 448.15 K now returns a finite physical log instead of
                 # raising CatalogCompileError.
                 delta_g_over_RT = 0.0
                 for nu, poly, _formula in exchange_terms:
@@ -3459,7 +3507,10 @@ def _polynomial_from_thermo_record(
     formula_s = str(formula) if formula is not None else None
     citation = record.get("citation")
     citation_s = str(citation) if citation is not None else None
-    Pstd = float(record.get("reference_pressure_Pa", _THERMO_REFERENCE_PRESSURE_PA))
+    Pstd = _finite_positive(
+        record.get("reference_pressure_Pa", _THERMO_REFERENCE_PRESSURE_PA),
+        f"{name}.reference_pressure_Pa",
+    )
 
     if fam in ("nasa_cea_7", "nasa_cea_9"):
         segments_raw = record.get("segments")
@@ -3859,12 +3910,21 @@ def _compile_code_metadata(
 def _assert_alpha_provenance_not_vaporock(
     family_id: str, alpha: Mapping[str, Any]
 ) -> None:
-    """Refuse VapoRock-fit alpha provenance at catalog compile (SC-50 wire).
+    """Scan named provenance fields for VapoRock-fit alpha sources (SC-50).
 
-    Null hypothesis refuted by production: ``assert_alpha_source_not_vaporock``
-    lived only behind the kinetics-anchor loaders / unit tests. Catalog compile
-    is the production gate for vaporisation_coefficients; wire the denial here
-    so a VapoRock-sourced alpha cannot enter the compiled rail.
+    ``assert_alpha_source_not_vaporock`` also runs from kinetics-anchor
+    loaders; this compile-time scan is the catalog's copy of that denial.
+    It inspects only these keys on this mapping:
+
+    * outer alpha: ``source``, ``provenance``, ``citation``, ``source_note``
+    * nested ``value`` mapping: ``cite``, ``source``, ``provenance``,
+      ``citation``, ``source_note``
+    * ``competing_sources[i]``: ``source``, ``provenance``, ``citation``,
+      ``source_note``
+
+    Keys outside those names are not scanned. ``parse_alpha_contract`` may
+    retain extra fields on a scalar specification; those extra fields are
+    denied here only when their names match the nested set above.
     """
 
     from simulator.vapour_rail.kinetics_anchors import (
@@ -3891,7 +3951,7 @@ def _assert_alpha_provenance_not_vaporock(
             _check(alpha.get(key), field=key)
     value = alpha.get("value")
     if isinstance(value, Mapping):
-        for key in ("cite", "source", "provenance", "source_note"):
+        for key in ("cite", "source", "provenance", "citation", "source_note"):
             if key in value:
                 _check(value.get(key), field=f"value.{key}")
     competing = alpha.get("competing_sources")
@@ -3938,6 +3998,27 @@ def _validate_kinetics(family_id: str, kinetics: Mapping[str, Any]) -> None:
         _assert_alpha_provenance_not_vaporock(family_id, alpha_contract)
 
 
+def _anchor_refs_from_validation(
+    validation: Mapping[str, Any], species_id: str
+) -> tuple[str, ...]:
+    """Return stripped string anchors; refuse non-string or blank members."""
+
+    anchors = validation.get("anchor_refs")
+    if not isinstance(anchors, list):
+        raise CatalogCompileError(
+            f"{species_id}: validation.anchor_refs must be a list"
+        )
+    compiled: list[str] = []
+    for index, item in enumerate(anchors):
+        if not isinstance(item, str) or not item.strip():
+            raise CatalogCompileError(
+                f"{species_id}: validation.anchor_refs[{index}] must be a "
+                "non-empty string"
+            )
+        compiled.append(item.strip())
+    return tuple(compiled)
+
+
 def _validation_status(
     validation: Mapping[str, Any], species_id: str
 ) -> ValidationStatus:
@@ -3947,12 +4028,11 @@ def _validation_status(
         raise CatalogCompileError(
             f"{species_id}: validation.status must be pending_validation or validated"
         ) from exc
-    anchors = validation.get("anchor_refs")
-    if not isinstance(anchors, list):
-        raise CatalogCompileError(f"{species_id}: validation.anchor_refs must be a list")
+    anchors = _anchor_refs_from_validation(validation, species_id)
     if status is ValidationStatus.VALIDATED and not anchors:
         raise CatalogCompileError(
-            f"{species_id}: validated rows require at least one anchor reference"
+            f"{species_id}: validated rows require at least one non-empty "
+            "string anchor reference"
         )
     return status
 
@@ -3984,6 +4064,20 @@ def _required_string(value: Any, field_name: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise CatalogCompileError(f"{field_name} must be a non-empty string")
     return value.strip()
+
+
+def _finite_real(value: Any, field_name: str) -> float:
+    """Coerce a finite real, including zero and negatives; refuse bool/NaN/inf."""
+
+    if isinstance(value, bool):
+        raise CatalogCompileError(f"{field_name} must be numeric, not boolean")
+    try:
+        result = float(value)
+    except (TypeError, ValueError) as exc:
+        raise CatalogCompileError(f"{field_name} must be numeric") from exc
+    if not math.isfinite(result):
+        raise CatalogCompileError(f"{field_name} must be finite")
+    return result
 
 
 def _finite_positive(value: Any, field_name: str) -> float:

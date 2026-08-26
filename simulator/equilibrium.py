@@ -26,18 +26,73 @@ from simulator.fe_redox import (
 )
 from simulator.environment import vacuum_floor_bar_for_environment
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, Atmosphere
 
 # Atmosphere modes where a turbine/bleed loop actively holds a commanded pO₂
 # setpoint. Only in these modes may the setpoint act as a floor on the
-# effective pO₂ -- an uncontrolled hard-vacuum / pN₂ run must not get a
-# synthetic O₂ floor.
+# effective pO₂. Uncontrolled hard-vacuum / pN₂ runs do not apply that
+# setpoint floor; they still use any real carried/upstream O₂ (see
+# ``_commanded_pO2_bar``).
 _O2_CONTROLLED_ATMOSPHERES = frozenset({
     Atmosphere.CONTROLLED_O2,
     Atmosphere.CONTROLLED_O2_FLOW,
     Atmosphere.O2_BACKPRESSURE,
 })
 _ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+
+
+def _internal_analytical_control_refusal(
+    temperature_C: object,
+    p_total_mbar: object,
+) -> dict[str, Any] | None:
+    """Return a refusal diagnostic for unusable T / total-P controls.
+
+    Scoped to ``EquilibriumMixin._internal_analytical_equilibrium``.
+    Admitted controls on that path: finite T_K > 0 and finite
+    p_total_mbar >= 0 (0 mbar is true vacuum). Non-numeric, non-finite,
+    non-positive kelvin, and negative total pressure do not yield a
+    finite physical T/P for the vapor-pressure algebra, so this helper
+    returns a refusal diagnostic instead of ``status='ok'`` or a foreign
+    Ellingham ``ValueError``.
+    """
+    invalid: list[dict[str, Any]] = []
+    if not is_declared_real_scalar(temperature_C):
+        invalid.append({
+            "field": "temperature_C",
+            "reason": "not_numeric",
+            "value": repr(temperature_C),
+        })
+    else:
+        t_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        if not math.isfinite(t_K) or t_K <= 0.0:
+            invalid.append({
+                "field": "temperature_C",
+                "reason": "kelvin_not_finite_and_positive",
+                "value": repr(temperature_C),
+                "temperature_K": t_K,
+            })
+    if not is_declared_real_scalar(p_total_mbar):
+        invalid.append({
+            "field": "p_total_mbar",
+            "reason": "not_numeric",
+            "value": repr(p_total_mbar),
+        })
+    else:
+        p_mbar = float(p_total_mbar)
+        if not math.isfinite(p_mbar) or p_mbar < 0.0:
+            invalid.append({
+                "field": "p_total_mbar",
+                "reason": "not_finite_or_negative",
+                "value": repr(p_total_mbar),
+            })
+    if not invalid:
+        return None
+    return {
+        "internal_analytical_refusal": "invalid_scientific_controls",
+        "invalid_controls": invalid,
+    }
+
 
 class EquilibriumMixin:
     def _get_equilibrium(self):
@@ -72,9 +127,12 @@ class EquilibriumMixin:
           - The commanded setpoint (``melt.pO2_mbar``) is applied again as
             an explicit *floor*, and only when the atmosphere is an
             actively O₂-controlled mode (turbine + bleed holding the
-            setpoint).  An uncontrolled HARD_VACUUM / PN2_SWEEP run gets no
-            synthetic floor -- its effective pO₂ collapses to the
-              numerical vacuum floor below for the whole campaign.
+            setpoint). Uncontrolled HARD_VACUUM / PN2_SWEEP runs do not
+            apply that setpoint. Effective pO₂ on those paths is
+            ``max(real_upstream_or_headspace_O2, vacuum_floor)``, so any
+            carried O₂ above the environmental floor still controls
+            equilibrium. It does not collapse to the vacuum floor for the
+            whole campaign.
           - A hard numerical floor (``self._vacuum_floor_bar()``) guards the
             1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
 
@@ -97,8 +155,10 @@ class EquilibriumMixin:
             # commanded-pO2 setpoint from the legacy no-headspace branch.
             # Re-apply melt.pO2_mbar as a floor in actively-controlled
             # atmospheres so a recipe pO2 setpoint still gates SiO suppression
-            # via 1/sqrt(pO2). Uncontrolled HARD_VACUUM / PN2_SWEEP runs get
-            # NO synthetic floor — they collapse to the environment floor.
+            # via 1/sqrt(pO2) above the SiO reference. Uncontrolled
+            # HARD_VACUUM / PN2_SWEEP runs get no setpoint floor; they
+            # still return max(real O2, vacuum floor), not the vacuum
+            # floor alone.
             if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
             return max(pO2_bar, self._vacuum_floor_bar())
@@ -139,7 +199,17 @@ class EquilibriumMixin:
     #
     # The decomposition equilibrium constant is:
     #
-    #   K = exp(ΔG_f / (R × T))   [K < 1 since ΔG_f < 0]       [ELLI-2]
+    #   K = exp(ΔG_f / (R × T))                                 [ELLI-2]
+    #
+    # Premise: ΔG_f is the formation energy of the oxide per mol O₂
+    # (kJ/mol-O2); decomposition is the reverse reaction, so
+    # K_decomp = exp(ΔG_f / RT) = exp(-ΔG_decomp / RT).
+    # Algebra/units: this method multiplies ΔG_f by 1000 J/kJ before
+    # dividing by R (J/(mol·K)) × T (K), so the exponent is
+    # dimensionless. Limiting cases: ΔG_f = 0 → K = 1; ΔG_f < 0 → K < 1;
+    # ΔG_f > 0 → K > 1. Current phase-segmented Na/K rows can have
+    # ΔG_f > 0 inside their declared fit range, so K < 1 is a sign case,
+    # not an invariant.
     #
     # For the decomposition reaction per mol O₂, the selected Ellingham row
     # supplies the metal standard state:
@@ -159,14 +229,17 @@ class EquilibriumMixin:
     # fit_target=pure_component_psat; pseudo_psat_backsolved_from_vaporock
     # rows are backsolved VapoRock curve-fit fallback terms.
     #
-    # This naturally captures the full Ellingham hierarchy:
-    #   Na, K (volatile, weak oxides):   high P_metal → easy pyrolysis
-    #   Fe, Mn, Cr (moderate oxides):    P_metal depends on T and pO₂
-    #   Mg (refractory):                 significant only at high T, low pO₂
-    #   Ca, Al, Ti (very refractory):    negligible P_metal → need MRE/thermite
+    # Qualitative process narrative, not a single-T ΔG table: alkali metals
+    # are volatile at recipe T; Ca/Al/Ti remain refractory at
+    # furnace-survivable T. Live ΔG_f(T) is phase-segmented and is read
+    # from ``ellingham_delta_g_kj_per_mol_o2``. Recalled grouped values
+    # such as "Na,K ≈ −320 kJ; Fe ≈ −370 kJ" do not describe those rows
+    # at 1600 °C or at the other process temperatures checked against
+    # this function. ``data/setpoints.yaml`` ``ellingham_V1c_reference``
+    # stores qualitative ordering plus crossover temperatures, not a
+    # per-species 1600 °C ΔG table.
     #
     # Data: NIST-JANAF Thermochemical Tables, Kubaschewski et al.
-    # Cross-verified against setpoints.yaml Ellingham values at 1600°C.
     #
     # Vapor-pressure convention contract (`data/vapor_pressures.yaml`):
     # - Metals with `fit_target: pure_component_psat` have raw Antoine
@@ -174,9 +247,9 @@ class EquilibriumMixin:
     #   single-counted.
     # - Metals with `fit_target: pseudo_psat_backsolved_from_vaporock` have raw
     #   Antoine evaluated as a pseudo-standard term such that
-    #   `a_M * 10^(A-B/T) ~= VapoRock_partial_pressure` on the calibration
-    #   grid. The convention is single-counted by construction but assumes
-    #   proximity to that grid.
+    #   `a_M * 10^(A-B/(T+C)) ~= VapoRock_partial_pressure` on the
+    #   calibration grid. The convention is single-counted by construction
+    #   but assumes proximity to that grid.
     # - Metal or oxide vapor rows with `fit_target: standard_reaction_term`
     #   use raw Antoine as a ΔG-equivalent term, consumed with explicit
     #   oxide-activity + pO2 exponents -- single-counted via explicit reaction
@@ -203,7 +276,8 @@ class EquilibriumMixin:
                ΔG_f(T) = ΔH_f - T × ΔS_f   (kJ/mol O₂)
 
         2. Get the decomposition equilibrium constant:            [ELLI-2]
-               K = exp(ΔG_f / (R × T))   [< 1 since ΔG_f < 0]
+               K = exp(ΔG_f / (R × T))
+           K < 1 only when ΔG_f < 0; see the class-level [ELLI-2] note.
 
         3. Solve for equilibrium metal activity on the phase basis:[ELLI-3]
                a_M = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
@@ -223,16 +297,18 @@ class EquilibriumMixin:
           managed campaigns (C2B, C3, C4).
         - Composition dependence: as an oxide is depleted, its activity
           drops and evaporation rate decreases.
-        - The full Ellingham hierarchy emerges naturally:
-            Na, K   → ΔG_f ≈ −320 kJ → high P_metal (easy pyrolysis)
-            Fe      → ΔG_f ≈ −370 kJ → moderate P_metal (C2A/C2B target)
-            Mn, Cr  → ΔG_f ≈ −460..−500 kJ → minor byproducts
-            Mg      → ΔG_f ≈ −830 kJ → significant only at very high T
-            Ca, Al  → ΔG_f ≈ −720..−900 kJ → negligible (need MRE/thermite)
+        - Volatility ordering is a process narrative (alkalis first,
+          refractories last), not a fixed ΔG table. Na/K and some
+          liquid-oxide rows on this method take standard-reaction
+          rails and ``continue`` before the legacy Ellingham
+          ``a_M × P_sat`` block, so returned pressures are a mix of
+          rails rather than that block alone.
 
         SiO vapor uses a separate equilibrium pathway because it
         evaporates as an oxide gas (SiO₂ → SiO + ½O₂), not as a
-        metal.  The Antoine equation + √pO₂ correction is used.  [THERMO-8]
+        metal. The Antoine row is the reference pressure; a √pO₂
+        suppression is applied only above the row's pO₂ reference
+        (see the oxide-vapor loop).  [THERMO-8]
         """
         from simulator.melt_backend.base import EquilibriumResult
         from engines.builtin.vapor_pressure import (
@@ -263,14 +339,32 @@ class EquilibriumMixin:
             REACTION_PLANE_MELT_INTERFACE,
         )
 
-        T_K = self.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
-        if T_K < 400:
-            # Builtin path ran and correctly found no significant
-            # evaporation below 400 K - a converged 'ok' outcome, not a
-            # failure or an unavailable engine.
+        refusal = _internal_analytical_control_refusal(
+            self.melt.temperature_C,
+            self.melt.p_total_mbar,
+        )
+        if refusal is not None:
             return EquilibriumResult(
                 temperature_C=self.melt.temperature_C,
-                pressure_bar=self.melt.p_total_mbar / 1000.0,
+                pressure_bar=0.0,
+                liquid_fraction=None,
+                phase_assemblage_available=False,
+                fO2_log=None,
+                status='out_of_domain',
+                diagnostics=refusal,
+            )
+
+        T_K = float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        if T_K < 400:
+            # Reached only after the control guard: T_K is finite and > 0 K,
+            # p_total_mbar is finite and >= 0. On this cold path the
+            # vapor-pressure loop is skipped; empty vapors with
+            # status='ok' is the intended sub-400 K outcome, not an
+            # unavailable engine. The guard above already returned for
+            # 0 K / NaN / inf / negative T.
+            return EquilibriumResult(
+                temperature_C=self.melt.temperature_C,
+                pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
                 liquid_fraction=None,
                 phase_assemblage_available=False,
                 status='ok',
@@ -284,8 +378,11 @@ class EquilibriumMixin:
         ellingham_extrapolations = {}
         vapor_pressure_authority_limits = {}
         warnings = []
-        # b-149 instance 3: typed notes for omitted species / below-threshold
-        # zeros. status remains 'ok'; absence is no longer silent.
+        # b-149 instance 3: typed notes on the `_sz_omit` paths in this
+        # method (missing activity, activity-threshold skip, P <= 1e-15 Pa).
+        # Those omissions keep status='ok' with a note. Other continues in
+        # this method (inactive row, missing parent, A<=0, oxide-vapor
+        # outside valid_range_K) still omit without a note.
         from simulator.silent_zero import (
             CATEGORY_PROVEN_ZERO,
             CATEGORY_REFUSE,
@@ -342,8 +439,10 @@ class EquilibriumMixin:
                     ZeroBecause.PROVEN_BELOW_THRESHOLD,
                     field='oxide_activity',
                     detail=(
-                        'oxide activity <= 1e-10; species omitted as near-zero '
-                        'activity (proven-small, not missing coefficient)'
+                        'oxide activity <= 1e-10; species omitted by the '
+                        'activity skip used on this path. That cutoff is an '
+                        'activity filter, not derived from the 1e-15 Pa '
+                        'vapor-pressure omit'
                     ),
                     category=CATEGORY_PROVEN_ZERO,
                 )
@@ -463,20 +562,28 @@ class EquilibriumMixin:
 
             # --- Pressure reference rail ---
             #
-            # We extrapolate the Clausius-Clapeyron equation beyond its
-            # validated range because:
-            #   1. The form log10(P) = A - B/T is physically meaningful
-            #      (Clausius-Clapeyron) even below the metal melting point
-            #   2. The Ellingham K_decomp already provides the dominant
-            #      physical constraint (K → 0 at low T), so extrapolation
-            #      of P_sat introduces only a minor secondary error
-            #   3. At low T, the product a_M × P_sat is negligible anyway
-            #      because K_decomp is extremely small
+            # Condensed-rail log10(P/Pa) = A - B/(T_K + C) (modified
+            # Antoine, evaluated below). When C = 0 this is linear in 1/T
+            # (Clausius-Clapeyron in log10). When C ≠ 0 the fit has a
+            # pole at T_K = -C; that pole is not a physical continuation
+            # of Clausius-Clapeyron, so the C = 0 form does not license
+            # arbitrary low-T extrapolation of a nonzero-C row.
             #
-            # For Fe (mp 1538°C = 1811K), this allows computing meaningful
-            # vapor pressures at 1400-1538°C where FeO decomposition in
-            # the silicate melt IS physically real, even though pure solid
-            # Fe has a slightly lower sublimation pressure. That
+            # K_decomp sets a_M, not a relative-error damper on P_sat.
+            # Later on this path, condensed P_effective = min(a_M, 1) *
+            # P_reference. Holding a_M fixed, d ln P_effective / d ln
+            # P_reference = 1, so a 1-dex source error in P_reference
+            # remains 1 dex in P_effective. A small K lowers the absolute
+            # pressure via a_M; it does not make a fractional P_sat
+            # extrapolation "minor."
+            #
+            # FeO decomposition in silicate melt is physically real below
+            # the Fe melting point; pure-component P_sat below melt is
+            # still an extrapolation. The Ellingham segment selector used
+            # on this path (`ellingham_segment_for_temperature`) switches
+            # Fe(delta) → Fe(l) at 1809 K, matching the JANAF Fe(cr,l)
+            # DELTA <--> LIQUID boundary (NIST-JANAF Fe-007), not the
+            # recalled 1538 °C = 1811.15 K conversion. That
             # pure-component rationale applies only to
             # fit_target=pure_component_psat rows.
             fit_target = str(sp_data.get("fit_target", "") or "")
@@ -908,18 +1015,21 @@ class EquilibriumMixin:
                     # FeO path: oxide_activity stays None by construction
                     # above, but a_oxide IS the computed authoritative FeO
                     # activity (kress_calphad_ferrous_feo, clamped >= 0).
-                    # Below-threshold here is proven-small evidence (cat-3),
-                    # not a missing activity model (cat-1) — tagging it
-                    # missing_activity would launder a proven zero into a
-                    # missing-input story.
+                    # Below-threshold here is the same 1e-10 activity skip
+                    # used on other metals, tagged cat-3 so it is not
+                    # confused with a missing activity model (cat-1). The
+                    # skip is not derived from the 1e-15 Pa vapor-pressure
+                    # omit; tagging it missing_activity would still launder
+                    # a computed activity into a missing-input story.
                     _sz_omit(
                         species,
                         ZeroBecause.PROVEN_BELOW_THRESHOLD,
                         field='a_FeO_authoritative',
                         detail=(
                             f'a_FeO_authoritative={a_oxide!r} <= 1e-10; '
-                            'species omitted as proven-small FeO activity '
-                            '(computed authoritative value, not missing input)'
+                            'species omitted by the 1e-10 activity skip '
+                            '(computed authoritative FeO activity, not missing '
+                            'input; skip is not a 1e-15 Pa pressure proof)'
                         ),
                         category=CATEGORY_PROVEN_ZERO,
                     )
@@ -965,7 +1075,7 @@ class EquilibriumMixin:
             dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(
                 species,
                 T_K,
-            )   # negative (formation favorable)
+            )   # sign follows the live row; not always negative
 
             # K_decomp = exp(ΔG_f / (R × T))
             # ΔG_f in kJ, R in J/(mol·K) → multiply by 1000
@@ -1089,9 +1199,11 @@ class EquilibriumMixin:
         #
         # These evaporate as oxide gases, not as metals. Fe is intentionally
         # modeled through the metallic-Fe path above, not as FeO vapor.
-        # SiO₂(melt) → SiO(g) + ½O₂(g), with p(SiO) ∝ 1/√pO₂.
-        # The Antoine equation gives the reference vapor pressure,
-        # then the √pO₂ suppression and oxide activity are applied.
+        # SiO₂(melt) → SiO(g) + ½O₂(g). Mass action at the calibration
+        # reference is p(SiO) ∝ 1/√pO₂, but this loop applies that
+        # square-root factor only when pO2_bar > the SiO row's
+        # pO2_reference_bar. At and below that reference the pressure is
+        # not enhanced; it is flat in pO₂. See the SiO branch below.
 
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
 
@@ -1110,6 +1222,8 @@ class EquilibriumMixin:
                     field="P_sat",
                 )
             else:
+                # Out-of-range or A <= 0: omit without a silent-zero note
+                # on this path (the `_sz_omit` helpers are not called).
                 continue
 
             parent_oxide = data.get('parent_oxide', '')
@@ -1150,12 +1264,19 @@ class EquilibriumMixin:
                     field="P_sat_pO2",
                 )
 
-            # SiO suppression by pO2: p(SiO) scales as 1/sqrt(pO2).
-            # Premise: the fitted Antoine row is calibrated at its declared
-            # pO2_reference_bar, not at the current body vacuum floor. Algebra:
-            # P = P_ref * sqrt(p_ref / pO2). Unit check: bar/bar is
-            # dimensionless. Sanity: changing lunar/asteroid environmental
-            # floors must not retune the SiO fit itself.
+            # SiO pO2 correction is piecewise around the calibration
+            # reference, not a global 1/sqrt(pO2) law.
+            # Premise: SiO2(melt) → SiO(g) + 1/2 O2(g) has
+            #   K = p_SiO * pO2^{1/2} / a_SiO2  (reduced pressures).
+            # Algebra: p_SiO = K a_SiO2 / sqrt(pO2). Relative to the
+            # fitted reference p_ref:
+            #   P = P_ref * sqrt(p_ref / pO2)   when pO2 > p_ref.
+            # Unit check: p_ref/pO2 is bar/bar, dimensionless.
+            # Sanity: 100× higher pO2 above p_ref cuts p_SiO by 10.
+            # At pO2 <= p_ref this branch does not run, so p_SiO stays
+            # at the reference-calibrated value (no 1/sqrt enhancement).
+            # Body vacuum floors below p_ref therefore do not retune
+            # the SiO fit; they also do not raise p_SiO.
             sio_reference_bar = vacuum_floor_bar
             if name == 'SiO':
                 sio_reference_bar = max(
@@ -1214,12 +1335,15 @@ class EquilibriumMixin:
                 consumer='legacy-equilibrium-fallback',
             ),
         }
-        # b-149: surface typed omit/zero causes; status stays 'ok' (no refusal).
+        # b-149: merge notes collected on the `_sz_omit` paths. This
+        # completed path sets status='ok'; invalid T/P already returned
+        # out_of_domain above. Oxide-vapor valid_range_K misses remain
+        # un-noted on this path.
         if silent_zero_notes:
             merge_notes_into_mapping(_eq_diagnostics, silent_zero_notes)
         return EquilibriumResult(
             temperature_C=self.melt.temperature_C,
-            pressure_bar=self.melt.p_total_mbar / 1000.0,
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             liquid_fraction=None,
             phase_assemblage_available=False,
             vapor_pressures_Pa=vapor_pressures,

@@ -1,8 +1,10 @@
 """Detached downstream thermal-train sizing diagnostics.
 
-The module accepts recorded flow rates at its boundary, converts them once to
-mol/s, and keeps all internal heat-flow arithmetic in J/mol and W.  It neither
-reads nor writes AtomLedger and never mutates a simulator run.
+The module accepts recorded flow rates at its boundary.
+``report_from_recorded_series`` converts hot-species kg/hr rows to mol/s for
+radiator enthalpy (J/mol * mol/s = W).  ``claude_cycle_cold_end`` keeps a
+parallel mass-native ledger in kg/hr, J/kg, and W.  Functions in this file
+do not read or write AtomLedger and do not take a simulator-run object.
 """
 
 from __future__ import annotations
@@ -44,10 +46,19 @@ SECONDS_PER_HOUR = 3600.0
 KELVIN_OFFSET = CELSIUS_TO_KELVIN_OFFSET
 HOT_RADIATOR_SPLIT_K = 1000.0
 OXYGEN_MOLAR_MASS_KG_PER_MOL = resolve_species_formula("O2").molar_mass_kg_per_mol()
-# NBSIR 77-859 gaseous O2 property tables near the 150 K compressor inlet;
-# the design holds this first-order constant across the equal-stage ladder.
+# First-order O2 heat-capacity ratio.  Used by orifice_diameter_for_C
+# (choked mass-flux factor and critical-pressure ratio), claude_cycle_cold_end
+# (polytropic exponent (gamma-1)/gamma), and intercooled_compression.
+# NBSIR 77-859 is a slush solid/liquid report (O2 program range 44-58.2 K)
+# and does not contain this number.  Ideal-gas gamma = Cp/(Cp-R) from
+# oxygen_cp_shomate_j_per_mol_k is 1.399 at 150 K and 1.395 at 298.15 K;
+# this module does not recompute gamma from Cp(T).  A sourced replacement
+# is unestablished.
 OXYGEN_GAMMA = 1.395
-# NBSIR 77-859, gaseous oxygen specific gas constant.
+# First-order specific gas constant Rs = R/M.  With GAS_CONSTANT and
+# OXYGEN_MOLAR_MASS_KG_PER_MOL (0.031998 kg/mol), R/M = 259.843 J/kg/K.
+# The stored value is that quotient rounded to 0.1 J/kg/K.  NBSIR 77-859
+# does not contain 259.8.
 OXYGEN_SPECIFIC_GAS_CONSTANT_J_PER_KG_K = 259.8
 
 # NIST Chemistry WebBook SRD 69, oxygen phase-change data.
@@ -59,7 +70,13 @@ OXYGEN_FUSION_ENTHALPY_J_PER_MOL = 444.0
 OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL = 6820.0
 # NBSIR 77-859, Table 3 and section 6.1, solid O2 at the triple point.
 OXYGEN_SUBLIMATION_ENTHALPY_J_PER_MOL = 8199.5
-# NBSIR 77-859 low-temperature vapor approximation, bounded 54.361-100 K.
+# Constant-Cp vapor model used by oxygen_cp_j_per_mol_k when
+# allow_low_temperature is set and T is in [T_triple, 100 K).  Premise:
+# a rigid-rotor / frozen-vibration diatomic has Cp = (7/2)R.
+# Algebra: 3.5 * GAS_CONSTANT = 29.1006 J/mol/K.  The stored value is
+# that product rounded to 0.01 J/mol/K.  NBSIR 77-859 does not tabulate
+# this number or a 54.361-100 K gas-Cp window; its O2 program range is
+# 44-58.2 K.
 OXYGEN_LOW_T_CP_J_PER_MOL_K = 29.10
 # Roder, NBSIR 77-859 sections 6.2/6.4.  The gamma-solid correlation is
 # refused below its 44 K program limit; its 54.359 K source endpoint is
@@ -504,6 +521,9 @@ def orifice_diameter_for_C(
     critical_ratio = (2.0 / (OXYGEN_GAMMA + 1.0)) ** (
         OXYGEN_GAMMA / (OXYGEN_GAMMA - 1.0)
     )
+    # 0.95 is an asserted discontinuous vapor-gate threshold on this path,
+    # not a configured policy parameter and not an error bound on
+    # oxygen_saturation_pressure_pa.  A sourced margin is unestablished.
     if pressure >= 0.95 * saturation_pressure:
         raise ValueError("orifice inlet fails vapor gate: P0 must be < 0.95*P_sat(T0)")
     if back_pressure / pressure > critical_ratio:
@@ -759,8 +779,10 @@ def mass_rate_kg_hr_to_molar_rate_mol_s(species: str, mass_rate_kg_hr: float) ->
 
     rate = _finite_nonnegative(mass_rate_kg_hr, f"mass rate for {species}")
     molar_mass = resolve_species_formula(str(species)).molar_mass_kg_per_mol()
-    # kg/hr / (kg/mol * s/hr) = mol/s.  This is the only mass-rate conversion
-    # in the train; downstream enthalpy terms multiply this mol/s value by J/mol.
+    # kg/hr / (kg/mol * s/hr) = mol/s.  report_from_recorded_series uses this
+    # helper to convert recorded hot-species kg/hr rows before radiator
+    # enthalpy (J/mol * mol/s = W).  claude_cycle_cold_end does not call it;
+    # that path keeps mass-native state in kg/hr and J/kg.
     return rate / (SECONDS_PER_HOUR * molar_mass)
 
 
@@ -816,7 +838,22 @@ def vapor_cp_j_per_mol_k(species: str, temperature_K: float) -> float:
 
 
 def oxygen_saturation_pressure_pa(temperature_K: float) -> float:
-    """Return a phase-aware O2 saturation pressure joined at the triple point."""
+    """Return an O2 saturation pressure joined at the triple point.
+
+    Solid branch, 44 K through the triple point: Roder NBSIR 77-859
+    sublimation correlation, normalized to the modern NIST triple-point
+    pressure.  Temperatures below 44 K are refused.
+
+    Liquid branch, T greater than the triple point: two-anchor
+    Clausius-Clapeyron between (T_tp, P_tp) and (T_b, P_b).  This
+    function does not apply an upper validity gate, so T above the
+    critical point still returns a finite extrapolation.  NIST SRD 69
+    reports T_c = 154.58 K; oxygen has no liquid-vapor saturation
+    pressure above T_c.  That refusal is not implemented here.
+
+    orifice_diameter_for_C uses the returned value as a vapor-gate input
+    on the path through that function.
+    """
 
     temperature = _finite_positive(temperature_K, "temperature_K")
     if temperature <= OXYGEN_TRIPLE_POINT_K:
@@ -848,6 +885,17 @@ def oxygen_saturation_pressure_pa(temperature_K: float) -> float:
 
 
 def oxygen_deposition_gate(partial_pressure_pa: float, wall_temperature_K: float) -> dict[str, Any]:
+    """Compare p_O2 to oxygen_saturation_pressure_pa(T_wall).
+
+    Returned keys keep the frost/sublimation names consumed by
+    report_from_recorded_series.  ThermalTrainParameters refuses
+    T_frost_K above the triple point, so that report path evaluates the
+    solid branch.  For T_wall above the triple point,
+    oxygen_saturation_pressure_pa uses its liquid branch and frost_forms
+    is a saturation-exceeded flag on that liquid curve, not a solid-frost
+    verdict.
+    """
+
     partial_pressure = _finite_nonnegative(partial_pressure_pa, "partial_pressure_pa")
     saturation_pressure = oxygen_saturation_pressure_pa(wall_temperature_K)
     return {
@@ -1023,11 +1071,20 @@ def segmented_radiator_area_m2(
         radiative_flux = epsilon * STEFAN_BOLTZMANN * (midpoint ** 4 - sink ** 4)
         for species, rate in rates.items():
             crossing = (latent_crossings_K or {}).get(species)
+            # Below a crossing the species is skipped.  This loop has no
+            # condensed-phase Cp, so it does not compute a condensed-sensible
+            # to latent ratio and does not establish that the omitted term
+            # is small.
             if crossing is not None and midpoint < float(crossing):
                 continue
             # Premise: one segment removes n_dot*Cp*dT.  Algebra and units:
-            # (mol/s)*(J/mol/K)*K = W, then A = W/(W/m2).  For 1 kg/hr Na
-            # across 0.01 K at 1000 K this gives 2.51 mW and 4.43e-8 m2.
+            # (mol/s)*(J/mol/K)*K = W, then
+            # A = W / (epsilon*sigma*(T_mid^4 - T_sink^4)).
+            # Sanity: 1 kg/hr Na, dT=0.01 K, midpoint 1000.005 K, Cp=5/2 R
+            # gives load = 2.51 mW.  Area also depends on epsilon and T_sink.
+            # epsilon=1, T_sink=0 K (unit-test blackbody/zero-sink case):
+            # 4.43e-8 m2.  Emissivity 0.85 and night sink 90 K (the values
+            # in data/thermal_train_params.yaml): 5.21e-8 m2.
             load = rate * vapor_cp_j_per_mol_k(species, midpoint) * (upper - cursor)
             sensible_load += load
             sensible_area += load / radiative_flux
@@ -1375,17 +1432,23 @@ def report_from_recorded_series(
     crossings: dict[str, float] = {}
     crossing_authority: dict[str, dict[str, Any]] = {}
     for species, reason in sorted(entry_refusals.items()):
-        # Invalid entries cannot enter mol-native aggregation.  Preserve their
-        # recorded peak only as a fail-closed report projection.
-        unconverted_peak_kg_hr = max(
-            (
-                _finite_nonnegative(row[species], f"recorded {species} kg/hr")
-                for row in hot_species_kg_hr_series
-                if species in row
-            ),
-            default=0.0,
-        )
-        peak_hot_by_species[species] = unconverted_peak_kg_hr
+        # Species that failed mass_rate_kg_hr_to_molar_rate_mol_s are not
+        # added to peak_hot_molar_by_species on that snapshot.  Project a
+        # kg/hr peak only from finite nonnegative recorded values on this
+        # path; a non-numeric or non-finite rate has no mass peak to keep.
+        finite_recorded = []
+        for row in hot_species_kg_hr_series:
+            if species not in row:
+                continue
+            try:
+                finite_recorded.append(
+                    _finite_nonnegative(row[species], f"recorded {species} kg/hr")
+                )
+            except (TypeError, ValueError):
+                continue
+        unconverted_peak_kg_hr = max(finite_recorded) if finite_recorded else None
+        if unconverted_peak_kg_hr is not None:
+            peak_hot_by_species[species] = unconverted_peak_kg_hr
         excluded[species] = {
             "peak_kg_hr": unconverted_peak_kg_hr,
             "reason": reason,
@@ -1542,9 +1605,11 @@ def report_from_recorded_series(
     peak_o2_mol_s = max(oxygen_molar_rates, default=0.0)
     peak_o2_mol_hr = peak_o2_mol_s * SECONDS_PER_HOUR
     peak_o2_kg_hr = molar_rate_mol_s_to_mass_rate_kg_hr("O2", peak_o2_mol_s)
-    # Melt-offgas O2 co-flows through S-A before the separator, then enters S-B
-    # at 1000 K.  Adding it only as sensible load avoids inventing a hot-stage
-    # condensation crossing or charging O2 latent heat in S-A.
+    # Melt-offgas O2 is added to the S-A species vector only when the recorded
+    # inlet exceeds HOT_RADIATOR_SPLIT_K.  That branch charges O2 as sensible
+    # load on S-A and does not invent an O2 condensation crossing.  S-B inlet
+    # is assigned separately below as max(HOT_RADIATOR_SPLIT_K, T_floor_K)
+    # even when this S-A O2 term is skipped.
     hot_section_species = dict(hot_species)
     if peak_o2_mol_s > 0.0 and inlet_temperature > HOT_RADIATOR_SPLIT_K:
         hot_section_species["O2"] = hot_section_species.get("O2", 0.0) + peak_o2_mol_s
@@ -1569,8 +1634,11 @@ def report_from_recorded_series(
     hot_section["sizing_basis"] = "per_species_maxima_conservative"
     mid_section["sizing_basis"] = "per_species_maxima_conservative"
 
-    # S-B begins after the hot separator.  Melt-to-split enthalpy is upstream
-    # and is charged once to S-A, not again to the passive O2 row.
+    # S-B inlet is the post-separator datum max(HOT_RADIATOR_SPLIT_K, T_floor_K).
+    # When the S-A branch above charged melt-to-split O2 sensible duty, this
+    # inlet avoids charging that interval again.  When inlet_temperature was
+    # not above the split, S-A did not take that O2 load; S-B still starts
+    # at this split datum.
     o2_inlet_K = max(HOT_RADIATOR_SPLIT_K, params.T_floor_K)
     o2_night = segmented_radiator_area_m2(
         {"O2": peak_o2_mol_s},
@@ -1680,8 +1748,11 @@ def report_from_recorded_series(
         capture_status = {"status": "refused", "reason": "deposition_gate_not_met"}
     captured_batch_kg = captured_batch_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
     overflow = thermal_train_overflow_kg_hr(peak_o2_kg_hr, capacity_kg_hr)
-    # Equal-stage intercooling rejects over the T_floor-to-T_reject band;
-    # midpoint sizing avoids pretending the whole surface radiates at 300 K.
+    # Midpoint of T_floor and T_reject is the wall temperature passed to
+    # _isothermal_radiator.  Production compression["intercooler_reject_W"]
+    # is 0.0 on this path (claude_cycle_cold_end, not intercooled_compression),
+    # so the returned load and area are zero.  n_compressor_stages is not
+    # read here.
     intercooler_radiator_temperature_K = (params.T_floor_K + params.T_reject_K) / 2.0
     intercooler_radiator = _isothermal_radiator(
         compression["intercooler_reject_W"],
@@ -1802,8 +1873,20 @@ def report_from_recorded_series(
         "excluded_species": dict(sorted(excluded.items())),
         "excluded_species_nonzero": bool(excluded),
         "observed_upstream_state": {
-            "transport_saturation_peak_pct": max(observed_transport_saturation_pct, default=0.0),
-            "O2_vented_peak_kg_hr": max(observed_o2_vented_kg_hr, default=0.0),
+            "transport_saturation_peak_pct": max(
+                (
+                    _finite_nonnegative(value, "observed_transport_saturation_pct")
+                    for value in observed_transport_saturation_pct
+                ),
+                default=0.0,
+            ),
+            "O2_vented_peak_kg_hr": max(
+                (
+                    _finite_nonnegative(value, "observed_o2_vented_kg_hr")
+                    for value in observed_o2_vented_kg_hr
+                ),
+                default=0.0,
+            ),
             "note": "observed legacy upstream diagnostics; not thermal-train overflow",
         },
         "display_costs": display_costs,
