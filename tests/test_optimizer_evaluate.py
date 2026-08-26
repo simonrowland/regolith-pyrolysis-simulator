@@ -58,7 +58,13 @@ from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import (
+    ResultStore,
+    _deserialize_run_reference,
+    _json_dump,
+    _json_load,
+    _serialize_run_reference,
+)
 from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
@@ -3248,32 +3254,94 @@ def test_real_backend_not_converged_is_timeout_not_unavailable() -> None:
     assert any("not_converged" in note for note in result.notes)
 
 
-def test_real_backend_not_attempted_is_not_unavailable() -> None:
-    """Red-by-revert: a probe that never ran is not engine absence.
+def test_whole_run_not_attempted_aborts_and_is_not_silent_relabel() -> None:
+    """Pin: a whole-run ``not_attempted`` must abort, never PHYSICS_REFUSED.
 
-    Invert: the != ok abort still fires and this raises BackendUnavailableAbort.
+    Production does not emit this token on the optimizer envelope.
+    AlphaMELTS mid-run prior-close emits ``not_attempted`` on the kernel
+    ``IntentResult`` rail, but ``core._get_equilibrium`` is pre-gated on
+    ``backend.is_available()`` so a real backend raises before kernel
+    dispatch, and ``RunExecutor._aggregate_backend_status`` returns the
+    first of (unavailable, out_of_domain, not_converged) else *latest*,
+    never a history member. This FakeExecutor injection is therefore a
+    counterfactual.
+
+    This test would fail if the behaviour were correct-but-different —
+    a later redesign that made ``not_attempted`` a live whole-run honest
+    answer with a dedicated ``ScoredResult``. Rewrite the pin in that
+    case. It must keep failing on the silent relabel this pin exists to
+    block: keeping the token in the honest-non-ok set so fallthrough
+    reports never-attempted as attempted-and-refused-on-physics.
     """
-    result = evaluate(
-        _valid_patch(),
-        "lunar_mare_low_ti",
-        "high",
-        profile=_real_backend_profile(),
-        executor=FakeExecutor(
-            _execution(
-                backend_status="not_attempted",
-                backend_authoritative=True,
-                reason="prior transport closed",
-            )
-        ),
+    with pytest.raises(EngineBugAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                _execution(
+                    backend_status="not_attempted",
+                    backend_authoritative=True,
+                    reason="prior transport closed",
+                )
+            ),
+        )
+
+    assert raised.value.category is FailureCategory.ENGINE_BUG
+    assert raised.value.category is not FailureCategory.PHYSICS_REFUSED
+    assert raised.value.category is not FailureCategory.BACKEND_UNAVAILABLE
+    message = str(raised.value)
+    assert "not_attempted" in message
+    assert "PHYSICS_REFUSED" in message
+
+
+def test_run_reference_not_attempted_survives_result_store_passthrough() -> None:
+    """Pin: stored ``not_attempted`` survives the fidelity pass-through rail.
+
+    Production emits this token on the kernel IntentResult rail
+    (alphaMELTS mid-run prior-close) and keeps it on stored
+    ``RunReference.backend_status`` with ``evidence_class="melts"``.
+    ResultStore._deserialize_run_reference reconstructs RunReference,
+    so ``__post_init__`` re-enters ``_fidelity_alias_backend_status``.
+    The token is in ``_FIDELITY_PASSTHROUGH_BACKEND_STATUSES`` because
+    the fidelity alias table was not re-read for refused /
+    not_converged / not_attempted; they stay on the field and are not
+    sent through ``translate_legacy_token``.
+
+    The whole-run optimizer envelope is a different rail: evaluate()
+    aborts with EngineBugAbort on the same token (see
+    test_whole_run_not_attempted_aborts_and_is_not_silent_relabel)
+    because it is not a candidate physics answer. That abort never
+    reaches this boundary. The two rails do not contradict: the
+    envelope refuses to *score* a whole-run ``not_attempted``; this
+    rail *preserves* a stored token so it is not folded into absence
+    or raised as UnknownFidelityVocabularyTokenError.
+
+    Invert: drop ``not_attempted`` from
+    ``_FIDELITY_PASSTHROUGH_BACKEND_STATUSES`` and this raises
+    UnknownFidelityVocabularyTokenError on construct / deserialize.
+    """
+    reference = evaluate_module.RunReference(
+        status="ok",
+        backend_name="alphamelts",
+        backend_status="not_attempted",
+        backend_authoritative=True,
+        evidence_class="melts",
     )
 
-    assert not result.feasible
-    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
-    assert result.failure_category is not FailureCategory.ENGINE_BUG
-    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
-    assert result.run_reference is not None
-    assert result.run_reference.backend_status == "not_attempted"
-    assert result.run_reference.status == "not_attempted"
+    assert reference.backend_status == "not_attempted"
+    assert reference.evidence_class == "melts"
+
+    payload = _json_load(_json_dump(_serialize_run_reference(reference)))
+    loaded = _deserialize_run_reference(payload, result_blob=None)
+
+    assert payload["backend_status"] == "not_attempted"
+    assert loaded is not None
+    assert loaded.backend_status == "not_attempted"
+    assert loaded.backend_status is not None
+    assert loaded.backend_status != "unavailable"
+    assert loaded.evidence_class == "melts"
 
 
 def test_never_installed_engine_importerror_still_aborts_optimizer() -> None:

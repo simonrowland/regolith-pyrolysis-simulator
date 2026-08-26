@@ -205,7 +205,6 @@ _HONEST_NON_OK_BACKEND_STATUSES = frozenset(
     {
         "refused",
         "not_converged",
-        "not_attempted",
         "out_of_domain",
     }
 )
@@ -955,7 +954,30 @@ def evaluate(
             constraints=active_constraints,
         )
 
-    if backend_status in {"refused", "not_converged", "not_attempted"}:
+    if backend_status == "not_attempted":
+        # Per-probe sequential-transport token (alphaMELTS mid-run prior
+        # close on the kernel IntentResult rail). It is a legal
+        # INTENT_RESULT_STATUSES member, but it is not a whole-run
+        # optimizer envelope answer. Production never delivers it here:
+        # core._get_equilibrium is pre-gated on is_available(), and
+        # RunExecutor._aggregate_backend_status swallows non-priority
+        # history members. Do not relabel as refused (never-attempted is
+        # not attempted-and-refused-on-physics) and do not score the
+        # candidate.
+        raise EngineBugAbort(
+            "backend_status='not_attempted' reached the whole-run "
+            "optimizer envelope. That token is a per-probe sequential-"
+            "transport close (alphaMELTS mid-run prior close); it is "
+            "not a candidate physics answer. A mid-run transport death "
+            "must abort/drop and recycle the backend, never score the "
+            "candidate as PHYSICS_REFUSED.",
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        )
+
+    if backend_status in {"refused", "not_converged"}:
         return _honest_non_ok_backend_result(
             candidate_id,
             spec,
@@ -1213,16 +1235,6 @@ def _honest_non_ok_backend_result(
             reason=reason,
             message=message,
         )
-    if backend_status == "not_attempted":
-        return _not_attempted_backend_result(
-            candidate_id,
-            spec,
-            key,
-            run_execution,
-            profile,
-            reason=reason,
-            message=message,
-        )
     return _physics_refused_result(
         candidate_id,
         spec,
@@ -1348,43 +1360,6 @@ def _engine_not_converged_result(
             dict.fromkeys(
                 note
                 for note in (message, str(reason or "not_converged"))
-                if note
-            )
-        ),
-    )
-
-
-def _not_attempted_backend_result(
-    candidate_id: str | None,
-    spec: EvalSpec,
-    key: str,
-    run_execution: Any,
-    profile: Mapping[str, Any],
-    *,
-    reason: str,
-    message: str,
-) -> ScoredResult:
-    run_reference = replace(
-        _run_reference(run_execution, profile),
-        status="not_attempted",
-        error_message=message,
-        reason=str(reason or "not_attempted"),
-    )
-    return ScoredResult(
-        candidate_id=candidate_id,
-        eval_spec=spec,
-        cache_key=key,
-        feasible=False,
-        failure_category=FailureCategory.PHYSICS_REFUSED,
-        feasibility_margins={
-            PHYSICS_REFUSAL_GATE: _physics_refusal_margin(reason or "not_attempted"),
-        },
-        failing_gates=(PHYSICS_REFUSAL_GATE,),
-        run_reference=run_reference,
-        notes=tuple(
-            dict.fromkeys(
-                note
-                for note in (message, str(reason or "not_attempted"))
                 if note
             )
         ),
