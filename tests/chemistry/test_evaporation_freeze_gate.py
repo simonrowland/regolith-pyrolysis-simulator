@@ -13,6 +13,7 @@ from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryProvider,
     IntentResult,
+    IntentResultStatusError,
     ProviderUnavailableError,
 )
 from simulator.core import PoisonedHourError
@@ -2685,3 +2686,84 @@ def test_fallback_log_is_bounded_and_snapshot_serializes_hourly_summary(
         'campaign_hour': int(sim.melt.campaign_hour),
         'count': 300,
     }]
+
+
+def test_unrecognised_engine_status_does_not_authorize_the_redox_floor_fallback(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """An engine contract violation must NOT become "melt is fully liquid".
+
+    THIS IS THE CONSEQUENCE TEST for the provider-side status validation. The
+    provider tests pin the mechanism -- an unrecognised adapter token raises
+    IntentResultStatusError at the DTO boundary. They cannot see what happens
+    to that exception afterwards, and the answer used to be: it was caught by
+    a generic handler in _resolved_melt_redox_gate_authority, reclassified as
+    'unavailable' by a substring test on the message, and routed to the floor
+    fallback -- which declares the melt fully liquid above the Kress91
+    calibration floor and can commit an fe_redox_respeciation transition.
+
+    So the fix was cosmetic on this path: the DTO raised exactly as designed
+    and the next frame turned it straight back into a permissive default.
+
+    CONTRAST WITH THE SIBLING TEST above,
+    test_fallback_authorized_redox_transition_is_balanced_and_provenanced,
+    which raises ProviderUnavailableError and asserts the fallback DOES
+    authorize a transition. That behaviour is correct and must not change: a
+    KNOWN absence is a measurement failure, and asserting solid without data
+    would be worse. The distinction this test defends is between "nobody
+    answered" (fall back) and "somebody answered something we cannot
+    interpret" (refuse) -- the same two fail-closed categories the kernel
+    vocabulary exists to keep apart.
+
+    FALSIFIABILITY: goes red if the IntentResultStatusError re-raise is
+    removed from _resolved_melt_redox_gate_authority, because the generic
+    handler then swallows it, no exception reaches the caller, and a
+    transition is appended. It also goes red if the error is re-raised but a
+    transition is somehow still committed. Verified against the pre-fix code:
+    without the re-raise the ledger gains a transition and pytest.raises
+    fails on the missing exception.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1500.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test unrecognised status refusal oxygen provenance',
+        material_origin="feedstock",
+    )
+
+    def unrecognised_status_curve():
+        # Exactly what the MAGEMin / AlphaMELTS providers now raise when an
+        # adapter reports a token outside INTENT_RESULT_STATUSES.
+        raise IntentResultStatusError('failed')
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', unrecognised_status_curve)
+    transition_count = len(sim.atom_ledger.transitions)
+    fallback_count = len(sim._melt_redox_liquidus_gate_fallback_diagnostics)
+
+    with pytest.raises(IntentResultStatusError) as excinfo:
+        sim._apply_fe_redox_respeciation()
+
+    # The offending token survives to the caller rather than being flattened
+    # into a generic availability failure.
+    assert excinfo.value.status == 'failed'
+
+    # No ledger authority was taken on the strength of an uninterpretable
+    # engine answer, and no fallback record was manufactured for it.
+    assert len(sim.atom_ledger.transitions) == transition_count
+    assert (
+        len(sim._melt_redox_liquidus_gate_fallback_diagnostics)
+        == fallback_count
+    )

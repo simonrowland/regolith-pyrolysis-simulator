@@ -337,6 +337,7 @@ from simulator.chemistry.kernel import (
     ChemistryKernel,
     IntentRequest,
     IntentResult,
+    IntentResultStatusError,
     LedgerTransitionProposal,
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     ProviderRegistry,
@@ -4417,6 +4418,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if curve is None:
             try:
                 curve = self._freeze_gate_curve()
+            except IntentResultStatusError:
+                # An engine that answered with a status we do not recognise is
+                # NOT an unavailable engine, and must not be routed to the
+                # floor fallback below.
+                #
+                # The distinction is the whole point. The fallback's own
+                # comment (see _melt_redox_liquid_fraction_factor) argues that
+                # "an unavailable liquidus is a measurement failure, not
+                # evidence of solidification", and therefore declares the melt
+                # fully liquid above the Kress91 calibration floor. That
+                # reasoning holds for a KNOWN absence -- we asked, nobody
+                # answered, and asserting solid without data would be worse.
+                # It does not hold for an UNKNOWN answer: the engine did
+                # respond, we could not interpret what it said, and treating
+                # that as "no measurement" silently upgrades an engine-contract
+                # violation into an authoritative liquid_fraction = 1.0 that
+                # can commit an fe_redox_respeciation transition.
+                #
+                # Fail-closed category: an unrecognised status is a MISSING
+                # INPUT (we do not know what the engine meant), which refuses.
+                # Genuine absence and non-convergence are separate categories
+                # and keep their existing handling below.
+                #
+                # Without this branch the provider-side validation added for
+                # the MAGEMin status fail-open is cosmetic on this path: the
+                # DTO raises exactly as intended and the generic handler two
+                # lines down converts it straight back into a permissive
+                # default.
+                raise
             except Exception as exc:  # noqa: BLE001 - optional liquidus engines
                 reason = str(exc)
                 liquidus_status: Literal['unavailable', 'not_converged'] = (

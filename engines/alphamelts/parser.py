@@ -80,7 +80,17 @@ def project_equilibrium_to_diagnostics(
         )
 
     warnings: Tuple[str, ...] = tuple(getattr(equilibrium_result, 'warnings', ()) or ())
-    backend_status = str(getattr(equilibrium_result, 'status', 'ok'))
+    # An absent or empty status is the ABSENCE of an answer, not a good one.
+    # This seam previously manufactured 'ok' for a statusless result, and no
+    # amount of validation further downstream can recover the lost
+    # information -- by the time IntentResult sees the token it is already the
+    # affirmative one. Real EquilibriumResult instances default to 'ok' of
+    # their own accord, so this fires only for a malformed or duck-typed
+    # result that never declared one. Same policy the MAGEMin provider
+    # applies; keeping the two engines asymmetric here was the gap.
+    backend_status = str(
+        getattr(equilibrium_result, 'status', None) or 'unavailable'
+    )
 
     # 0.5.4 W6 (M3 historical-audit closure, 2026-05-28): prefer the
     # structured ``EquilibriumResult.liquidus_T_C`` field; fall back to

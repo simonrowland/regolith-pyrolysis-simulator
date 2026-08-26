@@ -22,7 +22,9 @@ from simulator.chemistry.kernel.config import (
 from simulator.chemistry.kernel.dto import (
     ControlAudit,
     IntentRequest,
+    INTENT_RESULT_STATUSES,
     IntentResult,
+    IntentResultStatusError,
     LedgerTransitionProposal,
     ProviderAccountView,
 )
@@ -48,7 +50,9 @@ from simulator.chemistry.kernel.registry import ProviderRegistry
 __all__ = (
     # DTOs
     "IntentRequest",
+    "INTENT_RESULT_STATUSES",
     "IntentResult",
+    "IntentResultStatusError",
     "LedgerTransitionProposal",
     "ControlAudit",
     "ProviderAccountView",

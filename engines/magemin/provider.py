@@ -243,14 +243,43 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             engine_version=self._engine_version(),
         )
 
-        backend_status = diagnostics.backend_status
-        kernel_status = backend_status if backend_status in (
-            'ok', 'not_converged', 'out_of_domain', 'unavailable'
-        ) else 'ok'
-
+        # Hand the adapter's status to the vocabulary owner unchanged.
+        #
+        # This provider used to keep a private four-token allowlist and map
+        # everything outside it to ``'ok'``.  That inverted the meaning of an
+        # unrecognised token: an engine saying something we do not understand
+        # was reported as an engine saying the answer is good.  It is a
+        # fail-open, and it is not confined to telemetry --
+        # :class:`MAGEMinShadowProvider` is the registered fallback for the
+        # authoritative ``GATE_LIQUID_FRACTION`` intent, and the freeze-gate
+        # consumer prefers ``IntentResult.status`` over the diagnostic's
+        # backend status when deciding whether to accept solidus/liquidus
+        # bounds (``simulator/evaporation.py``).  So a failed MAGEMin result
+        # that still carried its last finite bounds could set the liquid
+        # fraction multiplier applied to authoritative evaporation rates.
+        #
+        # ``IntentResult.__post_init__`` validates against
+        # ``INTENT_RESULT_STATUSES`` and raises ``IntentResultStatusError``
+        # otherwise, so passing the token through moves the decision to the
+        # single owner and makes an unknown token loud at the seam that
+        # produced it.  This matches ``AlphaMELTSProvider``, which had the
+        # same private allowlist removed for the same reason.
+        #
+        # Fail-closed category: an unrecognised status is a MISSING INPUT --
+        # we do not know what the engine meant -- so it refuses rather than
+        # being silently downgraded to a plausible-looking token.  A genuinely
+        # out-of-domain answer is a different category and the adapter already
+        # says ``'out_of_domain'`` for it.
+        #
+        # Blast radius: every ``EquilibriumResult``/``LiquidusSolidusResult``
+        # construction in the tree (150 call sites) uses only ``ok``,
+        # ``not_converged``, ``out_of_domain`` or ``unavailable``, all four of
+        # which are in the vocabulary, and no MAGEMin path derives the status
+        # from a subprocess payload.  So this raises for engine-contract
+        # violations and for nothing that exists today.
         return IntentResult(
             intent=request.intent,
-            status=kernel_status,
+            status=diagnostics.backend_status,
             transition=None,
             control_audit=control_audit,
             diagnostic=diagnostics.as_diagnostic(),
@@ -316,9 +345,22 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
 
     @staticmethod
     def _extract_status(result: Any) -> str:
+        # Defaults to 'unavailable', not 'ok'.
+        #
+        # This helper is parity-only: its two callers in parity_compare receive
+        # IntentResult objects the Planner has already validated, so the default
+        # is unreachable today and this change is behaviour-neutral. It is made
+        # anyway for two reasons. First, an unreachable default that would be
+        # WRONG if reached is a latent fail-open waiting for a caller who does
+        # not know the invariant. Second, and more practically, 'ok' here is the
+        # same status-laundering shape the round-2 class guard now forbids
+        # across every provider -- and the right response to a guard finding a
+        # real instance of its pattern is to remove the pattern, not to carve an
+        # exception into the guard. A guard with exceptions is one someone
+        # eventually deletes.
         if isinstance(result, Mapping):
-            return str(result.get('status', 'ok'))
-        return str(getattr(result, 'status', 'ok'))
+            return str(result.get('status') or 'unavailable')
+        return str(getattr(result, 'status', None) or 'unavailable')
 
     # ------------------------------------------------------------------
     # Helpers
@@ -600,7 +642,16 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 liquidus_T_K = liquidus_T_C + CELSIUS_TO_KELVIN_OFFSET
         solidus_T_C = _safe_attr_float(equilibrium, 'solidus_T_C')
 
-        backend_status = str(getattr(equilibrium, 'status', 'ok') or 'ok')
+        # An absent or empty status is the ABSENCE of an answer, not a good
+        # one, so it falls back to 'unavailable' rather than 'ok'.  This is
+        # the same fail-open as the allowlist removed above, one layer down:
+        # both places used to let a silence become an affirmation.  Every real
+        # result carries a status of its own (EquilibriumResult defaults to
+        # 'ok', LiquidusSolidusResult to 'unavailable'), so this fires only
+        # for an object that never declared one.
+        backend_status = str(
+            getattr(equilibrium, 'status', None) or 'unavailable'
+        )
         # Thread adapter diagnostics (incl. aggregate-budget exhaustion
         # reason/elapsed/call_count/last_T) through the provider envelope.
         # Pre-fix the liquidus finder produced these on

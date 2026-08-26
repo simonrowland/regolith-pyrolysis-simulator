@@ -1441,3 +1441,124 @@ def test_provider_rejects_authoritative_registration_for_other_intent():
     provider = AlphaMELTSProvider(backend=None)
     with pytest.raises(KernelError):
         registry.register(provider, [ChemistryIntent.VAPOR_PRESSURE])
+
+
+# ---------------------------------------------------------------------------
+# Absent adapter status must not become 'ok'
+#
+# Round-1 review of the MAGEMin status fix found the SAME fail-open still live
+# in AlphaMELTS at two seams, and round-2 closure review recorded that the fix
+# landed in production code but had no behavioural regression through the
+# AUTHORITATIVE gate path -- so reverting either hunk would leave every other
+# new test green. These two close that.
+# ---------------------------------------------------------------------------
+
+
+def test_parser_projection_refuses_a_statusless_equilibrium():
+    """A result that never declares a status projects 'unavailable', not 'ok'.
+
+    Covers engines/alphamelts/parser.py. SimpleNamespace is used deliberately
+    with NO ``status`` attribute -- a real EquilibriumResult defaults to 'ok'
+    of its own accord, so only a duck-typed or malformed adapter reaches this,
+    which is exactly the case the seam used to manufacture success for.
+
+    FALSIFIABILITY: reverting the parser default to 'ok' turns this red. It was
+    green against the pre-fix parser only in the sense that the assertion did
+    not exist; with the assertion, pre-fix code yields 'ok' and fails.
+    """
+    statusless = SimpleNamespace(
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={'Fe': 1.0},
+        liquid_composition_wt_pct={'SiO2': 50.0},
+        warnings=(),
+    )
+    assert not hasattr(statusless, 'status')
+
+    backend = _FakeAlphaMELTSBackend(mode='thermoengine', equilibrium=statusless)
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+        )
+    )
+
+    assert result.diagnostic['backend_status'] == 'unavailable'
+    assert result.status != 'ok'
+
+
+def test_authoritative_gate_refuses_a_statusless_ec_sample(monkeypatch):
+    """The authoritative GATE_LIQUID_FRACTION path must refuse a silent sample.
+
+    This is the regression the round-2 closure review named as missing.
+    GATE_LIQUID_FRACTION routes through _run_equilibrium_crystallization_path,
+    whose sampler previously accepted a statusless object as 'ok' and then read
+    liquid_fraction and liquid_composition_wt_pct straight off it. Because this
+    provider is authority-capable for that intent, a stale liquid fraction
+    accepted here scales authoritative evaporation flux through the freeze gate.
+
+    The sample carries STALE FINITE BOUNDS on purpose: the danger was never a
+    crash, it was a plausible number surviving into physics. A test whose fake
+    returns empty data could pass while the defect remained.
+
+    FALSIFIABILITY: reverting engines/alphamelts/provider.py to
+    ``getattr(result, 'status', 'ok') != 'ok'`` makes the sampler accept this
+    object and the dispatch returns an ok-shaped gate answer, so the status
+    assertion fails.
+    """
+    import engines.alphamelts.provider as provider_module
+
+    statusless_sample = SimpleNamespace(
+        liquid_fraction=0.5,                      # stale but finite
+        liquid_composition_wt_pct={'SiO2': 50.0},  # stale but plausible
+        warnings=(),
+    )
+    assert not hasattr(statusless_sample, 'status')
+
+    monkeypatch.setattr(provider_module, 'python_api_available', lambda _b: True)
+    monkeypatch.setattr(
+        provider_module,
+        'equilibrate_via_python_api',
+        lambda *_a, **_k: statusless_sample,
+    )
+
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    # No _subprocess_required patch needed: the fake backend has no
+    # stage0_subprocess_required attribute, so it already returns False.
+
+    result = provider.dispatch(
+        _make_request(
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            composition_mol=_basalt_species_mol(),
+        )
+    )
+
+    # ★ Assert the SPECIFIC refusal, not merely "not ok".
+    #
+    # The first draft of this test asserted only `status != 'ok'` and PASSED
+    # against the reverted (defective) provider -- because a mis-arity lambda
+    # in the test's own monkeypatch made the EC path fail earlier with
+    # not_converged, so the assertion was satisfied without the fix. Counter-
+    # factual verification caught it. A refusal test must name the refusal it
+    # expects, or any unrelated failure satisfies it.
+    diagnostic = dict(result.diagnostic)
+    assert result.status != 'ok', (
+        f'authoritative gate accepted a statusless sample: {result.status!r} '
+        f'diagnostic={diagnostic}'
+    )
+    # The refusal surfaces as an EC-path failure whose warning carries the
+    # sample status we now raise with. Asserting the WARNING TEXT rather than
+    # backend_status is deliberate: the outer EC handler normalises the raised
+    # RuntimeError to not_converged, so backend_status alone cannot distinguish
+    # "the sample was silent" from "the solver did not converge" -- and that
+    # ambiguity is what let the loose first draft pass.
+    joined = ' | '.join(result.warnings)
+    assert 'unavailable' in joined, (
+        'gate refused, but not for the statusless-sample reason. '
+        f'status={result.status!r} backend_status='
+        f'{diagnostic.get("backend_status")!r} warnings={result.warnings[:2]}'
+    )
+    assert result.transition is None

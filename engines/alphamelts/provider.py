@@ -772,9 +772,17 @@ class AlphaMELTSProvider(ChemistryProvider):
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
-            if getattr(result, 'status', 'ok') != 'ok':
+            # A sample that declares no status has NOT told us it succeeded.
+            # The previous default accepted a statusless object as 'ok' and
+            # then read liquid_fraction / liquid_composition_wt_pct off it,
+            # so a duck-typed result carrying stale finite bounds could scale
+            # authoritative evaporation flux through the freeze gate. Absent
+            # or empty now means 'unavailable' and is refused here, matching
+            # the parser projection and the MAGEMin provider.
+            sample_status = getattr(result, 'status', None) or 'unavailable'
+            if sample_status != 'ok':
                 warning = '; '.join(getattr(result, 'warnings', ()) or ())
-                raise RuntimeError(warning or str(getattr(result, 'status')))
+                raise RuntimeError(warning or str(sample_status))
             composition = dict(
                 getattr(result, 'liquid_composition_wt_pct', {}) or {}
             )

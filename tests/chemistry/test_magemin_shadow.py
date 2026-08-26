@@ -38,6 +38,7 @@ from simulator.chemistry.kernel import (
     ControlAudit,
     IntentRequest,
     IntentResult,
+    IntentResultStatusError,
     KernelError,
     ProviderAccountView,
     ProviderRegistry,
@@ -761,3 +762,153 @@ def test_provider_with_real_adapter_smoke():
     assert result.status in (
         'ok', 'not_converged', 'out_of_domain', 'unavailable',
     )
+
+
+# ---------------------------------------------------------------------------
+# Status vocabulary: the provider must not invent 'ok'
+#
+# Milestone coherence audit 2026-08-26, P1. The provider used to keep a
+# private four-token allowlist and map every other adapter status to 'ok'.
+# That is a fail-open at the worst possible seam: MAGEMinShadowProvider is
+# the registered fallback for the authoritative GATE_LIQUID_FRACTION intent,
+# and the freeze-gate consumer prefers IntentResult.status over the
+# diagnostic's backend status when deciding whether to accept solidus /
+# liquidus bounds. A failed MAGEMin result carrying stale finite bounds could
+# therefore set the liquid-fraction multiplier applied to authoritative
+# evaporation rates -- silently halving a real rate instead of refusing.
+#
+# 590b1cda gave the status vocabulary a single validated owner
+# (IntentResult / INTENT_RESULT_STATUSES). AlphaMELTS was converted to pass
+# its adapter status straight through; MAGEMin was missed. These two tests
+# pin the conversion.
+# ---------------------------------------------------------------------------
+
+
+class _StatuslessEquilibriumResult:
+    """An adapter result that never declares a status at all.
+
+    Deliberately NOT a subclass of :class:`_FakeEquilibriumResult`, whose
+    ``status`` defaults to ``'ok'`` -- inheriting it would hand the test the
+    very attribute it exists to prove is absent.
+    """
+
+    def __init__(self) -> None:
+        self.liquidus_T_K = 1700.0
+        self.phase_masses_kg = {'liquid': 1.0}
+        self.phases_present = ('liquid',)
+        self.liquid_composition_wt_pct = {}
+        self.liquid_fraction = 1.0
+        self.warnings = ()
+
+
+def test_unknown_adapter_status_is_refused_at_the_dto_boundary():
+    """An unrecognised adapter status must raise, not become 'ok'.
+
+    FALSIFIABILITY: this goes red the moment the provider reintroduces any
+    local status mapping, because a mapped token constructs an IntentResult
+    successfully and no exception escapes. Against the pre-fix provider the
+    dispatch returned status='ok' and this test fails on the missing raise --
+    it is not a test that passes either way.
+
+    'failed' is used because it is a plausible adapter token that is NOT in
+    INTENT_RESULT_STATUSES; the point is the handling of tokens the kernel
+    does not recognise, not this token in particular.
+    """
+    fake_equilibrium = _FakeEquilibriumResult(
+        liquidus_T_K=1700.0,
+        phase_masses_kg={'liquid': 0.5, 'olivine': 0.5},
+        status='failed',
+    )
+    shadow = MAGEMinShadowProvider(
+        backend=_FakeMAGEMinBackend(equilibrium=fake_equilibrium),
+    )
+    request = _make_request(ChemistryIntent.SILICATE_LIQUIDUS)
+
+    with pytest.raises(IntentResultStatusError) as excinfo:
+        shadow.dispatch(request)
+
+    # The error must name the offending token, so an operator reading the
+    # traceback learns what the engine actually said rather than only that
+    # something was wrong.
+    assert excinfo.value.status == 'failed'
+    assert 'failed' in str(excinfo.value)
+
+
+def test_absent_adapter_status_reports_unavailable_not_ok():
+    """A result that declares no status is an absent answer, not a good one.
+
+    Same fail-open class as the allowlist, one layer down: the projection
+    used to coerce a missing or empty status to 'ok'. Silence must not read
+    as affirmation.
+
+    FALSIFIABILITY: goes red if the fallback returns to 'ok' (the assertion
+    below fails on the token) or if the projection starts raising on a
+    statusless object (the dispatch raises before the assertion). Against the
+    pre-fix provider this returned 'ok' and the test fails.
+    """
+    shadow = MAGEMinShadowProvider(
+        backend=_FakeMAGEMinBackend(equilibrium=_StatuslessEquilibriumResult()),
+    )
+    result = shadow.dispatch(_make_request(ChemistryIntent.SILICATE_LIQUIDUS))
+
+    assert result.status == 'unavailable'
+    assert result.diagnostic['backend_status'] == 'unavailable'
+    # Writer purity is unchanged by this fix and is worth re-asserting here,
+    # because a status change is exactly the kind of edit that could tempt
+    # someone to start populating a transition.
+    assert result.transition is None
+
+
+def test_in_vocabulary_adapter_statuses_pass_through_unchanged():
+    """The four statuses the adapter actually emits reach the DTO intact.
+
+    Guards the other half of the fix: passing the token through must not
+    have narrowed what a healthy MAGEMin run can report. Every
+    EquilibriumResult / LiquidusSolidusResult construction in the tree uses
+    one of these four, so this is the live vocabulary, not a hypothetical.
+    """
+    for token in ('ok', 'not_converged', 'out_of_domain', 'unavailable'):
+        fake_equilibrium = _FakeEquilibriumResult(
+            liquidus_T_K=1700.0,
+            phase_masses_kg={'liquid': 1.0},
+            status=token,
+        )
+        shadow = MAGEMinShadowProvider(
+            backend=_FakeMAGEMinBackend(equilibrium=fake_equilibrium),
+        )
+        result = shadow.dispatch(_make_request(ChemistryIntent.SILICATE_LIQUIDUS))
+        assert result.status == token, (
+            f'adapter status {token!r} was rewritten to {result.status!r}'
+        )
+
+
+@pytest.mark.parametrize("declared", [None, ""])
+def test_explicit_none_or_empty_status_reports_unavailable_not_ok(declared):
+    """An explicitly-declared empty status is silence too, and must refuse.
+
+    The statusless-object test above covers a MISSING attribute. This covers
+    the other half of the same hunk: an attribute that exists and says
+    nothing. Both are the absence of an answer and both must land on
+    'unavailable' rather than 'ok'.
+
+    Called out by review as unpinned: the projection's ``or 'unavailable'``
+    handles None and '' as well as the missing case, but only the missing
+    case had a test, so a change to ``getattr(equilibrium, 'status', 'unavailable')``
+    -- which drops the falsy handling while looking equivalent -- would have
+    kept every existing test green.
+
+    FALSIFIABILITY: goes red if the falsy branch is removed (None/'' would
+    then reach IntentResult and raise, or coerce to the string 'None').
+    """
+    fake_equilibrium = _FakeEquilibriumResult(
+        liquidus_T_K=1700.0,
+        phase_masses_kg={'liquid': 1.0},
+        status=declared,
+    )
+    shadow = MAGEMinShadowProvider(
+        backend=_FakeMAGEMinBackend(equilibrium=fake_equilibrium),
+    )
+    result = shadow.dispatch(_make_request(ChemistryIntent.SILICATE_LIQUIDUS))
+
+    assert result.status == 'unavailable'
+    assert result.diagnostic['backend_status'] == 'unavailable'
