@@ -581,3 +581,455 @@ points:
   status: match
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 2173.0
+
+# 2026-08-26 corpus-integration append (controller merge of five worker
+# fragments: tp2 DeMaria pO2, tp3 Sossi remine, tp4 metadata completion,
+# tp1 transition_point [residual_unit K], std2 observable paths). One
+# fragment pin quarantined, NOT appended: kems-012 sossi_2019 Na Table 4
+# gamma at residual 0.0 — the engine Na2O coefficient is parameterized
+# from that same table (self-agreement, b-134 class); it re-enters only
+# as self-agreement-excluded under the std2 provenance guard.
+# --- tp2 fragment ---
+- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1428.57
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 0.31300586081772297
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1428.57
+- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1412.43
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 0.3370624634621697
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1412.43
+- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1379.31
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 0.05194806837879019
+  band_dex: 0.01
+  status: match
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1379.31
+- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1360.54
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 0.24142572765124345
+  band_dex: 0.01
+  status: match
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1360.54
+- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1342.28
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 0.384267760576019
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1342.28
+- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1298.7
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 0.5887527203013809
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1298.7
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1474.93
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 0.9434054318187791
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1474.93
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1459.85
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 0.9856850665339089
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1459.85
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1449.28
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 1.0086742766444063
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1449.28
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1438.85
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 1.0314321012862382
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1438.85
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1428.57
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 1.10405418999761
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1428.57
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1418.44
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 1.1765650864777855
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1418.44
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1398.6
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 1.3211165770794284
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1398.6
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1379.31
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 1.315112142091595
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1379.31
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1351.35
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 1.6299944538786524
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1351.35
+- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1324.5
+  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
+  source_id: kems-022-demaria-1971
+  observation_type: psat_series
+  species: Na
+  residual_dex: 2.043550129219774
+  band_dex: 0.01
+  status: mismatch
+  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
+  temperature_K: 1324.5
+# --- tp3 fragment ---
+- key: sossi_2019_k_table4_gamma_this_work:gamma
+  case_id: kems-012-sossi-2019::sossi_2019_k_table4_gamma_this_work
+  source_id: kems-012-sossi-2019
+  observation_type: activity_coefficient
+  species: K
+  residual_dex: 0.7983546364719307
+  band_dex: 0.01
+  status: mismatch
+  note: 2026-08-26 kems-012 remine. Table 4 γ_i (this work)=2.2e-4 vs engine DeMaria/Sossi-Fegley 3.5e-5.
+    Residual reported, not tuned. Derived under authors-adopted α_e=1; not a vacuum Langmuir alpha and
+    not a mass_spec pin.
+  temperature_K: 1673.15
+# --- tp4 fragment ---
+- key: BIC57_VO_absolute_points:T=1875
+  case_id: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points
+  source_id: berkowitz-chupka-inghram-1957
+  observation_type: psat_series
+  species: VO
+  residual_dex: 1.108675850931988
+  band_dex: 0.01
+  status: mismatch
+  note: New pin after standard_state completion (pure VO(s) vs catalog Antoine). Residual is reported,
+    not tuned.
+  temperature_K: 1875.0
+  residual: -0.1429314290698832
+- key: BIC57_VO_absolute_points:T=1876
+  case_id: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points
+  source_id: berkowitz-chupka-inghram-1957
+  observation_type: psat_series
+  species: VO
+  residual_dex: 0.9748491277871426
+  band_dex: 0.01
+  status: mismatch
+  note: New pin after standard_state completion (pure VO(s) vs catalog Antoine). Residual is reported,
+    not tuned.
+  temperature_K: 1876.0
+  residual: -0.10370838747120151
+# --- tp1 fragment ---
+- key: Al_normal_boiling_point:Psat=1atm
+  case_id: nist-webbook::Al_normal_boiling_point
+  source_id: nist-webbook
+  observation_type: transition_point
+  species: Al
+  residual_unit: K
+  residual_K: -464.518421490156
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 2793.0
+  residual: -464.518421490156
+- key: Ca_normal_boiling_point:Psat=1atm
+  case_id: nist-webbook::Ca_normal_boiling_point
+  source_id: nist-webbook
+  observation_type: transition_point
+  species: Ca
+  residual_unit: K
+  residual_K: -39.21613812210671
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 1757.0
+  residual: -39.21613812210671
+- key: Cl2_normal_boiling_point:Psat=1atm
+  case_id: nist-webbook::Cl2_normal_boiling_point
+  source_id: nist-webbook
+  observation_type: transition_point
+  species: Cl2
+  residual_unit: K
+  residual_K: 1.087733277886798
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 239.5
+  residual: 1.087733277886798
+- key: Cr_normal_boiling_point:Psat=1atm
+  case_id: janaf-4th::Cr_normal_boiling_point
+  source_id: janaf-4th
+  observation_type: transition_point
+  species: Cr
+  residual_unit: K
+  residual_K: -198.72536926059684
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 2952.078
+  residual: -198.72536926059684
+- key: Fe_normal_boiling_point:Psat=1atm
+  case_id: janaf-4th::Fe_normal_boiling_point
+  source_id: janaf-4th
+  observation_type: transition_point
+  species: Fe
+  residual_unit: K
+  residual_K: 1.149888431852105
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 3134.0
+  residual: 1.149888431852105
+- key: HF_normal_boiling_point:Psat=1atm
+  case_id: nist-webbook::HF_normal_boiling_point
+  source_id: nist-webbook
+  observation_type: transition_point
+  species: HF
+  residual_unit: K
+  residual_K: 0.34168604038626427
+  band_K: 0.05
+  status: match
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 292.7
+  residual: 0.34168604038626427
+- key: K_normal_boiling_point:Psat=1atm
+  case_id: nist-webbook::K_normal_boiling_point
+  source_id: nist-webbook
+  observation_type: transition_point
+  species: K
+  residual_unit: K
+  residual_K: -7.253949269729674
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 1037.0
+  residual: -7.253949269729674
+- key: KCl_normal_boiling_point:Psat=1atm
+  case_id: janaf-4th::KCl_normal_boiling_point
+  source_id: janaf-4th
+  observation_type: transition_point
+  species: KCl
+  residual_unit: K
+  residual_K: 0.7089512153388569
+  band_K: 0.05
+  status: match
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 1693.15
+  residual: 0.7089512153388569
+- key: Mg_normal_boiling_point:Psat=1atm
+  case_id: nist-webbook::Mg_normal_boiling_point
+  source_id: nist-webbook
+  observation_type: transition_point
+  species: Mg
+  residual_unit: K
+  residual_K: -2.3035004248990845
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 1363.0
+  residual: -2.3035004248990845
+- key: Mn_normal_boiling_point:Psat=1atm
+  case_id: janaf-4th::Mn_normal_boiling_point
+  source_id: janaf-4th
+  observation_type: transition_point
+  species: Mn
+  residual_unit: K
+  residual_K: -1.6916601452976465e-10
+  band_K: 0.05
+  status: match
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 2334.526
+  residual: -1.6916601452976465e-10
+- key: NO2_normal_boiling_point:Psat=1atm
+  case_id: nist-webbook::NO2_normal_boiling_point
+  source_id: nist-webbook
+  observation_type: transition_point
+  species: NO2
+  residual_unit: K
+  residual_K: -1.6103458955868177
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 295.08
+  residual: -1.6103458955868177
+- key: Na_normal_boiling_point:Psat=1atm
+  case_id: janaf-4th::Na_normal_boiling_point
+  source_id: janaf-4th
+  observation_type: transition_point
+  species: Na
+  residual_unit: K
+  residual_K: 23.584730718736182
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 1156.0
+  residual: 23.584730718736182
+- key: NaCl_normal_boiling_point:Psat=1atm
+  case_id: janaf-4th::NaCl_normal_boiling_point
+  source_id: janaf-4th
+  observation_type: transition_point
+  species: NaCl
+  residual_unit: K
+  residual_K: 0.2899531373195714
+  band_K: 0.05
+  status: match
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 1738.15
+  residual: 0.2899531373195714
+- key: Si_normal_boiling_point:Psat=1bar
+  case_id: janaf-4th::Si_normal_boiling_point
+  source_id: janaf-4th
+  observation_type: transition_point
+  species: Si
+  residual_unit: K
+  residual_K: -944.4304423798353
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance. Target pressure is JANAF 1 bar (extract pressure_basis),
+    not 1 atm.
+  temperature_K: 3504.616
+  residual: -944.4304423798353
+- key: Ti_normal_boiling_point:Psat=1atm
+  case_id: janaf-4th::Ti_normal_boiling_point
+  source_id: janaf-4th
+  observation_type: transition_point
+  species: Ti
+  residual_unit: K
+  residual_K: -70.806000188918
+  band_K: 0.05
+  status: mismatch
+  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
+    ±0.05 K is numerical noise, not an accuracy tolerance.
+  temperature_K: 3630.956
+  residual: -70.806000188918
+# --- std2 fragment ---
+- key: richter_2007_al_non_loss_until_mg_exhausted:ordering
+  case_id: kems-010-richter-2007::richter_2007_al_non_loss_until_mg_exhausted
+  source_id: kems-010-richter-2007
+  observation_type: rate_series
+  species: Al
+  residual_dex: 0.0
+  band_dex: 0.01
+  residual: 0.0
+  band_residual: 0.01
+  status: ordering-pass
+  note: 'Ordering pin: Al not lost until Mg exhausted; 3/3 pairwise rank constraints held over 1873–2173
+    K.'
+- key: richter_2007_ca_non_loss_until_mg_exhausted:ordering
+  case_id: kems-010-richter-2007::richter_2007_ca_non_loss_until_mg_exhausted
+  source_id: kems-010-richter-2007
+  observation_type: rate_series
+  species: Ca
+  residual_dex: 0.0
+  band_dex: 0.01
+  residual: 0.0
+  band_residual: 0.01
+  status: ordering-pass
+  note: 'Ordering pin: Ca not lost until Mg exhausted; 3/3 pairwise rank constraints held over 1873–2173
+    K.'
+- key: hashimoto_1983_cao_al2o3_residue_enrichment:ordering
+  case_id: kems-015-hashimoto-1983::hashimoto_1983_cao_al2o3_residue_enrichment
+  source_id: kems-015-hashimoto-1983
+  observation_type: rate_series
+  species: Ca
+  residual_dex: 0.0
+  band_dex: 0.01
+  residual: 0.0
+  band_residual: 0.01
+  status: ordering-pass
+  note: 'Ordering pin: CaO+Al2O3 residue enrichment; 6/6 later-than-volatile constraints held.'
+- key: hashimoto_1983_fcmas_qualitative_volatility_order:ordering
+  case_id: kems-015-hashimoto-1983::hashimoto_1983_fcmas_qualitative_volatility_order
+  source_id: kems-015-hashimoto-1983
+  observation_type: rate_series
+  species: Fe
+  residual_dex: 0.06963592814139442
+  band_dex: 0.01
+  residual: -4.0
+  band_residual: 0.01
+  status: ordering-fail
+  note: 'Ordering FINDING: Hashimoto Fe>(Mg|Si)>Ca>Al; engine held 23/27 pairwise constraints (residual
+    -4 pairs). Not tuned.'

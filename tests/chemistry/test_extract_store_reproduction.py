@@ -2,9 +2,9 @@
 
 Parameterized suite GENERATED from the extract store: for every ADOPTED
 (priority-winner) observation of type ``psat_series`` / ``rate_series`` /
-``activity_coefficient``, run the engine at the observation's own conditions
-and record reproduction residuals against the stated (or documented default)
-error budget.
+``activity_coefficient`` / ``alpha`` / ``gibbs_table`` / ``transition_point``,
+run the engine at the observation's own conditions and record reproduction
+residuals against the stated (or documented default) error budget.
 
 Follows the shape of ``test_kems_reproduction.py`` + ``test_langmuir_knudsen.py``:
 shared comparison records, typed status vocabulary, no silent pass on
@@ -32,12 +32,16 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     COMPARISON_STATUSES,
     CONDENSED_FORM_STATES,
     DEFAULT_PSAT_UNCERTAINTY,
+    DEFAULT_TRANSITION_POINT_UNCERTAINTY,
     MODEL_LIMITATIONS_PATH,
+    ORDERING_VERDICT_STATUSES,
     RAIL_COMPARABLE_SYSTEM_CLASSES,
     RAIL_INCOMPARABLE_SYSTEM_CLASSES,
     RAIL_TARGET_CONDENSED_FORM,
     ROLLUP_BEGIN,
     ROLLUP_END,
+    SCORING_STATUSES,
+    SELF_AGREEMENT_STATUS,
     TARGET_TYPES,
     AdoptedObservation,
     append_rollup_to_model_limitations,
@@ -54,11 +58,16 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     motzfeldt_available,
     observation_condensed_form_state,
     observation_form_transition_context,
+    observation_is_sossi_fegley_2018_table2,
     observation_system_class,
+    parse_ordering_claim,
+    parse_published_gamma_range,
+    self_agreement_excluded,
     rail_alpha_comparability,
     rail_condensed_form_comparability,
     rail_system_class_comparability,
     residual_dex,
+    residual_K,
     resolve_chamber_pressure_pa,
     resolve_pO2_bar,
     resolve_uncertainty,
@@ -124,7 +133,9 @@ def test_store_yields_adopted_target_type_observations(
     kems = [obs for obs in adopted_observations if obs.source_id.startswith("kems-")]
     # B1 harvest + class-tagged fence rows expanded the KEMS surface; keep the
     # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
-    assert len(kems) == 152
+    # 2026-08-26 corpus integration: Sossi remine + metadata completion added
+    # kems-source observations (kems-012 alone now carries 53 adopted rows).
+    assert len(kems) == 198
     assert len({obs.source_id for obs in kems}) == 20
     for obs in adopted_observations:
         assert obs.is_priority_winner or obs.adoption_basis == "mass_spec_extract"
@@ -152,6 +163,12 @@ def test_default_uncertainty_is_documented_per_observation() -> None:
     assert unc["kind"] == DEFAULT_PSAT_UNCERTAINTY["kind"]
     assert unc["value"] == DEFAULT_PSAT_UNCERTAINTY["value"]
     assert "rationale" in unc
+
+    tp_unc = resolve_uncertainty(_Stub(), kind_hint="transition_point")  # type: ignore[arg-type]
+    assert tp_unc["defaulted"] is True
+    assert tp_unc["kind"] == "absolute"
+    assert tp_unc["value"] == DEFAULT_TRANSITION_POINT_UNCERTAINTY["value"]
+    assert tp_unc["kind"] != "log10_decades"
 
 
 def test_engine_refusal_never_silent_pass_and_never_bare_failure() -> None:
@@ -872,9 +889,10 @@ def test_adopted_observation_reproduction(
     widen the budget. Engine refusals and non-numeric payloads skip with a
     typed reason — never a silent pass.
 
-    Comparable points additionally pin residual_dex against the checked-in
-    baseline: a residual that moves outside its band is RED (regression);
-    a residual that stays put keeps reporting FINDING.
+    Comparable points additionally pin residual_dex (or residual_K for
+    transition_point) against the checked-in baseline: a residual that
+    moves outside its band is RED (regression); a residual that stays put
+    keeps reporting FINDING.
     """
 
     if obs is None:
@@ -890,11 +908,14 @@ def test_adopted_observation_reproduction(
 
     mismatches = [r for r in evaluation.records if r.status == "mismatch"]
     matches = [r for r in evaluation.records if r.status == "match"]
-    comparable = mismatches + matches
+    ordering_scored = [
+        r for r in evaluation.records if r.status in {"ordering-pass", "ordering-fail"}
+    ]
+    comparable = mismatches + matches + ordering_scored
 
     if comparable:
         # FINDING text required for every mismatch (residual IS the result).
-        if mismatches:
+        if mismatches or any(r.status == "ordering-fail" for r in comparable):
             assert evaluation.findings, (
                 f"{obs.param_id()}: mismatch without FINDING text "
                 f"(statuses={[r.status for r in evaluation.records]})"
@@ -921,7 +942,42 @@ def test_adopted_observation_reproduction(
                 f"(residual_dex={residual_dex(record)!r}, residual={record.residual!r})"
             )
             pin = by_key[key]
-            measured = residual_dex(record)
+            assert pin.get("status", record.status) == record.status, (
+                f"{key}: live status {record.status!r} != pin status {pin.get('status')!r}"
+            )
+            if str(pin.get("residual_unit") or "") == "K":
+                measured_K = residual_K(record)
+                assert measured_K is not None, (
+                    f"{key}: residual_K is None (expected={record.expected_value}, "
+                    f"actual={record.actual_value}, units={record.units})"
+                )
+                expected_K = float(pin["residual_K"])
+                band_K = float(pin["band_K"])
+                assert abs(measured_K - expected_K) <= band_K, (
+                    f"RESIDUAL REGRESSION {key}: residual_K moved "
+                    f"measured={measured_K:.6g} pin={expected_K:.6g} "
+                    f"band=±{band_K:g} K (Δ={abs(measured_K - expected_K):.6g}). "
+                    f"actual={record.actual_value} expected_lit={record.expected_value} "
+                    f"residual={record.residual}. The residual IS the result — if the "
+                    f"engine changed honestly, update the pin with a mechanism comment; "
+                    f"do not widen band_K to hide the move."
+                )
+                continue
+            if record.status in {"ordering-pass", "ordering-fail"}:
+                # Ordering pins the pair-count residual (0 ⇒ pass). residual_dex
+                # is defined only when both sides are positive.
+                if pin.get("residual") is not None and record.residual is not None:
+                    band_r = float(pin.get("band_residual") or pin.get("band_dex") or 0.01)
+                    assert abs(record.residual - float(pin["residual"])) <= band_r, (
+                        f"RESIDUAL REGRESSION {key}: ordering residual moved "
+                        f"measured={record.residual} pin={pin['residual']} "
+                        f"band=±{band_r}"
+                    )
+                measured = residual_dex(record)
+                if measured is None:
+                    continue
+            else:
+                measured = residual_dex(record)
             assert measured is not None, (
                 f"{key}: residual_dex is None (expected={record.expected_value}, "
                 f"actual={record.actual_value})"
@@ -967,10 +1023,10 @@ def test_pinned_residuals_cover_all_live_comparable_points(
         _record_pin_key(r)
         for ev in battery_evaluations
         for r in ev.records
-        if r.status in {"match", "mismatch"}
+        if r.status in SCORING_STATUSES
     }
     assert len(live_keys) == sum(
-        r.status in {"match", "mismatch"}
+        r.status in SCORING_STATUSES
         for ev in battery_evaluations
         for r in ev.records
     ), "duplicate live residual identity"
@@ -1009,7 +1065,10 @@ def test_measured_rate_series_executes_hkl(monkeypatch) -> None:
     assert len(calls) == 4
     assert not comparable
     assert {r.status for r in evaluation.records} == {"assumed-input"}
-    assert evaluation.skip_reason == "typed-refusal:missing_condition:melt_composition"
+    # 2026-08-26: metadata completion supplied this row's melt composition, so
+    # the refusal ladder progressed to the NEXT missing condition — the same
+    # pO2 gap that blocks the DeMaria psat series. Still correctly refused.
+    assert evaluation.skip_reason == "typed-refusal:missing_condition:pO2_boundary"
     assert "typed-refusal:missing_condition:pO2_boundary" in evaluation.skip_reasons
     assert all(r.observable_id.endswith(":rate") for r in evaluation.records)
 
@@ -1237,6 +1296,90 @@ def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     assert evaluation.skip_reasons == [skip_reason]
 
 
+def test_transition_point_is_an_adopted_target_type(
+    adopted_observations: list[AdoptedObservation],
+) -> None:
+    assert "transition_point" in TARGET_TYPES
+    rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"]
+    assert len(rows) == 64
+    assert all(obs.is_priority_winner for obs in rows)
+    kinds = {str(obs.values.get("property_kind")) for obs in rows}
+    assert "normal_boiling_point" in kinds
+    assert "melting_point" in kinds
+
+
+def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
+    vapor_pressure_data,
+) -> None:
+    obs = next(
+        row
+        for row in load_adopted_observations()
+        if row.observation_id == "Na_melting_point"
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
+    assert evaluation.skip_reason == "typed-refusal:no_engine_melting_point_model"
+    assert evaluation.records
+    assert all(r.status != "match" for r in evaluation.records)
+    assert all(r.actual_value is None for r in evaluation.records)
+
+
+def test_normal_boiling_point_inverts_antoine_in_kelvin(
+    vapor_pressure_data,
+) -> None:
+    obs = next(
+        row
+        for row in load_adopted_observations()
+        if row.observation_id == "Na_normal_boiling_point"
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
+    comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
+    assert comparable, evaluation.skip_reason
+    record = comparable[0]
+    assert record.units == "K"
+    assert residual_dex(record) is None
+    assert residual_K(record) is not None
+    # Sanity: Na NIST 1156 K vs sidecar inversion ~1179.58 K (short
+    # extrapolation past the 924–1118 K certified window).
+    assert record.expected_value == pytest.approx(1156.0)
+    assert record.actual_value == pytest.approx(1179.584731, abs=1e-4)
+    assert record.residual == pytest.approx(23.584731, abs=1e-4)
+
+
+def test_silicate_melt_class_does_not_pin_a_pure_component_nbp(
+    vapor_pressure_data,
+) -> None:
+    """Class gate is not weakened: a silicate-melt row is the wrong carrier."""
+
+    obs = AdoptedObservation(
+        species_id="Na",
+        source_id="fixture-source",
+        observation_id="fixture_nbp",
+        obs_type="transition_point",
+        review_status="draft",
+        phase="silicate melt",
+        regime=None,
+        standard_state=None,
+        T_range_K=None,
+        units="K",
+        uncertainty=None,
+        locator={"note": "fixture"},
+        values={
+            "property_kind": "normal_boiling_point",
+            "value_K": 1156.0,
+            "system_class": "silicate_melt",
+            "pressure_basis_Pa": 101325,
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
+    assert evaluation.skip_reason is not None
+    assert "not_comparable_system_class:silicate_melt" in evaluation.skip_reason
+    assert all(r.status not in {"match", "mismatch"} for r in evaluation.records)
+
+
 def test_battery_rollup_matches_committed_model_limitations(
     battery_evaluations,
     adopted_observations: list[AdoptedObservation],
@@ -1370,12 +1513,16 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # qualitative rate bounds add rows without numeric residuals; Sossi Na
     # analytical ceilings remove four comparable points. Counts are live
     # battery, not hand-estimated.
-    assert coverage["observations"] == len(adopted_observations) == 189
-    assert coverage["comparable"] == 19
-    assert coverage["skipped"] == 170
+    # 2026-08-26 corpus integration: five worker slices merged (DeMaria pO2,
+    # Sossi remine, metadata completion, transition_point, observable paths)
+    # plus the DOI-keyed self-agreement guard. Numbers are the LIVE merged
+    # battery, measured after the merge — neither worker's own pinned view.
+    assert coverage["observations"] == len(adopted_observations) == 299
+    assert coverage["comparable"] == 42
+    assert coverage["skipped"] == 257
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 52
-    assert coverage["gap_points"] == 242
+    assert coverage["comparable_points"] == 90
+    assert coverage["gap_points"] == 302
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1397,23 +1544,29 @@ def test_coverage_ledger_is_observation_first_and_exact(
         )
         for key, row in by_type.items()
     } == {
-        "activity_coefficient": (49, 0, 49, 0),
+        "activity_coefficient": (75, 1, 74, 1),
         "alpha": (60, 16, 44, 40),
-        "gibbs_table": (12, 0, 12, 0),
-        "psat_series": (19, 0, 19, 0),
-        "rate_series": (49, 3, 46, 12),
+        "gibbs_table": (24, 0, 24, 0),
+        "psat_series": (19, 3, 16, 18),
+        "rate_series": (57, 7, 50, 16),
+        "transition_point": (64, 15, 49, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
         key: (row["observations"], row["comparable"], row["comparable_points"])
         for key, row in by_family.items()
     } == {
-        "activity_coefficient": (49, 0, 0),
+        "activity_coefficient": (52, 1, 1),
+        "activity_self_agreement": (9, 0, 0),
         "alpha": (60, 16, 40),
         "alpha_in_legacy_rate_series": (3, 3, 12),
-        "gibbs_table": (12, 0, 0),
-        "psat_series": (19, 0, 0),
-        "rate_hkl": (46, 0, 0),
+        "gibbs_table": (24, 0, 0),
+        "ordering_activity": (14, 0, 0),
+        "ordering_bound": (17, 4, 4),
+        "psat_series": (19, 3, 18),
+        "rate_hkl": (36, 0, 0),
+        "relative_volatility": (1, 0, 0),
+        "transition_point": (64, 15, 15),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations
@@ -1425,3 +1578,191 @@ def test_coverage_ledger_is_observation_first_and_exact(
 
 def test_model_limitations_path_constant_matches_repo_doc() -> None:
     assert MODEL_LIMITATIONS_PATH.resolve() == MODEL_LIMITATIONS.resolve()
+
+
+def test_published_gamma_range_parser_handles_latex_and_refuses_smashed_ocr() -> None:
+    assert parse_published_gamma_range("0.28–0.37") == pytest.approx((0.28, 0.37))
+    assert parse_published_gamma_range("0.02") == pytest.approx((0.02, 0.02))
+    lo, hi = parse_published_gamma_range(r"$6.3 \times 10^{-5}$ – $7.1 \times 10^{-4}$")
+    assert lo == pytest.approx(6.3e-5)
+    assert hi == pytest.approx(7.1e-4)
+    lo, hi = parse_published_gamma_range(r"$10^{-6}$ – $10^{-10}$")
+    assert {lo, hi} == {1e-6, 1e-10}
+    assert parse_published_gamma_range("1.2–20.80.3–5.20.05–1.65") is None
+
+
+def test_self_agreement_is_keyed_on_table2_provenance_not_species_name() -> None:
+    from simulator.chemistry.melt_activity import MELT_OXIDE_ACTIVITY_COEFFICIENTS
+
+    table2 = AdoptedObservation(
+        species_id="SiO2",
+        source_id="kems-041-sossi-fegley-2018",
+        observation_id="sossi_fegley_2018_table2_gamma_SiO2__SiO_2_",
+        obs_type="activity_coefficient",
+        review_status="draft",
+        phase="complex_silicate_melt",
+        regime="compiled_melt_activity",
+        standard_state=None,
+        T_range_K=(1573.0, 1773.0),
+        units="dimensionless",
+        uncertainty=None,
+        locator={"table": "2"},
+        values={"gamma_range_as_published": "0.9–1.1"},
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="fixture",
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+    sio2 = MELT_OXIDE_ACTIVITY_COEFFICIENTS["SiO2"]
+    assert observation_is_sossi_fegley_2018_table2(table2)
+    assert self_agreement_excluded(table2, sio2.citation)
+    na2o = MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"]
+    assert not self_agreement_excluded(table2, na2o.citation)
+
+
+def test_gamma_range_path_self_agreement_is_computed_and_never_scored() -> None:
+    obs = AdoptedObservation(
+        species_id="SiO2",
+        source_id="kems-041-sossi-fegley-2018",
+        observation_id="sossi_fegley_2018_table2_gamma_SiO2__SiO_2_",
+        obs_type="activity_coefficient",
+        review_status="draft",
+        phase="complex_silicate_melt_CMAS",
+        regime="compiled_melt_activity",
+        standard_state=None,
+        T_range_K=(1573.0, 1773.0),
+        units="dimensionless",
+        uncertainty=None,
+        locator={"table": "2"},
+        values={
+            "quantity": "activity_coefficient_range",
+            "oxide_formula_as_published": r"$SiO_2$",
+            "gamma_range_as_published": "0.9–1.1",
+            "system_class": "silicate_melt",
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="fixture",
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.records
+    record = evaluation.records[0]
+    assert record.status == SELF_AGREEMENT_STATUS
+    assert record.expected_value is not None
+    assert record.actual_value == pytest.approx(1.0)
+    assert record.status not in SCORING_STATUSES
+    assert evaluation.skip_reason == "typed-refusal:self_agreement_excluded"
+
+
+def test_ordering_bound_emits_declared_verdict() -> None:
+    obs = AdoptedObservation(
+        species_id="Al",
+        source_id="fixture-ordering",
+        observation_id="al_not_lost_until_mg",
+        obs_type="rate_series",
+        review_status="draft",
+        phase="silicate_melt",
+        regime="langmuir_free_evaporation",
+        standard_state=None,
+        T_range_K=(1873.15, 2173.15),
+        units="qualitative bound",
+        uncertainty=None,
+        locator={"note": "fixture"},
+        values={
+            "quantity": "qualitative_non_loss_bound",
+            "system_class": "silicate_melt",
+            "semantics": "bound_not_point_ordering",
+            "component": "Al",
+            "comparison_component": "Mg",
+            "bound": "no_significant_loss_until_Mg_virtually_exhausted",
+            "composition_wt_pct": {
+                "SiO2": 45.0,
+                "MgO": 10.0,
+                "Al2O3": 15.0,
+                "CaO": 12.0,
+                "FeO": 18.0,
+            },
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="fixture",
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+    claim = parse_ordering_claim(obs)
+    assert claim is not None
+    assert claim["kind"] == "later_than"
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.records
+    record = evaluation.records[0]
+    assert record.status in ORDERING_VERDICT_STATUSES | {"out-of-domain"}
+    assert record.status != "unsupported-observable"
+
+
+def test_published_cro_is_not_cr2o3_self_agreement() -> None:
+    """CrO (Cr2+) is a different oxide from the engine's Cr2O3/CrO1.5 coefficient."""
+
+    obs = AdoptedObservation(
+        species_id="Cr",
+        source_id="kems-041-sossi-fegley-2018",
+        observation_id="sossi_fegley_2018_table2_gamma_Cr_CrO",
+        obs_type="activity_coefficient",
+        review_status="draft",
+        phase="complex_silicate_melt_CAS",
+        regime="compiled_melt_activity",
+        standard_state=None,
+        T_range_K=(1773.0, 1773.0),
+        units="dimensionless",
+        uncertainty=None,
+        locator={"table": "2"},
+        values={
+            "quantity": "activity_coefficient_range",
+            "oxide_formula_as_published": "CrO",
+            "gamma_range_as_published": "1.9–7.2",
+            "system_class": "silicate_melt",
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="fixture",
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.records[0].status != SELF_AGREEMENT_STATUS
+    assert evaluation.skip_reason == (
+        "typed-refusal:missing_capability:melt_activity_gamma:CrO"
+    )
+
+
+def test_clausing_payload_is_geometry_not_a_rate() -> None:
+    obs = AdoptedObservation(
+        species_id="Fe",
+        source_id="fixture-clausing",
+        observation_id="clausing_table",
+        obs_type="rate_series",
+        review_status="draft",
+        phase="method_monograph",
+        regime="kems_effusion",
+        standard_state=None,
+        T_range_K=(300.0, 300.0),
+        units="dimensionless",
+        uncertainty=None,
+        locator={"table": "I"},
+        values={
+            "quantity": "clausing_factor_table",
+            "points": [{"L_over_r": 1.0, "clausing_factor": 0.672}],
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="fixture",
+    )
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.skip_reason == (
+        "typed-refusal:unsupported_observable:clausing_factor_not_species_rate"
+    )
+    assert evaluation.records
+    assert evaluation.records[0].status == "unsupported-observable"

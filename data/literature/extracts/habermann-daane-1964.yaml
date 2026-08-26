@@ -57,7 +57,12 @@ species:
       - 623
       - 931
       phase: solid_sublimation
-      standard_state: null
+      standard_state: pure Yb(s) Knudsen-effusion sublimation (Habermann & Daane 1964 / Habermann 1963 thesis eq. 34); pure-component condensed metal, not a rail carrier
+      condensed_form:
+        state: crystalline
+        metastable: false
+        basis: explicit_author
+        note: Solid-branch sublimation 623–931 K (Habermann thesis Fig. 15 caption). Locator docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md Hab64_Yb_metal_antoine.
       units: log10(P_mmHg) = A − B/T_K
       uncertainty:
         mid_range_Delta_sub_H_uncertainty_kcal_mol: 0.15

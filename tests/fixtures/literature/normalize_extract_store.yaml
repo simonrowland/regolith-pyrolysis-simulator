@@ -1,0 +1,283 @@
+schema_version: literature_extract.v1
+source_id: normalize_extract_store
+source:
+  citation: Fixture for tools/normalize_extract_store.py self-test (not literature)
+extraction:
+  method: unit_test
+  date: '2026-08-26'
+  worker: std1-standardize
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[fe_alpha_pin].values.alpha
+  value: 0.24
+  note: numeric alpha must survive unit-adjacent rewrites
+  locator:
+    note: fixture
+species:
+  AL:
+    observations:
+    - observation_id: cea_AL_gibbs
+      type: gibbs_table
+      locator:
+        record: AL
+      phase: gas
+      standard_state: CEA/JANAF P°=100000.0 Pa; phase_flag=0
+      units: J/mol
+      values:
+        cea_name: AL
+        formula: Al
+        delta_f_H_298_15_J_per_mol: 330000.0
+  CO:
+    observations:
+    - observation_id: cea_CO_gibbs
+      type: gibbs_table
+      locator:
+        record: CO
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: CO
+        formula: CO
+  Co:
+    observations:
+    - observation_id: cea_Co_gibbs
+      type: gibbs_table
+      locator:
+        record: Co
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: Co
+        formula: Co
+  BI:
+    observations:
+    - observation_id: cea_BI_gibbs
+      type: gibbs_table
+      locator:
+        record: BI
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: BI
+        formula: BI
+  AL2O3:
+    observations:
+    - observation_id: cea_AL2O3_gibbs
+      type: gibbs_table
+      locator:
+        record: AL2O3
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: AL2O3
+        formula: Al2O3
+  AL2O3_L:
+    observations:
+    - observation_id: cea_AL2O3_L_gibbs
+      type: gibbs_table
+      locator:
+        record: AL2O3(L)
+      phase: condensed_liquid
+      standard_state: phase_flag=3
+      units: J/mol
+      values:
+        cea_name: AL2O3(L)
+        formula: Al2O3
+  Li2CL2:
+    observations:
+    - observation_id: cea_Li2CL2_gibbs
+      type: gibbs_table
+      locator:
+        record: Li2CL2
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: Li2CL2
+        formula: Li2Cl2
+        molecular_weight_g_per_mol: 84.788
+  HF:
+    observations:
+    - observation_id: cea_HF_gibbs
+      type: gibbs_table
+      locator:
+        record: HF
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: HF
+        formula: HF
+        molecular_weight_g_per_mol: 20.0063432
+  SN:
+    observations:
+    - observation_id: cea_SN_gibbs
+      type: gibbs_table
+      locator:
+        record: SN
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: SN
+        formula: SN
+        molecular_weight_g_per_mol: 46.0717
+  Sn:
+    observations:
+    - observation_id: cea_Sn_gibbs
+      type: gibbs_table
+      locator:
+        record: Sn
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: Sn
+        formula: Sn
+        molecular_weight_g_per_mol: 118.71
+  ALOH:
+    observations:
+    - observation_id: cea_ALOH_gibbs
+      type: gibbs_table
+      locator:
+        record: ALOH
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: ALOH
+        formula: AlOH
+        molecular_weight_g_per_mol: 43.988878
+  HALO:
+    observations:
+    - observation_id: cea_HALO_gibbs
+      type: gibbs_table
+      locator:
+        record: HALO
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: HALO
+        formula: AlOH
+        molecular_weight_g_per_mol: 43.988878
+  'C3H7,i-propyl':
+    observations:
+    - observation_id: cea_C3H7_i_gibbs
+      type: gibbs_table
+      locator:
+        record: C3H7,i-propyl
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: C3H7,i-propyl
+        formula: C3H7
+        molecular_weight_g_per_mol: 43.08768
+  'C3H7,n-propyl':
+    observations:
+    - observation_id: cea_C3H7_n_gibbs
+      type: gibbs_table
+      locator:
+        record: C3H7,n-propyl
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: C3H7,n-propyl
+        formula: C3H7
+        molecular_weight_g_per_mol: 43.08768
+  SiO2_b-crt:
+    observations:
+    - observation_id: cea_SiO2_bcrt
+      type: gibbs_table
+      locator:
+        record: SiO2(b-crt)
+      phase: condensed
+      standard_state: phase_flag=1
+      units: J/mol
+      values:
+        cea_name: SiO2(b-crt)
+        formula: SiO2
+        molecular_weight_g_per_mol: 60.0843
+  SiO2_b-qz:
+    observations:
+    - observation_id: cea_SiO2_bqz
+      type: gibbs_table
+      locator:
+        record: SiO2(b-qz)
+      phase: condensed
+      standard_state: phase_flag=1
+      units: J/mol
+      values:
+        cea_name: SiO2(b-qz)
+        formula: SiO2
+        molecular_weight_g_per_mol: 60.0843
+  CH2OH:
+    observations:
+    - observation_id: cea_CH2OH
+      type: gibbs_table
+      locator:
+        record: CH2OH
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: CH2OH
+        formula: CH3O
+        molecular_weight_g_per_mol: 31.03392
+  CH3O:
+    observations:
+    - observation_id: cea_CH3O
+      type: gibbs_table
+      locator:
+        record: CH3O
+      phase: gas
+      standard_state: phase_flag=0
+      units: J/mol
+      values:
+        cea_name: CH3O
+        formula: CH3O
+        molecular_weight_g_per_mol: 31.03392
+  Fe:
+    observations:
+    - observation_id: fe_alpha_pin
+      type: alpha
+      locator:
+        table: '1'
+      T_range_K:
+      - 1700.0
+      - 1700.0
+      phase: liquid
+      units: dimensionless
+      values:
+        alpha: 0.24
+        T_C: 1426.85
+        gas_species: Fe(g)
+    - observation_id: fe_activity_simple_range
+      type: activity_coefficient
+      locator:
+        table: '2'
+      units: dimensionless
+      values:
+        gamma_range_as_published: 0.28–0.37
+    - observation_id: fe_activity_complex_range
+      type: activity_coefficient
+      locator:
+        table: '2'
+      units: dimensionless
+      values:
+        gamma_range_as_published: a $10^{-3}$ b $8.4 \times 10^{-4}$ –2.2 × $10^{-3}$
+    - observation_id: fe_psat_atm_only
+      type: psat_series
+      locator:
+        table: '3'
+      units: atm
+      values:
+        points:
+        - T_K: 1396.0
+          p_atm: 5.54e-09

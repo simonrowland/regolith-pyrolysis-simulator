@@ -326,7 +326,10 @@ species:
   Na:
     # 2026-08-11: demoted T3 -> T2 when the non-measurement Sossi
     # mass_spec residual pin was withdrawn. VapoRock external evidence remains.
-    tier: T2
+    # 2026-08-26: re-promoted T2 -> T3 on DeMaria 1971 KEMS lunar-basalt Na
+    # psat with Table 1 co-measured p(O2). The Sossi gamma / alpha_e=1
+    # withdrawal is a different measurement and STAYS withdrawn.
+    tier: T3
     target_tier: T4
     validations:
       vaporock:
@@ -342,11 +345,27 @@ species:
           - validation-data/pin-evidence/na_vaporock_lh_liquid_2026-08-08.yaml
         internal_notes_refs:
           - docs-private/research/2026-08-08-t383-build/report.md
-      # mass_spec withdrawn 2026-08-11 (evidence recovery): the surviving
-      # Sossi Na records are a disagreeing gamma-derived 0.3-1.7 inference and
-      # a separately adopted physical/analytical ceiling alpha_e <= 1. Neither
-      # is a measured coefficient eligible for a residual pin. They remain
-      # visible as typed non-comparable/status-bearing evidence. See
+      mass_spec:
+        # DeMaria 1971 KEMS Na(g) partial-pressure series over Apollo 12
+        # lunar basalt 12022/12065. pO2 recovered from the companion Table 1
+        # O2 series on the same extract (unit conversion atm→bar only).
+        # Class = silicate_melt. Form is untyped on the extract (paper does
+        # not tabulate solidus/liquidus); the psat path does not apply the
+        # α form gate. Residual IS the result: max 2.043550129219774 dex at
+        # 12065 T=1324.5 K. Not tuned. Sossi 2019 Na withdrawal 2026-08-11
+        # (gamma-derived inference + alpha_e=1 analytical ceiling) is a
+        # different measurement and remains withdrawn.
+        pinned_residual_dex: 2.043550129219774
+        evidence_refs:
+          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
+          - docs/model-limitations.md#extract-store-reproduction-battery
+        internal_notes_refs:
+          - docs-private/research/2026-08-26-demaria-po2/findings.md
+      # Sossi mass_spec remains withdrawn 2026-08-11 (evidence recovery): the
+      # surviving Sossi Na records are a disagreeing gamma-derived 0.3-1.7
+      # inference and a separately adopted physical/analytical ceiling
+      # alpha_e <= 1. Neither is a measured coefficient. They remain visible
+      # as typed non-comparable/status-bearing evidence. See
       # validation-data/pin-evidence/na_mass_spec_analytical_ceiling_withdrawal_2026-08-11.yaml
   Na2:
     tier: T1

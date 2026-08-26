@@ -307,21 +307,22 @@ the individual factors, which is what KEMS activity data and evaporation-coeffic
 
 Generated from production priority-winner observations plus every KEMS
 extract observation of type `psat_series` / `rate_series` /
-`activity_coefficient` / `alpha`. Residuals
+`activity_coefficient` / `alpha` / `gibbs_table` / `transition_point`. Residuals
 are the deliverable (doctrine: *Headline accuracy is the product*).
 Engine refusals surface as typed skips; mismatches are FINDINGs —
 tolerances are **not** widened to pass. Geometry: tools/motzfeldt.py available; geometry inversion is used only with complete numeric inputs, otherwise a typed capability/data gap is reported.
 
-Observations: **189 total / 19 comparable / 170 skipped**. Comparable residual points: **52**; explicit gap records: **242**. Extrapolated-alpha FINDINGs: **13**.
+Observations: **299 total / 42 comparable / 257 skipped**. Comparable residual points: **90**; explicit gap records: **302**. Extrapolated-alpha FINDINGs: **21**.
 
-- In-scope observations evaluated: **189**
-- Comparable observations: **19**
-- Skipped observations with typed reasons: **170**
-- Species with FINDING (mismatch outside stated/default budget): **4**
+- In-scope observations evaluated: **299**
+- Comparable observations: **42**
+- Skipped observations with typed reasons: **257**
+- Species with FINDING (mismatch outside stated/default budget): **13**
 
 | Species | Types | N pts | Match | Mismatch | Skip/gap | Max residual (dex) | Mean residual (dex) | Classification |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| Al | activity_coefficient,rate_series | 4 | 0 | 0 | 4 | — | — | engine-or-payload-skip |
+| Ag | activity_coefficient | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
+| Al | activity_coefficient,rate_series,transition_point | 7 | 1 | 1 | 5 | — | — | FINDING-mismatch |
 | Al2O | psat_series | 14 | 0 | 0 | 14 | — | — | engine-or-payload-skip |
 | Al2O3 | alpha | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | AlO | gibbs_table,psat_series | 6 | 0 | 0 | 6 | — | — | engine-or-payload-skip |
@@ -329,66 +330,119 @@ Observations: **189 total / 19 comparable / 170 skipped**. Comparable residual p
 | As4O6 | activity_coefficient,psat_series | 7 | 0 | 0 | 7 | — | — | engine-or-payload-skip |
 | BaO | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Bi | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Ca | activity_coefficient,gibbs_table,rate_series | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
+| Br2 | transition_point | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| CH4 | transition_point | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| CO | transition_point | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
+| CO2 | transition_point | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Ca | activity_coefficient,gibbs_table,rate_series,transition_point | 8 | 2 | 1 | 5 | — | — | FINDING-mismatch |
 | CaO | gibbs_table,rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Cd | activity_coefficient | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
+| Cl2 | transition_point | 2 | 0 | 1 | 1 | — | — | FINDING-mismatch |
 | Co | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Cr | activity_coefficient,alpha,psat_series,rate_series | 8 | 0 | 0 | 8 | — | — | engine-or-payload-skip |
+| Cr | activity_coefficient,alpha,gibbs_table,psat_series,rate_series,transition_point | 11 | 0 | 1 | 10 | — | — | FINDING-mismatch |
 | Cs2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Cu | activity_coefficient,alpha,rate_series | 6 | 0 | 0 | 6 | — | — | engine-or-payload-skip |
+| Cu | activity_coefficient,alpha,gibbs_table,rate_series | 8 | 0 | 0 | 8 | — | — | engine-or-payload-skip |
 | Eu_metal_and_EuO | activity_coefficient | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
-| Fe | activity_coefficient,alpha,gibbs_table,rate_series | 36 | 0 | 13 | 23 | 1.1 | 1.07 | FINDING-mismatch |
+| Fe | activity_coefficient,alpha,gibbs_table,rate_series,transition_point | 38 | 0 | 15 | 23 | 1.1 | 1.07 | FINDING-mismatch |
+| Ga | activity_coefficient,gibbs_table | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
 | Ga2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Ge | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Gd | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Ge | activity_coefficient,gibbs_table | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | GeO2 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| H2O | transition_point | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| H2S | transition_point | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| HCHO | transition_point | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| HCl | transition_point | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| HF | transition_point | 2 | 1 | 0 | 1 | — | — | within-budget |
 | In | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| K | activity_coefficient,alpha,gibbs_table,rate_series | 7 | 1 | 1 | 5 | 0.886 | 0.886 | FINDING-mismatch |
+| K | activity_coefficient,alpha,gibbs_table,rate_series,transition_point | 12 | 1 | 3 | 8 | 0.886 | 0.857 | FINDING-mismatch |
+| KCl | transition_point | 2 | 1 | 0 | 1 | — | — | within-budget |
+| La | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Li | activity_coefficient,gibbs_table | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | Li2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Mg | activity_coefficient,alpha,psat_series,rate_series | 36 | 8 | 9 | 19 | 0.52 | 0.168 | FINDING-mismatch |
+| Mg | activity_coefficient,alpha,psat_series,rate_series,transition_point | 39 | 8 | 10 | 21 | 0.52 | 0.168 | FINDING-mismatch |
+| MgCl2 | transition_point | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | MgO | alpha,gibbs_table,psat_series,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
-| Mn | activity_coefficient,alpha,psat_series,rate_series | 10 | 0 | 0 | 10 | — | — | engine-or-payload-skip |
+| Mn | activity_coefficient,alpha,gibbs_table,psat_series,rate_series,transition_point | 13 | 1 | 0 | 12 | — | — | within-budget |
+| Mo | activity_coefficient,gibbs_table | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
 | MoO2 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | MoO3 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Na | activity_coefficient,alpha,gibbs_table,psat_series,rate_series | 27 | 0 | 0 | 27 | — | — | engine-or-payload-skip |
-| NaF | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| N2 | transition_point | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| NH3 | transition_point | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| NO2 | transition_point | 2 | 0 | 1 | 1 | — | — | FINDING-mismatch |
+| Na | activity_coefficient,alpha,gibbs_table,psat_series,rate_series,transition_point | 31 | 2 | 15 | 14 | 2.04 | 0.905 | FINDING-mismatch |
+| NaCl | transition_point | 2 | 1 | 0 | 1 | — | — | within-budget |
+| NaF | psat_series,transition_point | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | Ni | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | O | psat_series | 13 | 0 | 0 | 13 | — | — | engine-or-payload-skip |
-| O2 | psat_series | 7 | 0 | 0 | 7 | — | — | engine-or-payload-skip |
+| O2 | psat_series,transition_point | 10 | 0 | 0 | 10 | — | — | engine-or-payload-skip |
 | P | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | P4O10 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Pb | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Pb | activity_coefficient,gibbs_table,transition_point | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
+| Rb | activity_coefficient,gibbs_table | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
 | Rb2O | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | S | alpha,rate_series | 4 | 0 | 0 | 4 | — | — | engine-or-payload-skip |
 | S2 | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| SO2 | transition_point | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
 | SO3 | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Sb4O6 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Sc | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Se_n_ladder | psat_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
-| Si | alpha,rate_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| Si | alpha,rate_series,transition_point | 5 | 0 | 1 | 4 | — | — | FINDING-mismatch |
 | SiO | alpha,rate_series | 45 | 7 | 13 | 25 | 0.41 | 0.233 | FINDING-mismatch |
 | SiO2 | activity_coefficient,alpha,gibbs_table | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
 | Sn | activity_coefficient,alpha,rate_series | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
 | SrO | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| Ti | psat_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Ti | psat_series,rate_series,transition_point | 5 | 0 | 1 | 4 | — | — | FINDING-mismatch |
 | TiO | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | TiO2 | activity_coefficient,rate_series | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
-| V | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
-| VO_VO2 | activity_coefficient,psat_series | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| V | activity_coefficient,rate_series | 2 | 0 | 0 | 2 | — | — | engine-or-payload-skip |
+| VO_VO2 | activity_coefficient,psat_series | 3 | 0 | 2 | 1 | 1.11 | 1.04 | FINDING-mismatch |
 | WO2 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | WO3 | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Yb | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 | Yb_metal_and_YbO | activity_coefficient,psat_series | 5 | 0 | 0 | 5 | — | — | engine-or-payload-skip |
-| Zn | activity_coefficient | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
+| Zn | activity_coefficient,gibbs_table | 3 | 0 | 0 | 3 | — | — | engine-or-payload-skip |
+| Zr | rate_series | 1 | 0 | 0 | 1 | — | — | engine-or-payload-skip |
 
 **Typed observation skips (roadmap, one primary reason per skipped observation):**
 
 - `typed-refusal:analytical_upper_bound_not_measurement`: **3**
-- `typed-refusal:form_unresolved`: **7**
-- `typed-refusal:gibbs_table_not_runtime_observable`: **9**
+- `typed-refusal:form_unresolved`: **9**
+- `typed-refusal:gibbs_table_not_runtime_observable`: **20**
 - `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO`: **2**
+- `typed-refusal:missing_capability:gas_speciation_ladder`: **14**
+- `typed-refusal:missing_capability:melt_activity_gamma:AgO0.5`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:AsO1.5`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:BiO1.5`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:CdO`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:CoO`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:CrO`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:CuO0.5`: **2**
+- `typed-refusal:missing_capability:melt_activity_gamma:FeO`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:GeO`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:GeO2`: **2**
+- `typed-refusal:missing_capability:melt_activity_gamma:InO1.5`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:LiO0.5`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:MoO2`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:MoO3`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:NiO`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:PbO`: **2**
+- `typed-refusal:missing_capability:melt_activity_gamma:RbO0.5`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:SnO`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:WO3`: **1**
+- `typed-refusal:missing_capability:melt_activity_gamma:ZnO`: **2**
 - `typed-refusal:missing_condition:melt_composition`: **1**
-- `typed-refusal:missing_condition:pO2_boundary`: **9**
-- `typed-refusal:missing_condition:standard_state_boundary`: **5**
-- `typed-refusal:missing_numeric_activity`: **36**
-- `typed-refusal:missing_numeric_species_rate`: **25**
-- `typed-refusal:missing_numeric_species_rate:qualitative_bound`: **17**
+- `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant`: **9**
+- `typed-refusal:missing_condition:pO2_boundary`: **8**
+- `typed-refusal:missing_numeric_activity`: **4**
+- `typed-refusal:missing_numeric_activity:unparseable_gamma_range`: **2**
+- `typed-refusal:missing_numeric_species_rate`: **5**
+- `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux`: **18**
+- `typed-refusal:no_engine_melting_point_model`: **27**
+- `typed-refusal:no_engine_solid_solid_transition_model`: **1**
+- `typed-refusal:no_engine_triple_point_model`: **14**
+- `typed-refusal:no_pure_component_saturation_curve`: **7**
 - `typed-refusal:no_usable_rate_series_payload`: **2**
 - `typed-refusal:not_comparable_condensed_form:crystalline`: **7**
 - `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition`: **1**
@@ -399,126 +453,163 @@ Observations: **189 total / 19 comparable / 170 skipped**. Comparable residual p
 - `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline`: **5**
 - `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous`: **3**
 - `typed-refusal:pointer_or_anchor_without_numeric_points`: **5**
+- `typed-refusal:pure_psat_out_of_certified_range`: **4**
 - `typed-refusal:pure_solid_thermochemistry_not_melt_activity`: **2**
-- `typed-refusal:thermodynamic_model_parameter_not_activity_measurement`: **1**
+- `typed-refusal:self_agreement_excluded`: **9**
+- `typed-refusal:thermodynamic_model_parameter_not_activity_measurement`: **2**
 - `typed-refusal:unsupported_observable:clausing_factor_not_species_rate`: **3**
-- `typed-refusal:unsupported_observable:qualitative_activity_ordering`: **11**
+- `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient`: **17**
+- `typed-refusal:unsupported_observable:ordering_claim_unparsed`: **13**
 
 **Coverage by observation type:**
 
 | Type | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
-| activity_coefficient | 49 | 0 | 49 | 0 | 49 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×36; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
+| activity_coefficient | 75 | 1 | 74 | 1 | 74 | `typed-refusal:form_unresolved` ×2; `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_capability:gas_speciation_ladder` ×14; `typed-refusal:missing_capability:melt_activity_gamma:AgO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:AsO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:BiO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CdO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CoO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CrO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CuO0.5` ×2; `typed-refusal:missing_capability:melt_activity_gamma:FeO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO2` ×2; `typed-refusal:missing_capability:melt_activity_gamma:InO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:LiO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:MoO2` ×1; `typed-refusal:missing_capability:melt_activity_gamma:MoO3` ×1; `typed-refusal:missing_capability:melt_activity_gamma:NiO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:PbO` ×2; `typed-refusal:missing_capability:melt_activity_gamma:RbO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:SnO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:WO3` ×1; `typed-refusal:missing_capability:melt_activity_gamma:ZnO` ×2; `typed-refusal:missing_numeric_activity` ×4; `typed-refusal:missing_numeric_activity:unparseable_gamma_range` ×2; `typed-refusal:self_agreement_excluded` ×9; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×17 |
 | alpha | 60 | 16 | 44 | 40 | 56 | `typed-refusal:analytical_upper_bound_not_measurement` ×3; `typed-refusal:form_unresolved` ×7; `typed-refusal:no_usable_rate_series_payload` ×2; `typed-refusal:not_comparable_condensed_form:crystalline` ×7; `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten` ×2; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×11; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×5; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×3 |
-| gibbs_table | 12 | 0 | 12 | 0 | 0 | `typed-refusal:gibbs_table_not_runtime_observable` ×9; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
-| psat_series | 19 | 0 | 19 | 0 | 88 | `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_condition:standard_state_boundary` ×5; `typed-refusal:pointer_or_anchor_without_numeric_points` ×5 |
-| rate_series | 49 | 3 | 46 | 12 | 49 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×25; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×17; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
+| gibbs_table | 24 | 0 | 24 | 0 | 0 | `typed-refusal:gibbs_table_not_runtime_observable` ×20; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×2 |
+| psat_series | 19 | 3 | 16 | 18 | 70 | `typed-refusal:missing_condition:pO2_boundary` ×7; `typed-refusal:pointer_or_anchor_without_numeric_points` ×5; `typed-refusal:pure_psat_out_of_certified_range` ×4 |
+| rate_series | 57 | 7 | 50 | 16 | 53 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×9; `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_species_rate` ×5; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×18; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×13 |
+| transition_point | 64 | 15 | 49 | 15 | 49 | `typed-refusal:no_engine_melting_point_model` ×27; `typed-refusal:no_engine_solid_solid_transition_model` ×1; `typed-refusal:no_engine_triple_point_model` ×14; `typed-refusal:no_pure_component_saturation_curve` ×7 |
 
 **Coverage by comparison family:**
 
 | Comparison family | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
-| activity_coefficient | 49 | 0 | 49 | 0 | 49 | `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×36; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
+| activity_coefficient | 52 | 1 | 51 | 1 | 51 | `typed-refusal:form_unresolved` ×2; `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_capability:melt_activity_gamma:AgO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:AsO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:BiO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CdO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CoO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CrO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CuO0.5` ×2; `typed-refusal:missing_capability:melt_activity_gamma:FeO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO2` ×2; `typed-refusal:missing_capability:melt_activity_gamma:InO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:LiO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:MoO2` ×1; `typed-refusal:missing_capability:melt_activity_gamma:MoO3` ×1; `typed-refusal:missing_capability:melt_activity_gamma:NiO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:PbO` ×2; `typed-refusal:missing_capability:melt_activity_gamma:RbO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:SnO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:WO3` ×1; `typed-refusal:missing_capability:melt_activity_gamma:ZnO` ×2; `typed-refusal:missing_numeric_activity` ×4; `typed-refusal:missing_numeric_activity:unparseable_gamma_range` ×2; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×17 |
+| activity_self_agreement | 9 | 0 | 9 | 0 | 9 | `typed-refusal:self_agreement_excluded` ×9 |
 | alpha | 60 | 16 | 44 | 40 | 56 | `typed-refusal:analytical_upper_bound_not_measurement` ×3; `typed-refusal:form_unresolved` ×7; `typed-refusal:no_usable_rate_series_payload` ×2; `typed-refusal:not_comparable_condensed_form:crystalline` ×7; `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten` ×2; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×11; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×5; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×3 |
 | alpha_in_legacy_rate_series | 3 | 3 | 0 | 12 | 0 | — |
-| gibbs_table | 12 | 0 | 12 | 0 | 0 | `typed-refusal:gibbs_table_not_runtime_observable` ×9; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
-| psat_series | 19 | 0 | 19 | 0 | 88 | `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_condition:standard_state_boundary` ×5; `typed-refusal:pointer_or_anchor_without_numeric_points` ×5 |
-| rate_hkl | 46 | 0 | 46 | 0 | 49 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×25; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×17; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
+| gibbs_table | 24 | 0 | 24 | 0 | 0 | `typed-refusal:gibbs_table_not_runtime_observable` ×20; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×2 |
+| ordering_activity | 14 | 0 | 14 | 0 | 14 | `typed-refusal:missing_capability:gas_speciation_ladder` ×14 |
+| ordering_bound | 17 | 4 | 13 | 4 | 13 | `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×13 |
+| psat_series | 19 | 3 | 16 | 18 | 70 | `typed-refusal:missing_condition:pO2_boundary` ×7; `typed-refusal:pointer_or_anchor_without_numeric_points` ×5; `typed-refusal:pure_psat_out_of_certified_range` ×4 |
+| rate_hkl | 36 | 0 | 36 | 0 | 39 | `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×9; `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_species_rate` ×5; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×18; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
+| relative_volatility | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_condition:melt_composition` ×1 |
+| transition_point | 64 | 15 | 49 | 15 | 49 | `typed-refusal:no_engine_melting_point_model` ×27; `typed-refusal:no_engine_solid_solid_transition_model` ×1; `typed-refusal:no_engine_triple_point_model` ×14; `typed-refusal:no_pure_component_saturation_curve` ×7 |
 
 **Coverage by species:**
 
 | Species | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
-| Al | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×3 |
+| Ag | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_capability:melt_activity_gamma:AgO0.5` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1 |
+| Al | 7 | 2 | 5 | 2 | 5 | `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:self_agreement_excluded` ×1; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×2 |
 | Al2O | 1 | 0 | 1 | 0 | 14 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
 | Al2O3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1 |
 | AlO | 2 | 0 | 2 | 0 | 6 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_condition:pO2_boundary` ×1 |
-| As | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| As4O6 | 3 | 0 | 3 | 0 | 7 | `typed-refusal:missing_condition:standard_state_boundary` ×2; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| BaO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Bi | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Ca | 6 | 0 | 6 | 0 | 5 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×3 |
-| CaO | 2 | 0 | 2 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×1 |
-| Co | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Cr | 7 | 0 | 7 | 0 | 8 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:molten_metal` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×2 |
-| Cs2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Cu | 6 | 0 | 6 | 0 | 6 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×3 |
-| Eu_metal_and_EuO | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Fe | 24 | 4 | 20 | 13 | 23 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×2; `typed-refusal:not_comparable_condensed_form:crystalline` ×3; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×3; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3 |
-| Ga2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Ge | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| GeO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| In | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| K | 8 | 2 | 6 | 2 | 5 | `typed-refusal:form_unresolved` ×3; `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| Li2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Mg | 16 | 7 | 9 | 17 | 19 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:not_comparable_condensed_form:partially_molten` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×1 |
-| MgO | 4 | 0 | 4 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×1; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×1 |
-| Mn | 8 | 0 | 8 | 0 | 10 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×3; `typed-refusal:not_comparable_system_class:molten_metal` ×3 |
-| MoO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| MoO3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Na | 16 | 0 | 16 | 0 | 27 | `typed-refusal:analytical_upper_bound_not_measurement` ×3; `typed-refusal:form_unresolved` ×3; `typed-refusal:gibbs_table_not_runtime_observable` ×3; `typed-refusal:missing_condition:pO2_boundary` ×2; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:no_usable_rate_series_payload` ×1 |
-| NaF | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
-| Ni | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
+| As | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:AsO1.5` ×1 |
+| As4O6 | 3 | 0 | 3 | 0 | 7 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1; `typed-refusal:pure_psat_out_of_certified_range` ×2 |
+| BaO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| Bi | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:BiO1.5` ×1 |
+| Br2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| CH4 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| CO | 2 | 0 | 2 | 0 | 2 | `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:no_pure_component_saturation_curve` ×1 |
+| CO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:no_engine_triple_point_model` ×1 |
+| Ca | 9 | 3 | 6 | 3 | 5 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:self_agreement_excluded` ×1; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| CaO | 2 | 0 | 2 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×1 |
+| Cd | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_capability:melt_activity_gamma:CdO` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1 |
+| Cl2 | 2 | 1 | 1 | 1 | 1 | `typed-refusal:no_engine_triple_point_model` ×1 |
+| Co | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:CoO` ×1 |
+| Cr | 11 | 1 | 10 | 1 | 10 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CrO` ×1; `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×1; `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:not_comparable_system_class:molten_metal` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×2; `typed-refusal:self_agreement_excluded` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1 |
+| Cs2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| Cu | 9 | 0 | 9 | 0 | 8 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CuO0.5` ×2; `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×3; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1 |
+| Eu_metal_and_EuO | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_capability:gas_speciation_ladder` ×2 |
+| Fe | 26 | 6 | 20 | 15 | 23 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_capability:melt_activity_gamma:FeO` ×1; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×3; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×3; `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×3; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×3; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| Ga | 3 | 0 | 3 | 0 | 2 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×2 |
+| Ga2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| Gd | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1 |
+| Ge | 4 | 0 | 4 | 0 | 3 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO2` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1 |
+| GeO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:GeO2` ×1 |
+| H2O | 3 | 0 | 3 | 0 | 3 | `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:no_pure_component_saturation_curve` ×1 |
+| H2S | 3 | 0 | 3 | 0 | 3 | `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:no_pure_component_saturation_curve` ×1 |
+| HCHO | 3 | 0 | 3 | 0 | 3 | `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:no_pure_component_saturation_curve` ×1 |
+| HCl | 1 | 0 | 1 | 0 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| HF | 2 | 1 | 1 | 1 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| In | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:InO1.5` ×1 |
+| K | 14 | 4 | 10 | 4 | 8 | `typed-refusal:form_unresolved` ×4; `typed-refusal:gibbs_table_not_runtime_observable` ×2; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| KCl | 2 | 1 | 1 | 1 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| La | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1 |
+| Li | 4 | 0 | 4 | 0 | 3 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:melt_activity_gamma:LiO0.5` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×2 |
+| Li2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| Mg | 19 | 8 | 11 | 18 | 21 | `typed-refusal:missing_condition:pO2_boundary` ×2; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×1; `typed-refusal:self_agreement_excluded` ×1 |
+| MgCl2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| MgO | 4 | 0 | 4 | 0 | 3 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×1; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×1 |
+| Mn | 13 | 1 | 12 | 1 | 12 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×2; `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×2; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:not_comparable_system_class:molten_metal` ×3; `typed-refusal:self_agreement_excluded` ×1; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
+| Mo | 3 | 0 | 3 | 0 | 2 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×2 |
+| MoO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:MoO2` ×1 |
+| MoO3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:MoO3` ×1 |
+| N2 | 3 | 0 | 3 | 0 | 3 | `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:no_pure_component_saturation_curve` ×1 |
+| NH3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| NO2 | 2 | 1 | 1 | 1 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| Na | 20 | 3 | 17 | 17 | 14 | `typed-refusal:analytical_upper_bound_not_measurement` ×3; `typed-refusal:form_unresolved` ×4; `typed-refusal:gibbs_table_not_runtime_observable` ×3; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:no_usable_rate_series_payload` ×1; `typed-refusal:self_agreement_excluded` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| NaCl | 2 | 1 | 1 | 1 | 1 | `typed-refusal:no_engine_melting_point_model` ×1 |
+| NaF | 3 | 0 | 3 | 0 | 3 | `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_pure_component_saturation_curve` ×1; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
+| Ni | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:NiO` ×1 |
 | O | 1 | 0 | 1 | 0 | 13 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
-| O2 | 1 | 0 | 1 | 0 | 7 | `typed-refusal:missing_condition:pO2_boundary` ×1 |
-| P | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| P4O10 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Pb | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Rb2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| S | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×2 |
+| O2 | 4 | 0 | 4 | 0 | 10 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:no_pure_component_saturation_curve` ×1 |
+| P | 1 | 0 | 1 | 0 | 1 | `typed-refusal:self_agreement_excluded` ×1 |
+| P4O10 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| Pb | 6 | 0 | 6 | 0 | 5 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:melt_activity_gamma:PbO` ×2; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×2 |
+| Rb | 3 | 0 | 3 | 0 | 2 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:melt_activity_gamma:RbO0.5` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1 |
+| Rb2O | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| S | 4 | 0 | 4 | 0 | 4 | `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×2 |
 | S2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
+| SO2 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1 |
 | SO3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
-| Sb4O6 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Se_n_ladder | 1 | 0 | 1 | 0 | 3 | `typed-refusal:missing_condition:standard_state_boundary` ×1 |
-| Si | 3 | 0 | 3 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1 |
-| SiO | 23 | 6 | 17 | 20 | 25 | `typed-refusal:missing_numeric_species_rate` ×4; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×4; `typed-refusal:no_usable_rate_series_payload` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×3; `typed-refusal:not_comparable_condensed_form:partially_molten` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×1; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×3 |
-| SiO2 | 6 | 0 | 6 | 0 | 3 | `typed-refusal:form_unresolved` ×1; `typed-refusal:gibbs_table_not_runtime_observable` ×2; `typed-refusal:missing_numeric_activity` ×2; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
-| Sn | 5 | 0 | 5 | 0 | 5 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×2 |
-| SrO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Ti | 1 | 0 | 1 | 0 | 1 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
-| TiO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| TiO2 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| V | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| VO_VO2 | 2 | 0 | 2 | 0 | 3 | `typed-refusal:missing_condition:standard_state_boundary` ×1; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| WO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| WO3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
-| Yb_metal_and_YbO | 3 | 0 | 3 | 0 | 5 | `typed-refusal:missing_condition:standard_state_boundary` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×1 |
-| Zn | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity` ×1 |
+| Sb4O6 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| Sc | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1 |
+| Se_n_ladder | 1 | 0 | 1 | 0 | 3 | `typed-refusal:pure_psat_out_of_certified_range` ×1 |
+| Si | 5 | 1 | 4 | 1 | 4 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| SiO | 23 | 6 | 17 | 20 | 25 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×2; `typed-refusal:no_usable_rate_series_payload` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×3; `typed-refusal:not_comparable_condensed_form:partially_molten` ×1; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×1; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×3; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×4 |
+| SiO2 | 6 | 0 | 6 | 0 | 3 | `typed-refusal:form_unresolved` ×1; `typed-refusal:gibbs_table_not_runtime_observable` ×2; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:self_agreement_excluded` ×1; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
+| Sn | 5 | 0 | 5 | 0 | 5 | `typed-refusal:missing_capability:melt_activity_gamma:SnO` ×1; `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×2; `typed-refusal:not_comparable_system_class:molten_metal` ×2 |
+| SrO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| Ti | 5 | 1 | 4 | 1 | 4 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1; `typed-refusal:no_engine_melting_point_model` ×1; `typed-refusal:no_engine_solid_solid_transition_model` ×1; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1 |
+| TiO | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| TiO2 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:self_agreement_excluded` ×1; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| V | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_activity:unparseable_gamma_range` ×1; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1 |
+| VO_VO2 | 2 | 1 | 1 | 2 | 1 | `typed-refusal:missing_capability:gas_speciation_ladder` ×1 |
+| WO2 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_activity:unparseable_gamma_range` ×1 |
+| WO3 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_capability:melt_activity_gamma:WO3` ×1 |
+| Yb | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1 |
+| Yb_metal_and_YbO | 3 | 0 | 3 | 0 | 5 | `typed-refusal:missing_capability:gas_speciation_ladder` ×2; `typed-refusal:pure_psat_out_of_certified_range` ×1 |
+| Zn | 4 | 0 | 4 | 0 | 3 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_capability:melt_activity_gamma:ZnO` ×2; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×1 |
+| Zr | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1 |
 
 **Coverage by source:**
 
 | Source | Observations | Comparable | Skipped | Comparable points | Gap points | Typed skip reasons |
 |---|---:|---:|---:|---:|---:|---|
-| behrens-rosenblatt-1972 | 1 | 0 | 1 | 0 | 3 | `typed-refusal:missing_condition:standard_state_boundary` ×1 |
-| berkowitz-chupka-inghram-1957 | 1 | 0 | 1 | 0 | 2 | `typed-refusal:missing_condition:standard_state_boundary` ×1 |
+| behrens-rosenblatt-1972 | 1 | 0 | 1 | 0 | 3 | `typed-refusal:pure_psat_out_of_certified_range` ×1 |
+| berkowitz-chupka-inghram-1957 | 1 | 1 | 0 | 2 | 0 | — |
 | costa-jacobson-2015 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:not_comparable_condensed_form:crystalline` ×2 |
 | fedkin-grossman-ghiorso-2006 | 8 | 6 | 2 | 24 | 2 | `typed-refusal:form_unresolved` ×2 |
-| habermann-daane-1964 | 1 | 0 | 1 | 0 | 3 | `typed-refusal:missing_condition:standard_state_boundary` ×1 |
-| janaf-4th | 4 | 0 | 4 | 0 | 4 | `typed-refusal:pointer_or_anchor_without_numeric_points` ×4 |
-| kems-001-homma-1966 | 10 | 0 | 10 | 0 | 10 | `typed-refusal:missing_numeric_species_rate` ×4; `typed-refusal:not_comparable_system_class:molten_metal` ×6 |
-| kems-002-ohno-1967 | 11 | 0 | 11 | 0 | 11 | `typed-refusal:missing_numeric_species_rate` ×6; `typed-refusal:not_comparable_system_class:molten_metal` ×5 |
+| habermann-daane-1964 | 1 | 0 | 1 | 0 | 3 | `typed-refusal:pure_psat_out_of_certified_range` ×1 |
+| janaf-4th | 25 | 8 | 17 | 8 | 17 | `typed-refusal:no_engine_melting_point_model` ×10; `typed-refusal:no_engine_solid_solid_transition_model` ×1; `typed-refusal:no_engine_triple_point_model` ×1; `typed-refusal:no_pure_component_saturation_curve` ×1; `typed-refusal:pointer_or_anchor_without_numeric_points` ×4 |
+| kems-001-homma-1966 | 10 | 0 | 10 | 0 | 10 | `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×3; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1; `typed-refusal:not_comparable_system_class:molten_metal` ×6 |
+| kems-002-ohno-1967 | 11 | 0 | 11 | 0 | 11 | `typed-refusal:missing_condition:melt_density_to_convert_specific_evaporation_constant` ×6; `typed-refusal:not_comparable_system_class:molten_metal` ×5 |
 | kems-003-pound-1972 | 6 | 0 | 6 | 0 | 6 | `typed-refusal:not_comparable_system_class:pure_element_condensed+not_comparable_condensed_form:crystalline` ×5; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×1 |
 | kems-005-fedkin-2006 | 10 | 5 | 5 | 11 | 5 | `typed-refusal:form_unresolved` ×4; `typed-refusal:no_usable_rate_series_payload` ×1 |
 | kems-007-costa-2015 | 4 | 0 | 4 | 0 | 12 | `typed-refusal:not_comparable_condensed_form:crystalline` ×4 |
 | kems-008-schaefer-fegley-2004 | 5 | 2 | 3 | 3 | 3 | `typed-refusal:form_unresolved` ×1; `typed-refusal:not_comparable_condensed_form:crystalline` ×1; `typed-refusal:not_comparable_condensed_form:crystalline:straddles_transition` ×1 |
 | kems-009-safarian-2013 | 2 | 0 | 2 | 0 | 2 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:pure_element_condensed` ×1 |
-| kems-010-richter-2007 | 6 | 2 | 4 | 6 | 7 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×2 |
+| kems-010-richter-2007 | 6 | 4 | 2 | 8 | 5 | `typed-refusal:missing_condition:pO2_boundary` ×1; `typed-refusal:missing_numeric_species_rate` ×1 |
 | kems-011-wetzel-gail-2013 | 3 | 0 | 3 | 0 | 5 | `typed-refusal:missing_numeric_species_rate` ×1; `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×2 |
-| kems-012-sossi-2019 | 7 | 2 | 5 | 2 | 4 | `typed-refusal:analytical_upper_bound_not_measurement` ×2; `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:no_usable_rate_series_payload` ×1 |
-| kems-015-hashimoto-1983 | 9 | 0 | 9 | 0 | 9 | `typed-refusal:missing_numeric_species_rate` ×7; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×2 |
-| kems-016-stolyarova-1992 | 10 | 0 | 10 | 0 | 4 | `typed-refusal:gibbs_table_not_runtime_observable` ×5; `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1 |
-| kems-017-stolyarova-2013 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| kems-018-stolyarova-2012 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| kems-022-demaria-1971 | 23 | 0 | 23 | 0 | 81 | `typed-refusal:gibbs_table_not_runtime_observable` ×2; `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_condition:pO2_boundary` ×9; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×9 |
-| kems-027-plante-hastie-1983 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate` ×1 |
-| kems-031-halwax-2024 | 5 | 0 | 5 | 0 | 3 | `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2 |
-| kems-032-copland-jacobson-2010 | 5 | 0 | 5 | 0 | 4 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×2 |
+| kems-012-sossi-2019 | 53 | 3 | 50 | 3 | 37 | `typed-refusal:analytical_upper_bound_not_measurement` ×2; `typed-refusal:gibbs_table_not_runtime_observable` ×12; `typed-refusal:missing_capability:melt_activity_gamma:AgO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CdO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CuO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO2` ×1; `typed-refusal:missing_capability:melt_activity_gamma:LiO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:PbO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:RbO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:ZnO` ×1; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×8; `typed-refusal:no_usable_rate_series_payload` ×1; `typed-refusal:self_agreement_excluded` ×1; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1; `typed-refusal:unsupported_observable:logKstar_not_activity_coefficient` ×17 |
+| kems-015-hashimoto-1983 | 9 | 2 | 7 | 2 | 7 | `typed-refusal:missing_condition:melt_composition` ×1; `typed-refusal:missing_numeric_species_rate` ×2; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×4 |
+| kems-016-stolyarova-1992 | 10 | 0 | 10 | 0 | 4 | `typed-refusal:gibbs_table_not_runtime_observable` ×5; `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:thermodynamic_model_parameter_not_activity_measurement` ×1; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| kems-017-stolyarova-2013 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| kems-018-stolyarova-2012 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| kems-022-demaria-1971 | 23 | 2 | 21 | 16 | 65 | `typed-refusal:gibbs_table_not_runtime_observable` ×2; `typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO` ×2; `typed-refusal:missing_condition:pO2_boundary` ×7; `typed-refusal:missing_numeric_activity` ×1; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×9 |
+| kems-027-plante-hastie-1983 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×1 |
+| kems-031-halwax-2024 | 5 | 0 | 5 | 0 | 3 | `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×2; `typed-refusal:pointer_or_anchor_without_numeric_points` ×1; `typed-refusal:pure_solid_thermochemistry_not_melt_activity` ×2 |
+| kems-032-copland-jacobson-2010 | 5 | 0 | 5 | 0 | 4 | `typed-refusal:gibbs_table_not_runtime_observable` ×1; `typed-refusal:missing_numeric_species_rate:geometry_without_measured_flux` ×2; `typed-refusal:unsupported_observable:clausing_factor_not_species_rate` ×2 |
 | kems-037-richter-2002 | 4 | 0 | 4 | 0 | 4 | `typed-refusal:not_comparable_condensed_form:partially_molten` ×2; `typed-refusal:not_comparable_condensed_form:partially_molten:straddles_transition` ×2 |
-| kems-041-sossi-fegley-2018 | 29 | 0 | 29 | 0 | 29 | `typed-refusal:missing_numeric_activity` ×28; `typed-refusal:missing_numeric_species_rate:qualitative_bound` ×1 |
-| nist-webbook | 2 | 0 | 2 | 0 | 6 | `typed-refusal:missing_condition:standard_state_boundary` ×2 |
+| kems-041-sossi-fegley-2018 | 29 | 0 | 29 | 0 | 29 | `typed-refusal:form_unresolved` ×2; `typed-refusal:missing_capability:melt_activity_gamma:AsO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:BiO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CoO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CrO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:CuO0.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:FeO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:GeO2` ×1; `typed-refusal:missing_capability:melt_activity_gamma:InO1.5` ×1; `typed-refusal:missing_capability:melt_activity_gamma:MoO2` ×1; `typed-refusal:missing_capability:melt_activity_gamma:MoO3` ×1; `typed-refusal:missing_capability:melt_activity_gamma:NiO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:PbO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:SnO` ×1; `typed-refusal:missing_capability:melt_activity_gamma:WO3` ×1; `typed-refusal:missing_capability:melt_activity_gamma:ZnO` ×1; `typed-refusal:missing_numeric_activity:unparseable_gamma_range` ×2; `typed-refusal:self_agreement_excluded` ×8; `typed-refusal:unsupported_observable:ordering_claim_unparsed` ×1 |
+| nist-webbook | 45 | 7 | 38 | 7 | 42 | `typed-refusal:no_engine_melting_point_model` ×17; `typed-refusal:no_engine_triple_point_model` ×13; `typed-refusal:no_pure_component_saturation_curve` ×6; `typed-refusal:pure_psat_out_of_certified_range` ×2 |
 | richter-et-al-2007 | 2 | 2 | 0 | 6 | 0 | — |
 | sossi-et-al-2019 | 1 | 0 | 1 | 0 | 1 | `typed-refusal:analytical_upper_bound_not_measurement` ×1 |
-| sossi-fegley-2018 | 14 | 0 | 14 | 0 | 14 | `typed-refusal:missing_numeric_activity` ×3; `typed-refusal:unsupported_observable:qualitative_activity_ordering` ×11 |
+| sossi-fegley-2018 | 14 | 0 | 14 | 0 | 14 | `typed-refusal:missing_capability:gas_speciation_ladder` ×14 |
 | wetzel-gail-2013-sio-arrhenius | 1 | 0 | 1 | 0 | 3 | `typed-refusal:not_comparable_system_class:solid_film_growth+not_comparable_condensed_form:glass_amorphous` ×1 |
 
 **Uncertainty ledger:** extract-side terms are propagated when the
@@ -538,9 +629,14 @@ match/mismatch against that documented budget):
 - `rate_series` (measured flux): `log10_decades` = 0.5 (extract rate observation has no usable numeric uncertainty; default half-dex digitized high-temperature flux envelope (t-512))
 - `alpha`: `absolute` = 0.05 (extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512))
 - `activity_coefficient`: `relative_fraction` = 0.5 (extract observation has no usable numeric uncertainty; default 50% relative activity/γ envelope (t-512))
+- `transition_point`: `absolute` = 1.0 K (extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope))
 
 **FINDINGS (mismatches outside budget — not tuned away):**
 
+- FINDING mismatch Al Al_normal_boiling_point T_obs=2793 K T_engine=2328.48 K residual_K=-464.518 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'} extrapolated: true
+- FINDING mismatch Ca Ca_normal_boiling_point T_obs=1757 K T_engine=1717.78 K residual_K=-39.2161 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'} extrapolated: true
+- FINDING mismatch Cl2 Cl2_normal_boiling_point T_obs=239.5 K T_engine=240.588 K residual_K=1.08773 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'}
+- FINDING mismatch Cr Cr_normal_boiling_point T_obs=2952.08 K T_engine=2753.35 K residual_K=-198.725 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'} extrapolated: true
 - FINDING mismatch Fe α T=1973K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2073K expected=0.25 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2173K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
@@ -549,12 +645,16 @@ match/mismatch against that documented budget):
 - FINDING mismatch Fe α T=2073K expected=0.25 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2173K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2273K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
+- FINDING mismatch Fe Fe_normal_boiling_point T_obs=3134 K T_engine=3135.15 K residual_K=1.14989 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'}
 - FINDING mismatch Fe α T=2123K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512)'}
 - FINDING mismatch Fe α T=1973K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2073K expected=0.25 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2173K expected=0.24 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Fe α T=2273K expected=0.23 actual=0.02 budget={'kind': 'absolute', 'value': 0.02, 'defaulted': False, 'source': 'point.sigma', 'components': []}
+- FINDING ordering-fail Fe hashimoto_1983_fcmas_qualitative_volatility_order asserted=Fe > Mg|Si > Ca > Al pairs_ok=23.0/27.0
 - FINDING mismatch K α T=1698.15K expected=1 actual=0.13 budget={'kind': 'absolute', 'value': 0.05, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default absolute α envelope ±0.05 (t-512)'}
+- FINDING mismatch K gamma expected=0.00022 actual=3.5e-05 residual_dex=0.7983546364719307 budget={'kind': 'relative_fraction', 'value': 0.5, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default 50% relative activity/γ envelope (t-512)'}
+- FINDING mismatch K K_normal_boiling_point T_obs=1037 K T_engine=1029.75 K residual_K=-7.25395 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'} extrapolated: true
 - FINDING mismatch Mg α T=1973K expected=0.24 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Mg α T=2073K expected=0.28 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Mg α T=2173K expected=0.28 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []}
@@ -564,6 +664,24 @@ match/mismatch against that documented budget):
 - FINDING mismatch Mg α T=2173K expected=0.28 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Mg α T=2273K expected=0.27 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []}
 - FINDING mismatch Mg α T=2123K expected=0.24 actual=0.2 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'observation.values.sigma', 'components': ['sigma']}
+- FINDING mismatch Mg Mg_normal_boiling_point T_obs=1363 K T_engine=1360.7 K residual_K=-2.3035 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'} extrapolated: true
+- FINDING mismatch NO2 NO2_normal_boiling_point T_obs=295.08 K T_engine=293.47 K residual_K=-1.61035 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'}
+- FINDING mismatch Na Na_normal_boiling_point T_obs=1156 K T_engine=1179.58 K residual_K=23.5847 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'} extrapolated: true
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12022_digitized T=1428.57K expected=0.090306 Pa actual=0.04392489634531263 residual_dex=0.31300586081772297 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12022_digitized T=1412.43K expected=0.0717326 Pa actual=0.03301065711299539 residual_dex=0.3370624634621697 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12022_digitized T=1342.28K expected=0.00359515 Pa actual=0.008709323318674848 residual_dex=0.384267760576019 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12022_digitized T=1298.7K expected=0.00090306 Pa actual=0.003503235446015108 residual_dex=0.5887527203013809 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1474.93K expected=0.0090306 Pa actual=0.07927240568367641 residual_dex=0.9434054318187791 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1459.85K expected=0.00639318 Pa actual=0.06185882395550915 residual_dex=0.9856850665339089 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1449.28K expected=0.00507828 Pa actual=0.05180729526957892 residual_dex=1.0086742766444063 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1438.85K expected=0.00403382 Pa actual=0.043365935932496685 residual_dex=1.0314321012862382 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1428.57K expected=0.00285573 Pa actual=0.03628865548745939 residual_dex=1.10405418999761 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1418.44K expected=0.0020217 Pa actual=0.030358604023788243 residual_dex=1.1765650864777855 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1398.6K expected=0.00101325 Pa actual=0.021224290901984494 residual_dex=1.3211165770794284 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1379.31K expected=0.000717326 Pa actual=0.014819337028274197 residual_dex=1.315112142091595 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1351.35K expected=0.00020217 Pa actual=0.00862404799822511 residual_dex=1.6299944538786524 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Na demaria_1971_na_psat_figure1_sample_12065_digitized T=1324.5K expected=4.52602e-05 Pa actual=0.005003416931833127 residual_dex=2.043550129219774 budget={'kind': 'log10_decades', 'value': 0.3, 'defaulted': False, 'source': 'observation.uncertainty.dex'}
+- FINDING mismatch Si Si_normal_boiling_point T_obs=3504.62 K T_engine=2560.19 K residual_K=-944.43 target_P=100000 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'} extrapolated: true
 - FINDING mismatch SiO α T=1973K expected=0.12 actual=0.08032771227334354 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
 - FINDING mismatch SiO α T=2073K expected=0.17 actual=0.08790105714998556 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
 - FINDING mismatch SiO α T=2173K expected=0.2 actual=0.09539408461828996 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
@@ -577,11 +695,21 @@ match/mismatch against that documented budget):
 - FINDING mismatch SiO α T=2173K expected=0.2 actual=0.09539408461828996 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
 - FINDING mismatch SiO α T=2273K expected=0.21 actual=0.10278334807870564 budget={'kind': 'absolute', 'value': 0.01, 'defaulted': False, 'source': 'point.sigma', 'components': []} extrapolated: true
 - FINDING mismatch SiO α T=2273K expected=0.2 actual=0.10278334807870564 budget={'kind': 'absolute', 'value': 0.08, 'defaulted': False, 'source': 'observation.values.alpha_range', 'components': ['published alpha range half-width']} extrapolated: true
+- FINDING mismatch Ti Ti_normal_boiling_point T_obs=3630.96 K T_engine=3560.15 K residual_K=-70.806 target_P=101325 Pa budget={'kind': 'absolute', 'value': 1.0, 'defaulted': True, 'rationale': 'extract transition_point has no usable numeric uncertainty; default 1 K absolute envelope (TRC-typical NBP u; match/mismatch budget, not a regression band and not a dex envelope)'} extrapolated: true
+- FINDING mismatch VO_VO2 BIC57_VO_absolute_points T=1875K expected=0.155 Pa actual=0.012068570930116797 residual_dex=1.108675850931988 budget={'kind': 'log10_decades', 'value': 0.5, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default half-dex high-T vapor-pressure envelope (t-512)'}
+- FINDING mismatch VO_VO2 BIC57_VO_absolute_points T=1876K expected=0.116 Pa actual=0.012291612528798502 residual_dex=0.9748491277871426 budget={'kind': 'log10_decades', 'value': 0.5, 'defaulted': True, 'rationale': 'extract observation has no usable numeric uncertainty; default half-dex high-T vapor-pressure envelope (t-512)'}
 
 Comparable per-observation residuals and uncertainty ledger:
 
 | Source | Observation | Type | Species | Coordinate | Literature | Literature uncertainty | Engine uncertainty | Combined propagated uncertainty | Engine | Residual | Residual dex | Residual / literature budget | Status |
 |---|---|---|---|---|---:|---|---|---|---:|---:|---:|---:|---|
+| kems-010-richter-2007 | richter_2007_al_non_loss_until_mg_exhausted | rate_series | Al | T_min_K=1873.15, T_max_K=2173.15, n_T=3 | 3 | absolute=0.0 (ordering pairwise count (exact integer)) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 3 | 0 | 0 | 0 | ordering-pass |
+| nist-webbook | Al_normal_boiling_point | transition_point | Al | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 2793 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 2328.48 | -464.518 | — | 464.518 | mismatch |
+| kems-010-richter-2007 | richter_2007_ca_non_loss_until_mg_exhausted | rate_series | Ca | T_min_K=1873.15, T_max_K=2173.15, n_T=3 | 3 | absolute=0.0 (ordering pairwise count (exact integer)) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 3 | 0 | 0 | 0 | ordering-pass |
+| kems-015-hashimoto-1983 | hashimoto_1983_cao_al2o3_residue_enrichment | rate_series | Ca | T_min_K=1873.15, T_max_K=2273.15, n_T=3 | 6 | absolute=0.0 (ordering pairwise count (exact integer)) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 6 | 0 | 0 | 0 | ordering-pass |
+| nist-webbook | Ca_normal_boiling_point | transition_point | Ca | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 1757 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1717.78 | -39.2161 | — | 39.2161 | mismatch |
+| nist-webbook | Cl2_normal_boiling_point | transition_point | Cl2 | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 239.5 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 240.588 | 1.08773 | — | 1.08773 | mismatch |
+| janaf-4th | Cr_normal_boiling_point | transition_point | Cr | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 2952.08 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 2753.35 | -198.725 | — | 198.725 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir | alpha | Fe | temperature_K=1973 | 0.23 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.21 | 1.0607 | 10.5 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir | alpha | Fe | temperature_K=2073 | 0.25 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.23 | 1.09691 | 11.5 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir | alpha | Fe | temperature_K=2173 | 0.24 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.22 | 1.07918 | 11 | mismatch |
@@ -590,13 +718,19 @@ Comparable per-observation residuals and uncertainty ledger:
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | rate_series | Fe | temperature_K=2073 | 0.25 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.23 | 1.09691 | 11.5 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | rate_series | Fe | temperature_K=2173 | 0.24 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.22 | 1.07918 | 11 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series | rate_series | Fe | temperature_K=2273 | 0.23 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.21 | 1.0607 | 10.5 | mismatch |
+| janaf-4th | Fe_normal_boiling_point | transition_point | Fe | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 3134 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 3135.15 | 1.14989 | — | 1.14989 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_class_b1 | alpha | Fe | temperature_K=2123 | 0.24 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.22 | 1.07918 | 4.4 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_hashimoto_langmuir_table3 | alpha | Fe | temperature_K=1973 | 0.23 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.21 | 1.0607 | 10.5 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_hashimoto_langmuir_table3 | alpha | Fe | temperature_K=2073 | 0.25 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.23 | 1.09691 | 11.5 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_hashimoto_langmuir_table3 | alpha | Fe | temperature_K=2173 | 0.24 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.22 | 1.07918 | 11 | mismatch |
 | kems-005-fedkin-2006 | fedkin_2006_fe_hashimoto_langmuir_table3 | alpha | Fe | temperature_K=2273 | 0.23 | absolute=0.02 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.02 | -0.21 | 1.0607 | 10.5 | mismatch |
+| kems-015-hashimoto-1983 | hashimoto_1983_fcmas_qualitative_volatility_order | rate_series | Fe | T_min_K=1873.15, T_max_K=2273.15, n_T=3 | 27 | absolute=0.0 (ordering pairwise count (exact integer)) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 23 | -4 | 0.0696359 | — | ordering-fail |
+| nist-webbook | HF_normal_boiling_point | transition_point | HF | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 292.7 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 293.042 | 0.341686 | — | 0.341686 | match |
 | kems-012-sossi-2019 | sossi_2019_k_class_b1 | alpha | K | temperature_K=1698.15 | 1 | absolute=1.55 (observation.values.alpha_range); published alpha range half-width | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.13 | -0.87 | 0.886057 | 0.56129 | match |
 | kems-012-sossi-2019 | sossi_2019_k_open_furnace_alpha_e_context | alpha | K | temperature_K=1698.15 | 1 | absolute=0.05 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.13 | -0.87 | 0.886057 | 17.4 | mismatch |
+| kems-012-sossi-2019 | sossi_2019_k_table4_gamma_this_work | activity_coefficient | K | temperature_K=1673.15 | 0.00022 | relative_fraction=0.5 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 3.5e-05 | -0.000185 | 0.798355 | 1.68182 | mismatch |
+| nist-webbook | K_normal_boiling_point | transition_point | K | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 1037 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1029.75 | -7.25395 | — | 7.25395 | mismatch |
+| janaf-4th | KCl_normal_boiling_point | transition_point | KCl | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 1693.15 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1693.86 | 0.708951 | — | 0.708951 | match |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_mg_hashimoto_langmuir | alpha | Mg | temperature_K=1973 | 0.24 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.04 | 0.0791812 | 4 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_mg_hashimoto_langmuir | alpha | Mg | temperature_K=2073 | 0.28 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.08 | 0.146128 | 8 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_mg_hashimoto_langmuir | alpha | Mg | temperature_K=2173 | 0.28 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | -0.08 | 0.146128 | 8 | mismatch |
@@ -611,9 +745,31 @@ Comparable per-observation residuals and uncertainty ledger:
 | kems-010-richter-2007 | richter_2007_mg_cai_langmuir_alpha_arrhenius | alpha | Mg | temperature_K=1873 | 0.0603586 | absolute=0.2054316518789593 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.139641 | 0.520291 | 0.679746 | match |
 | kems-010-richter-2007 | richter_2007_mg_cai_langmuir_alpha_arrhenius | alpha | Mg | temperature_K=2023 | 0.107388 | absolute=0.3383970051344181 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0926118 | 0.270073 | 0.273678 | match |
 | kems-010-richter-2007 | richter_2007_mg_cai_langmuir_alpha_arrhenius | alpha | Mg | temperature_K=2173 | 0.176453 | absolute=0.5176490661392505 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0235469 | 0.0544007 | 0.0454881 | match |
+| nist-webbook | Mg_normal_boiling_point | transition_point | Mg | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 1363 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1360.7 | -2.3035 | — | 2.3035 | mismatch |
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=1873 | 0.0603586 | absolute=0.2054316518789593 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.139641 | 0.520291 | 0.679746 | match |
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=2023 | 0.107388 | absolute=0.3383970051344181 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0926118 | 0.270073 | 0.273678 | match |
 | richter-et-al-2007 | richter_2007_mg_cai_arrhenius_langmuir | alpha | Mg | temperature_K=2173 | 0.176453 | absolute=0.5176490661392505 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.2 | 0.0235469 | 0.0544007 | 0.0454881 | match |
+| janaf-4th | Mn_normal_boiling_point | transition_point | Mn | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 2334.53 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 2334.53 | -1.69166e-10 | — | 1.69166e-10 | match |
+| nist-webbook | NO2_normal_boiling_point | transition_point | NO2 | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 295.08 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 293.47 | -1.61035 | — | 1.61035 | mismatch |
+| janaf-4th | Na_normal_boiling_point | transition_point | Na | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 1156 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1179.58 | 23.5847 | — | 23.5847 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12022_digitized | psat_series | Na | temperature_K=1428.57 | 0.090306 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0439249 | -0.0463811 | 0.313006 | 1.04335 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12022_digitized | psat_series | Na | temperature_K=1412.43 | 0.0717326 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0330107 | -0.038722 | 0.337062 | 1.12354 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12022_digitized | psat_series | Na | temperature_K=1379.31 | 0.020217 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0179378 | -0.00227922 | 0.0519481 | 0.17316 | match |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12022_digitized | psat_series | Na | temperature_K=1360.54 | 0.00717326 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0125067 | 0.00533343 | 0.241426 | 0.804752 | match |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12022_digitized | psat_series | Na | temperature_K=1342.28 | 0.00359515 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.00870932 | 0.00511418 | 0.384268 | 1.28089 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12022_digitized | psat_series | Na | temperature_K=1298.7 | 0.00090306 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.00350324 | 0.00260018 | 0.588753 | 1.96251 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1474.93 | 0.0090306 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0792724 | 0.0702418 | 0.943405 | 3.14468 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1459.85 | 0.00639318 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0618588 | 0.0554656 | 0.985685 | 3.28562 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1449.28 | 0.00507828 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0518073 | 0.046729 | 1.00867 | 3.36225 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1438.85 | 0.00403382 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0433659 | 0.0393321 | 1.03143 | 3.43811 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1428.57 | 0.00285573 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0362887 | 0.0334329 | 1.10405 | 3.68018 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1418.44 | 0.0020217 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0303586 | 0.0283369 | 1.17657 | 3.92188 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1398.6 | 0.00101325 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0212243 | 0.020211 | 1.32112 | 4.40372 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1379.31 | 0.000717326 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0148193 | 0.014102 | 1.31511 | 4.38371 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1351.35 | 0.00020217 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.00862405 | 0.00842188 | 1.62999 | 5.43331 | mismatch |
+| kems-022-demaria-1971 | demaria_1971_na_psat_figure1_sample_12065_digitized | psat_series | Na | temperature_K=1324.5 | 4.52602e-05 | log10_decades=0.3 (observation.uncertainty.dex) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.00500342 | 0.00495816 | 2.04355 | 6.81183 | mismatch |
+| janaf-4th | NaCl_normal_boiling_point | transition_point | NaCl | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 1738.15 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 1738.44 | 0.289953 | — | 0.289953 | match |
+| janaf-4th | Si_normal_boiling_point | transition_point | Si | property_kind=normal_boiling_point, target_pressure_Pa=100000 | 3504.62 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 2560.19 | -944.43 | — | 944.43 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir | alpha | SiO | temperature_K=1973 | 0.12 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0803277 | -0.0396723 | 0.174316 | 3.96723 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir | alpha | SiO | temperature_K=2073 | 0.17 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0879011 | -0.0820989 | 0.286455 | 8.20989 | mismatch |
 | fedkin-grossman-ghiorso-2006 | fedkin_2006_table3_sio_hashimoto_langmuir | alpha | SiO | temperature_K=2173 | 0.2 | absolute=0.01 (point.sigma) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0953941 | -0.104606 | 0.321509 | 10.4606 | mismatch |
@@ -634,20 +790,32 @@ Comparable per-observation residuals and uncertainty ledger:
 | richter-et-al-2007 | richter_2007_si_cai_arrhenius_langmuir | alpha | SiO | temperature_K=1873 | 0.0687787 | absolute=0.1634119997736591 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.072704 | 0.0039253 | 0.0241043 | 0.0240209 | match |
 | richter-et-al-2007 | richter_2007_si_cai_arrhenius_langmuir | alpha | SiO | temperature_K=2023 | 0.106584 | absolute=0.2344569366817506 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0841227 | -0.0224611 | 0.102778 | 0.0958007 | match |
 | richter-et-al-2007 | richter_2007_si_cai_arrhenius_langmuir | alpha | SiO | temperature_K=2173 | 0.155477 | absolute=0.3183997506581433 (point.sigma); Arrhenius E uncertainty propagated as sigma_alpha/alpha=sigma_E/(R*T) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0953941 | -0.0600825 | 0.212143 | 0.188701 | match |
+| janaf-4th | Ti_normal_boiling_point | transition_point | Ti | property_kind=normal_boiling_point, target_pressure_Pa=101325 | 3630.96 | absolute=1.0 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 3560.15 | -70.806 | — | 70.806 | mismatch |
+| berkowitz-chupka-inghram-1957 | BIC57_VO_absolute_points | psat_series | VO | temperature_K=1875 | 0.155 | log10_decades=0.5 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0120686 | -0.142931 | 1.10868 | 2.21735 | mismatch |
+| berkowitz-chupka-inghram-1957 | BIC57_VO_absolute_points | psat_series | VO | temperature_K=1876 | 0.116 | log10_decades=0.5 (documented default) | unavailable (engine path exposes no quantitative model uncertainty) | not computable (engine uncertainty unavailable) | 0.0122916 | -0.103708 | 0.974849 | 1.9497 | mismatch |
 
 Assumption-only engine diagnostics (visible negative results, but excluded from comparable coverage, headlines, and residual pins):
 
 | Source | Observation | Type | Species | Coordinate | Literature | Assumption-only engine value | Raw residual dex | Typed gaps | Status |
 |---|---|---|---|---|---:|---:|---:|---|---|
+| kems-041-sossi-fegley-2018 | sossi_fegley_2018_table2_gamma_Al__AlO_1_5_ | activity_coefficient | Al | temperature_K=1673 | 0.32187 | 0.322 | 0.000175994 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
+| kems-041-sossi-fegley-2018 | sossi_fegley_2018_table2_gamma_Ca_CaO | activity_coefficient | Ca | temperature_K=1873 | 0.0122474 | 0.012 | 0.00886438 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
+| kems-041-sossi-fegley-2018 | sossi_fegley_2018_table2_gamma_Cr__CrO_1_5_ | activity_coefficient | Cr | temperature_K=1773 | 31.0805 | 31.1 | 0.000271826 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
 | kems-022-demaria-1971 | demaria_1971_fe_activity_multi_rotating_cell | activity_coefficient | Fe | window=temperature-not-stated | 1 | 0.135318 | 0.868646 | typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO; typed-refusal:missing_condition:source_sample_composition; typed-refusal:missing_capability:reference_state_conversion:pure_Fe_to_FeO; typed-refusal:unsupported_observable:qualitative_activity_not_point | assumed-input (excluded) |
 | kems-022-demaria-1971 | demaria_1971_fe_lunar_basalt_kems_main_cell | activity_coefficient | Fe | temperature_K=1550 | 1 | 0.135318 | 0.868646 | typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO; typed-refusal:missing_condition:source_sample_composition; typed-refusal:missing_capability:reference_state_conversion:pure_Fe_to_FeO; typed-refusal:unsupported_observable:qualitative_activity_not_point | assumed-input (excluded) |
-| kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=2173.15 | 0.00251189 | 0.536913 | 2.3299 | typed-refusal:missing_condition:melt_composition; typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
-| kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=2073.15 | 0.000630957 | 0.0799963 | 2.10307 | typed-refusal:missing_condition:melt_composition; typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
-| kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=1973.15 | 0.000125893 | 0.0097594 | 1.88942 | typed-refusal:missing_condition:melt_composition; typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
-| kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=1873.15 | 1.58489e-05 | 0.000926307 | 1.76675 | typed-refusal:missing_condition:melt_composition; typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
+| kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=2173.15 | 0.00251189 | 0.536913 | 2.3299 | typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
+| kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=2073.15 | 0.000630957 | 0.0799963 | 2.10307 | typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
+| kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=1973.15 | 0.000125893 | 0.0097594 | 1.88942 | typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
+| kems-010-richter-2007 | richter_2007_mg_rate_series_geometry | rate_series | Mg | temperature_K=1873.15 | 1.58489e-05 | 0.000926307 | 1.76675 | typed-refusal:missing_condition:pO2_boundary | assumed-input (excluded) |
+| kems-041-sossi-fegley-2018 | sossi_fegley_2018_table2_gamma_Mg_MgO | activity_coefficient | Mg | temperature_K=1873 | 1 | 1 | 0 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
+| kems-041-sossi-fegley-2018 | sossi_fegley_2018_table2_gamma_Mn_MnO | activity_coefficient | Mn | temperature_K=1873 | 1.89737 | 1.9 | 0.000602351 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
 | kems-012-sossi-2019 | sossi_2019_na_alpha_e_authors_adopted_unity | alpha | Na | temperature_K=1698.15 | 1 | 1 | 0 | typed-refusal:analytical_upper_bound_not_measurement | assumed-input (excluded) |
 | kems-012-sossi-2019 | sossi_2019_na_class_and_transport_b1 | alpha | Na | temperature_K=1698.15 | 1 | 1 | 0 | typed-refusal:analytical_upper_bound_not_measurement | assumed-input (excluded) |
+| kems-012-sossi-2019 | sossi_2019_na_table4_gamma_this_work | activity_coefficient | Na | temperature_K=1673.15 | 0.001 | 0.001 | 0 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
 | sossi-et-al-2019 | sossi_2019_na_open_furnace_apparent | alpha | Na | temperature_K=1698.15 | 1 | 1 | 0 | typed-refusal:analytical_upper_bound_not_measurement | assumed-input (excluded) |
+| kems-041-sossi-fegley-2018 | sossi_fegley_2018_table2_gamma_P__PO_2_5_ | activity_coefficient | P | temperature_K=1873 | 1e-08 | 1e-06 | 2 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
+| kems-041-sossi-fegley-2018 | sossi_fegley_2018_table2_gamma_SiO2__SiO_2_ | activity_coefficient | SiO2 | temperature_K=1673 | 0.994987 | 1 | 0.0021824 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
+| kems-041-sossi-fegley-2018 | sossi_fegley_2018_table2_gamma_TiO2__TiO_2_ | activity_coefficient | TiO2 | temperature_K=1673 | 1.59687 | 1.6 | 0.000849892 | typed-refusal:self_agreement_excluded | self-agreement-excluded (excluded) |
 
 <!-- END t-512 extract-store reproduction rollup -->
 Four transition-metal monoxide gas carriers now have executable, status-bearing catalog rows.

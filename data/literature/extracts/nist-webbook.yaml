@@ -671,7 +671,12 @@ species:
       - 629.0
       - 953.0
       phase: liquid
-      standard_state: null
+      standard_state: pure liquid Se; NIST/Stull TOTAL vapour pressure over elemental selenium (pure-component condensed element; not a single Sen monomer)
+      condensed_form:
+        state: unresolved
+        metastable: false
+        basis: mixed_evidence
+        note: Condensed phase is elemental Se(l) 629–953 K (Stull 1947 via NIST-WB SRD 69 CAS 7782-49-2; Se fusion 494.2 K NEA-TDB). The rail condensed-form vocabulary has no elemental-liquid token; do not label this liquid_melt (that token is the silicate-melt rail target). Locator docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md NIST_Stull_Se_total_P.
       units: log10(P_bar) = A − B/(T_K + C)
       uncertainty:
         warning: TOTAL selenium vapor pressure — speciation is multi-Sen
@@ -710,7 +715,12 @@ species:
       - 485.7
       - 730.4
       phase: highT_compiled
-      standard_state: null
+      standard_state: pure condensed As2O3 (Stull 1947 compiled; solid vs liquid / arsenolite vs claudetite unresolved across 485–730 K) / As4O6(g); pure-component condensed oxide, not a rail carrier
+      condensed_form:
+        state: unresolved
+        metastable: false
+        basis: mixed_evidence
+        note: Stull is a compiled multi-source table. Phase purity (solid vs liquid; arsenolite vs claudetite) across 485.7–730.4 K is not licensed from this extract; gap 421.69–485.7 K is not interpolated. Locator NIST Antoine row 485.7–730.4 K (docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md NIST_Stull47_As2O3_highT).
       units: log10(P_bar) = A − B/(T_K + C)
       uncertainty:
         warning: 'Stull is a compiled multi-source table; phase purity (solid vs

@@ -199,8 +199,14 @@ species:
         alpha: null
         gas_species: SiO(g)
         material: Hashimoto_1983_FCMAS_silicate_melt
-        note: α_SiO shows progressive increase with T (authors); per-T table values partially truncated
-          in OCR HTML table — retain series envelope ±0.01 uncertainty
+        semantics: competing_observation_do_not_average
+        superseded_by: fedkin_2006_sio_hashimoto_table3_complete_b1
+        payload_status: incomplete_placeholder
+        note: Incomplete OCR placeholder for Table 3 SiO. Complete per-T series lives on
+          fedkin_2006_sio_hashimoto_table3_complete_b1 (already residual-pinned). Do not
+          copy that series here — a second pin of the same Hashimoto/Fedkin measurement
+          is forbidden. α_SiO shows progressive increase with T (authors); per-T table
+          values partially truncated in OCR HTML table.
         alpha_uncertainty_sigma: 0.01
         missing_for_motzfeldt:
         - orifice_area

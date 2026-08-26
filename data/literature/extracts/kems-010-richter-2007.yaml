@@ -99,6 +99,18 @@ species:
       units: mol cm^-2 s^-1 (log10 scale in Fig. 2 OCR scatter)
       values:
         quantity: vacuum_evaporation_flux_J_Mg_vs_T
+        composition_wt_pct:
+          MgO: 11.48
+          SiO2: 46.00
+          Al2O3: 19.39
+          CaO: 23.12
+        composition_basis: starting_material
+        composition_source: Richter et al. 2007 Table 1 row "Starting material" (wt%). Residues evolve along the evaporation trajectory; this is the bulk recipe of the Type B CAI-like starting glass, not a per-point residue composition.
+        composition_locator:
+          source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+          table: '1'
+          paragraph: Starting material
+          line_range: '112'
         sample_diameters_mm_used:
         - 2.5
         - 6.0

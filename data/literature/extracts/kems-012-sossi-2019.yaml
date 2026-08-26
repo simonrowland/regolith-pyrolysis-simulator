@@ -8,9 +8,10 @@ source:
   year: 2019
 extraction:
   method: OCR-artifact transcription (prior MinerU of byte-identical PDF; 2026-08-03 spool failed; retry1
-    still in errors on s2 — no supersede) + phase-2 geometry extract
-  date: '2026-08-03'
-  worker: ocr-phase2b-gk
+    still in errors on s2 — no supersede) + phase-2 geometry extract + 2026-08-26 remine of Tables
+    1–6 residue/logK*/γ_i (Mn primary; open-furnace residue typed as residue, not alpha)
+  date: '2026-08-26'
+  worker: tp3-sossi-remine
   provenance_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/
 review_status: draft
 species:
@@ -269,6 +270,78 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
+    - observation_id: sossi_2019_na_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for NaO0.5; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 0.00022
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.001
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: NaO0.5
+        gas_species: Na(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=1.0e-3±2.2e-4 at 1673.15 K. Engine melt γ(Na2O) is parameterized
+          from this same table — residual 0 is circular, not independent validation.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+
   K:
     observations:
     - observation_id: sossi_2019_k_open_furnace_alpha_e_context
@@ -364,6 +437,3794 @@ species:
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             line_range: '408'
+    - observation_id: sossi_2019_k_logKstar_table3
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for KO0.5(l) = K(g) + 1/4 O2
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.06
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: K(g)
+        reaction: KO0.5(l) = K(g) + 1/4 O2
+        n_electrons: 1
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -3.95
+        log10_K_star_uncertainty: 0.06
+        N_points_at_T: 2
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1673.15:
+            log10_K_star: -3.95
+            log10_K_star_uncertainty: 0.06
+            N_points_at_T: 2
+        note: >-
+          Table 3 column 1673.15 K. Prose §4.2: log K* K (−3.95±0.06) at 1400°C. Single-T row (K*
+          footnote in Table 5).
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_k_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for KO0.5; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 5.5e-05
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.00022
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: KO0.5
+        gas_species: K(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=2.2e-4±5.5e-5 at 1673.15 K. Literature span 5e-5–7e-4. Derived
+          under α_e=1.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_k_table5_experimental
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: KO0.5(l) = K(g) + 1/4 O2
+        n_electrons: 1
+        n_points: 1
+        Delta_S_star_kJ_molK: 0.05
+        Delta_H_star_kJ_mol: 209.5
+        Delta_S_std_kJ_molK: 0.12
+        Delta_H_std_kJ_mol: 209.5
+        source_column: 2
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 K* experimental ΔS*=0.050, ΔH*=209.5; Source 2 = L&H 1984. Footnote *: logK* at
+          only 1 T; ΔS*/ΔH* by assuming γ_i constant in T.
+  Mn:
+    observations:
+    - observation_id: sossi_2019_mn_table2_open_furnace_residue_ppm
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '2'
+        section: '4.0 Results / Table 2'
+        line_range: '1104-1108'
+        note: >-
+          LA-ICP-MS Mn residue ppm in quenched glass vs T, t, fO2. Open 1-bar furnace; NOT a
+          vacuum Langmuir alpha and NOT a mol m^-2 s^-1 flux. Run 2M-15-07-16f omitted (empty OCR
+          row).
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar gas-mixing furnace residue composition (LA-ICP-MS on quenched glass)
+      regime: open_furnace_apparent
+      units: ppm by mass in quenched glass (as published Table 2)
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        gas_species: Mn(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        numeric_rate_status: not_reported_do_not_infer
+        not_a_measured_alpha: true
+        not_a_langmuir_vacuum_coefficient: true
+        starting_calculated_ppm: 992.4
+        starting_measured_ppm: 690.2
+        starting_measured_stdev_ppm: 3.8
+        starting_method: solution_ICP-MS of decarbonated powder (Table 1); not the same method as Table 2 LA-ICP-MS glasses
+        residue_ppm_min: 593.4
+        residue_ppm_max: 863.9
+        n_runs_tabulated: 43
+        authors_volatility_class: >-
+          non-volatile (OCR section 4.5 line 236 no statistically discernible change from initial concentrations)
+        series:
+        - run_id: 2M-15-07-16c
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 15
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 759.6
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-15-07-16d
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 15
+          log10_fO2: -3.44
+          loop: Pt
+          residue_ppm: 747.0
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-15-07-16g
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 15
+          log10_fO2: -5.63
+          loop: Pt
+          residue_ppm: 775.6
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-15-07-16h
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 15
+          log10_fO2: -7.99
+          loop: Pt
+          residue_ppm: 805.9
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: P11-06-18a
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 60
+          log10_fO2: -3.44
+          loop: Pt
+          residue_ppm: 709.6
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 1M-15-07-16a
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 60
+          log10_fO2: -3.44
+          loop: Pt
+          residue_ppm: 734.5
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 1M-15-07-16b
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 60
+          log10_fO2: -5.67
+          loop: Pt
+          residue_ppm: 800.5
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 1M-PS6
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 60
+          log10_fO2: -8.0
+          loop: Pt
+          residue_ppm: 782.9
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 3M-18-07-16b
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 120
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 593.4
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-18-07-16a
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 120
+          log10_fO2: -3.44
+          loop: Pt
+          residue_ppm: 756.5
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-18-07-16c
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 120
+          log10_fO2: -7.33
+          loop: Pt
+          residue_ppm: 721.6
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 1M-PS3
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -3.07
+          loop: Pt
+          residue_ppm: 828.4
+          form_note: at_or_above_liquidus
+        - run_id: 1M-PS2
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -5.49
+          loop: Pt
+          residue_ppm: 760.4
+          form_note: at_or_above_liquidus
+        - run_id: 1M-PS4
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -8.0
+          loop: Pt
+          residue_ppm: 833.9
+          form_note: at_or_above_liquidus
+        - run_id: P09/06/18b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -9.23
+          loop: Pt
+          residue_ppm: 802.1
+          form_note: at_or_above_liquidus
+        - run_id: P09/06/18a
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -9.23
+          loop: Re
+          residue_ppm: 722.0
+          form_note: at_or_above_liquidus
+        - run_id: 1M-PS5
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -10.01
+          loop: Pt
+          residue_ppm: 851.2
+          form_note: at_or_above_liquidus
+        - run_id: P08-02-17b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 692.7
+          form_note: at_or_above_liquidus
+        - run_id: 3M-29/2/16
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 721.4
+          form_note: at_or_above_liquidus
+        - run_id: 1M-2/3/16
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -3.07
+          loop: Pt
+          residue_ppm: 863.9
+          form_note: at_or_above_liquidus
+        - run_id: C18/12/15
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -3.07
+          loop: Ir
+          residue_ppm: 852.5
+          form_note: at_or_above_liquidus
+        - run_id: 1M-PS1
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -5.5
+          loop: Pt
+          residue_ppm: 784.8
+          form_note: at_or_above_liquidus
+        - run_id: P09/06/18c
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -5.51
+          loop: Re
+          residue_ppm: 749.3
+          form_note: at_or_above_liquidus
+        - run_id: C17/12/15a
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -7.97
+          loop: Re
+          residue_ppm: 820.4
+          form_note: at_or_above_liquidus
+        - run_id: 1M-1/3/16
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -10.01
+          loop: Re
+          residue_ppm: 845.8
+          form_note: at_or_above_liquidus
+        - run_id: 3M-1/3/16
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 120
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 779.3
+          form_note: at_or_above_liquidus
+        - run_id: C17/12/15b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 120
+          log10_fO2: -7.97
+          loop: Re
+          residue_ppm: 754.6
+          form_note: at_or_above_liquidus
+        - run_id: 1M-1/3/16b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 120
+          log10_fO2: -10.01
+          loop: Re
+          residue_ppm: 819.9
+          form_note: at_or_above_liquidus
+        - run_id: 3M-29/2/16b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 930
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 782.4
+          form_note: at_or_above_liquidus
+        - run_id: C17/12/15c
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 720
+          log10_fO2: -7.97
+          loop: Re
+          residue_ppm: 843.3
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16e
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 15
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 848.9
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16a
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 15
+          log10_fO2: -2.74
+          loop: Pt
+          residue_ppm: 742.5
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16b
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 15
+          log10_fO2: -5.5
+          loop: Pt
+          residue_ppm: 739.9
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16c
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 15
+          log10_fO2: -7.97
+          loop: Re
+          residue_ppm: 738.1
+          form_note: at_or_above_liquidus
+        - run_id: 3M-2/3/16
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 60
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 764.0
+          form_note: at_or_above_liquidus
+        - run_id: 2M-17-07-16a
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 60
+          log10_fO2: -2.74
+          loop: Pt
+          residue_ppm: 717.7
+          form_note: at_or_above_liquidus
+        - run_id: 2M-17-07-16b
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 60
+          log10_fO2: -5.5
+          loop: Pt
+          residue_ppm: 760.1
+          form_note: at_or_above_liquidus
+        - run_id: 2M-17-07-16c
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 60
+          log10_fO2: -7.97
+          loop: Pt
+          residue_ppm: 784.9
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16f
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 801.1
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16g
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -2.59
+          loop: Pt
+          residue_ppm: 825.4
+          form_note: at_or_above_liquidus
+        - run_id: P11-06-18b
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -5.48
+          loop: Pt
+          residue_ppm: 747.4
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16h
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -6.01
+          loop: Pt
+          residue_ppm: 766.4
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16d
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -9.56
+          loop: Re
+          residue_ppm: 819.6
+          form_note: at_or_above_liquidus
+        note: Residue ppm is what was measured. Do not convert to alpha or to HKL flux;
+          1-bar open-furnace transport is not vacuum Langmuir. K* was not fitted for this
+          species because no loss was resolved (Table 3 omits Mn/Ti/Sc/V/Zr/REE).
+      uncertainty:
+        note: Table 2 values as published; experimental reproducibility median misfit 6.0% relative
+          (OCR §4.2) for volatile duplicates. Non-volatile scatter is the Table 2 run-to-run range.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_mn_table5_pure_system_not_experimental
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 pure-system columns (not this experiment)
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: pure_oxide_liquid_standard
+      standard_state: pure liquid oxide Raoultian; Chase/L&H/Lamoreaux as cited by Sossi Table 5 Source column
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: pure_system_reaction_enthalpy_entropy
+        evidence_class: pure_system_literature_reprint
+        reaction: MnO(l) = Mn(g) + 1/2 O2
+        n_electrons: 2
+        Delta_S_std_kJ_molK: 0.173
+        Delta_H_std_kJ_mol: 606.3
+        source_column: 1,4
+        derived: true
+        derivation:
+          premise: Sossi reprints pure-system ΔH°/ΔS° from cited compilations; not measured in these runs
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Pure System# row. Source 1=Chase 1998, 4=O'Neill and Pownceby 1993. NOT measured
+          in these open-furnace runs; Mn is classified non-volatile (§4.5).
+    - observation_id: sossi_2019_mn_table6_te1_pure_system_derived
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '6'
+        section: '5.1 Equilibrium evaporation / Table 6'
+        line_range: '1130'
+        note: >-
+          Table 6 1% evaporation temperatures for Mn; caption/Fig.13: Mn taken from pure-system
+          thermodynamic data, not the experiments
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: pure_oxide_liquid_standard
+      standard_state: 1% evaporation temperature at 1 bar from pure-system ΔH°/ΔS° (not a residue measurement)
+      regime: open_furnace_apparent
+      units: K
+      values:
+        quantity: one_percent_evaporation_temperature
+        evidence_class: thermodynamic_model_parameter
+        gas_species: Mn(g)
+        derived: true
+        not_from_this_experiment: true
+        derivation:
+          premise: OCR Fig.13 / Table 6 caption — Mn, Mg, Fe, Co, Ni, Cr (below IW-1) taken from pure-system data (Table 5)
+          algebra: T_e^1 from experimental or pure-system K(T) at stated log fO2 (OCR §5.1)
+          unit_check: temperatures in K as published
+          sanity_check: Mn Te1(-10)=1974 K lies above the 1573–1823 K experimental window, consistent with no observed Mn loss
+        Te1_K_logfO2_m10: 1974
+        Te1_K_logfO2_m5: 2339
+        Te1_K_logfO2_air: 2783
+        note: Not a measured residue temperature and not an alpha. Pure-system reprint.
+  Ti:
+    observations:
+    - observation_id: sossi_2019_ti_table2_open_furnace_residue_ppm
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '2'
+        section: '4.0 Results / Table 2'
+        line_range: '1104-1108'
+        note: >-
+          LA-ICP-MS Ti residue ppm in quenched glass vs T, t, fO2. Open 1-bar furnace; NOT a
+          vacuum Langmuir alpha and NOT a mol m^-2 s^-1 flux. Run 2M-15-07-16f omitted (empty OCR
+          row).
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar gas-mixing furnace residue composition (LA-ICP-MS on quenched glass)
+      regime: open_furnace_apparent
+      units: ppm by mass in quenched glass (as published Table 2)
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        gas_species: Ti(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        numeric_rate_status: not_reported_do_not_infer
+        not_a_measured_alpha: true
+        not_a_langmuir_vacuum_coefficient: true
+        starting_calculated_ppm: 1008.0
+        starting_measured_ppm: 1045.0
+        starting_measured_stdev_ppm: 46.6
+        starting_method: solution_ICP-MS of decarbonated powder (Table 1); not the same method as Table 2 LA-ICP-MS glasses
+        residue_ppm_min: 1084.4
+        residue_ppm_max: 1425.6
+        n_runs_tabulated: 43
+        authors_volatility_class: >-
+          non-volatile (OCR section 4.5 line 236 no statistically discernible change from initial concentrations)
+        series:
+        - run_id: 2M-15-07-16c
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 15
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1312.4
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-15-07-16d
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 15
+          log10_fO2: -3.44
+          loop: Pt
+          residue_ppm: 1196.3
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-15-07-16g
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 15
+          log10_fO2: -5.63
+          loop: Pt
+          residue_ppm: 1285.4
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-15-07-16h
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 15
+          log10_fO2: -7.99
+          loop: Pt
+          residue_ppm: 1425.6
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: P11-06-18a
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 60
+          log10_fO2: -3.44
+          loop: Pt
+          residue_ppm: 1120.8
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 1M-15-07-16a
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 60
+          log10_fO2: -3.44
+          loop: Pt
+          residue_ppm: 1235.9
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 1M-15-07-16b
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 60
+          log10_fO2: -5.67
+          loop: Pt
+          residue_ppm: 1385.7
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 1M-PS6
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 60
+          log10_fO2: -8.0
+          loop: Pt
+          residue_ppm: 1368.3
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 3M-18-07-16b
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 120
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1224.3
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-18-07-16a
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 120
+          log10_fO2: -3.44
+          loop: Pt
+          residue_ppm: 1255.8
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 2M-18-07-16c
+          T_C: 1300
+          T_K: 1573.15
+          t_min: 120
+          log10_fO2: -7.33
+          loop: Pt
+          residue_ppm: 1417.5
+          form_note: 1300C_some_low_fO2_runs_have_5pct_microphenocrysts
+        - run_id: 1M-PS3
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -3.07
+          loop: Pt
+          residue_ppm: 1276.6
+          form_note: at_or_above_liquidus
+        - run_id: 1M-PS2
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -5.49
+          loop: Pt
+          residue_ppm: 1258.3
+          form_note: at_or_above_liquidus
+        - run_id: 1M-PS4
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -8.0
+          loop: Pt
+          residue_ppm: 1350.8
+          form_note: at_or_above_liquidus
+        - run_id: P09/06/18b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -9.23
+          loop: Pt
+          residue_ppm: 1156.0
+          form_note: at_or_above_liquidus
+        - run_id: P09/06/18a
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -9.23
+          loop: Re
+          residue_ppm: 1180.8
+          form_note: at_or_above_liquidus
+        - run_id: 1M-PS5
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 15
+          log10_fO2: -10.01
+          loop: Pt
+          residue_ppm: 1290.5
+          form_note: at_or_above_liquidus
+        - run_id: P08-02-17b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1188.2
+          form_note: at_or_above_liquidus
+        - run_id: 3M-29/2/16
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1084.4
+          form_note: at_or_above_liquidus
+        - run_id: 1M-2/3/16
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -3.07
+          loop: Pt
+          residue_ppm: 1273.1
+          form_note: at_or_above_liquidus
+        - run_id: C18/12/15
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -3.07
+          loop: Ir
+          residue_ppm: 1346.1
+          form_note: at_or_above_liquidus
+        - run_id: 1M-PS1
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -5.5
+          loop: Pt
+          residue_ppm: 1135.3
+          form_note: at_or_above_liquidus
+        - run_id: P09/06/18c
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -5.51
+          loop: Re
+          residue_ppm: 1135.7
+          form_note: at_or_above_liquidus
+        - run_id: C17/12/15a
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -7.97
+          loop: Re
+          residue_ppm: 1418.9
+          form_note: at_or_above_liquidus
+        - run_id: 1M-1/3/16
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 60
+          log10_fO2: -10.01
+          loop: Re
+          residue_ppm: 1396.8
+          form_note: at_or_above_liquidus
+        - run_id: 3M-1/3/16
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 120
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1323.2
+          form_note: at_or_above_liquidus
+        - run_id: C17/12/15b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 120
+          log10_fO2: -7.97
+          loop: Re
+          residue_ppm: 1317.2
+          form_note: at_or_above_liquidus
+        - run_id: 1M-1/3/16b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 120
+          log10_fO2: -10.01
+          loop: Re
+          residue_ppm: 1385.9
+          form_note: at_or_above_liquidus
+        - run_id: 3M-29/2/16b
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 930
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1170.0
+          form_note: at_or_above_liquidus
+        - run_id: C17/12/15c
+          T_C: 1400
+          T_K: 1673.15
+          t_min: 720
+          log10_fO2: -7.97
+          loop: Re
+          residue_ppm: 1349.0
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16e
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 15
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1319.0
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16a
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 15
+          log10_fO2: -2.74
+          loop: Pt
+          residue_ppm: 1219.5
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16b
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 15
+          log10_fO2: -5.5
+          loop: Pt
+          residue_ppm: 1238.0
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16c
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 15
+          log10_fO2: -7.97
+          loop: Re
+          residue_ppm: 1247.0
+          form_note: at_or_above_liquidus
+        - run_id: 3M-2/3/16
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 60
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1210.9
+          form_note: at_or_above_liquidus
+        - run_id: 2M-17-07-16a
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 60
+          log10_fO2: -2.74
+          loop: Pt
+          residue_ppm: 1239.6
+          form_note: at_or_above_liquidus
+        - run_id: 2M-17-07-16b
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 60
+          log10_fO2: -5.5
+          loop: Pt
+          residue_ppm: 1214.1
+          form_note: at_or_above_liquidus
+        - run_id: 2M-17-07-16c
+          T_C: 1500
+          T_K: 1773.15
+          t_min: 60
+          log10_fO2: -7.97
+          loop: Pt
+          residue_ppm: 1312.0
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16f
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -0.68
+          loop: Pt
+          residue_ppm: 1298.5
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16g
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -2.59
+          loop: Pt
+          residue_ppm: 1368.7
+          form_note: at_or_above_liquidus
+        - run_id: P11-06-18b
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -5.48
+          loop: Pt
+          residue_ppm: 1123.5
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16h
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -6.01
+          loop: Pt
+          residue_ppm: 1239.6
+          form_note: at_or_above_liquidus
+        - run_id: 2M-16-07-16d
+          T_C: 1550
+          T_K: 1823.15
+          t_min: 15
+          log10_fO2: -9.56
+          loop: Re
+          residue_ppm: 1220.5
+          form_note: at_or_above_liquidus
+        note: Residue ppm is what was measured. Do not convert to alpha or to HKL flux;
+          1-bar open-furnace transport is not vacuum Langmuir. K* was not fitted for this
+          species because no loss was resolved (Table 3 omits Mn/Ti/Sc/V/Zr/REE).
+      uncertainty:
+        note: Table 2 values as published; experimental reproducibility median misfit 6.0% relative
+          (OCR §4.2) for volatile duplicates. Non-volatile scatter is the Table 2 run-to-run range.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  Sc:
+    observations:
+    - observation_id: sossi_2019_sc_table1_2_nonvolatile_residue
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '1'
+        section: '4.5 Data fitting'
+        line_range: '1100, 236'
+        note: >-
+          Sc doped at ~1000 ppm; authors class as non-volatile (no statistically discernible
+          change)
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace residue composition
+      regime: open_furnace_apparent
+      units: ppm by mass (Table 1 starting; Table 2 glasses)
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        gas_species: Sc(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        numeric_rate_status: not_reported_do_not_infer
+        not_a_measured_alpha: true
+        starting_calculated_ppm: 970.8
+        starting_measured_ppm: 850.8
+        starting_measured_stdev_ppm: 28.9
+        authors_volatility_class: >-
+          non-volatile (OCR section 4.5 Mn, Sc, Ti, V, Zr and the REEs)
+        note: Full per-run LA-ICP-MS columns are in Table 2 (OCR line 1108). Not digitized from figures.
+          No Table 3 logK* because no loss was resolved. Not converted to alpha or flux.
+      uncertainty:
+        note: Table 1 St. Dev. on starting powder (N=2); Table 2 per-run glasses as published
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  V:
+    observations:
+    - observation_id: sossi_2019_v_table1_2_nonvolatile_residue
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '1'
+        section: '4.5 Data fitting'
+        line_range: '1100, 236'
+        note: >-
+          V doped at ~1000 ppm; authors class as non-volatile (no statistically discernible
+          change)
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace residue composition
+      regime: open_furnace_apparent
+      units: ppm by mass (Table 1 starting; Table 2 glasses)
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        gas_species: V(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        numeric_rate_status: not_reported_do_not_infer
+        not_a_measured_alpha: true
+        starting_calculated_ppm: 1019.7
+        starting_measured_ppm: 1024.6
+        starting_measured_stdev_ppm: 32.4
+        authors_volatility_class: >-
+          non-volatile (OCR section 4.5 Mn, Sc, Ti, V, Zr and the REEs)
+        note: Full per-run LA-ICP-MS columns are in Table 2 (OCR line 1108). Not digitized from figures.
+          No Table 3 logK* because no loss was resolved. Not converted to alpha or flux.
+      uncertainty:
+        note: Table 1 St. Dev. on starting powder (N=2); Table 2 per-run glasses as published
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  Zr:
+    observations:
+    - observation_id: sossi_2019_zr_table1_2_nonvolatile_residue
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '1'
+        section: '4.5 Data fitting'
+        line_range: '1100, 236'
+        note: >-
+          Zr doped at ~1000 ppm; authors class as non-volatile (no statistically discernible
+          change)
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace residue composition
+      regime: open_furnace_apparent
+      units: ppm by mass (Table 1 starting; Table 2 glasses)
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        gas_species: Zr(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        numeric_rate_status: not_reported_do_not_infer
+        not_a_measured_alpha: true
+        starting_calculated_ppm: 991.9
+        starting_measured_ppm: 1118.1
+        starting_measured_stdev_ppm: 34.8
+        authors_volatility_class: >-
+          non-volatile (OCR section 4.5 Mn, Sc, Ti, V, Zr and the REEs)
+        note: Full per-run LA-ICP-MS columns are in Table 2 (OCR line 1108). Not digitized from figures.
+          No Table 3 logK* because no loss was resolved. Not converted to alpha or flux.
+      uncertainty:
+        note: Table 1 St. Dev. on starting powder (N=2); Table 2 per-run glasses as published
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  La:
+    observations:
+    - observation_id: sossi_2019_la_table1_2_nonvolatile_residue
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '1'
+        section: '4.5 Data fitting'
+        line_range: '1100, 236'
+        note: >-
+          La doped at ~1000 ppm; authors class as non-volatile (no statistically discernible
+          change)
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace residue composition
+      regime: open_furnace_apparent
+      units: ppm by mass (Table 1 starting; Table 2 glasses)
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        gas_species: La(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        numeric_rate_status: not_reported_do_not_infer
+        not_a_measured_alpha: true
+        starting_calculated_ppm: 1038.9
+        starting_measured_ppm: 969.8
+        starting_measured_stdev_ppm: 21.2
+        authors_volatility_class: >-
+          non-volatile (OCR section 4.5 Mn, Sc, Ti, V, Zr and the REEs)
+        note: Full per-run LA-ICP-MS columns are in Table 2 (OCR line 1108). Not digitized from figures.
+          No Table 3 logK* because no loss was resolved. Not converted to alpha or flux.
+      uncertainty:
+        note: Table 1 St. Dev. on starting powder (N=2); Table 2 per-run glasses as published
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  Gd:
+    observations:
+    - observation_id: sossi_2019_gd_table1_2_nonvolatile_residue
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '1'
+        section: '4.5 Data fitting'
+        line_range: '1100, 236'
+        note: >-
+          Gd doped at ~1000 ppm; authors class as non-volatile (no statistically discernible
+          change)
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace residue composition
+      regime: open_furnace_apparent
+      units: ppm by mass (Table 1 starting; Table 2 glasses)
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        gas_species: Gd(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        numeric_rate_status: not_reported_do_not_infer
+        not_a_measured_alpha: true
+        starting_calculated_ppm: 1063.3
+        starting_measured_ppm: 1060.6
+        starting_measured_stdev_ppm: 25.2
+        authors_volatility_class: >-
+          non-volatile (OCR section 4.5 Mn, Sc, Ti, V, Zr and the REEs)
+        note: Full per-run LA-ICP-MS columns are in Table 2 (OCR line 1108). Not digitized from figures.
+          No Table 3 logK* because no loss was resolved. Not converted to alpha or flux.
+      uncertainty:
+        note: Table 1 St. Dev. on starting powder (N=2); Table 2 per-run glasses as published
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  Yb:
+    observations:
+    - observation_id: sossi_2019_yb_table1_2_nonvolatile_residue
+      type: rate_series
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '1'
+        section: '4.5 Data fitting'
+        line_range: '1100, 236'
+        note: >-
+          Yb doped at ~1000 ppm; authors class as non-volatile (no statistically discernible
+          change)
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace residue composition
+      regime: open_furnace_apparent
+      units: ppm by mass (Table 1 starting; Table 2 glasses)
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        gas_species: Yb(g)
+        material: ferrobasalt_FCMAS_open_furnace_1bar
+        numeric_rate_status: not_reported_do_not_infer
+        not_a_measured_alpha: true
+        starting_calculated_ppm: 1036.2
+        starting_measured_ppm: 1111.0
+        starting_measured_stdev_ppm: 26.4
+        authors_volatility_class: >-
+          non-volatile (OCR section 4.5 Mn, Sc, Ti, V, Zr and the REEs)
+        note: Full per-run LA-ICP-MS columns are in Table 2 (OCR line 1108). Not digitized from figures.
+          No Table 3 logK* because no loss was resolved. Not converted to alpha or flux.
+      uncertainty:
+        note: Table 1 St. Dev. on starting powder (N=2); Table 2 per-run glasses as published
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  Li:
+    observations:
+    - observation_id: sossi_2019_li_logKstar_table3_Li_g
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for LiO0.5(l) = Li(g) + 1/4 O2
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.05
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Li(g)
+        reaction: LiO0.5(l) = Li(g) + 1/4 O2
+        n_electrons: 1
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -5.36
+        log10_K_star_uncertainty: 0.05
+        N_points_at_T: 2
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1673.15:
+            log10_K_star: -5.36
+            log10_K_star_uncertainty: 0.05
+            N_points_at_T: 2
+        note: >-
+          Table 3 n=1 reaction at log fO2=−8; OCR §4.5.2.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_li_logKstar_table3_LiO_g
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for LiO0.5(l) + 1/4 O2 = LiO(g)
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.07
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Li(g)
+        reaction: LiO0.5(l) + 1/4 O2 = LiO(g)
+        n_electrons: -1
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -3.39
+        log10_K_star_uncertainty: 0.07
+        N_points_at_T: 2
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1673.15:
+            log10_K_star: -3.39
+            log10_K_star_uncertainty: 0.07
+            N_points_at_T: 2
+        note: >-
+          Table 3 n=−1 reaction in air; OCR §4.5.2.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_li_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 3.1
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 15.4
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: LiO0.5
+        gas_species: Li(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 LiO0.5 (−8) γ_i (this work)=15.4±3.1 at 1673.15 K. Air row is 1.8±0.2
+          (competing; this observation is the reducing row).
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_li_table5_experimental_Li_g
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: LiO0.5(l) = Li(g) + 1/4 O2
+        n_electrons: 1
+        n_points: 1
+        Delta_S_star_kJ_molK: 0.133
+        Delta_H_star_kJ_mol: 413.0
+        Delta_S_std_kJ_molK: 0.139
+        Delta_H_std_kJ_mol: 413.0
+        source_column: 1
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Li* n=1. Footnote *: single-T logK*. OCR Table 5 also has an n=−1 Li* row
+          (ΔS*=0.130, ΔH*=326.3).
+  Rb:
+    observations:
+    - observation_id: sossi_2019_rb_logKstar_table3
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for RbO0.5(l) = Rb(g) + 1/4 O2
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.1
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Rb(g)
+        reaction: RbO0.5(l) = Rb(g) + 1/4 O2
+        n_electrons: 1
+        t0_min: 14.4
+        T_K: 1673.15
+        log10_K_star: -3.12
+        log10_K_star_uncertainty: 0.1
+        N_points_at_T: 3
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -4.15
+            N_points_at_T: 1
+          1673.15:
+            log10_K_star: -3.12
+            log10_K_star_uncertainty: 0.1
+            N_points_at_T: 3
+          1773.15:
+            log10_K_star: -2.63
+            log10_K_star_uncertainty: 0.02
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -2.26
+            N_points_at_T: 1
+        note: >-
+          Table 3 t0=14.4 min. 1573.15 and 1823.15 values have no published SD (N=1).
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_rb_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for RbO0.5; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 1.5e-05
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.00013
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: RbO0.5
+        gas_species: Rb(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=1.3e-4±1.5e-5 at 1673.15 K; 7.4e-5±5.9e-6 at 1773.15 K; 9.0e-5
+          at 1823.15 K. Primary scalar is 1673.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_rb_table5_experimental
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: RbO0.5(l) = Rb(g) + 1/4 O2
+        n_electrons: 1
+        n_points: 6
+        Delta_S_star_kJ_molK: 0.123
+        Delta_S_star_uncertainty_kJ_molK: 0.024
+        Delta_H_star_kJ_mol: 306.4
+        Delta_H_star_uncertainty_kJ_mol: 41.6
+        Delta_S_std_kJ_molK: 0.255
+        Delta_H_std_kJ_mol: 402.4
+        source_column: 2
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Rb experimental 6 points. Source 2 = L&H 1984.
+  Cu:
+    observations:
+    - observation_id: sossi_2019_cu_logKstar_table3
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for CuO0.5(l) = Cu(g) + 1/4 O2
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.1
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Cu(g)
+        reaction: CuO0.5(l) = Cu(g) + 1/4 O2
+        n_electrons: 1
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -3.7
+        log10_K_star_uncertainty: 0.1
+        N_points_at_T: 3
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -4.09
+            log10_K_star_uncertainty: 0.12
+            N_points_at_T: 3
+          1673.15:
+            log10_K_star: -3.7
+            log10_K_star_uncertainty: 0.1
+            N_points_at_T: 3
+          1773.15:
+            log10_K_star: -3.13
+            log10_K_star_uncertainty: 0.06
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -2.9
+            N_points_at_T: 1
+        note: >-
+          Table 3 fitted logK*; open-furnace apparent K*, not a vacuum Langmuir alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_cu_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for CuO0.5; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 1.7
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 11.8
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: CuO0.5
+        gas_species: Cu(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=11.8±1.7 at 1673.15 K (also 24.0±6.3 at 1573.15, 8.5±0.1 at
+          1773.15, 6.4 at 1823.15). Literature α_e=2.4±0.8 at 1300 °C is K*/(γ_lit K) — not
+          extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_cu_table5_experimental
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: CuO0.5(l) = Cu(g) + 1/4 O2
+        n_electrons: 1
+        n_points: 9
+        Delta_S_star_kJ_molK: 0.089
+        Delta_S_star_uncertainty_kJ_molK: 0.009
+        Delta_H_star_kJ_mol: 264.0
+        Delta_H_star_uncertainty_kJ_mol: 15.7
+        Delta_S_std_kJ_molK: 0.135
+        Delta_H_std_kJ_mol: 377.7
+        source_column: 1, 4
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          OCR Table 5 reaction text writes 1/2 O2 for Cu; Table 3 n=1 is 1/4 O2. Recorded here as
+          Table 3 stoichiometry (n=1). Ambiguity noted, not silently averaged.
+  Ag:
+    observations:
+    - observation_id: sossi_2019_ag_logKstar_table3
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for AgO0.5(l) = Ag(g) + 1/4 O2
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        note: Table 3 value without published SD at this T (single-T or N=1 row)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Ag(g)
+        reaction: AgO0.5(l) = Ag(g) + 1/4 O2
+        n_electrons: 1
+        t0_min: 0
+        T_K: 1573.15
+        log10_K_star: -2.23
+        N_points_at_T: 1
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -2.23
+            N_points_at_T: 1
+        note: >-
+          Table 3 Ag only at 1573.15 K (N=1). OCR §4.5.1: vaporisation stoichiometry not well
+          constrained. 1300 °C is the stated liquidus; some low-fO2 1300 °C runs have ≈5%
+          microphenocrysts.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_ag_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.67
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: AgO0.5
+        gas_species: Ag(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.67 in the 1673.15 K column; no SD. logK* itself is only at
+          1573.15 K — T assignment of gamma is as printed, not re-derived.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  Zn:
+    observations:
+    - observation_id: sossi_2019_zn_logKstar_table3
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for ZnO(l) = Zn(g) + 1/2 O2
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.09
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Zn(g)
+        reaction: ZnO(l) = Zn(g) + 1/2 O2
+        n_electrons: 2
+        t0_min: 9.0
+        T_K: 1673.15
+        log10_K_star: -3.96
+        log10_K_star_uncertainty: 0.09
+        N_points_at_T: 4
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -5.06
+            log10_K_star_uncertainty: 0.09
+            N_points_at_T: 3
+          1673.15:
+            log10_K_star: -3.96
+            log10_K_star_uncertainty: 0.09
+            N_points_at_T: 4
+          1773.15:
+            log10_K_star: -2.92
+            log10_K_star_uncertainty: 0.17
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -2.57
+            N_points_at_T: 1
+        note: >-
+          Table 3 t0=9.0 min. n=2.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_zn_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for ZnO; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 0.13
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.51
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: ZnO
+        gas_species: Zn(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.51±0.13 at 1673.15 K. Literature α_e≈2 (Reyes & Gaskell) is
+          K*/(γ_lit K) — not extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_zn_table5_experimental
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: ZnO(l) = Zn(g) + 1/2 O2
+        n_electrons: 2
+        n_points: 10
+        Delta_S_star_kJ_molK: 0.253
+        Delta_S_star_uncertainty_kJ_molK: 0.011
+        Delta_H_star_kJ_mol: 548.6
+        Delta_H_star_uncertainty_kJ_mol: 19.6
+        Delta_S_std_kJ_molK: 0.177
+        Delta_H_std_kJ_mol: 411.7
+        source_column: 3
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Zn 10 points. Source 3 = Lamoreaux et al. 1987.
+  Ge:
+    observations:
+    - observation_id: sossi_2019_ge_logKstar_table3
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for GeO2(l) = GeO(g) + 1/2 O2
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.06
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Ge(g)
+        reaction: GeO2(l) = GeO(g) + 1/2 O2
+        n_electrons: 2
+        t0_min: 10.4
+        T_K: 1673.15
+        log10_K_star: -3.7
+        log10_K_star_uncertainty: 0.06
+        N_points_at_T: 4
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -5.04
+            log10_K_star_uncertainty: 0.13
+            N_points_at_T: 3
+          1673.15:
+            log10_K_star: -3.7
+            log10_K_star_uncertainty: 0.06
+            N_points_at_T: 4
+          1773.15:
+            log10_K_star: -2.71
+            log10_K_star_uncertainty: 0.13
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -2.29
+            N_points_at_T: 1
+        note: >-
+          Table 3 t0=10.4 min. n=2. Gas species GeO(g), not Ge(g).
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_ge_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for GeO2; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 0.01
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.11
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: GeO2
+        gas_species: Ge(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.11±0.01 at 1673.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_ge_table5_experimental
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: GeO2(l) = GeO(g) + 1/2 O2
+        n_electrons: 2
+        n_points: 10
+        Delta_S_star_kJ_molK: 0.294
+        Delta_S_star_uncertainty_kJ_molK: 0.014
+        Delta_H_star_kJ_mol: 612.7
+        Delta_H_star_uncertainty_kJ_mol: 23.9
+        Delta_S_std_kJ_molK: 0.219
+        Delta_H_std_kJ_mol: 453.8
+        source_column: 3
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Ge 10 points. Source 3 = Lamoreaux et al. 1987.
+  Cd:
+    observations:
+    - observation_id: sossi_2019_cd_logKstar_table3
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for CdO(l) = Cd(g) + 1/2 O2
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        note: Table 3 value without published SD at this T (single-T or N=1 row)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Cd(g)
+        reaction: CdO(l) = Cd(g) + 1/2 O2
+        n_electrons: 2
+        t0_min: 0
+        T_K: 1573.15
+        log10_K_star: -2.48
+        N_points_at_T: 1
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -2.48
+            N_points_at_T: 1
+        note: >-
+          Table 3 Cd only at 1573.15 K (N=1). 1300 °C liquidus caveat as for Ag.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_cd_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.15
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: CdO
+        gas_species: Cd(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.15 in the 1673.15 K column; no SD. logK* only at 1573.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+  Ga:
+    observations:
+    - observation_id: sossi_2019_ga_logKstar_table3_Ga_g
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for GaO1.5(l) = Ga(g) + 3/4 O2
+      T_range_K:
+      - 1673.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.32
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Ga(g)
+        reaction: GaO1.5(l) = Ga(g) + 3/4 O2
+        n_electrons: 3
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -9.92
+        log10_K_star_uncertainty: 0.32
+        N_points_at_T: 3
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1673.15:
+            log10_K_star: -9.92
+            log10_K_star_uncertainty: 0.32
+            N_points_at_T: 3
+          1773.15:
+            log10_K_star: -8.42
+            log10_K_star_uncertainty: 0.07
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -7.76
+            N_points_at_T: 1
+        note: >-
+          Table 3 n=3 Ga(g) reaction. No evaporation at 1300 °C (OCR §4.5.2).
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_ga_logKstar_table3_GaO_g
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for GaO1.5(l) = GaO(g) + 1/4 O2
+      T_range_K:
+      - 1673.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.26
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Ga(g)
+        reaction: GaO1.5(l) = GaO(g) + 1/4 O2
+        n_electrons: 1
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -5.1
+        log10_K_star_uncertainty: 0.26
+        N_points_at_T: 3
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1673.15:
+            log10_K_star: -5.1
+            log10_K_star_uncertainty: 0.26
+            N_points_at_T: 3
+          1773.15:
+            log10_K_star: -4.45
+            log10_K_star_uncertainty: 0.04
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -4.16
+            N_points_at_T: 1
+        note: >-
+          Table 3 n=1 GaO(g) reaction.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_ga_table5_experimental_Ga_g
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: GaO1.5(l) = Ga(g) + 3/4 O2
+        n_electrons: 3
+        n_points: 6
+        Delta_S_star_kJ_molK: 0.334
+        Delta_S_star_uncertainty_kJ_molK: 0.026
+        Delta_H_star_kJ_mol: 885.9
+        Delta_H_star_uncertainty_kJ_mol: 45.7
+        Delta_S_std_kJ_molK: 0.245
+        Delta_H_std_kJ_mol: 760.4
+        source_column: 3
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Ga n=3, 6 points. Companion n=1 row ΔS*=0.117±0.015, ΔH*=358.9±24.6 not
+          duplicated as a second observation to keep the extract one-row-per-reaction; that
+          companion is OCR Table 5 Ga n=1.
+  Pb:
+    observations:
+    - observation_id: sossi_2019_pb_logKstar_table3_PbO_g
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for PbO(l) = PbO(g)
+      T_range_K:
+      - 1573.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        note: Table 3 value without published SD at this T (single-T or N=1 row)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Pb(g)
+        reaction: PbO(l) = PbO(g)
+        n_electrons: 0
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -2.0
+        N_points_at_T: 1
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -2.9
+            log10_K_star_uncertainty: 0.12
+            N_points_at_T: 2
+          1673.15:
+            log10_K_star: -2.0
+            N_points_at_T: 1
+        note: >-
+          Table 3 n=0 congruent PbO(g). Rapidly lost; measurable remainder only at 1300 °C and
+          high fO2 at 1400 °C.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_pb_logKstar_table3_Pb_g
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for PbO(l) = Pb(g) + 1/2 O2
+      T_range_K:
+      - 1573.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        note: Table 3 value without published SD at this T (single-T or N=1 row)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Pb(g)
+        reaction: PbO(l) = Pb(g) + 1/2 O2
+        n_electrons: 2
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -3.49
+        N_points_at_T: 1
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -4.47
+            log10_K_star_uncertainty: 0.19
+            N_points_at_T: 2
+          1673.15:
+            log10_K_star: -3.49
+            N_points_at_T: 1
+        note: >-
+          Table 3 n=2 Pb(g) reaction.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_pb_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for PbO; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.17
+        quantity: activity_coefficient_this_work
+        oxide_formula_as_published: PbO
+        gas_species: Pb(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 PbO^ (n=0, PbO(g) channel) γ_i (this work)=0.17 at 1673.15 K; 0.06±0.02 at
+          1573.15 K. Companion PbO# (n=2) γ=0.38 at 1673.15 / 0.21±0.09 at 1573.15. Primary scalar
+          is the n=0 1673.15 value as printed. Table 4 α_e rows (0.3–1.7) are K*/(γ_lit K) — not
+          extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_pb_table5_experimental_PbO_g
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: PbO(l) = PbO(g)
+        n_electrons: 0
+        n_points: 3
+        Delta_S_star_kJ_molK: 0.232
+        Delta_S_star_uncertainty_kJ_molK: 0.043
+        Delta_H_star_kJ_mol: 452.1
+        Delta_H_star_uncertainty_kJ_mol: 70.6
+        Delta_S_std_kJ_molK: 0.119
+        Delta_H_std_kJ_mol: 238.0
+        source_column: 3
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Pb n=0, 3 points. Companion n=2 ΔS*=0.227±0.070, ΔH*=490.9±112.1.
+  Mo:
+    observations:
+    - observation_id: sossi_2019_mo_logKstar_table3_MoO3_congruent
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for MoO3(l) = MoO3(g)
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.0
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Mo(g)
+        reaction: MoO3(l) = MoO3(g)
+        n_electrons: 0
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -4.34
+        log10_K_star_uncertainty: 0.0
+        N_points_at_T: 2
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -4.67
+            N_points_at_T: 1
+          1673.15:
+            log10_K_star: -4.34
+            log10_K_star_uncertainty: 0.0
+            N_points_at_T: 2
+          1773.15:
+            log10_K_star: -3.64
+            log10_K_star_uncertainty: 0.01
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -3.41
+            N_points_at_T: 1
+        note: >-
+          Table 3 Mo n=0. OCR §4.5.3: logK* listed as approximate because of γ(MoO3)/γ(MoO2)=20.7
+          assumption.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_mo_logKstar_table3_MoO2_ox
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for MoO2(l) + 1/2 O2 = MoO3(g)
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        log10_K_star_uncertainty: 0.0
+        note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Mo(g)
+        reaction: MoO2(l) + 1/2 O2 = MoO3(g)
+        n_electrons: -2
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -2.86
+        log10_K_star_uncertainty: 0.0
+        N_points_at_T: 2
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1573.15:
+            log10_K_star: -2.87
+            N_points_at_T: 1
+          1673.15:
+            log10_K_star: -2.86
+            log10_K_star_uncertainty: 0.0
+            N_points_at_T: 2
+          1773.15:
+            log10_K_star: -2.48
+            log10_K_star_uncertainty: 0.01
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -2.39
+            N_points_at_T: 1
+        note: >-
+          Table 3 Mo n=−2. Approximate (see n=0 note).
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_mo_table5_experimental_MoO3
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: MoO3(l) = MoO3(g)
+        n_electrons: 0
+        n_points: 6
+        Delta_S_star_kJ_molK: 0.118
+        Delta_S_star_uncertainty_kJ_molK: 0.016
+        Delta_H_star_kJ_mol: 332.4
+        Delta_H_star_uncertainty_kJ_mol: 16.4
+        Delta_S_std_kJ_molK: 0.12
+        Delta_H_std_kJ_mol: 316.3
+        source_column: 1
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Mo* n=0, 6 points. OCR Table 5 n=−2 companion writes MoO2(g) in the reaction
+          text vs Table 3 MoO3(g); that OCR conflict is recorded, not silently repaired.
+          ΔS*=0.033±0.004, ΔH*=143.2±7.8 on the n=−2 row.
+  Cr:
+    observations:
+    - observation_id: sossi_2019_cr_logKstar_table3_CrO_ox
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '3'
+        section: 'Results / Table 3'
+        line_range: '1108-1112'
+        note: >-
+          Table 3 fitted logK* for CrO(l) + 1/2 O2 = CrO2(g)
+      T_range_K:
+      - 1673.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      regime: open_furnace_apparent
+      units: log10 dimensionless (bar-based mass-action as published)
+      uncertainty:
+        note: Table 3 value without published SD at this T (single-T or N=1 row)
+      values:
+        quantity: log10_K_star_equilibrium_fit
+        gas_species: Cr(g)
+        reaction: CrO(l) + 1/2 O2 = CrO2(g)
+        n_electrons: -2
+        t0_min: 0
+        T_K: 1673.15
+        log10_K_star: -2.7
+        N_points_at_T: 1
+        material: ferrobasalt_FCMAS_open_furnace
+        derived: true
+        derivation:
+          premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
+          algebra: K* is the fitted mass-action constant; not inverted to alpha here
+          unit_check: log10 K* as published, bar-based
+          sanity_check: Na −4.25±0.10 and K −3.95±0.06 at 1400 °C match OCR §4.2 prose
+        log10_K_star_by_T_K:
+          1673.15:
+            log10_K_star: -2.7
+            N_points_at_T: 1
+          1773.15:
+            log10_K_star: -2.4
+            log10_K_star_uncertainty: 0.03
+            N_points_at_T: 2
+          1823.15:
+            log10_K_star: -2.29
+            N_points_at_T: 1
+        note: >-
+          Table 3 Cr n=−2, semi-empirical (OCR §4.5.4). Cr was NOT doped; Table 1 calculated '-',
+          measured 36.8±0.5 ppm impurity. 1300 °C Cr data anomalously depleted and not fit.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
+    - observation_id: sossi_2019_cr_table5_experimental_CrO_ox
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '5'
+        section: 'Table 5 pure-system / experimental thermodynamic data'
+        line_range: '1121-1127'
+        note: >-
+          Table 5 experimental columns
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: open 1-bar furnace second-law ΔH*/ΔS* from fitted K*(T)
+      regime: open_furnace_apparent
+      units: kJ/mol and kJ/(mol·K) as published in Table 5
+      values:
+        quantity: experimental_reaction_enthalpy_entropy
+        evidence_class: experimental_open_furnace_second_law
+        reaction: CrO(l) + 1/2 O2 = CrO2(g)
+        n_electrons: -2
+        n_points: 4
+        Delta_S_star_kJ_molK: 0.046
+        Delta_S_star_uncertainty_kJ_molK: 0.016
+        Delta_H_star_kJ_mol: 163.1
+        Delta_H_star_uncertainty_kJ_mol: 28.6
+        Delta_S_std_kJ_molK: 0.08
+        Delta_H_std_kJ_mol: 237.6
+        source_column: 1, 6
+        derived: true
+        derivation:
+          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
+          unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
+          sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
+        note: >-
+          Table 5 Cr* n=−2, 4 points. Semi-empirical. Impurity, not a dopant.
 fidelity_samples:
 - species: Na
   observable: alpha
@@ -427,3 +4288,417 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     section: '4.6'
+- species: Na
+  observable: activity_coefficient
+  observation_id: sossi_2019_na_table4_gamma_this_work
+  field: gamma
+  value: 0.001
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: K
+  observable: activity_coefficient
+  observation_id: sossi_2019_k_logKstar_table3
+  field: log10_K_star
+  value: -3.95
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: K
+  observable: activity_coefficient
+  observation_id: sossi_2019_k_table4_gamma_this_work
+  field: gamma
+  value: 0.00022
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: K
+  observable: gibbs_table
+  observation_id: sossi_2019_k_table5_experimental
+  field: Delta_H_star_kJ_mol
+  value: 209.5
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Mn
+  observable: rate_series
+  observation_id: sossi_2019_mn_table2_open_furnace_residue_ppm
+  field: starting_measured_ppm
+  value: 690.2
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '2'
+    line_range: '1104-1108'
+- species: Mn
+  observable: gibbs_table
+  observation_id: sossi_2019_mn_table5_pure_system_not_experimental
+  field: Delta_H_std_kJ_mol
+  value: 606.3
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Mn
+  observable: gibbs_table
+  observation_id: sossi_2019_mn_table6_te1_pure_system_derived
+  field: Te1_K_logfO2_m10
+  value: 1974
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '6'
+    line_range: '1130'
+- species: Ti
+  observable: rate_series
+  observation_id: sossi_2019_ti_table2_open_furnace_residue_ppm
+  field: starting_measured_ppm
+  value: 1045.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '2'
+    line_range: '1104-1108'
+- species: Sc
+  observable: rate_series
+  observation_id: sossi_2019_sc_table1_2_nonvolatile_residue
+  field: starting_measured_ppm
+  value: 850.8
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '1'
+    line_range: '1100'
+- species: V
+  observable: rate_series
+  observation_id: sossi_2019_v_table1_2_nonvolatile_residue
+  field: starting_measured_ppm
+  value: 1024.6
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '1'
+    line_range: '1100'
+- species: Zr
+  observable: rate_series
+  observation_id: sossi_2019_zr_table1_2_nonvolatile_residue
+  field: starting_measured_ppm
+  value: 1118.1
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '1'
+    line_range: '1100'
+- species: La
+  observable: rate_series
+  observation_id: sossi_2019_la_table1_2_nonvolatile_residue
+  field: starting_measured_ppm
+  value: 969.8
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '1'
+    line_range: '1100'
+- species: Gd
+  observable: rate_series
+  observation_id: sossi_2019_gd_table1_2_nonvolatile_residue
+  field: starting_measured_ppm
+  value: 1060.6
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '1'
+    line_range: '1100'
+- species: Yb
+  observable: rate_series
+  observation_id: sossi_2019_yb_table1_2_nonvolatile_residue
+  field: starting_measured_ppm
+  value: 1111.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '1'
+    line_range: '1100'
+- species: Li
+  observable: activity_coefficient
+  observation_id: sossi_2019_li_logKstar_table3_Li_g
+  field: log10_K_star
+  value: -5.36
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Li
+  observable: activity_coefficient
+  observation_id: sossi_2019_li_logKstar_table3_LiO_g
+  field: log10_K_star
+  value: -3.39
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Li
+  observable: activity_coefficient
+  observation_id: sossi_2019_li_table4_gamma_this_work
+  field: gamma
+  value: 15.4
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: Li
+  observable: gibbs_table
+  observation_id: sossi_2019_li_table5_experimental_Li_g
+  field: Delta_H_star_kJ_mol
+  value: 413.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Rb
+  observable: activity_coefficient
+  observation_id: sossi_2019_rb_logKstar_table3
+  field: log10_K_star
+  value: -3.12
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Rb
+  observable: activity_coefficient
+  observation_id: sossi_2019_rb_table4_gamma_this_work
+  field: gamma
+  value: 0.00013
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: Rb
+  observable: gibbs_table
+  observation_id: sossi_2019_rb_table5_experimental
+  field: Delta_H_star_kJ_mol
+  value: 306.4
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Cu
+  observable: activity_coefficient
+  observation_id: sossi_2019_cu_logKstar_table3
+  field: log10_K_star
+  value: -3.7
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Cu
+  observable: activity_coefficient
+  observation_id: sossi_2019_cu_table4_gamma_this_work
+  field: gamma
+  value: 11.8
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: Cu
+  observable: gibbs_table
+  observation_id: sossi_2019_cu_table5_experimental
+  field: Delta_H_star_kJ_mol
+  value: 264.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Ag
+  observable: activity_coefficient
+  observation_id: sossi_2019_ag_logKstar_table3
+  field: log10_K_star
+  value: -2.23
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Ag
+  observable: activity_coefficient
+  observation_id: sossi_2019_ag_table4_gamma_this_work
+  field: gamma
+  value: 0.67
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: Zn
+  observable: activity_coefficient
+  observation_id: sossi_2019_zn_logKstar_table3
+  field: log10_K_star
+  value: -3.96
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Zn
+  observable: activity_coefficient
+  observation_id: sossi_2019_zn_table4_gamma_this_work
+  field: gamma
+  value: 0.51
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: Zn
+  observable: gibbs_table
+  observation_id: sossi_2019_zn_table5_experimental
+  field: Delta_H_star_kJ_mol
+  value: 548.6
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Ge
+  observable: activity_coefficient
+  observation_id: sossi_2019_ge_logKstar_table3
+  field: log10_K_star
+  value: -3.7
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Ge
+  observable: activity_coefficient
+  observation_id: sossi_2019_ge_table4_gamma_this_work
+  field: gamma
+  value: 0.11
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: Ge
+  observable: gibbs_table
+  observation_id: sossi_2019_ge_table5_experimental
+  field: Delta_H_star_kJ_mol
+  value: 612.7
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Cd
+  observable: activity_coefficient
+  observation_id: sossi_2019_cd_logKstar_table3
+  field: log10_K_star
+  value: -2.48
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Cd
+  observable: activity_coefficient
+  observation_id: sossi_2019_cd_table4_gamma_this_work
+  field: gamma
+  value: 0.15
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: Ga
+  observable: activity_coefficient
+  observation_id: sossi_2019_ga_logKstar_table3_Ga_g
+  field: log10_K_star
+  value: -9.92
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Ga
+  observable: activity_coefficient
+  observation_id: sossi_2019_ga_logKstar_table3_GaO_g
+  field: log10_K_star
+  value: -5.1
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Ga
+  observable: gibbs_table
+  observation_id: sossi_2019_ga_table5_experimental_Ga_g
+  field: Delta_H_star_kJ_mol
+  value: 885.9
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Pb
+  observable: activity_coefficient
+  observation_id: sossi_2019_pb_logKstar_table3_PbO_g
+  field: log10_K_star
+  value: -2.0
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Pb
+  observable: activity_coefficient
+  observation_id: sossi_2019_pb_logKstar_table3_Pb_g
+  field: log10_K_star
+  value: -3.49
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Pb
+  observable: activity_coefficient
+  observation_id: sossi_2019_pb_table4_gamma_this_work
+  field: gamma
+  value: 0.17
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '4'
+    line_range: '1112-1118'
+- species: Pb
+  observable: gibbs_table
+  observation_id: sossi_2019_pb_table5_experimental_PbO_g
+  field: Delta_H_star_kJ_mol
+  value: 452.1
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Mo
+  observable: activity_coefficient
+  observation_id: sossi_2019_mo_logKstar_table3_MoO3_congruent
+  field: log10_K_star
+  value: -4.34
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Mo
+  observable: activity_coefficient
+  observation_id: sossi_2019_mo_logKstar_table3_MoO2_ox
+  field: log10_K_star
+  value: -2.86
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Mo
+  observable: gibbs_table
+  observation_id: sossi_2019_mo_table5_experimental_MoO3
+  field: Delta_H_star_kJ_mol
+  value: 332.4
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'
+- species: Cr
+  observable: activity_coefficient
+  observation_id: sossi_2019_cr_logKstar_table3_CrO_ox
+  field: log10_K_star
+  value: -2.7
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '3'
+    line_range: '1108-1112'
+- species: Cr
+  observable: gibbs_table
+  observation_id: sossi_2019_cr_table5_experimental_CrO_ox
+  field: Delta_H_star_kJ_mol
+  value: 163.1
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    table: '5'
+    line_range: '1121-1127'

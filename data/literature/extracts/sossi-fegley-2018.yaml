@@ -200,6 +200,10 @@ species:
         gas_species_order:
         - Eu
         - EuO
+        semantics: bound_not_point_ordering
+        note: Speciation window only (Eu then EuO over Eu2O3(s), SF18-T1). No numeric γ
+          or activity is printed on this row; sibling sf18_speciation_Eu_metal_and_EuO
+          already carries the same ordering. Locator SF18_Eu2O3_window / SF18-T1 p.403.
     - observation_id: sf18_speciation_Eu_metal_and_EuO
       type: activity_coefficient
       locator:
@@ -235,6 +239,10 @@ species:
         gas_species_order:
         - Yb
         - YbO
+        semantics: bound_not_point_ordering
+        note: Speciation window only (Yb then YbO over Yb2O3(s), SF18-T1). No numeric γ
+          or activity is printed on this row; sibling sf18_speciation_Yb_metal_and_YbO
+          already carries the same ordering. Locator SF18_Yb2O3_window / SF18-T1 p.407.
     - observation_id: sf18_speciation_Yb_metal_and_YbO
       type: activity_coefficient
       locator:
@@ -357,6 +365,10 @@ species:
         melting_point_K_SF18: 699
         antoine_coefficients: null
         antoine_status: UNKNOWN-NO-SOURCE (primary equation coefficients not recovered this pass)
+        semantics: bound_not_point_ordering
+        note: SF18 Table 1 dominance order P4O10 >> P4O9, P4O8, P4O7, P4O6 over P4O10(s).
+          No numeric γ or activity is printed. Sibling speciation rows already use
+          bound_not_point_ordering. Locator SF18_T1_P4O10_KEMS_dominance / SF18-T1 p.405.
     - observation_id: melt_associative_P4O10
       type: gibbs_table
       locator:

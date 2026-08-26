@@ -116,7 +116,14 @@ def test_comparison_status_vocabulary_and_precedence() -> None:
         "out-of-domain",
         "out-of-domain",
     ]
-    assert {record.status for record in records} | {"match"} == COMPARISON_STATUSES
+    observed = {record.status for record in records} | {"match"}
+    assert observed <= COMPARISON_STATUSES
+    assert COMPARISON_STATUSES - observed <= {
+        "ordering-pass",
+        "ordering-fail",
+        "ordering-not-evaluable",
+        "self-agreement-excluded",
+    }
 
 
 @pytest.mark.parametrize("status_flags", [{}, {"assumed_input": True}])

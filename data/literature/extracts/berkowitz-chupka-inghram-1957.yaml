@@ -20,7 +20,12 @@ species:
         record: BIC57_VO_absolute_points
       T_range_K: null
       phase: gas
-      standard_state: null
+      standard_state: pure VO(s) condensed reservoir; absolute p(VO,g) quoted by Ban86 p. 603 from Berkowitz et al. 1957 (incongruent oxide vaporization; pure-component condensed oxide, not a rail carrier)
+      condensed_form:
+        state: crystalline
+        metastable: false
+        basis: explicit_author
+        note: Condensed reservoir VO(s) / VO1.022 as Ban86 quote of BIC57. Not a melt. Locator docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md BIC57_VO_absolute_points.
       units: P as published (bar / Pa / mmHg per source_form)
       values:
         gas_species: VO

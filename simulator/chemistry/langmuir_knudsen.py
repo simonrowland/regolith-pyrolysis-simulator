@@ -24,6 +24,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -289,6 +290,7 @@ def series_flux(
     )
 
 
+@lru_cache(maxsize=1)
 def _vapor_pressure_data() -> dict[str, Any]:
     payload = yaml.safe_load(_VAPOR_PRESSURES_PATH.read_text()) or {}
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view

@@ -119,6 +119,7 @@ species:
       - 1800.0
       - 2400.0
       phase: pure_MgO_CaO
+      standard_state: pure MgO(s) / CaO(s) in Ir Knudsen cell (geometry package; not a numeric Psat series)
       regime: kems_effusion
       units: as published
       values:
@@ -129,6 +130,11 @@ species:
         alpha: null
         note: Paper measures equilibrium ΔH / Psat in Ir cell; EXPLICITLY not an HKL α measurement. Do
           not promote as α.
+        numeric_psat_transcription_status: not_transcribed
+        numeric_psat_note: OCR figure-scatter of Figs 8–13/11 (p_Ca, p_Mg, p_O, p_O2 vs 1000/T) is
+          approximate (~ values), not an author table. Figs 14–15 are FactSage recalculations from
+          the third-law ΔfH, not the measured series. Leaving this row a geometry pointer rather than
+          inventing a Psat series from scatter. Locator kems-031-halwax-2024.md Figs 8–15.
         missing_for_motzfeldt:
         - clausing_factor
         - sample_surface_area

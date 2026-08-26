@@ -23,7 +23,13 @@ species:
       - 369.29
       - 421.69
       phase: solid_arsenolite
-      standard_state: null
+      standard_state: pure arsenolite As2O3(s) / As4O6(g); NIST Antoine of Behrens & Rosenblatt 1972 solid-branch data (pure-component condensed oxide, not a rail carrier)
+      condensed_form:
+        state: crystalline
+        polymorph: arsenolite
+        metastable: false
+        basis: explicit_author
+        note: 'BR72 title: octahedral arsenic trioxide (arsenolite). T 369.29–421.69 K is below As2O3 fusion; locator NIST Antoine row citing Behrens & Rosenblatt 1972 (docs-private/research/2026-07-30-vp-acquire-5/dominant-missing-12.md NIST_BR72_arsenolite_As4O6).'
       units: log10(P_bar) = A − B/(T_K + C)
       values:
         gas_species: As4O6

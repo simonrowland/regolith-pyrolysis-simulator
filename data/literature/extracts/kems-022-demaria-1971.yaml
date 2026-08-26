@@ -1311,10 +1311,12 @@ species:
       units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
       uncertainty:
         sigma_log10P_dex_per_point: 0.3
+        dex: 0.3
         fully_correlated_cell_calibration_offset_note: 'Framework §4.3.A error model: one fully-correlated
           cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
           Authors also state ≥factor 2 absolute-P uncertainty from calibration.'
-        note: pre-registered digitization σ; do not retune Pref/γ to close residuals
+        note: pre-registered digitization σ; do not retune Pref/γ to close residuals. dex=0.3 is the
+          already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
       values:
         gas_species: Na(g)
         quantity: partial_pressure_figure_digitized
@@ -1332,6 +1334,39 @@ species:
         first_observed_T_K: 1250.0
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
+        pO2_atm_as_published: 5.54e-09
+        pO2_bar:
+          value: 5.613405e-09
+          units: bar
+          inferred: true
+          kind: derivation_unit_conversion
+          source_observation_id: demaria_1971_o2_psat_table1_alkali_range
+          source_sample: '12022'
+          source_T_K: 1396.0
+          source_instrument: NAA
+          basis: Direct Table 1 NAA p(O2) for sample 12022 at 1396 K — the only Table 1 12022 row
+            inside this series' T window [1299, 1429] K. The 1475 K 12022 row (4.96e-8 atm) is outside
+            the digitized Na window and is not used. Not interpolated. Not DEFAULT_PO2_BAR. Not a
+            vacuum-floor. Re-cell gettering is already inside the measured p(O2).
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            table: '1'
+            paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+            line_range: 103-105
+          derivation:
+            premise: 'DeMaria 1971 Table 1, sample 12022, T=1396 K, P(O2)=5.54e-9 atm (NAA). Authors:
+              molecular oxygen detected during alkali evaporation; p(O2) far below stoichiometric
+              Me2O(s)→2Me(g)+1/2 O2(g); attributed partially to O interaction with the Re container;
+              ReO2/ReO3 observed at higher T; passivated Re on 12065 raised O2+/Me+. A Re cell is a
+              categorical redox boundary, not a numeric buffer; the tabulated p(O2) is the measurement.'
+            algebra: pO2_bar = p_atm × (1.01325 bar / 1 atm) = 5.54e-9 × 1.01325 = 5.613405e-9 bar
+            unit_check: 5.54e-9 atm × 101325 Pa/atm = 5.613405e-4 Pa; 5.613405e-4 Pa / 1e5 Pa/bar =
+              5.613405e-9 bar. Matches the already-stored Table 1 point p_Pa=0.0005613405.
+            sanity_check: 5.6e-9 bar is the same order as the alkali-window O2 table (5.54e-9–4.96e-8
+              atm). Distinct from DEFAULT_PO2_BAR=1e-8. Harness is observation-level, so this single
+              measured pO2 is attached to the whole series; no Clausius–Clapeyron interpolation or
+              extrapolation is applied. Residual includes any T-mismatch (lowest Na point is 97 K
+              below 1396 K).
         line_anchor_1429K:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
@@ -1437,10 +1472,12 @@ species:
       units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
       uncertainty:
         sigma_log10P_dex_per_point: 0.3
+        dex: 0.3
         fully_correlated_cell_calibration_offset_note: 'Framework §4.3.A error model: one fully-correlated
           cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
           Authors state ≥factor 2 absolute-P uncertainty from calibration (12065 section).'
-        note: pre-registered digitization σ; do not retune Pref/γ to close residuals
+        note: pre-registered digitization σ; do not retune Pref/γ to close residuals. dex=0.3 is the
+          already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
       values:
         gas_species: Na(g)
         quantity: partial_pressure_figure_digitized
@@ -1472,6 +1509,41 @@ species:
           series; progressive depletion lowers later points). Not included in this pre-depletion set.'
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
+        pO2_atm_as_published: 3.78e-09
+        pO2_bar:
+          value: 3.830085e-09
+          units: bar
+          inferred: true
+          kind: derivation_unit_conversion
+          source_observation_id: demaria_1971_o2_psat_table1_alkali_range
+          source_sample: '12065'
+          source_T_K: 1433.0
+          source_instrument: NAA
+          basis: 'Direct Table 1 NAA p(O2) for sample 12065 at 1433 K — the lowest-T overlapping Table 1
+            12065 row inside this series T window [1325, 1475] K, and the nearest Table 1 row to the
+            series median T (~1423.5 K). Other overlapping 12065 Table 1 rows (1459 K 8.78e-9 atm;
+            1471 K 1.27e-8 atm) are recorded on the companion O2 observation and are not averaged.
+            Not interpolated. Not DEFAULT_PO2_BAR. Not a vacuum-floor. Passivated-Re gettering is
+            already inside the measured p(O2) (authors, higher O2+/Me+ than unpassivated 12022).'
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+            table: '1'
+            paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+            line_range: 103-105
+          derivation:
+            premise: 'DeMaria 1971 Table 1, sample 12065, T=1433 K, P(O2)=3.78e-9 atm (NAA). Same alkali
+              vaporization window as Fig. 1 squares. Authors used passivated Re cells for 12065 and
+              measured a higher O2+/Me+ ratio than on 12022; the tabulated p(O2) is the measurement,
+              not a Re/ReO2 buffer calculation.'
+            algebra: pO2_bar = p_atm × (1.01325 bar / 1 atm) = 3.78e-9 × 1.01325 = 3.830085e-9 bar
+            unit_check: 3.78e-9 atm × 101325 Pa/atm = 3.830085e-4 Pa; 3.830085e-4 Pa / 1e5 Pa/bar =
+              3.830085e-9 bar. Matches the already-stored Table 1 point p_Pa=0.0003830085.
+            sanity_check: 3.8e-9 bar sits inside the 12065 alkali-window O2 table (3.78e-9–2.11e-8 atm).
+              Distinct from DEFAULT_PO2_BAR=1e-8. Harness is observation-level, so this single measured
+              pO2 is attached to the whole series; no interpolation. Residual includes T-mismatch
+              (lowest Na point is 108 K below 1433 K). A factor ~5.6 span across Table 1 12065 pO2
+              moves p_Na by only ~0.19 dex (p_Na ∝ pO2^{-1/4}); it cannot manufacture or hide a ~2 dex
+              residual.
         line_anchor_1429K:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
@@ -1777,3 +1849,15 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     paragraph: 1 mm diameter
+- path: species.Na.observations[demaria_1971_na_psat_figure1_sample_12022_digitized].values.pO2_bar.value
+  value: 5.613405e-09
+  note: Table 1 sample 12022 T=1396 K P(O2)=5.54e-9 atm converted to bar (×1.01325)
+  locator:
+    table: '1'
+    paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+- path: species.Na.observations[demaria_1971_na_psat_figure1_sample_12065_digitized].values.pO2_bar.value
+  value: 3.830085e-09
+  note: Table 1 sample 12065 T=1433 K P(O2)=3.78e-9 atm converted to bar (×1.01325)
+  locator:
+    table: '1'
+    paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization

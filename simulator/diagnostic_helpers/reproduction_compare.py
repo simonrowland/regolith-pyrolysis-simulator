@@ -17,6 +17,28 @@ COMPARISON_STATUSES = frozenset(
         "unsupported-speciation",
         "assumed-input",
         "out-of-domain",
+        # Declared ordering/bound verdicts (extract-store qualitative claims).
+        "ordering-pass",
+        "ordering-fail",
+        "ordering-not-evaluable",
+        # Computed against the same table the engine coefficient cites; shown,
+        # never counted as validation (b-134 class).
+        "self-agreement-excluded",
+    }
+)
+ORDERING_VERDICT_STATUSES = frozenset(
+    {
+        "ordering-pass",
+        "ordering-fail",
+        "ordering-not-evaluable",
+    }
+)
+SCORING_STATUSES = frozenset(
+    {
+        "match",
+        "mismatch",
+        "ordering-pass",
+        "ordering-fail",
     }
 )
 COMPARISON_ARTIFACT_SCHEMA_VERSION = 2
@@ -217,6 +239,7 @@ def compare_values(
     unsupported_speciation: bool = False,
     assumed_input: bool = False,
     out_of_domain: bool = False,
+    status_override: str | None = None,
 ) -> ComparisonRecord:
     """Compare one independent observation to one runtime value."""
 
@@ -229,7 +252,11 @@ def compare_values(
         raise ValueError("numeric observations require cited uncertainty")
     if expected_value is not None:
         _validated_uncertainty(expected_uncertainty)
-    if out_of_domain:
+    if status_override is not None:
+        if status_override not in COMPARISON_STATUSES:
+            raise ValueError(f"unsupported comparison status: {status_override!r}")
+        status = status_override
+    elif out_of_domain:
         status = "out-of-domain"
     elif unsupported_speciation:
         status = "unsupported-speciation"
