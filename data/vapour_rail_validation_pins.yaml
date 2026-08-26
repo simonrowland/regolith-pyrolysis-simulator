@@ -350,22 +350,119 @@ species:
         # lunar basalt 12022/12065. pO2 recovered from the companion Table 1
         # O2 series on the same extract (unit conversion atm→bar only).
         #
-        # ★ INTERPRETATION (t-743, resolved APPARATUS 2026-08-26 — full
-        # evidence docs-private/research/2026-08-26-na-sample-split/):
-        # the 2.044 dex headline is the coldest 12065 (passivated-Re) point,
-        # NOT a 100x Na-model error. At matched T=1428.57 K, same instrument,
-        # measured p_Na(12022)/p_Na(12065) = 31.6 (1.500 dex) while Na2O
-        # differs 1.33x (0.125 dex) and Table 1 pO2 points the WRONG way for
-        # the pO2^(-1/4) lever (-0.042 dex); Henry+pO2 leave 1.42 dex
-        # unexplained, measured-vs-measured, no engine involved. The same
-        # ~1.5 dex split appears independently on K (Fig. 2) with K2O
-        # essentially equal. Digitisation verified against the printed
-        # figure. The authors themselves except Na and K from their
-        # factor-of-2 calibration envelope. Believe 12022 as the
-        # model-vs-measurement comparison (max 0.59 dex, sign-flip at
-        # 1379 K); treat 12065 as a second KEMS series that does not
-        # constrain the Na vapour model. Both series STAY pinned; do not
-        # drop 12065, re-baseline, or retune.
+        # ★ INTERPRETATION (t-743). The APPARATUS reading recorded here on
+        # 2026-08-26 (commit bd01eaae) is WITHDRAWN the same day: an
+        # adversarial pass whose null was "12065 is sound and the engine is
+        # genuinely ~2 dex wrong" returned NULL-SUSTAINED. Evidence:
+        # docs-private/reviews/2026-08-26-t743-adversarial/grok-findings.md
+        # (supersedes docs-private/research/2026-08-26-na-sample-split/).
+        #
+        # What survives. The measured-vs-measured split is real and its
+        # arithmetic reproduces exactly. At matched T = 1428.57 K, both
+        # samples, same instrument:
+        #   log10 p_Na(12022) - log10 p_Na(12065)
+        #     = -6.05 - (-7.55)              = 1.500 dex   (31.62x)
+        #   Na2O mole-fraction (Henry) term  = 0.125 dex   (0.36/0.27 wt%)
+        #   Table-1 pO2 term, p^(-1/4):
+        #     -(1/4) * log10(5.54e-9/3.78e-9) = -0.042 dex (WRONG sign)
+        #   residual after both               = 1.417 dex   (26.1x)
+        # Digitisation is not a decade slip: an independent readout of the
+        # printed Fig. 1 and the MinerU scatter OCR both place the 7.00
+        # abscissa pair at ~-6.05 / ~-7.55.
+        #
+        # ★ What was WRONG. That 1.417 dex was called "unexplained by
+        # composition", but the 0.125 dex Henry term is the ONLY composition
+        # term this engine can express: the runtime vapour path is constant
+        # gamma (a = gamma * X, gamma_NaO0.5 = 1e-3), so by construction its
+        # answer is Henry x pO2^(-1/4) and nothing else. "The engine differs
+        # by exactly 1.21x" is that tautology restated, not a finding that
+        # melt chemistry is dead. Given a composition-dependent activity
+        # model and the REAL bulk analyses, IMCC-SF04 gives an a(Na2O) ratio
+        # of 1.21 dex at 1429 K (extrapolated, sub-liquidus) and 1.06 dex at
+        # 1800 K (in domain) — cutting the residual from 1.417 dex to
+        # ~0.3-0.4 dex, inside the authors' own factor-of-2 plus digitisation
+        # sigma.
+        #
+        # ★ The two samples are not resolved the same way, so the comparison
+        # was never composition-vs-composition (b-249, verified in-repo):
+        #   - 12065 carries a real cited suite on the extract
+        #     (sample_oxide_composition_wt_pct, Wolf/VapoRock Table 2 =
+        #     Maxwell & Wiik 1971): Al2O3 10.05, TiO2 3.34, MgO 7.82.
+        #   - 12022 carries NO suite. Its own composition_source says the
+        #     full oxide suite is "reported elsewhere (Smales 1971)" and
+        #     was not extracted, so _melt_recipe_mol() in
+        #     simulator/diagnostic_helpers/extract_reproduction.py falls back
+        #     to data/feedstocks.yaml::lunar_mare_low_ti (Al2O3 13.5,
+        #     TiO2 1.5, MgO 9.0) with a Na2O/K2O overlay.
+        # So the battery compares a REAL 12065 analysis against a GENERIC
+        # low-Ti mare proxy, and reports the difference as chemistry. Worse,
+        # the proxy reverses the sign of both majors that drive the alkali
+        # activity lever: real 12022 is LOWER Al2O3 and HIGHER TiO2 than
+        # 12065 (ilmenite / olivine-ilmenite basalt vs pigeonite basalt),
+        # while the proxy is higher Al2O3 and lower TiO2. No external source
+        # is needed to see the second half: our own 12065 extract says
+        # TiO2 = 3.34 wt%, and the proxy we hand its Apollo 12 twin says
+        # 1.5 — a 2.2x disagreement inside one comparison. The resolver does
+        # emit its provenance string, so the asymmetry is discoverable in the
+        # artifact; it simply was not read before a physics conclusion was
+        # drawn across it.
+        #
+        # ★ Smales et al. 1971 (Proc. Lunar Sci. Conf. 2, Table 2 p. 1254,
+        # filed at docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf)
+        # supplies the real 12022 suite and settles it. Signed differences
+        # (12022 minus 12065, wt%), real pair vs what the proxy asserts:
+        #   oxide   real      proxy     verdict
+        #   SiO2    -4.57     -2.37     sign ok, magnitude halved
+        #   TiO2    +1.56     -1.84     SIGN REVERSED
+        #   Al2O3   -1.85     +3.45     SIGN REVERSED
+        #   FeO     +1.84     -3.26     SIGN REVERSED
+        #   CaO     -1.73     +0.27     SIGN REVERSED
+        #   MnO     +0.05     -0.06     SIGN REVERSED
+        #   MgO     +4.08     +1.18     sign ok, understated 3.5x
+        # Five of seven majors point the WRONG WAY, including both levers
+        # (Al2O3, TiO2) that set melt polymerisation and hence alkali
+        # activity. The proxy did not blur the composition difference; it
+        # inverted it.
+        #
+        # ★★ And the Henry term itself is source-dependent at a magnitude
+        # that exceeds the term. DeMaria's own text gives Na2O = 0.36 wt%
+        # for their split 12022,57; Smales Table 2 gives 0.23 wt% for 12022:
+        #   log10(0.36/0.27) = +0.124939 dex   <- the number pinned here
+        #   log10(0.23/0.27) = -0.069636 dex   <- opposite sign
+        #   |log10(0.36/0.23)| = 0.195 dex     <- inter-source spread
+        # So the term used to rule composition OUT (0.125 dex) is smaller
+        # than the disagreement between two primary analyses of the same
+        # rock (0.195 dex), and its sign is not even determined. Whether
+        # that is split-to-split heterogeneity or an analytical difference
+        # is open; either way it is not a basis for a conclusion. Same
+        # pattern on K2O: Henry is -0.031 dex on DeMaria's 0.068 and
+        # -0.078 dex on Smales' 0.061.
+        #
+        # ★ K is NOT an independent witness. Na and K draw on the same free
+        # oxide / NBO pool, so any real melt-side effect must appear on both;
+        # a shared-mechanism observation cannot corroborate the mechanism.
+        # IMCC in fact UNDER-predicts the K split (0.47-0.59 dex vs ~1.5 dex
+        # visual). That is an open hole in the melt-chemistry account, not
+        # evidence for apparatus.
+        #
+        # ★ The authors did not licence discarding the y-axis. They excepted
+        # Na and K from the factor-of-2 calibration bound because the split
+        # was TOO LARGE to be absorbed by calibration — i.e. they treated it
+        # as real.
+        #
+        # ★ b-247 (non-additivity) fired here too: an Al2O3-only swap moves
+        # a(Na2O) by 0.05-0.16 dex, while the JOINT Si+Mg+Fe+Ti+Al difference
+        # supplies 1.06-1.21 dex. Summing one-at-a-time sensitivities is what
+        # made composition look dead.
+        #
+        # RULING: 12065 KEEPS CONSTRAINING the Na rail. The 2.044 dex pin is
+        # a real model error on a real measurement, dominated by the
+        # constant-gamma activity treatment rather than by Pref. Do not
+        # de-weight 12065, do not re-baseline, do not retune: a filter that
+        # removes exactly the sample making the model look worst is
+        # residual-driven, unlike the a priori form/class/assumed-input
+        # guards, every one of which has so far tightened or held the
+        # residual.
         # Class = silicate_melt. Form is untyped on the extract (paper does
         # not tabulate solidus/liquidus); the psat path does not apply the
         # α form gate. Residual IS the result: max 2.043550129219774 dex at
@@ -378,6 +475,7 @@ species:
           - docs/model-limitations.md#extract-store-reproduction-battery
         internal_notes_refs:
           - docs-private/research/2026-08-26-demaria-po2/findings.md
+          - docs-private/reviews/2026-08-26-t743-adversarial/grok-findings.md
       # Sossi mass_spec remains withdrawn 2026-08-11 (evidence recovery): the
       # surviving Sossi Na records are a disagreeing gamma-derived 0.3-1.7
       # inference and a separately adopted physical/analytical ceiling
