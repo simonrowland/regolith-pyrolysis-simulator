@@ -31,6 +31,18 @@ RANKED_TOKENS = frozenset(BACKEND_STATUS_PRECEDENCE)
 # melt_effect_adjustment import it. Nothing else may restate it.
 PRECEDENCE_OWNER = "simulator/chemistry/kernel/dto.py"
 
+# The crash-point rule and the boolean derived from it. Both are scanned,
+# because a copy of either reopens the disagreement this file exists to stop.
+CRASH_POINT_RULE_NAMES = frozenset({"carrier_has_crash_point", "crash_point_from_carrier"})
+
+# The two key names ARE the rule's signature. Name-scanning cannot catch a
+# renamed copy -- a review proved that by injecting one under another name --
+# so the shape is matched instead. Verified against the tree: exactly one
+# function mentions both keys, and it is the owner, so this fires on no
+# correct code today.
+CRASH_POINT_KEYS = frozenset({"out_of_domain_crash_point", "crash_point"})
+CRASH_POINT_OWNER = "simulator/optimize/backend_status.py"
+
 
 def _python_sources() -> list[pathlib.Path]:
     paths: list[pathlib.Path] = []
@@ -57,8 +69,61 @@ def test_precedence_ordering_has_exactly_one_owner() -> None:
             tree = ast.parse(path.read_text(encoding="utf-8", errors="replace"))
         except SyntaxError:
             continue
+        # Container literals are the OBVIOUS restatement, and they are not the
+        # only one: an if/elif chain returning the tokens in order states the
+        # same rule with no Tuple in sight. A NOT-FIXED review injected exactly
+        # that and this test stayed green.
+        #
+        # The first attempt at closing that hole flagged any function MENTIONING
+        # all three tokens. It fired on five functions of correct code --
+        # magemin.equilibrate, vaporock.equilibrate, alphamelts._run_liquidus_finder
+        # and a calibration report -- which all SET a status per engine outcome
+        # rather than RANKING statuses against each other. A guard that fires on
+        # correct work gets deleted, so the net is cast on the ranking SHAPE
+        # instead: a token that is both TESTED and RETURNED in the same function
+        # is being ranked, not assigned. Setters return a token they never test;
+        # membership frozensets test tokens they never return.
         for node in ast.walk(tree):
-            if not isinstance(node, (ast.Tuple, ast.List)):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            returned = {
+                sub.value.value
+                for sub in ast.walk(node)
+                if isinstance(sub, ast.Return)
+                and isinstance(sub.value, ast.Constant)
+                and isinstance(sub.value.value, str)
+            }
+            tested = {
+                const.value
+                for branch in ast.walk(node)
+                if isinstance(branch, ast.If)
+                for const in ast.walk(branch.test)
+                if isinstance(const, ast.Constant) and isinstance(const.value, str)
+            }
+            ranked_here = RANKED_TOKENS & returned & tested
+            if ranked_here == RANKED_TOKENS:
+                offenders.append(f"{rel}:{node.lineno} ({node.name}) [if/elif rank]")
+
+            for sub in ast.walk(node):
+                if not isinstance(sub, (ast.Tuple, ast.List)):
+                    continue
+                values = [
+                    element.value
+                    for element in sub.elts
+                    if isinstance(element, ast.Constant) and isinstance(element.value, str)
+                ]
+                if RANKED_TOKENS.issubset(set(values)):
+                    offenders.append(f"{rel}:{sub.lineno} ({node.name}) [literal]")
+
+        # module-level container literals, outside any function
+        func_lines = {
+            ln
+            for fn in ast.walk(tree)
+            if isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef))
+            for ln in range(fn.lineno, (fn.end_lineno or fn.lineno) + 1)
+        }
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.Tuple, ast.List)) or node.lineno in func_lines:
                 continue
             values = [
                 element.value
@@ -66,7 +131,7 @@ def test_precedence_ordering_has_exactly_one_owner() -> None:
                 if isinstance(element, ast.Constant) and isinstance(element.value, str)
             ]
             if RANKED_TOKENS.issubset(set(values)):
-                offenders.append(f"{rel}:{node.lineno}")
+                offenders.append(f"{rel}:{node.lineno} [module literal]")
     assert offenders == [], (
         "backend_status precedence is restated outside its owner "
         f"({PRECEDENCE_OWNER}); import BACKEND_STATUS_PRECEDENCE instead: {offenders}"
@@ -122,10 +187,59 @@ def test_crash_point_predicate_has_exactly_one_definition() -> None:
         except SyntaxError:
             continue
         for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef) and node.name.lstrip("_") == "carrier_has_crash_point":
-                definitions.append(f"{path.relative_to(REPO_ROOT).as_posix()}:{node.lineno}")
-    assert len(definitions) == 1, (
-        f"carrier_has_crash_point must have one definition, found: {definitions}"
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            # Scan BOTH names. The first draft of this test scanned only
+            # carrier_has_crash_point -- the derived boolean -- and not
+            # crash_point_from_carrier, which is the actual rule. A NOT-FIXED
+            # review pointed out it was therefore decorative for the thing it
+            # most needed to protect.
+            if node.name.lstrip("_") in CRASH_POINT_RULE_NAMES:
+                definitions.append(
+                    f"{path.relative_to(REPO_ROOT).as_posix()}:{node.lineno} ({node.name})"
+                )
+    assert len(definitions) == len(CRASH_POINT_RULE_NAMES), (
+        "the crash-point rule and its derived predicate must have exactly one "
+        f"definition each, found: {definitions}"
+    )
+
+
+def test_no_module_restates_the_crash_point_rule_under_another_name() -> None:
+    """A renamed copy is still a copy, and the name scan cannot see it.
+
+    `test_crash_point_predicate_has_exactly_one_definition` matches on function
+    NAMES, so a NOT-FIXED review evaded it in one line by calling the old
+    presence-based loop `_carrier_holds_crash_evidence`. It stayed green. Any
+    name-based check has that hole by construction.
+
+    So this matches the SHAPE instead: the pair of key names is the rule's
+    signature, and a function that reaches for both of them is deciding what
+    counts as crash evidence rather than asking the owner. Verified against the
+    tree when written -- exactly one function mentions both keys and it is the
+    owner -- so this fires on no correct code.
+    """
+    offenders: list[str] = []
+    for path in _python_sources():
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        if rel == CRASH_POINT_OWNER:
+            continue
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8", errors="replace"))
+        except SyntaxError:
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            names = {
+                sub.value
+                for sub in ast.walk(node)
+                if isinstance(sub, ast.Constant) and isinstance(sub.value, str)
+            }
+            if CRASH_POINT_KEYS.issubset(names):
+                offenders.append(f"{rel}:{node.lineno} ({node.name})")
+    assert offenders == [], (
+        "the crash-point rule is restated outside its owner "
+        f"({CRASH_POINT_OWNER}); call crash_point_from_carrier instead: {offenders}"
     )
 
 
