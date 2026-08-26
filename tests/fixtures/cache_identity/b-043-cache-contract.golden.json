@@ -1403,6 +1403,18 @@
       "type": "index"
     },
     {
+      "name": "idx_alphamelts_outputs_phase_context_isothermal",
+      "sql": "CREATE INDEX idx_alphamelts_outputs_phase_context_isothermal\n    ON alphamelts_outputs(\n        status,\n        status_kind,\n        generic_phase_assemblage_available,\n        generic_temperature_C\n    )\n    WHERE engine_epoch >= 2",
+      "table": "alphamelts_outputs",
+      "type": "index"
+    },
+    {
+      "name": "idx_alphamelts_outputs_phase_context_liquidus",
+      "sql": "CREATE INDEX idx_alphamelts_outputs_phase_context_liquidus\n    ON alphamelts_outputs(\n        status,\n        status_kind,\n        engine_epoch,\n        generic_phase_assemblage_available,\n        COALESCE(alpha_liquidus_T_C, generic_liquidus_T_C)\n    )",
+      "table": "alphamelts_outputs",
+      "type": "index"
+    },
+    {
       "name": "idx_alphamelts_outputs_status",
       "sql": "CREATE INDEX idx_alphamelts_outputs_status\n    ON alphamelts_outputs(status, engine_epoch)",
       "table": "alphamelts_outputs",

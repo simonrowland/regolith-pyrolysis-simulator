@@ -1439,7 +1439,61 @@ CREATE INDEX IF NOT EXISTS idx_grid_keys_drain
     ON grid_keys(batch_id, shard, shuffle_rank);
 CREATE INDEX IF NOT EXISTS idx_grid_key_claims_expiry
     ON grid_key_claims(expires_at_epoch);
+CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_phase_context_liquidus
+    ON alphamelts_outputs(
+        status,
+        status_kind,
+        engine_epoch,
+        generic_phase_assemblage_available,
+        COALESCE(alpha_liquidus_T_C, generic_liquidus_T_C)
+    );
+CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_phase_context_isothermal
+    ON alphamelts_outputs(
+        status,
+        status_kind,
+        generic_phase_assemblage_available,
+        generic_temperature_C
+    )
+    WHERE engine_epoch >= 2;
 """
+
+
+PHASE_CONTEXT_LOOKUP_INDEX_STATEMENTS: tuple[str, ...] = (
+    """
+    CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_phase_context_liquidus
+    ON alphamelts_outputs(
+        status,
+        status_kind,
+        engine_epoch,
+        generic_phase_assemblage_available,
+        COALESCE(alpha_liquidus_T_C, generic_liquidus_T_C)
+    )
+    """,
+    """
+    CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_phase_context_isothermal
+    ON alphamelts_outputs(
+        status,
+        status_kind,
+        generic_phase_assemblage_available,
+        generic_temperature_C
+    )
+    WHERE engine_epoch >= 2
+    """,
+)
+
+
+def install_phase_context_lookup_indexes(connection: sqlite3.Connection) -> None:
+    """CREATE INDEX the PhaseContext lookup indexes. Additive; no schema check.
+
+    ``GridCacheWriter`` cannot open a pre-v2 accumulator: validation
+    requires ``grid_keys.input_payload_json`` (and siblings) before
+    ``_ensure_phase_context_lookup_indexes`` runs. The live
+    ``grind-accumulator.db`` predates those columns. Call this on a raw
+    ``sqlite3`` connection for that file; ``CREATE INDEX IF NOT EXISTS``
+    is valid on both legacy and v2 caches.
+    """
+    for statement in PHASE_CONTEXT_LOOKUP_INDEX_STATEMENTS:
+        connection.execute(statement)
 
 
 class GridCacheWriter:
@@ -1505,6 +1559,7 @@ class GridCacheWriter:
             self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
             self._ensure_claim_table()
+            self._ensure_phase_context_lookup_indexes()
             if self.backend_name is not None:
                 self._bind_engine_result_namespace(
                     _engine_result_namespace({}, self.backend_name)
@@ -1856,6 +1911,9 @@ class GridCacheWriter:
             "CREATE INDEX IF NOT EXISTS idx_grid_key_claims_expiry "
             "ON grid_key_claims(expires_at_epoch)"
         )
+
+    def _ensure_phase_context_lookup_indexes(self) -> None:
+        install_phase_context_lookup_indexes(self.connection)
 
     def _begin_write_section(self, savepoint_name: str) -> str | None:
         if self.connection.in_transaction:
