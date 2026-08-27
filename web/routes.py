@@ -994,7 +994,27 @@ def _read_cache_summary(cache_path: Path, run_id: str) -> dict[str, Any]:
                 """
             ).fetchone()
             if latest is not None:
-                summary['latest_result'] = _result_metadata(latest, run_id=run_id)
+                # ★ ONE UNREADABLE LATEST MUST NOT TAKE THE WHOLE LISTING DOWN.
+                # This surrounding try catches sqlite3.Error ONLY, so a stored
+                # backend_status the fidelity vocabulary cannot read raised
+                # straight through /api/optimizer/runs and every HEALTHY run in
+                # the listing went with it -- the run library became
+                # unreachable because of one row in one run.
+                #
+                # Contained rather than excluded, for the same reason the detail
+                # page is: at this level the RUN is the entity the operator came
+                # for, and dropping it loses the run itself, not merely a row
+                # inside it. The marked payload says not authoritative, not
+                # real, certification forbidden.
+                #
+                # ★ FOUND BY REVIEW, NOT BY ME. My own containment audit for
+                # 3582fb38 checked whether each caller sat inside a `try`, and
+                # this one does -- but it catches the WRONG EXCEPTION. Presence
+                # of a guard is not coverage by that guard; that check was
+                # structural where it needed to be behavioural.
+                summary['latest_result'] = _result_metadata(
+                    latest, run_id=run_id, contain_unreadable_backend=True
+                )
     except sqlite3.Error as exc:
         summary['error'] = str(exc)
     return summary

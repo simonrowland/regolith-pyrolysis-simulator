@@ -3261,6 +3261,71 @@ def test_wide_winners_table_is_wrapped_in_a_scroll_container(client) -> None:
     assert ".table-scroll" in css and "overflow-x: auto" in css
 
 
+def test_runs_listing_survives_one_unreadable_latest_result(client) -> None:
+    """One bad row in ONE run must not take the whole run library down.
+
+    /api/optimizer/runs builds each summary's latest_result through
+    _result_metadata. The surrounding try in _read_cache_summary catches
+    sqlite3.Error ONLY, so a stored backend_status the fidelity vocabulary
+    cannot read raised straight through the endpoint and every HEALTHY run went
+    with it.
+
+    ★ THIS GAP SURVIVED MY OWN CONTAINMENT AUDIT for 3582fb38. That audit asked
+    whether each caller of _result_metadata sat inside a `try` -- and this one
+    does. It catches the wrong exception. Presence of a guard is not coverage by
+    that guard, and checking for the former while claiming the latter is a
+    structural test wearing a behavioural claim. An independent reviewer found
+    it by executing the endpoint rather than reading the callers.
+
+    The fixture therefore asserts the thing that actually matters and that a
+    single-run fixture cannot show: a HEALTHY run stored alongside the bad one
+    is still listed.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+
+    healthy_dir = runs_dir / "run-healthy"
+    healthy_dir.mkdir(parents=True)
+    healthy_store = ResultStore(healthy_dir / "cache.sqlite")
+    healthy_spec = _base_spec(recipe_id="recipe-healthy")
+    healthy_store.store(
+        healthy_spec,
+        _scored(healthy_spec, candidate_id="candidate-healthy"),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    unreadable_dir = runs_dir / "run-unreadable"
+    unreadable_dir.mkdir(parents=True)
+    unreadable_store = ResultStore(unreadable_dir / "cache.sqlite")
+    unreadable_spec = _base_spec(recipe_id="recipe-unreadable")
+    unreadable_store.store(
+        unreadable_spec,
+        _scored(
+            unreadable_spec,
+            candidate_id="candidate-unreadable-latest",
+            feasible=False,
+            trace={"backend_status": "not_converged"},
+            backend_status="not_converged",
+            backend_authoritative=False,
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/api/optimizer/runs")
+
+    assert response.status_code == 200, (
+        "one unreadable latest result took the whole runs listing down"
+    )
+    payload = response.get_json()
+    candidates = {
+        (run.get("latest_result") or {}).get("candidate_id")
+        for run in payload.get("runs", [])
+    }
+    assert "candidate-healthy" in candidates, (
+        "the healthy run was lost along with the unreadable one"
+    )
+    assert "candidate-unreadable-latest" in candidates
+
+
 def test_detail_page_renders_a_row_whose_backend_token_is_unreadable(
     client,
 ) -> None:
