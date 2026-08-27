@@ -787,6 +787,64 @@ def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:
     )
 
 
+def test_leaderboard_contains_one_unreadable_row_without_losing_the_page(
+    client,
+) -> None:
+    """One row the vocabulary cannot read must not take the whole board down.
+
+    Rendering a row runs its STORED provenance through the fidelity vocabulary,
+    which RAISES on a token it does not know. Stored rows outlive the vocabulary
+    that wrote them, so a token retired after the row was cached arrives here as
+    an unknown one -- and uncontained, that single row aborted the request and
+    the operator lost every OTHER run's results with it.
+
+    The bad row is written by mutating the STORED payload directly rather than
+    by going through the store, because the write gate would reject it. That is
+    the point: this row cannot be created today, only INHERITED from an older
+    vocabulary, which is exactly the case the containment exists for.
+
+    Asserts the survivor is still ranked AND that the loss is declared. A silent
+    skip would leave the board looking complete while under-reporting it.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-contained"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    good = _base_spec(recipe_id="row-good")
+    bad = _base_spec(recipe_id="row-bad")
+    store.store(good, _scored(good, candidate_id="candidate-good", oxygen=10.0),
+                created_at="2026-06-01T00:00:00Z")
+    store.store(bad, _scored(bad, candidate_id="candidate-bad", oxygen=99.0),
+                created_at="2026-06-01T00:00:00Z")
+
+    # Retire the token on ONE row, the way an older vocabulary would have left it.
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        conn.row_factory = sqlite3.Row
+        for row in conn.execute(
+            "SELECT cache_key, run_reference FROM results"
+        ).fetchall():
+            reference = json.loads(row["run_reference"])
+            if reference.get("product_summary", {}).get("oxygen_kg") != 99.0:
+                continue
+            reference["evidence_class"] = "a-token-this-build-never-heard-of"
+            conn.execute(
+                "UPDATE results SET run_reference = ? WHERE cache_key = ?",
+                (json.dumps(reference), row["cache_key"]),
+            )
+
+    response = client.get(
+        "/api/optimizer/leaderboard?feedstock_id=lunar_mare_low_ti"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    candidates = {entry["candidate_id"] for entry in payload["entries"]}
+    assert "candidate-good" in candidates
+    assert "candidate-bad" not in candidates
+    assert payload["excluded_unreadable"] == 1
+
+
 def test_optimizer_backend_payload_marks_analytical_unavailable() -> None:
     """An analytical eval_spec displays as unavailable and non-certifiable.
 

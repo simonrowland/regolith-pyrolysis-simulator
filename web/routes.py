@@ -1189,6 +1189,9 @@ def _leaderboard_entries(
     excluded_counts = {
         'excluded_infeasible': 0,
         'excluded_nonfinite': 0,
+        # A row the vocabulary cannot read is EXCLUDED AND COUNTED, never
+        # silently dropped -- see the containment below.
+        'excluded_unreadable': 0,
     }
     selected_metric = (
         canonical_objective_metric(objective_metric)
@@ -1225,18 +1228,36 @@ def _leaderboard_entries(
                 excluded_counts['excluded_nonfinite'] += 1
                 continue
             selected_sense = str(objective.get('sense') or selected_sense)
-            entry = _result_metadata(
-                row,
-                run_id=run_id,
-                objective_metric=selected_metric,
-            )
-            entry['objective_metric'] = selected_metric
-            entry['objective_value'] = value
-            entry['objective_sense'] = selected_sense
-            entry['data_digest_scope'] = {
-                'mode': 'entry_data_digests',
-                'data_digests': entry.get('eval_spec', {}).get('data_digests') or {},
-            }
+            # ★ ONE UNREADABLE ROW MUST NOT TAKE THE PAGE DOWN. Rendering a row
+            # runs its stored provenance through the fidelity vocabulary, which
+            # RAISES on a token it does not know -- and stored rows outlive the
+            # vocabulary that wrote them, so a token retired after the row was
+            # cached reaches this loop as an unknown one. Uncontained, a single
+            # such row aborted the whole request and the operator lost every
+            # OTHER run's results to it.
+            #
+            # Contained AND COUNTED, not swallowed: the row drops out of the
+            # board and says so through excluded_unreadable, the same way
+            # infeasible and non-finite rows already declare themselves. A
+            # silent skip here would under-report the board while looking
+            # complete, which is the failure this endpoint is least able to
+            # afford.
+            try:
+                entry = _result_metadata(
+                    row,
+                    run_id=run_id,
+                    objective_metric=selected_metric,
+                )
+                entry['objective_metric'] = selected_metric
+                entry['objective_value'] = value
+                entry['objective_sense'] = selected_sense
+                entry['data_digest_scope'] = {
+                    'mode': 'entry_data_digests',
+                    'data_digests': entry.get('eval_spec', {}).get('data_digests') or {},
+                }
+            except Exception:
+                excluded_counts['excluded_unreadable'] += 1
+                continue
             rows.append((entry, value, selected_sense))
 
     reverse = selected_sense != 'minimize'
