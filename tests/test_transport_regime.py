@@ -729,3 +729,82 @@ def test_refuse_continuum_formula_if_load_bearing_actually_refuses_a_nan():
         float("inf"), campaign_name="C4", asking_site="tests.b275.wrapper_vacuum"
     )
     assert vacuum.action is tr.ContinuumValidityAction.OK
+
+
+def test_free_molecular_helper_keeps_the_true_vacuum_limit_it_used_to_refuse():
+    """b-283 / SC-146: +inf is the free-molecular limit, not a missing Kn.
+
+    The guard was ``not math.isfinite(kn) or kn < 0.0``, which cannot separate
+    the two non-finite values even though they mean opposite things: NaN is "we
+    do not know Kn" (refuse) while +inf is lambda >> L, true vacuum, this
+    project's lunar baseline (keep).
+
+    Asserted as CONTINUITY rather than as absence-of-refusal. A test that only
+    checked ``+inf does not raise`` would pass against a guard that admitted it
+    and then returned something incoherent. The claim that matters is that the
+    limit behaves like the large finite values it is the limit of -- the old
+    guard admitted 1e12 and refused +inf, which is precisely the discontinuity.
+    """
+
+    import math
+
+    from simulator.transport_regime import (
+        _require_free_molecular_knudsen,
+        assess_continuum_formula_validity,
+        classify_knudsen_regime,
+    )
+
+    large_finite = _require_free_molecular_knudsen(1e12, category="test")
+    limit = _require_free_molecular_knudsen(math.inf, category="test")
+    assert large_finite == 1e12
+    assert limit == math.inf
+
+    # Same file, same physical state: all three must agree that +inf is
+    # free-molecular. They disagreed before this fix.
+    assert classify_knudsen_regime(math.inf) == classify_knudsen_regime(1e12)
+    inf_assessment = assess_continuum_formula_validity(math.inf, asking_site="test")
+    big_assessment = assess_continuum_formula_validity(1e12, asking_site="test")
+    assert inf_assessment.in_domain == big_assessment.in_domain is True
+
+    # The genuinely-missing input is still refused, and so are negatives.
+    for bad in (math.nan, -1.0):
+        with pytest.raises(Exception) as excinfo:
+            _require_free_molecular_knudsen(bad, category="test")
+        # Name the refusal. "raised something" would pass on an unrelated
+        # TypeError -- an arity slip in this very test file produced exactly
+        # that false signal while this fix was being verified.
+        assert "invalid_knudsen_number" in str(excinfo.value)
+
+
+def test_molecular_conductance_is_computable_in_true_vacuum():
+    """b-283: the refusal was not latent -- it reached both production callers.
+
+    Kn = +inf is the mandate's baseline operating regime (lunar vacuum), so a
+    helper that refused it made conductance uncomputable exactly where the
+    project actually operates.
+    """
+
+    import math
+
+    from simulator.transport_regime import (
+        molecular_aperture_conductance_m3_s,
+        molecular_tube_conductance_m3_s,
+    )
+
+    aperture_limit = molecular_aperture_conductance_m3_s(
+        0.01, 1500.0, 0.028, knudsen_number=math.inf
+    )
+    aperture_large = molecular_aperture_conductance_m3_s(
+        0.01, 1500.0, 0.028, knudsen_number=1e12
+    )
+    assert aperture_limit == pytest.approx(aperture_large)
+    assert aperture_limit > 0.0
+
+    tube_limit = molecular_tube_conductance_m3_s(
+        0.12, 2.0, 1500.0, 0.028, transmission_probability=0.5, knudsen_number=math.inf
+    )
+    tube_large = molecular_tube_conductance_m3_s(
+        0.12, 2.0, 1500.0, 0.028, transmission_probability=0.5, knudsen_number=1e12
+    )
+    assert tube_limit == pytest.approx(tube_large)
+    assert tube_limit > 0.0

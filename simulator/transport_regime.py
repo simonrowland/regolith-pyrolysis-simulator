@@ -470,8 +470,34 @@ def _require_free_molecular_knudsen(
     knudsen_number: float, *, category: str
 ) -> float:
     knudsen_number = float(knudsen_number)
-    if not math.isfinite(knudsen_number) or knudsen_number < 0.0:
-        _refuse("invalid_knudsen_number", "Kn must be finite and >= 0")
+    # SC-146 / b-283: refuse NaN and negatives, KEEP +inf. The old guard was
+    # `not math.isfinite(...)`, which cannot tell the two non-finite values apart
+    # even though they mean opposite things here:
+    #   NaN  = we do not know Kn -> missing input -> refuse
+    #   +inf = Kn = lambda/L with lambda >> L -> TRUE free-molecular flow, i.e.
+    #          true vacuum, which is this project's lunar baseline -> keep
+    # Nothing downstream needs a finite value: both callers
+    # (molecular_aperture_conductance_m3_s, molecular_tube_conductance_m3_s) pass
+    # Kn into this precondition ONLY and compute conductance from area,
+    # temperature and molar mass -- Kn never enters the arithmetic. And the very
+    # next check below WANTS +inf to pass: `inf < FREE_MOLECULAR_KNUDSEN_MIN` is
+    # False, so the semantic test already agrees +inf is free-molecular.
+    #
+    # The explicit isnan is load-bearing and must not be "simplified" away: by
+    # IEEE 754 every ordered comparison with NaN is False, so `nan < MIN` is also
+    # False and a NaN would sail through the regime check below as if it were a
+    # large Kn. Ordered comparisons alone cannot reject NaN.
+    #
+    # Measured before this change: Kn=1e12 -> OK, Kn=+inf -> REFUSE, while
+    # classify_knudsen_regime(+inf) said free_molecular and
+    # assess_continuum_formula_validity(+inf) said ok/in_domain. Three functions
+    # in this one file disagreed about the same physical state; the helper
+    # admitted the large finite limit and refused the limit itself.
+    if math.isnan(knudsen_number) or knudsen_number < 0.0:
+        _refuse(
+            "invalid_knudsen_number",
+            "Kn must not be NaN or negative; +inf is the free-molecular limit",
+        )
     if knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN:
         _refuse(
             category,
