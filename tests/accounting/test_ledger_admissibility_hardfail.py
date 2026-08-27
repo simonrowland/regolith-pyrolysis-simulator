@@ -6,6 +6,7 @@ from collections.abc import Callable
 import pytest
 
 from simulator.accounting.exceptions import (
+    AccountCreditPolicyError,
     AccountingError,
     OverdraftError,
     UnbalancedTransitionError,
@@ -227,7 +228,22 @@ def _direct_reservoir_no_limit() -> tuple[Action, Action, type[BaseException]]:
             {"C": 0.25},
         )
 
-    return valid, invalid, OverdraftError
+    # b-284: this path hard-fails as it always did; only the TYPE changed, and
+    # deliberately. "No credit limit is configured" is not an overdraw -- nothing
+    # was drawn past a bound, there is no bound. It used to raise OverdraftError,
+    # which the optimizer catches and classifies as inventory_overdraw, so a
+    # configuration gap was pruning good recipes as physically infeasible while
+    # never telling the operator the config was incomplete.
+    #
+    # The admissibility invariant this case guards is unchanged: the action is
+    # still inadmissible and still raises. AccountCreditPolicyError remains an
+    # AccountingError, so anything catching that base class is unaffected; only
+    # code catching OverdraftError specifically stops catching it, which is the
+    # entire point of the change.
+    #
+    # The kernel twin of this case expects ProposalRejected and is untouched --
+    # the planner wraps whatever the ledger raises, so it never saw the type.
+    return valid, invalid, AccountCreditPolicyError
 
 
 def _direct_terminal_disallowed_species() -> tuple[Action, Action, type[BaseException]]:
