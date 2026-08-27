@@ -3587,6 +3587,140 @@ def test_winners_table_ranks_by_score_not_by_selector_pair_order(
     )
 
 
+def test_optimizer_winner_entries_opens_each_run_store_once(
+    client,
+    monkeypatch,
+) -> None:
+    """The winners table must not re-scan every run store for every pair.
+
+    GET /optimizer used to call _leaderboard_entries(run_dirs) once per
+    selector pair. Each of those calls opened every run store, so the page
+    did O(pairs × run_dirs) sqlite opens. At 169 pairs and 326 runs that is
+    ~55k opens and a multi-minute render. Fixture-size tests hid it because
+    2 pairs × a few dirs collapses to a handful of opens.
+
+    The first repair (one open per run) still left an O(pairs × run_dirs)
+    Python loop: digest-scope on every run for every pair, including empty
+    (run, pair) cells. Opens stayed linear while the page stayed unusable.
+    This fixture is large enough that BOTH nested loops are distinguishable:
+    8 run dirs × 8 unique pairs is 72 inner scans on the old shape.
+
+    Assert on COUNTS, never on wall-clock time. Each run holds a DISTINCT
+    pair so empty (run, pair) cells exist for the old nested walk to visit
+    and for a linear grouped walk to skip.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    n_runs = 8
+    for index in range(n_runs):
+        run_dir = runs_dir / f"run-open-count-{index:02d}"
+        run_dir.mkdir(parents=True)
+        store = ResultStore(run_dir / "cache.sqlite")
+        spec = _base_spec(
+            recipe_id=f"recipe-{index:02d}",
+            feedstock_id=f"feedstock-{index:02d}",
+            profile_id=f"profile-{index:02d}",
+        )
+        store.store(
+            spec,
+            _scored(
+                spec,
+                candidate_id=f"candidate-{index:02d}",
+                oxygen=10.0 + index,
+            ),
+            created_at="2026-06-01T00:00:00Z",
+        )
+
+    opens: list[Path] = []
+    query_calls: list[int] = []
+    filter_calls: list[int] = []
+    yaml_loads: list[int] = []
+    real_connect = web_routes._connect_result_store
+    real_query = web_routes._query_result_rows
+    real_interoperable = web_routes.interoperable_corpus_versions
+
+    def counting_connect(cache_path: Path) -> sqlite3.Connection:
+        opens.append(Path(cache_path))
+        return real_connect(cache_path)
+
+    def counting_query(*args: object, **kwargs: object):
+        query_calls.append(1)
+        return real_query(*args, **kwargs)
+
+    def counting_interoperable() -> tuple[str, ...]:
+        yaml_loads.append(1)
+        return real_interoperable()
+
+    monkeypatch.setattr(web_routes, "_connect_result_store", counting_connect)
+    monkeypatch.setattr(web_routes, "_query_result_rows", counting_query)
+    monkeypatch.setattr(
+        web_routes, "interoperable_corpus_versions", counting_interoperable
+    )
+    if hasattr(web_routes, "_filter_rows_to_digest_scope"):
+        real_filter = web_routes._filter_rows_to_digest_scope
+
+        def counting_filter(*args: object, **kwargs: object):
+            filter_calls.append(1)
+            return real_filter(*args, **kwargs)
+
+        monkeypatch.setattr(
+            web_routes, "_filter_rows_to_digest_scope", counting_filter
+        )
+
+    with client.application.test_request_context("/optimizer"):
+        run_dirs = web_routes._optimizer_run_dirs(web_routes._optimizer_runs_root())
+        entries, _metric, _excluded = web_routes._optimizer_winner_entries(
+            run_dirs,
+            feedstock_id=None,
+            profile_id=None,
+            fidelity=None,
+            objective_metric=None,
+            limit=50,
+        )
+
+    n_pairs = n_runs
+    quadratic = n_runs * n_pairs
+    inner_python = len(query_calls) + len(filter_calls)
+    assert len(run_dirs) == n_runs
+    assert len(entries) == n_pairs, (
+        "linear-scan repair returned no ranked rows; a vacuous empty board "
+        "must not pass this count"
+    )
+    assert n_runs <= len(opens) <= n_runs + n_pairs, (
+        f"winner-table store opens should be O(run_dirs)+O(pairs) "
+        f"[{n_runs}..{n_runs + n_pairs}], got {len(opens)}; "
+        f"nested per-pair scan is {n_runs * (1 + n_pairs)}"
+    )
+    assert len(opens) < n_runs * (1 + n_pairs)
+    assert inner_python <= n_runs + n_pairs, (
+        f"per-run/per-pair Python work should be O(run_dirs + pairs)="
+        f"{n_runs + n_pairs}, got {inner_python} "
+        f"(query={len(query_calls)} filter={len(filter_calls)}); "
+        f"nested empty digest-scope is {quadratic}"
+    )
+    assert inner_python < quadratic
+    assert len(yaml_loads) <= 2, (
+        f"corpus-version YAML should load O(1) per winners scan, got "
+        f"{len(yaml_loads)}; per-row _corpus_version_badge re-parse is "
+        f"O(rows)"
+    )
+
+    yaml_loads.clear()
+    with client.application.test_request_context("/api/optimizer/leaderboard"):
+        board, _metric, _scope, _excluded = web_routes._leaderboard_entries(
+            run_dirs,
+            feedstock_id=None,
+            profile_id=None,
+            fidelity=None,
+            objective_metric=None,
+            limit=50,
+        )
+    assert board, "JSON leaderboard scan returned no rows"
+    assert len(yaml_loads) <= 2, (
+        f"corpus-version YAML should load O(1) per leaderboard scan, got "
+        f"{len(yaml_loads)}; per-row re-parse is O(rows)"
+    )
+
+
 def test_optimizer_page_and_table_render_feedstock_profile_winners(
     client,
     tmp_path,

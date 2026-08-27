@@ -456,17 +456,34 @@ def _corpus_version_badge(
     }
 
 
-def _corpus_filter_clause(
-    conn: sqlite3.Connection,
+def _corpus_filter_from_present(
+    present_columns: set[str],
     accepted_versions: tuple[str, ...],
 ) -> tuple[str, tuple[Any, ...]]:
-    if not _table_has_column(conn, 'results', 'corpus_version'):
+    if 'corpus_version' not in present_columns:
         return '1 = 1', ()
     if not accepted_versions:
         return 'corpus_version IS NULL', ()
     placeholders = ', '.join('?' for _ in accepted_versions)
     return (
         f'(corpus_version IS NULL OR corpus_version IN ({placeholders}))',
+        accepted_versions,
+    )
+
+
+def _results_table_columns(conn: sqlite3.Connection) -> set[str]:
+    return {
+        row['name']
+        for row in conn.execute('PRAGMA table_info(results)')
+    }
+
+
+def _corpus_filter_clause(
+    conn: sqlite3.Connection,
+    accepted_versions: tuple[str, ...],
+) -> tuple[str, tuple[Any, ...]]:
+    return _corpus_filter_from_present(
+        _results_table_columns(conn),
         accepted_versions,
     )
 
@@ -783,6 +800,7 @@ def _result_metadata(
     run_id: str,
     objective_metric: str | None = None,
     contain_unreadable_backend: bool = False,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     objectives = _objective_items(row)
     selected = _objective_for(objectives, objective_metric)
@@ -796,7 +814,10 @@ def _result_metadata(
     if not isinstance(eval_spec, dict):
         eval_spec = {}
     corpus_version = _corpus_version_value(_row_value(row, 'corpus_version'))
-    corpus_badge = _corpus_version_badge(corpus_version)
+    corpus_badge = _corpus_version_badge(
+        corpus_version,
+        accepted_versions=accepted_corpus_versions,
+    )
     product_summary = run_reference.get('product_summary', {})
     if not isinstance(product_summary, dict):
         product_summary = {}
@@ -1039,73 +1060,212 @@ def _optimizer_run_metadata(run_dir: Path, root: Path) -> dict[str, Any]:
     return metadata
 
 
+_WINNER_RANKING_COLUMNS: tuple[str, ...] = (
+    'cache_key',
+    'candidate_id',
+    'feedstock_id',
+    'recipe_id',
+    'profile_id',
+    'fidelity',
+    'feasible',
+    'feasibility_margins',
+    'failure_category',
+    'objectives',
+    'data_digests',
+    'created_at',
+    'corpus_version',
+)
+
+
+def _fetch_selector_rows(
+    cache_path: Path,
+    *,
+    feedstock_id: str | None,
+    profile_id: str | None,
+    fidelity: str | None,
+    columns: tuple[str, ...] | None = None,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
+) -> list[sqlite3.Row]:
+    if accepted_corpus_versions is None:
+        accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    where, params = _selector_where_without_data_digests(
+        feedstock_id,
+        profile_id=profile_id,
+        fidelity=fidelity,
+    )
+    corpus_where, corpus_params = _corpus_filter_from_present(
+        {'corpus_version'}, accepted_corpus_versions,
+    )
+    select_cols = ', '.join(columns) if columns else '*'
+    sql = (
+        f'SELECT {select_cols} FROM results '
+        f'WHERE {where} AND {corpus_where}'
+    )
+    bind = (*params, *corpus_params)
+    with _connect_result_store(cache_path) as conn:
+        try:
+            return list(conn.execute(sql, bind).fetchall())
+        except sqlite3.OperationalError:
+            present = _results_table_columns(conn)
+            corpus_where, corpus_params = _corpus_filter_from_present(
+                present, accepted_corpus_versions,
+            )
+            if columns is None:
+                select_cols = '*'
+            else:
+                selected = [column for column in columns if column in present]
+                select_cols = ', '.join(selected) if selected else '*'
+            return list(conn.execute(
+                f"""
+                SELECT {select_cols}
+                FROM results
+                WHERE {where} AND {corpus_where}
+                """,
+                (*params, *corpus_params),
+            ).fetchall())
+
+
+def _fetch_full_result_row(
+    cache_path: Path,
+    cache_key: str,
+    *,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
+    has_corpus_version: bool | None = None,
+) -> sqlite3.Row | None:
+    if accepted_corpus_versions is None:
+        accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    with _connect_result_store(cache_path) as conn:
+        if has_corpus_version is None:
+            present = _results_table_columns(conn)
+            has_corpus_version = 'corpus_version' in present
+        corpus_where, corpus_params = _corpus_filter_from_present(
+            {'corpus_version'} if has_corpus_version else set(),
+            accepted_corpus_versions,
+        )
+        return conn.execute(
+            f"""
+            SELECT *
+            FROM results
+            WHERE cache_key = ? AND {corpus_where}
+            LIMIT 1
+            """,
+            (cache_key, *corpus_params),
+        ).fetchone()
+
+
+def _digest_scopes_from_rows(rows: list[sqlite3.Row]) -> list[Mapping[str, str]]:
+    latest: dict[Any, Any] = {}
+    for row in rows:
+        raw = _row_value(row, 'data_digests')
+        created = _row_value(row, 'created_at')
+        if raw not in latest:
+            latest[raw] = created
+            continue
+        prev = latest[raw]
+        if created is None:
+            continue
+        if prev is None or str(created) > str(prev):
+            latest[raw] = created
+    items = list(latest.items())
+    items.sort(
+        key=lambda item: (
+            item[0] is not None,
+            '' if item[0] is None else str(item[0]),
+        )
+    )
+    items.sort(
+        key=lambda item: (
+            item[1] is not None,
+            '' if item[1] is None else str(item[1]),
+        ),
+        reverse=True,
+    )
+    scopes: list[Mapping[str, str]] = []
+    for raw, _created in items:
+        data_digests = _json_value(raw, {})
+        if not isinstance(data_digests, Mapping):
+            continue
+        scopes.append({str(key): str(value) for key, value in data_digests.items()})
+    return scopes
+
+
+def _filter_rows_to_digest_scope(
+    rows: list[sqlite3.Row],
+    *,
+    profile_id: str | None,
+) -> tuple[list[sqlite3.Row], list[Mapping[str, str]]]:
+    digest_scopes = _digest_scopes_from_rows(rows)
+    if not digest_scopes:
+        return [], digest_scopes
+    if len(digest_scopes) == 1 or profile_id:
+        selected_json = _canonical_json(digest_scopes[0])
+        return [
+            row for row in rows
+            if _row_value(row, 'data_digests') == selected_json
+        ], digest_scopes
+    return list(rows), digest_scopes
+
+
+def _scope_selector_rows(
+    rows: list[sqlite3.Row],
+    *,
+    profile_id: str | None,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
+) -> tuple[list[sqlite3.Row], dict[str, Any]]:
+    if accepted_corpus_versions is None:
+        accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    accepted_list = list(accepted_corpus_versions)
+    filtered, digest_scopes = _filter_rows_to_digest_scope(
+        rows,
+        profile_id=profile_id,
+    )
+    if not digest_scopes:
+        return [], {
+            'mode': 'no_current_data_digests',
+            'gui_version': current_code_version(),
+            'accepted_corpus_versions': accepted_list,
+        }
+    if len(digest_scopes) == 1 or profile_id:
+        selected = digest_scopes[0]
+        return filtered, {
+            'mode': 'exact_data_digests',
+            'gui_version': current_code_version(),
+            'accepted_corpus_versions': accepted_list,
+            'data_digests': selected,
+            'available_current_data_digest_count': len(digest_scopes),
+            'narrowed_to_latest': len(digest_scopes) > 1,
+        }
+    return filtered, {
+        'mode': 'multiple_current_data_digests',
+        'gui_version': current_code_version(),
+        'accepted_corpus_versions': accepted_list,
+        'available_current_data_digest_count': len(digest_scopes),
+        'data_digests': digest_scopes,
+    }
+
+
 def _query_result_rows(
     cache_path: Path,
     *,
     feedstock_id: str | None,
     profile_id: str | None,
     fidelity: str | None,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
 ) -> tuple[list[sqlite3.Row], dict[str, Any]]:
-    accepted_corpus_versions = tuple(interoperable_corpus_versions())
-    with _connect_result_store(cache_path) as conn:
-        digest_scopes = _current_selector_data_digest_scopes(
-            conn,
-            feedstock_id=feedstock_id,
-            profile_id=profile_id,
-            fidelity=fidelity,
-            accepted_corpus_versions=accepted_corpus_versions,
-        )
-        if not digest_scopes:
-            return [], {
-                'mode': 'no_current_data_digests',
-                'gui_version': current_code_version(),
-                'accepted_corpus_versions': list(accepted_corpus_versions),
-            }
-        corpus_where, corpus_params = _corpus_filter_clause(conn, accepted_corpus_versions)
-        if len(digest_scopes) == 1 or profile_id:
-            selected = digest_scopes[0]
-            where, params = _selector_where_with_data_digests(
-                feedstock_id,
-                profile_id=profile_id,
-                fidelity=fidelity,
-                data_digests=selected,
-            )
-            rows = conn.execute(
-                f"""
-                SELECT *
-                FROM results
-                WHERE {where} AND {corpus_where}
-                """,
-                (*params, *corpus_params),
-            ).fetchall()
-            return rows, {
-                'mode': 'exact_data_digests',
-                'gui_version': current_code_version(),
-                'accepted_corpus_versions': list(accepted_corpus_versions),
-                'data_digests': selected,
-                'available_current_data_digest_count': len(digest_scopes),
-                'narrowed_to_latest': len(digest_scopes) > 1,
-            }
-        where, params = _selector_where_without_data_digests(
-            feedstock_id,
-            profile_id=profile_id,
-            fidelity=fidelity,
-        )
-        rows = conn.execute(
-            f"""
-            SELECT *
-            FROM results
-            WHERE {where} AND {corpus_where}
-            """,
-            (*params, *corpus_params),
-        ).fetchall()
-        return rows, {
-            'mode': 'multiple_current_data_digests',
-            'gui_version': current_code_version(),
-            'accepted_corpus_versions': list(accepted_corpus_versions),
-            'available_current_data_digest_count': len(digest_scopes),
-            'data_digests': digest_scopes,
-        }
+    if accepted_corpus_versions is None:
+        accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    rows = _fetch_selector_rows(
+        cache_path,
+        feedstock_id=feedstock_id,
+        profile_id=profile_id,
+        fidelity=fidelity,
+        accepted_corpus_versions=accepted_corpus_versions,
+    )
+    return _scope_selector_rows(
+        rows,
+        profile_id=profile_id,
+        accepted_corpus_versions=accepted_corpus_versions,
+    )
 
 
 def _selector_where_without_data_digests(
@@ -1273,17 +1433,69 @@ def _constraint_margin_summary(
     return [margin for margin in margins if margin.get('verdict') != 'pass'][:3]
 
 
-def _leaderboard_entries(
-    run_dirs: list[Path],
+def _empty_leaderboard_exclusions() -> dict[str, int]:
+    return {
+        'excluded_infeasible': 0,
+        'excluded_nonfinite': 0,
+        'excluded_unreadable': 0,
+        'excluded_metric_absent': 0,
+    }
+
+
+def _collect_ranked_candidates(
+    run_rows: list[tuple[str, list[sqlite3.Row]]],
     *,
-    feedstock_id: str | None,
-    profile_id: str | None,
-    fidelity: str | None,
+    objective_metric: str | None,
+) -> tuple[list[tuple[str, sqlite3.Row, float, str]], str | None, dict[str, int]]:
+    """Rank by numeric objective without parsing result blobs.
+
+    Full `_result_metadata` is deferred to the winner(s). Infeasible / missing
+    metric / non-finite exclusions are counted here; unreadable provenance is
+    counted when a candidate is materialized.
+    """
+    excluded_counts = _empty_leaderboard_exclusions()
+    selected_metric = (
+        canonical_objective_metric(objective_metric)
+        if objective_metric is not None
+        else None
+    )
+    selected_sense = 'maximize'
+    ranked: list[tuple[str, sqlite3.Row, float, str]] = []
+    for run_id, result_rows in run_rows:
+        for row in result_rows:
+            if not _result_row_feasible(row):
+                excluded_counts['excluded_infeasible'] += 1
+                continue
+            objectives = _objective_items(row)
+            if selected_metric is None:
+                primary = _objective_for(objectives)
+                if primary is not None:
+                    selected_metric = canonical_objective_metric(
+                        str(primary.get('metric'))
+                    )
+            objective = _objective_for(objectives, selected_metric)
+            if objective is None:
+                excluded_counts['excluded_metric_absent'] += 1
+                continue
+            value = _numeric_objective_value(objective)
+            if value is None:
+                excluded_counts['excluded_nonfinite'] += 1
+                continue
+            selected_sense = str(objective.get('sense') or selected_sense)
+            ranked.append((run_id, row, value, selected_sense))
+    reverse = selected_sense != 'minimize'
+    ranked.sort(key=lambda item: item[2], reverse=reverse)
+    return ranked, selected_metric, excluded_counts
+
+
+def _leaderboard_from_result_rows(
+    run_rows: list[tuple[str, list[sqlite3.Row]]],
+    *,
     objective_metric: str | None,
     limit: int,
-) -> tuple[list[dict[str, Any]], str | None, dict[str, Any], dict[str, int]]:
+    accepted_corpus_versions: tuple[str, ...] | None = None,
+) -> tuple[list[dict[str, Any]], str | None, dict[str, int]]:
     rows: list[tuple[dict[str, Any], float, str]] = []
-    digest_scopes: list[dict[str, Any]] = []
     excluded_counts = {
         'excluded_infeasible': 0,
         'excluded_nonfinite': 0,
@@ -1306,18 +1518,8 @@ def _leaderboard_entries(
         else None
     )
     selected_sense = 'maximize'
-    root = _optimizer_runs_root()
 
-    for run_dir in run_dirs:
-        run_id = _optimizer_run_id(run_dir, root)
-        result_rows, digest_scope = _query_result_rows(
-            run_dir / OPTIMIZER_CACHE_NAME,
-            feedstock_id=feedstock_id,
-            profile_id=profile_id,
-            fidelity=fidelity,
-        )
-        digest_scope = {**digest_scope, 'run_id': run_id}
-        digest_scopes.append(digest_scope)
+    for run_id, result_rows in run_rows:
         for row in result_rows:
             if not _result_row_feasible(row):
                 excluded_counts['excluded_infeasible'] += 1
@@ -1355,6 +1557,7 @@ def _leaderboard_entries(
                     row,
                     run_id=run_id,
                     objective_metric=selected_metric,
+                    accepted_corpus_versions=accepted_corpus_versions,
                 )
                 entry['objective_metric'] = selected_metric
                 entry['objective_value'] = value
@@ -1393,6 +1596,40 @@ def _leaderboard_entries(
                 'no single ranking is valid across them'
             )
         entries.append(entry)
+    return entries, selected_metric, excluded_counts
+
+
+def _leaderboard_entries(
+    run_dirs: list[Path],
+    *,
+    feedstock_id: str | None,
+    profile_id: str | None,
+    fidelity: str | None,
+    objective_metric: str | None,
+    limit: int,
+) -> tuple[list[dict[str, Any]], str | None, dict[str, Any], dict[str, int]]:
+    digest_scopes: list[dict[str, Any]] = []
+    run_rows: list[tuple[str, list[sqlite3.Row]]] = []
+    root = _optimizer_runs_root()
+    accepted_corpus_versions = tuple(interoperable_corpus_versions())
+
+    for run_dir in run_dirs:
+        run_id = _optimizer_run_id(run_dir, root)
+        result_rows, digest_scope = _query_result_rows(
+            run_dir / OPTIMIZER_CACHE_NAME,
+            feedstock_id=feedstock_id,
+            profile_id=profile_id,
+            fidelity=fidelity,
+            accepted_corpus_versions=accepted_corpus_versions,
+        )
+        digest_scopes.append({**digest_scope, 'run_id': run_id})
+        run_rows.append((run_id, result_rows))
+    entries, selected_metric, excluded_counts = _leaderboard_from_result_rows(
+        run_rows,
+        objective_metric=objective_metric,
+        limit=limit,
+        accepted_corpus_versions=accepted_corpus_versions,
+    )
     return (
         entries,
         selected_metric,
@@ -2406,6 +2643,29 @@ def _optimizer_result_view(entry: Mapping[str, Any]) -> dict[str, Any]:
     return view
 
 
+def _selector_pair_key(row: sqlite3.Row) -> tuple[str, str]:
+    return (
+        str(_row_value(row, 'feedstock_id') or ''),
+        str(_row_value(row, 'profile_id') or ''),
+    )
+
+
+def _selector_pairs_from_loaded_rows(
+    loaded: list[list[sqlite3.Row]],
+    *,
+    profile_id: str | None,
+) -> list[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for rows in loaded:
+        scoped, _digest_scopes = _filter_rows_to_digest_scope(
+            rows,
+            profile_id=profile_id,
+        )
+        for row in scoped:
+            pairs.add(_selector_pair_key(row))
+    return sorted(pairs)
+
+
 def _selector_pairs(
     run_dirs: list[Path],
     *,
@@ -2413,20 +2673,16 @@ def _selector_pairs(
     profile_id: str | None,
     fidelity: str | None,
 ) -> list[tuple[str, str]]:
-    pairs: set[tuple[str, str]] = set()
-    for run_dir in run_dirs:
-        rows, _digest_scope = _query_result_rows(
+    loaded = [
+        _fetch_selector_rows(
             run_dir / OPTIMIZER_CACHE_NAME,
             feedstock_id=feedstock_id,
             profile_id=profile_id,
             fidelity=fidelity,
         )
-        for row in rows:
-            pairs.add((
-                str(row['feedstock_id'] or ''),
-                str(row['profile_id'] or ''),
-            ))
-    return sorted(pairs)
+        for run_dir in run_dirs
+    ]
+    return _selector_pairs_from_loaded_rows(loaded, profile_id=profile_id)
 
 
 # Why each exclusion reason is phrased for an OPERATOR rather than reusing the
@@ -2482,11 +2738,31 @@ def _optimizer_winner_entries(
     # "nothing matched the filters", which is a different and far more
     # reassuring claim than the truth.
     excluded_totals: dict[str, int] = {}
-    for pair_feedstock, pair_profile in _selector_pairs(
-        run_dirs,
-        feedstock_id=feedstock_id,
+    root = _optimizer_runs_root()
+    accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    loaded: list[tuple[str, list[sqlite3.Row]]] = []
+    indexed: list[tuple[str, dict[tuple[str, str], list[sqlite3.Row]]]] = []
+    run_paths: dict[str, tuple[Path, bool]] = {}
+    for run_dir in run_dirs:
+        run_id = _optimizer_run_id(run_dir, root)
+        rows = _fetch_selector_rows(
+            run_dir / OPTIMIZER_CACHE_NAME,
+            feedstock_id=feedstock_id,
+            profile_id=profile_id,
+            fidelity=fidelity,
+            columns=_WINNER_RANKING_COLUMNS,
+            accepted_corpus_versions=accepted_corpus_versions,
+        )
+        has_corpus_version = bool(rows) and 'corpus_version' in rows[0].keys()
+        run_paths[run_id] = (run_dir, has_corpus_version)
+        loaded.append((run_id, rows))
+        bucket: dict[tuple[str, str], list[sqlite3.Row]] = {}
+        for row in rows:
+            bucket.setdefault(_selector_pair_key(row), []).append(row)
+        indexed.append((run_id, bucket))
+    for pair_feedstock, pair_profile in _selector_pairs_from_loaded_rows(
+        [rows for _run_id, rows in loaded],
         profile_id=profile_id,
-        fidelity=fidelity,
     ):
         # ★ EVERY PAIR MUST BE RANKED ON THE SAME METRIC. This passed the
         # caller's (often None) objective_metric to every pair, so each pair
@@ -2496,19 +2772,58 @@ def _optimizer_winner_entries(
         # which is not a comparison at all. Feeding the resolved metric forward
         # pins the axis after the first pair fixes it; a pair whose objectives
         # lack that metric drops out rather than being ranked on a substitute.
-        winners, metric, _digest_scope, pair_excluded = _leaderboard_entries(
-            run_dirs,
-            feedstock_id=pair_feedstock,
-            profile_id=pair_profile,
-            fidelity=fidelity,
+        pair_run_rows: list[tuple[str, list[sqlite3.Row]]] = []
+        pair_key = (pair_feedstock, pair_profile)
+        for run_id, bucket in indexed:
+            pair_rows = bucket.get(pair_key)
+            if not pair_rows:
+                continue
+            scoped, _digest_scopes = _filter_rows_to_digest_scope(
+                pair_rows,
+                profile_id=pair_profile,
+            )
+            pair_run_rows.append((run_id, scoped))
+        candidates, metric, pair_excluded = _collect_ranked_candidates(
+            pair_run_rows,
             objective_metric=selected_metric,
-            limit=1,
         )
         if metric and selected_metric is None:
             selected_metric = metric
+        winner = None
+        for run_id, _row, value, sense in candidates:
+            run_dir, has_corpus_version = run_paths[run_id]
+            full_row = _fetch_full_result_row(
+                run_dir / OPTIMIZER_CACHE_NAME,
+                str(_row['cache_key']),
+                accepted_corpus_versions=accepted_corpus_versions,
+                has_corpus_version=has_corpus_version,
+            )
+            if full_row is None:
+                pair_excluded['excluded_unreadable'] += 1
+                continue
+            try:
+                entry = _result_metadata(
+                    full_row,
+                    run_id=run_id,
+                    objective_metric=selected_metric,
+                    accepted_corpus_versions=accepted_corpus_versions,
+                )
+                entry['objective_metric'] = selected_metric
+                entry['objective_value'] = value
+                entry['objective_sense'] = sense
+                entry['data_digest_scope'] = {
+                    'mode': 'entry_data_digests',
+                    'data_digests': entry.get('eval_spec', {}).get('data_digests') or {},
+                }
+            except Exception:
+                pair_excluded['excluded_unreadable'] += 1
+                continue
+            winner = _optimizer_result_view(entry)
+            break
         for key, count in (pair_excluded or {}).items():
             excluded_totals[key] = excluded_totals.get(key, 0) + int(count)
-        entries.extend(_optimizer_result_view(entry) for entry in winners)
+        if winner is not None:
+            entries.append(winner)
 
     # ★ RANK MUST BE SCORE ORDER, AND THAT REQUIRES SEEING EVERY PAIR FIRST.
     # This used to `break` once `limit` rows had accumulated and then assign
@@ -2524,9 +2839,10 @@ def _optimizer_winner_entries(
     # order is collect-all -> sort -> truncate -> rank, which is what
     # _leaderboard_entries itself does.
     #
-    # Cost: one limit=1 query per selector pair rather than per pair up to the
-    # limit. That is the price of a correct ranking; a cheaper scheme would have
-    # to push the ordering down into the query rather than truncate the walk.
+    # Cost: one store open per run dir, then pair ranking in memory. The
+    # previous shape re-queried every run store for every selector pair
+    # (O(pairs × run_dirs) sqlite opens) and made /optimizer unusable as runs
+    # accumulated. Ranking still collects every pair before truncating.
     # A set of rows can only be totally ordered if they share one objective
     # sense: "best" under minimize and "best" under maximize are opposite ends
     # of the same axis, so a mixed set has NO valid single ranking. Silently
