@@ -51,6 +51,25 @@ VapoRock had a DIFFERENT defect (an absent-status default of ``'ok'``), which th
 correctly does not flag. A guard that flagged all three would have been telling us
 nothing.
 
+THE REFINED PREDICATE WAS RE-VERIFIED THE SAME WAY (2026-08-27)
+---------------------------------------------------------------
+Narrowing the default check to FLATTERING tokens only (below) raises the obvious
+question: did it stop catching the thing it was written for? Answered against real
+committed source rather than the hand-written fixtures, by running both matchers
+over ``git show <rev>:<path>``:
+
+    dd35551a~1  engines/magemin/provider.py     allowlist line 247
+                                                flattering defaults 320, 321, 603
+                engines/alphamelts/provider.py  flattering default 775
+                engines/alphamelts/parser.py    flattering default 83
+                engines/vaporock/provider.py    clean
+    HEAD        all four                        clean
+
+So the narrowed predicate still finds the genuine MAGEMin allowlist at the same line,
+still finds all five historical ``'ok'`` defaults, and still reports clean on the fixed
+tree. The refinement removed false positives without removing detection -- which is the
+claim that actually needed evidence, and fixtures could not have supplied it.
+
 It is deliberately paired with, and does not replace:
   - the per-provider mechanism tests (an unrecognised token raises at the DTO);
   - the consequence test in `test_evaporation_freeze_gate.py`, which proves the
