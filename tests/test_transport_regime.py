@@ -648,3 +648,55 @@ def test_core_carrier_normalizer_preserves_legacy_edge_behavior(
         normalize(value, allow_unset=False)
     assert type(exc_info.value) is ValueError
     assert str(exc_info.value) == error_message
+
+
+def test_free_molecular_conductance_accepts_the_free_molecular_limit() -> None:
+    """Kn = +inf is TRUE VACUUM -- the defining case, not an invalid input.
+
+    Kn = lambda / L, so Kn -> +inf is the mean free path growing without bound
+    against the tube. The free-molecular conductance helper used to reject it
+    through an isfinite guard sitting one line above a check
+    (Kn >= FREE_MOLECULAR_KNUDSEN_MIN) that +inf satisfies trivially -- so the
+    free-molecular function refused the free-molecular limit.
+
+    CONTINUITY IS THE ASSERTION, not mere acceptance. The conductance is
+    Kn-INDEPENDENT in this branch, so +inf must return exactly what a large
+    finite Kn returns; a value that merely "did not raise" would not show the
+    limit was taken correctly.
+    """
+    kwargs = dict(
+        transmission_probability=1.0,
+    )
+    finite = tr.molecular_tube_conductance_m3_s(
+        DIAMETER_M, LENGTH_M, HOT_TEMPERATURE_K, 0.028,
+        knudsen_number=1e12, **kwargs,
+    )
+    limit = tr.molecular_tube_conductance_m3_s(
+        DIAMETER_M, LENGTH_M, HOT_TEMPERATURE_K, 0.028,
+        knudsen_number=math.inf, **kwargs,
+    )
+    assert limit == pytest.approx(finite)
+
+    # NaN is not a limit and a negative Kn has no physical reading; both still refuse.
+    for bad in (math.nan, -1.0):
+        with pytest.raises(tr.TransportRegimeRefusal):
+            tr.molecular_tube_conductance_m3_s(
+                DIAMETER_M, LENGTH_M, HOT_TEMPERATURE_K, 0.028,
+                knudsen_number=bad, **kwargs,
+            )
+
+
+def test_transitional_guard_still_refuses_the_free_molecular_limit() -> None:
+    """The MIRROR of the test above, pinned so nobody 'fixes' it too.
+
+    _require_free_molecular_knudsen and _require_transitional_knudsen share the
+    same isfinite token and need OPPOSITE corrections. The transitional band is
+    0.01 <= Kn_D < 10, so +inf is genuinely NOT transitional and refusing it is
+    CORRECT. Relaxing it the way the free-molecular helper was relaxed would be
+    the mirror-image bug -- which is exactly what a search-and-replace across
+    that token would produce.
+    """
+    with pytest.raises(tr.TransportRegimeRefusal):
+        tr._require_transitional_knudsen(math.inf)
+    # and it still accepts a genuinely transitional value
+    assert tr._require_transitional_knudsen(5.0) == pytest.approx(5.0)

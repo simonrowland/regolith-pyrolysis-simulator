@@ -435,8 +435,27 @@ def _require_free_molecular_knudsen(
     knudsen_number: float, *, category: str
 ) -> float:
     knudsen_number = float(knudsen_number)
-    if not math.isfinite(knudsen_number) or knudsen_number < 0.0:
-        _refuse("invalid_knudsen_number", "Kn must be finite and >= 0")
+    # ★ +inf IS THE DEFINING CASE OF THIS PRECONDITION, NOT AN INVALID INPUT.
+    # Kn = lambda / L, so Kn -> +inf is the mean free path growing without bound
+    # against the tube: true vacuum, the free-molecular limit this function
+    # exists to serve. The guard used to reject it via isfinite, one line above
+    # a check (Kn >= FREE_MOLECULAR_KNUDSEN_MIN) that +inf satisfies trivially --
+    # so the free-molecular helper refused the free-molecular limit.
+    #
+    # Not a numerical-stability guard doing its job: the conductance below is
+    # Kn-INDEPENDENT in this branch. Measured on a 0.12 m x 1 m tube, N2 at
+    # 1773 K, transmission 1.0 -- Kn = 10, 50, 1e3 and 1e12 ALL return
+    # 3.273821 m3/s. Twelve orders of magnitude, one value; there is nothing
+    # for +inf to destabilise.
+    #
+    # NaN and negatives are still refused: NaN is not a limit, and Kn < 0 has no
+    # physical reading (a negative mean free path).
+    #
+    # ⚠ DO NOT COPY THIS RELAXATION INTO _require_transitional_knudsen. Its band
+    # is 0.01 <= Kn_D < 10, so +inf is genuinely NOT transitional and refusing it
+    # there is CORRECT. Same token, opposite right answer.
+    if math.isnan(knudsen_number) or knudsen_number < 0.0:
+        _refuse("invalid_knudsen_number", "Kn must not be NaN and must be >= 0")
     if knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN:
         _refuse(
             category,
