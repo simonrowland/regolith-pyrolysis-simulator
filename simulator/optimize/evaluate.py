@@ -6067,10 +6067,37 @@ def _is_numerical_overflow_message(message: str) -> bool:
 
 
 def _is_inventory_overdraw_message(message: str) -> bool:
+    """Does this failure actually describe an inventory overdraw?
+
+    b-281. This is asked of two differently-formatted strings. One caller passes
+    ``str(exc)`` -- the raw message. The other passes ``run_execution.error_message``,
+    which ``run_executor._safe_exception_text`` builds as ``f"{type(exc).__name__}: {message}"``.
+    So any clause that tests a CLASS NAME answers differently at the two sites, and
+    at the second one it answers unconditionally.
+
+    A ``"proposalrejected"`` clause used to lead. The planner wraps EVERY apply
+    failure -- account-policy violation, origin-resolution failure, projected-conservation
+    failure, even a ZeroDivisionError -- in ``ProposalRejected``. So on the run-executor
+    path that clause matched every time, the content clause below never ran, and unrelated
+    engine failures were published to operators as "recipe attempted to draw more inventory
+    than available" with ``failing_gates=("inventory_overdraw",)`` -- and the optimizer
+    pruned the recipe on the strength of it. The class name carried no information about
+    the condition, so it is gone.
+
+    ``"overdrafterror"`` is ALSO a class-name test and is deliberately KEPT. Same syntactic
+    shape, opposite verdict: OverdraftError IS the overdraw family, so its name does carry
+    the condition. A shared form is not a shared verdict; do not "tidy" this into a single
+    rule.
+
+    Residual, tracked separately: ledger.py raises OverdraftError for a MISSING CREDIT LIMIT
+    ("reservoir account ... has no credit limit for ..."), which is a configuration gap
+    rather than a recipe drawing too much. It still classifies as overdraw through the
+    kept clause.
+    """
+
     lowered = message.lower()
     return (
-        "proposalrejected" in lowered
-        or "overdrafterror" in lowered
+        "overdrafterror" in lowered
         or (
             "insufficient available" in lowered
             and "balance would be" in lowered

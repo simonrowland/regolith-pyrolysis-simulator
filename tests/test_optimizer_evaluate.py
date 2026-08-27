@@ -4966,3 +4966,67 @@ def test_out_of_domain_result_does_not_store_itself_as_healthy() -> None:
     # unqualified `ok` beside a pruned candidate
     assert result.run_reference.backend_status == "out_of_domain"
     assert result.run_reference.backend_status != "ok"
+
+
+def test_overdraw_classifier_agrees_at_both_call_sites_regardless_of_formatting():
+    """b-281: the same failure must classify the same way at both consumers.
+
+    The predicate is asked of two differently-formatted strings. evaluate.py
+    passes ``str(exc)`` -- the raw message. The run-executor path passes
+    ``run_execution.error_message``, which ``_safe_exception_text`` builds as
+    ``f"{type(exc).__name__}: {message}"``. Any clause testing a CLASS NAME
+    therefore answers differently at the two sites, and since the planner wraps
+    every apply failure in ProposalRejected, the old leading clause answered
+    True unconditionally on the second path.
+
+    The invariant is the point, not the individual verdicts: AGREEMENT ACROSS
+    FORMATTING. Asserting only "an account-policy failure is not an overdraw"
+    would pass again the moment someone reintroduces a class-name clause that
+    happens to miss that one message. Requiring both spellings to agree fails on
+    any class-name test, including one nobody has written yet.
+    """
+
+    from simulator.chemistry.kernel.planner import ProposalRejected
+    from simulator.optimize.evaluate import _is_inventory_overdraw_message
+    from simulator.run_executor import _safe_exception_text
+
+    not_overdraw = (
+        "account 'oxygen_cistern_liquid_inventory' only accepts species: O2; got 'N2'",
+        "could not resolve origin lot for species SiO",
+        "projected conservation failed for element Fe",
+        "ZeroDivisionError: division by zero",
+    )
+    for message in not_overdraw:
+        exc = ProposalRejected(message)
+        raw = _is_inventory_overdraw_message(str(exc))
+        prefixed = _is_inventory_overdraw_message(_safe_exception_text(exc))
+        assert raw is False, f"{message!r} is not an overdraw"
+        assert prefixed is raw, (
+            "classification must not depend on whether the caller prepended the "
+            f"exception class name; {message!r} split raw={raw} prefixed={prefixed}"
+        )
+
+    # The genuine case, which the content clause must still catch under both
+    # spellings - deleting the class-name clause must not cost a real overdraw.
+    real = ProposalRejected(
+        "insufficient available 'Fe' in normal account 'process.cleaned_melt': "
+        "balance would be -3.2 kg"
+    )
+    assert _is_inventory_overdraw_message(str(real)) is True
+    assert _is_inventory_overdraw_message(_safe_exception_text(real)) is True
+
+
+def test_overdraft_error_class_name_clause_is_deliberately_kept():
+    """b-281 companion: OverdrafError's name DOES carry the condition.
+
+    This passes both before and after the b-281 fix, and that is deliberate - it
+    is not covering that change. It exists so that a later cleanup which reads
+    "class-name tests were the bug, remove them" and deletes this clause too goes
+    red. The two clauses share a syntactic shape and have opposite correct
+    verdicts: ProposalRejected is a broad wrapper that says nothing about
+    overdraw, OverdraftError IS the overdraw family.
+    """
+
+    from simulator.optimize.evaluate import _is_inventory_overdraw_message
+
+    assert _is_inventory_overdraw_message("OverdraftError: some overdraw detail") is True
