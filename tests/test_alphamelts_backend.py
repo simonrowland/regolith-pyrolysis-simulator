@@ -1,4 +1,5 @@
 import contextlib
+import dataclasses
 import io
 import math
 import inspect
@@ -452,6 +453,47 @@ def test_diagnostics_to_equilibrium_clamped_success_is_requested_point_ood():
     assert result.diagnostics['requested_temperature_C'] == pytest.approx(650.0)
     assert result.diagnostics['requested_pressure_bar'] == pytest.approx(1.0e-6)
     assert result.diagnostics['authoritative_for_requested_conditions'] is False
+
+
+@pytest.mark.parametrize(
+    'incoming_status',
+    ['refused', 'unavailable', 'unsupported', 'not_attempted',
+     'not_converged', 'non_authoritative'],
+)
+def test_clamped_operating_point_never_upgrades_a_degrading_status(
+    incoming_status,
+):
+    """A status rewrite may only DEGRADE, never upgrade (b-297).
+
+    The paired positive case is
+    ``test_diagnostics_to_equilibrium_clamped_success_is_requested_point_ood``
+    above: an incoming 'ok' at a clamped point DOES still become
+    'out_of_domain', because that rewrite loses no information -- the clamp
+    is itself the caveat.  Every status here already carries a caveat of its
+    own, so overwriting it would destroy that information.
+
+    'refused' and 'unavailable' are the load-bearing cases.  Unguarded, a
+    provider refusal at a clamped operating point was rewritten to
+    'out_of_domain' and became indistinguishable from a legitimate clamped
+    computation, so no downstream category-1 gate could recover the fact
+    that the provider had refused to supply physics at all.
+    """
+    diagnostics = dataclasses.replace(
+        _clamped_success_diagnostics(),
+        backend_status=incoming_status,
+    )
+
+    result = diagnostics_to_equilibrium(
+        diagnostics,
+        {
+            'temperature_C': 650.0,
+            'pressure_bar': 1.0e-6,
+            'fO2_log': -9.0,
+        },
+    )
+
+    assert result.status == incoming_status
+    assert (result.diagnostics or {}).get('backend_status') != 'out_of_domain'
 
 
 def test_alphamelts_subprocess_subbar_pressure_refuses_before_execution(
