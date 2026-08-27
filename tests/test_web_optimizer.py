@@ -3222,6 +3222,44 @@ def test_product_strip_shows_the_unclassified_mass_beside_the_named_bins(
     )
 
 
+def test_wide_winners_table_is_wrapped_in_a_scroll_container(client) -> None:
+    """The 15-column table must carry its own horizontal scroll box.
+
+    Measured at 1623px against both a 1440px and a 1280px viewport, the table
+    pushed the whole DOCUMENT sideways -- so the filter controls and every
+    other card moved with it, not only the table.
+
+    ★ HONEST LIMIT OF THIS TEST: it proves the containment element is EMITTED
+    and that the stylesheet defines it. It does NOT prove the overflow is
+    actually contained, because nothing here lays out a viewport or measures a
+    box. Treat a green here as necessary and not sufficient; the measurement
+    belongs in a browser pass. It is still worth pinning, because the failure
+    it guards against is someone removing the wrapper during unrelated markup
+    edits, which is silent and easy.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-scroll-wrap"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+    spec = _base_spec(recipe_id="recipe-scroll-wrap")
+    store.store(spec, _scored(spec, candidate_id="candidate-scroll-wrap"),
+                created_at="2026-06-01T00:00:00Z")
+
+    table = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "candidate-scroll-wrap" in table
+    wrap = table.index('class="table-scroll"')
+    assert wrap < table.index('class="composition-table"'), (
+        "the wide table is not inside its scroll container"
+    )
+
+    # NOT client.application.root_path: the test module creates the app, so
+    # Flask roots it at tests/. Anchor on the web package itself.
+    css = (
+        Path(web_routes.__file__).parent / "static" / "css" / "style.css"
+    ).read_text(encoding="utf-8")
+    assert ".table-scroll" in css and "overflow-x: auto" in css
+
+
 def test_winners_table_ranks_by_score_not_by_selector_pair_order(
     client,
 ) -> None:

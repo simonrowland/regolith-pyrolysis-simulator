@@ -1075,6 +1075,17 @@ input, select, button, textarea { font-family: inherit; }
     font-weight: 600;
 }
 
+/* A wide table scrolls inside its own box so the PAGE BODY never scrolls
+   horizontally. The optimizer winners table carries 15 columns and measured
+   1623px wide against both a 1440px and a 1280px viewport, which pushed the
+   whole document sideways -- so the filter controls and every other card
+   moved with it, not just the table. Containing the overflow here keeps the
+   horizontal scroll where it belongs, on the one element that is genuinely
+   too wide. */
+.table-scroll {
+    overflow-x: auto;
+}
+
 .advisory-table-wrap {
     overflow-x: auto;
     margin-top: var(--space-3);

@@ -1,6 +1,7 @@
 <div class="section-card">
     <h3>Feedstock/Profile Winners</h3>
     {% if entries %}
+    <div class="table-scroll">
     <table class="composition-table">
         <thead>
             <tr>
@@ -128,6 +129,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% if excluded_rows %}
     <div class="empty-hint">
         {{ excluded_total }} stored row{{ "" if excluded_total == 1 else "s" }}
