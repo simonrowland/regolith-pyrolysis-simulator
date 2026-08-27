@@ -341,3 +341,52 @@ def test_load_foulant_registry_builds_alias_index(foulant_registry_yaml: Path) -
     assert registry.alias_to_carrier["caso4"] == "CaSO4"
     assert registry.carriers["NaCl"].reaction_family == "volatilization"
     assert registry.carriers["NaCl"].fate["on_escape"]["account"] == "evaporation"
+
+
+def test_vapor_pressure_yaml_is_parsed_once_across_calls(monkeypatch):
+    """The 1.2 MB vapour YAML must be parsed once, not per call.
+
+    data/vapor_pressures.yaml is ~1.2 MB / 28.7k lines and PyYAML's pure-python
+    scanner takes ~2.7 s on it. Both readers used to re-open and re-parse it on
+    every call, so ONE web run start paid 8 x _load_vapor_pressures plus
+    4 x _compiled_carrier_pressure -- >= 22 s of parsing before the first tick,
+    which reads to an operator as "the run started and then hung".
+
+    Assert on the PARSE COUNT, never on wall-clock: a timing assertion is flaky
+    under load and, worse, would still pass if the cache were removed on a fast
+    machine. The positive control (payload is non-empty) is what stops a cache
+    that returns nothing from passing this vacuously.
+    """
+    import yaml as _yaml
+
+    from engines.builtin import foulant_disposition as fd
+
+    fd._VAPOR_PAYLOAD_CACHE.clear()
+
+    calls = {"n": 0}
+    real_load = _yaml.load
+
+    def counting_load(*args, **kwargs):
+        calls["n"] += 1
+        return real_load(*args, **kwargs)
+
+    monkeypatch.setattr(_yaml, "load", counting_load)
+
+    first = fd._load_vapor_payload(fd._DEFAULT_VAPOR_PRESSURES_PATH)
+    assert calls["n"] == 1, "first read should parse exactly once"
+    # positive control: a cache that returns an empty payload must not pass
+    assert first, "parsed vapour payload is empty; the cache returned nothing"
+
+    for _ in range(5):
+        again = fd._load_vapor_payload(fd._DEFAULT_VAPOR_PRESSURES_PATH)
+        assert again is first, "cached payload should be the same object"
+    assert calls["n"] == 1, (
+        f"vapour YAML re-parsed {calls['n']} times across 6 calls; it must be "
+        "parsed once per (path, mtime, size)"
+    )
+
+    # An edited file must invalidate: forge a changed mtime/size in the key.
+    forged = (str(fd._DEFAULT_VAPOR_PRESSURES_PATH.resolve()), 1, 1)
+    assert forged not in fd._VAPOR_PAYLOAD_CACHE, (
+        "cache key must include mtime and size so an edited data file is re-read"
+    )
