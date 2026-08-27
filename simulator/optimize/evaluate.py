@@ -131,6 +131,14 @@ from simulator.run_executor import RunExecutor
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError
 from simulator.transport_regime import TransportRegimeRefusal
+from simulator.optimize.backend_status import (
+    crash_point_from_carrier,
+    backend_statuses_from_carrier as _backend_statuses_from_carrier,
+    carrier_has_crash_point as _carrier_has_crash_point,
+    latest_backend_status as _latest_backend_status,
+    latest_backend_status_from_sequence as _latest_backend_status_from_sequence,
+    select_backend_status as _select_backend_status,
+)
 
 
 MASS_BALANCE_ABORT_PCT = 5e-12
@@ -205,10 +213,29 @@ _HONEST_NON_OK_BACKEND_STATUSES = frozenset(
     {
         "refused",
         "not_converged",
-        "not_attempted",
         "out_of_domain",
     }
 )
+# The only whole-run status that crash evidence may PROMOTE into an
+# out-of-domain verdict.
+#
+# A first version of this was `{"ok"} | _HONEST_NON_OK_BACKEND_STATUSES`, on the
+# reasoning that crash evidence should corroborate any status the engine
+# actually answered with. That is too wide, and a review demonstrated why:
+# `refused` and `not_converged` ARE engine answers, and each already has its own
+# branch below producing PHYSICS_REFUSED and TIMEOUT respectively. Letting a
+# crash point promote them replaces a verdict the engine gave with one it did
+# not, which is the same overreach in the opposite direction.
+#
+# `ok` is the one case where crash evidence adds something: the run reported
+# success while its diagnostics record leaving the declared domain, and that
+# contradiction is exactly what the synthesis is for. Every other status already
+# says what happened, and the branches below say what to do about it.
+#
+# `out_of_domain` is not listed because it never reaches the set -- the first
+# clause returns True for it directly.
+_STATUSES_CRASH_EVIDENCE_MAY_PROMOTE = frozenset({"ok"})
+
 _TYPED_ABSENCE_EXCEPTION_CLASSES = (
     BackendUnavailableError,
     EngineWorkerUnavailable,
@@ -955,7 +982,30 @@ def evaluate(
             constraints=active_constraints,
         )
 
-    if backend_status in {"refused", "not_converged", "not_attempted"}:
+    if backend_status == "not_attempted":
+        # Per-probe sequential-transport token (alphaMELTS mid-run prior
+        # close on the kernel IntentResult rail). It is a legal
+        # INTENT_RESULT_STATUSES member, but it is not a whole-run
+        # optimizer envelope answer. Production never delivers it here:
+        # core._get_equilibrium is pre-gated on is_available(), and
+        # RunExecutor._aggregate_backend_status swallows non-priority
+        # history members. Do not relabel as refused (never-attempted is
+        # not attempted-and-refused-on-physics) and do not score the
+        # candidate.
+        raise EngineBugAbort(
+            "backend_status='not_attempted' reached the whole-run "
+            "optimizer envelope. That token is a per-probe sequential-"
+            "transport close (alphaMELTS mid-run prior close); it is "
+            "not a candidate physics answer. A mid-run transport death "
+            "must abort/drop and recycle the backend, never score the "
+            "candidate as PHYSICS_REFUSED.",
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        )
+
+    if backend_status in {"refused", "not_converged"}:
         return _honest_non_ok_backend_result(
             candidate_id,
             spec,
@@ -1213,16 +1263,6 @@ def _honest_non_ok_backend_result(
             reason=reason,
             message=message,
         )
-    if backend_status == "not_attempted":
-        return _not_attempted_backend_result(
-            candidate_id,
-            spec,
-            key,
-            run_execution,
-            profile,
-            reason=reason,
-            message=message,
-        )
     return _physics_refused_result(
         candidate_id,
         spec,
@@ -1348,43 +1388,6 @@ def _engine_not_converged_result(
             dict.fromkeys(
                 note
                 for note in (message, str(reason or "not_converged"))
-                if note
-            )
-        ),
-    )
-
-
-def _not_attempted_backend_result(
-    candidate_id: str | None,
-    spec: EvalSpec,
-    key: str,
-    run_execution: Any,
-    profile: Mapping[str, Any],
-    *,
-    reason: str,
-    message: str,
-) -> ScoredResult:
-    run_reference = replace(
-        _run_reference(run_execution, profile),
-        status="not_attempted",
-        error_message=message,
-        reason=str(reason or "not_attempted"),
-    )
-    return ScoredResult(
-        candidate_id=candidate_id,
-        eval_spec=spec,
-        cache_key=key,
-        feasible=False,
-        failure_category=FailureCategory.PHYSICS_REFUSED,
-        feasibility_margins={
-            PHYSICS_REFUSAL_GATE: _physics_refusal_margin(reason or "not_attempted"),
-        },
-        failing_gates=(PHYSICS_REFUSAL_GATE,),
-        run_reference=run_reference,
-        notes=tuple(
-            dict.fromkeys(
-                note
-                for note in (message, str(reason or "not_attempted"))
                 if note
             )
         ),
@@ -4718,6 +4721,12 @@ def _out_of_domain_result(
                 run_execution,
                 assessment.trace_payload,
             ),
+            # The gate reached this verdict; the stored artifact must say so.
+            # Without it an explicit `ok` carrying a crash point persists as
+            # `ok` -- and then canonicalises to authoritative, certifiable and
+            # a green operator badge for a candidate this very result is
+            # pruning as out of domain.
+            decided_backend_status="out_of_domain",
         ),
         notes=(
             *assessment.notes,
@@ -5092,10 +5101,27 @@ def _out_of_domain_diagnostics(run_execution: Any) -> Mapping[str, Any]:
 def _crash_point_from_diagnostics(
     diagnostics: Mapping[str, Any],
 ) -> Mapping[str, Any] | None:
-    raw = diagnostics.get("out_of_domain_crash_point")
+    """Extract the crash point for this module's consumers.
+
+    The RULE for what counts as a crash point lives in backend_status; this is
+    only the local projection of it (JSON-compacting for the callers here).
+    It used to restate the rule and accepted an empty mapping, so
+    _has_out_of_domain_backend_signal turned a content-free placeholder into a
+    permanent out-of-domain prune while the carrier walker said there was no
+    evidence at all. Review r1, reproduced through evaluate().
+
+    _compact_jsonable stays on this side: backend_status must not import from
+    evaluate (evaluate already imports IT), and compaction is a serialisation
+    concern of these callers rather than part of the rule.
+
+    The other consumer, at the rump-terminal path, gets a bonus correction: an
+    empty placeholder now yields None and therefore the truthful reason
+    "missing_crash_point", where it previously proceeded and reported
+    "incomplete_crash_point_controls" -- an answer about the CONTROLS when the
+    real problem was that there was no crash point at all.
+    """
+    raw = crash_point_from_carrier(diagnostics)
     if raw is None:
-        raw = diagnostics.get("crash_point")
-    if not isinstance(raw, MappingABC):
         return None
     return _compact_jsonable(raw)
 
@@ -5559,7 +5585,25 @@ def _run_reference(
     trace_payload: Mapping[str, Any] | None = None,
     cost_parameters: Mapping[str, Any] | None = None,
     coating_margin: GateMargin | None = None,
+    decided_backend_status: str | None = None,
 ) -> RunReference:
+    """Build the stored reference for a run.
+
+    ★ `decided_backend_status` EXISTS SO THE ARTIFACT CANNOT CONTRADICT THE
+    DISPOSITION. The raw walker reports what the ENGINE said, which is right for
+    the general case and wrong for the one case where the evaluator's gate
+    reaches a verdict the engine did not state outright: an explicit `ok`
+    carrying a populated crash point is promoted to OUT_OF_DOMAIN by
+    `_has_out_of_domain_backend_signal`, and without this the reference would
+    persist `ok` beside a pruned candidate -- then canonicalise to
+    backend_authoritative=True, certification_allowed=True and a green operator
+    badge for a run the optimizer had just fail-closed on.
+
+    That is the same artifact-versus-decision disagreement that was fixed for
+    `unavailable + crash`, reappearing at `ok + crash` when crash synthesis
+    moved out of the walker. Callers that reach a gated verdict pass it here;
+    everyone else keeps the engine's own answer.
+    """
     summary: Mapping[str, Any] = {}
     if str(getattr(run_execution, "status", "ok")) != "refused":
         try:
@@ -5577,10 +5621,18 @@ def _run_reference(
         status=str(getattr(run_execution, "status", "ok")),
         error_message=str(getattr(run_execution, "error_message", "")),
         reason=str(getattr(run_execution, "reason", "")),
-        trace=_live_run_reference_trace(run_execution, trace_payload),
+        trace=_live_run_reference_trace(
+            run_execution,
+            trace_payload,
+            decided_backend_status=decided_backend_status,
+        ),
         product_summary=summary,
         backend_name=_run_reference_backend_name(run_execution),
-        backend_status=_latest_backend_status(run_execution),
+        backend_status=(
+            decided_backend_status
+            if decided_backend_status is not None
+            else _latest_backend_status(run_execution)
+        ),
         backend_status_reason=_latest_backend_status_reason(run_execution),
         backend_authoritative=_backend_authoritative(run_execution),
     )
@@ -5589,9 +5641,15 @@ def _run_reference(
 def _live_run_reference_trace(
     run_execution: Any,
     trace_payload: Mapping[str, Any] | None,
+    *,
+    decided_backend_status: str | None = None,
 ) -> Any:
     trace = getattr(run_execution, "trace", None)
-    payload = _cache_trace_payload(run_execution, trace_payload)
+    payload = _cache_trace_payload(
+        run_execution,
+        trace_payload,
+        decided_backend_status=decided_backend_status,
+    )
     if not isinstance(payload, MappingABC) or payload is trace:
         return trace
     return _TraceOverlay(trace, MappingProxyType(dict(payload)))
@@ -5600,6 +5658,8 @@ def _live_run_reference_trace(
 def _cache_trace_payload(
     run_execution: Any,
     trace_payload: Mapping[str, Any] | None,
+    *,
+    decided_backend_status: str | None = None,
 ) -> Mapping[str, Any] | Any:
     payload: dict[str, Any] = {}
     if isinstance(trace_payload, Mapping):
@@ -5609,6 +5669,7 @@ def _cache_trace_payload(
         _canonical_backend_trace_fields(
             run_execution,
             backend_name=_run_reference_backend_name(run_execution),
+            decided_backend_status=decided_backend_status,
         )
     )
 
@@ -5684,8 +5745,19 @@ def _canonical_backend_trace_fields(
     run_execution: Any,
     *,
     backend_name: str | None,
+    decided_backend_status: str | None = None,
 ) -> dict[str, Any]:
-    backend_status = _latest_backend_status(run_execution)
+    # The trace IS part of the artifact, so the same rule the reference's own
+    # backend_status follows applies here: a verdict the evaluator's gate
+    # reached outranks the walker's re-reading of what the engine said. Without
+    # this the reference could persist out_of_domain while its own trace -- the
+    # carrier every downstream consumer walks -- persisted ok beside it, which
+    # is the contradiction decided_backend_status exists to prevent.
+    backend_status = (
+        decided_backend_status
+        if decided_backend_status is not None
+        else _latest_backend_status(run_execution)
+    )
     backend_status_reason = _latest_backend_status_reason(run_execution)
     backend_authoritative = _backend_authoritative(run_execution)
     # refused / not_converged / not_attempted are honest engine answers.
@@ -5755,10 +5827,6 @@ def _abort_on_non_authoritative_backend_status(
         )
 
 
-def _latest_backend_status(run_execution: Any) -> str | None:
-    return _select_backend_status(_backend_statuses_from_run_execution(run_execution))
-
-
 def _latest_backend_status_reason(run_execution: Any) -> str | None:
     return _select_backend_status_reason(
         _backend_status_reasons_from_run_execution(run_execution)
@@ -5783,8 +5851,53 @@ def _has_out_of_domain_backend_signal(
     *,
     backend_status: str | None = None,
 ) -> bool:
+    """Did this run actually leave the declared domain?
+
+    ★ CRASH EVIDENCE CORROBORATES A STATUS THE ENGINE PRODUCED. IT CANNOT
+    MANUFACTURE ONE THE ENGINE NEVER PRODUCED.
+
+    This branch runs at the top of the evaluator, BEFORE every status-based
+    decision -- before the `not_attempted` bug-abort, before the honest
+    non-ok return, and before `_abort_on_non_authoritative_backend_status`
+    turns `unavailable` into a retry. It used to consult a retained crash
+    point regardless of the selected status, so it preempted all of them.
+
+    The consequence was reproduced three times independently: a run whose
+    selected status was `unavailable` was pruned as OUT_OF_DOMAIN while the
+    stored RunReference still read `unavailable` -- the candidate disposition
+    and the artifact disagreeing about the same run. And because
+    `_last_out_of_domain_diagnostics` is written only on an out-of-domain
+    result and never cleared by a later `unavailable` one, the crash point
+    driving that verdict can outlive the status that produced it. Varying only
+    its temperature flipped the outcome between a FEASIBLE candidate eligible
+    for ranking and a permanent physics prune -- opposite errors from one
+    stale field, selected by a temperature the candidate never ran at.
+
+    ★ AN EARLIER REVISION OF THIS PARAGRAPH SAID THE CLAUSE APPLIES TO EVERY
+    STATUS IN `_HONEST_NON_OK_BACKEND_STATUSES`, and a review caught that the
+    code had since narrowed past it. The set is `_STATUSES_CRASH_EVIDENCE_MAY_
+    PROMOTE`, and it is `{"ok"}` alone: `refused` and `not_converged` each have
+    their own branch below producing PHYSICS_REFUSED and TIMEOUT, so letting
+    crash evidence overwrite those would replace a verdict the engine GAVE with
+    one it did not.
+
+    `ok` is the single case where crash evidence adds something -- the run
+    claimed success while its diagnostics record leaving the domain -- and that
+    contradiction is what the promotion exists to resolve.
+
+    A status of None -- no engine answer at all -- is likewise not something
+    crash evidence may promote into a physics verdict.
+
+    Ordering note: moving this branch later instead would NOT work. Its first
+    clause is also the `out_of_domain` dispatch, so after the abort call an
+    out-of-domain run would fall through (that token is an honest non-ok, so
+    the abort returns without raising) and its result would simply be lost.
+    The branch does two jobs; only the second one needed gating.
+    """
     if backend_status == "out_of_domain":
         return True
+    if backend_status not in _STATUSES_CRASH_EVIDENCE_MAY_PROMOTE:
+        return False
     diagnostics = _out_of_domain_diagnostics(run_execution)
     return _crash_point_from_diagnostics(diagnostics) is not None
 
@@ -5797,31 +5910,6 @@ def _backend_authoritative_from_carrier(carrier: Any) -> bool | None:
         return bool(raw) if raw is not None else None
     raw = getattr(carrier, "backend_authoritative", None)
     return bool(raw) if raw is not None else None
-
-
-def _latest_backend_status_from_sequence(value: Any) -> str | None:
-    if not isinstance(value, (list, tuple)) or not value:
-        return None
-    return _select_backend_status(
-        status
-        for item in value
-        for status in _backend_statuses_from_carrier(item)
-    )
-
-
-def _backend_statuses_from_run_execution(run_execution: Any) -> tuple[str, ...]:
-    sim = getattr(run_execution, "simulator", None)
-    carriers = (
-        run_execution,
-        getattr(run_execution, "trace", None),
-        getattr(sim, "_last_backend_diagnostics", None),
-        getattr(sim, "_last_out_of_domain_diagnostics", None),
-    )
-    return tuple(
-        status
-        for carrier in carriers
-        for status in _backend_statuses_from_carrier(carrier)
-    )
 
 
 def _backend_status_reasons_from_run_execution(run_execution: Any) -> tuple[str, ...]:
@@ -5837,35 +5925,6 @@ def _backend_status_reasons_from_run_execution(run_execution: Any) -> tuple[str,
         for carrier in carriers
         for reason in _backend_status_reasons_from_carrier(carrier)
     )
-
-
-def _backend_statuses_from_carrier(carrier: Any) -> tuple[str, ...]:
-    if carrier is None:
-        return ()
-    statuses: list[str] = []
-    if isinstance(carrier, MappingABC):
-        raw = carrier.get("backend_status")
-        if raw is not None:
-            statuses.append(str(raw))
-        if _carrier_has_crash_point(carrier):
-            statuses.append("out_of_domain")
-        for key in ("per_hour", "hours"):
-            status = _latest_backend_status_from_sequence(carrier.get(key))
-            if status is not None:
-                statuses.append(status)
-        for key in ("trace", "backend_diagnostics", "diagnostics"):
-            statuses.extend(_backend_statuses_from_carrier(carrier.get(key)))
-        return tuple(statuses)
-    raw = getattr(carrier, "backend_status", None)
-    if raw is not None:
-        statuses.append(str(raw))
-    for attr in ("per_hour", "hours"):
-        status = _latest_backend_status_from_sequence(getattr(carrier, attr, None))
-        if status is not None:
-            statuses.append(status)
-    for attr in ("trace", "backend_diagnostics", "diagnostics"):
-        statuses.extend(_backend_statuses_from_carrier(getattr(carrier, attr, None)))
-    return tuple(statuses)
 
 
 def _backend_status_reasons_from_carrier(carrier: Any) -> tuple[str, ...]:
@@ -5899,21 +5958,6 @@ def _backend_status_reasons_from_carrier(carrier: Any) -> tuple[str, ...]:
     return tuple(reasons)
 
 
-def _carrier_has_crash_point(carrier: Mapping[Any, Any]) -> bool:
-    return any(
-        isinstance(carrier.get(key), MappingABC) and bool(carrier.get(key))
-        for key in ("out_of_domain_crash_point", "crash_point")
-    )
-
-
-def _select_backend_status(statuses: Iterable[str]) -> str | None:
-    values = tuple(str(status) for status in statuses if status is not None)
-    for status in ("out_of_domain", "unavailable", "not_converged"):
-        if status in values:
-            return status
-    if values:
-        return values[-1]
-    return None
 
 
 def _select_backend_status_reason(reasons: Iterable[str]) -> str | None:

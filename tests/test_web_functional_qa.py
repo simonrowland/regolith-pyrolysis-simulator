@@ -23,6 +23,7 @@ from simulator.accounting.queries import (
 )
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.runner import RUNNER_MASS_BALANCE_LIMIT_PCT
 from web.events import _clear_simulation_state, _simulations
 from web.run_store import RunArtifactStore
 
@@ -279,7 +280,13 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     }
     assert completion["oxygen_kg"] == sim._oxygen_total_kg()
     assert completion["terminal_rump_by_species"] == sim._terminal_rump_by_species()
-    assert completion["mass_balance_error_pct"] == pytest.approx(0.0, abs=1e-9)
+    # Production completion emits a percent value (not a fraction) plus the
+    # named breach state.  The mandate's 5e-12 % bound therefore applies
+    # directly, and this fails for any correct-but-different out-of-bound value.
+    assert abs(completion["mass_balance_error_pct"]) <= (
+        RUNNER_MASS_BALANCE_LIMIT_PCT
+    )
+    assert completion["mass_balance_error_breached"] is False
 
     story = completion["product_story"]
     assert story["input"] == {
@@ -602,7 +609,13 @@ def test_alternate_path_b_completes_with_gate_pause_resume(web_driver):
     assert decisions[0][0] == "PATH_AB"
     assert decisions[0][1] != "A_staged"
     assert state["session"].simulator.record.path == "B"
-    assert completion["mass_balance_error_pct"] == pytest.approx(0.0, abs=1e-9)
+    # Production completion emits a percent value (not a fraction) plus the
+    # named breach state.  The mandate's 5e-12 % bound therefore applies
+    # directly, and this fails for any correct-but-different out-of-bound value.
+    assert abs(completion["mass_balance_error_pct"]) <= (
+        RUNNER_MASS_BALANCE_LIMIT_PCT
+    )
+    assert completion["mass_balance_error_breached"] is False
     assert sum(event["name"] == "decision_required" for event in events) == len(
         decisions
     )

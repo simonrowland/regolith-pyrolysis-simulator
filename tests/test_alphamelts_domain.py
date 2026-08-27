@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pathlib
 import pytest
 
 from engines.alphamelts.domain import (
@@ -14,6 +13,11 @@ from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     DomainGateAssessment,
     melts_endmember_to_parent_oxide_activity,
+)
+from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.chemistry.kernel.dto import (
+    INTENT_RESULT_STATUSES,
+    IntentResult,
 )
 
 
@@ -112,34 +116,31 @@ def test_two_component_alkali_silica_is_not_refused_by_this_gate() -> None:
     assert assessment.failed_constraints == ()
 
 
-def test_unrecognised_backend_status_refuses_instead_of_passing():
-    """An unknown adapter status must not be reported as a successful run.
-
-    engines/alphamelts/provider.py mapped anything outside its four-token
-    whitelist to 'ok'. A repo scan found backend_status is also set to failed,
-    missing, stale, not_run, not_attempted, stub, diagnostic_stub, fallback,
-    mixed_backend and no_compared_results -- three of those in production code
-    at simulator/optimize/fidelity.py. Every one would have been reported as a
-    successful equilibrium. Unknown is a missing input, doctrine category (1),
-    so it refuses.
-    """
-    import engines.alphamelts.provider as provider_mod
-
-    src = pathlib.Path(provider_mod.__file__).read_text()
-    # Strip comments before grepping: the fix's own comment quotes the old
-    # fail-open form, and a guard that trips on its own documentation is a
-    # guard that will be deleted rather than believed.
-    code = "\n".join(
-        line.split("#", 1)[0] for line in src.splitlines()
+def test_intent_result_status_vocabulary_accepts_every_production_token():
+    """The DTO owns the exact status vocabulary emitted by providers."""
+    expected = frozenset(
+        {
+            "ok",
+            "refused",
+            "not_converged",
+            "out_of_domain",
+            "unavailable",
+            "unsupported",
+            "not_attempted",
+            "non_authoritative",
+        }
     )
-    assert "else 'ok'" not in code, (
-        "unknown backend_status must not default to ok"
-    )
-    assert "kernel_status = 'unavailable'" not in code
-    assert "KERNEL_RESULT_STATUSES" in src
-    # Unrecognised must raise, not collapse to the absence token.
-    assert "unrecognised backend_status" in src
-    assert "kernel accepts" in src
+    # Production providers emit every token above: notably builtin/AlphaMELTS
+    # emit unsupported, a closed ThermoEngine rail emits not_attempted, and the
+    # VapoRock shadow emits non_authoritative. The exact-set assertion makes a
+    # correct-but-different token fail until producer and contract move together.
+    assert INTENT_RESULT_STATUSES == expected
+    for status in expected:
+        result = IntentResult(
+            intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+            status=status,
+        )
+        assert result.status == status
 
 
 def test_melts_endmember_identity_matches_hand_worked_sio2_al2o3() -> None:

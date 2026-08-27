@@ -441,33 +441,6 @@ def test_pyrolysis_run_completes_with_band_adjustment_provenance():
     assert "refusal_diagnostic" not in payload["run_metadata"]
 
 
-# t-385 (2026-07-21): mass-balance class measured 1302.6 s standalone
-# (subset-junit-3); ceiling >= 1.2x headroom over measured n0 (family serialized on one gateway). xdist_group
-# pins the MAGEMin full-run family to one gateway.
-# Nightly (2026-08-02 CI tiering): executor partial path (~247 s junit).
-@pytest.mark.nightly
-@pytest.mark.xdist_group("magemin_fullrun_a")
-@pytest.mark.timeout(1800)
-def test_run_executor_long_path_refuses_at_transitional_kn():
-    run = _run(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=500,
-        additives_kg={},
-    )
-
-    execution = RunExecutor().execute(run._session_config())
-
-    assert execution.status == "refused"
-    assert execution.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert execution.error_message == execution.reason
-    assert execution.simulator.melt.hour == 14
-    diagnostic = execution.refusal_diagnostic
-    assert diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert diagnostic["evaporation_flux_kg_hr"] is None
-    assert 0.01 <= diagnostic["knudsen_number"] < 10.0
-
-
 def test_run_executor_final_budget_pending_decision_is_partial(monkeypatch):
     snapshot = SimpleNamespace()
     simulator = SimpleNamespace(
@@ -509,84 +482,6 @@ def test_run_executor_final_budget_pending_decision_is_partial(monkeypatch):
 
     assert execution.status == "partial"
     assert execution.reason == "pending_decision"
-
-
-@pytest.mark.parametrize(
-    "feedstock_id",
-    (
-        "lunar_mare_low_ti",
-        "targeted_super_kreep_ore",
-    ),
-)
-def test_run_executor_refuses_before_stage0_exit_in_transitional_kn(
-    feedstock_id: str,
-) -> None:
-    config = replace(
-        PyrolysisRun(
-            feedstock_id=feedstock_id,
-            campaign="C0",
-            hours=500,
-            allow_fallback_vapor=True,
-            allow_unmeasured_alpha_fallback=True,
-            run_metadata_overrides={
-                "started_at_utc": "2026-06-17T00:00:00Z",
-                "kernel_commit_sha": "stage0-stop-test",
-            },
-        )._session_config(),
-        stop_at_stage0_exit=True,
-    )
-
-    execution = RunExecutor().execute(config)
-
-    assert execution.status == "refused"
-    assert execution.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert execution.error_message == execution.reason
-    assert execution.simulator.melt.campaign is CampaignPhase.C0
-    assert execution.simulator.melt.hour == 14
-    diagnostic = execution.refusal_diagnostic
-    assert diagnostic["commanded_pressure_mbar"] == 0.0
-    assert diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert diagnostic["evaporation_flux_kg_hr"] is None
-    assert 0.01 <= diagnostic["knudsen_number"] < 10.0
-
-
-def test_stage0_transitional_refusal_rolls_back_to_completed_hour_prefix() -> None:
-    config = replace(
-        PyrolysisRun(
-            feedstock_id="lunar_mare_low_ti",
-            campaign="C0",
-            hours=500,
-            allow_fallback_vapor=True,
-            allow_unmeasured_alpha_fallback=True,
-            run_metadata_overrides={
-                "started_at_utc": "2026-06-17T00:00:00Z",
-                "kernel_commit_sha": "stage0-stop-parity",
-            },
-        )._session_config(),
-        stop_at_stage0_exit=True,
-    )
-    execution = RunExecutor().execute(config)
-    actual = _ledger_mol_by_account(execution.simulator)
-    prefix = RunExecutor().execute(
-        replace(
-            config,
-            hours=int(execution.simulator.melt.hour),
-            stop_at_stage0_exit=False,
-        )
-    )
-    expected = _ledger_mol_by_account(prefix.simulator)
-
-    assert execution.status == "refused"
-    assert execution.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert prefix.status == "ok"
-    assert actual == expected
-    assert len(execution.simulator.atom_ledger.transitions) == len(
-        prefix.simulator.atom_ledger.transitions
-    )
-    assert (
-        execution.simulator.atom_ledger.element_atom_drift_report()
-        == prefix.simulator.atom_ledger.element_atom_drift_report()
-    )
 
 
 def test_backend_status_aggregation_preserves_recovered_domain_edges():
@@ -754,10 +649,19 @@ def test_run_executor_ood_envelope_keeps_honest_exception(monkeypatch):
 
 
 def test_run_executor_importerror_envelope_is_still_absence(monkeypatch):
-    """Genuine missing library through the envelope is still absence.
+    """Genuine missing library through the envelope is REPORTED as absence.
 
-    Invert: map ImportError onto not_converged in the envelope helper
-    and backend_status becomes not_converged.
+    ★ THIS GUARD USED TO PROVE ONLY THE NEGATIVE. It asserted
+        backend_status != "not_converged"
+        backend_status != "out_of_domain"
+    which forbids RELABELLING absence as an honest engine answer -- correct as
+    far as it goes -- but never REQUIRED `unavailable`. So the flattering
+    default `ok` passed a test written to prevent exactly this, and a genuine
+    missing library was serialized by the runner as a healthy engine.
+
+    A guard that proves what a value is NOT, and never what it IS, leaves the
+    default as an unchecked answer. The positive assertion is the one that
+    matters.
     """
     missing = ImportError("No module named 'thermoengine'")
 
@@ -773,6 +677,8 @@ def test_run_executor_importerror_envelope_is_still_absence(monkeypatch):
 
     assert execution.status == "failed"
     assert execution.failure_exception is missing
+    assert execution.backend_status == "unavailable"
+    # kept: absence must still never be relabelled as an honest engine answer
     assert execution.backend_status != "not_converged"
     assert execution.backend_status != "out_of_domain"
 
@@ -1019,6 +925,10 @@ def test_c4_transitional_flux_refusal_is_visible_and_preserves_ledger_closure():
     assert 0.01 <= diagnostic["knudsen_number"] < 10.0
     assert diagnostic["commanded_pressure_mbar"] == pytest.approx(0.2)
     assert "Mg" in diagnostic["affected_species"]
+    assert diagnostic["campaign_name"] == "C4"
+    assert diagnostic["process_regime"] == "pyrolysis_extraction"
+    assert diagnostic["asking_site"] == "engines.builtin.evaporation_flux"
+    assert diagnostic["stage"] == "C4"
 
     assert _ledger_mol_by_account(sim) == ledger_before
     assert tuple(sim.atom_ledger.transitions) == transitions_before
@@ -1137,3 +1047,108 @@ def test_provider_projection_raises_on_uncertified_melt_resistance():
                 dict(result.diagnostic),
             )
     assert ei.value.reason == "uncertified_melt_resistance_model"
+
+
+def test_typed_failure_does_not_overrule_a_recorded_unavailable(monkeypatch):
+    """b-264: a typed failure is a candidate for the ranking, not a replacement.
+
+    ★ THIS TEST EXISTS AT THE CALL SITE ON PURPOSE. The defect lived in the
+    caller --
+
+        backend_status = _aggregate_backend_status(history, latest)
+        if honest is not None:
+            backend_status = honest        # selection discarded
+
+    -- so a unit test on `_aggregate_backend_status` alone could pin the new
+    contract but could never have caught the original bug. The sibling
+    envelope tests above do not catch it either: they use a bare simulator
+    whose history is empty, where the typed token wins under precedence too,
+    so the override and the candidate are indistinguishable. A RECORDED
+    `unavailable` in the history is what separates them.
+
+    Direction that matters: `out_of_domain` prunes the candidate permanently as
+    a physics verdict about the recipe, while `unavailable` means the engine
+    was missing and the candidate deserves a retry. Overruled, a broken install
+    became a permanent conclusion about the process being designed.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    ood = ThermoEngineOutOfDomainError(
+        ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET,
+        requested=-9.0,
+    )
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise ood
+
+    monkeypatch.setattr("simulator.run_executor.drive_session", fail_drive_session)
+
+    session = type(
+        "AbsentEngineSession",
+        (),
+        {
+            "simulator": SimpleNamespace(
+                _backend_status_history=("unavailable",),
+                _last_backend_status="unavailable",
+            )
+        },
+    )()
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.failure_exception is ood
+    assert execution.backend_status == "unavailable"
+    assert execution.backend_status != "out_of_domain"
+
+
+def test_unclassifiable_exception_does_not_mint_engine_absence(monkeypatch):
+    """Failing to CLASSIFY an exception must not be reported as a missing engine.
+
+    `_backend_status_from_honest_exception` stringifies the exception to
+    classify it. An exception whose `__str__` itself raises therefore breaks the
+    classifier -- and if that call sits inside the degraded envelope's
+    `_safe_str(..., "unavailable")` boundary, the failure is swallowed and the
+    run reports the FACTUAL token `unavailable` with no absence evidence behind
+    it. The optimizer then raises BackendUnavailableAbort, cancels the batch and
+    leaves the candidate for retry, when the real event was an unclassified
+    programming failure that should stay loud.
+
+    ★ NOTE THE EXCEPTION TYPE. The sibling
+    test_run_executor_failure_envelope_uses_safe_exception_text raises
+    RuntimeError, which the ThermoEngine membership helpers catch themselves --
+    so it never reaches the classifier and cannot see this path. A non-RuntimeError
+    is required, which is why this test exists separately rather than as another
+    case of that one.
+    """
+
+    class _BadStr(Exception):
+        def __str__(self) -> str:
+            raise ValueError("stringifying this exception fails")
+
+    boom = _BadStr()
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise boom
+
+    monkeypatch.setattr("simulator.run_executor.drive_session", fail_drive_session)
+
+    session = type(
+        "HealthyHistorySession",
+        (),
+        {
+            "simulator": SimpleNamespace(
+                _backend_status_history=("ok",),
+                _last_backend_status="ok",
+            )
+        },
+    )()
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    # the run failed, and says so
+    assert execution.status == "failed"
+    # ...but the engine was never absent, and must not be reported as such
+    assert execution.backend_status != "unavailable"

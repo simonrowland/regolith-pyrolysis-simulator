@@ -40,9 +40,11 @@ from simulator.chemistry.kernel.capabilities import (
     ChemistryIntent,
 )
 from simulator.chemistry.kernel.dto import (
+    INTENT_RESULT_STATUSES,
     ControlAudit,
     IntentRequest,
     IntentResult,
+    IntentResultStatusError,
 )
 from simulator.chemistry.kernel.errors import ProviderUnavailableError
 from simulator.chemistry.kernel.provider import ChemistryProvider
@@ -461,6 +463,30 @@ class VapoRockProvider(ChemistryProvider):
         backend_status = str(
             getattr(equilibrium, 'status', None) or 'unavailable'
         )
+        # Validate the ENGINE-OUTCOME token here, because it never reaches the
+        # DTO's own validation the way the other providers' tokens do.
+        #
+        # This provider always constructs IntentResult(status='non_authoritative'),
+        # and that is correct and deliberate -- it encodes AUTHORITY (VapoRock
+        # has none), not engine success. But it means the adapter's own status
+        # only ever travels as diagnostic['backend_status'], so
+        # IntentResult.__post_init__ never sees it and an unrecognised token
+        # passes straight through into a result the planner records as a normal
+        # successful shadow dispatch.
+        #
+        # That matters even though VapoRock is diagnostic-only at runtime: the
+        # corpus-parity harness reads vaporock_full_speciation_Pa off the
+        # successful shadow record WITHOUT consulting backend_status. So an
+        # adapter answering with a token we cannot interpret, while carrying
+        # stale speciation, would have its stale numbers consumed as engine
+        # EVIDENCE. Runtime evaporation stays safe; validation evidence would
+        # not be.
+        #
+        # Checked against the same frozen vocabulary the DTO owns, so the two
+        # cannot drift apart -- this is a second CALL to the owner, not a
+        # second COPY of the rule.
+        if backend_status not in INTENT_RESULT_STATUSES:
+            raise IntentResultStatusError(backend_status)
         return VapoRockDiagnostics(
             **envelope_fields,
             vapor_pressures_Pa=vapor_pressures_Pa,

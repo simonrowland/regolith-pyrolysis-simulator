@@ -127,7 +127,7 @@ def producer_backed_operator_tick(monkeypatch):
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 1,

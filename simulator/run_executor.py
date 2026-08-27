@@ -43,6 +43,7 @@ from simulator.trace import PhysicsTrace
 from simulator.transport_regime import TransportRegimeRefusal
 
 
+from simulator.chemistry.kernel import select_backend_status
 _TYPED_PHYSICS_REFUSALS = (
     VaporPressureRangeError,
     CertifiedPointRefusedError,
@@ -472,12 +473,8 @@ class RunExecutor:
             backend_status = _aggregate_backend_status(
                 getattr(sim, "_backend_status_history", ()),
                 latest_backend_status,
+                exception_status=_backend_status_from_honest_exception(failure_exc),
             )
-            honest_backend_status = _backend_status_from_honest_exception(
-                failure_exc
-            )
-            if honest_backend_status is not None:
-                backend_status = honest_backend_status
             backend_authoritative = bool(
                 getattr(sim, "_backend_authoritative", True)
             )
@@ -527,18 +524,37 @@ class RunExecutor:
                 ),
                 "unavailable",
             )
+            # ★ CLASSIFY OUTSIDE THE "unavailable" FALLBACK BOUNDARY.
+            #
+            # A first version of this fix put the classifier call inside the
+            # _safe_str(..., "unavailable") lambda. That looked tidier and was a
+            # new fail-open: _backend_status_from_honest_exception stringifies
+            # the exception to classify it, so an exception whose __str__ itself
+            # raises made the classifier fail, _safe_str swallowed it, and the
+            # run reported the FACTUAL token `unavailable` with no absence
+            # evidence behind it. The optimizer then raises
+            # BackendUnavailableAbort, cancels the batch and leaves the
+            # candidate for retry -- an unclassified programming failure
+            # rewritten as missing tooling.
+            #
+            # `unavailable` must never be the fallback for FAILING TO CLASSIFY.
+            # An unclassifiable exception contributes NO candidate, so the
+            # aggregate stands on the evidence that does exist rather than on a
+            # token invented by the error path.
+            try:
+                honest_exception_status = _backend_status_from_honest_exception(
+                    failure_exc
+                )
+            except Exception:
+                honest_exception_status = None
             backend_status = _safe_str(
                 lambda: _aggregate_backend_status(
                     getattr(sim, "_backend_status_history", ()),
                     latest_backend_status,
+                    exception_status=honest_exception_status,
                 ),
                 "unavailable",
             )
-            honest_backend_status = _backend_status_from_honest_exception(
-                failure_exc
-            )
-            if honest_backend_status is not None:
-                backend_status = honest_backend_status
             backend_authoritative = _safe_bool(
                 lambda: getattr(sim, "_backend_authoritative", False),
                 False,
@@ -679,25 +695,79 @@ def _safe_bool(builder: Any, default: bool) -> bool:
         return default
 
 
-def _aggregate_backend_status(history: Any, latest: str) -> str:
+def _aggregate_backend_status(
+    history: Any,
+    latest: str,
+    *,
+    exception_status: str | None = None,
+) -> str:
+    """Rank a run's history, its latest token, and any typed failure down to one.
+
+    The precedence rule itself lives with the vocabulary it ranks
+    (`simulator.chemistry.kernel.dto.select_backend_status`); this function only
+    assembles the candidate list. It used to restate the ordering inline, which
+    is how the two optimizer copies drifted to a transposed order without
+    anything noticing.
+
+    ★ `exception_status` is a CANDIDATE, not an override. Both call sites used
+    to do this:
+
+        backend_status = _aggregate_backend_status(history, latest)
+        if honest is not None:
+            backend_status = honest        # <- selection discarded
+
+    which computed the owner's answer and then threw it away, so a run whose
+    history said `unavailable` reported `out_of_domain` after a domain-typed
+    exception and `not_converged` after a timeout. That is the exact
+    transposition the owner's derivation says must not happen: engine absence
+    became a permanent physics claim about the recipe. Feeding the typed failure
+    IN as one more candidate keeps one decision point, so precedence applies to
+    it like anything else.
+
+    It is appended LAST deliberately. The owner falls back to the final value
+    when no ranked token is present, so a typed failure carrying an unranked
+    token (`refused`) still wins over an unremarkable history of `ok`, while a
+    ranked history token still outranks it.
+    """
     try:
         statuses = [str(status) for status in history]
     except TypeError:
         statuses = []
     statuses.append(str(latest))
-    for status in ("unavailable", "out_of_domain", "not_converged"):
-        if status in statuses:
-            return status
-    return str(latest)
+    if exception_status is not None:
+        statuses.append(str(exception_status))
+    selected = select_backend_status(statuses)
+    # `statuses` always carries at least str(latest), and str() never yields
+    # None, so the owner always ranks something; this narrows `str | None` to
+    # `str` for the declared return type rather than guarding a reachable case.
+    return selected if selected is not None else str(latest)
 
 
 def _backend_status_from_honest_exception(
     exc: BaseException | None,
 ) -> str | None:
-    """Map a typed engine answer to backend_status. None is not a status.
+    """Map a typed engine answer to backend_status. None means UNCLASSIFIABLE.
 
-    Type-driven. ImportError / EngineWorkerUnavailable are absence, not
-    an honest non-ok token, and must not be rewritten here.
+    Type-driven, and it distinguishes three things that are not the same:
+
+      TYPED ABSENCE (ImportError / EngineWorkerUnavailable /
+        BackendUnavailableError) -> "unavailable". The engine was not there,
+        and that IS the honest answer, so it is stated.
+      A TYPED ENGINE ANSWER (timeout, refusal, out-of-domain) -> its own token.
+      ANYTHING ELSE -> None, meaning we could not classify it. None is not a
+        status and must never become one.
+
+    ★ ABSENCE USED TO RETURN None, on the reasoning that absence "is not an
+    honest non-ok token and must not be rewritten here". The first half was
+    right and the conclusion was not: declining to state absence does not leave
+    the field empty, it leaves whatever the run already had -- and for a bare
+    session that is the default `ok`. So a genuine missing library was
+    serialized by the runner as `backend_status="ok"` while the optimizer,
+    inspecting the exception separately, correctly aborted as unavailable. Two
+    surfaces, one run, opposite claims.
+
+    Refusing to relabel absence as `not_converged` or `out_of_domain` is
+    correct. Refusing to name it at all is how the flattering default wins.
     """
     if exc is None:
         return None
@@ -715,7 +785,7 @@ def _backend_status_from_honest_exception(
     if isinstance(
         exc, (ImportError, EngineWorkerUnavailable, BackendUnavailableError)
     ):
-        return None
+        return "unavailable"
     timeout = thermoengine_timeout_cause_from_exception(exc)
     if timeout is not None:
         return STATUS_BY_TIMEOUT_CAUSE[timeout]

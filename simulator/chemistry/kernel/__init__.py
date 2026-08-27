@@ -22,7 +22,11 @@ from simulator.chemistry.kernel.config import (
 from simulator.chemistry.kernel.dto import (
     ControlAudit,
     IntentRequest,
+    BACKEND_STATUS_PRECEDENCE,
+    INTENT_RESULT_STATUSES,
     IntentResult,
+    IntentResultStatusError,
+    select_backend_status,
     LedgerTransitionProposal,
     ProviderAccountView,
 )
@@ -48,7 +52,11 @@ from simulator.chemistry.kernel.registry import ProviderRegistry
 __all__ = (
     # DTOs
     "IntentRequest",
+    "BACKEND_STATUS_PRECEDENCE",
+    "INTENT_RESULT_STATUSES",
     "IntentResult",
+    "IntentResultStatusError",
+    "select_backend_status",
     "LedgerTransitionProposal",
     "ControlAudit",
     "ProviderAccountView",

@@ -39,6 +39,7 @@ from simulator.fidelity_vocabulary import (
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.optimize.evaluate import (
+    _crash_point_from_diagnostics,
     BackendUnavailableAbort,
     EngineBugAbort,
     EvaluationAbort,
@@ -58,7 +59,13 @@ from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import (
+    ResultStore,
+    _deserialize_run_reference,
+    _json_dump,
+    _json_load,
+    _serialize_run_reference,
+)
 from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
@@ -112,9 +119,9 @@ PROFILE = {
         "campaign": "C0",
         "hours": 1,
         "mass_kg": 1000.0,
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
     },
-    "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+    "fidelities": {"fast": {"backend_name": "internal-analytical", "hours": 1}},
     "seed_recipes": [
         {
             "id": "evaluate-c0-seed",
@@ -1002,7 +1009,7 @@ def _knudsen_gate_profile() -> dict:
         },
         "fidelities": {
             "fast": {
-                "backend_name": "stub",
+                "backend_name": "internal-analytical",
                 "hours": 24,
             }
         },
@@ -1659,9 +1666,9 @@ def _best_tap_composition_profile(
         "campaign": "C2A_continuous",
         "hours": 24,
         "mass_kg": 1000.0,
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
     }
-    profile["fidelities"] = {"fast": {"backend_name": "stub"}}
+    profile["fidelities"] = {"fast": {"backend_name": "internal-analytical"}}
     target = profile["objectives"][0]["target"]
     target["maturity"] = {
         "mode": "campaign_hours",
@@ -2170,7 +2177,7 @@ def test_zero_mass_direct_run_executor_refuses_before_execution() -> None:
                 setpoints=bundle.setpoints,
                 vapor_pressures=bundle.vapor_pressures,
                 campaign="C0",
-                backend_name="stub",
+                backend_name="internal-analytical",
                 backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
                 hours=1,
                 mass_kg=0.0,
@@ -3167,6 +3174,12 @@ def test_real_backend_missing_backend_status_aborts_as_backend_unavailable() -> 
 
 
 def test_real_backend_unavailable_backend_status_aborts_as_backend_unavailable() -> None:
+    """Production engine-absence carriers emit ``unavailable`` and must abort.
+
+    This intentionally fails if the absence path becomes lenient or substitutes
+    a correct-but-different token: ``unavailable`` is the closed-vocabulary
+    report for an absent real backend, not an honest infeasible engine answer.
+    """
     real_profile = {
         **PROFILE,
         "run": {**PROFILE["run"], "backend_name": "alphamelts"},
@@ -3242,32 +3255,94 @@ def test_real_backend_not_converged_is_timeout_not_unavailable() -> None:
     assert any("not_converged" in note for note in result.notes)
 
 
-def test_real_backend_not_attempted_is_not_unavailable() -> None:
-    """Red-by-revert: a probe that never ran is not engine absence.
+def test_whole_run_not_attempted_aborts_and_is_not_silent_relabel() -> None:
+    """Pin: a whole-run ``not_attempted`` must abort, never PHYSICS_REFUSED.
 
-    Invert: the != ok abort still fires and this raises BackendUnavailableAbort.
+    Production does not emit this token on the optimizer envelope.
+    AlphaMELTS mid-run prior-close emits ``not_attempted`` on the kernel
+    ``IntentResult`` rail, but ``core._get_equilibrium`` is pre-gated on
+    ``backend.is_available()`` so a real backend raises before kernel
+    dispatch, and ``RunExecutor._aggregate_backend_status`` returns the
+    first of (unavailable, out_of_domain, not_converged) else *latest*,
+    never a history member. This FakeExecutor injection is therefore a
+    counterfactual.
+
+    This test would fail if the behaviour were correct-but-different —
+    a later redesign that made ``not_attempted`` a live whole-run honest
+    answer with a dedicated ``ScoredResult``. Rewrite the pin in that
+    case. It must keep failing on the silent relabel this pin exists to
+    block: keeping the token in the honest-non-ok set so fallthrough
+    reports never-attempted as attempted-and-refused-on-physics.
     """
-    result = evaluate(
-        _valid_patch(),
-        "lunar_mare_low_ti",
-        "high",
-        profile=_real_backend_profile(),
-        executor=FakeExecutor(
-            _execution(
-                backend_status="not_attempted",
-                backend_authoritative=True,
-                reason="prior transport closed",
-            )
-        ),
+    with pytest.raises(EngineBugAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                _execution(
+                    backend_status="not_attempted",
+                    backend_authoritative=True,
+                    reason="prior transport closed",
+                )
+            ),
+        )
+
+    assert raised.value.category is FailureCategory.ENGINE_BUG
+    assert raised.value.category is not FailureCategory.PHYSICS_REFUSED
+    assert raised.value.category is not FailureCategory.BACKEND_UNAVAILABLE
+    message = str(raised.value)
+    assert "not_attempted" in message
+    assert "PHYSICS_REFUSED" in message
+
+
+def test_run_reference_not_attempted_survives_result_store_passthrough() -> None:
+    """Pin: stored ``not_attempted`` survives the fidelity pass-through rail.
+
+    Production emits this token on the kernel IntentResult rail
+    (alphaMELTS mid-run prior-close) and keeps it on stored
+    ``RunReference.backend_status`` with ``evidence_class="melts"``.
+    ResultStore._deserialize_run_reference reconstructs RunReference,
+    so ``__post_init__`` re-enters ``_fidelity_alias_backend_status``.
+    The token is in ``_FIDELITY_PASSTHROUGH_BACKEND_STATUSES`` because
+    the fidelity alias table was not re-read for refused /
+    not_converged / not_attempted; they stay on the field and are not
+    sent through ``translate_legacy_token``.
+
+    The whole-run optimizer envelope is a different rail: evaluate()
+    aborts with EngineBugAbort on the same token (see
+    test_whole_run_not_attempted_aborts_and_is_not_silent_relabel)
+    because it is not a candidate physics answer. That abort never
+    reaches this boundary. The two rails do not contradict: the
+    envelope refuses to *score* a whole-run ``not_attempted``; this
+    rail *preserves* a stored token so it is not folded into absence
+    or raised as UnknownFidelityVocabularyTokenError.
+
+    Invert: drop ``not_attempted`` from
+    ``_FIDELITY_PASSTHROUGH_BACKEND_STATUSES`` and this raises
+    UnknownFidelityVocabularyTokenError on construct / deserialize.
+    """
+    reference = evaluate_module.RunReference(
+        status="ok",
+        backend_name="alphamelts",
+        backend_status="not_attempted",
+        backend_authoritative=True,
+        evidence_class="melts",
     )
 
-    assert not result.feasible
-    assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
-    assert result.failure_category is not FailureCategory.ENGINE_BUG
-    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
-    assert result.run_reference is not None
-    assert result.run_reference.backend_status == "not_attempted"
-    assert result.run_reference.status == "not_attempted"
+    assert reference.backend_status == "not_attempted"
+    assert reference.evidence_class == "melts"
+
+    payload = _json_load(_json_dump(_serialize_run_reference(reference)))
+    loaded = _deserialize_run_reference(payload, result_blob=None)
+
+    assert payload["backend_status"] == "not_attempted"
+    assert loaded is not None
+    assert loaded.backend_status == "not_attempted"
+    assert loaded.backend_status is not None
+    assert loaded.backend_status != "unavailable"
+    assert loaded.evidence_class == "melts"
 
 
 def test_never_installed_engine_importerror_still_aborts_optimizer() -> None:
@@ -4376,11 +4451,11 @@ def test_strict_vaporock_unavailable_eval_fails_closed_with_vaporock_key(
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "allow_fallback_vapor": False,
             "force_builtin_vapor_pressure": False,
         },
-        "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+        "fidelities": {"fast": {"backend_name": "internal-analytical", "hours": 1}},
     }
     failed = _execution(
         status="failed",
@@ -4511,7 +4586,7 @@ def test_stub_fidelity_drops_inherited_cached_real_cache_config(tmp_path) -> Non
             "backend_name": "cached-real",
             "reduced_real_cache": cache_config,
         },
-        "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+        "fidelities": {"fast": {"backend_name": "internal-analytical", "hours": 1}},
     }
     executor = FakeExecutor(_execution(backend_status="ok"))
 
@@ -4632,3 +4707,262 @@ def test_run_reference_unknown_backend_status_fails_closed() -> None:
             status="failed",
             trace={"backend_status": "opaque-status"},
         )
+def test_empty_production_named_crash_point_does_not_prune_the_recipe() -> None:
+    """The production field name, through the real evaluator path.
+
+    The sibling test above covers the "crash_point" ALIAS. This one covers
+    "out_of_domain_crash_point", which is the name every producer actually
+    writes (diagnostic_helpers/alphamelts_volatility.py,
+    melt_backend/alphamelts.py, engines/alphamelts/provider.py) and the name
+    the direct predicate keys on first.
+
+    Before the fix this returned feasible=False with
+    failure_category=OUT_OF_DOMAIN while backend_status stayed "ok" -- a
+    permanent prune of the candidate, justified by a mapping containing
+    nothing. An empty placeholder is not evidence of a domain excursion.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": {},
+                },
+            )
+        ),
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "ok"
+    assert "melts_domain_out_of_domain" not in result.notes
+
+
+def test_populated_crash_point_still_marks_the_recipe_out_of_domain() -> None:
+    """The other direction, so the fix cannot pass by disabling the signal.
+
+    Without this, a change that made the predicate always return None would
+    satisfy the test above and silently stop reporting REAL domain excursions.
+    A guard that only checks the permissive direction is half a guard.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": {
+                        "temperature_C": 1400.0,
+                        "pressure_bar": 0.01,
+                        "fO2_log": -9.0,
+                        "composition_mol": {"SiO2": 1.0},
+                    },
+                },
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is not None
+
+
+def test_promoted_out_of_domain_reaches_the_trace_not_only_the_reference() -> None:
+    """The stored trace must not contradict the reference it ships inside.
+
+    A PROMOTED verdict is reached by the evaluator's gate, not stated outright
+    by the engine, so a walker re-reading the run execution still sees the
+    engine's own "ok". The reference honours the decision, but its trace was
+    built by a separate re-derivation, so the same artifact carried
+    out_of_domain on the reference and ok on the trace at once -- and the trace
+    is the carrier downstream consumers walk, so the flattering answer was the
+    one they got.
+
+    Verified by counterfactual, not by construction: with the decided-status
+    preference removed from the trace builder, this asserts ok here.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    # The engine's OWN answer stays "ok" -- the promotion is the
+                    # gate's, which is exactly why the two sinks could disagree.
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": {
+                        "temperature_C": 1400.0,
+                        "pressure_bar": 0.01,
+                        "fO2_log": -9.0,
+                        "composition_mol": {"SiO2": 1.0},
+                    },
+                },
+            )
+        ),
+    )
+
+    reference = result.run_reference
+    assert reference is not None
+    assert reference.backend_status == "out_of_domain"
+    assert dict(reference.trace)["backend_status"] == "out_of_domain"
+
+
+def test_empty_placeholder_does_not_mask_a_populated_alias() -> None:
+    """The one deliberate behaviour change in the P1-a fix, pinned where it shows.
+
+    The old extractor fell back from the canonical key to the alias only when
+    the canonical key was literally ABSENT. So a carrier holding an empty
+    canonical key beside a populated alias returned the EMPTY one -- a
+    placeholder masking a real excursion recorded one key over. Skipping
+    empties at each key fixes that.
+
+    ★ THIS IS A UNIT ASSERTION ON PURPOSE, and the reason is worth stating.
+    A first draft tested it through evaluate() and asserted feasible is False.
+    That test PASSED BOTH BEFORE AND AFTER the fix, because both versions
+    prune -- the old one on the empty placeholder, the new one on the real
+    alias evidence. Same verdict, different reason, so the integration path
+    cannot see the change at all. A test that cannot fail against the defect
+    it names is decorative, so it asserts on the extractor, which is where the
+    two versions actually differ:
+
+        old -> {}                                  (the empty canonical key)
+        new -> {"temperature_C": ..., ...}         (the populated alias)
+    """
+    populated = {"temperature_C": 1400.0, "pressure_bar": 0.01}
+    masked_carrier = {
+        "out_of_domain_crash_point": {},
+        "crash_point": populated,
+    }
+
+    extracted = _crash_point_from_diagnostics(masked_carrier)
+
+    assert extracted is not None
+    assert extracted.get("temperature_C") == 1400.0
+    assert extracted != {}
+
+
+# --- b-264: the status owner is authoritative, not advisory -------------------
+
+_B264_CRASH = {
+    "temperature_C": 1400.0,
+    "pressure_bar": 0.01,
+    "fO2_log": -9.0,
+    "composition_mol": {"SiO2": 1.0},
+}
+
+
+def test_unavailable_is_not_overruled_by_a_retained_crash_point() -> None:
+    """A missing engine must route to retry, not to a permanent physics verdict.
+
+    Reproduced independently by three reviews before the fix: with a top-level
+    status of `unavailable` and diagnostics carrying `out_of_domain` plus a
+    POPULATED crash point, evaluate() pruned the candidate as OUT_OF_DOMAIN
+    while the stored RunReference still read `unavailable` -- the candidate
+    disposition and the artifact disagreeing about the same run.
+
+    It matters because the prune is permanent and silent. `out_of_domain` is a
+    verdict about the RECIPE, so the candidate leaves the search space and is
+    never revisited once the engine is fixed; `unavailable` is a verdict about
+    the TOOLING and deserves a retry. And the crash point driving it can be
+    STALE -- core writes `_last_out_of_domain_diagnostics` only on an
+    out-of-domain result and never clears it on a later `unavailable` one, so
+    the evidence outlives the status that produced it.
+    """
+    with pytest.raises(BackendUnavailableAbort):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                _execution(
+                    backend_status="unavailable",
+                    backend_authoritative=True,
+                    backend_diagnostics={
+                        "backend_status": "out_of_domain",
+                        "out_of_domain_crash_point": dict(_B264_CRASH),
+                    },
+                )
+            ),
+        )
+
+
+def test_a_real_domain_excursion_is_still_reported() -> None:
+    """The other direction, so the gate cannot pass by silencing the signal.
+
+    Without this, gating the crash clause on "did the engine answer" could be
+    satisfied by never firing it at all, and real excursions would stop being
+    reported. Same carrier as above; only the whole-run status differs.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": dict(_B264_CRASH),
+                },
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is not None
+
+
+def test_out_of_domain_result_does_not_store_itself_as_healthy() -> None:
+    """The stored artifact must not contradict the disposition that produced it.
+
+    ★ THIS IS THE REGRESSION THAT MOVED RATHER THAN DIED. An earlier fix stopped
+    `unavailable + crash` being pruned as out-of-domain while the artifact said
+    `unavailable`. Moving crash synthesis out of the status walker then created
+    the mirror image at `ok + crash`: the gate correctly promoted the run to
+    OUT_OF_DOMAIN, while `_run_reference` called the raw walker again and
+    persisted `ok`.
+
+    That is not cosmetic. The stored status feeds fidelity canonicalisation and
+    the operator's backend badge, so a candidate the optimizer had just
+    fail-closed on was serialized as healthy and authoritative and rendered
+    green. Fail-closed disposition, flattering artifact.
+
+    The gated verdict is now what gets persisted.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": {
+                        "temperature_C": 1400.0,
+                        "pressure_bar": 0.01,
+                        "fO2_log": -9.0,
+                        "composition_mol": {"SiO2": 1.0},
+                    },
+                },
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.run_reference is not None
+    # the artifact agrees with the decision, rather than reporting the engine's
+    # unqualified `ok` beside a pruned candidate
+    assert result.run_reference.backend_status == "out_of_domain"
+    assert result.run_reference.backend_status != "ok"

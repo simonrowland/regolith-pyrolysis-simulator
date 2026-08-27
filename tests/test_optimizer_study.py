@@ -297,7 +297,7 @@ def _scope_spec() -> EvalSpec:
     return _spec(
         RecipePatch({}),
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         PROFILE,
         physics_constraints_from_profile(PROFILE),
     )
@@ -367,7 +367,7 @@ def _save_format_record(
         eval_spec=_spec(
             RecipePatch({}),
             FEEDSTOCK,
-            "stub",
+            "internal-analytical",
             PROFILE,
             cost_parameters=cost_parameters,
         ),
@@ -407,7 +407,7 @@ def _write_save_format_artifacts(
         profile=PROFILE,
         feedstock=FEEDSTOCK,
         strategy="random",
-        fidelity="stub",
+        fidelity="internal-analytical",
         budget=4,
         parallel=1,
         out_dir=out,
@@ -436,7 +436,7 @@ def _write_save_format_artifacts(
         out,
         profile=PROFILE,
         feedstock=FEEDSTOCK,
-        fidelity="stub",
+        fidelity="internal-analytical",
         definitions=study.objective_definitions(PROFILE),
         pareto=(record,),
         leaderboard=(record,),
@@ -749,7 +749,7 @@ def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=2,
         budget=4,
         out_dir=out,
@@ -800,7 +800,7 @@ def test_study_journal_replay_fails_closed_on_strategy_state_mismatch(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=2,
         out_dir=out,
@@ -830,7 +830,7 @@ def test_study_journal_replay_fails_closed_on_corrupt_strategy_state(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=2,
         out_dir=out,
@@ -860,7 +860,7 @@ def test_study_journal_replay_relevant_projection_is_seed_deterministic(
             PROFILE,
             FEEDSTOCK,
             "random",
-            "stub",
+            "internal-analytical",
             parallel=2,
             budget=4,
             out_dir=tmp_path / name,
@@ -892,7 +892,7 @@ def test_staged_journal_replay_reconstructs_beam_archive(tmp_path: Path) -> None
         profile,
         FEEDSTOCK,
         "staged",
-        "stub",
+        "internal-analytical",
         parallel=2,
         budget=2,
         out_dir=out,
@@ -922,7 +922,7 @@ def test_study_journal_replay_fails_closed_on_manifest_mismatch(tmp_path: Path) 
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=2,
         out_dir=out,
@@ -946,7 +946,7 @@ def test_study_journal_replay_rejects_top_level_objectives_mismatch(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=2,
         out_dir=out,
@@ -978,7 +978,7 @@ def test_run_resume_continues_pending_asks_without_overwriting_journal(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=2,
         budget=4,
         out_dir=out,
@@ -1025,7 +1025,7 @@ def test_run_resume_continues_pending_asks_without_overwriting_journal(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=2,
         budget=4,
         out_dir=out,
@@ -1057,7 +1057,7 @@ def test_run_completed_resume_preserves_existing_provenance_rows(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=2,
         out_dir=out,
@@ -1074,7 +1074,7 @@ def test_run_completed_resume_preserves_existing_provenance_rows(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=2,
         out_dir=out,
@@ -1095,7 +1095,7 @@ def test_study_journal_replay_fails_closed_on_out_of_order_events(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=2,
         out_dir=out,
@@ -1122,7 +1122,7 @@ def test_study_journal_replay_fails_closed_on_tell_before_ask(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=1,
         out_dir=out,
@@ -1194,7 +1194,7 @@ def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(
         profile=profile,
         feedstock=FEEDSTOCK,
         strategy="random",
-        fidelity="stub",
+        fidelity="internal-analytical",
         budget=3,
         parallel=1,
         out_dir=out,
@@ -1203,7 +1203,7 @@ def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(
     spec = _spec(
         RecipePatch({}),
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         profile,
         physics_constraints_from_profile(profile),
     )
@@ -1288,7 +1288,7 @@ def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(
         out,
         profile=profile,
         feedstock=FEEDSTOCK,
-        fidelity="stub",
+        fidelity="internal-analytical",
         definitions=study.objective_definitions(profile),
         failure_counts={},
         config=config,
@@ -1314,7 +1314,7 @@ def test_write_empty_artifacts_synthesizes_aborted_save_sidecars(tmp_path: Path)
         profile=PROFILE,
         feedstock=FEEDSTOCK,
         strategy="random",
-        fidelity="stub",
+        fidelity="internal-analytical",
         budget=3,
         parallel=1,
         out_dir=out,
@@ -1325,7 +1325,7 @@ def test_write_empty_artifacts_synthesizes_aborted_save_sidecars(tmp_path: Path)
         out,
         profile=PROFILE,
         feedstock=FEEDSTOCK,
-        fidelity="stub",
+        fidelity="internal-analytical",
         definitions=study.objective_definitions(PROFILE),
         failure_counts={"no_candidates": 1},
         config=config,
@@ -1374,7 +1374,7 @@ def _assert_candidate_pressure_pairs_valid(candidates: list[Any]) -> None:
 
 
 def _pressure_feasible_scored(candidate: Any) -> ScoredResult:
-    spec = _spec(candidate.patch, FEEDSTOCK, "stub", PROFILE)
+    spec = _spec(candidate.patch, FEEDSTOCK, "internal-analytical", PROFILE)
     objectives = ObjectiveVector(
         (
             ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
@@ -1527,7 +1527,7 @@ def _sso2_objective_profile(profile_id: str) -> dict[str, Any]:
 def test_sso2_objective_evidence_projects_reader_failure_without_field_collision(tmp_path) -> None:
     metric = "sso2_pn2_fe_drain_silica"
     profile = _sso2_objective_profile("sso2-study-test")
-    spec = _spec(RecipePatch({}), FEEDSTOCK, "stub", profile)
+    spec = _spec(RecipePatch({}), FEEDSTOCK, "internal-analytical", profile)
     evidence = {
         "reader": metric,
         "status": "wall_coating_failed",
@@ -1701,7 +1701,7 @@ def _stored_sso2_record(
     objectives: ObjectiveVector,
 ) -> study.StudyRecord:
     profile = _sso2_objective_profile(profile_id)
-    spec = _spec(RecipePatch({}), FEEDSTOCK, "stub", profile)
+    spec = _spec(RecipePatch({}), FEEDSTOCK, "internal-analytical", profile)
     scored = ScoredResult(
         candidate_id=f"{profile_id}-candidate",
         eval_spec=spec,
@@ -2085,7 +2085,7 @@ def _write_prior_warm_start_run(
     scored = _seed_safe_certified_evaluator(
         patch.validated(schema),
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         profile=profile,
         candidate_id=candidate_id,
         constraints=study._constraints_for_profile(profile),
@@ -2108,7 +2108,7 @@ def _write_prior_warm_start_run(
         out_dir,
         profile=profile,
         feedstock=FEEDSTOCK,
-        fidelity="stub",
+        fidelity="internal-analytical",
         definitions=study.objective_definitions(PROFILE),
         pareto=(record,),
         leaderboard=(record,),
@@ -2202,7 +2202,7 @@ def test_study_write_lock_is_not_held_during_solve(tmp_path) -> None:
                 PROFILE,
                 FEEDSTOCK,
                 _SingleCandidateStrategy(),
-                "stub",
+                "internal-analytical",
                 parallel=1,
                 budget=1,
                 out_dir=out_dir,
@@ -2223,11 +2223,11 @@ def test_study_write_lock_is_not_held_during_solve(tmp_path) -> None:
     assert solve_entered.exists(), failures
 
     patch = RecipePatch({})
-    spec = _spec(patch, FEEDSTOCK, "stub", PROFILE, constraints)
+    spec = _spec(patch, FEEDSTOCK, "internal-analytical", PROFILE, constraints)
     direct_scored = _evaluator()(
         patch,
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         profile=PROFILE,
         candidate_id="direct-000000",
         constraints=constraints,
@@ -2405,9 +2405,9 @@ def _closed_loop_best_tap_profile() -> dict[str, Any]:
             "campaign": "C0b_p_cleanup",
             "hours": 3,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
         },
-        "fidelities": {"stub": {"backend_name": "stub", "hours": 3}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 3}},
         "objectives": [
             {
                 "type": "composition_target",
@@ -2453,7 +2453,7 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -2571,7 +2571,7 @@ def _legacy_energy_cached_scored(
     index: int,
     energy_metric: str,
 ) -> ScoredResult:
-    spec = _spec(candidate.patch, FEEDSTOCK, "stub", profile, constraints)
+    spec = _spec(candidate.patch, FEEDSTOCK, "internal-analytical", profile, constraints)
     return ScoredResult(
         candidate_id=candidate.id,
         eval_spec=spec,
@@ -2652,7 +2652,7 @@ def test_strategy_cache_hit_legacy_energy_scores_against_canonical_profile(
         profile,
         FEEDSTOCK,
         active_strategy,
-        "stub",
+        "internal-analytical",
         parallel=budget,
         budget=budget,
         out_dir=tmp_path / f"{strategy_name}-out",
@@ -2709,7 +2709,7 @@ def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None
         profile,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         1,
         tmp_path,
@@ -2759,7 +2759,7 @@ def test_study_search_space_identity_tracks_schema_bounds_digest(tmp_path) -> No
             PROFILE,
             FEEDSTOCK,
             _SingleCandidateStrategy(),
-            "stub",
+            "internal-analytical",
             1,
             1,
             out_dir,
@@ -2810,7 +2810,7 @@ def test_warm_start_rejects_stale_search_space_identity(tmp_path) -> None:
             PROFILE,
             FEEDSTOCK,
             "staged",
-            "stub",
+            "internal-analytical",
             parallel=1,
             budget=1,
             out_dir=current,
@@ -2833,7 +2833,7 @@ def test_warm_start_from_prior_run_store_admits_real_seed(tmp_path) -> None:
         PROFILE,
         FEEDSTOCK,
         "staged",
-        "stub",
+        "internal-analytical",
         parallel=1,
         budget=2,
         out_dir=current,
@@ -2872,7 +2872,7 @@ def test_warm_start_rejects_corrupt_patch_recipe_identity(tmp_path) -> None:
             PROFILE,
             FEEDSTOCK,
             "staged",
-            "stub",
+            "internal-analytical",
             parallel=1,
             budget=1,
             out_dir=current,
@@ -2895,7 +2895,7 @@ def test_profile_seed_epoch_stamp_mismatch_warns_but_reevaluates(
             profile,
             FEEDSTOCK,
             "staged",
-            "stub",
+            "internal-analytical",
             parallel=1,
             budget=1,
             out_dir=tmp_path,
@@ -2920,7 +2920,7 @@ def test_optuna_incomplete_warm_start_drop_counted_in_search_provenance(
             PROFILE,
             FEEDSTOCK,
             "bayes",
-            "stub",
+            "internal-analytical",
             parallel=1,
             budget=1,
             out_dir=tmp_path,
@@ -2948,7 +2948,7 @@ def test_evalspec_seed_identity_tracks_canonical_evalspec_fields() -> None:
     spec, _ = _build_eval_inputs(
         patch,
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         PROFILE,
         schema,
         constraints=physics_constraints_from_profile(PROFILE),
@@ -3012,7 +3012,7 @@ def test_study_records_seed_provenance_and_dual_winner_artifacts(tmp_path) -> No
         PROFILE,
         FEEDSTOCK,
         "staged",
-        "stub",
+        "internal-analytical",
         parallel=2,
         budget=2,
         out_dir=tmp_path / "run",
@@ -3070,7 +3070,7 @@ def test_study_surfaces_knob_saturation_in_pareto_and_provenance(tmp_path) -> No
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -3103,7 +3103,7 @@ def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(tmp_path) ->
         profile,
         FEEDSTOCK,
         _SingleCandidateStrategy(),
-        "stub",
+        "internal-analytical",
         1,
         1,
         tmp_path,
@@ -3130,7 +3130,7 @@ def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(tmp_path) ->
     replay = evaluate(
         emitted_patch,
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         profile=profile,
         executor=replay_executor,
         candidate_id="replay",
@@ -3189,7 +3189,7 @@ def test_parallel_composition_target_stub_study_completes(
         yaml.safe_load(profile_path.read_text()),
         "lunar_mare_low_ti",
         "screen",
-        "stub",
+        "internal-analytical",
         2,
         4,
         tmp_path / "study",
@@ -3373,7 +3373,7 @@ def test_degenerate_furnace_lifetimes_complete_study_with_bounded_ordering(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         len(cases),
         tmp_path / "degenerate-lifetime",
@@ -3747,7 +3747,7 @@ def test_two_phase_certification_pool_includes_pareto_beyond_scalar_top_k(
         PROFILE,
         FEEDSTOCK,
         _FixedCandidateStrategy(_pareto_certification_candidates()),
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path / "two-phase-pareto-pool",
@@ -3773,7 +3773,7 @@ def test_two_phase_certification_pool_preserves_single_objective_scalar_top_k_ti
         profile,
         FEEDSTOCK,
         _FixedCandidateStrategy(_single_objective_tie_candidates()),
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path / "two-phase-single-objective-tie",
@@ -3846,7 +3846,7 @@ def test_two_phase_certification_preserves_seed_lineage_for_dual_winner(
         PROFILE,
         FEEDSTOCK,
         "staged",
-        "stub",
+        "internal-analytical",
         1,
         2,
         out,
@@ -3904,7 +3904,7 @@ def test_two_phase_ranking_preserves_nullable_objective_positions(tmp_path) -> N
         profile,
         FEEDSTOCK,
         _FixedCandidateStrategy(_nullable_position_candidates()),
-        "stub",
+        "internal-analytical",
         1,
         4,
         tmp_path / "two-phase-nullable-position",
@@ -3936,7 +3936,7 @@ def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path) -> None:
             "campaign": "C0b_p_cleanup",
             "hours": 2,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
         },
     }
     record = study.StudyRecord(
@@ -3982,7 +3982,7 @@ def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path) -> None:
         tmp_path,
         profile=profile,
         feedstock=FEEDSTOCK,
-        fidelity="stub",
+        fidelity="internal-analytical",
         definitions=[
             study.ObjectiveDefinition(
                 "composition_target:pc-glass-clear",
@@ -4027,7 +4027,7 @@ def test_tap_truncated_c3_materialization_fails_loud_for_dosing_schedule(tmp_pat
             "campaign": "C3",
             "hours": 6,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
         },
     }
     record = study.StudyRecord(
@@ -4060,7 +4060,7 @@ def test_tap_truncated_c3_materialization_fails_loud_for_dosing_schedule(tmp_pat
             tmp_path,
             profile=profile,
             feedstock=FEEDSTOCK,
-            fidelity="stub",
+            fidelity="internal-analytical",
             definitions=[
                 study.ObjectiveDefinition(
                     "composition_target:pc-glass-clear",
@@ -4191,7 +4191,7 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
     pareto = study._pareto_payload(
         PROFILE,
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         [study.ObjectiveDefinition("composition_target:pc-glass-clear", "maximize", "score_0_1")],
         [record],
         record,
@@ -4366,7 +4366,7 @@ def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_pa
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         2,
         tmp_path,
@@ -4397,7 +4397,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     spec_loose, _ = _build_eval_inputs(
         patch.validated(schema),
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         PROFILE,
         schema,
         constraints=loose,
@@ -4405,7 +4405,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     spec_tight, _ = _build_eval_inputs(
         patch.validated(schema),
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         PROFILE,
         schema,
         constraints=tight,
@@ -4444,8 +4444,8 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     candidate = study.Candidate(id="random-7-000000", patch=patch)
 
     assert cache_key(spec_tight) != cache_key(spec_loose)
-    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "stub", schema, store, loose)
-    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "stub", schema, store, tight) is None
+    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, loose)
+    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, tight) is None
 
 
 def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
@@ -4466,7 +4466,7 @@ def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
     spec_loose, _ = _build_eval_inputs(
         patch.validated(schema),
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         loose_profile,
         schema,
         constraints=loose,
@@ -4474,7 +4474,7 @@ def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
     spec_tight, _ = _build_eval_inputs(
         patch.validated(schema),
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         tight_profile,
         schema,
         constraints=tight,
@@ -4503,7 +4503,7 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
         spec, _ = _build_eval_inputs(
             validated,
             FEEDSTOCK,
-            "stub",
+            "internal-analytical",
             profile,
             schema,
             constraints=constraints,
@@ -4554,7 +4554,7 @@ def test_feasibility_filter_excludes_infeasible_from_pareto_but_logs_provenance(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -4579,7 +4579,7 @@ def test_out_of_domain_candidate_is_stored_and_study_continues(tmp_path) -> None
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -4621,7 +4621,7 @@ def test_feasible_earned_rump_ood_cache_rejection_warns_and_study_continues(
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -4648,7 +4648,7 @@ def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         2,
         tmp_path,
@@ -4697,7 +4697,7 @@ def test_parallel_all_timeouts_is_a_designed_no_winner_outcome(tmp_path) -> None
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         2,
         tmp_path,
@@ -4721,7 +4721,7 @@ def test_all_infeasible_completes_with_no_feasible_winner(tmp_path) -> None:
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -4759,7 +4759,7 @@ def test_stale_profile_refusal_flows_through_study_as_named_failure(tmp_path) ->
             _stale_melt_target_profile(),
             FEEDSTOCK,
             "random",
-            "stub",
+            "internal-analytical",
             1,
             1,
             tmp_path,
@@ -4783,7 +4783,7 @@ def test_all_out_of_domain_completes_no_feasible_and_logs_count(tmp_path) -> Non
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -4811,7 +4811,7 @@ def test_single_feasible_point_is_winner(tmp_path) -> None:
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -4854,8 +4854,8 @@ def test_winner_tie_determinism_uses_cache_key_then_candidate_id(tmp_path) -> No
             ),
         )
 
-    first = study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path / "first", seed=7, evaluator=tied)
-    second = study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path / "second", seed=7, evaluator=tied)
+    first = study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path / "first", seed=7, evaluator=tied)
+    second = study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path / "second", seed=7, evaluator=tied)
 
     expected = min(first.pareto, key=lambda record: (record.cache_key or "", record.candidate_id))
     assert first.winner.candidate_id == expected.candidate_id
@@ -4866,9 +4866,9 @@ def test_winner_tie_determinism_uses_cache_key_then_candidate_id(tmp_path) -> No
 
 
 def test_completed_rerun_preserves_provenance_without_duplicating_rows(tmp_path) -> None:
-    study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
+    study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
     before = _read_provenance(tmp_path)
-    study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
+    study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
 
     provenance = _read_provenance(tmp_path)
     assert len(provenance) == 3
@@ -4877,7 +4877,7 @@ def test_completed_rerun_preserves_provenance_without_duplicating_rows(tmp_path)
 
 
 def test_completed_rerun_replays_journal_without_mutating_provenance(tmp_path) -> None:
-    study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
+    study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
     before = _read_provenance(tmp_path)
     with sqlite3.connect(tmp_path / "cache.sqlite") as conn:
         conn.execute(
@@ -4893,7 +4893,7 @@ def test_completed_rerun_replays_journal_without_mutating_provenance(tmp_path) -
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -4913,7 +4913,7 @@ def test_engine_bug_result_aborts_without_pareto(tmp_path) -> None:
             PROFILE,
             FEEDSTOCK,
             "random",
-            "stub",
+            "internal-analytical",
             1,
             1,
             tmp_path,
@@ -4929,7 +4929,7 @@ def test_nonfinite_payload_result_continues_and_counts_failure(tmp_path) -> None
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -4955,7 +4955,7 @@ def test_invalid_recipe_result_continues_and_counts_failure(tmp_path) -> None:
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         tmp_path,
@@ -5060,7 +5060,7 @@ def test_all_invalid_recipe_results_fail_loud_with_counts(tmp_path) -> None:
             PROFILE,
             FEEDSTOCK,
             "random",
-            "stub",
+            "internal-analytical",
             1,
             2,
             tmp_path,
@@ -5082,7 +5082,7 @@ def test_all_nonfinite_payload_results_fail_loud_with_counts(tmp_path) -> None:
             PROFILE,
             FEEDSTOCK,
             "random",
-            "stub",
+            "internal-analytical",
             1,
             2,
             tmp_path,
@@ -5123,7 +5123,7 @@ def test_feasible_nonfinite_margin_aborts_without_pareto(tmp_path) -> None:
         )
 
     with pytest.raises(study.StudyAbort, match="margin.*NaN"):
-        study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 1, tmp_path, evaluator=bad_margin)
+        study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 1, tmp_path, evaluator=bad_margin)
 
     assert not (tmp_path / "pareto.json").exists()
     assert not (tmp_path / "winner.recipe.yaml").exists()
@@ -5153,7 +5153,7 @@ def test_infeasible_nonfinite_margin_aborts_without_pareto(tmp_path) -> None:
         )
 
     with pytest.raises(study.StudyAbort, match="observed.*NaN"):
-        study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 1, tmp_path, evaluator=bad_margin)
+        study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 1, tmp_path, evaluator=bad_margin)
 
     assert not (tmp_path / "pareto.json").exists()
     assert not (tmp_path / "winner.recipe.yaml").exists()
@@ -5188,7 +5188,7 @@ def test_infeasible_missing_metadata_aborts_before_ok_artifacts(tmp_path) -> Non
             PROFILE,
             FEEDSTOCK,
             "random",
-            "stub",
+            "internal-analytical",
             1,
             1,
             tmp_path,
@@ -5226,7 +5226,7 @@ def test_nonfinite_objective_aborts_without_pareto(tmp_path) -> None:
         )
 
     with pytest.raises(study.StudyAbort, match="oxygen_kg is non-finite"):
-        study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 1, tmp_path, evaluator=bad_objective)
+        study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 1, tmp_path, evaluator=bad_objective)
 
     assert not (tmp_path / "pareto.json").exists()
     assert not (tmp_path / "winner.recipe.yaml").exists()
@@ -5256,7 +5256,7 @@ def test_feasible_nonfinite_or_unmarked_result_is_rejected(tmp_path) -> None:
         )
 
     with pytest.raises(study.StudyAbort, match="eval_spec/cache_key"):
-        study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 1, tmp_path, evaluator=unmarked)
+        study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 1, tmp_path, evaluator=unmarked)
 
 
 def test_study_result_records_are_light_no_trace_or_snapshots(tmp_path) -> None:
@@ -5264,7 +5264,7 @@ def test_study_result_records_are_light_no_trace_or_snapshots(tmp_path) -> None:
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         2,
         tmp_path,
@@ -5316,7 +5316,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--strategy",
             "bogus",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
         ],
@@ -5339,7 +5339,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
         ],
@@ -5362,7 +5362,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
         ],
@@ -5408,7 +5408,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "0",
         ],
@@ -5431,7 +5431,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
             "--pin",
@@ -5458,7 +5458,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
             "--out",
@@ -5485,7 +5485,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--strategy",
             "staged",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
             "--out",
@@ -5511,7 +5511,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
             "--out",
@@ -5554,7 +5554,7 @@ def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> 
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
             "--out",
@@ -5597,7 +5597,7 @@ def test_cli_constrained_max_overlay_forwards_hardware_caps(tmp_path, monkeypatc
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
             "--out",
@@ -5647,7 +5647,7 @@ def test_cli_rejects_incoherent_constrained_max_args(
                 "--strategy",
                 "random",
                 "--fidelity",
-                "stub",
+                "internal-analytical",
                 "--budget",
                 "1",
                 "--out",
@@ -5673,7 +5673,7 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
             "--out",
@@ -5850,7 +5850,7 @@ def test_cli_writes_success_job_status_marker_for_completed_no_feasible_winner(
             "--strategy",
             "random",
             "--fidelity",
-            "stub",
+            "internal-analytical",
             "--budget",
             "1",
             "--out",
@@ -5892,7 +5892,7 @@ def test_cli_writes_failure_job_status_marker_for_no_feasible_config_error(
                 "--strategy",
                 "random",
                 "--fidelity",
-                "stub",
+                "internal-analytical",
                 "--budget",
                 "1",
                 "--out",
@@ -6155,7 +6155,7 @@ def test_two_phase_loop_certifies_top_k_and_reports_certified_winner(tmp_path) -
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         5,
         out,
@@ -6214,7 +6214,7 @@ def test_two_phase_certification_scores_legacy_energy_alias_as_primary_metric(
         profile,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         5,
         out,
@@ -6237,7 +6237,7 @@ def test_two_phase_certification_filters_exact_infeasible_before_objective(tmp_p
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         5,
         out,
@@ -6270,7 +6270,7 @@ def test_two_phase_certification_all_infeasible_completes_no_winner(tmp_path) ->
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         1,
         out,
@@ -6316,7 +6316,7 @@ def test_two_phase_certification_all_degraded_completes_no_winner(tmp_path) -> N
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         1,
         out,
@@ -6354,7 +6354,7 @@ def test_two_phase_certification_excludes_degraded_raw_leader(tmp_path) -> None:
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         5,
         out,
@@ -6434,7 +6434,7 @@ def test_main_run_all_degraded_completes_no_winner(tmp_path) -> None:
         PROFILE,
         FEEDSTOCK,
         "random",
-        "stub",
+        "internal-analytical",
         1,
         3,
         out,
@@ -6457,7 +6457,7 @@ def test_two_phase_disabled_matches_single_pass_output(tmp_path) -> None:
         profile=PROFILE,
         feedstock=FEEDSTOCK,
         strategy="random",
-        fidelity="stub",
+        fidelity="internal-analytical",
         parallel=1,
         budget=3,
         seed=7,
@@ -6484,7 +6484,7 @@ def test_two_phase_certification_records_parallel_for_adaptive_strategy(tmp_path
         PROFILE,
         FEEDSTOCK,
         "bayes",
-        "stub",
+        "internal-analytical",
         2,
         4,
         out,
@@ -6500,8 +6500,8 @@ def test_determinism_same_seed_same_pareto_and_winner(tmp_path) -> None:
     first = tmp_path / "first"
     second = tmp_path / "second"
 
-    study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, first, seed=11, evaluator=_evaluator())
-    study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, second, seed=11, evaluator=_evaluator())
+    study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, first, seed=11, evaluator=_evaluator())
+    study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, second, seed=11, evaluator=_evaluator())
 
     assert (first / "pareto.json").read_text() == (second / "pareto.json").read_text()
     assert (first / "winner.recipe.yaml").read_text() == (second / "winner.recipe.yaml").read_text()

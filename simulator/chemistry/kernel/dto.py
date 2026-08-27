@@ -374,6 +374,86 @@ class IntentRequest:
         object.__setattr__(self, "control_inputs", _freeze_str_any(self.control_inputs))
 
 
+INTENT_RESULT_STATUSES = frozenset(
+    {
+        "ok",
+        "refused",
+        "not_converged",
+        "out_of_domain",
+        "unavailable",
+        "unsupported",
+        "not_attempted",
+        "non_authoritative",
+    }
+)
+
+
+class IntentResultStatusError(ValueError):
+    """An :class:`IntentResult` carried an unrecognised status token."""
+
+    def __init__(self, status: str) -> None:
+        self.status = status
+        self.allowed_statuses = INTENT_RESULT_STATUSES
+        super().__init__(
+            f"unrecognised IntentResult.status {status!r}; expected one of "
+            f"{tuple(sorted(self.allowed_statuses))}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Whole-run status precedence — ONE owner, and the order is not arbitrary.
+# ---------------------------------------------------------------------------
+
+#: Most-severe-first precedence for reducing several per-probe statuses to one
+#: whole-run status.
+#:
+#: DERIVATION — the order follows from WHAT WAS LEARNED, not from a severity
+#: ranking picked by feel, and the tie between the first two is decided by the
+#: asymmetry of being wrong:
+#:
+#:   unavailable    the engine was not there. We learned NOTHING about the
+#:                  physics of this run.
+#:   out_of_domain  the engine WAS there and said this composition/temperature
+#:                  lies outside its calibration. That is a physics claim.
+#:   not_converged  the engine was there, attempted the solve, and failed to
+#:                  converge. Also a claim, but a weaker one.
+#:
+#: `unavailable` must outrank `out_of_domain` because of what each causes
+#: downstream. Reporting `out_of_domain` makes the optimizer prune the candidate
+#: as PHYSICALLY INFEASIBLE — a permanent verdict about the recipe. Reporting
+#: `unavailable` routes to retry — a verdict about the tooling. Being wrong the
+#: first way permanently discards a possibly-good recipe on evidence that was
+#: never gathered; being wrong the second way costs a retry. So a run that lost
+#: its engine partway MUST NOT be allowed to make a physics claim about itself.
+#:
+#: ★ DO NOT REORDER THIS TUPLE without re-deriving the above. It previously
+#: existed as three separate implementations — two in the optimizer sharing the
+#: transposed order `(out_of_domain, unavailable, not_converged)`, and one in the
+#: runner with the correct order. Two agreed with each other and disagreed with
+#: the third, which is what happens when a rule is COPIED rather than IMPORTED.
+BACKEND_STATUS_PRECEDENCE: tuple[str, ...] = (
+    "unavailable",
+    "out_of_domain",
+    "not_converged",
+)
+
+
+def select_backend_status(statuses) -> str | None:
+    """Reduce many per-probe statuses to one whole-run status.
+
+    Returns the most severe member of :data:`BACKEND_STATUS_PRECEDENCE` present,
+    else the last status seen, else ``None`` for an empty input. Callers that
+    need "the latest" rather than "the most severe" want a different function —
+    this one deliberately does not preserve ordering information beyond the
+    fallback.
+    """
+    values = tuple(str(status) for status in statuses if status is not None)
+    for status in BACKEND_STATUS_PRECEDENCE:
+        if status in values:
+            return status
+    return values[-1] if values else None
+
+
 @dataclass(frozen=True)
 class IntentResult:
     """Provider response to an :class:`IntentRequest`.
@@ -383,9 +463,10 @@ class IntentResult:
     metadata for trace and UI (phases present, liquidus margin, parity
     deltas, ...).  ``status`` follows the planner-level vocabulary:
     ``ok`` / ``refused`` / ``not_converged`` / ``out_of_domain`` /
-    ``unavailable`` / ``unsupported``.  ``refused`` is a policy refusal:
-    dispatch met the provider, but the request violates a physics/regime gate
-    (for example, reductant margin <= 0).
+    ``unavailable`` / ``unsupported`` / ``not_attempted`` /
+    ``non_authoritative``.  ``refused`` is a policy refusal: dispatch met the
+    provider, but the request violates a physics/regime gate (for example,
+    reductant margin <= 0).
     """
 
     intent: ChemistryIntent
@@ -398,6 +479,9 @@ class IntentResult:
     def __post_init__(self) -> None:
         if not isinstance(self.intent, ChemistryIntent):
             raise TypeError("IntentResult.intent must be a ChemistryIntent")
-        object.__setattr__(self, "status", str(self.status))
+        status = str(self.status)
+        if status not in INTENT_RESULT_STATUSES:
+            raise IntentResultStatusError(status)
+        object.__setattr__(self, "status", status)
         object.__setattr__(self, "diagnostic", _freeze_str_any(self.diagnostic))
         object.__setattr__(self, "warnings", tuple(str(w) for w in self.warnings))

@@ -9,7 +9,12 @@ import yaml
 from engines.vaporock import VapoRockProvider
 import simulator.melt_backend.vaporock as vaporock_module
 from simulator.accounting.formulas import resolve_species_formula
-from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+from simulator.chemistry.kernel import (
+    INTENT_RESULT_STATUSES,
+    ChemistryIntent,
+    IntentRequest,
+    IntentResultStatusError,
+)
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from engines.domain_reason import OutOfDomainReason
@@ -2825,3 +2830,106 @@ def test_strip_gas_suffix_passthrough_collides_with_oxides():
     assert "SiO2" in OXIDE_SPECIES
     assert "FeO" in OXIDE_SPECIES
 
+
+
+
+def _vaporock_provider_with_status(status):
+    """A VapoRock provider whose adapter reports exactly ``status``."""
+
+    class FakeBackend:
+        def is_available(self):
+            return True
+
+        def get_engine_version(self):
+            return "fake-vaporock"
+
+        def equilibrate(self, **kwargs):
+            return types.SimpleNamespace(
+                vapor_pressures_Pa={"SiO": 0.4},
+                # Stale speciation that a downstream harness would otherwise
+                # consume as engine evidence.
+                vaporock_full_speciation_Pa={"SiO": 0.4},
+                warnings=(),
+                status=status,
+            )
+
+    return VapoRockProvider(backend=FakeBackend(), vapor_pressure_data={})
+
+
+def _vapor_pressure_request():
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Na2O": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        fO2_log=-8.0,
+        control_inputs={"pO2_bar": 1e-6, "intrinsic_fO2_log": -8.0},
+    )
+
+
+def test_vaporock_refuses_an_unrecognised_engine_outcome_token():
+    """VapoRock's ENGINE-OUTCOME token must be validated, not just carried.
+
+    This provider always constructs ``IntentResult(status='non_authoritative')``
+    -- correctly, because that encodes AUTHORITY (VapoRock has none), not
+    engine success. The side effect is that the adapter's own status travels
+    only as ``diagnostic['backend_status']`` and never reaches
+    ``IntentResult.__post_init__``, so an unrecognised token used to pass
+    straight through into a result the planner records as a normal successful
+    shadow dispatch.
+
+    Why that matters despite VapoRock being diagnostic-only at runtime: the
+    corpus-parity harness reads ``vaporock_full_speciation_Pa`` off the
+    successful shadow record WITHOUT consulting ``backend_status``. An adapter
+    answering with a token we cannot interpret, while carrying stale
+    speciation, would have those stale numbers consumed as engine EVIDENCE.
+    Runtime evaporation stays safe; validation evidence would not be.
+
+    FALSIFIABILITY: goes red if the vocabulary check is removed (dispatch then
+    returns a normal non_authoritative result carrying the stale 0.4 Pa row),
+    or if it is narrowed to a local literal set that happens to include
+    'failed'.
+    """
+    provider = _vaporock_provider_with_status("failed")
+
+    with pytest.raises(IntentResultStatusError) as excinfo:
+        provider.dispatch(_vapor_pressure_request())
+
+    assert excinfo.value.status == "failed"
+
+
+@pytest.mark.parametrize("token", sorted(INTENT_RESULT_STATUSES))
+def test_vaporock_accepts_every_vocabulary_token_and_keeps_its_role_status(token):
+    """Validation must not narrow what a healthy adapter may report.
+
+    The guard checks against the owner's frozen vocabulary rather than a local
+    list precisely so the two cannot drift; this pins that every member is in
+    fact accepted, and that accepting one does NOT leak the engine-outcome
+    token into the authority field. ``IntentResult.status`` stays
+    'non_authoritative' for all of them -- authority and engine outcome are
+    different questions and must not collapse into one field.
+    """
+    provider = _vaporock_provider_with_status(token)
+
+    result = provider.dispatch(_vapor_pressure_request())
+
+    assert result.status == "non_authoritative"
+    assert result.diagnostic["backend_status"] == token
+
+
+def test_vaporock_absent_status_reports_unavailable_not_ok():
+    """Silence from the adapter is absence, not success.
+
+    VapoRock already had this half right before the vocabulary guard was
+    added; pinning it so a later refactor of the projection cannot quietly
+    reintroduce an 'ok' default the way the MAGEMin and AlphaMELTS seams had.
+    """
+    provider = _vaporock_provider_with_status(None)
+
+    result = provider.dispatch(_vapor_pressure_request())
+
+    assert result.status == "non_authoritative"
+    assert result.diagnostic["backend_status"] == "unavailable"

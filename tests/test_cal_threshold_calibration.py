@@ -300,7 +300,7 @@ def test_internal_analytical_backend_never_blocked_by_partial_matrix():
     assert not cal._is_real_backend_calibration_blocked(
         [{"rows": [], "stop_reason": "timeout"}],
         {"row_count": 0, "analysis_by_feedstock_campaign_target": {}},
-        backend="stub",
+        backend="internal-analytical",
         feedstocks=("lunar_mare_low_ti",),
         campaigns=("C2B",),
     )

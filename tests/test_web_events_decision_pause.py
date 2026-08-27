@@ -106,7 +106,7 @@ def _deterministic_liquidus_gate(monkeypatch):
 START_PARAMS = {
     'feedstock': 'lunar_mare_low_ti',
     'mass_kg': 1000,
-    'backend': 'stub',
+    'backend': 'internal-analytical',
     'track': 'pyrolysis',
     'speed': 0,
     'c4_max_temp_C': 1670,

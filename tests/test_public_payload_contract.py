@@ -49,9 +49,9 @@ def test_socket_start_payload_keeps_existing_kg_shape():
         sim=sim,
         feedstock_key="oxide",
         mass_kg=1000.0,
-        backend_requested="stub",
+        backend_requested="internal-analytical",
         backend_active="InternalAnalyticalBackend",
-        backend_status="stub",
+        backend_status="internal-analytical",
         backend_authoritative=False,
         backend_message="Using InternalAnalyticalBackend",
         c5_enabled=True,
@@ -62,9 +62,9 @@ def test_socket_start_payload_keeps_existing_kg_shape():
     assert payload["status"] == "started"
     assert payload["mass_kg"] == pytest.approx(1000.0)
     assert isinstance(payload["mass_kg"], numbers.Real)
-    assert payload["backend_requested"] == "stub"
+    assert payload["backend_requested"] == "internal-analytical"
     assert payload["backend_active"] == "InternalAnalyticalBackend"
-    assert payload["backend_status"] == "stub"
+    assert payload["backend_status"] == "internal-analytical"
     assert payload["backend_authoritative"] is False
     assert payload["c5_enabled"] is True
     assert payload["mre_target_species"] == "SiO2"
@@ -80,7 +80,7 @@ def test_tick_payload_keeps_existing_kg_keys():
         sim=sim,
         snapshot=snapshot,
         backend_message="Using InternalAnalyticalBackend",
-        backend_status="stub",
+        backend_status="internal-analytical",
         backend_authoritative=False,
     )
 
@@ -120,7 +120,7 @@ def test_tick_payload_keeps_existing_kg_keys():
         payload["process_bucket_metadata"]["chloride_salt_phase"]["disposition"]
         == "separated_chloride_salt_fouling_risk"
     )
-    assert payload["backend_status"] == "stub"
+    assert payload["backend_status"] == "internal-analytical"
     assert payload["backend_authoritative"] is False
 
 

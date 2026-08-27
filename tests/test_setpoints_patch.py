@@ -34,7 +34,7 @@ def _session_config(**overrides) -> SimSessionConfig:
         "setpoints": _load_yaml("setpoints.yaml"),
         "vapor_pressures": _load_yaml("vapor_pressures.yaml"),
         "campaign": "C0",
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
         "backend_policy": BackendSelectionPolicy.RUNNER_STRICT,
     }
     values.update(overrides)

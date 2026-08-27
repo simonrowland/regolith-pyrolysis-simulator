@@ -1329,6 +1329,8 @@ def test_provider_refuses_transitional_kn_domain_without_fabricating_zero_flux()
     assert result.diagnostic["evaporation_flux_status"] == "not_evaluated"
     assert result.diagnostic["evaporation_flux_kg_hr"] is None
     assert result.diagnostic["affected_species"] == ("Na",)
+    assert result.diagnostic["process_regime"] == "unknown"
+    assert result.diagnostic["asking_site"] == "engines.builtin.evaporation_flux"
     assert result.diagnostic["ledger_yields_authorized"] is False
     assert result.diagnostic["authority_class"] == "diagnostic-limited"
     assert result.diagnostic["p_bulk_transport_domain"] == (

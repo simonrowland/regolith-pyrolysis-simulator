@@ -47,8 +47,8 @@ PROFILE = {
         }
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
-    "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "stub"},
-    "fidelities": {"stub": {"backend_name": "stub", "hours": 1}},
+    "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "internal-analytical"},
+    "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
     "seed_recipes": [
         {
             "id": "knob-saturation-seed",
@@ -243,7 +243,7 @@ def test_knob_saturation_does_not_change_evalspec_cache_key() -> None:
     spec, _ = _build_eval_inputs(
         patch,
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         PROFILE,
         schema,
     )

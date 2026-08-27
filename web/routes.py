@@ -33,6 +33,10 @@ from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
 )
+from simulator.optimize.backend_status import (
+    backend_statuses_from_carrier,
+    select_backend_status,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_MBAR
 from simulator.transport_constants import (
     MEAN_FREE_PATH_DENOMINATOR_FACTOR,
@@ -580,26 +584,44 @@ def _target_thermal_windows(eval_spec: Mapping[str, Any]) -> list[dict[str, str]
     return rows
 
 
-def _latest_backend_status(carrier: Any) -> str | None:
-    if carrier is None:
-        return None
+def _backend_status_candidates(carrier: Any) -> tuple[str, ...]:
+    """Every backend_status token this carrier can testify to.
+
+    Delegates the walk to the kernel-owned collector rather than restating it.
+    `result_blob` is added because it is a carrier key the optimizer side has no
+    reason to know about but the stored-result view does; everything else the
+    old local walker reached (per_hour, hours, trace) the owner already reaches,
+    plus backend_diagnostics and diagnostics, which it did NOT.
+    """
+    statuses = list(backend_statuses_from_carrier(carrier))
     if isinstance(carrier, Mapping):
-        raw = carrier.get('backend_status')
-        if raw is not None:
-            return str(raw)
-        for key in ('per_hour', 'hours', 'trace', 'result_blob'):
-            status = _latest_backend_status(carrier.get(key))
-            if status is not None:
-                return status
-        return None
-    if isinstance(carrier, (list, tuple)):
-        for item in reversed(carrier):
-            status = _latest_backend_status(item)
-            if status is not None:
-                return status
-        return None
-    raw = getattr(carrier, 'backend_status', None)
-    return str(raw) if raw is not None else None
+        statuses.extend(backend_statuses_from_carrier(carrier.get('result_blob')))
+    return tuple(statuses)
+
+
+def _latest_backend_status(carrier: Any) -> str | None:
+    """Rank this carrier's tokens with the same precedence as everyone else.
+
+    ★ THIS USED TO BE AN INDEPENDENT RESOLVER AND IT DISAGREED WITH THE ENGINE.
+    It returned the FIRST backend_status it found and applied no precedence at
+    all, and it walked a different set of carriers -- it never looked at
+    `backend_diagnostics`, which the optimizer's walker does. The two sets were
+    not nested: each looked somewhere the other did not.
+
+    So the same evidence produced three answers. Reproduced on one carrier
+    (`{'per_hour': [{'backend_status': 'ok'}],
+       'backend_diagnostics': {'backend_status': 'unavailable'}}`):
+    this function said `ok` while the ranked owner said `unavailable`. The
+    runner aborts the study on that evidence and the optimizer prunes the
+    candidate on it, while this view -- which feeds the operator's backend badge
+    AND `certification_allowed` -- issued a clean bill.
+
+    Note the mechanism was the CARRIER SET more than the ranking: when the token
+    sat somewhere both walkers looked, they agreed. A divergent answer needs no
+    divergent copy of the rule; asking a different question of different
+    evidence is enough.
+    """
+    return select_backend_status(_backend_status_candidates(carrier))
 
 
 def _optional_bool(value: Any) -> bool | None:
@@ -644,7 +666,16 @@ def _optimizer_backend_payload(
         canonical_backend_name(str(raw_requested)) if raw_requested else None
     )
     requested = str(requested_token) if requested_token else 'not declared'
-    stored_status = _latest_backend_status(result_blob) or _latest_backend_status(run_reference)
+    # Rank across BOTH carriers in one selection. This was
+    # `_latest_backend_status(result_blob) or _latest_backend_status(run_reference)`,
+    # which is first-non-None-wins: a healthy token in the stored blob hid a
+    # worse one on the run reference purely because of argument order.
+    stored_status = select_backend_status(
+        (
+            *_backend_status_candidates(result_blob),
+            *_backend_status_candidates(run_reference),
+        )
+    )
     if stored_status is None:
         stored_status = 'unavailable'
     internal_analyticalish = (

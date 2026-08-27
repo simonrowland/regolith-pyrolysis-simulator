@@ -3724,15 +3724,19 @@ class ExtractionMixin:
                     exc
                 ) from exc
         hold_time_s = hold_time_h * 3600.0
+        from simulator.transport_regime import continuum_validity_refuses
+
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,
             pipe_diameter_m=pipe_diameter_m,
             gas_temperature_K=gas_temperature_K,
             carrier_gas=str(carrier_gas),
+            campaign_name='C7_CA_ALUMINOTHERMIC',
+            asking_site='extraction.c7_ca_transport',
         )
         flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        if domain_diag is not None:
+        if continuum_validity_refuses(domain_diag):
             # C7-specific diagnostic-limited suppression; not provider parity.
             flux_kg_s_m2 = 0.0
         ca_transport_mol = (
@@ -3780,7 +3784,7 @@ class ExtractionMixin:
                     'series_resistance_frozen_skull_stir_ceiling',
                 )
             )
-        if domain_diag is not None:
+        if continuum_validity_refuses(domain_diag):
             transport_refusal = 'viscous_p_bulk_transport_out_of_domain'
         elif (
             cf7_ca_shell_route_active
@@ -3830,7 +3834,9 @@ class ExtractionMixin:
                     'p_bulk_transport_domain': domain_diag[
                         'p_bulk_transport_domain'
                     ],
-                    'ledger_yields_authorized': False,
+                    'ledger_yields_authorized': domain_diag[
+                        'ledger_yields_authorized'
+                    ],
                     'detail': domain_diag['detail'],
                     'model_domain': domain_diag['model_domain'],
                     'VISCOUS_KNUDSEN_MAX': domain_diag['VISCOUS_KNUDSEN_MAX'],

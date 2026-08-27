@@ -1,8 +1,10 @@
-"""Pinned VPR-P0a transport-regime formulas.
+"""Pinned VPR-P0a transport-regime formulas and applicability.
 
-This module is intentionally isolated from the live condensation/evaporation
-paths. It holds only reference transport formulas and fail-closed validity
-guards for the vacuum-pyrolysis reproduction work.
+Classification (KnudsenRegime / classify_knudsen_regime) is shared with the
+live condensation path. Continuum-formula validity is NOT a global fail-closed:
+it is load-bearing only where viscous sweep of metal/SiO vapor is the answer
+being computed (pyrolysis extraction). Stage 0 volatile bakeout is a different
+regime; below the continuum threshold is category-2 compute-and-mark.
 """
 
 from __future__ import annotations
@@ -13,6 +15,14 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Mapping
 
+from simulator.physical_constants import BOLTZMANN, GAS_CONSTANT
+from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.silent_zero import (
+    CATEGORY_MARK,
+    CATEGORY_REFUSE,
+    ZeroBecause,
+    note_dict,
+)
 from simulator.transport_constants import (
     CARRIER_GAS_PROPERTIES,
     COLLISION_DIAMETER_SOURCE,
@@ -20,8 +30,6 @@ from simulator.transport_constants import (
     FREE_MOLECULAR_KNUDSEN_MIN,
     VISCOUS_KNUDSEN_MAX,
 )
-from simulator.physical_constants import BOLTZMANN, GAS_CONSTANT
-from simulator.scalar_boundary import is_declared_real_scalar
 
 
 # Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
@@ -61,13 +69,83 @@ class KnudsenRegime(str, Enum):
     FREE_MOLECULAR = "free_molecular"
 
 
+class ProcessRegime(str, Enum):
+    """Which process question a transport formula is answering."""
+
+    STAGE0_BAKEOUT = "stage0_bakeout"
+    PYROLYSIS_EXTRACTION = "pyrolysis_extraction"
+    ELECTROLYSIS = "electrolysis"
+    IDLE = "idle"
+    UNKNOWN = "unknown"
+
+
+class ContinuumValidityAction(str, Enum):
+    OK = "ok"
+    MARK = "mark"
+    REFUSE = "refuse"
+
+
+# Stage 0 / C0 / C0b: drive off H2O, CO2, sulfur, halides, perchlorates, organics.
+# Low overhead pressure is the intent. Continuum (Bernoulli) transport is not
+# load-bearing for that answer.
+_STAGE0_BAKEOUT_CAMPAIGNS = frozenset({
+    "C0",
+    "C0B",
+    "C0b_p_cleanup",
+})
+# Metal / SiO vapor extraction: the mandate viscous-flow invariant (Kn << 0.01)
+# is load-bearing so evolved vapor is swept to a designated condenser.
+_PYROLYSIS_EXTRACTION_CAMPAIGNS = frozenset({
+    "C2A",
+    "C2A_continuous",
+    "C2A_STAGED",
+    "C2A_staged",
+    "C2B",
+    "C3",
+    "C3_K",
+    "C3_NA",
+    "C4",
+    "C6",
+    "C7_CA_ALUMINOTHERMIC",
+})
+_ELECTROLYSIS_CAMPAIGNS = frozenset({
+    "C5",
+    "MRE_BASELINE",
+})
+_IDLE_CAMPAIGNS = frozenset({
+    "IDLE",
+    "COMPLETE",
+})
+
+CONTINUUM_QUESTION = "continuum_conductance"
+
+
 class TransportRegimeRefusal(ValueError):
     """Named fail-closed refusal for out-of-validity transport inputs."""
 
-    def __init__(self, category: str, detail: str | None = None) -> None:
+    def __init__(
+        self,
+        category: str,
+        detail: str | None = None,
+        *,
+        stage: str | None = None,
+        process_regime: str | None = None,
+        asking_site: str | None = None,
+        question: str | None = None,
+    ) -> None:
         self.category = category
         self.reason = category
+        self.stage = None if stage is None else str(stage)
+        self.process_regime = (
+            None if process_regime is None else str(process_regime)
+        )
+        self.asking_site = None if asking_site is None else str(asking_site)
+        self.question = None if question is None else str(question)
         message = category if detail is None else f"{category}: {detail}"
+        if self.stage:
+            message = f"{message} (stage={self.stage})"
+        if self.asking_site and "asking_site" not in message:
+            message = f"{message} [asked by {self.asking_site}]"
         super().__init__(message)
 
 
@@ -90,8 +168,229 @@ class MeanFreePathResult:
     collision_diameter_source: str
 
 
-def _refuse(category: str, detail: str | None = None) -> None:
-    raise TransportRegimeRefusal(category, detail)
+def _refuse(
+    category: str,
+    detail: str | None = None,
+    *,
+    stage: str | None = None,
+    process_regime: str | None = None,
+    asking_site: str | None = None,
+    question: str | None = None,
+) -> None:
+    raise TransportRegimeRefusal(
+        category,
+        detail,
+        stage=stage,
+        process_regime=process_regime,
+        asking_site=asking_site,
+        question=question,
+    )
+
+
+def resolve_process_regime(
+    campaign_name: str | None = None,
+    *,
+    process_regime: ProcessRegime | str | None = None,
+) -> ProcessRegime:
+    """Map a campaign / explicit regime onto the transport applicability set.
+
+    Missing or blank campaign_name is UNKNOWN (category-1 missing input), not
+    a silent bakeout carve-out.
+    """
+
+    if process_regime is not None:
+        if isinstance(process_regime, ProcessRegime):
+            return process_regime
+        return ProcessRegime(str(process_regime))
+    if campaign_name is None:
+        return ProcessRegime.UNKNOWN
+    name = str(campaign_name).strip()
+    if not name:
+        return ProcessRegime.UNKNOWN
+    if name in _STAGE0_BAKEOUT_CAMPAIGNS:
+        return ProcessRegime.STAGE0_BAKEOUT
+    if name in _PYROLYSIS_EXTRACTION_CAMPAIGNS:
+        return ProcessRegime.PYROLYSIS_EXTRACTION
+    if name in _ELECTROLYSIS_CAMPAIGNS:
+        return ProcessRegime.ELECTROLYSIS
+    if name in _IDLE_CAMPAIGNS:
+        return ProcessRegime.IDLE
+    return ProcessRegime.UNKNOWN
+
+
+def continuum_transport_is_load_bearing(
+    process_regime: ProcessRegime | str,
+) -> bool:
+    """True iff leaving Kn < 0.01 must fail-close for the question asked.
+
+    The mandate viscous-flow invariant exists so evolved metal/SiO vapor is
+    swept to a designated condenser instead of crossing ballistically to a
+    cold wall. The sole carve-out is Stage 0 volatile bakeout, where low
+    overhead pressure is the intent. Missing/unknown/idle/electrolysis keep
+    the fail-closed default so omitting a campaign cannot drop the guard.
+    """
+
+    regime = (
+        process_regime
+        if isinstance(process_regime, ProcessRegime)
+        else ProcessRegime(str(process_regime))
+    )
+    return regime is not ProcessRegime.STAGE0_BAKEOUT
+
+
+@dataclass(frozen=True)
+class ContinuumFormulaValidity:
+    action: ContinuumValidityAction
+    process_regime: ProcessRegime
+    knudsen_number: float
+    campaign_name: str | None
+    stage: str | None
+    asking_site: str
+    in_domain: bool
+    load_bearing: bool
+    note: dict[str, object] | None
+    detail: str
+
+    @property
+    def refuses(self) -> bool:
+        return self.action is ContinuumValidityAction.REFUSE
+
+
+def _knudsen_is_transitional(knudsen_number: float) -> bool:
+    kn = float(knudsen_number)
+    if not math.isfinite(kn):
+        return False
+    return VISCOUS_KNUDSEN_MAX <= kn < FREE_MOLECULAR_KNUDSEN_MIN
+
+
+def assess_continuum_formula_validity(
+    knudsen_number: float,
+    *,
+    campaign_name: str | None = None,
+    process_regime: ProcessRegime | str | None = None,
+    stage: str | None = None,
+    asking_site: str,
+) -> ContinuumFormulaValidity:
+    """Decide ok / mark / refuse for a continuum (Bernoulli/Poiseuille) formula.
+
+    Viscous Kn is in-domain. Free-molecular Kn uses the reconstructible HKL
+    path, not continuum P_bulk. Transitional Kn is out-of-domain for viscous
+    Poiseuille P_bulk: refuse where that formula is load-bearing, otherwise
+    compute-and-mark.
+    """
+
+    regime = resolve_process_regime(
+        campaign_name, process_regime=process_regime
+    )
+    asked_stage = (
+        None if stage is None and not campaign_name else str(
+            stage if stage is not None else campaign_name
+        )
+    )
+    load_bearing = continuum_transport_is_load_bearing(regime)
+    kn = float(knudsen_number)
+    if not _knudsen_is_transitional(kn):
+        return ContinuumFormulaValidity(
+            action=ContinuumValidityAction.OK,
+            process_regime=regime,
+            knudsen_number=kn,
+            campaign_name=None if campaign_name is None else str(campaign_name),
+            stage=asked_stage,
+            asking_site=str(asking_site),
+            in_domain=True,
+            load_bearing=load_bearing,
+            note=None,
+            detail="",
+        )
+    detail = (
+        "transitional Kn uses viscous Poiseuille / Bernoulli P_bulk outside "
+        f"its validity domain (Kn < {VISCOUS_KNUDSEN_MAX:g}); "
+        f"free-molecular Kn >= {FREE_MOLECULAR_KNUDSEN_MIN:g} keeps the "
+        "HKL upper-bound path"
+    )
+    if load_bearing:
+        note = note_dict(
+            ZeroBecause.REFUSED_UPSTREAM,
+            site=str(asking_site),
+            field="continuum_p_bulk",
+            detail=(
+                f"{detail}; process_regime={regime.value}; "
+                f"stage={asked_stage!r}; continuum transport is load-bearing"
+            ),
+            doctrine_category=CATEGORY_REFUSE,
+        )
+        return ContinuumFormulaValidity(
+            action=ContinuumValidityAction.REFUSE,
+            process_regime=regime,
+            knudsen_number=kn,
+            campaign_name=None if campaign_name is None else str(campaign_name),
+            stage=asked_stage,
+            asking_site=str(asking_site),
+            in_domain=False,
+            load_bearing=True,
+            note=note,
+            detail=detail,
+        )
+    note = note_dict(
+        ZeroBecause.OUT_OF_DOMAIN_MARKED,
+        site=str(asking_site),
+        field="continuum_p_bulk",
+        detail=(
+            f"{detail}; process_regime={regime.value}; "
+            f"stage={asked_stage!r}; continuum formula is not load-bearing "
+            "for this stage (category-2 compute-and-mark)"
+        ),
+        doctrine_category=CATEGORY_MARK,
+    )
+    return ContinuumFormulaValidity(
+        action=ContinuumValidityAction.MARK,
+        process_regime=regime,
+        knudsen_number=kn,
+        campaign_name=None if campaign_name is None else str(campaign_name),
+        stage=asked_stage,
+        asking_site=str(asking_site),
+        in_domain=False,
+        load_bearing=False,
+        note=note,
+        detail=detail,
+    )
+
+
+def continuum_validity_refuses(payload: Mapping[str, object] | None) -> bool:
+    """True iff a continuum-validity diagnostic is a fail-closed refusal."""
+
+    if not payload:
+        return False
+    return str(payload.get("status") or "") == "refused"
+
+
+def refuse_continuum_formula_if_load_bearing(
+    knudsen_number: float,
+    *,
+    campaign_name: str | None = None,
+    process_regime: ProcessRegime | str | None = None,
+    stage: str | None = None,
+    asking_site: str,
+) -> ContinuumFormulaValidity:
+    """Raise TransportRegimeRefusal only when continuum transport is load-bearing."""
+
+    assessment = assess_continuum_formula_validity(
+        knudsen_number,
+        campaign_name=campaign_name,
+        process_regime=process_regime,
+        stage=stage,
+        asking_site=asking_site,
+    )
+    if assessment.action is ContinuumValidityAction.REFUSE:
+        _refuse(
+            "continuum_formula_out_of_domain",
+            assessment.detail,
+            stage=assessment.stage,
+            process_regime=assessment.process_regime.value,
+            asking_site=assessment.asking_site,
+            question=CONTINUUM_QUESTION,
+        )
+    return assessment
 
 
 def _require_positive(value: float, *, name: str, category: str) -> float:

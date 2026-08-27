@@ -96,7 +96,7 @@ def _real_path_record(
         ("cached_physics_bucket", EvidenceClass.MELTS.value, "ESTIMATED", "cached_physics_bucket"),
         ("cached_interpolated", EvidenceClass.MELTS.value, "ESTIMATED", "cached_interpolated"),
         ("live_fill", EvidenceClass.INTERNAL_ANALYTICAL.value, "UNVERIFIED", "live_fill"),
-        ("cached_exact", "stub", "UNVERIFIED", "cached_exact"),
+        ("cached_exact", "internal-analytical", "UNVERIFIED", "cached_exact"),
         ("live_fill", "diagnostic_stub", "UNVERIFIED", "live_fill"),
     ],
 )
@@ -110,11 +110,11 @@ def test_optimizer_tier_label_mapping_matrix(
         "cache_state": cache_state,
         "backend_status": "ok",
     }
-    if evidence_class in {"stub", "diagnostic_stub"}:
+    if evidence_class in {"internal-analytical", "diagnostic_stub"}:
         run_reference["backend_name"] = evidence_class
         run_reference["backend_authoritative"] = False
     elif evidence_class == EvidenceClass.INTERNAL_ANALYTICAL.value:
-        run_reference["backend_name"] = "stub"
+        run_reference["backend_name"] = "internal-analytical"
         run_reference["evidence_class"] = evidence_class
         run_reference["backend_authoritative"] = False
     else:
@@ -125,7 +125,7 @@ def test_optimizer_tier_label_mapping_matrix(
 
     assert label["ux_label"] == expected_ux
     assert label["tier"] == expected_tier
-    if evidence_class in {"stub", "diagnostic_stub"}:
+    if evidence_class in {"internal-analytical", "diagnostic_stub"}:
         assert label["evidence_class"] == EvidenceClass.INTERNAL_ANALYTICAL.value
         assert label["certification_allowed"] is False
     else:
@@ -133,7 +133,7 @@ def test_optimizer_tier_label_mapping_matrix(
         assert label["certification_allowed"] is may_certify(evidence_class)
     if expected_ux == "CERTIFIED":
         assert label["certification_allowed"] is True
-    if evidence_class in {EvidenceClass.INTERNAL_ANALYTICAL.value, "stub", "diagnostic_stub"}:
+    if evidence_class in {EvidenceClass.INTERNAL_ANALYTICAL.value, "internal-analytical", "diagnostic_stub"}:
         assert label["ux_label"] != "CERTIFIED"
 
 
@@ -267,7 +267,7 @@ def test_web_optimizer_tier_label_delegates_to_shared_producer() -> None:
 def test_summary_honesty_real_path_matches_web_without_proof_grade() -> None:
     record = _real_path_record(proof_grade=None)
 
-    summary_label = study._summary_honesty_payload("stub", record, records=(record,))
+    summary_label = study._summary_honesty_payload("internal-analytical", record, records=(record,))
     web_label = _optimizer_tier_label(record.trace_summary, record.result_blob)
 
     assert record.result_blob["evidence_class"] == EvidenceClass.MELTS.value
@@ -285,7 +285,7 @@ def test_summary_honesty_real_path_preserves_result_blob_proof_grade(
 ) -> None:
     record = _real_path_record(proof_grade=proof_grade)
 
-    summary_label = study._summary_honesty_payload("stub", record, records=(record,))
+    summary_label = study._summary_honesty_payload("internal-analytical", record, records=(record,))
     web_label = _optimizer_tier_label(record.trace_summary, record.result_blob)
 
     assert record.result_blob["evidence_class"] == EvidenceClass.MELTS.value

@@ -111,26 +111,38 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     carrier_gas: str = "N2",
     commanded_pressure_pa: float | None = None,
     affected_species: tuple[str, ...] = (),
+    campaign_name: str | None = None,
+    process_regime: str | None = None,
+    asking_site: str = "evaporation.viscous_p_bulk",
+    stage: str | None = None,
 ) -> dict[str, Any] | None:
-    """Build a refusal diagnostic when ledger yields leave the P_bulk domain.
+    """Build a continuum-P_bulk validity diagnostic.
 
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
     safety gate and NOT a coating gate. Returns a typed diagnostic payload
-    when Kn is transitional at nonzero overhead (viscous Poiseuille P_bulk
-    out of domain) or when Kn is NaN or non-positive. Returns None only for
-    established in-domain states: viscous continuum, free-molecular flow, and
-    true vacuum (Kn = +inf), which is a determined state rather than an invalid
-    input.
+    when Kn is NaN or non-positive (invalid input), or when Kn is transitional
+    and the continuum formula is load-bearing for the asking stage. Returns
+    None for established in-domain states: viscous continuum, free-molecular
+    flow, and true vacuum (Kn = +inf), which is a determined state rather than
+    an invalid input.
 
-    The authoritative provider returns this payload with ``status=refused``;
-    direct hard-refusal consumers may call
-    ``refuse_viscous_p_bulk_out_of_domain``. The 0.6.3 optimizer floor
-    (~1 mbar, Kn≈0.004) never enters this domain; t-379 (0.7) lifts it with
+    Transitional Kn at nonzero overhead is out-of-domain for viscous
+    Poiseuille P_bulk. Applicability lives in
+    ``simulator.transport_regime.assess_continuum_formula_validity``:
+    pyrolysis extraction fail-closes (status=refused); Stage 0 bakeout
+    computes and marks (status=out_of_domain). Missing campaign is
+    UNKNOWN and still refuses so the pyrolysis guard cannot be dropped
+    by omitting the stage. The 0.6.3 optimizer floor (~1 mbar, Kn≈0.004)
+    never enters this domain; t-379 (0.7) lifts pyrolysis refusals with
     transitional/molecular conductance.
     """
     from simulator.transport_constants import (
         FREE_MOLECULAR_KNUDSEN_MIN,
         VISCOUS_KNUDSEN_MAX,
+    )
+    from simulator.transport_regime import (
+        ContinuumValidityAction,
+        assess_continuum_formula_validity,
     )
 
     if overhead_pressure_pa <= 0.0:
@@ -196,32 +208,47 @@ def viscous_p_bulk_out_of_domain_diagnostic(
             "evaporation_flux_status": "not_evaluated",
             "evaporation_flux_kg_hr": None,
         }
-    # Viscous continuum: Poiseuille P_bulk is in-domain.
-    if kn < VISCOUS_KNUDSEN_MAX:
+    # MERGE 2026-08-26: validation FIRST, then the engine's stage-scoped
+    # classifier. assess_continuum_formula_validity() does NOT validate its
+    # input -- _knudsen_is_transitional() returns False for any non-finite Kn,
+    # so a NaN would classify as OK/in_domain and return None with no refusal.
+    # That is the exact fail-open the guard above closed on 2026-08-22. The
+    # delegate subsumes the old viscous/free-molecular early returns (both are
+    # non-transitional -> OK -> None) and adds the stage scoping from 644fac1a.
+    assessment = assess_continuum_formula_validity(
+        kn,
+        campaign_name=campaign_name,
+        process_regime=process_regime,
+        stage=stage,
+        asking_site=asking_site,
+    )
+    if assessment.action is ContinuumValidityAction.OK:
         return None
-    # Finite free-molecular flow: local R_g=0 and the HKL upper bound on Δp
-    # is reconstructible without a transitional film coefficient.
-    if kn >= FREE_MOLECULAR_KNUDSEN_MIN:
-        return None
-    # Transitional band: continuum film is off but Poiseuille still evolves
-    # P_bulk — out-of-domain for ledger-authoritative yields until t-379.
     commanded_pa = (
         float(overhead_pressure_pa)
         if commanded_pressure_pa is None
         else max(0.0, float(commanded_pressure_pa))
     )
-    return {
-        "status": "refused",
-        "authority_class": "diagnostic-limited",
-        "authority_reason": "viscous_p_bulk_transport_out_of_domain",
-        "reason": "viscous_p_bulk_transport_out_of_domain",
+    refuses = assessment.action is ContinuumValidityAction.REFUSE
+    payload: dict[str, Any] = {
+        "status": "refused" if refuses else "out_of_domain",
+        "authority_class": (
+            "diagnostic-limited" if refuses else "status_bearing"
+        ),
+        "authority_reason": (
+            "viscous_p_bulk_transport_out_of_domain"
+            if refuses
+            else "continuum_formula_out_of_domain_marked"
+        ),
+        "reason": (
+            "viscous_p_bulk_transport_out_of_domain"
+            if refuses
+            else "continuum_formula_out_of_domain_marked"
+        ),
         "p_bulk_transport_domain": "out_of_domain_transitional",
-        "ledger_yields_authorized": False,
+        "ledger_yields_authorized": not refuses,
         "detail": (
-            "transitional Kn uses viscous Poiseuille P_bulk outside its "
-            f"validity domain (Kn < {VISCOUS_KNUDSEN_MAX:g}); free-"
-            f"molecular Kn >= {FREE_MOLECULAR_KNUDSEN_MIN:g} keeps the "
-            "HKL upper-bound path; t-379 (0.7) supplies transitional/"
+            f"{assessment.detail}; t-379 (0.7) supplies transitional/"
             "molecular conductance"
         ),
         "knudsen_number": kn,
@@ -245,9 +272,17 @@ def viscous_p_bulk_out_of_domain_diagnostic(
             "transport_model_validity_domain"
             ";not_kn_safety_gate;not_coating_gate"
         ),
-        "evaporation_flux_status": "not_evaluated",
+        "process_regime": assessment.process_regime.value,
+        "campaign_name": assessment.campaign_name,
+        "stage": assessment.stage,
+        "asking_site": assessment.asking_site,
+        "doctrine_category": 1 if refuses else 2,
+        "evaporation_flux_status": "not_evaluated" if refuses else "evaluated",
         "evaporation_flux_kg_hr": None,
     }
+    if assessment.note is not None:
+        payload["silent_zero_notes"] = [dict(assessment.note)]
+    return payload
 
 
 def refuse_viscous_p_bulk_out_of_domain(
@@ -257,24 +292,34 @@ def refuse_viscous_p_bulk_out_of_domain(
     pipe_diameter_m: float,
     gas_temperature_K: float,
     carrier_gas: str = "N2",
+    campaign_name: str | None = None,
+    process_regime: str | None = None,
+    asking_site: str = "evaporation.viscous_p_bulk",
+    stage: str | None = None,
 ) -> None:
     """Typed refusal when ledger yields leave the viscous P_bulk domain.
 
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
     safety gate and NOT a coating gate. Hard-raises when the diagnostic helper
-    reports transitional out-of-domain transport or an invalid Kn input. The
-    authoritative provider returns a refused result from the same payload;
-    bounded C7/native-Fe consumers apply their own explicitly tagged
-    diagnostic-limited policy.
+    reports a load-bearing transitional refusal or an invalid Kn input.
+    Bakeout out-of-domain marks do not raise. The authoritative provider
+    returns a refused result from the same payload; bounded C7/native-Fe
+    consumers apply their own explicitly tagged diagnostic-limited policy.
     """
+    from simulator.transport_regime import continuum_validity_refuses
+
     diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
         knudsen_number=knudsen_number,
         overhead_pressure_pa=overhead_pressure_pa,
         pipe_diameter_m=pipe_diameter_m,
         gas_temperature_K=gas_temperature_K,
         carrier_gas=carrier_gas,
+        campaign_name=campaign_name,
+        process_regime=process_regime,
+        asking_site=asking_site,
+        stage=stage,
     )
-    if diagnostic is None:
+    if diagnostic is None or not continuum_validity_refuses(diagnostic):
         return
     reason = str(
         diagnostic.get("reason")
@@ -2595,6 +2640,14 @@ class EvaporationMixin:
             ),
             'allow_unmeasured_alpha_fallback': kernel_config.get(
                 'allow_unmeasured_alpha_fallback', False
+            ),
+            'campaign_name': str(
+                getattr(
+                    getattr(getattr(self, 'melt', None), 'campaign', None),
+                    'name',
+                    '',
+                )
+                or ''
             ),
         }
         if vapour_batch_report is not None:

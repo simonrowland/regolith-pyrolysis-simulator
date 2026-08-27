@@ -182,7 +182,7 @@ def _result(
     backend_name: str | None = None,
     backend_status: str | None = None,
 ) -> ScoredResult:
-    eval_spec = _eval_spec(candidate_id, backend_name or "stub")
+    eval_spec = _eval_spec(candidate_id, backend_name or "internal-analytical")
     cache_key = f"cache-{candidate_id}"
     run_reference = _run_reference(backend_status, backend_name)
     if not feasible:
@@ -672,7 +672,7 @@ def test_authoritative_high_correlation_is_trustworthy_and_writes_artifacts(
         top_k=(3,),
         per_eval_timeout_s=2.0,
         feedstock_id=FEEDSTOCK_ID,
-        profile={"fidelities": {"fast": {"backend_name": "stub"}, "high": {"backend_name": "alphamelts"}}},
+        profile={"fidelities": {"fast": {"backend_name": "internal-analytical"}, "high": {"backend_name": "alphamelts"}}},
         objective_names=("oxygen_kg", "energy_kWh"),
         artifact_dir=tmp_path,
     )
@@ -1282,7 +1282,7 @@ def test_missing_declared_objective_in_arm_withholds_inconclusive_and_names_metr
         top_k=(3,),
         per_eval_timeout_s=2.0,
         feedstock_id=FEEDSTOCK_ID,
-        profile={"fidelities": {"fast": {"backend_name": "stub"}, "high": {"backend_name": "alphamelts"}}},
+        profile={"fidelities": {"fast": {"backend_name": "internal-analytical"}, "high": {"backend_name": "alphamelts"}}},
         objective_names=("oxygen_kg", "energy_kWh"),
         artifact_dir=tmp_path,
     )
@@ -1625,7 +1625,7 @@ def test_fidelity_pool_reuses_warm_workers_and_cold_env_preserves_zero_drop_pari
         top_k=(2,),
         per_eval_timeout_s=2.0,
         feedstock_id=FEEDSTOCK_ID,
-        profile={"run": {"backend_name": "stub"}},
+        profile={"run": {"backend_name": "internal-analytical"}},
         objective_names=("oxygen_kg",),
     )
 
@@ -1647,7 +1647,7 @@ def test_fidelity_pool_reuses_warm_workers_and_cold_env_preserves_zero_drop_pari
         top_k=(2,),
         per_eval_timeout_s=2.0,
         feedstock_id=FEEDSTOCK_ID,
-        profile={"run": {"backend_name": "stub"}},
+        profile={"run": {"backend_name": "internal-analytical"}},
         objective_names=("oxygen_kg",),
     )
 

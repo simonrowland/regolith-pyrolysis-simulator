@@ -100,18 +100,6 @@ _DECLARED_ACCOUNT = 'process.cleaned_melt'
 # Note attached to the ControlAudit for every dispatch (checklist 6).
 _DIAGNOSTIC_AUDIT_NOTE = 'diagnostic, not enforced'
 
-# Closed result vocabulary. Unrecognised backend_status raises; it
-# must not collapse to the absence token.
-KERNEL_RESULT_STATUSES = frozenset({
-    'ok',
-    'not_converged',
-    'out_of_domain',
-    'unavailable',
-    'refused',
-    'not_attempted',
-})
-
-
 class AlphaMELTSProvider(ChemistryProvider):
     """Diagnostic-only provider for AlphaMELTS via the kernel.
 
@@ -286,26 +274,16 @@ class AlphaMELTSProvider(ChemistryProvider):
         diagnostics = _with_backend_status_reason(diagnostics)
 
         backend_status = diagnostics.backend_status
-        # Closed kernel vocabulary. An unrecognised backend status
-        # raises — it must not become the absence token, and it must
-        # not silently become refused either. `refused` and
-        # `not_attempted` are first-class members so a typed row-local
-        # refusal cannot collapse to unavailable.
-        extra_warnings: tuple[str, ...] = ()
-        if backend_status not in KERNEL_RESULT_STATUSES:
-            raise RuntimeError(
-                f'unrecognised backend_status {backend_status!r}; '
-                f'kernel accepts {tuple(sorted(KERNEL_RESULT_STATUSES))}'
-            )
-        kernel_status = backend_status
-
+        # IntentResult owns the closed kernel vocabulary. An unrecognised
+        # backend status raises there; it must not become the absence token or
+        # silently become refused.
         return IntentResult(
             intent=request.intent,
-            status=kernel_status,
+            status=backend_status,
             transition=None,  # Diagnostic-only -- checklist item 5.
             control_audit=control_audit,
             diagnostic=diagnostics.as_diagnostic(),
-            warnings=tuple(diagnostics.backend_warnings) + extra_warnings,
+            warnings=tuple(diagnostics.backend_warnings),
         )
 
     # ------------------------------------------------------------------
@@ -794,9 +772,17 @@ class AlphaMELTSProvider(ChemistryProvider):
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
-            if getattr(result, 'status', 'ok') != 'ok':
+            # A sample that declares no status has NOT told us it succeeded.
+            # The previous default accepted a statusless object as 'ok' and
+            # then read liquid_fraction / liquid_composition_wt_pct off it,
+            # so a duck-typed result carrying stale finite bounds could scale
+            # authoritative evaporation flux through the freeze gate. Absent
+            # or empty now means 'unavailable' and is refused here, matching
+            # the parser projection and the MAGEMin provider.
+            sample_status = getattr(result, 'status', None) or 'unavailable'
+            if sample_status != 'ok':
                 warning = '; '.join(getattr(result, 'warnings', ()) or ())
-                raise RuntimeError(warning or str(getattr(result, 'status')))
+                raise RuntimeError(warning or str(sample_status))
             composition = dict(
                 getattr(result, 'liquid_composition_wt_pct', {}) or {}
             )

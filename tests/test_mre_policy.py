@@ -39,9 +39,9 @@ BASE_PROFILE = {
         "campaign": "C5",
         "hours": 15,
         "mass_kg": 1000.0,
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
     },
-    "fidelities": {"fast": {"backend_name": "stub", "hours": 15}},
+    "fidelities": {"fast": {"backend_name": "internal-analytical", "hours": 15}},
     "seed_recipes": [{"id": "seed", "source_campaign": "C5", "patch": {}}],
 }
 

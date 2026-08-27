@@ -15,6 +15,7 @@ from types import MappingProxyType
 import pytest
 
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+import simulator.optimize.evaluate as evaluate_module
 import simulator.optimize.pool as pool_module
 from simulator.optimize.determinism import THREAD_ENV_VARS, deterministic_result_view, pin_worker_env
 from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
@@ -171,7 +172,7 @@ def _profile() -> dict[str, object]:
             "campaign": "C0",
             "hours": 2,
             "mass_kg": 10.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "track": "pyrolysis",
         },
     }
@@ -182,7 +183,7 @@ def _pool_task(
     *,
     feedstock_id: str,
     stage0_subprocess_required: bool,
-    backend_name: str = "stub",
+    backend_name: str = "internal-analytical",
 ) -> pool_module._PoolTask:
     profile = _profile()
     profile["run"] = dict(profile["run"])
@@ -220,7 +221,7 @@ def test_warm_runtime_spec_requires_one_backend_and_one_feedstock() -> None:
                 0,
                 feedstock_id="lunar_mare_low_ti",
                 stage0_subprocess_required=True,
-                backend_name="stub",
+                backend_name="internal-analytical",
             ),
             _pool_task(
                 1,
@@ -252,7 +253,7 @@ def test_warm_runtime_spec_requires_one_backend_and_one_feedstock() -> None:
         stage0_subprocess_required=True,
     )
 
-    # Alias equivalence: legacy "stub" and the canonical token are one backend
+    # Alias equivalence: legacy "internal-analytical" and the canonical token are one backend
     # identity, so a mixed alias pair must still warm (not fall back to None).
     alias_spec = pool_module._warm_runtime_spec(
         (
@@ -260,7 +261,7 @@ def test_warm_runtime_spec_requires_one_backend_and_one_feedstock() -> None:
                 0,
                 feedstock_id="lunar_mare_low_ti",
                 stage0_subprocess_required=True,
-                backend_name="stub",
+                backend_name="internal-analytical",
             ),
             _pool_task(
                 1,
@@ -698,7 +699,7 @@ def _spec(
         mass_kg=10.0,
         additives_kg={},
         track="pyrolysis",
-        backend_name="stub",
+        backend_name="internal-analytical",
         runtime_campaign_overrides={},
         chemistry_kernel={},
     )
@@ -820,6 +821,13 @@ def test_process_pool_timeout_records_failure_and_continues(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
+    """Production wall timeout is unfinished work, never engine absence.
+
+    ``_timeout_result`` emits ``not_converged`` plus the specific timeout reason.
+    This intentionally fails for ``unavailable`` or any correct-but-different
+    status token: the closed vocabulary requires ``not_converged``, and the
+    direct abort-gate call proves the emitted reference cannot mint absence.
+    """
     class FakeExecutor:
         def __init__(self, *, max_workers: int | None, initializer: object) -> None:
             self.max_workers = max_workers
@@ -848,14 +856,18 @@ def test_process_pool_timeout_records_failure_and_continues(
     monkeypatch.setattr(pool_module, "ProcessPoolExecutor", FakeExecutor)
     monkeypatch.setattr(pool_module, "wait", fake_wait)
 
+    profile = _profile()
+    profile["run"] = dict(profile["run"])
+    profile["run"]["backend_name"] = "alphamelts"
+    slow_patch = _patch(50)
     requests = [
-        PoolEvaluationRequest(_patch(50), "lunar_mare_low_ti", "fast", candidate_id="slow"),
+        PoolEvaluationRequest(slow_patch, "lunar_mare_low_ti", "fast", candidate_id="slow"),
         PoolEvaluationRequest(_patch(2), "lunar_mare_low_ti", "fast", candidate_id="fast"),
     ]
 
     results = evaluate_batch(
         requests,
-        profile=_profile(),
+        profile=profile,
         max_workers=1,
         output_root=tmp_path,
         evaluate_fn=_slow_or_abort_evaluate,
@@ -866,7 +878,19 @@ def test_process_pool_timeout_records_failure_and_continues(
     assert results[0].failure_category is FailureCategory.TIMEOUT
     assert results[0].run_reference is not None
     assert results[0].run_reference.reason == "optimizer_eval_timeout"
-    assert results[0].run_reference.backend_status == "unavailable"
+    assert results[0].run_reference.backend_status == "not_converged"
+    assert results[0].run_reference.trace["backend_status"] == "not_converged"
+    timeout_spec = replace(
+        _spec(slow_patch, "lunar_mare_low_ti", "fast", profile),
+        backend_name="alphamelts",
+    )
+    evaluate_module._abort_on_non_authoritative_backend_status(
+        results[0].run_reference,
+        spec=timeout_spec,
+        patch=slow_patch,
+        candidate_id="slow",
+        key="wall-timeout-regression",
+    )
     assert results[1].feasible is True
     assert results[1].failure_category is None
 

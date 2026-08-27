@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import math
 import sqlite3
+import threading
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
@@ -22,6 +23,23 @@ COMPOSITION_MATCH_EPS = 1.0e-6
 MAX_COMPOSITION_DISTANCE = 0.05
 CONTROL_MATCH_TOLERANCE = 0.05
 DEFAULT_GRIND_CACHE = Path("docs-private/recipe-db/grind-accumulator.db")
+
+# Read-only lookup cannot CREATE INDEX (mode=ro). GridCacheWriter emits
+# idx_alphamelts_outputs_phase_context_liquidus and
+# idx_alphamelts_outputs_phase_context_isothermal; queries remain correct
+# if those indexes are absent.
+# Keyed by (resolved path, thread ident): sqlite3 defaults to
+# check_same_thread=True, and the web runtime starts each run on a new
+# native thread (socketio.start_background_task). A process-global
+# connection is a ProgrammingError on the next thread and a close() leak
+# when discard runs from a foreign thread.
+# Entries are not reaped on thread death. Thread idents recycle, so
+# retention is roughly historical peak concurrency × distinct paths,
+# held until process exit (or _close_grind_cache_connections). A
+# handful of fds + page-cache in the web runtime; it would matter if a
+# process kept a large peak of concurrent run threads against a
+# multi-GB accumulator.
+_READONLY_CONNECTIONS: dict[tuple[str, int], tuple[int, sqlite3.Connection]] = {}
 
 
 class InvalidLiquidFractionError(ValueError):
@@ -207,36 +225,35 @@ def _uncached_grind_cache_lookup(
             and abs(temperature_C - liquidus_hint)
             > LIQUIDUS_MATCH_TOLERANCE_C
         )
-        uri = f"file:{path.resolve()}?mode=ro"
-        with sqlite3.connect(uri, uri=True) as connection:
-            connection.row_factory = sqlite3.Row
-            database_id = _metadata_value(connection, "database_id")
-            if database_id:
-                provenance["database_id"] = database_id
-            if max_epoch >= 2:
-                provenance["isothermal_status"] = "available_epoch_2"
-            candidates = _candidate_rows(
-                connection,
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                include_isothermal=max_epoch >= 2,
+        connection = _grind_cache_readonly_connection(path)
+        database_id = _metadata_value(connection, "database_id")
+        if database_id:
+            provenance["database_id"] = database_id
+        if max_epoch >= 2:
+            provenance["isothermal_status"] = "available_epoch_2"
+        candidates = _candidate_rows(
+            connection,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            include_isothermal=max_epoch >= 2,
+        )
+        if off_liquidus_request:
+            refused_epoch_1 = sum(
+                int(row["engine_epoch"]) == 1 for row in candidates
             )
-            if off_liquidus_request:
-                refused_epoch_1 = sum(
-                    int(row["engine_epoch"]) == 1 for row in candidates
-                )
-                candidates = [
-                    row
-                    for row in candidates
-                    if int(row["engine_epoch"]) != 1
-                ]
-                provenance.update(
-                    epoch_1_candidate_status="refused_off_liquidus_request",
-                    epoch_1_candidates_refused=refused_epoch_1,
-                    liquidus_temperature_C=liquidus_hint,
-                )
+            candidates = [
+                row
+                for row in candidates
+                if int(row["engine_epoch"]) != 1
+            ]
+            provenance.update(
+                epoch_1_candidate_status="refused_off_liquidus_request",
+                epoch_1_candidates_refused=refused_epoch_1,
+                liquidus_temperature_C=liquidus_hint,
+            )
     except (OSError, sqlite3.Error) as exc:
+        _discard_grind_cache_connection(path)
         provenance.update(
             status="unavailable",
             reason=f"grind_cache_read_failed:{type(exc).__name__}",
@@ -295,12 +312,59 @@ def _uncached_grind_cache_lookup(
 
 @lru_cache(maxsize=8)
 def _max_engine_epoch(path: str, _mtime_ns: int) -> int:
-    uri = f"file:{path}?mode=ro"
-    with sqlite3.connect(uri, uri=True) as connection:
-        row = connection.execute(
-            "SELECT MAX(engine_epoch) FROM alphamelts_outputs"
-        ).fetchone()
+    connection = _grind_cache_readonly_connection(Path(path))
+    row = connection.execute(
+        "SELECT MAX(engine_epoch) FROM alphamelts_outputs"
+    ).fetchone()
     return int(row[0] or 0)
+
+
+def _readonly_connection_key(resolved: str) -> tuple[str, int]:
+    return (resolved, threading.get_ident())
+
+
+def _grind_cache_readonly_connection(path: Path) -> sqlite3.Connection:
+    """Reuse one mode=ro SQLite connection per resolved path and thread."""
+    resolved = str(path.resolve())
+    key = _readonly_connection_key(resolved)
+    mtime_ns = path.stat().st_mtime_ns
+    cached = _READONLY_CONNECTIONS.get(key)
+    if cached is not None and cached[0] == mtime_ns:
+        return cached[1]
+    connection = sqlite3.connect(f"file:{resolved}?mode=ro", uri=True)
+    connection.row_factory = sqlite3.Row
+    if cached is not None:
+        try:
+            cached[1].close()
+        except sqlite3.Error:
+            pass
+    _READONLY_CONNECTIONS[key] = (mtime_ns, connection)
+    return connection
+
+
+def _close_grind_cache_connections() -> None:
+    for key in list(_READONLY_CONNECTIONS):
+        _mtime_ns, connection = _READONLY_CONNECTIONS.pop(key)
+        try:
+            connection.close()
+        except sqlite3.Error:
+            pass
+
+
+def _discard_grind_cache_connection(path: Path) -> None:
+    try:
+        resolved = str(path.resolve())
+    except OSError:
+        return
+    cached = _READONLY_CONNECTIONS.pop(
+        _readonly_connection_key(resolved), None
+    )
+    if cached is None:
+        return
+    try:
+        cached[1].close()
+    except sqlite3.Error:
+        pass
 
 
 def _metadata_value(connection: sqlite3.Connection, key: str) -> str | None:
@@ -313,6 +377,41 @@ def _metadata_value(connection: sqlite3.Connection, key: str) -> str | None:
     return None if row is None else str(row[0])
 
 
+def _sargable_bounds(center: float, tolerance: float) -> tuple[float, float]:
+    """Inclusive BETWEEN range that cannot exclude a residual-accepted row.
+
+    Residual authority is always ``ABS(x - center) <= tolerance`` (IEEE-754
+    binary64, the pre-t735 predicate). BETWEEN is only an indexable
+    over-approximation; extra rows are legal and the residual rejects them.
+
+    Proof that the range cannot exclude a residual-accepted finite x.
+    Residual accept means ``|fl(x - center)| <= τ``. Round-to-nearest
+    gives ``|x - center| <= τ + 0.5 ulp(fl(x - center))``. Because
+    ``math.ulp`` is nondecreasing in magnitude, ``|fl(x - center)| <= τ``
+    implies ``ulp(fl(x - center)) <= ulp(τ)``, so
+    ``x ∈ [center - τ - 0.5 ulp(τ), center + τ + 0.5 ulp(τ)]``.
+
+    Those real endpoints are not computed exactly. ``fl(center ± τ)``
+    errs by at most 0.5 ulp of the *computed endpoint*. When
+    ``center ± τ`` cancels, that ulp is far smaller than ``ulp(τ)`` —
+    the scale of the residual subtraction. One ULP of the cancelled
+    endpoint is not an over-approx of the residual (counterexample:
+    stored ``1e-18``, center ``-0.05``, τ ``0.05``; ``nextafter(0, +∞)``
+    is ``5e-324``, residual still equals ``0.05``). Expanding by a full
+    ``ulp(τ)`` covers the residual's rounding interval; one ``nextafter``
+    of the computed endpoint covers inward rounding of the endpoint
+    itself. Hence every residual-accepted x satisfies
+    ``lo <= x <= hi``, so BETWEEN cannot drop a row the residual would
+    keep. Overflow of an endpoint widens to ``±inf``. Underflow stays
+    on the subnormal lattice and widens by one ``nextafter`` step.
+    """
+    unit = math.ulp(tolerance)
+    return (
+        math.nextafter((center - tolerance) - unit, float("-inf")),
+        math.nextafter((center + tolerance) + unit, float("inf")),
+    )
+
+
 def _candidate_rows(
     connection: sqlite3.Connection,
     *,
@@ -321,6 +420,32 @@ def _candidate_rows(
     fO2_log: float,
     include_isothermal: bool,
 ) -> list[sqlite3.Row]:
+    # |x - t| <= tol  <=>  t - tol <= x <= t + tol
+    #                 <=>  x BETWEEN t - tol AND t + tol
+    # on the reals (closed interval; SQLite BETWEEN is inclusive). ABS(col - ?)
+    # is not sargable. BETWEEN on the raw column (epoch-2:
+    # o.generic_temperature_C) or the epoch-1 applicable temperature
+    # COALESCE(alpha_liquidus_T_C, generic_liquidus_T_C) can use
+    # idx_alphamelts_outputs_phase_context_liquidus /
+    # idx_alphamelts_outputs_phase_context_isothermal when present.
+    # IEEE-754: abs(x - t) <= tol is not bit-identical to x BETWEEN t-tol AND
+    # t+tol (e.g. abs(-9.0 - (-9.05)) = 0.05000000000000071 > 0.05). BETWEEN
+    # is therefore applied to the over-approx from _sargable_bounds (ulp(τ)
+    # plus one nextafter — not one ULP of the computed endpoint, which fails
+    # when center±τ cancels); the residual ABS predicates are the pre-t735
+    # authority and keep the candidate set identical. Lookup is mode=ro so
+    # it must not CREATE INDEX; GridCacheWriter emits those indexes. Missing
+    # indexes change timing, not which row is selected.
+    # No LIMIT: the caller scores every surviving row by composition distance
+    # and drops epoch-1 rows after the query on an off-liquidus request.
+    # LIMIT 1 on the temperature ORDER BY would change the selected physics row.
+    temperature_lo, temperature_hi = _sargable_bounds(
+        temperature_C, LIQUIDUS_MATCH_TOLERANCE_C
+    )
+    pressure_lo, pressure_hi = _sargable_bounds(
+        pressure_bar, CONTROL_MATCH_TOLERANCE
+    )
+    fo2_lo, fo2_hi = _sargable_bounds(fO2_log, CONTROL_MATCH_TOLERANCE)
     common_select = """
         SELECT o.id, o.engine_epoch, g.composition_mol_json,
                o.generic_liquid_fraction, o.generic_phase_masses_kg_json,
@@ -335,16 +460,25 @@ def _candidate_rows(
            AND o.generic_phase_assemblage_available = 1
            AND g.artifact_kind = 'equilibrium'
            AND o.engine_epoch {epoch_predicate}
+           AND {temperature_column} BETWEEN ? AND ?
            AND ABS({temperature_column} - ?) <= ?
+           AND g.pressure_bar BETWEEN ? AND ?
            AND ABS(g.pressure_bar - ?) <= ?
+           AND g.fO2_log BETWEEN ? AND ?
            AND ABS(g.fO2_log - ?) <= ?
          ORDER BY ABS({temperature_column} - ?), o.id
     """
     params = (
+        temperature_lo,
+        temperature_hi,
         temperature_C,
         LIQUIDUS_MATCH_TOLERANCE_C,
+        pressure_lo,
+        pressure_hi,
         pressure_bar,
         CONTROL_MATCH_TOLERANCE,
+        fo2_lo,
+        fo2_hi,
         fO2_log,
         CONTROL_MATCH_TOLERANCE,
         temperature_C,

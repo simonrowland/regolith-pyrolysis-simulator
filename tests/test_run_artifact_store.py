@@ -60,7 +60,7 @@ def _runner_payload(status: str = "partial") -> dict:
             "started_at_utc": "2026-07-15T12:00:00Z",
             "feedstock_id": "lunar_mare_low_ti",
             "mass_kg": 1000.0,
-            "backend": "stub",
+            "backend": "internal-analytical",
             "kernel_commit_sha": "abc123",
         },
         "per_hour_summary": [
@@ -193,9 +193,9 @@ def test_build_run_artifact_repackages_runner_payload(monkeypatch) -> None:
     assert "c3_dose" not in artifact["header"]
     assert "recipe_snapshot" not in artifact["header"]
     assert artifact["header"]["engine_identity"] == {
-        "name": "stub",
-        "cache_version": "stub-cache-v1",
-        "backend_wire_token": "stub",
+        "name": "internal-analytical",
+        "cache_version": "internal-analytical-cache-v1",
+        "backend_wire_token": "internal-analytical",
         "kernel_commit_sha": "abc123",
     }
     assert (

@@ -10,7 +10,7 @@ import hashlib
 import math
 from types import MappingProxyType, SimpleNamespace
 from collections.abc import Callable, Mapping as MappingABC, Sequence
-from typing import Any, Iterable, Mapping, TypeVar
+from typing import Any, Mapping, TypeVar
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting.formulas import resolve_species_formula
@@ -36,6 +36,13 @@ from simulator.diagnostics import (
     wall_deposit_sticking_authority_status,
 )
 from simulator.trace import wall_deposit_kg_by_zone_species
+from simulator.optimize.backend_status import (
+    backend_statuses_from_carrier as _backend_statuses_from_carrier,
+    carrier_has_crash_point as _carrier_has_crash_point,
+    latest_backend_status as _latest_backend_status,
+    latest_backend_status_from_sequence as _latest_backend_status_from_sequence,
+    select_backend_status as _select_backend_status,
+)
 
 
 _MISSING = object()
@@ -3122,75 +3129,6 @@ def _terminal_rump_missing_completion_evidence_problem(
     )
 
 
-def _latest_backend_status(run_execution: Any) -> str | None:
-    sim = getattr(run_execution, "simulator", None)
-    carriers = (
-        run_execution,
-        getattr(run_execution, "trace", None),
-        getattr(sim, "_last_backend_diagnostics", None),
-        getattr(sim, "_last_out_of_domain_diagnostics", None),
-    )
-    return _select_backend_status(
-        status
-        for carrier in carriers
-        for status in _backend_statuses_from_carrier(carrier)
-    )
-
-
-def _backend_statuses_from_carrier(carrier: Any) -> tuple[str, ...]:
-    if carrier is None:
-        return ()
-    statuses: list[str] = []
-    if isinstance(carrier, MappingABC):
-        raw = carrier.get("backend_status")
-        if raw is not None:
-            statuses.append(str(raw))
-        if _carrier_has_crash_point(carrier):
-            statuses.append("out_of_domain")
-        for key in ("per_hour", "hours"):
-            status = _latest_backend_status_from_sequence(carrier.get(key))
-            if status is not None:
-                statuses.append(status)
-        for key in ("trace", "backend_diagnostics", "diagnostics"):
-            statuses.extend(_backend_statuses_from_carrier(carrier.get(key)))
-        return tuple(statuses)
-    raw = getattr(carrier, "backend_status", None)
-    if raw is not None:
-        statuses.append(str(raw))
-    for attr in ("per_hour", "hours"):
-        status = _latest_backend_status_from_sequence(getattr(carrier, attr, None))
-        if status is not None:
-            statuses.append(status)
-    for attr in ("trace", "backend_diagnostics", "diagnostics"):
-        statuses.extend(_backend_statuses_from_carrier(getattr(carrier, attr, None)))
-    return tuple(statuses)
-
-
-def _latest_backend_status_from_sequence(value: Any) -> str | None:
-    if not isinstance(value, (list, tuple)) or not value:
-        return None
-    return _select_backend_status(
-        status
-        for item in value
-        for status in _backend_statuses_from_carrier(item)
-    )
-
-
-def _carrier_has_crash_point(carrier: MappingABC[Any, Any]) -> bool:
-    return any(
-        isinstance(carrier.get(key), MappingABC)
-        for key in ("out_of_domain_crash_point", "crash_point")
-    )
-
-
-def _select_backend_status(statuses: Iterable[str]) -> str | None:
-    values = tuple(str(status) for status in statuses if status is not None)
-    for status in ("out_of_domain", "unavailable", "not_converged"):
-        if status in values:
-            return status
-    if values:
-        return values[-1]
-    return None
 
 
 def _carrier_value(carrier: Any, name: str) -> Any:

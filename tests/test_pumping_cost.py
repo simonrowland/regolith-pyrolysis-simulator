@@ -452,6 +452,38 @@ def test_pumping_context_refuses_negative_vented_flow_before_target_pressure():
     assert context["hour"] == 9
 
 
+def test_pumping_context_refuses_a_snapshot_missing_the_vented_flow_field():
+    """An ABSENT field is not a zero flow.
+
+    The sibling above covers an invalid VALUE. This covers a missing FIELD,
+    which used to default to 0.0 and was therefore indistinguishable from a
+    genuine zero: the row was skipped silently and the recipe's pumping load --
+    a number the optimizer ranks by -- came out understated. The old code was
+    careful about a bad value and careless about a missing field.
+
+    The reason is asserted BY NAME on purpose. Checking only that the status is
+    not ok would also pass on missing-ambient-pressure and
+    missing-target-pressure, which are different honest refusals reachable from
+    this same call, so the test would survive the defect it names.
+    """
+    context = pumping_context_from_sim(
+        SimpleNamespace(
+            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
+        ),
+        (
+            SimpleNamespace(
+                hour=9,
+                overhead=SimpleNamespace(headspace_temperature_K=773.15),
+                # O2_vented_mol_hr deliberately absent -- a carrier that is not
+                # a real HourSnapshot, which declares it as a typed float.
+            ),
+        ),
+    )
+
+    assert context["status"] == "refused"
+    assert context["reason"] == "missing-o2-vented-flow"
+
+
 def test_pumping_context_only_costs_o2_not_already_compressed_by_turbine():
     snapshot = SimpleNamespace(
         hour=1,
@@ -518,3 +550,127 @@ def test_pumping_context_forwards_only_explicit_validated_line_conductance():
     assert diagnostic["status"] == "ok"
     assert diagnostic["feasible"] is True
     assert diagnostic["pumping_electrical_kWh"] > 0.0
+
+
+# --- b-259: a missing offgas rate is not a proven zero -----------------------
+# The degenerate branch used to answer two of the three fail-closed categories
+# with one return, so a NaN offgas rate came back as a free vent, indistinguishable
+# from a genuine zero -- on a number the optimizer ranks candidates by.
+
+_B259_BASE = dict(ambient_pressure_pa=101325.0, gas_temperature_K=500.0)
+
+
+@pytest.mark.parametrize(
+    "offgas,duration,token",
+    [
+        (math.nan, 3600.0, "invalid-offgas-rate"),
+        (math.inf, 3600.0, "invalid-offgas-rate"),
+        (1.0, math.nan, "invalid-duration"),
+        (1.0, math.inf, "invalid-duration"),
+    ],
+)
+def test_missing_offgas_or_duration_refuses_instead_of_venting_free(offgas, duration, token):
+    """A rate we do not know is not a rate of zero.
+
+    cost_ledger.py passes _finite(row.get("offgas_mol_per_s"), math.nan), so an
+    absent ledger key reaches this function as NaN. Answering that with a free
+    vent understates the recipe's cost, and cost is a number the optimizer ranks
+    candidates by.
+    """
+    result = estimate_subambient_pump_cost(
+        target_pressure_pa=100.0, offgas_mol_per_s=offgas, duration_s=duration, **_B259_BASE
+    )
+    assert result.status == token
+    assert result.feasible is False
+    # Pin the regime too. A NOT-FIXED review observed that without this, a
+    # reintroduction returning regime="vent-free" alongside the refusing status
+    # would still pass -- the assertion would be blind to a result that still
+    # calls itself a free vent while claiming to refuse.
+    assert result.regime == token
+
+
+@pytest.mark.parametrize("offgas,duration", [(0.0, 3600.0), (1.0, 0.0)])
+def test_genuine_zero_offgas_keeps_its_free_vent(offgas, duration):
+    """A proven zero keeps the zero -- nothing to pump really is free.
+
+    EXACT zero only. A first version of this parametrization included
+    offgas=-1.0 here and asserted status="ok"/feasible=True for it, which
+    ratified a negative molar flow as a proven zero. A review caught it and
+    pointed at the contradiction: the snapshot-boundary test above already
+    requires the same negative flow to refuse as invalid-o2-vented-flow, so
+    the two tests disagreed about the same number.
+    """
+    result = estimate_subambient_pump_cost(
+        target_pressure_pa=100.0, offgas_mol_per_s=offgas, duration_s=duration, **_B259_BASE
+    )
+    assert result.regime == "vent-free"
+    assert result.status == "ok"
+    assert result.feasible is True
+    assert result.energy_kWh == 0.0
+
+
+@pytest.mark.parametrize(
+    "offgas,duration,token",
+    [
+        (-1.0, 3600.0, "invalid-offgas-rate"),
+        (-1e-12, 3600.0, "invalid-offgas-rate"),
+        (1.0, -1.0, "invalid-duration"),
+    ],
+)
+def test_negative_inputs_refuse_rather_than_venting_free(offgas, duration, token):
+    """A negative rate is an impossible measurement, not a small one.
+
+    Distinct from the missing-input cases above: those are values we do not
+    have, these are values we have and that cannot be real. Both refuse, and
+    neither may borrow the proven zero's free vent.
+    """
+    result = estimate_subambient_pump_cost(
+        target_pressure_pa=100.0, offgas_mol_per_s=offgas, duration_s=duration, **_B259_BASE
+    )
+    assert result.status == token
+    assert result.regime == token
+    assert result.feasible is False
+
+
+def test_missing_input_is_distinguishable_from_a_proven_zero():
+    """The defect was that these two were byte-identical results."""
+    missing = estimate_subambient_pump_cost(
+        target_pressure_pa=100.0, offgas_mol_per_s=math.nan, duration_s=3600.0, **_B259_BASE
+    )
+    proven_zero = estimate_subambient_pump_cost(
+        target_pressure_pa=100.0, offgas_mol_per_s=0.0, duration_s=3600.0, **_B259_BASE
+    )
+    assert (missing.status, missing.feasible) != (proven_zero.status, proven_zero.feasible)
+
+
+def test_a_real_pumping_load_is_still_costed():
+    """Guard against the fix swallowing the working path.
+
+    Sizing the control correctly takes some care, and getting it wrong is what
+    two earlier drafts did. The speed ceiling is the pump and the line in
+    SERIES, 1/S_eff = 1/S_pump + 1/C, with S_pump = 50.0 m3/s by default. The
+    required speed here is 41.57 m3/s, so C must satisfy
+    1/50 + 1/C < 1/41.57, i.e. C > ~247 m3/s. C = 1000.0 clears it (S_eff =
+    47.62). Omit C entirely and the answer is
+    "missing-validated-line-conductance" with feasible=None; pass C = 100 and
+    it is "pump-speed-limit-exceeded" with feasible=False (S_eff = 33.33).
+    Both are DIFFERENT honest refusals and neither is what this test is about.
+
+    Two drafts of this test went red against unfixed code for those two
+    unrelated reasons, which would have read as the b-259 fix breaking the happy
+    path. Recorded because a control that fails for its own reasons is worse
+    than no control -- it manufactures a false attribution.
+
+    Note the energy is computed as 56.02 kWh in ALL THREE cases, including the
+    two refusals: the function computes the physics and MARKS the verdict rather
+    than refusing to compute, which is the correct category-2 behaviour.
+    """
+    result = estimate_subambient_pump_cost(
+        target_pressure_pa=100.0,
+        offgas_mol_per_s=1.0,
+        duration_s=3600.0,
+        validated_line_conductance_m3_s=1000.0,
+        **_B259_BASE,
+    )
+    assert result.energy_kWh > 0.0
+    assert result.status == "ok"

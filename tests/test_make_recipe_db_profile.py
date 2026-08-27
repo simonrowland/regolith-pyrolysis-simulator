@@ -631,7 +631,7 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
         evaluate(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             profile=profile,
             candidate_id=f"smoke-{target_id}",
         )
@@ -640,7 +640,7 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
     result = evaluate(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile=profile,
         candidate_id=f"smoke-{target_id}",
     )

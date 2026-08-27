@@ -24,7 +24,7 @@ def _runner_document(status: str = "ok") -> dict[str, object]:
             "started_at_utc": "2026-07-15T12:00:00Z",
             "feedstock_id": "lunar_mare_low_ti",
             "mass_kg": 1000.0,
-            "backend": "stub",
+            "backend": "internal-analytical",
         },
         "per_hour_summary": [{"hour": 1, "campaign": "C0"}],
         "final_state": {"process.cleaned_melt": {"SiO2": 2.0}},
@@ -742,7 +742,7 @@ def test_typed_single_run_maps_through_canonical_command_payload(monkeypatch):
             },
             "name": "Typed run",
             "seed": 7,
-            "fidelity": "stub",
+            "fidelity": "internal-analytical",
         },
     }
 
@@ -1732,7 +1732,7 @@ def test_source_run_draft_is_pure_and_child_persists_lineage(
         },
         "name": "Source run",
         "seed": 11,
-        "fidelity": "stub",
+        "fidelity": "internal-analytical",
         "parent_run_id": None,
     }
     persist_run_artifact(
@@ -1849,7 +1849,7 @@ def test_alias_fidelity_is_canonical_in_persisted_typed_provenance(
 
     submission = client.post(
         "/api/runs",
-        json=_single_run_body({"mass_kg": 1000}, fidelity="stub"),
+        json=_single_run_body({"mass_kg": 1000}, fidelity="internal-analytical"),
     )
     assert submission.status_code == 201
     run_id = submission.get_json()["run_id"]
@@ -1877,7 +1877,7 @@ def test_alias_fidelity_is_canonical_in_persisted_typed_provenance(
         elif isinstance(value, str):
             yield value
 
-    assert "stub" not in set(strings(artifact))
+    assert "internal-analytical" not in set(strings(artifact))
 
 
 def test_source_run_draft_unknown_is_typed_404(tmp_path):

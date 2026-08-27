@@ -177,6 +177,50 @@ SIGTERM stops new submissions, waits for active calls, commits the final batch,
 and closes SQLite. The plist sets `Nice=10`, `KeepAlive=true`, and 22 workers
 (80% of the studio's 28 cores).
 
+Existing grind caches do not gain the PhaseContext lookup indexes until
+those indexes are created on the file (lookup is `mode=ro` and cannot
+`CREATE INDEX`). The route depends on schema:
+
+- **v2 databases** (`grid_keys` has `input_payload_json` and the other
+  provenance columns): `GridCacheWriter(..., existing_only=True)` installs
+  them, and the next `grid_pregrind` or `grind_harvest` writer open does
+  too. One-liner against a v2 cache path (not the live accumulator):
+  `.venv/bin/python -c "from scripts.grid_pregrind_writer import GridCacheWriter; from pathlib import Path; w=GridCacheWriter(Path('path/to/v2-grid-cache.db'), existing_only=True).__enter__(); w.__exit__(None, None, None)"`
+
+- **Legacy databases**, including the live
+  `docs-private/recipe-db/grind-accumulator.db` (predates those columns):
+  `GridCacheWriter`, `grid_pregrind`, and `grind_harvest` all refuse with
+  `ValueError: existing database lacks v2 provenance columns: input_payload_json`.
+  They do **not** install the indexes on that file. Apply the DDL directly
+  (measured 10.7 s wall on a copy of the 1.17 GB / 45k-row accumulator):
+
+  ```bash
+  sqlite3 docs-private/recipe-db/grind-accumulator.db <<'SQL'
+  CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_phase_context_liquidus
+  ON alphamelts_outputs(
+      status,
+      status_kind,
+      engine_epoch,
+      generic_phase_assemblage_available,
+      COALESCE(alpha_liquidus_T_C, generic_liquidus_T_C)
+  );
+  CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_phase_context_isothermal
+  ON alphamelts_outputs(
+      status,
+      status_kind,
+      generic_phase_assemblage_available,
+      generic_temperature_C
+  )
+  WHERE engine_epoch >= 2;
+  SQL
+  ```
+
+  Same DDL via the helper (still a raw `sqlite3` connection, not the
+  writer): `.venv/bin/python -c "import sqlite3; from pathlib import Path; from scripts.grid_pregrind_writer import install_phase_context_lookup_indexes; p=Path('docs-private/recipe-db/grind-accumulator.db'); c=sqlite3.connect(p); install_phase_context_lookup_indexes(c); c.commit(); c.close()"`
+
+  To bench an indexed **copy** without mutating production (legacy or v2):
+  `.venv/bin/python scripts/replay_phase_context_lookup_identity.py --db docs-private/recipe-db/grind-accumulator.db --bench --index-copy /tmp/t735-indexed`
+
 ## Incremental harvest
 
 Run manually or from cron on the laptop. The remote backup is a WAL-consistent
