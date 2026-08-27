@@ -2233,10 +2233,40 @@ def _cached_coating_margin(
     return _deserialize_margins({"coating": payload})["coating"]
 
 
+def _authoritative_carrier_record(species: str) -> dict[str, object]:
+    """A vapour-carrier record that establishes authority for one species.
+
+    Coating authority requires TWO axes: the alpha/sticking provenance these
+    fixtures already supply, and vapour_carrier_authority_by_species, which is
+    one of _WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS. Supplying only the first left
+    the rederivation correctly reporting
+    "wall_deposit_vapour_carrier_authority_missing", so the tests below were
+    asserting authority on a payload that no longer establishes it. Supplying
+    the vapour axis here lets each test isolate the axis it is actually about
+    rather than tripping over a second, unrelated gap.
+
+    Shape follows vapour_carrier_authority_status: a value-kind pressure with an
+    eligible flux, an authoritative verdict, a certification ceiling that is not
+    "never", a validated status and a live flux.
+    """
+    return {
+        "species_id": species,
+        "pressure": {"kind": "value"},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "authoritative",
+        "certification_ceiling": "melts",
+        "validation_status": "validated",
+        "is_flux_active": True,
+    }
+
+
 def _wall_sticking_status_payload(species: str, *, cited: bool) -> dict[str, object]:
     return wall_deposit_sticking_authority_status(
         {"hot_wall": {species: 0.05}},
         {
+            "vapour_carrier_authority_by_species": {
+                species: _authoritative_carrier_record(species),
+            },
             "alpha_s_provenance_by_species": {
                 species: {
                     "hot_wall": {
@@ -2393,6 +2423,12 @@ def test_cached_coating_margin_positive_deposit_without_grounding_fails_closed()
             "output_status": "authoritative",
             "deposited_species": ["K"],
             "uncertified_alpha_species": [],
+            # The vapour axis is established so the ALPHA gap is what this test
+            # isolates; without it the rederivation reports the vapour axis
+            # instead and the test stops being about missing grounding.
+            "vapour_carrier_authority_by_species": {
+                "K": _authoritative_carrier_record("K"),
+            },
         },
     )
 
