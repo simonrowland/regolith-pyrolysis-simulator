@@ -428,6 +428,31 @@ def refuse_continuum_formula_if_load_bearing(
     return assessment
 
 
+def _require_pressure_allowing_vacuum(
+    value: float, *, name: str, category: str
+) -> float:
+    """Validate a pressure where ZERO is a physical state, not a missing input.
+
+    b-287 / SC-146. Mean-free-path takes lambda = kT / (sqrt(2) pi d^2 P), so as
+    P -> 0 lambda -> +inf and Kn = lambda/L -> +inf: true vacuum, the
+    free-molecular limit, and this project's lunar baseline. P = 0 is therefore a
+    KEEP-THE-ZERO value here, distinct from an unknown pressure.
+
+    Deliberately a SEPARATE helper rather than a relaxation of _require_positive.
+    That helper also guards temperature_K, molar mass, collision diameter, tube
+    diameter and length, characteristic length, and the Poiseuille
+    mean_pressure_pa -- none of which have a meaningful zero, and Poiseuille flow
+    at P = 0 is not a limit but a nonsense. Widening the shared helper to admit
+    this one legitimate zero would admit six illegitimate ones. Shared form,
+    different verdicts: fix the call site, not the helper.
+    """
+
+    value = float(value)
+    if math.isnan(value) or value < 0.0:
+        _refuse(category, f"{name} must not be NaN or negative")
+    return value
+
+
 def _require_positive(value: float, *, name: str, category: str) -> float:
     if not is_declared_real_scalar(value, allow_numeric_str=True):
         raise TypeError(f"{name} must be numeric")
@@ -814,7 +839,7 @@ def single_species_mean_free_path_m(
     temperature_K: float,
     collision_diameter_m: float,
 ) -> float:
-    pressure_pa = _require_positive(
+    pressure_pa = _require_pressure_allowing_vacuum(
         pressure_pa,
         name="pressure_pa",
         category="invalid_pressure",
@@ -829,6 +854,17 @@ def single_species_mean_free_path_m(
         name="collision_diameter_m",
         category="invalid_collision_diameter",
     )
+    if pressure_pa == 0.0:
+        # lambda = kT / (sqrt(2) pi d^2 P). The denominator is linear in P, so
+        # lambda diverges as P -> 0 and the limit is +inf, not an error. Returned
+        # explicitly because the float division below would raise
+        # ZeroDivisionError instead of producing the limit. Downstream this gives
+        # Kn = lambda/L = +inf, which classify_knudsen_regime already calls
+        # FREE_MOLECULAR and which b-283 taught the free-molecular guard to accept
+        # -- before this change that limit was unreachable through this path.
+        # Continuity check: 1e-9 Pa -> 4.25e7 m, 1e-12 Pa -> 4.25e10 m, monotonic
+        # increase by the same factor as the pressure decrease.
+        return math.inf
     denominator = (
         math.sqrt(2.0)
         * math.pi
@@ -886,7 +922,7 @@ def mixture_mean_free_path_m(
             "missing_carrier_state",
             "carrier mole fractions are required",
         )
-    pressure_pa = _require_positive(
+    pressure_pa = _require_pressure_allowing_vacuum(
         pressure_pa,
         name="pressure_pa",
         category="invalid_pressure",
@@ -922,6 +958,13 @@ def mixture_mean_free_path_m(
             "carrier_mole_fractions_not_normalized",
             "carrier mole fractions must sum to 1.0",
         )
+    if pressure_pa == 0.0:
+        # Same limit as the single-species case: the denominator is linear in P,
+        # so lambda -> +inf as P -> 0. Placed AFTER the carrier-mole-fraction and
+        # normalisation checks on purpose -- a malformed carrier spec must still
+        # refuse at true vacuum. Only the arithmetic changes here, not any other
+        # refusal.
+        return math.inf
     return BOLTZMANN_CONSTANT_J_K * temperature_K / (
         pressure_pa * denominator_sum
     )

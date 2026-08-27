@@ -808,3 +808,80 @@ def test_molecular_conductance_is_computable_in_true_vacuum():
     )
     assert tube_limit == pytest.approx(tube_large)
     assert tube_limit > 0.0
+
+
+def test_mean_free_path_treats_true_vacuum_as_the_limit_not_a_bad_input():
+    """b-287 / SC-146: P = 0 is a physical state here, not a missing pressure.
+
+    lambda = kT / (sqrt(2) pi d^2 P) is linear in P in the denominator, so
+    lambda -> +inf as P -> 0 and Kn = lambda/L -> +inf: true vacuum, the
+    free-molecular limit, this project's lunar baseline. The guard refused it
+    while ADMITTING P = 1e-12, so once again the large finite value was accepted
+    and the limit it converges to was rejected.
+
+    Asserted as continuity plus a monotonicity check across four decades, not as
+    absence-of-refusal: a guard that admitted P = 0 and returned 0.0, or NaN,
+    would pass a does-not-raise test and be badly wrong.
+    """
+
+    import math
+
+    from simulator.transport_regime import (
+        classify_knudsen_regime,
+        single_species_mean_free_path,
+        single_species_mean_free_path_m,
+    )
+
+    # Monotonic divergence: each 1e3 drop in P must raise lambda by 1e3.
+    near = single_species_mean_free_path_m(1e-9, 1873.15, 3.7e-10)
+    nearer = single_species_mean_free_path_m(1e-12, 1873.15, 3.7e-10)
+    assert nearer == pytest.approx(near * 1e3, rel=1e-9)
+
+    limit = single_species_mean_free_path_m(0.0, 1873.15, 3.7e-10)
+    assert limit == math.inf
+
+    # And the chain end-to-end: the limit must classify as the regime it IS.
+    result = single_species_mean_free_path("N2", 0.0, 1873.15, 0.12)
+    assert result.lambda_m == math.inf
+    assert result.knudsen_number == math.inf
+    assert result.regime == classify_knudsen_regime(math.inf)
+
+    # A genuinely unknown pressure is still refused, and names its reason.
+    for bad in (math.nan, -1.0):
+        with pytest.raises(Exception) as excinfo:
+            single_species_mean_free_path_m(bad, 1873.15, 3.7e-10)
+        assert "invalid_pressure" in str(excinfo.value)
+
+
+def test_vacuum_relaxation_did_not_leak_into_the_shared_positive_guard():
+    """b-287 non-target: only PRESSURE gained a legitimate zero.
+
+    _require_positive also guards temperature, collision diameter, tube geometry
+    and the Poiseuille mean pressure, none of which have a meaningful zero --
+    Poiseuille flow at P = 0 is not a limit, it is a nonsense. The fix is a
+    separate helper at the two mean-free-path call sites for exactly that reason.
+
+    This test exists so that a later simplification which "unifies the two
+    pressure guards" goes red instead of admitting six illegitimate zeros to
+    tidy up one legitimate one. Shared form is not shared verdict.
+    """
+
+    from simulator.transport_regime import (
+        poiseuille_conductance_m3_s,
+        single_species_mean_free_path_m,
+    )
+
+    for kwargs, field in (
+        ({"pressure_pa": 1000.0, "temperature_K": 0.0, "collision_diameter_m": 3.7e-10},
+         "invalid_temperature"),
+        ({"pressure_pa": 1000.0, "temperature_K": 1873.15, "collision_diameter_m": 0.0},
+         "invalid_collision_diameter"),
+    ):
+        with pytest.raises(Exception) as excinfo:
+            single_species_mean_free_path_m(**kwargs)
+        assert field in str(excinfo.value)
+
+    # Poiseuille is viscous flow; a zero mean pressure there is not a limit.
+    with pytest.raises(Exception) as excinfo:
+        poiseuille_conductance_m3_s(0.12, 2.0, 0.0, 4.0e-5)
+    assert "invalid_pressure" in str(excinfo.value)
