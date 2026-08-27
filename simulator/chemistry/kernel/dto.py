@@ -415,6 +415,36 @@ BACKEND_STATUS_PRECEDENCE: tuple[str, ...] = (
     "not_converged",
 )
 
+#: ★ THE PARTITION THAT STOPS AN UNRANKED TOKEN LOSING TO RECENCY.
+#: BACKEND_STATUS_PRECEDENCE deliberately ranks only three tokens, and that is
+#: NOT a bug to be fixed by lengthening it -- the tuple above carries a derived
+#: ordering, and extending it would also silently weaken
+#: test_backend_status_owner's ownership guard, which flags a production literal
+#: only when it contains EVERY ranked token (a longer tuple makes that subset
+#: test strictly harder to trip).
+#:
+#: The actual defect was that anything unranked fell through to `values[-1]`,
+#: so a degrading token lost to a LATER `ok` purely on position: `refused`,
+#: `not_attempted`, `unsupported` and `non_authoritative` all reduced to `ok`.
+#: A refused run reported success.
+#:
+#: Fixing that needs a PARTITION, not an ordering. Exactly one member of
+#: INTENT_RESULT_STATUSES manufactures confidence; every other member
+#: under-claims, and a reader who sees one knows less confidence is warranted.
+#: So the rule is simply that a degrading token never loses to a flattering one,
+#: which requires no judgement about the relative severity of `refused` versus
+#: `unsupported` -- a judgement this module's own header rightly demands a
+#: written derivation for, and which is not needed here.
+#:
+#: DEGRADING is derived by subtraction rather than listed, so a token added to
+#: INTENT_RESULT_STATUSES is degrading by DEFAULT and cannot silently become
+#: unranked. The only way to make a new token flattering is to say so here.
+FLATTERING_INTENT_RESULT_STATUSES: frozenset[str] = frozenset({"ok"})
+
+DEGRADING_INTENT_RESULT_STATUSES: frozenset[str] = (
+    INTENT_RESULT_STATUSES - FLATTERING_INTENT_RESULT_STATUSES
+)
+
 
 def select_backend_status(statuses) -> str | None:
     """Reduce many per-probe statuses to one whole-run status.
@@ -429,6 +459,13 @@ def select_backend_status(statuses) -> str | None:
     for status in BACKEND_STATUS_PRECEDENCE:
         if status in values:
             return status
+    # An unranked DEGRADING token must not lose to a later flattering one.
+    # Falling straight through to values[-1] made position decide, so a
+    # per-probe `ok` recorded after a terminal `refused` won. See
+    # DEGRADING_INTENT_RESULT_STATUSES.
+    degrading = [value for value in values if value in DEGRADING_INTENT_RESULT_STATUSES]
+    if degrading:
+        return degrading[-1]
     return values[-1] if values else None
 
 
