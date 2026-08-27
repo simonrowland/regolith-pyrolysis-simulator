@@ -47,7 +47,7 @@ def _spec(cost_parameters: dict) -> EvalSpec:
         feedstock_recipe_digest="feedstock-recipe-digest",
         feedstock_id="lunar_mare_low_ti",
         profile_id="profile-id",
-        fidelity="stub",
+        fidelity="internal-analytical",
         code_version=current_code_version(),
         data_digests=DATA_DIGESTS,
         cost_parameters=cost_parameters,

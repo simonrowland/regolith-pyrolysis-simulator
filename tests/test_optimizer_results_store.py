@@ -69,7 +69,7 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "mass_kg": 1000.0,
         "additives_kg": {"CaO": 1.5},
         "track": "pyrolysis",
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
         "runtime_campaign_overrides": {"C0": {"hold_time_h": 1.0}},
     }
     data.update(overrides)

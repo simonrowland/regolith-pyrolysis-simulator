@@ -47,7 +47,7 @@ def _session_config(feedstock_id: str, **overrides) -> SimSessionConfig:
         "setpoints": setpoints,
         "vapor_pressures": _load_yaml("vapor_pressures.yaml"),
         "campaign": "C0",
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
         "backend_policy": BackendSelectionPolicy.RUNNER_STRICT,
     }
     if feedstock_id == "mars_sulfate_rich":

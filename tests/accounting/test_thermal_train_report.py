@@ -475,7 +475,7 @@ def test_real_deterministic_runs_are_record_and_ledger_byte_neutral() -> None:
             setpoints=setpoints,
             vapor_pressures=load("vapor_pressures.yaml"),
             campaign="C0",
-            backend_name="stub",
+            backend_name="internal-analytical",
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
             hours=1,
             mass_kg=1000.0,

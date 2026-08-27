@@ -65,7 +65,7 @@ def _start_session(
             setpoints=setpoints or _setpoints(),
             vapor_pressures=vapor_pressures or _silica_vapor_pressures(),
             campaign="C0",
-            backend_name="stub",
+            backend_name="internal-analytical",
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
         )
     )

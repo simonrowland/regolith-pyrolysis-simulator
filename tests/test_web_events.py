@@ -3038,7 +3038,7 @@ def _terminal_runner_document(status: str) -> dict[str, object]:
             "started_at_utc": "2026-07-15T12:00:00Z",
             "feedstock_id": "lunar_mare_low_ti",
             "mass_kg": 1000.0,
-            "backend": "stub",
+            "backend": "internal-analytical",
         },
         "per_hour_summary": [
             {"hour": 1, "campaign": "C0", "T_C": 900.0, "mass_balance_pct": 0.0}
@@ -3905,7 +3905,7 @@ def test_reduced_terminal_payload_preserves_available_submission_provenance():
         _config=SimpleNamespace(
             feedstock_id="lunar_mare_low_ti",
             mass_kg=1000.0,
-            backend_name="stub",
+            backend_name="internal-analytical",
             track="pyrolysis",
         ),
         simulator=SimpleNamespace(melt=SimpleNamespace(hour=3)),

@@ -458,7 +458,7 @@ def test_runtime_loader_allows_knudsen_gate_on_melt_pool_targets() -> None:
 def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"].update({"campaign": "C4", "hours": 18})
-    profile["fidelities"] = {"stub": {"backend_name": "stub"}}
+    profile["fidelities"] = {"internal-analytical": {"backend_name": "internal-analytical"}}
     profile["seed_recipes"] = [
         {
             "id": "stale-c4-window",
@@ -477,7 +477,7 @@ def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None
 def test_default_c2a_profile_still_refuses_over_campaign_cap() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"].update({"campaign": "C2A_continuous", "hours": 29})
-    profile["fidelities"] = {"stub": {"backend_name": "stub"}}
+    profile["fidelities"] = {"internal-analytical": {"backend_name": "internal-analytical"}}
     profile["seed_recipes"] = [
         {
             "id": "default-c2a-window",
@@ -506,7 +506,7 @@ def test_default_c2a_profile_still_refuses_over_campaign_cap() -> None:
 def test_canonical_c2a_profile_accepts_148_hours_under_recipe_local_cap() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"].update({"campaign": "C2A_continuous", "hours": 24})
-    profile["fidelities"] = {"stub": {"backend_name": "stub"}}
+    profile["fidelities"] = {"internal-analytical": {"backend_name": "internal-analytical"}}
 
     validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 

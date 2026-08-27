@@ -131,7 +131,7 @@ def test_failed_vapor_source_forces_low_confidence() -> None:
 def test_non_authoritative_backend_caps_confidence_at_medium() -> None:
     artifact = build_run_artifact(
         _runner_payload(
-            backend="stub",
+            backend="internal-analytical",
             backend_status="unavailable",
             backend_authoritative=False,
         ),

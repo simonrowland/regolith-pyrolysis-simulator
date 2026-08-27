@@ -172,7 +172,7 @@ def _profile() -> dict[str, object]:
             "campaign": "C0",
             "hours": 2,
             "mass_kg": 10.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "track": "pyrolysis",
         },
     }
@@ -183,7 +183,7 @@ def _pool_task(
     *,
     feedstock_id: str,
     stage0_subprocess_required: bool,
-    backend_name: str = "stub",
+    backend_name: str = "internal-analytical",
 ) -> pool_module._PoolTask:
     profile = _profile()
     profile["run"] = dict(profile["run"])
@@ -221,7 +221,7 @@ def test_warm_runtime_spec_requires_one_backend_and_one_feedstock() -> None:
                 0,
                 feedstock_id="lunar_mare_low_ti",
                 stage0_subprocess_required=True,
-                backend_name="stub",
+                backend_name="internal-analytical",
             ),
             _pool_task(
                 1,
@@ -253,7 +253,7 @@ def test_warm_runtime_spec_requires_one_backend_and_one_feedstock() -> None:
         stage0_subprocess_required=True,
     )
 
-    # Alias equivalence: legacy "stub" and the canonical token are one backend
+    # Alias equivalence: legacy "internal-analytical" and the canonical token are one backend
     # identity, so a mixed alias pair must still warm (not fall back to None).
     alias_spec = pool_module._warm_runtime_spec(
         (
@@ -261,7 +261,7 @@ def test_warm_runtime_spec_requires_one_backend_and_one_feedstock() -> None:
                 0,
                 feedstock_id="lunar_mare_low_ti",
                 stage0_subprocess_required=True,
-                backend_name="stub",
+                backend_name="internal-analytical",
             ),
             _pool_task(
                 1,
@@ -699,7 +699,7 @@ def _spec(
         mass_kg=10.0,
         additives_kg={},
         track="pyrolysis",
-        backend_name="stub",
+        backend_name="internal-analytical",
         runtime_campaign_overrides={},
         chemistry_kernel={},
     )

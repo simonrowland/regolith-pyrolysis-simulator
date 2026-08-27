@@ -36,7 +36,7 @@ def main() -> int:
         setpoints=setpoints,
         vapor_pressures=_load("vapor_pressures.yaml"),
         campaign="C3_NA",
-        backend_name="stub",
+        backend_name="internal-analytical",
         backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
         # C3_NA ramps from 25 C at 50 C/hr; 33 snapshots include three
         # plateau hours in the 1500 C evaporation window.

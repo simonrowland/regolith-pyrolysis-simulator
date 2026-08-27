@@ -45,9 +45,9 @@ PROFILE = {
         "campaign": "C0",
         "hours": 1,
         "mass_kg": 1000.0,
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
     },
-    "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+    "fidelities": {"fast": {"backend_name": "internal-analytical", "hours": 1}},
     "seed_recipes": [
         {
             "id": "worker-runtime-seed",
@@ -76,7 +76,7 @@ def _session_config():
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
         hours=0,
-        backend_name="stub",
+        backend_name="internal-analytical",
     )._session_config()
 
 
@@ -212,7 +212,7 @@ def test_worker_runtime_keyed_by_feedstock_and_subprocess_required(
     )
 
     context = warm_worker_runtime(
-        "stub",
+        "internal-analytical",
         feedstock_id="lunar_mare_low_ti",
         stage0_subprocess_required=False,
     )
@@ -240,7 +240,7 @@ def test_backend_from_worker_runtime_rejects_feedstock_mismatch(
         lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
     context = warm_worker_runtime(
-        "stub",
+        "internal-analytical",
         feedstock_id="mars_basalt",
         stage0_subprocess_required=False,
     )
@@ -259,7 +259,7 @@ def test_backend_from_worker_runtime_rejects_subprocess_mismatch(
         lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
     context = warm_worker_runtime(
-        "stub",
+        "internal-analytical",
         feedstock_id="lunar_mare_low_ti",
         stage0_subprocess_required=False,
     )
@@ -278,7 +278,7 @@ def test_evaluate_uses_thread_local_worker_runtime(
         lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
     context = warm_worker_runtime(
-        "stub",
+        "internal-analytical",
         feedstock_id="lunar_mare_low_ti",
         stage0_subprocess_required=True,
     )
@@ -314,7 +314,7 @@ def test_evaluate_declines_thread_local_worker_runtime_for_feedstock_mismatch(
         lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
     context = warm_worker_runtime(
-        "stub",
+        "internal-analytical",
         feedstock_id="mars_basalt",
         stage0_subprocess_required=False,
     )
@@ -357,9 +357,9 @@ def test_pool_worker_initializer_warms_once(
 
     monkeypatch.setattr(pool_module, "warm_worker_runtime", record_warm)
 
-    pool_module._initialize_worker("stub")
+    pool_module._initialize_worker("internal-analytical")
 
-    assert calls == ["stub"]
+    assert calls == ["internal-analytical"]
 
 
 def test_pool_worker_initializer_passes_warm_runtime_spec(
@@ -382,13 +382,13 @@ def test_pool_worker_initializer_passes_warm_runtime_spec(
 
     pool_module._initialize_worker(
         pool_module._WarmRuntimeSpec(
-            backend_name="stub",
+            backend_name="internal-analytical",
             feedstock_id="lunar_mare_low_ti",
             stage0_subprocess_required=True,
         )
     )
 
-    assert calls == [("stub", "lunar_mare_low_ti", True)]
+    assert calls == [("internal-analytical", "lunar_mare_low_ti", True)]
 
 
 def test_web_does_not_import_worker_runtime() -> None:

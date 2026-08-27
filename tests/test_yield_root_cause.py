@@ -53,7 +53,7 @@ def _session_config(
         vapor_pressures=_load("vapor_pressures.yaml"),
         campaign="C0",
         hours=hours,
-        backend_name="stub",
+        backend_name="internal-analytical",
         c5_enabled=c5_enabled,
         mre_target_species=mre_target_species if c5_enabled else "",
         mre_max_voltage_V=1.6 if c5_enabled else 0.0,

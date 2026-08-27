@@ -72,7 +72,7 @@ def _runner_payload(
             "started_at_utc": "2026-07-15T12:00:00Z",
             "feedstock_id": "lunar_mare_low_ti",
             "mass_kg": 1000.0,
-            "backend": "stub",
+            "backend": "internal-analytical",
             "kernel_commit_sha": "kernel-sha",
         },
         "per_hour_summary": per_hour_summary,
@@ -217,9 +217,9 @@ def test_header_and_terminal_key_contract_omits_unavailable_optional_fields(
     assert set(artifact["header"]) == REQUIRED_HEADER_KEYS
     assert OPTIONAL_HEADER_KEYS.isdisjoint(artifact["header"])
     assert artifact["header"]["engine_identity"] == {
-        "name": "stub",
+        "name": "internal-analytical",
         "cache_version": None,
-        "backend_wire_token": "stub",
+        "backend_wire_token": "internal-analytical",
         "kernel_commit_sha": "kernel-sha",
     }
     assert (
@@ -281,7 +281,7 @@ def test_available_optional_header_fields_keep_verified_shapes(monkeypatch) -> N
     }
     payload["effective_config"] = {
         "mass_kg": {"value": 1000.0, "source": "override"},
-        "backend": {"value": "stub", "source": "default"},
+        "backend": {"value": "internal-analytical", "source": "default"},
     }
 
     artifact = build_run_artifact(payload, run_id="run-optional")
@@ -296,7 +296,7 @@ def test_available_optional_header_fields_keep_verified_shapes(monkeypatch) -> N
     payload["effective_config"]["mass_kg"]["value"] = -1.0
     assert artifact["header"]["effective_config"]["mass_kg"]["value"] == 1000.0
     assert artifact["header"]["cost_block"]["electrical_cost_per_kWh"] == 10.0
-    assert artifact["header"]["engine_identity"]["cache_version"] == "stub-cache-v1"
+    assert artifact["header"]["engine_identity"]["cache_version"] == "internal-analytical-cache-v1"
 
 
 def test_lifecycle_argument_is_validated_and_emitted() -> None:

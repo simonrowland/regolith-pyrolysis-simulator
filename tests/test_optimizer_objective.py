@@ -2664,7 +2664,7 @@ def test_best_tap_selects_single_intermediate_hour_with_grade_report() -> None:
     truncated_profile = {
         **profile,
         "run": {**profile["run"], "hours": 2},
-        "fidelities": {"stub": {**profile["fidelities"]["stub"], "hours": 2}},
+        "fidelities": {"internal-analytical": {**profile["fidelities"]["internal-analytical"], "hours": 2}},
     }
     truncated_run = _tap_run(snapshots[:2], configured_hours=2)
     reproduced = compute_objectives(truncated_profile, truncated_run)
@@ -3034,7 +3034,7 @@ def _captured_extraction_profile(maturity: dict[str, object]) -> dict:
 
 def _set_profile_hours(profile: dict, hours: int) -> None:
     profile["run"]["hours"] = hours
-    profile["fidelities"]["stub"]["hours"] = hours
+    profile["fidelities"]["internal-analytical"]["hours"] = hours
 
 
 def _composition_score_profile(
@@ -3084,7 +3084,7 @@ def _composition_score_profile(
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
-        "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "stub"},
-        "fidelities": {"stub": {"backend_name": "stub", "hours": 1}},
+        "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "internal-analytical"},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
         "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
     }
