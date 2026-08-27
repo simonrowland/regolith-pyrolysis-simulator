@@ -171,6 +171,38 @@ def test_non_terminal_hour_performs_zero_artifact_writes(tmp_path, monkeypatch) 
         web_events._clear_simulation_state(sid)
 
 
+def test_build_run_artifact_canonicalises_a_legacy_analytical_backend(monkeypatch) -> None:
+    """A run configured with the LEGACY alias must not serialise it.
+
+    Since the 0.6 migration the old spelling is an accepted INPUT alias and
+    internal-analytical is the serialization token, but this header was a raw
+    passthrough of the configured backend -- so an alias-configured run wrote
+    the retired spelling into a DURABLE artifact, and the name, the
+    cache_version and the wire token all inherited it.
+
+    ★ THE LEGACY SPELLING BELOW IS LOAD-BEARING AND MUST NOT BE "MODERNISED".
+    Feeding the canonical token in would make this test pass whether or not the
+    boundary canonicalises anything, which is precisely the defect it exists to
+    catch. The sibling test above feeds the canonical token and therefore cannot
+    fail against this bug -- that is why this one is separate rather than an
+    extra assertion there.
+    """
+    monkeypatch.setattr(
+        "simulator.accounting.run_artifact.cache_version_for",
+        lambda backend: f"{backend}-cache-v1",
+    )
+    payload = _runner_payload()
+    payload["run_metadata"]["backend"] = "stub"
+
+    artifact = build_run_artifact(payload, run_id="run-legacy", name="Legacy")
+
+    identity = artifact["header"]["engine_identity"]
+    assert identity["name"] == "internal-analytical"
+    assert identity["backend_wire_token"] == "internal-analytical"
+    # cache_version derives from the same token, so it canonicalises with it.
+    assert identity["cache_version"] == "internal-analytical-cache-v1"
+
+
 def test_build_run_artifact_repackages_runner_payload(monkeypatch) -> None:
     monkeypatch.setattr(
         "simulator.accounting.run_artifact.cache_version_for",
