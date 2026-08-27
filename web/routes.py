@@ -720,6 +720,24 @@ def _optimizer_backend_payload(
     )
     payload = backend_resolution_status(_StoredBackendResolutionCarrier(resolution)).as_payload()
     payload.update(canonical)
+    # ★ A PUBLISHED AUTHORITY SURFACE MAY NOT SAY "NOT STATED".
+    # canonicalize_fidelity_emission leaves certification_allowed as None
+    # whenever nothing established one, and this payload published that null
+    # straight out of the API. A consumer that treats a missing allowance as
+    # "not forbidden" then reads permission out of silence -- the same
+    # fail-open the result store was corrected for: an omitted certification
+    # allowance is not permission.
+    #
+    # The tier label already resolves it this way
+    # (bool(canonical.get("certification_allowed", False))); this makes the
+    # backend object agree instead of publishing a third answer. Note the
+    # asymmetry with STORAGE, which is deliberate: a stored run reference may
+    # legitimately record None for "nobody ever ruled", and
+    # test_optimizer_results_store pins that. What must never be null is the
+    # answer handed to a caller asking whether this result may be trusted.
+    payload['certification_allowed'] = bool(
+        canonical.get('certification_allowed', False)
+    )
     payload['tier_label'] = _optimizer_tier_label(
         run_reference,
         result_blob,

@@ -3115,6 +3115,47 @@ def test_reported_completeness_is_shown_not_called_missing(client) -> None:
     assert "SiO" in table
 
 
+def test_published_backend_never_reports_a_null_certification_allowance() -> None:
+    """The API may answer yes or no on certification. It may not answer null.
+
+    canonicalize_fidelity_emission leaves certification_allowed as None
+    whenever nothing established one, and the backend object published that
+    null straight out of the API while the tier label beside it resolved the
+    same question to boolean false. A consumer reading a missing allowance as
+    "not forbidden" takes permission from silence -- the fail-open the result
+    store was already corrected for.
+
+    ★ THIS EXERCISES THE READ PATH DIRECTLY, ON PURPOSE. The shape below is no
+    longer writable: the store now refuses a non-authoritative feasible result
+    outright (non_authoritative_backend), so a fixture that goes through
+    ResultStore.store cannot reach this branch and a test built that way passes
+    whether or not the bug is fixed. The rows that DO carry this shape are
+    already on disk, written by a looser earlier path, and reading them back is
+    exactly the surface under test.
+
+    Deliberately NOT asserted: the stored run reference may still carry None
+    for "nobody ever ruled", which test_optimizer_results_store pins. The rule
+    is about the answer handed to a caller, not about storage.
+    """
+    run_reference = {
+        "backend_name": "cached-real",
+        "backend_status": "ok",
+        "backend_real_active": True,
+        "backend_authoritative": False,
+    }
+
+    payload = web_routes._optimizer_backend_payload({}, {}, run_reference)
+
+    allowed = payload["certification_allowed"]
+    assert allowed is not None, (
+        "published backend certification allowance was null; "
+        "a consumer reading absence as permission fails open"
+    )
+    assert allowed is False
+    # and it must not disagree with the tier label rendered beside it
+    assert allowed is payload["tier_label"]["certification_allowed"]
+
+
 def test_winners_table_ranks_by_score_not_by_selector_pair_order(
     client,
 ) -> None:
