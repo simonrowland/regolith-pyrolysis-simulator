@@ -154,7 +154,7 @@ def _grind_cache_lookup(
     if path.is_file():
         return _cached_grind_cache_lookup(
             str(path.resolve()),
-            path.stat().st_mtime_ns,
+            _grind_cache_data_version(path),
             temperature_C,
             pressure_bar,
             tuple(sorted(composition_mol.items())),
@@ -171,10 +171,41 @@ def _grind_cache_lookup(
     )
 
 
+def _grind_cache_data_version(path: Path) -> tuple[int, int, int]:
+    """Version stamp for the grind cache that can SEE a live WAL commit.
+
+    b-289. The grind accumulator runs in WAL mode with synchronous=NORMAL, so a
+    writer that commits while staying open appends to ``<db>-wal`` and does NOT
+    touch the main file's mtime. A cache keyed on the main mtime alone therefore
+    cannot invalidate, while the committed row is already visible to any query --
+    measured: main mtime unchanged, -wal present, a fresh connection returns the
+    row.
+
+    The damage is a cached MISS. A long-lived web or background process asks for
+    a grid point before the writer has produced it, caches the refusal, and keeps
+    serving that refusal after the row exists. The producer is stranded until
+    checkpoint, LRU eviction, or an explicit cache clear.
+
+    Three components, each earning its place:
+      main mtime  -- checkpoints and non-WAL writes land here
+      wal mtime   -- ordinary WAL commits land here
+      wal size    -- two commits inside one mtime tick still move the size
+    A missing -wal (non-WAL mode, or fully checkpointed) reports (0, 0), which is
+    a stable stamp rather than an error.
+    """
+
+    main_mtime_ns = path.stat().st_mtime_ns
+    try:
+        wal_stat = Path(str(path) + "-wal").stat()
+    except OSError:
+        return (main_mtime_ns, 0, 0)
+    return (main_mtime_ns, wal_stat.st_mtime_ns, wal_stat.st_size)
+
+
 @lru_cache(maxsize=512)
 def _cached_grind_cache_lookup(
     path: str,
-    _mtime_ns: int,
+    _data_version: tuple[int, int, int],
     temperature_C: float,
     pressure_bar: float,
     composition_items: tuple[tuple[str, float], ...],
@@ -213,7 +244,7 @@ def _uncached_grind_cache_lookup(
     try:
         max_epoch = _max_engine_epoch(
             str(path.resolve()),
-            path.stat().st_mtime_ns,
+            _grind_cache_data_version(path),
         )
         liquidus_hint = (
             None
@@ -311,7 +342,7 @@ def _uncached_grind_cache_lookup(
 
 
 @lru_cache(maxsize=8)
-def _max_engine_epoch(path: str, _mtime_ns: int) -> int:
+def _max_engine_epoch(path: str, _data_version: tuple[int, int, int]) -> int:
     connection = _grind_cache_readonly_connection(Path(path))
     row = connection.execute(
         "SELECT MAX(engine_epoch) FROM alphamelts_outputs"
@@ -327,6 +358,14 @@ def _grind_cache_readonly_connection(path: Path) -> sqlite3.Connection:
     """Reuse one mode=ro SQLite connection per resolved path and thread."""
     resolved = str(path.resolve())
     key = _readonly_connection_key(resolved)
+    # b-289: deliberately the MAIN mtime only, NOT the WAL-aware stamp the two
+    # data caches above use. Same syntactic shape, opposite requirement.
+    # Measured: a read-only connection opened BEFORE a WAL commit still returns
+    # the new row, because each autocommit execute() starts a fresh read
+    # transaction. So this cache does not go stale on a WAL append, and keying it
+    # on the WAL would rebuild the connection on every write for no benefit.
+    # Its job is to notice the FILE being replaced, which does move the main
+    # mtime. Do not "unify" these three call sites.
     mtime_ns = path.stat().st_mtime_ns
     cached = _READONLY_CONNECTIONS.get(key)
     if cached is not None and cached[0] == mtime_ns:

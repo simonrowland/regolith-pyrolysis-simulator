@@ -955,3 +955,125 @@ def test_install_phase_context_lookup_indexes_on_schema_without_v2_provenance(
         )
     }
     assert "idx_alphamelts_outputs_phase_context_liquidus" in source_names
+
+
+def test_cached_miss_is_invalidated_by_a_commit_into_a_still_live_wal(tmp_path):
+    """b-289: a cached refusal must not outlive the row that answers it.
+
+    The grind accumulator runs WAL with synchronous=NORMAL, so a writer that
+    commits while staying OPEN appends to <db>-wal and never touches the main
+    file's mtime. The lookup LRU keyed only on that mtime, so a cached MISS kept
+    being served after the row existed -- a long-lived web or background process
+    would strand its own producer until checkpoint, LRU eviction, or an explicit
+    cache clear.
+
+    This is the case the existing coverage could not reach: the identity matrix
+    exercises row selection and connection reuse, but nothing performed a cached
+    miss followed by a commit into a live WAL. Note the writer is deliberately
+    NOT closed -- closing it checkpoints, which moves the main mtime and hides
+    the bug.
+    """
+
+    cache = tmp_path / "grind-accumulator.db"
+    writer = sqlite3.connect(str(cache))
+    try:
+        writer.execute("PRAGMA journal_mode=WAL")
+        writer.execute("PRAGMA synchronous=NORMAL")
+        _create_schema(writer)
+        writer.commit()
+
+        composition = {"SiO2": 45.0, "MgO": 30.0, "FeO": 15.0, "Al2O3": 10.0}
+        # ON the liquidus surface. Epoch 1 is liquidus-surface-only and the
+        # isothermal tier is empty pending the epoch-2 regrind, so an off-liquidus
+        # query refuses for a legitimate reason that has nothing to do with the
+        # cache -- which would make this test pass for the wrong reason, or rather
+        # fail for the wrong one.
+        query = dict(
+            temperature_C=1600.0,
+            pressure_bar=1.0,
+            composition_mol=composition,
+            fO2_log=-8.0,
+            liquidus_temperature_C=1600.0,
+        )
+
+        _reset_lookup_caches()
+        mtime_before = cache.stat().st_mtime_ns
+
+        # 1. miss, and the miss is now in the LRU
+        missed, _ = pc._grind_cache_lookup(cache, **query)
+        assert missed is None
+
+        # 2. the producer commits, and stays open -- the live-WAL case
+        _insert_row(
+            writer,
+            row_id=1,
+            composition=composition,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            engine_epoch=1,
+            generic_temperature_C=1600.0,
+            generic_liquidus_T_C=1600.0,
+            alpha_liquidus_T_C=1600.0,
+        )
+        writer.commit()
+
+        # The premise of the bug: the main file did not move.
+        assert cache.stat().st_mtime_ns == mtime_before, (
+            "this test only proves anything while the main-file mtime is "
+            "unchanged; if a checkpoint moved it, the stale-cache path is not "
+            "being exercised"
+        )
+
+        # 3. the same query must now see the row, from the same process
+        found, _ = pc._grind_cache_lookup(cache, **query)
+        assert found is not None, (
+            "cached refusal outlived the committed row -- the lookup key cannot "
+            "see the WAL"
+        )
+    finally:
+        writer.close()
+        _reset_lookup_caches()
+
+
+def test_readonly_connection_cache_is_deliberately_not_wal_keyed(tmp_path):
+    """b-289 non-target: only the DATA caches became WAL-aware.
+
+    Passes before and after the fix. It exists so that a later "unify these three
+    call sites" cleanup goes red. A read-only connection opened BEFORE a WAL
+    commit still returns the new row, because each autocommit execute() starts a
+    fresh read transaction -- so this cache does not go stale, and keying it on
+    the WAL would rebuild the connection on every single write for no benefit.
+    Same syntactic shape as the two caches above it, opposite requirement.
+    """
+
+    cache = tmp_path / "conn.db"
+    writer = sqlite3.connect(str(cache))
+    try:
+        writer.execute("PRAGMA journal_mode=WAL")
+        writer.execute("PRAGMA synchronous=NORMAL")
+        _create_schema(writer)
+        writer.commit()
+
+        reader = pc._grind_cache_readonly_connection(cache)
+        assert reader.execute("SELECT count(*) FROM alphamelts_outputs").fetchone()[0] == 0
+
+        _insert_row(
+            writer,
+            row_id=1,
+            composition={"SiO2": 45.0},
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            engine_epoch=1,
+            generic_temperature_C=1500.0,
+            generic_liquidus_T_C=1600.0,
+            alpha_liquidus_T_C=1600.0,
+        )
+        writer.commit()
+
+        # Same cached connection object, and it sees the commit unaided.
+        again = pc._grind_cache_readonly_connection(cache)
+        assert again is reader
+        assert again.execute("SELECT count(*) FROM alphamelts_outputs").fetchone()[0] == 1
+    finally:
+        writer.close()
+        _reset_lookup_caches()
