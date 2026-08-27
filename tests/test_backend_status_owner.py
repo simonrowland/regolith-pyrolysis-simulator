@@ -15,6 +15,19 @@ import pathlib
 
 import pytest
 
+from simulator.optimize.backend_status import (
+    latest_backend_status_from_sequence,
+)
+from simulator.optimize.pool import (
+    _latest_backend_status as _pool_latest_backend_status,
+)
+from simulator.optimize.study import (
+    _latest_backend_status as _study_latest_backend_status,
+)
+from simulator.optimize.result_trust import (
+    carrier_backend_status as _carrier_backend_status,
+)
+
 from simulator.chemistry.kernel.dto import (
     DEGRADING_INTENT_RESULT_STATUSES,
     FLATTERING_INTENT_RESULT_STATUSES,
@@ -540,3 +553,53 @@ def test_precedence_tuple_is_not_extended_to_cover_the_partition() -> None:
         "not_converged",
     )
     assert RANKED_TOKENS < DEGRADING_INTENT_RESULT_STATUSES
+
+
+@pytest.mark.parametrize("degrading", sorted(DEGRADING_INTENT_RESULT_STATUSES))
+def test_every_sequence_reducer_agrees_with_the_owner(degrading: str) -> None:
+    """EVERY reducer that answers "what was this run's status" must agree.
+
+    ★ THE AST OWNERSHIP GUARD STRUCTURALLY CANNOT CATCH THESE. It matches
+    modules that spell the ranked tokens in a literal or an if/elif chain -- but
+    pool and study answered with ``value[-1]``, which names no token at all.
+    Answering by POSITION restates the ordering without stating it, so the guard
+    reported one owner while three consumers disagreed with it. A behavioural
+    agreement test is the complement: the guard finds NEW copies that name
+    tokens, this finds copies that answer by position.
+
+    Verified divergence before the fix, from an independent coherence audit:
+
+        unavailable -> ok    owner=unavailable    pool=ok    study=ok
+        out_of_domain -> ok  owner=out_of_domain  pool=ok    study=ok
+
+    The control (ok -> unavailable) agreed even when broken, which is why a
+    single-case test would have missed it: position and severity give the same
+    answer whenever the degrading token happens to come last.
+    """
+    sequence = [{"backend_status": degrading}, {"backend_status": "ok"}]
+    expected = latest_backend_status_from_sequence(sequence)
+    assert expected == degrading, "owner itself regressed"
+
+    assert _pool_latest_backend_status(sequence) == expected, (
+        f"pool reducer disagrees with the owner on {degrading!r}"
+    )
+    assert _study_latest_backend_status(sequence) == expected, (
+        f"study reducer disagrees with the owner on {degrading!r}"
+    )
+    # ★ FOURTH SITE, and the one neither audit reported. result_trust reduced a
+    # per_hour sequence with nested[-1], so a run that refused early and
+    # recovered to ok reported ok -- in the module that decides whether a
+    # result may be TRUSTED, where the failing hour is precisely the hour that
+    # must survive. Found by grepping the SHAPE ([-1] near a status word) after
+    # the audit named three others; the token-matching ownership guard cannot
+    # see any of them.
+    assert _carrier_backend_status(
+        {"per_hour": [{"backend_status": degrading}, {"backend_status": "ok"}]}
+    ) == expected, (
+        f"result_trust carrier reducer disagrees with the owner on {degrading!r}"
+    )
+    # and the control: with the degrading token LAST, position and severity
+    # coincide, so this must pass both before and after any fix
+    control = [{"backend_status": "ok"}, {"backend_status": degrading}]
+    assert _pool_latest_backend_status(control) == degrading
+    assert _study_latest_backend_status(control) == degrading

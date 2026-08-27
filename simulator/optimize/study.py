@@ -6,6 +6,7 @@ from collections.abc import Callable, Mapping, Sequence
 from contextlib import nullcontext
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
+from simulator.chemistry.kernel import select_backend_status
 import copy
 import csv
 import hashlib
@@ -4140,9 +4141,19 @@ def _backend_status_from_trace(trace: Any) -> str | None:
 
 
 def _latest_backend_status(value: Any) -> str | None:
+    """Reduce a per-probe sequence to one whole-run status via the OWNER.
+
+    Same defect and same repair as the pool sibling: this read value[-1], so a
+    degrading token followed by a later ok reduced to ok. Answering by POSITION
+    restates the ordering without naming it, which is also why the one-owner
+    guard could not see it -- that guard matches ranked token literals and a
+    last-item implementation spells none.
+    """
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or not value:
         return None
-    return _backend_status_from_trace(value[-1])
+    return select_backend_status(
+        [_backend_status_from_trace(entry) for entry in value]
+    )
 
 
 def _to_record(
