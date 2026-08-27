@@ -24,7 +24,7 @@
         <tbody>
             {% for entry in entries %}
             <tr>
-                <td>{{ entry.rank }}</td>
+                <td>{{ entry.rank }}{% if entry.rank_ambiguous %}<span class="range" title="{{ entry.rank_ambiguous }}">&nbsp;?</span>{% endif %}</td>
                 <td>
                     <strong>{{ entry.feedstock_id }}</strong><br>
                     <span class="range">{{ entry.profile_id }}</span>

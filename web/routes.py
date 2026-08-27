@@ -2225,21 +2225,86 @@ def _optimizer_winner_entries(
         profile_id=profile_id,
         fidelity=fidelity,
     ):
+        # ★ EVERY PAIR MUST BE RANKED ON THE SAME METRIC. This passed the
+        # caller's (often None) objective_metric to every pair, so each pair
+        # independently resolved its own primary objective -- and a profile
+        # whose vector is ordered differently resolves a DIFFERENT metric. The
+        # table then ranked kg of oxygen against kWh of energy in one column,
+        # which is not a comparison at all. Feeding the resolved metric forward
+        # pins the axis after the first pair fixes it; a pair whose objectives
+        # lack that metric drops out rather than being ranked on a substitute.
         winners, metric, _digest_scope, _excluded_counts = _leaderboard_entries(
             run_dirs,
             feedstock_id=pair_feedstock,
             profile_id=pair_profile,
             fidelity=fidelity,
-            objective_metric=objective_metric,
+            objective_metric=selected_metric,
             limit=1,
         )
         if metric and selected_metric is None:
             selected_metric = metric
         entries.extend(_optimizer_result_view(entry) for entry in winners)
-        if len(entries) >= limit:
-            break
+
+    # ★ RANK MUST BE SCORE ORDER, AND THAT REQUIRES SEEING EVERY PAIR FIRST.
+    # This used to `break` once `limit` rows had accumulated and then assign
+    # rank by ENUMERATION of the pair walk -- so "Rank 1" was simply the first
+    # selector pair alphabetically, not the best candidate. Observed on a real
+    # store: HTML Rank 1 = 6.749 kg while HTML Rank 8 = 19.955 kg, and 119 of
+    # 169 pairs never appeared at all because the walk stopped at 50. The JSON
+    # leaderboard ranked the same rows correctly, so the two surfaces disagreed
+    # under the same column name.
+    #
+    # The two defects compound: truncating the WALK makes a later sort useless,
+    # because the best candidate can be pair #120 and never be collected. So the
+    # order is collect-all -> sort -> truncate -> rank, which is what
+    # _leaderboard_entries itself does.
+    #
+    # Cost: one limit=1 query per selector pair rather than per pair up to the
+    # limit. That is the price of a correct ranking; a cheaper scheme would have
+    # to push the ordering down into the query rather than truncate the walk.
+    # A set of rows can only be totally ordered if they share one objective
+    # sense: "best" under minimize and "best" under maximize are opposite ends
+    # of the same axis, so a mixed set has NO valid single ranking. Silently
+    # defaulting to maximize would present an undefined order as a confident
+    # one -- the same fail-open shape as ranking by pair position. We still
+    # render (a mixed set must not blank the page) but mark the rank as
+    # ambiguous so the number is not read as authoritative.
+    senses = {
+        str(entry.get('objective_sense') or 'maximize') for entry in entries
+    }
+    rank_ambiguous = len(senses) > 1
+    sense = senses.pop() if len(senses) == 1 else 'maximize'
+    reverse = sense != 'minimize'
+
+    def _rank_key(entry: Mapping[str, Any]) -> float:
+        value = entry.get('objective_value')
+        if (
+            not isinstance(value, (int, float))
+            or isinstance(value, bool)
+            or math.isnan(value)
+        ):
+            # BELT FOR AN UPSTREAM CONTRACT, not a live path today:
+            # _leaderboard_entries only returns rows whose objective passed
+            # _numeric_objective_value, so every entry here currently arrives
+            # with a finite float. This branch exists because that invariant
+            # lives in a DIFFERENT function -- if its filtering ever loosens,
+            # the failure lands here silently as a mis-ranking rather than as
+            # an error. NaN is called out because it is the dangerous shape:
+            # every NaN comparison is False, so sort() would place it at an
+            # arbitrary position, including Rank 1. Unrankable rows go last in
+            # either direction instead.
+            return float('-inf') if reverse else float('inf')
+        return float(value)
+
+    entries.sort(key=_rank_key, reverse=reverse)
+    entries = entries[:limit]
     for rank, entry in enumerate(entries, start=1):
         entry['rank'] = rank
+        if rank_ambiguous:
+            entry['rank_ambiguous'] = (
+                'rows mix minimize and maximize objectives; '
+                'no single ranking is valid across them'
+            )
     return entries, selected_metric
 
 

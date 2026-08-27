@@ -2910,6 +2910,105 @@ def test_optimizer_job_register_marks_dead_running_job_failed_on_rebuild(tmp_pat
     assert meta["status"] == "FAILED"
 
 
+def test_winners_table_pins_one_objective_metric_across_selector_pairs(
+    client,
+) -> None:
+    """Every ranked row must be scored on the SAME metric.
+
+    Each selector pair used to be queried with the caller's objective_metric
+    (usually None), so each pair independently resolved its own PRIMARY
+    objective. A profile whose objective vector is ordered differently resolves
+    a different metric -- and the table then ranked kilograms of oxygen against
+    kilowatt-hours of energy in a single column, which is not a comparison.
+
+    The fixture makes the two pairs disagree on purpose: the strong pair lists
+    energy FIRST, so on its own it would rank on energy_kWh (minimize, 1.0)
+    while the weak pair ranks on oxygen_kg (maximize, 6.0). Ranked on the
+    pinned oxygen axis the strong pair leads at 20.0; ranked on each pair's own
+    axis the weak pair's 6.0 outranks the strong pair's 1.0 and the order
+    inverts.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-metric-pin"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    weak = _base_spec(recipe_id="recipe-weak", feedstock_id="ceres_regolith")
+    strong = _base_spec(recipe_id="recipe-strong", feedstock_id="mars_basalt")
+    store.store(
+        weak,
+        _scored(weak, candidate_id="candidate-weak", oxygen=6.0, energy=1.0),
+        created_at="2026-06-01T00:00:00Z",
+    )
+    store.store(
+        strong,
+        _scored(
+            strong,
+            candidate_id="candidate-strong",
+            objectives=ObjectiveVector(
+                (
+                    # energy first: this pair's OWN primary objective
+                    ObjectiveValue("energy_kWh", "minimize", 1.0, "kWh", ordinal=0),
+                    ObjectiveValue("oxygen_kg", "maximize", 20.0, "kg", ordinal=1),
+                )
+            ),
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    response = client.get("/partials/optimizer-table")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+
+    assert "candidate-strong" in body
+    assert "candidate-weak" in body
+    assert body.index("candidate-strong") < body.index("candidate-weak"), (
+        "pairs were ranked on their own objective metrics, not one pinned axis"
+    )
+
+
+def test_winners_table_ranks_by_score_not_by_selector_pair_order(
+    client,
+) -> None:
+    """Rank 1 must be the best candidate, not the first pair alphabetically.
+
+    The winners table walked selector pairs, took the best row per pair, and
+    then assigned rank by ENUMERATION of that walk -- so Rank 1 was simply the
+    alphabetically-first feedstock. Worse, it stopped the walk once `limit` rows
+    had accumulated, so a later pair holding the actual best could never be
+    collected at all. Observed on a real store: HTML Rank 1 = 6.749 kg beside
+    HTML Rank 8 = 19.955 kg, with 119 of 169 pairs missing entirely.
+
+    The fixture inverts alphabetical order against score on purpose: the pair
+    that sorts FIRST by name carries the LOWER score, so a table that still
+    ranks by pair order puts it at Rank 1 and fails.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-rank-order"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    # sorts FIRST by feedstock name, LOWER score
+    weak = _base_spec(recipe_id="recipe-weak", feedstock_id="ceres_regolith")
+    # sorts LATER by feedstock name, HIGHER score
+    strong = _base_spec(recipe_id="recipe-strong", feedstock_id="mars_basalt")
+    store.store(weak, _scored(weak, candidate_id="candidate-weak", oxygen=6.7),
+                created_at="2026-06-01T00:00:00Z")
+    store.store(strong, _scored(strong, candidate_id="candidate-strong", oxygen=19.9),
+                created_at="2026-06-01T00:00:00Z")
+
+    response = client.get("/partials/optimizer-table")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+
+    # Both rows present, and the STRONGER one is rendered first.
+    assert "candidate-strong" in body
+    assert "candidate-weak" in body
+    assert body.index("candidate-strong") < body.index("candidate-weak"), (
+        "winners table still ranks by selector-pair order, not by score"
+    )
+
+
 def test_optimizer_page_and_table_render_feedstock_profile_winners(
     client,
     tmp_path,
