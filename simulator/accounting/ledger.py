@@ -1409,7 +1409,11 @@ class AtomLedger:
         for transition in self._transitions:
             debits = transition.debit_atom_moles(self.registry)
             credits = transition.credit_atom_moles(self.registry)
-            for element in set(debits) | set(credits):
+            # Sorted for the same reason as _reconcile_origin_projection
+            # (b-302): this builds a dict whose key order would otherwise be
+            # hash-dependent. Not serialised into run artifacts today, so this
+            # is hygiene rather than a fix -- but it is the same latent shape.
+            for element in sorted(set(debits) | set(credits)):
                 transition_terms[element].append(
                     credits.get(element, 0.0) - debits.get(element, 0.0)
                 )
@@ -2077,13 +2081,35 @@ def _reconcile_origin_projection(
     physical_species_mol: Mapping[str, Mapping[str, float]],
     registry: Mapping[str, Any],
 ) -> None:
-    accounts = set(physical_species_mol) | set(origins) | set(unresolved)
+    # ★ SORTED, and the sort is load-bearing rather than cosmetic (b-302).
+    # This function mutates the projection dicts IN PLACE before they are
+    # committed, and it writes through _set_element_balance /
+    # _set_origin_balance, which pop dead keys and setdefault-append new ones
+    # in whatever order this loop yields. A bare set of element/account
+    # STRINGS iterates in hash order: stable within a process, variable
+    # across processes. Every other insertion path into these dicts is
+    # already sorted (MaterialLot.atom_moles_for does dict(sorted(...))), so
+    # this was the single unordered writer, and it made the serialised
+    # yield_disposition non-reproducible run to run -- two elements in one
+    # account admit two orderings, which is exactly the bistable digest
+    # observed.
+    #
+    # VALUES WERE NEVER AT RISK: each element's reconcile math is an fsum
+    # over its own origins with a per-element scale, independent of iteration
+    # order, which is why two captured documents were value-identical across
+    # both orderings. This fixes SERIALISATION determinism, not arithmetic.
+    #
+    # Sorting here rather than passing sort_keys=True at the one test that
+    # digests the artifact is deliberate: it makes every present and future
+    # consumer deterministic -- artifact diffs, run stores, precompute
+    # comparisons -- instead of greening a single assertion.
+    accounts = sorted(set(physical_species_mol) | set(origins) | set(unresolved))
     for account in accounts:
         physical_atoms = _signed_atom_moles_from_species_mol(
             physical_species_mol.get(account, {}),
             registry,
         )
-        elements = (
+        elements = sorted(
             set(physical_atoms)
             | set(origins.get(account, {}))
             | set(unresolved.get(account, {}))
