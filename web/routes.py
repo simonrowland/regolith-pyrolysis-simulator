@@ -2142,6 +2142,10 @@ def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     if not metric:
         return {
             'status': 'inconclusive',
+            'has_value': False,
+            'qualifier': 'inconclusive',
+            'percent': None,
+            'percent_label': 'inconclusive',
             'reason': 'extraction completeness metric missing',
         }
 
@@ -2164,8 +2168,35 @@ def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
 
     if percent is None:
         status = 'inconclusive'
+    # ★ A STATUS THE SURFACE DOES NOT RECOGNISE IS NOT A MISSING METRIC.
+    # Both templates gated the number on status == "available" and fell through
+    # to "metric missing" for anything else. A stored metric with
+    # status "reported" therefore rendered as absent -- while the same row went
+    # on printing 92.27 kg of metals and 9.020 kg of O2. The hidden number was
+    # 0.21 % SiO extraction completeness, which is the Mandate's
+    # incomplete-extraction failure mode: the surface erased precisely the
+    # evidence that the run had failed, and kept the part that looked like
+    # success.
+    #
+    # So the rule is: THE NUMBER IS SHOWN WHENEVER THERE IS A NUMBER. Status
+    # becomes a qualifier on the value, not a gate in front of it, and only a
+    # genuinely absent metric may be called missing.
+    #
+    # This decision lives here rather than in the templates because the table
+    # and the detail page had the SAME defect written out twice -- duplicated
+    # presentation logic is what let one surface's gate become two surfaces'
+    # lie.
+    has_value = percent is not None
+    qualifier = None if status == 'available' else status
+    reason = metric.get('reason')
+    if not has_value and not reason:
+        # Truthful default: the metric IS here, it just carries no computable
+        # value. Saying "missing" here would be the same lie one level down.
+        reason = 'metric present but carries no completeness value'
     return {
         'status': status,
+        'has_value': has_value,
+        'qualifier': qualifier,
         'percent': percent,
         'percent_label': _format_quantity(percent, '%')
         if percent is not None
@@ -2178,7 +2209,7 @@ def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         ),
         'allowed_residual': metric.get('allowed_residual'),
         'product_bin': metric.get('product_bin'),
-        'reason': metric.get('reason'),
+        'reason': reason,
     }
 
 

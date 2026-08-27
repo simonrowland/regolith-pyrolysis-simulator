@@ -81,8 +81,13 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if entry.completeness.status == "available" and entry.completeness.percent is not none %}
-                    <strong>{{ entry.completeness.percent_label }}</strong><br>
+                    {% if entry.completeness.has_value %}
+                    <strong>{{ entry.completeness.percent_label }}</strong>
+                    {% if entry.completeness.qualifier %}
+                    <span class="version-badge version-badge-legacy"
+                          title="stored completeness status">{{ entry.completeness.qualifier }}</span>
+                    {% endif %}
+                    <br>
                     <span class="range">
                         target {{ entry.completeness.target_species or "not declared" }};
                         denominator {{ entry.completeness.denominator or "not declared" }};

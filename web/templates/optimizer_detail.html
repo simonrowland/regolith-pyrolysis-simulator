@@ -248,8 +248,9 @@
             <tr>
                 <td>Extraction completeness</td>
                 <td>
-                    {% if result.completeness.status == "available" and result.completeness.percent is not none %}
-                    {{ result.completeness.percent_label }};
+                    {% if result.completeness.has_value %}
+                    {{ result.completeness.percent_label }}{% if result.completeness.qualifier %}
+                    (status {{ result.completeness.qualifier }}){% endif %};
                     target {{ result.completeness.target_species or "not declared" }};
                     denominator {{ result.completeness.denominator or "not declared" }};
                     product bin {{ result.completeness.product_bin or "not declared" }}

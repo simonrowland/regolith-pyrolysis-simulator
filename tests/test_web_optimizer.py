@@ -3064,6 +3064,57 @@ def test_rows_lacking_the_ranked_metric_are_counted_not_silently_dropped(
     )
 
 
+def test_reported_completeness_is_shown_not_called_missing(client) -> None:
+    """A status the surface does not recognise is not a missing metric.
+
+    Both the table and the detail page gated the number on
+    status == "available" and fell through to "metric missing" for anything
+    else. A stored metric with status "reported" therefore rendered as absent
+    -- while the same row went on printing its metal and oxygen masses.
+
+    The hidden number in the observed case was 0.21 % SiO extraction
+    completeness, which is the Mandate's incomplete-extraction failure mode.
+    The surface erased exactly the evidence that the run had failed and kept
+    the part that looked like success, so this fixture uses that shape
+    verbatim: status "reported", completeness_fraction 0.002125, target SiO.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-completeness-reported"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    spec = _base_spec(recipe_id="recipe-reported")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-reported",
+            oxygen=9.02,
+            product_summary={
+                "product_yield_table": _product_yield_table(),
+                "extraction_completeness": {
+                    "status": "reported",
+                    "target_species": "SiO",
+                    "denominator_account": "cleaned_silicate_feed",
+                    "product_bin": "silica_glass",
+                    "completeness_fraction": 0.002125,
+                },
+            },
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    table = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "candidate-reported" in table
+    assert "0.2125 %" in table, "a reported completeness value was not rendered"
+    assert "metric missing" not in table, (
+        "a metric that is present was reported as missing"
+    )
+    # the non-certified status is disclosed rather than dropped
+    assert "reported" in table
+    assert "SiO" in table
+
+
 def test_winners_table_ranks_by_score_not_by_selector_pair_order(
     client,
 ) -> None:
