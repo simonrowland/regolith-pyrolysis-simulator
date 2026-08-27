@@ -682,11 +682,24 @@ def test_assess_continuum_validity_refuses_nan_but_keeps_true_vacuum_in_domain()
     assert negative_case.action is tr.ContinuumValidityAction.REFUSE
 
     # The half that must NOT be swept in with NaN.
+    #
+    # CONTINUITY, NOT ACCEPTANCE (idiom adopted from the b-280 fix). Asserting
+    # only "+inf does not refuse" would pass just as happily if +inf landed in
+    # the WRONG branch and merely failed to raise. Requiring it to agree with a
+    # very large finite Kn shows the free-molecular limit was actually taken:
+    # both must be the same verdict, reached the same way.
     vacuum = tr.assess_continuum_formula_validity(
         float("inf"), campaign_name="C4", asking_site="tests.b275.vacuum"
     )
+    huge_finite = tr.assess_continuum_formula_validity(
+        1.0e12, campaign_name="C4", asking_site="tests.b275.vacuum_limit"
+    )
     assert vacuum.action is tr.ContinuumValidityAction.OK
     assert vacuum.in_domain is True
+    assert (vacuum.action, vacuum.in_domain) == (
+        huge_finite.action,
+        huge_finite.in_domain,
+    ), "+inf must reach the same verdict as the finite free-molecular limit"
 
     # Negative control: an ordinary viscous Kn must stay untouched, so the guard
     # cannot be "satisfied" by refusing everything.
