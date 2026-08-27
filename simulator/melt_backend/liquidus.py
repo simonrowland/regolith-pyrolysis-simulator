@@ -33,10 +33,38 @@ from simulator.scalar_boundary import is_declared_real_scalar
 # Unit check: all terms in seconds; product is seconds.
 DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 300.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
+# The statuses a SAMPLE may refuse with and still be carried out through the
+# finder, so the caller learns WHICH refusal occurred rather than a generic
+# solver failure.
+#
+# 'refused' is here because ThermoEngine already computes it as the honest
+# category for two of its refusal causes -- FO2_REQUIRES_IRON and
+# FO2_TARGET_NOT_FINITE, per STATUS_BY_REFUSAL_CAUSE in
+# engines/alphamelts/thermoengine.py, whose own _ALLOWED_CAUSE_STATUSES is
+# {out_of_domain, refused}. Those are raised as typed exceptions rather than
+# returned as a status, so before this they fell to the finder's generic
+# guard and became 'not_converged' -- a policy refusal to supply physics
+# reported as an affirmative claim that a solve ran and failed to converge.
+#
+# ★ ORDER OF OPERATIONS MATTERS AND IS NOT COSMETIC (b-300): this set had to
+# widen BEFORE any sampler wraps that category. LiquidusSampleError validates
+# its status against this set, so handing it 'refused' while the set was the
+# old three raised ValueError INSIDE the sampler, which the same generic
+# guard caught, which minted 'not_converged' -- identical behaviour to the
+# bug, with a typed raise sitting in the diff to convince the author it was
+# fixed. Confirmed by execution before the widen.
+#
+# NOT widened with not_attempted, unsupported or non_authoritative: those are
+# provider or intent-level tokens describing whether a probe ran at all, not
+# how a frac_M sample refused. A timeout stays 'not_converged' (see
+# STATUS_BY_TIMEOUT_CAUSE) rather than gaining a token, because a new member
+# here would also have to exist in the kernel vocabulary or IntentResult
+# construction raises.
 LIQUIDUS_REFUSAL_STATUSES = frozenset({
     'not_converged',
     'out_of_domain',
     'unavailable',
+    'refused',
 })
 
 
