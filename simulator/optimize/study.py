@@ -3586,10 +3586,26 @@ def _ensure_staged_prefix_replay(
         return fresh, True
     _assert_honest_result(fresh, definitions)
     light_fresh = _strip_heavy_result(fresh)
-    # Grind-infra sweep Q2 (completeness): unlike the main/certify sinks, the
-    # staged prefix REQUIRES the row to be cached (it is read back immediately
-    # for replay-equality), so an admission rejection cannot be silently skipped
-    # — surface it loudly with the reason instead of a bare ResultStoreWriteRejected.
+    # The staged prefix normally round-trips through the store: it writes the
+    # row, reads it straight back, and asserts the cached copy replays equal to
+    # the fresh one. That is why an admission rejection used to be raised here
+    # rather than skipped like the main/certify sinks do.
+    #
+    # But refusing to CACHE a result is a normal outcome, not a failure of the
+    # run. Every optimizer profile this project ships names the analytical
+    # backend, which the trust rail correctly declines to admit as
+    # authoritative, so the raise made the staged strategy unusable in the only
+    # configuration that ships (b-271). Build the table; the cache is an
+    # optimisation for the next run, not a precondition for this one.
+    #
+    # What is genuinely lost when the row is refused is the PERSISTENCE
+    # round-trip, and only that. With nothing admitted there is no cached copy
+    # to compare against, so the replay-equality check is VACUOUS rather than
+    # failed — it is recorded as skipped instead of being silently dropped,
+    # because an unrecorded missing verification is how several defects in this
+    # subsystem were written. Within-run beam consistency is preserved by
+    # seeding the in-process replay cache with the fresh result, so later stages
+    # reuse the identical object; only the cross-run speedup is forfeited.
     try:
         store.store(
             prefix_spec,
@@ -3597,10 +3613,14 @@ def _ensure_staged_prefix_replay(
             created_at=datetime.now(UTC).isoformat(),
         )
     except ResultStoreWriteRejected as exc:
-        raise StagedBeamStateError(
-            f"staged prefix cache write rejected: {prefix_key} "
-            f"reasons={','.join(exc.reasons)}"
-        ) from exc
+        _LOGGER.warning(
+            "staged_prefix_cache_write_rejected prefix_key=%s reasons=%s "
+            "replay_round_trip=skipped_not_verified",
+            prefix_key,
+            ",".join(exc.reasons),
+        )
+        prefix_replay_cache[prefix_key] = light_fresh
+        return light_fresh, True
     cached = store.lookup(prefix_spec)
     if cached is None:
         raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")
