@@ -496,15 +496,69 @@ def translate_legacy_token(
     )
 
 
-def may_certify(
-    evidence_class: str | EvidenceClass | None,
-    *ordering_inputs: object,
-    **ordering_kwargs: object,
-) -> bool:
-    del ordering_inputs, ordering_kwargs
+def may_certify(evidence_class: str | EvidenceClass | None) -> bool:
+    """Can this KIND of computation EVER be certified? A CLASS property.
+
+    ★ THIS IS NOT A PER-RESULT VERDICT. It answers whether the evidence class
+    is certifiable in principle, and knows nothing about how any particular
+    run went. For "may THIS result be trusted", use
+    result_certification_allowed below (b-270).
+
+    The signature previously accepted *ordering_inputs and **ordering_kwargs
+    and immediately deleted them, which is the conflation made literal: it
+    ACCEPTED per-result context and discarded it, so every caller that wanted
+    a per-result answer silently received a class capability. Those
+    parameters are now gone, which makes "certification cannot be swayed by
+    ordering context" a STRUCTURAL guarantee rather than a behavioural one --
+    a function that cannot receive the inputs cannot be influenced by them.
+    """
     if evidence_class is None:
         return False
     return _evidence_class_value(evidence_class) not in CERTIFICATION_DENYLIST
+
+
+#: The only runtime disposition under which a RESULT may be certified.
+#: Everything else in RuntimeStatus is a caveat of some kind, and a caveated
+#: result has not earned certification whatever its evidence class permits in
+#: principle. Kept as a set derived from the enum rather than a hand-listed
+#: literal so a member added to RuntimeStatus is covered the day it is added
+#: -- the same partition discipline as the degrading/flattering split in the
+#: kernel DTO.
+CERTIFYING_RUNTIME_STATUSES: frozenset[str] = frozenset({RuntimeStatus.OK.value})
+NON_CERTIFYING_RUNTIME_STATUSES: frozenset[str] = (
+    frozenset(member.value for member in RuntimeStatus)
+    - CERTIFYING_RUNTIME_STATUSES
+)
+
+
+def result_certification_allowed(
+    evidence_class: str | EvidenceClass | None,
+    runtime_status: str | RuntimeStatus | None,
+) -> bool:
+    """May THIS RESULT be certified? A PER-RESULT verdict (b-270).
+
+    Both axes must permit: the evidence class must be certifiable in
+    principle AND this particular run must have completed without a caveat.
+
+    ★ ABSENCE IS NOT PERMISSION. A missing runtime status returns False
+    rather than deferring to the class, because a result that cannot say how
+    it went has not earned a certificate. That is the same rule the store
+    already applies on admission, stated once here so callers stop
+    re-deriving it inconsistently.
+
+    Not yet wired into canonicalisation: this lands as a pure helper so the
+    split is pinned by tests before any publisher changes meaning.
+    """
+    if not may_certify(evidence_class):
+        return False
+    if runtime_status is None:
+        return False
+    value = (
+        runtime_status.value
+        if isinstance(runtime_status, RuntimeStatus)
+        else str(runtime_status)
+    )
+    return value in CERTIFYING_RUNTIME_STATUSES
 
 
 def is_ratified_vapour_analytical_evidence_class(

@@ -10,6 +10,10 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.fidelity_vocabulary import (
+    CERTIFYING_RUNTIME_STATUSES,
+    NON_CERTIFYING_RUNTIME_STATUSES,
+    RuntimeStatus,
+    result_certification_allowed,
     CANONICAL_DIMENSIONS,
     CERTIFICATION_CEILING_NEVER,
     CERTIFICATION_DENYLIST,
@@ -426,13 +430,20 @@ def test_unknown_token_fails_loud_with_required_context() -> None:
     assert "chunk-1a" in message
 
 
-def test_certification_denylist_ignores_hostile_ordering_inputs() -> None:
-    hostile_ordering = {
-        "internal-analytical": 999,
-        "melts": -1,
-        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED: 999,
-        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED: 999,
-    }
+def test_certification_denylist_cannot_be_swayed_by_ordering_inputs() -> None:
+    """Certification is a function of the evidence CLASS alone (b-270).
+
+    This test previously proved that by PASSING hostile ordering inputs and
+    checking they were ignored -- may_certify accepted *ordering_inputs and
+    **ordering_kwargs and immediately deleted them. That acceptance was the
+    conflation made literal, so the parameters are gone and the guarantee is
+    now STRUCTURAL: a function that cannot receive ordering context cannot be
+    influenced by it, which is strictly stronger than deleting it on arrival.
+
+    Retargeted rather than deleted, because the invariant it protects is real
+    and is exactly what the b-270 split must not lose.
+    """
+    import inspect
 
     assert CERTIFICATION_DENYLIST == frozenset(
         {
@@ -445,20 +456,64 @@ def test_certification_denylist_ignores_hostile_ordering_inputs() -> None:
             VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
         }
     )
-    assert not may_certify(
-        EvidenceClass.INTERNAL_ANALYTICAL,
-        hostile_ordering,
-        ordering={"internal-analytical": "first"},
+
+    parameters = inspect.signature(may_certify).parameters
+    assert list(parameters) == ["evidence_class"], (
+        "may_certify must take the evidence class and nothing else; accepting "
+        "per-result or ordering context is how the class capability came to "
+        "be published as a per-result verdict"
     )
-    assert not may_certify(
-        EvidenceClass.ANALYTICAL_VAPOROCK_CALIBRATED,
-        hostile_ordering,
+    assert not any(
+        parameter.kind
+        in (parameter.VAR_POSITIONAL, parameter.VAR_KEYWORD)
+        for parameter in parameters.values()
     )
-    assert not may_certify(
-        EvidenceClass.ANALYTICAL_EXTERNAL_GROUNDED,
-        hostile_ordering,
-    )
-    assert may_certify(EvidenceClass.MELTS, hostile_ordering)
+
+    assert not may_certify(EvidenceClass.INTERNAL_ANALYTICAL)
+    assert not may_certify(EvidenceClass.ANALYTICAL_VAPOROCK_CALIBRATED)
+    assert not may_certify(EvidenceClass.ANALYTICAL_EXTERNAL_GROUNDED)
+    assert may_certify(EvidenceClass.MELTS)
+
+
+def test_result_certification_needs_both_the_class_and_a_clean_run() -> None:
+    """The per-result verdict is the AND of two independent axes (b-270).
+
+    The b-294 case is the one that matters and is asserted directly: a
+    physics refusal is stamped not_run, and not_run certifies today, so the
+    weaker label is the one that passes. The class answer stays True -- melts
+    CAN be certified -- while the result answer becomes False. Both sentences
+    are true simultaneously, which is precisely why one key could not carry
+    them.
+    """
+    assert may_certify("melts") is True
+    assert result_certification_allowed("melts", "not_run") is False
+
+    assert result_certification_allowed("melts", "ok") is True
+    assert result_certification_allowed("internal-analytical", "ok") is False
+
+
+def test_absent_runtime_status_is_not_permission_to_certify() -> None:
+    """A result that cannot say how it went has not earned a certificate."""
+    assert result_certification_allowed("melts", None) is False
+
+
+def test_only_ok_certifies_and_the_partition_is_derived() -> None:
+    """Every RuntimeStatus member is on exactly one side, by derivation.
+
+    The non-certifying set is computed from the enum rather than hand-listed,
+    so a member added to RuntimeStatus is covered the day it is added instead
+    of silently defaulting to the permissive side. That matters because five
+    members were added recently (d-003) and a hand-listed set would have left
+    them uncovered.
+    """
+    all_members = {member.value for member in RuntimeStatus}
+
+    assert CERTIFYING_RUNTIME_STATUSES == {"ok"}
+    assert CERTIFYING_RUNTIME_STATUSES | NON_CERTIFYING_RUNTIME_STATUSES == all_members
+    assert not (CERTIFYING_RUNTIME_STATUSES & NON_CERTIFYING_RUNTIME_STATUSES)
+
+    for status in NON_CERTIFYING_RUNTIME_STATUSES:
+        assert result_certification_allowed("melts", status) is False, status
 
 
 @pytest.mark.parametrize(
