@@ -5030,3 +5030,64 @@ def test_overdraft_error_class_name_clause_is_deliberately_kept():
     from simulator.optimize.evaluate import _is_inventory_overdraw_message
 
     assert _is_inventory_overdraw_message("OverdraftError: some overdraw detail") is True
+
+
+def test_direct_proposal_rejected_that_is_not_an_overdraw_aborts_as_engine_bug() -> None:
+    """b-285: the direct-exception branch must discriminate, like the returned-run one.
+
+    b-281 fixed the message classifier, which corrected the RETURNED-RUN
+    consumer. This branch caught (ProposalRejected, OverdraftError) directly and
+    never called the classifier, so it still returned INVALID_RECIPE with
+    failing_gates=("inventory_overdraw",) for any failure the planner wrapped.
+
+    The planner wraps arbitrary apply failures, so identical underlying failures
+    were receiving OPPOSITE trust treatment based only on which executor boundary
+    carried them. That asymmetry is the defect, and it is why fixing a predicate
+    is not the same as fixing its consumers.
+
+    The pre-existing direct-exception test supplies only a genuine overdraw, so
+    it stayed green throughout and could not have caught this.
+    """
+
+    for message in (
+        "projected conservation failed for element Fe",
+        "account 'oxygen_cistern_liquid_inventory' only accepts species: O2; got 'N2'",
+        "could not resolve origin lot for species SiO",
+    ):
+        with pytest.raises(EngineBugAbort) as excinfo:
+            evaluate(
+                _valid_patch(),
+                "lunar_mare_low_ti",
+                "fast",
+                profile=PROFILE,
+                executor=FakeExecutor(exc=ProposalRejected(message)),
+            )
+        # Name what aborted. Accepting any raise would pass on an unrelated
+        # error and prove nothing about the discrimination.
+        assert message in str(excinfo.value)
+
+
+def test_direct_genuine_overdraw_is_still_an_invalid_recipe() -> None:
+    """b-285 companion: narrowing the branch must not cost the real overdraw.
+
+    Deliberately overlaps test_proposal_rejected_direct_exception_is_invalid_recipe.
+    That test is the reason this fix is safe, so the assertion is restated next
+    to the change that could break it rather than left three thousand lines away.
+    """
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(
+            exc=ProposalRejected(
+                "insufficient available 'FeO' in normal account "
+                "'process.cleaned_melt': balance would be -7.87e-05 kg"
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.INVALID_RECIPE
+    assert result.failing_gates == ("inventory_overdraw",)

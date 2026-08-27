@@ -885,11 +885,36 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     except (ProposalRejected, OverdraftError) as exc:
+        # b-285: discriminate here too. b-281 taught the RETURNED-RUN consumer
+        # below (:909-962) to stop reading the broad ProposalRejected class name
+        # as evidence of an overdraw, but this DIRECT-exception branch never
+        # consulted that discriminator at all -- it returned INVALID_RECIPE with
+        # failing_gates=("inventory_overdraw",) for anything the planner wrapped.
+        #
+        # The planner wraps arbitrary apply failures: account-policy violations,
+        # origin-resolution failures, projected-conservation failures, and plain
+        # implementation bugs. So identical underlying failures were getting
+        # OPPOSITE trust treatment depending only on which executor boundary
+        # carried them -- pruned as a bad recipe if the exception escaped
+        # directly, correctly aborted as an engine bug if it arrived as a failed
+        # RunExecution. Same failure, same run, different verdict.
+        #
+        # Fixing the discriminator was not enough because a consumer bypassed it.
+        # Trace every consumer of a predicate, not just the predicate.
+        message = f"{type(exc).__name__}: {exc}"
+        if not _is_inventory_overdraw_message(message):
+            raise EngineBugAbort(
+                message,
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
         return _invalid_recipe_result(
             candidate_id,
             spec,
             key,
-            f"{type(exc).__name__}: {exc}",
+            message,
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
         honest = _result_from_honest_engine_exception(
