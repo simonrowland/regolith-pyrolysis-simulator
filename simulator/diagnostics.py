@@ -47,6 +47,15 @@ WALL_VAPOUR_CARRIER_AUTHORITY_MISSING_CODE = (
 WALL_DEPOSIT_ALIAS_CONFLICT_CODE = (
     "wall_deposit_payload_alias_conflict"
 )
+
+# Distinct from WALL_STICKING_ALPHA_NOTICE_CODE on purpose.  That code says
+# "every deposited species carries cited sticking provenance", which is
+# VACUOUSLY TRUE when nothing was deposited *and* when nothing was measured.
+# This code says the second thing out loud: coverage is unknown, so no
+# downstream fouling verdict may be treated as authoritative (b-296).
+WALL_DEPOSIT_COVERAGE_UNKNOWN_CODE = (
+    "wall_deposit_coverage_unknown"
+)
 _COATING_WALL_DEPOSIT_KEYS = (
     "wall_deposit_kg_by_segment_species",
     "wall_deposit_kg_by_zone_species",
@@ -433,6 +442,39 @@ def wall_deposit_sticking_authority_status(
         and not uncertified_species
         and not out_of_domain_species
     ):
+        # deposited_species is derived POSITIVE-ONLY, so an ABSENT projection
+        # and a MEASURED ZERO both arrive here as an empty tuple.  Those are
+        # different claims and only one of them may be certified:
+        #   sum is None  -> nothing was measured; "all deposited species are
+        #                   certified" is vacuously true and must NOT be
+        #                   reported as authoritative, or a furnace that was
+        #                   never inspected reads as never needing re-sinter.
+        #   sum is 0.0   -> the projection was populated and totalled zero.
+        #                   That is a PROVEN ZERO and the doctrine keeps it
+        #                   authoritative; refusing it would turn a genuine
+        #                   clean run into an unknown.
+        # The evidence the positive-only filter discarded is still available
+        # from wall_deposit_kg itself, which is why the discriminator reads
+        # the raw projection rather than deposited_species (b-296; same
+        # three-state collapse fixed one layer down in _coating_wall_deposit_selection).
+        measured_total_kg = _sum_wall_deposit_kg(wall_deposit_kg)
+        if measured_total_kg is None:
+            return _wall_deposit_authority_payload(
+                authoritative=False,
+                code=WALL_DEPOSIT_COVERAGE_UNKNOWN_CODE,
+                deposited_species=(),
+                uncertified_species=(),
+                provenance=_provenance_subset(provenance, provenance_species),
+                surface_geometry_provenance=geometry_notice,
+                geometry_status_bearing=False,
+                message=(
+                    'wall-deposit coverage unknown: no wall_deposit_kg '
+                    'projection was recorded, so no deposited species could '
+                    'be certified and no fouling verdict derived from it is '
+                    'authoritative'
+                ),
+                **carrier_authority_kwargs,
+            )
         return _wall_deposit_authority_payload(
             authoritative=True,
             code=WALL_STICKING_ALPHA_NOTICE_CODE,

@@ -671,6 +671,64 @@ def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
 
 
 @pytest.mark.parametrize(
+    'projection, expect_authoritative, expect_code, why',
+    [
+        (
+            {},
+            False,
+            'wall_deposit_coverage_unknown',
+            'absent projection: nothing was measured, so nothing may be certified',
+        ),
+        (
+            {'Hot': {'SiO': 0.0}, 'Rest': {'SiO': 0.0}},
+            True,
+            'wall_deposit_sticking_alpha_provenance',
+            'measured zero: a populated projection totalling zero is a PROVEN zero',
+        ),
+    ],
+    ids=['absent_is_unknown', 'measured_zero_is_proven'],
+)
+def test_absent_wall_deposit_is_not_certified_but_measured_zero_is(
+    projection,
+    expect_authoritative,
+    expect_code,
+    why,
+):
+    """An unmeasured deposit must not certify as clean (b-296).
+
+    deposited_species is derived POSITIVE-ONLY, so an absent projection and a
+    measured zero both arrive at the empty-species branch as an empty tuple.
+    That branch reported "every deposited species carries cited sticking
+    provenance" and set authoritative=True -- vacuously true with no species,
+    which let the system claim a furnace never needs re-sintering on a deposit
+    that was never measured.
+
+    Both halves matter and they pull in opposite directions.  Refusing the
+    empty case outright would be wrong for a genuine clean run: a populated
+    projection summing to zero is a proven zero, and the doctrine keeps proven
+    zeros authoritative.  So the split is on whether the projection carries
+    evidence at all, not on whether any species is positive.
+    """
+    status = wall_deposit_sticking_authority_status(projection)
+
+    assert status['authoritative'] is expect_authoritative, why
+    assert status['code'] == expect_code, why
+
+
+def test_positive_wall_deposit_still_reaches_the_species_bearing_branch():
+    """The b-296 split must not swallow the case it was never about.
+
+    A positive deposit has to keep flowing into the per-species authority
+    logic rather than being answered by either empty-projection branch, so
+    this pins that its verdict is still derived from species evidence.
+    """
+    status = wall_deposit_sticking_authority_status({'Hot': {'SiO': 1.5}})
+
+    assert status['code'] != 'wall_deposit_coverage_unknown'
+    assert tuple(status['deposited_species']) == ('SiO',)
+
+
+@pytest.mark.parametrize(
     ("temperature_K", "expected_authoritative"),
     ((1750.0, True), (1800.1, False)),
 )
