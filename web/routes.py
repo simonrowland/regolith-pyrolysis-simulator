@@ -804,10 +804,12 @@ def _result_metadata(
     constraint_margins = _result_row_constraint_margins(row)
 
     # ★ A ROW THE VOCABULARY CANNOT READ MUST NOT DECIDE WHO SEES THE PAGE.
-    # canonicalize_fidelity_emission refuses any backend_status outside
-    # RuntimeStatus, and INTENT_RESULT_STATUSES is NOT a subset of it --
-    # not_converged is ALREADY produced by select_backend_status today, so a
-    # stored row carrying it raises here. The leaderboard survives that because
+    # canonicalize_fidelity_emission refuses any backend_status it cannot
+    # resolve. INTENT_RESULT_STATUSES used NOT to be a subset of RuntimeStatus,
+    # so tokens the optimizer legitimately produced raised here; d-003 closed
+    # that crossover and all eight now resolve. The remaining exposure is
+    # stored or foreign data carrying an UNRECOGNISED token -- stored carriers
+    # are not re-validated on read. The leaderboard survives that because
     # _leaderboard_entries catches it and reports excluded_unreadable; the
     # detail page had no equivalent and returned a 500.
     #

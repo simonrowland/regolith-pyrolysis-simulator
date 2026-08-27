@@ -3404,7 +3404,15 @@ def test_detail_page_renders_a_row_whose_backend_token_is_unreadable(
 
 
 def _unreadable_backend_row() -> dict[str, object]:
-    """Minimal results-table row whose stored provenance the vocabulary refuses."""
+    """Minimal results-table row whose stored provenance the vocabulary refuses.
+
+    Uses a CASE VARIANT rather than a vocabulary member. Every one of the eight
+    intent-result tokens is now readable (d-003 closed that crossover), so the
+    remaining unreadable class is stored or foreign data carrying a token the
+    vocabulary does not recognise. A live IntentResult cannot carry 'Refused' --
+    its constructor validates -- but stored carriers are NOT re-validated on
+    read, which is the same legacy-data channel this containment exists for.
+    """
     import json as _json
     return {
         "cache_key": "key-unreadable",
@@ -3423,7 +3431,7 @@ def _unreadable_backend_row() -> dict[str, object]:
         "result_blob": "{}",
         "run_reference": _json.dumps({
             "backend_name": "alphamelts",
-            "backend_status": "not_converged",
+            "backend_status": "Refused",
             "evidence_class": "melts",
             "backend_authoritative": True,
         }),
@@ -3433,12 +3441,16 @@ def _unreadable_backend_row() -> dict[str, object]:
 def test_result_metadata_contains_an_unreadable_backend_only_when_asked() -> None:
     """The detail page renders a bad row; the board keeps DROPPING AND COUNTING it.
 
-    canonicalize_fidelity_emission refuses any backend_status outside
-    RuntimeStatus, and INTENT_RESULT_STATUSES is not a subset of it --
-    `not_converged` is ALREADY produced by select_backend_status today, so a
-    stored row carrying it raises. _leaderboard_entries catches that and reports
-    excluded_unreadable; _result_detail_model had no equivalent and returned a
-    500, because the page IS the row and cannot drop itself.
+    canonicalize_fidelity_emission refuses any backend_status it cannot
+    resolve. This test originally used `not_converged`, which was unreadable
+    because INTENT_RESULT_STATUSES was not a subset of RuntimeStatus; d-003
+    closed that crossover, so all eight intent tokens now resolve and a
+    genuinely unrecognised token is needed instead. The exposure is unchanged:
+    stored carriers are not re-validated on read, so foreign or legacy data can
+    still carry something the vocabulary refuses. _leaderboard_entries catches
+    that and reports excluded_unreadable; _result_detail_model had no
+    equivalent and returned a 500, because the page IS the row and cannot drop
+    itself.
 
     ★ The containment is OPT-IN, and this test is what pins that. Containing
     unconditionally would stop _leaderboard_entries ever raising, so its
@@ -3449,7 +3461,7 @@ def test_result_metadata_contains_an_unreadable_backend_only_when_asked() -> Non
     """
     row = {
         "backend_name": "alphamelts",
-        "backend_status": "not_converged",
+        "backend_status": "Refused",
         "evidence_class": "melts",
         "backend_authoritative": True,
     }
