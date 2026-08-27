@@ -289,6 +289,41 @@ def assess_continuum_formula_validity(
     )
     load_bearing = continuum_transport_is_load_bearing(regime)
     kn = float(knudsen_number)
+    # b-275: VALIDATE BEFORE CLASSIFYING. This function partitions the VALID Kn
+    # domain; it does not check that its input is a Kn at all. Without this guard
+    # `_knudsen_is_transitional` returns False for any non-finite value, so NaN
+    # fell through to the OK/in_domain branch below and received the SAME answer
+    # as a healthy viscous Kn -- an absent measurement reading as an established
+    # in-domain state. Both consumers inherited it: the evaporation diagnostic
+    # masked it with its own guard, and `refuse_continuum_formula_if_load_bearing`
+    # (which raises only on REFUSE) did not refuse a NaN at all.
+    #
+    # NaN is MISSING INPUT and must refuse. POSITIVE INFINITY IS NOT: Kn = lambda/L
+    # -> +inf is the mean free path dwarfing the pipe, i.e. true vacuum and the
+    # free-molecular limit -- a DETERMINED physical state and the mandate's own
+    # baseline regime. `not math.isfinite(kn)` cannot tell them apart, which is
+    # why this asks the two questions separately, matching `classify_knudsen_regime`
+    # below (the one idiom in this file that already had it right).
+    #
+    # Kn == 0 is left in-domain here to match classify_knudsen_regime's `< 0.0`.
+    # Note the file is NOT unanimous: the evaporation-side guard refuses `<= 0.0`.
+    # That disagreement is real and is deliberately not resolved by this change.
+    if math.isnan(kn) or kn < 0.0:
+        return ContinuumFormulaValidity(
+            action=ContinuumValidityAction.REFUSE,
+            process_regime=regime,
+            knudsen_number=kn,
+            campaign_name=None if campaign_name is None else str(campaign_name),
+            stage=asked_stage,
+            asking_site=str(asking_site),
+            in_domain=False,
+            load_bearing=load_bearing,
+            note=None,
+            detail=(
+                "invalid_knudsen_number: Kn must not be NaN or negative; "
+                f"received {kn!r}"
+            ),
+        )
     if not _knudsen_is_transitional(kn):
         return ContinuumFormulaValidity(
             action=ContinuumValidityAction.OK,

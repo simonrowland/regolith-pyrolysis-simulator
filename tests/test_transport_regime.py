@@ -648,3 +648,71 @@ def test_core_carrier_normalizer_preserves_legacy_edge_behavior(
         normalize(value, allow_unset=False)
     assert type(exc_info.value) is ValueError
     assert str(exc_info.value) == error_message
+
+
+def test_assess_continuum_validity_refuses_nan_but_keeps_true_vacuum_in_domain():
+    """b-275: the assessor must VALIDATE its input, not just partition the valid domain.
+
+    Historical defect: ``_knudsen_is_transitional`` answers ``False`` for any
+    non-finite Kn, so a NaN fell through to the OK/in_domain branch and received
+    the SAME verdict as a healthy viscous reading -- a missing measurement
+    reading as an established in-domain state. Both consumers inherited it:
+    the evaporation diagnostic happened to carry its own guard, and
+    ``refuse_continuum_formula_if_load_bearing`` -- which raises only on REFUSE --
+    did not refuse a NaN at all.
+
+    The pairing is the point. NaN is MISSING INPUT and must refuse; +inf is a
+    DETERMINED STATE (Kn = lambda/L -> inf is true vacuum and the free-molecular
+    limit, the mandate's own baseline regime) and must stay in-domain. A previous
+    fix widened a guard to ``not math.isfinite(kn)``, swept the two together, and
+    broke three C7 transport tests -- so asserting only the NaN half would let
+    that regression back in.
+    """
+
+    nan_case = tr.assess_continuum_formula_validity(
+        float("nan"), campaign_name="C4", asking_site="tests.b275.nan"
+    )
+    assert nan_case.action is tr.ContinuumValidityAction.REFUSE
+    assert nan_case.in_domain is False
+    assert "invalid_knudsen_number" in nan_case.detail
+
+    negative_case = tr.assess_continuum_formula_validity(
+        -1.0, campaign_name="C4", asking_site="tests.b275.negative"
+    )
+    assert negative_case.action is tr.ContinuumValidityAction.REFUSE
+
+    # The half that must NOT be swept in with NaN.
+    vacuum = tr.assess_continuum_formula_validity(
+        float("inf"), campaign_name="C4", asking_site="tests.b275.vacuum"
+    )
+    assert vacuum.action is tr.ContinuumValidityAction.OK
+    assert vacuum.in_domain is True
+
+    # Negative control: an ordinary viscous Kn must stay untouched, so the guard
+    # cannot be "satisfied" by refusing everything.
+    viscous = tr.assess_continuum_formula_validity(
+        0.005, campaign_name="C4", asking_site="tests.b275.viscous"
+    )
+    assert viscous.action is tr.ContinuumValidityAction.OK
+    assert viscous.in_domain is True
+
+
+def test_refuse_continuum_formula_if_load_bearing_actually_refuses_a_nan():
+    """b-275 consequence test: the mechanism is not enough, the caller must see it.
+
+    This wrapper is named for refusing, raises only on REFUSE, and before the fix
+    returned an OK assessment for a NaN -- i.e. silence from the function whose
+    entire job is to object. It has no production callers today, which is exactly
+    why it is worth pinning: the next caller reaches for it BY NAME.
+    """
+
+    with pytest.raises(tr.TransportRegimeRefusal):
+        tr.refuse_continuum_formula_if_load_bearing(
+            float("nan"), campaign_name="C4", asking_site="tests.b275.wrapper"
+        )
+
+    # True vacuum must still pass through without raising.
+    vacuum = tr.refuse_continuum_formula_if_load_bearing(
+        float("inf"), campaign_name="C4", asking_site="tests.b275.wrapper_vacuum"
+    )
+    assert vacuum.action is tr.ContinuumValidityAction.OK
