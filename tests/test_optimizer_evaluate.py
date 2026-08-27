@@ -119,9 +119,9 @@ PROFILE = {
         "campaign": "C0",
         "hours": 1,
         "mass_kg": 1000.0,
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
     },
-    "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+    "fidelities": {"fast": {"backend_name": "internal-analytical", "hours": 1}},
     "seed_recipes": [
         {
             "id": "evaluate-c0-seed",
@@ -1009,7 +1009,7 @@ def _knudsen_gate_profile() -> dict:
         },
         "fidelities": {
             "fast": {
-                "backend_name": "stub",
+                "backend_name": "internal-analytical",
                 "hours": 24,
             }
         },
@@ -1666,9 +1666,9 @@ def _best_tap_composition_profile(
         "campaign": "C2A_continuous",
         "hours": 24,
         "mass_kg": 1000.0,
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
     }
-    profile["fidelities"] = {"fast": {"backend_name": "stub"}}
+    profile["fidelities"] = {"fast": {"backend_name": "internal-analytical"}}
     target = profile["objectives"][0]["target"]
     target["maturity"] = {
         "mode": "campaign_hours",
@@ -2177,7 +2177,7 @@ def test_zero_mass_direct_run_executor_refuses_before_execution() -> None:
                 setpoints=bundle.setpoints,
                 vapor_pressures=bundle.vapor_pressures,
                 campaign="C0",
-                backend_name="stub",
+                backend_name="internal-analytical",
                 backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
                 hours=1,
                 mass_kg=0.0,
@@ -4451,11 +4451,11 @@ def test_strict_vaporock_unavailable_eval_fails_closed_with_vaporock_key(
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "allow_fallback_vapor": False,
             "force_builtin_vapor_pressure": False,
         },
-        "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+        "fidelities": {"fast": {"backend_name": "internal-analytical", "hours": 1}},
     }
     failed = _execution(
         status="failed",
@@ -4586,7 +4586,7 @@ def test_stub_fidelity_drops_inherited_cached_real_cache_config(tmp_path) -> Non
             "backend_name": "cached-real",
             "reduced_real_cache": cache_config,
         },
-        "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+        "fidelities": {"fast": {"backend_name": "internal-analytical", "hours": 1}},
     }
     executor = FakeExecutor(_execution(backend_status="ok"))
 
@@ -4774,6 +4774,48 @@ def test_populated_crash_point_still_marks_the_recipe_out_of_domain() -> None:
     assert result.failure_category is not None
 
 
+def test_promoted_out_of_domain_reaches_the_trace_not_only_the_reference() -> None:
+    """The stored trace must not contradict the reference it ships inside.
+
+    A PROMOTED verdict is reached by the evaluator's gate, not stated outright
+    by the engine, so a walker re-reading the run execution still sees the
+    engine's own "ok". The reference honours the decision, but its trace was
+    built by a separate re-derivation, so the same artifact carried
+    out_of_domain on the reference and ok on the trace at once -- and the trace
+    is the carrier downstream consumers walk, so the flattering answer was the
+    one they got.
+
+    Verified by counterfactual, not by construction: with the decided-status
+    preference removed from the trace builder, this asserts ok here.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    # The engine's OWN answer stays "ok" -- the promotion is the
+                    # gate's, which is exactly why the two sinks could disagree.
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": {
+                        "temperature_C": 1400.0,
+                        "pressure_bar": 0.01,
+                        "fO2_log": -9.0,
+                        "composition_mol": {"SiO2": 1.0},
+                    },
+                },
+            )
+        ),
+    )
+
+    reference = result.run_reference
+    assert reference is not None
+    assert reference.backend_status == "out_of_domain"
+    assert dict(reference.trace)["backend_status"] == "out_of_domain"
+
+
 def test_empty_placeholder_does_not_mask_a_populated_alias() -> None:
     """The one deliberate behaviour change in the P1-a fix, pinned where it shows.
 
@@ -4878,3 +4920,49 @@ def test_a_real_domain_excursion_is_still_reported() -> None:
 
     assert result.feasible is False
     assert result.failure_category is not None
+
+
+def test_out_of_domain_result_does_not_store_itself_as_healthy() -> None:
+    """The stored artifact must not contradict the disposition that produced it.
+
+    ★ THIS IS THE REGRESSION THAT MOVED RATHER THAN DIED. An earlier fix stopped
+    `unavailable + crash` being pruned as out-of-domain while the artifact said
+    `unavailable`. Moving crash synthesis out of the status walker then created
+    the mirror image at `ok + crash`: the gate correctly promoted the run to
+    OUT_OF_DOMAIN, while `_run_reference` called the raw walker again and
+    persisted `ok`.
+
+    That is not cosmetic. The stored status feeds fidelity canonicalisation and
+    the operator's backend badge, so a candidate the optimizer had just
+    fail-closed on was serialized as healthy and authoritative and rendered
+    green. Fail-closed disposition, flattering artifact.
+
+    The gated verdict is now what gets persisted.
+    """
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={
+                    "backend_status": "ok",
+                    "out_of_domain_crash_point": {
+                        "temperature_C": 1400.0,
+                        "pressure_bar": 0.01,
+                        "fO2_log": -9.0,
+                        "composition_mol": {"SiO2": 1.0},
+                    },
+                },
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.run_reference is not None
+    # the artifact agrees with the decision, rather than reporting the engine's
+    # unqualified `ok` beside a pruned candidate
+    assert result.run_reference.backend_status == "out_of_domain"
+    assert result.run_reference.backend_status != "ok"

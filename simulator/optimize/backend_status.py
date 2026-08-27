@@ -46,11 +46,18 @@ def carrier_has_crash_point(carrier: MappingABC[Any, Any]) -> bool:
 
     Derivation of the non-empty requirement
     ---------------------------------------
-    This predicate is not a formatting detail: a True here SYNTHESISES an
-    `out_of_domain` token into the status list, and `out_of_domain` is a verdict
-    that the recipe is physically infeasible, so the optimizer prunes the
-    candidate permanently rather than retrying it. Manufacturing that verdict is
-    expensive and irreversible for the candidate, so the bar is evidence.
+    ★ THIS DOCSTRING DESCRIBED THE OLD IMPLEMENTATION UNTIL A REVIEW CAUGHT IT.
+    It said a True here SYNTHESISES an `out_of_domain` token into the status
+    list. That stopped being true when the synthesis moved out of the walker:
+    the walker now reports only what the engine said, and the single gated
+    consumer (`evaluate._has_out_of_domain_backend_signal`) decides whether
+    crash evidence amounts to a verdict.
+
+    The requirement itself is unchanged and the reason still holds. A True here
+    still feeds a decision that ends in `out_of_domain` -- a verdict that the
+    recipe is physically infeasible, on which the optimizer prunes the candidate
+    permanently rather than retrying it. Manufacturing that verdict is expensive
+    and irreversible for the candidate, so the bar is evidence.
 
     An empty mapping is not evidence. `{}` carries no temperature, no pressure,
     no composition -- nothing that says where or how the backend left its

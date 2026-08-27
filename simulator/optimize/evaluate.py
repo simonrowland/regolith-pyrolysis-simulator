@@ -4721,6 +4721,12 @@ def _out_of_domain_result(
                 run_execution,
                 assessment.trace_payload,
             ),
+            # The gate reached this verdict; the stored artifact must say so.
+            # Without it an explicit `ok` carrying a crash point persists as
+            # `ok` -- and then canonicalises to authoritative, certifiable and
+            # a green operator badge for a candidate this very result is
+            # pruning as out of domain.
+            decided_backend_status="out_of_domain",
         ),
         notes=(
             *assessment.notes,
@@ -5579,7 +5585,25 @@ def _run_reference(
     trace_payload: Mapping[str, Any] | None = None,
     cost_parameters: Mapping[str, Any] | None = None,
     coating_margin: GateMargin | None = None,
+    decided_backend_status: str | None = None,
 ) -> RunReference:
+    """Build the stored reference for a run.
+
+    ★ `decided_backend_status` EXISTS SO THE ARTIFACT CANNOT CONTRADICT THE
+    DISPOSITION. The raw walker reports what the ENGINE said, which is right for
+    the general case and wrong for the one case where the evaluator's gate
+    reaches a verdict the engine did not state outright: an explicit `ok`
+    carrying a populated crash point is promoted to OUT_OF_DOMAIN by
+    `_has_out_of_domain_backend_signal`, and without this the reference would
+    persist `ok` beside a pruned candidate -- then canonicalise to
+    backend_authoritative=True, certification_allowed=True and a green operator
+    badge for a run the optimizer had just fail-closed on.
+
+    That is the same artifact-versus-decision disagreement that was fixed for
+    `unavailable + crash`, reappearing at `ok + crash` when crash synthesis
+    moved out of the walker. Callers that reach a gated verdict pass it here;
+    everyone else keeps the engine's own answer.
+    """
     summary: Mapping[str, Any] = {}
     if str(getattr(run_execution, "status", "ok")) != "refused":
         try:
@@ -5597,10 +5621,18 @@ def _run_reference(
         status=str(getattr(run_execution, "status", "ok")),
         error_message=str(getattr(run_execution, "error_message", "")),
         reason=str(getattr(run_execution, "reason", "")),
-        trace=_live_run_reference_trace(run_execution, trace_payload),
+        trace=_live_run_reference_trace(
+            run_execution,
+            trace_payload,
+            decided_backend_status=decided_backend_status,
+        ),
         product_summary=summary,
         backend_name=_run_reference_backend_name(run_execution),
-        backend_status=_latest_backend_status(run_execution),
+        backend_status=(
+            decided_backend_status
+            if decided_backend_status is not None
+            else _latest_backend_status(run_execution)
+        ),
         backend_status_reason=_latest_backend_status_reason(run_execution),
         backend_authoritative=_backend_authoritative(run_execution),
     )
@@ -5609,9 +5641,15 @@ def _run_reference(
 def _live_run_reference_trace(
     run_execution: Any,
     trace_payload: Mapping[str, Any] | None,
+    *,
+    decided_backend_status: str | None = None,
 ) -> Any:
     trace = getattr(run_execution, "trace", None)
-    payload = _cache_trace_payload(run_execution, trace_payload)
+    payload = _cache_trace_payload(
+        run_execution,
+        trace_payload,
+        decided_backend_status=decided_backend_status,
+    )
     if not isinstance(payload, MappingABC) or payload is trace:
         return trace
     return _TraceOverlay(trace, MappingProxyType(dict(payload)))
@@ -5620,6 +5658,8 @@ def _live_run_reference_trace(
 def _cache_trace_payload(
     run_execution: Any,
     trace_payload: Mapping[str, Any] | None,
+    *,
+    decided_backend_status: str | None = None,
 ) -> Mapping[str, Any] | Any:
     payload: dict[str, Any] = {}
     if isinstance(trace_payload, Mapping):
@@ -5629,6 +5669,7 @@ def _cache_trace_payload(
         _canonical_backend_trace_fields(
             run_execution,
             backend_name=_run_reference_backend_name(run_execution),
+            decided_backend_status=decided_backend_status,
         )
     )
 
@@ -5704,8 +5745,19 @@ def _canonical_backend_trace_fields(
     run_execution: Any,
     *,
     backend_name: str | None,
+    decided_backend_status: str | None = None,
 ) -> dict[str, Any]:
-    backend_status = _latest_backend_status(run_execution)
+    # The trace IS part of the artifact, so the same rule the reference's own
+    # backend_status follows applies here: a verdict the evaluator's gate
+    # reached outranks the walker's re-reading of what the engine said. Without
+    # this the reference could persist out_of_domain while its own trace -- the
+    # carrier every downstream consumer walks -- persisted ok beside it, which
+    # is the contradiction decided_backend_status exists to prevent.
+    backend_status = (
+        decided_backend_status
+        if decided_backend_status is not None
+        else _latest_backend_status(run_execution)
+    )
     backend_status_reason = _latest_backend_status_reason(run_execution)
     backend_authoritative = _backend_authoritative(run_execution)
     # refused / not_converged / not_attempted are honest engine answers.
@@ -5821,11 +5873,17 @@ def _has_out_of_domain_backend_signal(
     for ranking and a permanent physics prune -- opposite errors from one
     stale field, selected by a temperature the candidate never ran at.
 
-    So the crash clause now applies only when the engine actually answered.
-    Note this is NOT an equality test against `unavailable`: that would be a
-    guard at the callsite, drifting the moment the vocabulary grows a token.
-    It asks the vocabulary instead, via a set derived from the existing
-    `_HONEST_NON_OK_BACKEND_STATUSES` grouping.
+    ★ AN EARLIER REVISION OF THIS PARAGRAPH SAID THE CLAUSE APPLIES TO EVERY
+    STATUS IN `_HONEST_NON_OK_BACKEND_STATUSES`, and a review caught that the
+    code had since narrowed past it. The set is `_STATUSES_CRASH_EVIDENCE_MAY_
+    PROMOTE`, and it is `{"ok"}` alone: `refused` and `not_converged` each have
+    their own branch below producing PHYSICS_REFUSED and TIMEOUT, so letting
+    crash evidence overwrite those would replace a verdict the engine GAVE with
+    one it did not.
+
+    `ok` is the single case where crash evidence adds something -- the run
+    claimed success while its diagnostics record leaving the domain -- and that
+    contradiction is what the promotion exists to resolve.
 
     A status of None -- no engine answer at all -- is likewise not something
     crash evidence may promote into a physics verdict.
