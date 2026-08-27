@@ -1776,6 +1776,16 @@ def _best_tap_snapshot(hour: int) -> SimpleNamespace:
         temperature_C=snapshot.temperature_C,
         mass_balance_error_pct=snapshot.mass_balance_error_pct,
         knudsen_regime_summary=snapshot.knudsen_regime_summary,
+        # Copied from the REAL snapshot, not defaulted here. This double omits
+        # almost every HourSnapshot field, which is fine until a consumer needs
+        # one: the sub-ambient pumping context refuses on an ABSENT
+        # O2_vented_mol_hr (a missing input is not a proven zero), and that
+        # refusal propagates far enough to make the whole run infeasible --
+        # which stops these tests reaching the tap-selection behaviour they
+        # exist to check. A real HourSnapshot always carries the field, so
+        # carrying it here is what makes the double faithful rather than a
+        # workaround.
+        O2_vented_mol_hr=snapshot.O2_vented_mol_hr,
         inventory=SimpleNamespace(melt_oxide_kg={"CaO": 1.0}),
     )
 

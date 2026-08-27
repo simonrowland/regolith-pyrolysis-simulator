@@ -2369,6 +2369,13 @@ def _closed_loop_snapshot(hour: int, composition_wt_pct: Mapping[str, float]) ->
         mass_in_kg=1000.0,
         mass_out_kg=1000.0,
         mass_balance_error_pct=0.0,
+        # A real HourSnapshot declares this as a typed float defaulting to 0.0.
+        # This double omitted it, and the sub-ambient pumping context refuses on
+        # an ABSENT vented-O2 flow (a missing input is not a proven zero) -- a
+        # refusal that propagates until every candidate is infeasible and the
+        # study returns no winner at all. Carrying the field makes the double
+        # faithful; it is not a workaround for the refusal.
+        O2_vented_mol_hr=0.0,
     )
 
 
