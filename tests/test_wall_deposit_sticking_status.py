@@ -1568,3 +1568,54 @@ def test_authority_payload_with_sets_is_pickle_and_json_safe() -> None:
     record = payload["alpha_s_provenance_by_species"]["Fe"]["hot_wall"]
     assert record["tags"] == ["alpha", "beta"]
     assert record["frozen"] == ["delta", "gamma"]
+
+
+def test_unknown_wall_deposit_does_not_inherit_a_proven_zero_authority() -> None:
+    """An UNKNOWN deposit must not render as a never-resinter claim.
+
+    `_sum_nested_numbers` distinguishes three states, and the readout used to
+    collapse two of them:
+
+        {Hot:{}, Hottest:{}, Rest:{}} -> None   deposit UNKNOWN
+        {Hot:{K: 0.0}}                -> 0.0    deposit PROVEN ZERO
+        {Hot:{K: 0.05}}               -> 0.05   deposit POSITIVE
+
+    Authority was `not positive_deposit`, which is True for BOTH None and 0.0.
+    So a row with empty zone maps and no authority record claimed authority and
+    printed "campaigns to resinter: infinite" under status `available` --
+    absence of evidence becoming a never-resinter claim on the Mandate's own
+    failure-mode #2 (furnace coating).
+
+    BOTH halves are pinned here on purpose. Asserting only the unknown case
+    would leave a future change free to "fix" it by refusing the proven zero
+    too, which would destroy a legitimate measured result to silence a warning.
+    """
+    unknown = _coating_readout(
+        {
+            "wall_deposit_kg_by_zone_species": {"Hot": {}, "Hottest": {}, "Rest": {}},
+            "campaigns_to_resinter": "infinite",
+        }
+    )
+    assert unknown["authoritative"] is False
+    assert unknown["status"] == "warning"
+    assert "coverage unknown" in unknown["reason"]
+
+    # A MEASURED zero is a real result and keeps its authority.
+    proven_zero = _coating_readout(
+        {
+            "wall_deposit_kg_by_zone_species": {"Hot": {"K": 0.0}},
+            "campaigns_to_resinter": "infinite",
+        }
+    )
+    assert proven_zero["authoritative"] is True
+    assert proven_zero["status"] == "available"
+
+    # An explicit authority verdict still wins over the derived one.
+    explicit = _coating_readout(
+        {
+            "wall_deposit_kg_by_zone_species": {"Hot": {}},
+            "coating_authoritative": True,
+            "campaigns_to_resinter": "infinite",
+        }
+    )
+    assert explicit["authoritative"] is True

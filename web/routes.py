@@ -2020,7 +2020,15 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     wall = coating_wall_deposit_payload(result)
     total_kg = _sum_nested_numbers(wall)
     campaigns = result.get('campaigns_to_resinter')
-    positive_deposit = total_kg is not None and total_kg > 0.0
+    # ★ THREE STATES, NOT TWO. _sum_nested_numbers returns None when the zone
+    # maps carry no numbers at all, and 0.0 when they carry a measured zero:
+    #     {Hot:{}, Hottest:{}, Rest:{}} -> None   (deposit UNKNOWN)
+    #     {Hot:{K: 0.0}}                -> 0.0    (deposit PROVEN ZERO)
+    #     {Hot:{K: 0.05}}               -> 0.05   (deposit POSITIVE)
+    # `deposit_known` keeps the first two apart. Collapsing them is what let an
+    # unknown deposit inherit a proven zero's authority below.
+    deposit_known = total_kg is not None
+    positive_deposit = deposit_known and total_kg > 0.0
     authority = _mapping_value(result.get('wall_deposit_sticking_authority'))
     authoritative = result.get('coating_authoritative')
     if authoritative is None and authority:
@@ -2029,8 +2037,21 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
             authority.get('authoritative_for_deposit_mass'),
         )
     parsed_authoritative = _optional_bool(authoritative)
+    # ★ AN UNKNOWN DEPOSIT MUST NOT CLAIM AUTHORITY. This was
+    # `not positive_deposit`, which is True for BOTH a measured zero and a
+    # total absence of deposit data -- so a row with empty zone maps and no
+    # authority record rendered as authoritative and printed
+    # "campaigns to resinter: infinite" under status `available`. Absence of
+    # evidence became a never-resinter claim, on the Mandate's own
+    # failure-mode #2.
+    #
+    # The three categories are handled separately, per the fail-closed rule:
+    #   deposit PROVEN ZERO + no authority -> keep the zero, still authoritative
+    #   deposit UNKNOWN     + no authority -> refuse: not authoritative
+    #   deposit POSITIVE    + no authority -> not authoritative (unchanged)
+    # An explicit authority verdict always wins over all three.
     is_authoritative = (
-        not positive_deposit
+        (deposit_known and not positive_deposit)
         if parsed_authoritative is None
         else parsed_authoritative
     )
@@ -2038,9 +2059,17 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         result.get('coating_status_reason')
         or authority.get('message')
         or (
+            # The warning used to fire only on a POSITIVE deposit, so the
+            # unknown-deposit case lost its flag AND its explanation together:
+            # the readout claimed authority and said nothing about why.
             'wall-deposit sticking alpha authority missing'
             if positive_deposit and parsed_authoritative is None
-            else ''
+            else (
+                'wall-deposit coverage unknown: no deposit data and no '
+                'authority record'
+                if not deposit_known and parsed_authoritative is None
+                else ''
+            )
         )
     )
     if total_kg is None and campaigns in (None, ''):
