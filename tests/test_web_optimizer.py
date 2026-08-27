@@ -3093,12 +3093,29 @@ def test_reported_completeness_is_shown_not_called_missing(client) -> None:
             oxygen=9.02,
             product_summary={
                 "product_yield_table": _product_yield_table(),
+                # ★ THE REAL PRODUCER SHAPE, not a flattened stand-in.
+                # extraction_completeness_report puts target_species,
+                # denominator_account and product_bin INSIDE targets[<species>]
+                # and names the aggregate's owner in worst_target_species. The
+                # earlier version of this fixture claimed to use the observed
+                # payload "verbatim" while actually feeding the flat keys the
+                # consumer already read -- so it could not fail if the readout
+                # never learned the nested shape, which it had not. An
+                # independent audit caught that by comparing against the
+                # PRODUCER, which the test never did.
                 "extraction_completeness": {
                     "status": "reported",
-                    "target_species": "SiO",
-                    "denominator_account": "cleaned_silicate_feed",
-                    "product_bin": "silica_glass",
+                    "worst_target_species": "SiO",
                     "completeness_fraction": 0.002125,
+                    "targets": {
+                        "SiO": {
+                            "status": "reported",
+                            "target_species": "SiO",
+                            "denominator_account": "cleaned_silicate_feed",
+                            "product_bin": "silica_glass",
+                            "completeness_fraction": 0.002125,
+                        },
+                    },
                 },
             },
         ),
@@ -3113,7 +3130,9 @@ def test_reported_completeness_is_shown_not_called_missing(client) -> None:
     )
     # the non-certified status is disclosed rather than dropped
     assert "reported" in table
+    # the target the number is ABOUT must survive, not just the number
     assert "SiO" in table
+    assert "not declared" not in table
 
 
 def test_published_backend_never_reports_a_null_certification_allowance() -> None:

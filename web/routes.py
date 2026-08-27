@@ -2245,6 +2245,50 @@ def _first_mapping(*values: Any) -> Mapping[str, Any]:
     return {}
 
 
+def _completeness_field(
+    metric: Mapping[str, Any],
+    *names: str,
+) -> Any:
+    """Read a completeness attribute from the flat OR the per-target shape.
+
+    ★ THE PRODUCER NESTS THESE AND THE READOUT ONLY LOOKED AT THE TOP LEVEL.
+    extraction_completeness_report emits `worst_target_species` and
+    `completeness_fraction` at the top, but puts `target_species`,
+    `denominator_account` and `product_bin` INSIDE `targets[<species>]` -- see
+    _extraction_completeness_report_payload and
+    _extraction_completeness_target_report in simulator/optimize/physics.py.
+    Reading only the top level returned None for all three, so a real report
+    rendered its number and then "target not declared; denominator not
+    declared; bin not declared" -- the completeness fix showed the value and
+    then disclaimed everything that says what the value is ABOUT.
+
+    The flat lookup is kept first because stored rows predate the nested shape
+    and must keep working; the per-target lookup is the fallback, keyed by
+    worst_target_species since that is the target the aggregate fraction
+    belongs to (aggregation is min_all_targets).
+    """
+    for name in names:
+        value = metric.get(name)
+        if value not in (None, ''):
+            return value
+    worst = metric.get('worst_target_species')
+    targets = metric.get('targets')
+    if not isinstance(targets, Mapping):
+        return None
+    target = targets.get(worst) if worst is not None else None
+    if not isinstance(target, Mapping):
+        # a single-target report needs no worst-target pointer to be readable
+        candidates = [v for v in targets.values() if isinstance(v, Mapping)]
+        target = candidates[0] if len(candidates) == 1 else None
+    if not isinstance(target, Mapping):
+        return None
+    for name in names:
+        value = target.get(name)
+        if value not in (None, ''):
+            return value
+    return None
+
+
 def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     product_summary = _mapping_value(
         _mapping_value(result.get('run_reference')).get('product_summary')
@@ -2318,14 +2362,12 @@ def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         'percent_label': _format_quantity(percent, '%')
         if percent is not None
         else 'inconclusive',
-        'target_species': metric.get('target_species') or metric.get('target'),
-        'denominator': (
-            metric.get('denominator_account')
-            or metric.get('denominator')
-            or metric.get('denominator_label')
+        'target_species': _completeness_field(metric, 'target_species', 'target'),
+        'denominator': _completeness_field(
+            metric, 'denominator_account', 'denominator', 'denominator_label'
         ),
-        'allowed_residual': metric.get('allowed_residual'),
-        'product_bin': metric.get('product_bin'),
+        'allowed_residual': _completeness_field(metric, 'allowed_residual'),
+        'product_bin': _completeness_field(metric, 'product_bin'),
         'reason': reason,
     }
 
