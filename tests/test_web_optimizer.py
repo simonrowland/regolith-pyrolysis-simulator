@@ -3365,6 +3365,39 @@ def test_detail_page_renders_a_row_whose_backend_token_is_unreadable(
     )
     body = response.get_data(as_text=True)
     assert "candidate-unreadable" in body
+    # ★ 200 IS NOT ENOUGH. Review noted this would also pass if the page
+    # rendered a CERTIFIED badge -- a page that survives by flattering is not
+    # the fix. Assert the marking the containment exists to produce.
+    assert "unreadable" in body
+    assert "UNVERIFIED" in body
+    assert "CERTIFIED" not in body
+
+
+def _unreadable_backend_row() -> dict[str, object]:
+    """Minimal results-table row whose stored provenance the vocabulary refuses."""
+    import json as _json
+    return {
+        "cache_key": "key-unreadable",
+        "candidate_id": "candidate-unreadable",
+        "feedstock_id": "lunar_mare_low_ti",
+        "recipe_id": "recipe-unreadable",
+        "profile_id": "oxygen-yield-v1",
+        "fidelity": "fast",
+        "created_at": "2026-06-01T00:00:00Z",
+        "corpus_version": None,
+        "notes": "[]",
+        "objectives": "[]",
+        "feasible": 0,
+        "feasibility_margins": "{}",
+        "eval_spec": "{}",
+        "result_blob": "{}",
+        "run_reference": _json.dumps({
+            "backend_name": "alphamelts",
+            "backend_status": "not_converged",
+            "evidence_class": "melts",
+            "backend_authoritative": True,
+        }),
+    }
 
 
 def test_result_metadata_contains_an_unreadable_backend_only_when_asked() -> None:
@@ -3393,6 +3426,21 @@ def test_result_metadata_contains_an_unreadable_backend_only_when_asked() -> Non
 
     with pytest.raises(FidelityVocabularyTranslationError):
         web_routes._optimizer_backend_payload({}, {}, row)
+
+    # ★ DRIVE _result_metadata ITSELF THROUGH BOTH FLAG STATES. An independent
+    # review caught that this test previously called only the inner helpers, so
+    # it was flag-INDEPENDENT: had contain_unreadable_backend defaulted to True,
+    # the leaderboard would have stopped raising and excluded_unreadable would
+    # have died for this cause -- and this test, whose docstring claims to
+    # prevent exactly that, would have stayed green.
+    stored = _unreadable_backend_row()
+    with pytest.raises(FidelityVocabularyTranslationError):
+        web_routes._result_metadata(stored, run_id="run-x")
+    opted_in = web_routes._result_metadata(
+        stored, run_id="run-x", contain_unreadable_backend=True
+    )
+    assert opted_in["backend"]["certification_allowed"] is False
+    assert opted_in["backend"]["backend_active"] == "unreadable"
 
     contained = web_routes._unreadable_backend_payload("unreadable: token")
     # every field says the same thing, and none of them flatters
