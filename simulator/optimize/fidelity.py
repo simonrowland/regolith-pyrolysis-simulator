@@ -52,7 +52,9 @@ from simulator.fidelity_vocabulary import (
 EvaluateFn = Callable[..., ScoredResult]
 EvalOutcome = tuple[ScoredResult | None, Mapping[str, Any] | None]
 Pair = tuple[int, ScoredResult, ScoredResult]
-STUB_DIAGNOSTIC_REASON = "stub-vs-stub diagnostic, not authoritative"
+ANALYTICAL_DIAGNOSTIC_REASON = (
+    "internal-analytical vs internal-analytical diagnostic, not authoritative"
+)
 
 
 @dataclass(frozen=True)
@@ -89,7 +91,10 @@ DEFAULT_THRESHOLD_PROFILE: Mapping[str, Mapping[str, Any]] = {
     "top_k_recall_min": {
         "value": 0.80,
         "source_type": "engineering_envelope",
-        "source": "Phase-O gate: at least 80% of high-fidelity top-K survives stub-screen.",
+        "source": (
+            "Phase-O gate: at least 80% of high-fidelity top-K survives the "
+            "internal-analytical screen."
+        ),
     },
     "feasible_agreement_min": {
         "value": 0.95,
@@ -991,8 +996,8 @@ def _high_arm_authority_reason(backend_arms: Mapping[str, Mapping[str, Any]]) ->
     )
     if canonical_backend_name(high_backend) == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
         if canonical_backend_name(fast_backend) == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
-            return STUB_DIAGNOSTIC_REASON
-        return "high arm stub diagnostic, not authoritative"
+            return ANALYTICAL_DIAGNOSTIC_REASON
+        return "high arm internal-analytical diagnostic, not authoritative"
     if high.get("evidence_class") is not None and not high.get(
         "certification_allowed", False
     ):

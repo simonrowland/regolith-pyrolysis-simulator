@@ -611,11 +611,11 @@ def test_stub_high_self_parity_withholds_trust_verdict(tmp_path: Path) -> None:
     ] == pytest.approx(1.0)
     assert result.fast_screen_trustworthy is False
     assert result.confidence == "inconclusive"
-    assert result.notes == ("stub-vs-stub diagnostic, not authoritative",)
+    assert result.notes == ("internal-analytical vs internal-analytical diagnostic, not authoritative",)
 
     payload = json.loads(Path(result.artifact_paths["json"]).read_text())
     assert payload["fast_screen_trustworthy"] is False
-    assert payload["reason"] == "stub-vs-stub diagnostic, not authoritative"
+    assert payload["reason"] == "internal-analytical vs internal-analytical diagnostic, not authoritative"
     # The canonical internal-analytical arm is diagnostic evidence, not an
     # available certifying runtime. Perfect self-parity must therefore retain
     # backend_status="unavailable" and withhold the trust verdict.
