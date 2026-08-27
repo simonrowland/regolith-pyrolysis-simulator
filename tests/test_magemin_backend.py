@@ -273,6 +273,99 @@ def test_magemin_cold_liquidus_budget_retains_bounded_diagnostic_headroom():
     assert liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S == pytest.approx(300.0)
 
 
+# The test pins its OWN coarse grid rather than relying on the backend's
+# defaults, so the arithmetic below stays true if those defaults change.
+_B299_MIN_T_C = 1000.0
+_B299_MAX_T_C = 1200.0
+_B299_STEP_C = 50.0
+_B299_COARSE_SAMPLES = int((_B299_MAX_T_C - _B299_MIN_T_C) / _B299_STEP_C) + 1
+
+
+@pytest.mark.parametrize(
+    'backend_token',
+    ['out_of_domain', 'unavailable', 'not_converged'],
+)
+@pytest.mark.parametrize(
+    'ok_samples_first',
+    [0, _B299_COARSE_SAMPLES],
+    ids=['refuses_on_first_sample', 'refuses_during_bisection'],
+)
+def test_magemin_liquidus_preserves_the_backend_refusal_token(
+    backend_token,
+    ok_samples_first,
+):
+    """The finder must report WHICH refusal the backend gave (b-299).
+
+    A bare RuntimeError from the sampler falls through to the finder's
+    generic library-boundary guard, which mints 'not_converged'.  That
+    turns 'the engine was absent' (unavailable) or 'the physics is outside
+    the model' (out_of_domain) into an affirmative claim that a solve ran
+    and failed to converge.  The AlphaMELTS sampler already raises the
+    typed LiquidusSampleError; MAGEMin was the outlier.
+
+    The two parametrisations cover genuinely different finder phases.  The
+    finder completes its ENTIRE coarse scan before it brackets, so a
+    refusal on an early sample never reaches bracketing or bisection --
+    letting the whole coarse grid succeed first is what forces the refusal
+    into the bisection phase, and the off-grid assertion below is what
+    proves it got there rather than merely claiming so.
+    """
+    from simulator.melt_backend.base import EquilibriumResult
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {}
+    backend._subprocess_pool = None
+
+    sampled_at: list[float] = []
+
+    def fake_equilibrate(temperature_C, **_kwargs):
+        sampled_at.append(float(temperature_C))
+        healthy = len(sampled_at) <= ok_samples_first
+        span = _B299_MAX_T_C - _B299_MIN_T_C
+        return EquilibriumResult(
+            temperature_C=float(temperature_C),
+            pressure_bar=1.0e-6,
+            fO2_log=-9.0,
+            status='ok' if healthy else backend_token,
+            liquid_fraction=(
+                max(0.0, min(1.0, (float(temperature_C) - _B299_MIN_T_C) / span))
+                if healthy else None
+            ),
+            phase_masses_kg={'liquid': 1.0} if healthy else {},
+            warnings=[] if healthy else [f'MAGEMin said {backend_token}'],
+        )
+
+    backend.equilibrate = fake_equilibrate
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0, 'FeO': 1.0},
+        min_T_C=_B299_MIN_T_C,
+        max_T_C=_B299_MAX_T_C,
+        scan_step_C=_B299_STEP_C,
+    )
+
+    # The backend has an early 'unavailable' return for an uninitialised
+    # bridge, so a test that never reaches the sampler would pass vacuously
+    # for backend_token='unavailable'.  Pin that the sampler actually ran.
+    assert len(sampled_at) > ok_samples_first
+    refused_at = sampled_at[ok_samples_first]
+
+    if ok_samples_first:
+        # Every coarse-grid temperature is an exact multiple of the step
+        # above min_T_C; a bisection probe is not.  This is what makes the
+        # 'refuses_during_bisection' id honest rather than aspirational.
+        offset_steps = (refused_at - _B299_MIN_T_C) / _B299_STEP_C
+        assert offset_steps != pytest.approx(round(offset_steps)), (
+            f'refusal at {refused_at} C is still on the coarse grid; '
+            'this case is not exercising bisection'
+        )
+
+    assert result.status == backend_token
+
+
 def test_magemin_and_alphamelts_reject_exact_major_oxide_boundary():
     boundary = {'SiO2': 50.0, 'MgO': 45.0}
 
