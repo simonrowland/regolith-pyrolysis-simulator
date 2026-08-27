@@ -2023,9 +2023,24 @@ def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
     raw_status = panel.get('status')
     status = str(raw_status or '').strip().lower()
     reason = panel.get('reason')
-    if panel.get('unclassified_product_mass'):
+    # ★ THE UNACCOUNTED MASS IS CARRIED, NOT JUST DETECTED.
+    # This tested the unclassified mapping for truthiness, set the status from
+    # it, and then dropped the number -- so the strip said "unclassified
+    # product mass present" while the only figures it actually printed were the
+    # named bins. On the observed row that meant Ingots/metals 92.27 kg and O2
+    # 9.020 kg on the face of the card, with the 139.82 kg that could not be
+    # classified visible only in the detail page's diagnostics table.
+    #
+    # The unclassified mass was LARGER than the headline product. A product
+    # story that omits the biggest number in the ledger is not inconclusive,
+    # it is misleading, so the total travels with the status that it caused.
+    unclassified_kg = None
+    unclassified = panel.get('unclassified_product_mass')
+    if unclassified:
         status = 'inconclusive'
         reason = 'unclassified product mass present'
+        if isinstance(unclassified, Mapping):
+            unclassified_kg = _float_value(unclassified.get('total_kg'))
     elif status not in {'closed', 'final'}:
         stored_status = status or 'missing'
         status = 'inconclusive'
@@ -2039,6 +2054,12 @@ def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
         'status': status,
         'reason': reason,
         'items': items,
+        'unclassified_kg': unclassified_kg,
+        'unclassified_kg_label': (
+            _format_quantity(unclassified_kg, 'kg')
+            if unclassified_kg is not None
+            else None
+        ),
         'mass_closure': panel.get('mass_closure') or {},
     }
 

@@ -3156,6 +3156,72 @@ def test_published_backend_never_reports_a_null_certification_allowance() -> Non
     assert allowed is payload["tier_label"]["certification_allowed"]
 
 
+def test_product_strip_shows_the_unclassified_mass_beside_the_named_bins(
+    client,
+) -> None:
+    """"Product inconclusive" must come with the number that made it inconclusive.
+
+    The strip tested the unclassified mapping for truthiness, set the status
+    from it, and then dropped the value -- so the card said "unclassified
+    product mass present" while the only figures it printed were the named
+    bins. The unclassified total lived on the detail page's diagnostics table.
+
+    The fixture uses the observed proportions on purpose: 92.27 kg of ingots on
+    the face of the card, and 139.82 kg that could not be classified at all. A
+    product story that omits the LARGEST number in its own ledger is not
+    inconclusive, it is misleading.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-unclassified-strip"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    spec = _base_spec(recipe_id="recipe-unclassified-strip")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-unclassified",
+            product_summary={
+                "product_classes": {
+                    "unclassified": {
+                        "kg_by_species": {
+                            "unspent_K_reagent": 56.0,
+                            "unspent_Na_reagent": 83.6,
+                            "unspent_Mg_reagent": 0.22,
+                        },
+                        "total_kg": 139.82,
+                    },
+                },
+                "product_yield_table": {
+                    "status": "closed",
+                    "outputs": [
+                        {
+                            "kind": "output",
+                            "id": "ingots_metals",
+                            "label": "Ingots/metals",
+                            "kg": 92.27,
+                            "yield_pct": 7.715,
+                        },
+                    ],
+                    "total_input_kg": 1000.0,
+                    "products_out_kg": 92.27,
+                },
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    table = client.get("/partials/optimizer-table").get_data(as_text=True)
+
+    assert "Product inconclusive" in table
+    assert "92.27 kg" in table
+    assert "Unclassified" in table
+    assert "139.8 kg" in table, (
+        "the mass that made the ledger inconclusive was not shown beside the bins"
+    )
+
+
 def test_winners_table_ranks_by_score_not_by_selector_pair_order(
     client,
 ) -> None:
