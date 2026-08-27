@@ -53,6 +53,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore, _serialize_margins
+from simulator.fidelity_vocabulary import FidelityVocabularyTranslationError
 from web import routes as web_routes
 
 
@@ -3258,6 +3259,84 @@ def test_wide_winners_table_is_wrapped_in_a_scroll_container(client) -> None:
         Path(web_routes.__file__).parent / "static" / "css" / "style.css"
     ).read_text(encoding="utf-8")
     assert ".table-scroll" in css and "overflow-x: auto" in css
+
+
+def test_detail_page_renders_a_row_whose_backend_token_is_unreadable(
+    client,
+) -> None:
+    """END-TO-END: the page must come back 200, not 500.
+
+    The companion test asserts the containment SHAPE; this one asserts the
+    consequence, because a shape test passes as soon as the helper exists and
+    would go on passing if the detail model never called it. The failure being
+    guarded against is an operator opening a stored result and getting a 500.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-unreadable-token"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    spec = _base_spec(recipe_id="recipe-unreadable-token")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-unreadable",
+            feasible=False,
+            trace={"backend_status": "not_converged"},
+            backend_status="not_converged",
+            backend_authoritative=False,
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+    key = cache_key(spec)
+
+    response = client.get(
+        f"/optimizer/runs/run-unreadable-token/results/{key}"
+    )
+
+    assert response.status_code == 200, (
+        "detail page failed on a stored row the fidelity vocabulary cannot read"
+    )
+    body = response.get_data(as_text=True)
+    assert "candidate-unreadable" in body
+
+
+def test_result_metadata_contains_an_unreadable_backend_only_when_asked() -> None:
+    """The detail page renders a bad row; the board keeps DROPPING AND COUNTING it.
+
+    canonicalize_fidelity_emission refuses any backend_status outside
+    RuntimeStatus, and INTENT_RESULT_STATUSES is not a subset of it --
+    `not_converged` is ALREADY produced by select_backend_status today, so a
+    stored row carrying it raises. _leaderboard_entries catches that and reports
+    excluded_unreadable; _result_detail_model had no equivalent and returned a
+    500, because the page IS the row and cannot drop itself.
+
+    ★ The containment is OPT-IN, and this test is what pins that. Containing
+    unconditionally would stop _leaderboard_entries ever raising, so its
+    excluded_unreadable counter would silently stop firing for this cause -- a
+    live counter going quietly dead, which is the same defect class it exists to
+    report. So both halves are asserted here: default still RAISES, opt-in
+    contains.
+    """
+    row = {
+        "backend_name": "alphamelts",
+        "backend_status": "not_converged",
+        "evidence_class": "melts",
+        "backend_authoritative": True,
+    }
+
+    with pytest.raises(FidelityVocabularyTranslationError):
+        web_routes._optimizer_backend_payload({}, {}, row)
+
+    contained = web_routes._unreadable_backend_payload("unreadable: token")
+    # every field says the same thing, and none of them flatters
+    assert contained["backend_authoritative"] is False
+    assert contained["backend_real_active"] is False
+    assert contained["certification_allowed"] is False
+    assert contained["tier_label"]["ux_label"] == "UNVERIFIED"
+    # named, not blank: a blank renders as absence, and absence is what gets misread
+    assert contained["backend_active"] == "unreadable"
 
 
 def test_winners_table_ranks_by_score_not_by_selector_pair_order(

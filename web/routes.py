@@ -47,7 +47,10 @@ from simulator.diagnostics import (
     coating_summary_with_grounded_authority,
     coating_wall_deposit_payload,
 )
-from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
+from simulator.fidelity_vocabulary import (
+    FidelityVocabularyTranslationError,
+    canonicalize_fidelity_emission,
+)
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.furnace_materials import (
     PROXY_FURNACE_GROUNDING_TIERS,
@@ -746,11 +749,40 @@ def _optimizer_backend_payload(
     return payload
 
 
+def _unreadable_backend_payload(reason: str) -> dict[str, Any]:
+    """Backend section for a row whose stored provenance the vocabulary refuses.
+
+    Every field a surface reads is present and says the SAME thing: we could not
+    read this. Nothing here may resolve toward the confident answer --
+    authoritative is False, certification is forbidden, and the active backend
+    is named as unreadable rather than left blank, because a blank renders as
+    absence and absence is what got misread everywhere else.
+    """
+    return {
+        'backend_requested': 'unreadable',
+        'backend_active': 'unreadable',
+        'backend_status': 'unreadable',
+        'backend_status_message': reason,
+        'backend_authoritative': False,
+        'backend_real_active': False,
+        'certification_allowed': False,
+        'evidence_class': None,
+        'runtime_status': None,
+        'tier_label': {
+            'tier': 'unknown',
+            'ux_label': 'UNVERIFIED',
+            'certification_allowed': False,
+            'title': reason,
+        },
+    }
+
+
 def _result_metadata(
     row: sqlite3.Row,
     *,
     run_id: str,
     objective_metric: str | None = None,
+    contain_unreadable_backend: bool = False,
 ) -> dict[str, Any]:
     objectives = _objective_items(row)
     selected = _objective_for(objectives, objective_metric)
@@ -770,6 +802,32 @@ def _result_metadata(
         product_summary = {}
     product_summary = coating_summary_with_grounded_authority(product_summary)
     constraint_margins = _result_row_constraint_margins(row)
+
+    # ★ A ROW THE VOCABULARY CANNOT READ MUST NOT DECIDE WHO SEES THE PAGE.
+    # canonicalize_fidelity_emission refuses any backend_status outside
+    # RuntimeStatus, and INTENT_RESULT_STATUSES is NOT a subset of it --
+    # not_converged is ALREADY produced by select_backend_status today, so a
+    # stored row carrying it raises here. The leaderboard survives that because
+    # _leaderboard_entries catches it and reports excluded_unreadable; the
+    # detail page had no equivalent and returned a 500.
+    #
+    # The flag is EXPLICIT rather than always-contain on purpose. Containing
+    # unconditionally would stop _leaderboard_entries ever raising, so its
+    # excluded_unreadable counter would silently stop firing for this cause --
+    # a live counter quietly going dead, which is the same class of defect as
+    # the ones it was added to report. So the board keeps DROPPING AND COUNTING
+    # such rows, and only the detail page -- which cannot drop itself, being
+    # the row -- renders them marked.
+    try:
+        backend_payload = _optimizer_backend_payload(
+            eval_spec, result_blob, run_reference
+        )
+    except FidelityVocabularyTranslationError as exc:
+        if not contain_unreadable_backend:
+            raise
+        backend_payload = _unreadable_backend_payload(
+            f'stored backend provenance is not readable: {exc}'
+        )
 
     metadata = {
         'run_id': run_id,
@@ -794,7 +852,7 @@ def _result_metadata(
             'product_summary': product_summary,
         },
         'eval_spec': _eval_spec_summary(eval_spec),
-        'backend': _optimizer_backend_payload(eval_spec, result_blob, run_reference),
+        'backend': backend_payload,
         'tier_label': None,
         'previously_ungated': _result_row_previously_ungated(row),
         'constraint_margins': constraint_margins,
@@ -2697,7 +2755,9 @@ def _result_detail_model(
     row: sqlite3.Row,
 ) -> dict[str, Any]:
     run_id = _optimizer_run_id(run_dir, root)
-    result = _optimizer_result_view(_result_metadata(row, run_id=run_id))
+    result = _optimizer_result_view(
+        _result_metadata(row, run_id=run_id, contain_unreadable_backend=True)
+    )
     eval_spec = _json_value(row['eval_spec'], {})
     if not isinstance(eval_spec, Mapping):
         eval_spec = {}
