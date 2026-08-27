@@ -2967,6 +2967,103 @@ def test_winners_table_pins_one_objective_metric_across_selector_pairs(
     )
 
 
+def test_winners_table_declares_rows_it_excluded(client) -> None:
+    """A board that dropped rows must say so; the JSON reader already did.
+
+    The per-pair exclusion counters were unpacked and thrown away, so the page
+    rendered a clean Rank 1..N board while the JSON reader for the same store
+    reported 1094 excluded infeasible rows. The operator had no way to know the
+    board was a filtered view.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-excl-declared"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    spec = _base_spec(recipe_id="recipe-ok", feedstock_id="ceres_regolith")
+    store.store(spec, _scored(spec, candidate_id="candidate-ok", oxygen=9.0),
+                created_at="2026-06-01T00:00:00Z")
+    dud = _base_spec(recipe_id="recipe-dud", feedstock_id="ceres_regolith")
+    store.store(
+        dud,
+        _scored(dud, candidate_id="candidate-dud", oxygen=1.0, feasible=False),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    body = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "candidate-ok" in body
+    assert "excluded from this board" in body, (
+        "board dropped rows without declaring them"
+    )
+    assert "infeasible" in body
+
+
+def test_empty_board_caused_by_exclusions_does_not_claim_nothing_matched(
+    client,
+) -> None:
+    """"Nothing matched your filters" is a different claim from "everything was thrown out".
+
+    The second is the operator's problem to act on; the first tells them to go
+    away. The empty branch made only the reassuring claim.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-excl-empty"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    dud = _base_spec(recipe_id="recipe-dud", feedstock_id="ceres_regolith")
+    store.store(
+        dud,
+        _scored(dud, candidate_id="candidate-dud", oxygen=1.0, feasible=False),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    body = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "No rows could be ranked" in body
+    assert "No stored optimizer winners match the current filters." not in body
+
+
+def test_rows_lacking_the_ranked_metric_are_counted_not_silently_dropped(
+    client,
+) -> None:
+    """Pinning one metric drops pairs that lack it -- and that drop must be counted.
+
+    Pinning the ranked metric across selector pairs is correct, but it makes
+    this path reachable: a pair whose profile carries a different objective now
+    falls out. It fell out through a bare `continue` with no counter, so the
+    board could shrink with nothing to show for it.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-excl-metric"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    # alphabetically first: pins oxygen_kg as the board axis
+    pinner = _base_spec(recipe_id="recipe-pin", feedstock_id="ceres_regolith")
+    store.store(pinner, _scored(pinner, candidate_id="candidate-pin", oxygen=9.0),
+                created_at="2026-06-01T00:00:00Z")
+    # carries NO oxygen_kg at all, so it cannot be ranked on that axis
+    offaxis = _base_spec(recipe_id="recipe-offaxis", feedstock_id="mars_basalt")
+    store.store(
+        offaxis,
+        _scored(
+            offaxis,
+            candidate_id="candidate-offaxis",
+            objectives=ObjectiveVector(
+                (ObjectiveValue("energy_kWh", "minimize", 3.0, "kWh", ordinal=0),)
+            ),
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    body = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "candidate-pin" in body
+    assert "candidate-offaxis" not in body
+    assert "no value for the ranked metric" in body, (
+        "a pair dropped for lacking the ranked metric was not counted"
+    )
+
+
 def test_winners_table_ranks_by_score_not_by_selector_pair_order(
     client,
 ) -> None:

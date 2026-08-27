@@ -123,7 +123,22 @@
             {% endfor %}
         </tbody>
     </table>
+    {% if excluded_rows %}
+    <div class="empty-hint">
+        {{ excluded_total }} stored row{{ "" if excluded_total == 1 else "s" }}
+        excluded from this board:
+        {% for row in excluded_rows %}{{ row.count }} {{ row.label }}{{ "; " if not loop.last }}{% endfor %}
+    </div>
+    {% endif %}
+    {% else %}
+    {% if excluded_total %}
+    <div class="empty-hint">
+        No rows could be ranked: all {{ excluded_total }} stored row{{ "" if excluded_total == 1 else "s" }}
+        matching the current filters were excluded
+        ({% for row in excluded_rows %}{{ row.count }} {{ row.label }}{{ "; " if not loop.last }}{% endfor %}).
+    </div>
     {% else %}
     <div class="empty-hint">No stored optimizer winners match the current filters.</div>
+    {% endif %}
     {% endif %}
 </div>

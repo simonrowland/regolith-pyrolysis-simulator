@@ -1192,6 +1192,15 @@ def _leaderboard_entries(
         # A row the vocabulary cannot read is EXCLUDED AND COUNTED, never
         # silently dropped -- see the containment below.
         'excluded_unreadable': 0,
+        # A row whose objectives do not carry the SELECTED metric cannot be
+        # ranked on this board's axis. It used to vanish with no counter at
+        # all, which is the same fail-open shape as the others: the board
+        # looked complete while rows were being discarded. This became more
+        # reachable when the winners table started pinning one metric across
+        # every selector pair -- pinning is correct, but it means a pair whose
+        # profile lacks that metric now drops out, and a drop nobody counts is
+        # indistinguishable from a pair that had nothing to show.
+        'excluded_metric_absent': 0,
     }
     selected_metric = (
         canonical_objective_metric(objective_metric)
@@ -1222,6 +1231,7 @@ def _leaderboard_entries(
                     selected_metric = canonical_objective_metric(str(primary.get('metric')))
             objective = _objective_for(objectives, selected_metric)
             if objective is None:
+                excluded_counts['excluded_metric_absent'] += 1
                 continue
             value = _numeric_objective_value(objective)
             if value is None:
@@ -2208,6 +2218,41 @@ def _selector_pairs(
     return sorted(pairs)
 
 
+# Why each exclusion reason is phrased for an OPERATOR rather than reusing the
+# counter key: the key names the code path, the label names the thing that
+# happened to their data. An operator reading "excluded_nonfinite" cannot tell
+# whether that is their problem or ours.
+_EXCLUSION_LABELS: tuple[tuple[str, str], ...] = (
+    ('excluded_infeasible', 'infeasible'),
+    ('excluded_nonfinite', 'objective not a finite number'),
+    ('excluded_unreadable', 'stored provenance could not be read'),
+    ('excluded_metric_absent', 'no value for the ranked metric'),
+)
+
+
+def _exclusion_rows(counts: Mapping[str, int]) -> list[dict[str, Any]]:
+    """Ordered, labelled, zero-suppressed view of the exclusion counters.
+
+    Zero-suppressed because a wall of "0 infeasible, 0 unreadable" trains the
+    operator to ignore the line, and this line only matters when it is not
+    zero. Any counter added later without a label still shows up, under its own
+    key, rather than being silently omitted -- an unlabelled exclusion is still
+    an exclusion the operator is entitled to see.
+    """
+    known = {key for key, _ in _EXCLUSION_LABELS}
+    rows = [
+        {'key': key, 'label': label, 'count': int(counts[key])}
+        for key, label in _EXCLUSION_LABELS
+        if int(counts.get(key) or 0) > 0
+    ]
+    rows.extend(
+        {'key': key, 'label': key, 'count': int(count)}
+        for key, count in sorted(counts.items())
+        if key not in known and int(count or 0) > 0
+    )
+    return rows
+
+
 def _optimizer_winner_entries(
     run_dirs: list[Path],
     *,
@@ -2216,9 +2261,16 @@ def _optimizer_winner_entries(
     fidelity: str | None,
     objective_metric: str | None,
     limit: int,
-    ) -> tuple[list[dict[str, Any]], str | None]:
+    ) -> tuple[list[dict[str, Any]], str | None, dict[str, int]]:
     entries: list[dict[str, Any]] = []
     selected_metric = objective_metric
+    # ★ THE OPERATOR IS TOLD WHAT WAS DROPPED. These counters were unpacked
+    # per pair and thrown away, so the JSON reader reported 1094 excluded
+    # infeasible rows while the page rendered a clean Rank 1..50 board and said
+    # nothing. Worse in the empty case: a table emptied BY EXCLUSIONS read as
+    # "nothing matched the filters", which is a different and far more
+    # reassuring claim than the truth.
+    excluded_totals: dict[str, int] = {}
     for pair_feedstock, pair_profile in _selector_pairs(
         run_dirs,
         feedstock_id=feedstock_id,
@@ -2233,7 +2285,7 @@ def _optimizer_winner_entries(
         # which is not a comparison at all. Feeding the resolved metric forward
         # pins the axis after the first pair fixes it; a pair whose objectives
         # lack that metric drops out rather than being ranked on a substitute.
-        winners, metric, _digest_scope, _excluded_counts = _leaderboard_entries(
+        winners, metric, _digest_scope, pair_excluded = _leaderboard_entries(
             run_dirs,
             feedstock_id=pair_feedstock,
             profile_id=pair_profile,
@@ -2243,6 +2295,8 @@ def _optimizer_winner_entries(
         )
         if metric and selected_metric is None:
             selected_metric = metric
+        for key, count in (pair_excluded or {}).items():
+            excluded_totals[key] = excluded_totals.get(key, 0) + int(count)
         entries.extend(_optimizer_result_view(entry) for entry in winners)
 
     # ★ RANK MUST BE SCORE ORDER, AND THAT REQUIRES SEEING EVERY PAIR FIRST.
@@ -2305,7 +2359,7 @@ def _optimizer_winner_entries(
                 'rows mix minimize and maximize objectives; '
                 'no single ranking is valid across them'
             )
-    return entries, selected_metric
+    return entries, selected_metric, excluded_totals
 
 
 def _optimizer_table_context() -> dict[str, Any]:
@@ -2321,7 +2375,7 @@ def _optimizer_table_context() -> dict[str, Any]:
         ),
         'limit': _request_limit(default=50),
     }
-    entries, selected_metric = _optimizer_winner_entries(
+    entries, selected_metric, excluded_totals = _optimizer_winner_entries(
         run_dirs,
         feedstock_id=filters['feedstock_id'],
         profile_id=filters['profile_id'],
@@ -2333,6 +2387,9 @@ def _optimizer_table_context() -> dict[str, Any]:
     return {
         'runs_dir': str(root),
         'entries': entries,
+        'excluded_counts': excluded_totals,
+        'excluded_rows': _exclusion_rows(excluded_totals),
+        'excluded_total': sum(excluded_totals.values()),
         'imported_entries': imported_studies(root),
         'filters': filters,
         'feedstock_profiles': _optimizer_feedstock_profiles_payload(),
