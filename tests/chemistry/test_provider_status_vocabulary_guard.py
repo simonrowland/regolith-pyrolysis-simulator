@@ -76,6 +76,60 @@ ENGINES_ROOT = Path(__file__).resolve().parents[2] / "engines"
 # test of a status-ish name against a literal collection of status strings.
 _STATUS_NAME_HINTS = ("status", "backend_status", "kernel_status")
 
+# ★ THE AXIS IS DEGRADE-vs-FLATTER, NOT "IS IT A VOCABULARY TOKEN".
+#
+# The first version of this guard flagged any vocabulary member used as a
+# default, which meant `getattr(x, 'status', 'unavailable')` was treated exactly
+# as harshly as `getattr(x, 'status', 'ok')`. Those are opposites. A default to
+# unavailable UNDER-CLAIMS -- a reader who sees it knows less confidence is
+# warranted, and nothing is manufactured. A default to ok invents success out of
+# silence. Only the second is the defect, and the original rule was a proxy for
+# the real property rather than the property itself.
+#
+# That over-breadth was not theoretical: it fired on the CORRECT fix for the
+# bug this file exists to catch, and the fix was reshaped to appease it. A
+# guard that flags honest code is one somebody eventually deletes -- which this
+# file's own header warns about.
+#
+# The two sets are declared separately and asserted to PARTITION
+# INTENT_RESULT_STATUSES exactly (see
+# test_every_status_token_is_classified_on_the_degrade_flatter_axis). A curated
+# flattering list would rot silently the moment an affirmative token was added
+# to the vocabulary: the guard would keep reporting clean on the very shape it
+# exists to catch. With the partition assert, a new token fails this file until
+# somebody classifies it, so the default for an unclassified token is a red
+# test rather than an unflagged defect.
+# ★ RELATIONSHIP TO test_flattering_default_guard.py (4b8a8047), WHICH OVERLAPS
+# THIS CHECK ON PURPOSE. That sibling owns the flattering-default shape
+# REPOSITORY-WIDE (simulator/, web/, engines/), across three call shapes, with a
+# broader denylist than this vocabulary contains -- available, sourced, valid,
+# authoritative, complete, verified, measured, confirmed, high. It supersedes
+# nothing here by accident: its scope strictly contains this file's engines/
+# sweep for this one shape.
+#
+# The obvious tidy-up is therefore to DELETE the default check from this file
+# and let the sibling own it alone. That is exactly the trade 590b1cda made --
+# a crude check swapped for a better-looking one -- and this file's header
+# documents how that went: the deleted grep was the only thing that could have
+# caught the sibling remap, and MAGEMin carried the defect for the whole life of
+# that commit with every test green. So the duplication stays, deliberately.
+# What does NOT stay is the false-positive liability, which is the actual
+# complaint: a guard that flags honest code gets disabled, and then the
+# duplication is worth nothing.
+_FLATTERING_STATUS_DEFAULTS: frozenset[str] = frozenset({"ok"})
+
+_DEGRADING_STATUS_DEFAULTS: frozenset[str] = frozenset(
+    {
+        "non_authoritative",
+        "not_attempted",
+        "not_converged",
+        "out_of_domain",
+        "refused",
+        "unavailable",
+        "unsupported",
+    }
+)
+
 
 def _provider_sources() -> list[Path]:
     found = sorted(ENGINES_ROOT.rglob("provider.py"))
@@ -124,13 +178,16 @@ def _manufactured_status_defaults(tree: ast.AST) -> list[tuple[int, str]]:
     the historical MAGEMin allowlist but not the AlphaMELTS/VapoRock shape, where
     a MISSING status was defaulted to a real vocabulary token -- usually ``'ok'``.
 
-    The distinction that keeps this from over-firing: a ``None`` default is
-    correct and stays legal, because the caller must then decide explicitly what
-    silence means (the fixed providers use ``getattr(x, 'status', None) or
-    'unavailable'``). Supplying a vocabulary token AS THE DEFAULT is the defect:
-    it decides, at the seam, that an object which never declared a status is
-    reporting one -- and when that token is ``'ok'`` it manufactures success out
-    of silence.
+    What keeps this from over-firing is the DEGRADE-vs-FLATTER axis, not the
+    mere presence of a vocabulary token. A ``None`` default is correct and stays
+    legal, because the caller must then decide explicitly what silence means
+    (the fixed providers use ``getattr(x, 'status', None) or 'unavailable'``).
+    A DEGRADING string default is legal too: ``'unavailable'`` under-claims, and
+    a reader who sees it knows less confidence is warranted.
+
+    Only a FLATTERING default is the defect -- it decides, at the seam, that an
+    object which never declared a status is reporting success, manufacturing
+    confidence out of silence. See ``_FLATTERING_STATUS_DEFAULTS``.
     """
     hits: list[tuple[int, str]] = []
     for node in ast.walk(tree):
@@ -147,7 +204,7 @@ def _manufactured_status_defaults(tree: ast.AST) -> list[tuple[int, str]]:
         if not any(hint in attr.value.lower() for hint in _STATUS_NAME_HINTS):
             continue
         if isinstance(default, ast.Constant) and isinstance(default.value, str):
-            if default.value in INTENT_RESULT_STATUSES:
+            if default.value in _FLATTERING_STATUS_DEFAULTS:
                 hits.append((node.lineno, default.value))
 
     # The Mapping form of the same defect: ``result.get('status', 'ok')``.
@@ -170,7 +227,7 @@ def _manufactured_status_defaults(tree: ast.AST) -> list[tuple[int, str]]:
         if not any(hint in key.value.lower() for hint in _STATUS_NAME_HINTS):
             continue
         if isinstance(default, ast.Constant) and isinstance(default.value, str):
-            if default.value in INTENT_RESULT_STATUSES:
+            if default.value in _FLATTERING_STATUS_DEFAULTS:
                 hits.append((node.lineno, default.value))
 
     return sorted(set(hits))
@@ -245,7 +302,7 @@ def test_guard_does_not_fire_on_a_provider_originating_its_own_status() -> None:
     "source", _provider_sources(), ids=lambda p: f"{p.parent.name}/{p.name}"
 )
 def test_provider_does_not_manufacture_a_status_from_silence(source: Path) -> None:
-    """No provider may default a missing status to a vocabulary token.
+    """No provider may default a missing status to a FLATTERING token.
 
     The companion to the allowlist check. Round-1 and round-2 reviews together
     established that the status-laundering class has TWO shapes, and the first
@@ -267,8 +324,8 @@ def test_provider_does_not_manufacture_a_status_from_silence(source: Path) -> No
         f"{source} manufactures a status from silence at line(s) "
         f"{[(ln, d) for ln, d in hits]}. An absent status is the ABSENCE of an "
         "answer: default to None and decide explicitly what silence means "
-        "(the fixed providers use `or 'unavailable'`), never to a vocabulary "
-        "token -- least of all 'ok'."
+        "(the fixed providers use `or 'unavailable'`), or to a DEGRADING token "
+        "that under-claims -- never to one that reports success."
     )
 
 
@@ -303,3 +360,72 @@ def test_the_default_guard_catches_the_mapping_form_too() -> None:
 
     corrected = "return str(result.get('status') or 'unavailable')\n"
     assert not _manufactured_status_defaults(ast.parse(corrected))
+
+
+def test_every_status_token_is_classified_on_the_degrade_flatter_axis() -> None:
+    """The two sets must PARTITION the vocabulary, or the guard rots silently.
+
+    This is the load-bearing test for the whole degrade-vs-flatter refinement.
+    A hand-curated flattering list has one failure mode: somebody adds an
+    affirmative token to INTENT_RESULT_STATUSES, nobody adds it here, and the
+    guard goes on reporting clean on exactly the shape it exists to catch. That
+    failure is silent, which is the worst kind -- the guard keeps emitting
+    confidence while its coverage shrinks.
+
+    Asserting the partition makes an unclassified token a RED TEST rather than
+    an unflagged defect. Whoever adds the token has to say which side it falls
+    on, which is the one moment they are certain to know.
+    """
+    assert _FLATTERING_STATUS_DEFAULTS | _DEGRADING_STATUS_DEFAULTS == set(
+        INTENT_RESULT_STATUSES
+    ), (
+        "status vocabulary changed without classifying the new token(s): "
+        f"{set(INTENT_RESULT_STATUSES) ^ (_FLATTERING_STATUS_DEFAULTS | _DEGRADING_STATUS_DEFAULTS)}. "
+        "Decide whether each DEGRADES (under-claims, honest) or FLATTERS "
+        "(manufactures confidence from silence) and add it to the right set."
+    )
+    assert not (_FLATTERING_STATUS_DEFAULTS & _DEGRADING_STATUS_DEFAULTS)
+
+
+def test_the_default_guard_allows_a_degrading_string_default() -> None:
+    """``getattr(x, 'status', 'unavailable')`` is HONEST and must not be flagged.
+
+    The over-broad case. The guard used to flag any vocabulary member as a
+    default, so a degrading default was flagged exactly as hard as ``'ok'`` --
+    and this is not hypothetical: it fired on the CORRECT fix for the very bug
+    this file was written to catch, and the fix was reshaped to
+    ``getattr(..., None) or 'unavailable'`` to appease it. That produced a
+    uniform idiom, which has some value, but a guard that flags honest code is
+    one somebody eventually deletes, and this file's own header says so.
+
+    Distinguish the two carefully, because they look identical structurally and
+    differ only in which direction they lie:
+
+        getattr(x, 'status', 'ok')            -> invents success from silence
+        getattr(x, 'status', 'unavailable')   -> under-claims; a reader is warned
+
+    Both call shapes are covered, since the mapping form is the one the guard
+    originally missed.
+    """
+    for degrading in sorted(_DEGRADING_STATUS_DEFAULTS):
+        attr_form = f"s = str(getattr(equilibrium, 'status', {degrading!r}))\n"
+        assert not _manufactured_status_defaults(ast.parse(attr_form)), (
+            f"degrading default {degrading!r} was flagged as manufactured "
+            "confidence; only flattering defaults are the defect"
+        )
+        mapping_form = f"s = str(result.get('status', {degrading!r}))\n"
+        assert not _manufactured_status_defaults(ast.parse(mapping_form)), (
+            f"degrading default {degrading!r} flagged in the mapping form"
+        )
+
+    # ...and the flattering one is still caught, in BOTH shapes, so this test
+    # cannot pass by the matcher simply having stopped working.
+    for flattering in sorted(_FLATTERING_STATUS_DEFAULTS):
+        attr_form = f"s = str(getattr(equilibrium, 'status', {flattering!r}))\n"
+        assert _manufactured_status_defaults(ast.parse(attr_form)), (
+            f"flattering default {flattering!r} was NOT flagged"
+        )
+        mapping_form = f"s = str(result.get('status', {flattering!r}))\n"
+        assert _manufactured_status_defaults(ast.parse(mapping_form)), (
+            f"flattering default {flattering!r} not flagged in the mapping form"
+        )
