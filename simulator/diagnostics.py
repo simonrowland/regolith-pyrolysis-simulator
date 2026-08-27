@@ -739,16 +739,35 @@ def _coating_wall_deposit_selection(
     ]
     if not present:
         return None, ()
-    positive = [
+    # ★ A MEASURED ZERO IS EVIDENCE; AN ABSENT PROJECTION IS NOT.
+    # _sum_wall_deposit_kg already distinguishes them -- it returns None when
+    # nothing was found and a float (possibly 0.0) when something was -- but
+    # `(sum or 0.0) > _EPS` collapsed both into "not positive". The conflict
+    # walk then ran over the positive aliases only, so an alias reporting a
+    # MEASURED 0.0 kg against another reporting 0.25 kg raised no conflict at
+    # all: the contradicting evidence was filtered out before the comparison,
+    # and the flattering positive value was published as authoritative.
+    #
+    # The three-state rule (unknown / measured-zero / positive are distinct
+    # authority states) is already this project's invariant on the web coating
+    # readout. This is the same rule applied at the site that SELECTS the
+    # projection, which is where the contradiction actually has to be caught.
+    measured = [
         (key, value)
         for key, value in present
+        if _sum_wall_deposit_kg(value) is not None
+    ]
+    positive = [
+        (key, value)
+        for key, value in measured
         if (_sum_wall_deposit_kg(value) or 0.0) > _EPS
     ]
-    selected_key, selected_value = (positive or present)[0]
+    selected_key, selected_value = (positive or measured or present)[0]
     conflicts = tuple(
         key
-        for key, value in positive[1:]
-        if not _wall_deposit_aliases_equivalent(value, selected_value)
+        for key, value in measured
+        if key != selected_key
+        and not _wall_deposit_aliases_equivalent(value, selected_value)
     )
     if conflicts:
         conflicts = (selected_key, *conflicts)

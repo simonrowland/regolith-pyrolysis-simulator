@@ -7,6 +7,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.diagnostics import _coating_wall_deposit_selection
+
 import simulator.condensation as condensation_module
 from simulator.condensation import CondensationModel
 from simulator.core import CondensationTrain, EvaporationFlux, MeltState
@@ -1619,3 +1621,46 @@ def test_unknown_wall_deposit_does_not_inherit_a_proven_zero_authority() -> None
         }
     )
     assert explicit["authoritative"] is True
+
+
+def test_measured_zero_alias_conflicts_with_a_positive_alias() -> None:
+    """A measured zero is EVIDENCE; an absent projection is not.
+
+    _coating_wall_deposit_selection filtered aliases to positive values before
+    comparing them, so an alias reporting a measured 0.0 kg against another
+    reporting 0.25 kg raised no conflict: the contradicting evidence was removed
+    before the comparison ran, and the flattering positive value was published
+    as authoritative.
+
+    ★ THE EXISTING ALIAS TEST COULD NOT SEE THIS. It covers empty-versus-positive
+    and positive-versus-positive -- the two cases where the old filter happens to
+    be right -- and omits the one where it is wrong. All three states must be
+    exercised, because the defect lives exactly in the state that was skipped.
+
+    _sum_wall_deposit_kg already distinguishes the three: None for an absent
+    projection, 0.0 for a measured zero, positive otherwise. The bug was one line
+    later, where `(sum or 0.0) > _EPS` collapsed the first two together.
+    """
+    zero_vs_positive = {
+        "wall_deposit_kg_by_segment_species": {"hot_wall": {"Fe": 0.0}},
+        "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.25}},
+    }
+    _selected, conflicts = _coating_wall_deposit_selection(zero_vs_positive)
+    assert conflicts, (
+        "a measured zero did not conflict with a positive alias; contradicting "
+        "evidence was filtered out instead of being reported"
+    )
+
+    # absence is still NOT evidence, so it must still not conflict
+    empty_vs_positive = {
+        "wall_deposit_kg_by_segment_species": {},
+        "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.25}},
+    }
+    assert not _coating_wall_deposit_selection(empty_vs_positive)[1]
+
+    # and agreeing evidence must not be manufactured into a conflict
+    zero_vs_zero = {
+        "wall_deposit_kg_by_segment_species": {"hot_wall": {"Fe": 0.0}},
+        "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.0}},
+    }
+    assert not _coating_wall_deposit_selection(zero_vs_zero)[1]
