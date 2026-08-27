@@ -3482,6 +3482,57 @@ def test_result_metadata_contains_an_unreadable_backend_only_when_asked() -> Non
     assert contained["backend_active"] == "unreadable"
 
 
+def test_json_leaderboard_marks_a_mixed_sense_set_ambiguous(client) -> None:
+    """The JSON surface must not rank what the HTML surface calls unrankable.
+
+    _leaderboard_entries overwrites selected_sense as it walks rows, then sorted
+    the WHOLE set by whichever sense the last row happened to carry. A minimize
+    row at 1.0 therefore outranked a maximize row at 10.0, and both received an
+    unconditional rank. A value cannot be ordered under minimize and maximize at
+    once.
+
+    ★ The HTML winners table already refused to pretend otherwise, and this is
+    its SIBLING reading the same stored rows. Establishing the invariant on one
+    surface and leaving the other is exactly the diverged-duplicate shape a
+    coherence audit exists to find -- and it did: the earlier rank regression
+    exercised only the HTML path, and only with a single sense, so it could not
+    see this.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-mixed-sense-json"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    maximize = _base_spec(recipe_id="recipe-sense-max")
+    store.store(
+        maximize,
+        _scored(maximize, candidate_id="candidate-sense-max",
+                objectives=ObjectiveVector(
+                    (ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),))),
+        created_at="2026-06-01T00:00:00Z",
+    )
+    minimize = _base_spec(recipe_id="recipe-sense-min")
+    store.store(
+        minimize,
+        _scored(minimize, candidate_id="candidate-sense-min",
+                objectives=ObjectiveVector(
+                    (ObjectiveValue("oxygen_kg", "minimize", 1.0, "kg", ordinal=0),))),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    payload = client.get(
+        "/api/optimizer/leaderboard?objective_metric=oxygen_kg"
+    ).get_json()
+    entries = payload["entries"]
+    assert len(entries) == 2
+
+    for entry in entries:
+        assert entry.get("rank_ambiguous"), (
+            f"{entry.get('candidate_id')} was ranked without an ambiguity mark "
+            "across opposing objective senses"
+        )
+
+
 def test_winners_table_ranks_by_score_not_by_selector_pair_order(
     client,
 ) -> None:

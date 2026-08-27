@@ -1366,11 +1366,30 @@ def _leaderboard_entries(
                 continue
             rows.append((entry, value, selected_sense))
 
+    # ★ A MIXED-SENSE SET HAS NO VALID SINGLE RANKING, ON THIS SURFACE TOO.
+    # selected_sense is overwritten per row as the loop walks, so this sorted
+    # the WHOLE set by whichever sense the last row happened to carry: a
+    # minimize row at 1.0 outranked a maximize row at 10.0 and both were handed
+    # an unconditional rank. A value cannot be ordered under minimize and
+    # maximize at once.
+    #
+    # The HTML winners table already refuses to pretend otherwise. This is its
+    # sibling reading the SAME stored rows, and the two surfaces disagreed --
+    # the JSON consumer got a confident rank for an undefined comparison while
+    # the operator page said the ranking was ambiguous. Establishing the
+    # invariant on one surface and leaving the other is how the pair diverged.
+    senses = {str(sense or 'maximize') for _entry, _value, sense in rows}
+    rank_ambiguous = len(senses) > 1
     reverse = selected_sense != 'minimize'
     rows.sort(key=lambda item: item[1], reverse=reverse)
     entries = []
     for rank, (entry, _value, _sense) in enumerate(rows[:limit], start=1):
         entry['rank'] = rank
+        if rank_ambiguous:
+            entry['rank_ambiguous'] = (
+                'rows mix minimize and maximize objectives; '
+                'no single ranking is valid across them'
+            )
         entries.append(entry)
     return (
         entries,
