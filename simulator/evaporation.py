@@ -208,13 +208,39 @@ def viscous_p_bulk_out_of_domain_diagnostic(
             "evaporation_flux_status": "not_evaluated",
             "evaporation_flux_kg_hr": None,
         }
-    # MERGE 2026-08-26: validation FIRST, then the engine's stage-scoped
-    # classifier. assess_continuum_formula_validity() does NOT validate its
-    # input -- _knudsen_is_transitional() returns False for any non-finite Kn,
-    # so a NaN would classify as OK/in_domain and return None with no refusal.
-    # That is the exact fail-open the guard above closed on 2026-08-22. The
-    # delegate subsumes the old viscous/free-molecular early returns (both are
-    # non-transitional -> OK -> None) and adds the stage scoping from 644fac1a.
+    # MERGE 2026-08-26, CORRECTED 2026-08-27 (b-275 made the original stale).
+    # Validation FIRST, then the engine's stage-scoped classifier.
+    #
+    # The original text here said assess_continuum_formula_validity() does NOT
+    # validate its input, so a NaN would classify OK/in_domain and return None
+    # with no refusal. That WAS true and was the fail-open closed on 2026-08-22,
+    # but 96646e96 (b-275) then added the same validation inside assess, which
+    # made this comment describe code that no longer exists. Measured at HEAD,
+    # asking assess directly: NaN -> refuse, negative -> refuse, 0.0 -> ok/
+    # in_domain, +inf -> ok/in_domain, 1e12 -> ok/in_domain.
+    #
+    # So the guard above is now belt-and-braces for NaN and negatives rather
+    # than the only line of defence. It is kept because it refuses on a
+    # DIFFERENT predicate than assess does -- see the Kn == 0 note below --
+    # not because assess is still blind.
+    #
+    # Kn == 0 IS THE ONE REAL SPLIT, and it is deliberate:
+    #   assess       -> in_domain. Kn = lambda/L = 0 is the perfect-continuum
+    #                   limit, which is precisely where the continuum formula is
+    #                   MOST valid. Refusing it would be an SC-146 refusal of a
+    #                   real limit point.
+    #   here         -> refused. This branch runs only at NONZERO overhead
+    #                   pressure, where a real gas cannot have lambda = 0. A
+    #                   zero here is an upstream computation error, not a limit.
+    # The two answers differ because the questions differ: "is the formula valid
+    # at this Kn" versus "is this Kn physically reachable given our overhead".
+    # Written down because a FUTURE caller of assess that lacks this overhead
+    # precondition would inherit the permissive answer without inheriting the
+    # reason for it (milestone sweep, 2026-08-27).
+    #
+    # The delegate subsumes the old viscous/free-molecular early returns (both
+    # are non-transitional -> OK -> None) and adds the stage scoping from
+    # 644fac1a.
     assessment = assess_continuum_formula_validity(
         kn,
         campaign_name=campaign_name,
