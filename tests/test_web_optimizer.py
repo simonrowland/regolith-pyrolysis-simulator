@@ -83,17 +83,20 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "mass_kg": 1000.0,
         "additives_kg": {"CaO": 1.5},
         "track": "pyrolysis",
-        # ★ A REAL BACKEND, because these fixtures STORE FEASIBLE RESULTS.
-        # The result store admits a feasible result only if it could be
-        # certified, and the analytical backend denies authority BY DESIGN
-        # (backend_name_denies_authority('stub') has always been True). These
-        # fixtures previously supplied NO backend_name at all, and the empty
-        # token used to FAIL OPEN and grant authority -- the hole b-175 closed.
-        # So there is no honest provenance for an analytical fixture that
-        # permits the write; a fixture that needs a cached feasible result must
-        # model a backend that could actually be certified.
-        # Tests asserting the analytical badge build their payloads directly and
-        # do not go through here.
+        # ★ THE DEFAULT MODELS A CERTIFIABLE BACKEND, and tests whose subject is
+        # the ANALYTICAL badge override it explicitly.
+        #
+        # Most fixtures here store a FEASIBLE result and then render it. The
+        # result store admits a feasible result only if it could be certified,
+        # and the analytical backend denies authority by design
+        # (backend_name_denies_authority('stub') has always been True) -- these
+        # fixtures used to pass only because they supplied NO backend_name at
+        # all, and the empty token failed open. So the honest default for a
+        # fixture that gets stored and read back is a real backend.
+        #
+        # `_scored` derives its provenance FROM this spec, so the two cannot
+        # contradict each other; an earlier attempt hard-coded the provenance
+        # instead and the fidelity vocabulary rejected the mismatch outright.
         "backend_name": "alphamelts",
         "runtime_campaign_overrides": {"C0": {"hold_time_h": 1.0}},
     }
@@ -166,15 +169,24 @@ def _scored(
     evidence_class: str | None = None,
 ) -> ScoredResult:
     result_objectives = objectives or _objectives(oxygen, energy)
-    # Provenance is attached only when authority is actually CLAIMED, and its
-    # values match _base_spec's backend. Copying the conditional from
-    # tests/test_optimizer_study.py; the values follow the scenario, not the
-    # precedent -- an earlier attempt pasted that suite's melts values onto an
-    # analytical spec and the fidelity vocabulary rejected the contradiction
-    # outright.
+    # Provenance is DERIVED FROM THE SPEC, never hard-coded, so a fixture cannot
+    # claim one backend in its eval_spec and another in its result. That
+    # contradiction is exactly what the earlier version of this helper produced
+    # -- it stamped alphamelts/melts onto every authoritative result, including
+    # analytical specs -- and it is what let feasible ANALYTICAL rows reach the
+    # ResultStore in fixtures. Production cannot reach that state: it stamps an
+    # analytical run backend_authoritative=False (pool.py
+    # _ensure_pool_backend_provenance) and the store's certifiability gate
+    # rejects it. So an analytical spec deliberately gets NO provenance here and
+    # its feasible results are not cacheable -- the rule, not a gap.
     if backend_authoritative is True:
-        backend_name = backend_name or "alphamelts"
-        evidence_class = evidence_class or "melts"
+        spec_backend = str(getattr(spec, "backend_name", "") or "")
+        if spec_backend and spec_backend not in {
+            "stub",
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        }:
+            backend_name = backend_name or spec_backend
+            evidence_class = evidence_class or "melts"
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -706,17 +718,24 @@ def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:
             "campaign": "C5",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            # A leaderboard row must be CERTIFIABLE: production stamps an
+            # analytical run backend_authoritative=False (pool.py
+            # _ensure_pool_backend_provenance), which the store's
+            # certifiability gate rejects while feasible. The MRE eval_spec
+            # parity this test exists to check is backend-independent, so it
+            # runs a certifiable backend. Analytical DISPLAY is covered by the
+            # detail-page tests, which store an infeasible row.
+            "backend_name": "alphamelts",
             "c5_enabled": si_preset["c5_enabled"],
             "mre_max_voltage_V": si_preset["mre_max_voltage_V"],
             "mre_target_species": si_preset["mre_target_species"],
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"high": {"backend_name": "alphamelts"}},
     }
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "high",
         profile,
         RecipeSchema(),
     )
@@ -752,7 +771,11 @@ def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:
     assert entry["eval_spec"]["mre_max_voltage_V"] == pytest.approx(
         spec.mre_max_voltage_V
     )
-    assert entry["backend"]["backend_status"] == "unavailable"
+    # "ok", not "unavailable": _optimizer_backend_payload maps an ANALYTICAL
+    # eval_spec to "unavailable" unconditionally, so the old value was a
+    # restatement of the stub spec rather than of the stored status. This row
+    # runs a certifiable backend, so the stored status survives to the wire.
+    assert entry["backend"]["backend_status"] == "ok"
     assert detail.status_code == 200
     assert "candidate-web-parity" in detail.get_data(as_text=True)
     assert download.status_code == 200
@@ -762,6 +785,31 @@ def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:
     assert payload["eval_spec"]["mre_max_voltage_V"] == pytest.approx(
         spec.mre_max_voltage_V
     )
+
+
+def test_optimizer_backend_payload_marks_analytical_unavailable() -> None:
+    """An analytical eval_spec displays as unavailable and non-certifiable.
+
+    This is the coverage the stored-row fixtures used to carry, moved to the
+    payload builder because a FEASIBLE analytical row cannot exist in the
+    ResultStore: production stamps an analytical run backend_authoritative=False
+    (pool.py _ensure_pool_backend_provenance) and the store's certifiability gate
+    rejects it. Asserting the badge through a store round-trip therefore required
+    a fixture claiming one backend in eval_spec and another in the result -- the
+    contradiction this suite now refuses to express.
+    """
+    payload = web_routes._optimizer_backend_payload(
+        {"backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN},
+        # A healthy-looking STORED status that must not survive: the analytical
+        # mapping is unconditional, which is what stops a cheap screening run
+        # from displaying as a real one.
+        {"backend_status": "ok"},
+        {},
+    )
+    assert payload["backend_requested"] == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    assert payload["backend_active"] == ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME
+    assert payload["backend_status"] == "unavailable"
+    assert payload["tier_label"]["certification_allowed"] is False
 
 
 def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
@@ -826,21 +874,21 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert run["latest_result"]["eval_spec"]["c5_enabled"] is True
     assert run["latest_result"]["eval_spec"]["mre_max_voltage_V"] == 1.45
     assert run["latest_result"]["eval_spec"]["mre_target_species"] == "SiO2"
-    assert run["latest_result"]["backend"]["backend_requested"] == (
-        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
-    )
-    assert (
-        run["latest_result"]["backend"]["backend_active"]
-        == "InternalAnalyticalBackend"
-    )
-    assert run["latest_result"]["backend"]["backend_status"] == "unavailable"
-    assert run["latest_result"]["backend"]["backend_authoritative"] is False
-    assert (
-        run["latest_result"]["backend"]["evidence_class"]
-        == "internal-analytical"
-    )
-    assert run["latest_result"]["backend"]["runtime_status"] == "unavailable"
-    assert run["latest_result"]["backend"]["certification_allowed"] is False
+    # These rows are STORED ResultStore rows, and the store admits a feasible
+    # row only if it could be certified -- an analytical run is stamped
+    # backend_authoritative=False in production (pool.py
+    # _ensure_pool_backend_provenance) and is rejected. So a feasible analytical
+    # row on this surface is not a state production can reach; asserting it here
+    # only held while the fixture stamped alphamelts provenance onto an
+    # analytical spec. The analytical badge is covered directly, without a
+    # store round-trip, by test_optimizer_backend_payload_marks_analytical_unavailable.
+    assert run["latest_result"]["backend"]["backend_requested"] == "alphamelts"
+    assert run["latest_result"]["backend"]["backend_active"] == "alphamelts"
+    assert run["latest_result"]["backend"]["backend_status"] == "ok"
+    assert run["latest_result"]["backend"]["backend_authoritative"] is True
+    assert run["latest_result"]["backend"]["evidence_class"] == "melts"
+    assert run["latest_result"]["backend"]["runtime_status"] == "ok"
+    assert run["latest_result"]["backend"]["certification_allowed"] is True
 
     leaderboard = client.get(
         "/api/optimizer/leaderboard"
@@ -2866,7 +2914,10 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     assert "Captured volatiles" in table
     assert "Refractory ceramic/rump" in table
     assert "backend-badge" in table
-    assert f"{ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME} / unavailable" in table
+    # Certifiable backend: see the note in
+    # test_optimizer_reader_returns_fixture_db_metadata for why a stored row
+    # cannot carry the analytical badge.
+    assert "alphamelts / ok" in table
     assert "current" in table
     assert current_corpus_version() in table
 
@@ -3046,7 +3097,10 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert "computed from EvalSpec.hours" in html
     assert "Backend" in html
     assert "backend-badge" in html
-    assert f"{ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME} / unavailable" in html
+    # Certifiable backend: see the note in
+    # test_optimizer_reader_returns_fixture_db_metadata for why a stored row
+    # cannot carry the analytical badge.
+    assert "alphamelts / ok" in html
     assert "Target thermal window" in html
     assert "pc-glass-clear: C2B window 1260-1480 C" in html
 
