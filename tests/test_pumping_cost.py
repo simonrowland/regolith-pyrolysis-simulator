@@ -452,6 +452,38 @@ def test_pumping_context_refuses_negative_vented_flow_before_target_pressure():
     assert context["hour"] == 9
 
 
+def test_pumping_context_refuses_a_snapshot_missing_the_vented_flow_field():
+    """An ABSENT field is not a zero flow.
+
+    The sibling above covers an invalid VALUE. This covers a missing FIELD,
+    which used to default to 0.0 and was therefore indistinguishable from a
+    genuine zero: the row was skipped silently and the recipe's pumping load --
+    a number the optimizer ranks by -- came out understated. The old code was
+    careful about a bad value and careless about a missing field.
+
+    The reason is asserted BY NAME on purpose. Checking only that the status is
+    not ok would also pass on missing-ambient-pressure and
+    missing-target-pressure, which are different honest refusals reachable from
+    this same call, so the test would survive the defect it names.
+    """
+    context = pumping_context_from_sim(
+        SimpleNamespace(
+            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
+        ),
+        (
+            SimpleNamespace(
+                hour=9,
+                overhead=SimpleNamespace(headspace_temperature_K=773.15),
+                # O2_vented_mol_hr deliberately absent -- a carrier that is not
+                # a real HourSnapshot, which declares it as a typed float.
+            ),
+        ),
+    )
+
+    assert context["status"] == "refused"
+    assert context["reason"] == "missing-o2-vented-flow"
+
+
 def test_pumping_context_only_costs_o2_not_already_compressed_by_turbine():
     snapshot = SimpleNamespace(
         hour=1,

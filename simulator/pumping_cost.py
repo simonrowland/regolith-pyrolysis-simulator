@@ -517,9 +517,29 @@ def pumping_context_from_sim(
         # the turbine and was vented still needs target->Mars-ambient pumping,
         # so this sidecar uses O2_vented_mol_hr alone.
         overhead = getattr(snapshot, "overhead", None)
-        uncompressed_o2_mol_hr = _float_or_nan(
-            getattr(snapshot, "O2_vented_mol_hr", 0.0)
-        )
+        # ★ AN ABSENT FIELD IS NOT A ZERO FLOW. This read used to default to
+        # 0.0, so a carrier WITHOUT the field was indistinguishable from one
+        # reporting a genuine zero: both skipped the row silently and the
+        # recipe's pumping load was understated on a number the optimizer ranks
+        # by. Meanwhile an explicit NaN or a negative value refused -- the
+        # function was careful about a bad VALUE and careless about a missing
+        # FIELD.
+        #
+        # Refusing on absence cannot fire on correct work, which is why it is
+        # safe to make it a refusal rather than a warning: HourSnapshot declares
+        # `O2_vented_mol_hr: float = 0.0` (simulator/state.py:931,1101), a typed
+        # float with a default that production never sets to None. A real
+        # snapshot always carries it, so an absent attribute means the object is
+        # not a snapshot at all -- a missing input, which refuses, and is
+        # reported distinctly from an invalid one.
+        raw_uncompressed_o2 = getattr(snapshot, "O2_vented_mol_hr", None)
+        if raw_uncompressed_o2 is None:
+            return _pumping_context_refusal(
+                "missing-o2-vented-flow",
+                body=body,
+                feedstock_id=feedstock_id,
+            )
+        uncompressed_o2_mol_hr = _float_or_nan(raw_uncompressed_o2)
         if (
             not math.isfinite(uncompressed_o2_mol_hr)
             or uncompressed_o2_mol_hr < 0.0
