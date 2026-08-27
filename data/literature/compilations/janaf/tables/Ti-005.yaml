@@ -1,0 +1,3589 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nist-janaf-4th",
+  "source": {
+    "citation": "Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)",
+    "database": "NIST Standard Reference Database 13",
+    "doi": "10.18434/T42S31",
+    "url": "https://janaf.nist.gov/",
+    "last_data_update": 1998
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "extraction": {
+    "method": "machine parse of official NIST JANAF HTML table via indexed web retrieval; numeric tokens preserved as published",
+    "date": "2026-08-27",
+    "review_status": "machine_transcribed_unreviewed",
+    "network_note": "Direct worker networking unavailable; official NIST page retrieved through indexed web surface."
+  },
+  "table": {
+    "table_id": "Ti-005",
+    "url": "https://janaf.nist.gov/tables/Ti-005.html",
+    "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+    "index_entry": {
+      "formula": "Ti",
+      "name": "Titanium",
+      "state": "cr,l",
+      "target_element": "Ti"
+    },
+    "title_as_published": "Titanium (Ti)  |  | Ti_{1}(cr,l)",
+    "standard_state_as_published": "",
+    "units_as_published": {
+      "temperature": "K",
+      "heat_capacity": "J K^-1 mol^-1",
+      "entropy": "J K^-1 mol^-1",
+      "negative_gibbs_enthalpy_function": "J K^-1 mol^-1",
+      "enthalpy_increment": "kJ mol^-1",
+      "formation_enthalpy": "kJ mol^-1",
+      "formation_gibbs_energy": "kJ mol^-1",
+      "log10_formation_equilibrium_constant": "dimensionless"
+    },
+    "values": [
+      {
+        "temperature": {
+          "value": 0,
+          "as_published": "0",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "0",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "0",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "0",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": null,
+          "as_published": "INFINITE",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "0",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -4.83,
+          "as_published": "-4.830",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "0",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "0",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "0",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "0",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 100,
+          "as_published": "100",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "100",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 14.334,
+          "as_published": "14.334",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "100",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 8.261,
+          "as_published": "8.261",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "100",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 50.955,
+          "as_published": "50.955",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "100",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -4.269,
+          "as_published": "-4.269",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "100",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "100",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "100",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "100",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 200,
+          "as_published": "200",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 22.367,
+          "as_published": "22.367",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 21.227,
+          "as_published": "21.227",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 32.989,
+          "as_published": "32.989",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -2.352,
+          "as_published": "-2.352",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 250,
+          "as_published": "250",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "250",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 24.074,
+          "as_published": "24.074",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "250",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 26.414,
+          "as_published": "26.414",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "250",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 31.169,
+          "as_published": "31.169",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "250",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -1.189,
+          "as_published": "-1.189",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "250",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "250",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "250",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "250",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 350,
+          "as_published": "350",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "350",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 26.169,
+          "as_published": "26.169",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "350",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 34.882,
+          "as_published": "34.882",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "350",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 31.071,
+          "as_published": "31.071",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "350",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 1.334,
+          "as_published": "1.334",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "350",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "350",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "350",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "350",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 400,
+          "as_published": "400",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 26.862,
+          "as_published": "26.862",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 38.423,
+          "as_published": "38.423",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 31.772,
+          "as_published": "31.772",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 2.66,
+          "as_published": "2.660",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 450,
+          "as_published": "450",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "450",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 27.418,
+          "as_published": "27.418",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "450",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 41.62,
+          "as_published": "41.620",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "450",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 32.692,
+          "as_published": "32.692",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "450",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 4.018,
+          "as_published": "4.018",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "450",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "450",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "450",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "450",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 500,
+          "as_published": "500",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 27.877,
+          "as_published": "27.877",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 44.534,
+          "as_published": "44.534",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 33.733,
+          "as_published": "33.733",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 5.401,
+          "as_published": "5.401",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 700,
+          "as_published": "700",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 29.135,
+          "as_published": "29.135",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 54.134,
+          "as_published": "54.134",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 38.257,
+          "as_published": "38.257",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 11.114,
+          "as_published": "11.114",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 800,
+          "as_published": "800",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 29.472,
+          "as_published": "29.472",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 58.039,
+          "as_published": "58.039",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 40.49,
+          "as_published": "40.490",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 14.039,
+          "as_published": "14.039",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 900,
+          "as_published": "900",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 30.454,
+          "as_published": "30.454",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 61.561,
+          "as_published": "61.561",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 42.639,
+          "as_published": "42.639",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 17.03,
+          "as_published": "17.030",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1000,
+          "as_published": "1000",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 32.074,
+          "as_published": "32.074",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 64.848,
+          "as_published": "64.848",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 44.697,
+          "as_published": "44.697",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 20.151,
+          "as_published": "20.151",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1200,
+          "as_published": "1200",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 29.459,
+          "as_published": "29.459",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 74.479,
+          "as_published": "74.479",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 48.679,
+          "as_published": "48.679",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 30.961,
+          "as_published": "30.961",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1300,
+          "as_published": "1300",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 30.175,
+          "as_published": "30.175",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 76.864,
+          "as_published": "76.864",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 50.756,
+          "as_published": "50.756",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 33.941,
+          "as_published": "33.941",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1400,
+          "as_published": "1400",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 31.023,
+          "as_published": "31.023",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 79.131,
+          "as_published": "79.131",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 52.702,
+          "as_published": "52.702",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 37,
+          "as_published": "37.000",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1500,
+          "as_published": "1500",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 32.003,
+          "as_published": "32.003",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 81.304,
+          "as_published": "81.304",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 54.537,
+          "as_published": "54.537",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 40.15,
+          "as_published": "40.150",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1700,
+          "as_published": "1700",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 34.359,
+          "as_published": "34.359",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 85.448,
+          "as_published": "85.448",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 57.932,
+          "as_published": "57.932",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 46.778,
+          "as_published": "46.778",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1800,
+          "as_published": "1800",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 35.736,
+          "as_published": "35.736",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 87.451,
+          "as_published": "87.451",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 59.517,
+          "as_published": "59.517",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 50.281,
+          "as_published": "50.281",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1900,
+          "as_published": "1900",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 37.244,
+          "as_published": "37.244",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 89.422,
+          "as_published": "89.422",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 61.039,
+          "as_published": "61.039",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 53.929,
+          "as_published": "53.929",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "1900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2200,
+          "as_published": "2200",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 103.446,
+          "as_published": "103.446",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 66.233,
+          "as_published": "66.233",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 81.869,
+          "as_published": "81.869",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2300,
+          "as_published": "2300",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 105.546,
+          "as_published": "105.546",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 67.897,
+          "as_published": "67.897",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 86.592,
+          "as_published": "86.592",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2400,
+          "as_published": "2400",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 107.557,
+          "as_published": "107.557",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 69.508,
+          "as_published": "69.508",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 91.316,
+          "as_published": "91.316",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2500,
+          "as_published": "2500",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 109.485,
+          "as_published": "109.485",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 71.069,
+          "as_published": "71.069",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 96.04,
+          "as_published": "96.040",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2700,
+          "as_published": "2700",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 113.12,
+          "as_published": "113.120",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 74.051,
+          "as_published": "74.051",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 105.487,
+          "as_published": "105.487",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2800,
+          "as_published": "2800",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 114.838,
+          "as_published": "114.838",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 75.477,
+          "as_published": "75.477",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 110.211,
+          "as_published": "110.211",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2900,
+          "as_published": "2900",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 116.496,
+          "as_published": "116.496",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 76.863,
+          "as_published": "76.863",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 114.935,
+          "as_published": "114.935",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "2900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3000,
+          "as_published": "3000",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 118.097,
+          "as_published": "118.097",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 78.211,
+          "as_published": "78.211",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 119.659,
+          "as_published": "119.659",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3200,
+          "as_published": "3200",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 121.146,
+          "as_published": "121.146",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 80.8,
+          "as_published": "80.800",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 129.106,
+          "as_published": "129.106",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3300,
+          "as_published": "3300",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 122.6,
+          "as_published": "122.600",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 82.045,
+          "as_published": "82.045",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 133.83,
+          "as_published": "133.830",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3400,
+          "as_published": "3400",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 124.01,
+          "as_published": "124.010",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 83.259,
+          "as_published": "83.259",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 138.554,
+          "as_published": "138.554",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3500,
+          "as_published": "3500",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 125.379,
+          "as_published": "125.379",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 84.443,
+          "as_published": "84.443",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 143.277,
+          "as_published": "143.277",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3800,
+          "as_published": "3800",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 129.264,
+          "as_published": "129.264",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 87.83,
+          "as_published": "87.830",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 157.449,
+          "as_published": "157.449",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -407.864,
+          "as_published": "-407.864",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 19.039,
+          "as_published": "19.039",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.262,
+          "as_published": "-0.262",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3900,
+          "as_published": "3900",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 130.491,
+          "as_published": "130.491",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 88.908,
+          "as_published": "88.908",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 162.172,
+          "as_published": "162.172",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -406.685,
+          "as_published": "-406.685",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 30.258,
+          "as_published": "30.258",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.405,
+          "as_published": "-0.405",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "3900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4000,
+          "as_published": "4000",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 131.687,
+          "as_published": "131.687",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 89.963,
+          "as_published": "89.963",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 166.896,
+          "as_published": "166.896",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -405.56,
+          "as_published": "-405.560",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 41.447,
+          "as_published": "41.447",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.541,
+          "as_published": "-0.541",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4100,
+          "as_published": "4100",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4100",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4100",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 132.853,
+          "as_published": "132.853",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4100",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 90.995,
+          "as_published": "90.995",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4100",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 171.62,
+          "as_published": "171.620",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4100",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -404.488,
+          "as_published": "-404.488",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4100",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 52.609,
+          "as_published": "52.609",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4100",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.67,
+          "as_published": "-0.670",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4100",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4200,
+          "as_published": "4200",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 133.991,
+          "as_published": "133.991",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 92.005,
+          "as_published": "92.005",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 176.343,
+          "as_published": "176.343",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -403.467,
+          "as_published": "-403.467",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 63.745,
+          "as_published": "63.745",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.793,
+          "as_published": "-0.793",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4300,
+          "as_published": "4300",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 135.103,
+          "as_published": "135.103",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 92.994,
+          "as_published": "92.994",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 181.067,
+          "as_published": "181.067",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -402.495,
+          "as_published": "-402.495",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 74.857,
+          "as_published": "74.857",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.909,
+          "as_published": "-0.909",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4400,
+          "as_published": "4400",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 136.189,
+          "as_published": "136.189",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 93.964,
+          "as_published": "93.964",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 185.791,
+          "as_published": "185.791",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -401.57,
+          "as_published": "-401.570",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 85.948,
+          "as_published": "85.948",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.02,
+          "as_published": "-1.020",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4500,
+          "as_published": "4500",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.237,
+          "as_published": "47.237",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 137.25,
+          "as_published": "137.250",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 94.914,
+          "as_published": "94.914",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 190.515,
+          "as_published": "190.515",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -400.691,
+          "as_published": "-400.691",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 97.018,
+          "as_published": "97.018",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.126,
+          "as_published": "-1.126",
+          "locator": {
+            "table_id": "Ti-005",
+            "url": "https://janaf.nist.gov/tables/Ti-005.html",
+            "download_url": "https://janaf.nist.gov/tables/Ti-005.txt",
+            "row_temperature_as_published": "4500",
+            "column": "log Kf"
+          }
+        }
+      }
+    ],
+    "parse_ambiguities": [
+      {
+        "line_number": 29,
+        "raw_line": "1166.000  |  | 29.245  |  | 73.636  |  | 47.938  |  | 29.963  |  | TRANSITION",
+        "reason": "expected 8 values; found 6",
+        "locator": {
+          "table_id": "Ti-005",
+          "url": "https://janaf.nist.gov/tables/Ti-005.html"
+        }
+      },
+      {
+        "line_number": 41,
+        "raw_line": "1939.000  |  | 47.237  |  | 97.481  |  | 61.617  |  | 69.540  |  | TRANSITION",
+        "reason": "expected 8 values; found 6",
+        "locator": {
+          "table_id": "Ti-005",
+          "url": "https://janaf.nist.gov/tables/Ti-005.html"
+        }
+      },
+      {
+        "line_number": 64,
+        "raw_line": "3630.956  |  | 47.237  |  | 127.114  |  | 85.951  |  | 149.463  |  | FUGACITY = 1 bar",
+        "reason": "expected 8 values; found 6",
+        "locator": {
+          "table_id": "Ti-005",
+          "url": "https://janaf.nist.gov/tables/Ti-005.html"
+        }
+      }
+    ]
+  }
+}

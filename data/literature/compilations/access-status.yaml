@@ -1,0 +1,144 @@
+schema_version: literature_compilation_access.v1
+updated: '2026-08-27'
+compilation_role:
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Compilations consumed by an engine cannot validate that engine.
+
+sources:
+  nist_janaf_4th:
+    citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, Fourth Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998).
+    identifier: NIST Standard Reference Database 13
+    doi: 10.18434/T42S31
+    access: open_public_web
+    official_url: https://janaf.nist.gov/
+    formula_index_url: https://janaf.nist.gov/formula.html
+    local_status: target_first_partial_harvest
+    harvested_path: data/literature/compilations/janaf/
+    harvested_table_count: 380
+    harvested_temperature_row_count: 13833
+    official_index_lines_observed: 1800
+    remaining_action: Run tools/harvest_janaf_compilation.py from a network-enabled host to complete the official index.
+    acquisition_constraint: Direct DNS/networking was unavailable in the managed worker; target and Stage-0 tables were retrieved from official NIST pages through the indexed web surface.
+
+  nist_webbook_srd69:
+    citation: P. J. Linstrom and W. G. Mallard, eds., NIST Chemistry WebBook, NIST Standard Reference Database 69.
+    doi: 10.18434/T4D303
+    access: open_public_web
+    official_url: https://webbook.nist.gov/chemistry/
+    local_status: existing_manual_extract_is_partial
+    existing_path: data/literature/extracts/nist-webbook.yaml
+    existing_species_count: 22
+    harvest_status: not_bulk_harvested_in_this_pass
+    reason: No stable bulk snapshot was acquired under worker network isolation; individual pages remain legitimately obtainable from NIST.
+    note: WebBook pages vary by species and do not guarantee a complete thermochemical function table.
+
+  nasa_cea:
+    citation: McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.
+    access: open_public_source
+    official_repository_url: https://github.com/nasa/cea/blob/main/data/thermo.inp
+    official_software_url: https://www.nasa.gov/glenn/research/chemical-equilibrium-with-applications/
+    local_status: substantial_but_filtered_and_not_complete
+    existing_path: data/literature/extracts/nasa-cea-thermo.yaml
+    existing_species_count: 1615
+    filter_note: Existing ingest deliberately omits ions, D/T isotopes, noble gases, and condensed non-feedstock species.
+    harvest_status: not_extended_in_this_pass
+    reason: The authoritative raw thermo.inp snapshot is absent locally and could not be downloaded under worker network isolation; rebuilding from an unverified derivative would violate provenance.
+
+  ivtanthermo_glushko:
+    citation: IVTANTHERMO thermodynamic database, Institute for High Temperatures, Russian Academy of Sciences; Glushko thermodynamic-property compilation.
+    access: current_open_bulk_distribution_not_located
+    historical_nist_catalog_url: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication782.pdf
+    database_interface_url: http://www.chem.msu.ru/cgi-bin/tkv.pl?show=welcome.html/welcome.html
+    local_status: not_obtained
+    coverage_note: Historical descriptions report thermodynamic properties for approximately 2300 substances.
+    access_note: Ownership, licensing, and current distribution terms were not clear enough to justify acquisition.
+
+  landolt_boernstein_sgte:
+    citation: SGTE, Thermodynamic Properties of Inorganic Materials, Landolt-Börnstein, New Series, Group IV, Volume 19, Springer.
+    isbn: '3540653279'
+    access: copyrighted_book_or_subscription
+    publisher_url: https://link.springer.com/book/10.1007/b71126
+    where_copy_exists:
+      - SpringerLink institutional or purchased access
+      - WorldCat participating libraries
+    local_status: citation_only_not_obtained
+
+  barin:
+    citation: Ihsan Barin, Thermochemical Data of Pure Substances, Third Edition, VCH, 1995.
+    print_isbn: '9783527287451'
+    online_isbn: '9783527619825'
+    doi: 10.1002/9783527619825
+    access: copyrighted_book_purchase_or_subscription
+    publisher_url: https://onlinelibrary.wiley.com/doi/book/10.1002/9783527619825
+    where_copy_exists:
+      - Wiley Online Library institutional or purchased access
+      - WorldCat participating libraries
+    local_status: citation_only_not_obtained
+
+  knacke_kubaschewski_hesselmann:
+    citation: O. Knacke, O. Kubaschewski and K. Hesselmann, Thermochemical Properties of Inorganic Substances, Second Edition, Springer/Verlag Stahleisen, 1991, two volumes.
+    isbn:
+      - '9783540540144'
+      - '9780387540146'
+      - '9783514003637'
+    access: copyrighted_book
+    catalog_url: https://books.google.com/books?id=MaREAQAAIAAJ
+    where_copy_exists:
+      - WorldCat participating libraries
+      - CiNii Books participating libraries
+    local_status: citation_only_not_obtained
+
+  hultgren:
+    citation: R. Hultgren et al., Selected Values of the Thermodynamic Properties of the Elements, American Society for Metals, 1973.
+    isbn: '9780608101187'
+    access: copyrighted_book
+    catalog_url: https://books.google.com/books?id=nd9QAAAAYAAJ
+    where_copy_exists:
+      - WorldCat participating libraries
+      - university engineering and metallurgy libraries
+    local_status: citation_only_not_obtained
+
+  kubaschewski_alcock:
+    citation: O. Kubaschewski and C. B. Alcock, Metallurgical Thermochemistry, Fifth Edition, Pergamon Press, 1979.
+    isbn:
+      - '9780080208978'
+      - '9780080221076'
+    access: copyrighted_book
+    catalog_url: https://books.google.com/books?id=9p9RAAAAMAAJ
+    where_copy_exists:
+      - WorldCat participating libraries
+      - university engineering and metallurgy libraries
+    local_status: citation_only_not_obtained
+
+  sgte:
+    citation: Scientific Group Thermodata Europe databases and unary reference data.
+    access: mixed; selected publications/data are open, production databases are licensed through compatible software vendors
+    official_url: https://www.sgte.net/
+    local_status: production_database_not_obtained
+    note: Open SGTE publications must not be conflated with licensed production database releases.
+
+  factsage:
+    citation: FactSage thermochemical software and databases, Thermfact/CRCT and GTT-Technologies.
+    access: commercial_license
+    official_url: https://www.factsage.com/
+    download_url: https://www.factsage.com/fs_general.php
+    coverage: pure compounds plus solution databases for gases, metals, slags, salts, oxides, and other application systems
+    local_status: not_obtained
+    access_note: Current full downloads require customer credentials and maintenance entitlement.
+
+  mtdata:
+    citation: MTDATA thermodynamic software and databases, National Physical Laboratory.
+    access: commercial_license
+    official_url: https://www.mtdata.uk/
+    npl_catalog_url: https://resource.npl.co.uk/docs/commercial/measurement_services/catalogue_09.pdf
+    coverage: metals, oxides, mattes, semiconductors, aqueous systems, molten salts, and gases
+    local_status: not_obtained
+
+acquisition_policy:
+  paywalls_bypassed: false
+  bot_protection_bypassed: false
+  copyrighted_books_downloaded: false
+  commercial_databases_downloaded: false

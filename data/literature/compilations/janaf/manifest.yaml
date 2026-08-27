@@ -1,0 +1,3878 @@
+schema_version: literature_compilation_manifest.v1
+source_id: nist-janaf-4th
+generated_at: '2026-08-27T19:24:56.770857+00:00'
+corpus_status:
+  scope: target-first partial harvest
+  full_formula_index_status: harvester implemented; full run blocked by managed worker network isolation
+  official_formula_index_url: https://janaf.nist.gov/formula.html
+  official_formula_index_total_lines_observed: 1800
+compilation_role:
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+summary:
+  table_count: 380
+  thermodynamic_row_count: 13833
+  parse_ambiguity_count: 663
+  formula_count: 191
+target_coverage:
+  Na:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Na-001
+    - Na-002
+    - Na-003
+    - Na-004
+    - Na-005
+  K:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - K-001
+    - K-002
+    - K-003
+    - K-004
+    - K-005
+  Fe:
+    janaf_table_available: true
+    table_count: 6
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Fe-003
+    - Fe-004
+    - Fe-005
+    - Fe-006
+    - Fe-007
+    - Fe-008
+  Mg:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Mg-001
+    - Mg-002
+    - Mg-003
+    - Mg-004
+    - Mg-005
+  Si:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Si-001
+    - Si-002
+    - Si-003
+    - Si-004
+    - Si-005
+  SiO:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - O-012
+  SiO2:
+    janaf_table_available: true
+    table_count: 6
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    table_ids:
+    - O-035
+    - O-036
+    - O-037
+    - O-038
+    - O-039
+    - O-040
+  Ca:
+    janaf_table_available: true
+    table_count: 6
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Ca-001
+    - Ca-002
+    - Ca-003
+    - Ca-004
+    - Ca-005
+    - Ca-006
+  Al:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Al-001
+    - Al-002
+    - Al-003
+    - Al-004
+    - Al-005
+  Cr:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Cr-001
+    - Cr-002
+    - Cr-003
+    - Cr-004
+    - Cr-005
+  Mn:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Mn-001
+    - Mn-002
+    - Mn-003
+    - Mn-004
+    - Mn-005
+  Ti:
+    janaf_table_available: true
+    table_count: 6
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Ti-001
+    - Ti-002
+    - Ti-003
+    - Ti-004
+    - Ti-005
+    - Ti-006
+  O:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - O-001
+  O2:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - ref
+    table_ids:
+    - O-029
+  P:
+    janaf_table_available: true
+    table_count: 8
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - P-001
+    - P-002
+    - P-003
+    - P-004
+    - P-005
+    - P-006
+    - P-007
+    - P-008
+  S:
+    janaf_table_available: true
+    table_count: 6
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - S-001
+    - S-002
+    - S-003
+    - S-004
+    - S-005
+    - S-006
+  Cl:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - Cl-001
+  F:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - F-001
+  H2O:
+    janaf_table_available: true
+    table_count: 7
+    phases:
+    - fl
+    - g
+    - l
+    - l,g
+    table_ids:
+    - H-063
+    - H-064
+    - H-065
+    - H-066
+    - H-067
+    - H-068
+    - H-069
+  CO:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - C-093
+  CO2:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - C-095
+  Ni:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Ni-001
+    - Ni-002
+    - Ni-003
+    - Ni-004
+    - Ni-005
+  Zn:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    - ref
+    table_ids:
+    - Zn-001
+    - Zn-002
+    - Zn-003
+    - Zn-004
+    - Zn-005
+  Na2O:
+    janaf_table_available: true
+    table_count: 3
+    phases:
+    - cr
+    - cr,l
+    - l
+    table_ids:
+    - Na-012
+    - Na-013
+    - Na-014
+  NaO:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - Na-008
+  K2O:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - cr
+    table_ids:
+    - K-012
+  KO:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - K-008
+  FeO:
+    janaf_table_available: true
+    table_count: 4
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    table_ids:
+    - Fe-018
+    - Fe-019
+    - Fe-020
+    - Fe-021
+  Fe2O3:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - cr
+    table_ids:
+    - Fe-030
+  MgO:
+    janaf_table_available: true
+    table_count: 4
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    table_ids:
+    - Mg-008
+    - Mg-009
+    - Mg-010
+    - Mg-011
+  CaO:
+    janaf_table_available: true
+    table_count: 4
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    table_ids:
+    - Ca-027
+    - Ca-028
+    - Ca-029
+    - Ca-030
+  Al2O3:
+    janaf_table_available: true
+    table_count: 6
+    phases:
+    - cr
+    - cr,l
+    - l
+    table_ids:
+    - Al-096
+    - Al-097
+    - Al-098
+    - Al-099
+    - Al-100
+    - Al-101
+  TiO2:
+    janaf_table_available: true
+    table_count: 5
+    phases:
+    - cr
+    - cr,l
+    - g
+    - l
+    table_ids:
+    - O-042
+    - O-043
+    - O-044
+    - O-045
+    - O-046
+  Cr2O3:
+    janaf_table_available: true
+    table_count: 3
+    phases:
+    - cr
+    - cr,l
+    - l
+    table_ids:
+    - Cr-014
+    - Cr-015
+    - Cr-016
+  MnO:
+    janaf_table_available: false
+    table_count: 0
+    phases: []
+    table_ids: []
+  P2O5:
+    janaf_table_available: false
+    table_count: 0
+    phases: []
+    table_ids: []
+  PO:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - O-004
+  PO2:
+    janaf_table_available: true
+    table_count: 1
+    phases:
+    - g
+    table_ids:
+    - O-032
+entries:
+- table_id: Al-001
+  formula: Al
+  phase: ref
+  title_as_published: Aluminum (Al)  |  | Al_{1}(ref)
+  url: https://janaf.nist.gov/tables/Al-001.html
+  download_url: https://janaf.nist.gov/tables/Al-001.txt
+  row_count: 48
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Al-001.yaml
+- table_id: Al-002
+  formula: Al
+  phase: cr
+  title_as_published: Aluminum (Al)  |  | Al_{1}(cr)
+  url: https://janaf.nist.gov/tables/Al-002.html
+  download_url: https://janaf.nist.gov/tables/Al-002.txt
+  row_count: 12
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-002.yaml
+- table_id: Al-003
+  formula: Al
+  phase: l
+  title_as_published: Aluminum (Al)  |  | Al_{1}(l)
+  url: https://janaf.nist.gov/tables/Al-003.html
+  download_url: https://janaf.nist.gov/tables/Al-003.txt
+  row_count: 22
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/Al-003.yaml
+- table_id: Al-004
+  formula: Al
+  phase: cr,l
+  title_as_published: Aluminum (Al)  |  | Al_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Al-004.html
+  download_url: https://janaf.nist.gov/tables/Al-004.txt
+  row_count: 26
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Al-004.yaml
+- table_id: Al-005
+  formula: Al
+  phase: g
+  title_as_published: Aluminum (Al)  |  | Al_{1}(g)
+  url: https://janaf.nist.gov/tables/Al-005.html
+  download_url: https://janaf.nist.gov/tables/Al-005.txt
+  row_count: 57
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-005.yaml
+- table_id: Al-014
+  formula: AlCl
+  phase: g
+  title_as_published: Aluminum Chloride (AlCl)  |  | Al_{1}Cl_{1}(g)
+  url: https://janaf.nist.gov/tables/Al-014.html
+  download_url: https://janaf.nist.gov/tables/Al-014.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-014.yaml
+- table_id: Al-019
+  formula: AlClO
+  phase: cr
+  title_as_published: Aluminum Chloride Oxide (OAlCl)  |  | Al_{1}Cl_{1}O_{1}(cr)
+  url: https://janaf.nist.gov/tables/Al-019.html
+  download_url: https://janaf.nist.gov/tables/Al-019.txt
+  row_count: 22
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Al-019.yaml
+- table_id: Al-020
+  formula: AlClO
+  phase: g
+  title_as_published: Aluminum Chloride Oxide (OAlCl)  |  | Al_{1}Cl_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/Al-020.html
+  download_url: https://janaf.nist.gov/tables/Al-020.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-020.yaml
+- table_id: Al-021
+  formula: AlCl2
+  phase: g
+  title_as_published: Aluminum Chloride (AlCl_{2})  |  | Al_{1}Cl_{2}(g)
+  url: https://janaf.nist.gov/tables/Al-021.html
+  download_url: https://janaf.nist.gov/tables/Al-021.txt
+  row_count: 51
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-021.yaml
+- table_id: Al-025
+  formula: AlCl3
+  phase: cr
+  title_as_published: Aluminum Chloride (AlCl_{3})  |  | Al_{1}Cl_{3}(cr)
+  url: https://janaf.nist.gov/tables/Al-025.html
+  download_url: https://janaf.nist.gov/tables/Al-025.txt
+  row_count: 12
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-025.yaml
+- table_id: Al-026
+  formula: AlCl3
+  phase: l
+  title_as_published: Aluminum Chloride (AlCl_{3})  |  | Al_{1}Cl_{3}(l)
+  url: https://janaf.nist.gov/tables/Al-026.html
+  download_url: https://janaf.nist.gov/tables/Al-026.txt
+  row_count: 9
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Al-026.yaml
+- table_id: Al-027
+  formula: AlCl3
+  phase: cr,l
+  title_as_published: Aluminum Chloride (AlCl_{3})  |  | Al_{1}Cl_{3}(cr,l)
+  url: https://janaf.nist.gov/tables/Al-027.html
+  download_url: https://janaf.nist.gov/tables/Al-027.txt
+  row_count: 13
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Al-027.yaml
+- table_id: Al-028
+  formula: AlCl3
+  phase: g
+  title_as_published: Aluminum Chloride (AlCl_{3})  |  | Al_{1}Cl_{3}(g)
+  url: https://janaf.nist.gov/tables/Al-028.html
+  download_url: https://janaf.nist.gov/tables/Al-028.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-028.yaml
+- table_id: Al-033
+  formula: AlF
+  phase: g
+  title_as_published: Aluminum Fluoride (AlF)  |  | Al_{1}F_{1}(g)
+  url: https://janaf.nist.gov/tables/Al-033.html
+  download_url: https://janaf.nist.gov/tables/Al-033.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-033.yaml
+- table_id: Al-035
+  formula: AlFO
+  phase: g
+  title_as_published: Aluminum Fluoride Oxide (OAlF)  |  | Al_{1}F_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/Al-035.html
+  download_url: https://janaf.nist.gov/tables/Al-035.txt
+  row_count: 47
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-035.yaml
+- table_id: Al-036
+  formula: AlF2
+  phase: g
+  title_as_published: Aluminum Fluoride (AlF_{2})  |  | Al_{1}F_{2}(g)
+  url: https://janaf.nist.gov/tables/Al-036.html
+  download_url: https://janaf.nist.gov/tables/Al-036.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-036.yaml
+- table_id: Al-039
+  formula: AlF2O
+  phase: g
+  title_as_published: Aluminum Fluoride Oxide (OAlF_{2})  |  | Al_{1}F_{2}O_{1}(g)
+  url: https://janaf.nist.gov/tables/Al-039.html
+  download_url: https://janaf.nist.gov/tables/Al-039.txt
+  row_count: 43
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-039.yaml
+- table_id: Al-041
+  formula: AlF3
+  phase: cr
+  title_as_published: Aluminum Fluoride (AlF_{3})  |  | Al_{1}F_{3}(cr)
+  url: https://janaf.nist.gov/tables/Al-041.html
+  download_url: https://janaf.nist.gov/tables/Al-041.txt
+  row_count: 25
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Al-041.yaml
+- table_id: Al-042
+  formula: AlF3
+  phase: l
+  title_as_published: Aluminum Fluoride (AlF_{3})  |  | Al_{1}F_{3}(l)
+  url: https://janaf.nist.gov/tables/Al-042.html
+  download_url: https://janaf.nist.gov/tables/Al-042.txt
+  row_count: 30
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Al-042.yaml
+- table_id: Al-043
+  formula: AlF3
+  phase: cr,l
+  title_as_published: Aluminum Fluoride (AlF_{3})  |  | Al_{1}F_{3}(cr,l)
+  url: https://janaf.nist.gov/tables/Al-043.html
+  download_url: https://janaf.nist.gov/tables/Al-043.txt
+  row_count: 34
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Al-043.yaml
+- table_id: Al-044
+  formula: AlF3
+  phase: g
+  title_as_published: Aluminum Fluoride (AlF_{3})  |  | Al_{1}F_{3}(g)
+  url: https://janaf.nist.gov/tables/Al-044.html
+  download_url: https://janaf.nist.gov/tables/Al-044.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-044.yaml
+- table_id: Al-079
+  formula: AlS
+  phase: g
+  title_as_published: Aluminum Sulfide (AlS)  |  | Al_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/Al-079.html
+  download_url: https://janaf.nist.gov/tables/Al-079.txt
+  row_count: 39
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-079.yaml
+- table_id: Al-080
+  formula: Al2
+  phase: g
+  title_as_published: Aluminum (Al_{2})  |  | Al_{2}(g)
+  url: https://janaf.nist.gov/tables/Al-080.html
+  download_url: https://janaf.nist.gov/tables/Al-080.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-080.yaml
+- table_id: Al-085
+  formula: Al2Cl6
+  phase: g
+  title_as_published: Aluminum Chloride ((AlCl_{3})_{2})  |  | Al_{2}Cl_{6}(g)
+  url: https://janaf.nist.gov/tables/Al-085.html
+  download_url: https://janaf.nist.gov/tables/Al-085.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-085.yaml
+- table_id: Al-087
+  formula: AlF3
+  phase: g
+  title_as_published: Aluminum Fluoride ((AlF_{3})_{2}) Al_{2}F_{6}(g)
+  url: https://janaf.nist.gov/tables/Al-087.html
+  download_url: https://janaf.nist.gov/tables/Al-087.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-087.yaml
+- table_id: Al-096
+  formula: Al2O3
+  phase: cr
+  title_as_published: Aluminum Oxide, Alpha (Al_{2}O_{3})  |  | Al_{2}O_{3}(cr)
+  url: https://janaf.nist.gov/tables/Al-096.html
+  download_url: https://janaf.nist.gov/tables/Al-096.txt
+  row_count: 25
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Al-096.yaml
+- table_id: Al-097
+  formula: Al2O3
+  phase: cr
+  title_as_published: Aluminum Oxide, Delta (Al_{2}O_{3})  |  | Al_{2}O_{3}(cr)
+  url: https://janaf.nist.gov/tables/Al-097.html
+  download_url: https://janaf.nist.gov/tables/Al-097.txt
+  row_count: 23
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Al-097.yaml
+- table_id: Al-098
+  formula: Al2O3
+  phase: cr
+  title_as_published: Aluminum Oxide, Gamma (Al_{2}O_{3})  |  | Al_{2}O_{3}(cr)
+  url: https://janaf.nist.gov/tables/Al-098.html
+  download_url: https://janaf.nist.gov/tables/Al-098.txt
+  row_count: 23
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Al-098.yaml
+- table_id: Al-099
+  formula: Al2O3
+  phase: cr
+  title_as_published: Aluminum Oxide, Kappa (Al_{2}O_{3})  |  | Al_{2}O_{3}(cr)
+  url: https://janaf.nist.gov/tables/Al-099.html
+  download_url: https://janaf.nist.gov/tables/Al-099.txt
+  row_count: 23
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Al-099.yaml
+- table_id: Al-100
+  formula: Al2O3
+  phase: l
+  title_as_published: Aluminum Oxide (Al_{2}O_{3})  |  | Al_{2}O_{3}(l)
+  url: https://janaf.nist.gov/tables/Al-100.html
+  download_url: https://janaf.nist.gov/tables/Al-100.txt
+  row_count: 30
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Al-100.yaml
+- table_id: Al-101
+  formula: Al2O3
+  phase: cr,l
+  title_as_published: Aluminum Oxide (Al_{2}O_{3})  |  | Al_{2}O_{3}(cr,l)
+  url: https://janaf.nist.gov/tables/Al-101.html
+  download_url: https://janaf.nist.gov/tables/Al-101.txt
+  row_count: 25
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Al-101.yaml
+- table_id: Al-105
+  formula: Al2S3
+  phase: cr
+  title_as_published: Aluminum Sulfide (Al_{2}S_{3})  |  | Al_{2}S_{3}(cr)
+  url: https://janaf.nist.gov/tables/Al-105.html
+  download_url: https://janaf.nist.gov/tables/Al-105.txt
+  row_count: 13
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Al-105.yaml
+- table_id: C-018
+  formula: CCl
+  phase: g
+  title_as_published: Chloromethylidyne (CCl)  |  | C_{1}Cl_{1}(g)
+  url: https://janaf.nist.gov/tables/C-018.html
+  download_url: https://janaf.nist.gov/tables/C-018.txt
+  row_count: 50
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-018.yaml
+- table_id: C-022
+  formula: CClO
+  phase: g
+  title_as_published: Carbonyl Chloride (COCl)  |  | C_{1}Cl_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/C-022.html
+  download_url: https://janaf.nist.gov/tables/C-022.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-022.yaml
+- table_id: C-023
+  formula: CCl2
+  phase: g
+  title_as_published: Dichloromethylene (CCl_{2}) C_{1}Cl_{2}(g)
+  url: https://janaf.nist.gov/tables/C-023.html
+  download_url: https://janaf.nist.gov/tables/C-023.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-023.yaml
+- table_id: C-025
+  formula: CCl2O
+  phase: g
+  title_as_published: Carbonic Dichloride (COCl_{2})  |  | C_{1}Cl_{2}O_{1}(g)
+  url: https://janaf.nist.gov/tables/C-025.html
+  download_url: https://janaf.nist.gov/tables/C-025.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-025.yaml
+- table_id: C-026
+  formula: CCl3
+  phase: g
+  title_as_published: Trichloromethyl (CCl_{3})  |  | C_{1}Cl_{3}(g)
+  url: https://janaf.nist.gov/tables/C-026.html
+  download_url: https://janaf.nist.gov/tables/C-026.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-026.yaml
+- table_id: C-028
+  formula: CCl4
+  phase: g
+  title_as_published: Tetrachloromethane (CCl_{4})  |  | C_{1}Cl_{4}(g)
+  url: https://janaf.nist.gov/tables/C-028.html
+  download_url: https://janaf.nist.gov/tables/C-028.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-028.yaml
+- table_id: C-030
+  formula: CF
+  phase: g
+  title_as_published: Fluoromethylidyne (CF)  |  | C_{1}F_{1}(g)
+  url: https://janaf.nist.gov/tables/C-030.html
+  download_url: https://janaf.nist.gov/tables/C-030.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-030.yaml
+- table_id: C-033
+  formula: CFO
+  phase: g
+  title_as_published: Carbonyl Fluoride (COF)  |  | C_{1}F_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/C-033.html
+  download_url: https://janaf.nist.gov/tables/C-033.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-033.yaml
+- table_id: C-034
+  formula: CF2
+  phase: g
+  title_as_published: Difluoromethylene (CF_{2})  |  | C_{1}F_{2}(g)
+  url: https://janaf.nist.gov/tables/C-034.html
+  download_url: https://janaf.nist.gov/tables/C-034.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-034.yaml
+- table_id: C-036
+  formula: CF2O
+  phase: g
+  title_as_published: Carbonic Difluoride (COF_{2})  |  | C_{1}F_{2}O_{1}(g)
+  url: https://janaf.nist.gov/tables/C-036.html
+  download_url: https://janaf.nist.gov/tables/C-036.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-036.yaml
+- table_id: C-037
+  formula: CF3
+  phase: g
+  title_as_published: Trifluoromethyl (CF_{3})  |  | C_{1}F_{3}(g)
+  url: https://janaf.nist.gov/tables/C-037.html
+  download_url: https://janaf.nist.gov/tables/C-037.txt
+  row_count: 45
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-037.yaml
+- table_id: C-040
+  formula: CF4
+  phase: g
+  title_as_published: Tetrafluoromethane (CF_{4})  |  | C_{1}F_{4}(g)
+  url: https://janaf.nist.gov/tables/C-040.html
+  download_url: https://janaf.nist.gov/tables/C-040.txt
+  row_count: 57
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-040.yaml
+- table_id: C-041
+  formula: CF4O
+  phase: g
+  title_as_published: Trifluoromethyl Hypofluorite (CF_{3}OF)  |  | C_{1}F_{4}O_{1}(g)
+  url: https://janaf.nist.gov/tables/C-041.html
+  download_url: https://janaf.nist.gov/tables/C-041.txt
+  row_count: 41
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-041.yaml
+- table_id: C-093
+  formula: CO
+  phase: g
+  title_as_published: Carbon Monoxide (CO)  |  | C_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/C-093.html
+  download_url: https://janaf.nist.gov/tables/C-093.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-093.yaml
+- table_id: C-094
+  formula: COS
+  phase: g
+  title_as_published: Carbon Oxide Sulfide (COS)  |  | C_{1}O_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/C-094.html
+  download_url: https://janaf.nist.gov/tables/C-094.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-094.yaml
+- table_id: C-095
+  formula: CO2
+  phase: g
+  title_as_published: Carbon Dioxide (CO_{2})  |  | C_{1}O_{2}(g)
+  url: https://janaf.nist.gov/tables/C-095.html
+  download_url: https://janaf.nist.gov/tables/C-095.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-095.yaml
+- table_id: C-098
+  formula: CS
+  phase: g
+  title_as_published: Carbon Sulfide (CS)  |  | C_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/C-098.html
+  download_url: https://janaf.nist.gov/tables/C-098.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-098.yaml
+- table_id: C-099
+  formula: CS2
+  phase: g
+  title_as_published: Carbon Disulfide (CS_{2})  |  | C_{1}S_{2}(g)
+  url: https://janaf.nist.gov/tables/C-099.html
+  download_url: https://janaf.nist.gov/tables/C-099.txt
+  row_count: 41
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-099.yaml
+- table_id: C-116
+  formula: C2Cl2
+  phase: g
+  title_as_published: Dichloroethyne (C_{2}Cl_{2})  |  | C_{2}Cl_{2}(g)
+  url: https://janaf.nist.gov/tables/C-116.html
+  download_url: https://janaf.nist.gov/tables/C-116.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-116.yaml
+- table_id: C-117
+  formula: C2Cl4
+  phase: g
+  title_as_published: Tetrachloroethene (C_{2}Cl_{4})  |  | C_{2}Cl_{4}(g)
+  url: https://janaf.nist.gov/tables/C-117.html
+  download_url: https://janaf.nist.gov/tables/C-117.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-117.yaml
+- table_id: C-118
+  formula: C2Cl6
+  phase: g
+  title_as_published: Hexachloroethane (C_{2}Cl_{6})  |  | C_{2}Cl_{6}(g)
+  url: https://janaf.nist.gov/tables/C-118.html
+  download_url: https://janaf.nist.gov/tables/C-118.txt
+  row_count: 42
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/C-118.yaml
+- table_id: C-120
+  formula: C2F2
+  phase: g
+  title_as_published: Difluoroethyne (C_{2}F_{2})  |  | C_{2}F_{2}(g)
+  url: https://janaf.nist.gov/tables/C-120.html
+  download_url: https://janaf.nist.gov/tables/C-120.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-120.yaml
+- table_id: C-122
+  formula: C2F4
+  phase: g
+  title_as_published: Tetrafluoroethene (C_{2}F_{4})  |  | C_{2}F_{4}(g)
+  url: https://janaf.nist.gov/tables/C-122.html
+  download_url: https://janaf.nist.gov/tables/C-122.txt
+  row_count: 44
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-122.yaml
+- table_id: C-123
+  formula: C2F6
+  phase: g
+  title_as_published: Hexafluoroethane (C_{2}F_{6})  |  | C_{2}F_{6}(g)
+  url: https://janaf.nist.gov/tables/C-123.html
+  download_url: https://janaf.nist.gov/tables/C-123.txt
+  row_count: 53
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/C-123.yaml
+- table_id: Ca-001
+  formula: Ca
+  phase: ref
+  title_as_published: Calcium (Ca)  |  | Ca_{1}(ref)
+  url: https://janaf.nist.gov/tables/Ca-001.html
+  download_url: https://janaf.nist.gov/tables/Ca-001.txt
+  row_count: 49
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Ca-001.yaml
+- table_id: Ca-002
+  formula: Ca
+  phase: cr
+  title_as_published: Calcium, Alpha (Ca)  |  | Ca_{1}(cr)
+  url: https://janaf.nist.gov/tables/Ca-002.html
+  download_url: https://janaf.nist.gov/tables/Ca-002.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Ca-002.yaml
+- table_id: Ca-003
+  formula: Ca
+  phase: cr
+  title_as_published: Calcium, Beta (Ca)  |  | Ca_{1}(cr)
+  url: https://janaf.nist.gov/tables/Ca-003.html
+  download_url: https://janaf.nist.gov/tables/Ca-003.txt
+  row_count: 10
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ca-003.yaml
+- table_id: Ca-004
+  formula: Ca
+  phase: l
+  title_as_published: Calcium (Ca)  |  | Ca_{1}(l)
+  url: https://janaf.nist.gov/tables/Ca-004.html
+  download_url: https://janaf.nist.gov/tables/Ca-004.txt
+  row_count: 19
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ca-004.yaml
+- table_id: Ca-005
+  formula: Ca
+  phase: cr,l
+  title_as_published: Calcium (Ca)  |  | Ca_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Ca-005.html
+  download_url: https://janaf.nist.gov/tables/Ca-005.txt
+  row_count: 22
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Ca-005.yaml
+- table_id: Ca-006
+  formula: Ca
+  phase: g
+  title_as_published: Calcium (Ca)  |  | Ca_{1}(g)
+  url: https://janaf.nist.gov/tables/Ca-006.html
+  download_url: https://janaf.nist.gov/tables/Ca-006.txt
+  row_count: 55
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-006.yaml
+- table_id: Ca-008
+  formula: CaCl
+  phase: g
+  title_as_published: Calcium Chloride (CaCl)  |  | Ca_{1}Cl_{1}(g)
+  url: https://janaf.nist.gov/tables/Ca-008.html
+  download_url: https://janaf.nist.gov/tables/Ca-008.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-008.yaml
+- table_id: Ca-009
+  formula: CaCl2
+  phase: cr
+  title_as_published: Calcium Chloride (CaCl_{2})  |  | Ca_{1}Cl_{2}(cr)
+  url: https://janaf.nist.gov/tables/Ca-009.html
+  download_url: https://janaf.nist.gov/tables/Ca-009.txt
+  row_count: 17
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Ca-009.yaml
+- table_id: Ca-010
+  formula: CaCl2
+  phase: l
+  title_as_published: Calcium Chloride (CaCl_{2})  |  | Ca_{1}Cl_{2}(l)
+  url: https://janaf.nist.gov/tables/Ca-010.html
+  download_url: https://janaf.nist.gov/tables/Ca-010.txt
+  row_count: 23
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ca-010.yaml
+- table_id: Ca-011
+  formula: CaCl2
+  phase: cr,l
+  title_as_published: Calcium Chloride (CaCl_{2})  |  | Ca_{1}Cl_{2}(cr,l)
+  url: https://janaf.nist.gov/tables/Ca-011.html
+  download_url: https://janaf.nist.gov/tables/Ca-011.txt
+  row_count: 26
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Ca-011.yaml
+- table_id: Ca-012
+  formula: CaCl2
+  phase: g
+  title_as_published: Calcium Chloride (CaCl_{2})  |  | Ca_{1}Cl_{2}(g)
+  url: https://janaf.nist.gov/tables/Ca-012.html
+  download_url: https://janaf.nist.gov/tables/Ca-012.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-012.yaml
+- table_id: Ca-013
+  formula: CaF
+  phase: g
+  title_as_published: Calcium Fluoride (CaF)  |  | Ca_{1}F_{1}(g)
+  url: https://janaf.nist.gov/tables/Ca-013.html
+  download_url: https://janaf.nist.gov/tables/Ca-013.txt
+  row_count: 53
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-013.yaml
+- table_id: Ca-014
+  formula: CaF2
+  phase: cr
+  title_as_published: Calcium Fluoride (CaF_{2})  |  | Ca_{1}F_{2}(cr)
+  url: https://janaf.nist.gov/tables/Ca-014.html
+  download_url: https://janaf.nist.gov/tables/Ca-014.txt
+  row_count: 21
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Ca-014.yaml
+- table_id: Ca-015
+  formula: CaF2
+  phase: l
+  title_as_published: Calcium Fluoride (CaF_{2})  |  | Ca_{1}F_{2}(l)
+  url: https://janaf.nist.gov/tables/Ca-015.html
+  download_url: https://janaf.nist.gov/tables/Ca-015.txt
+  row_count: 31
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ca-015.yaml
+- table_id: Ca-016
+  formula: CaF2
+  phase: cr,l
+  title_as_published: Calcium Fluoride (CaF_{2})  |  | Ca_{1}F_{2}(cr,l)
+  url: https://janaf.nist.gov/tables/Ca-016.html
+  download_url: https://janaf.nist.gov/tables/Ca-016.txt
+  row_count: 33
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Ca-016.yaml
+- table_id: Ca-017
+  formula: CaF2
+  phase: g
+  title_as_published: Calcium Fluoride (CaF_{2})  |  | Ca_{1}F_{2}(g)
+  url: https://janaf.nist.gov/tables/Ca-017.html
+  download_url: https://janaf.nist.gov/tables/Ca-017.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-017.yaml
+- table_id: Ca-027
+  formula: CaO
+  phase: cr
+  title_as_published: Calcium Oxide (CaO)  |  | Ca_{1}O_{1}(cr)
+  url: https://janaf.nist.gov/tables/Ca-027.html
+  download_url: https://janaf.nist.gov/tables/Ca-027.txt
+  row_count: 28
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Ca-027.yaml
+- table_id: Ca-028
+  formula: CaO
+  phase: l
+  title_as_published: Calcium Oxide (CaO)  |  | Ca_{1}O_{1}(l)
+  url: https://janaf.nist.gov/tables/Ca-028.html
+  download_url: https://janaf.nist.gov/tables/Ca-028.txt
+  row_count: 32
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Ca-028.yaml
+- table_id: Ca-029
+  formula: CaO
+  phase: cr,l
+  title_as_published: Calcium Oxide (CaO)  |  | Ca_{1}O_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Ca-029.html
+  download_url: https://janaf.nist.gov/tables/Ca-029.txt
+  row_count: 36
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Ca-029.yaml
+- table_id: Ca-030
+  formula: CaO
+  phase: g
+  title_as_published: Calcium Oxide (CaO)  |  | Ca_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/Ca-030.html
+  download_url: https://janaf.nist.gov/tables/Ca-030.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-030.yaml
+- table_id: Ca-031
+  formula: CaS
+  phase: cr
+  title_as_published: Calcium Sulfide (CaS)  |  | Ca_{1}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Ca-031.html
+  download_url: https://janaf.nist.gov/tables/Ca-031.txt
+  row_count: 25
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-031.yaml
+- table_id: Ca-032
+  formula: CaS
+  phase: g
+  title_as_published: Calcium Sulfide (CaS)  |  | Ca_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/Ca-032.html
+  download_url: https://janaf.nist.gov/tables/Ca-032.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-032.yaml
+- table_id: Ca-033
+  formula: Ca2
+  phase: g
+  title_as_published: Calcium (Ca_{2})  |  | Ca_{2}(g)
+  url: https://janaf.nist.gov/tables/Ca-033.html
+  download_url: https://janaf.nist.gov/tables/Ca-033.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ca-033.yaml
+- table_id: Cl-001
+  formula: Cl
+  phase: g
+  title_as_published: Chlorine (Cl)  |  | Cl_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-001.html
+  download_url: https://janaf.nist.gov/tables/Cl-001.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-001.yaml
+- table_id: Cl-025
+  formula: ClFe
+  phase: g
+  title_as_published: Iron Chloride (FeCl)  |  | Cl_{1}Fe_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-025.html
+  download_url: https://janaf.nist.gov/tables/Cl-025.txt
+  row_count: 51
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-025.yaml
+- table_id: Cl-026
+  formula: ClH
+  phase: g
+  title_as_published: Hydrogen Chloride (HCl)  |  | Cl_{1}H_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-026.html
+  download_url: https://janaf.nist.gov/tables/Cl-026.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-026.yaml
+- table_id: Cl-027
+  formula: ClHO
+  phase: g
+  title_as_published: Hypochlorous Acid (HOCl)  |  | Cl_{1}H_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-027.html
+  download_url: https://janaf.nist.gov/tables/Cl-027.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-027.yaml
+- table_id: Cl-036
+  formula: ClK
+  phase: cr
+  title_as_published: Potassium Chloride (KCl)  |  | Cl_{1}K_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-036.html
+  download_url: https://janaf.nist.gov/tables/Cl-036.txt
+  row_count: 13
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cl-036.yaml
+- table_id: Cl-037
+  formula: ClK
+  phase: l
+  title_as_published: Potassium Chloride (KCl)  |  | Cl_{1}K_{1}(l)
+  url: https://janaf.nist.gov/tables/Cl-037.html
+  download_url: https://janaf.nist.gov/tables/Cl-037.txt
+  row_count: 14
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Cl-037.yaml
+- table_id: Cl-038
+  formula: ClK
+  phase: cr,l
+  title_as_published: Potassium Chloride (KCl)  |  | Cl_{1}K_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Cl-038.html
+  download_url: https://janaf.nist.gov/tables/Cl-038.txt
+  row_count: 17
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Cl-038.yaml
+- table_id: Cl-039
+  formula: ClK
+  phase: g
+  title_as_published: Potassium Chloride (KCl)  |  | Cl_{1}K_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-039.html
+  download_url: https://janaf.nist.gov/tables/Cl-039.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-039.yaml
+- table_id: Cl-040
+  formula: ClKO4
+  phase: cr
+  title_as_published: Potassium Perchlorate (KClO_{4})  |  | Cl_{1}K_{1}O_{4}(cr)
+  url: https://janaf.nist.gov/tables/Cl-040.html
+  download_url: https://janaf.nist.gov/tables/Cl-040.txt
+  row_count: 13
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Cl-040.yaml
+- table_id: Cl-049
+  formula: ClMg
+  phase: g
+  title_as_published: Magnesium Chloride (MgCl)  |  | Cl_{1}Mg_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-049.html
+  download_url: https://janaf.nist.gov/tables/Cl-049.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-049.yaml
+- table_id: Cl-053
+  formula: ClNa
+  phase: cr
+  title_as_published: Sodium Chloride (NaCl)  |  | Cl_{1}Na_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-053.html
+  download_url: https://janaf.nist.gov/tables/Cl-053.txt
+  row_count: 13
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cl-053.yaml
+- table_id: Cl-054
+  formula: ClNa
+  phase: l
+  title_as_published: Sodium Chloride (NaCl)  |  | Cl_{1}Na_{1}(l)
+  url: https://janaf.nist.gov/tables/Cl-054.html
+  download_url: https://janaf.nist.gov/tables/Cl-054.txt
+  row_count: 17
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Cl-054.yaml
+- table_id: Cl-055
+  formula: ClNa
+  phase: cr,l
+  title_as_published: Sodium Chloride (NaCl)  |  | Cl_{1}Na_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Cl-055.html
+  download_url: https://janaf.nist.gov/tables/Cl-055.txt
+  row_count: 21
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Cl-055.yaml
+- table_id: Cl-056
+  formula: ClNa
+  phase: g
+  title_as_published: Sodium Chloride (NaCl)  |  | Cl_{1}Na_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-056.html
+  download_url: https://janaf.nist.gov/tables/Cl-056.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-056.yaml
+- table_id: Cl-057
+  formula: ClNaO4
+  phase: cr
+  title_as_published: Sodium Perchlorate (NaClO_{4})  |  | Cl_{1}Na_{1}O_{4}(cr)
+  url: https://janaf.nist.gov/tables/Cl-057.html
+  download_url: https://janaf.nist.gov/tables/Cl-057.txt
+  row_count: 10
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Cl-057.yaml
+- table_id: Cl-058
+  formula: ClNi
+  phase: g
+  title_as_published: Nickel Chloride (NiCl)  |  | Cl_{1}Ni_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-058.html
+  download_url: https://janaf.nist.gov/tables/Cl-058.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-058.yaml
+- table_id: Cl-060
+  formula: OTiCl
+  phase: g
+  title_as_published: Titanium Chloride Oxide (OTiCl) Cl_{1}O_{1}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-060.html
+  download_url: https://janaf.nist.gov/tables/Cl-060.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-060.yaml
+- table_id: Cl-062
+  formula: PCl
+  phase: g
+  title_as_published: Phosphorus Chloride (PCl) Cl_{1}P_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-062.html
+  download_url: https://janaf.nist.gov/tables/Cl-062.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-062.yaml
+- table_id: Cl-068
+  formula: ClSi
+  phase: g
+  title_as_published: Clorosilylidyne (SiCl)  |  | Cl_{1}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-068.html
+  download_url: https://janaf.nist.gov/tables/Cl-068.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-068.yaml
+- table_id: Cl-070
+  formula: ClTi
+  phase: g
+  title_as_published: Titanium Chloride (TiCl)  |  | Cl_{1}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-070.html
+  download_url: https://janaf.nist.gov/tables/Cl-070.txt
+  row_count: 54
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-070.yaml
+- table_id: Cl-073
+  formula: Cl2
+  phase: ref
+  title_as_published: Chlorine (Cl_{2})  |  | Cl_{2}(ref)
+  url: https://janaf.nist.gov/tables/Cl-073.html
+  download_url: https://janaf.nist.gov/tables/Cl-073.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-073.yaml
+- table_id: Cl-081
+  formula: Cl2Fe
+  phase: cr
+  title_as_published: Iron Chloride (FeCl_{2})  |  | Cl_{2}Fe_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-081.html
+  download_url: https://janaf.nist.gov/tables/Cl-081.txt
+  row_count: 16
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-081.yaml
+- table_id: Cl-082
+  formula: Cl2Fe
+  phase: l
+  title_as_published: Iron Chloride (FeCl_{2})  |  | Cl_{2}Fe_{1}(l)
+  url: https://janaf.nist.gov/tables/Cl-082.html
+  download_url: https://janaf.nist.gov/tables/Cl-082.txt
+  row_count: 13
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Cl-082.yaml
+- table_id: Cl-083
+  formula: Cl2Fe
+  phase: cr,l
+  title_as_published: Iron Chloride (FeCl_{2})  |  | Cl_{2}Fe_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Cl-083.html
+  download_url: https://janaf.nist.gov/tables/Cl-083.txt
+  row_count: 17
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cl-083.yaml
+- table_id: Cl-084
+  formula: Cl2Fe
+  phase: g
+  title_as_published: Iron Chloride (FeCl_{2})  |  | Cl_{2}Fe_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-084.html
+  download_url: https://janaf.nist.gov/tables/Cl-084.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-084.yaml
+- table_id: Cl-091
+  formula: Cl2K2
+  phase: g
+  title_as_published: Potassium Chloride ((KCl)_{2})  |  | Cl_{2}K_{2}(g)
+  url: https://janaf.nist.gov/tables/Cl-091.html
+  download_url: https://janaf.nist.gov/tables/Cl-091.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-091.yaml
+- table_id: Cl-093
+  formula: Cl2Mg
+  phase: cr
+  title_as_published: Magnesium Chloride (MgCl_{2})  |  | Cl_{2}Mg_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-093.html
+  download_url: https://janaf.nist.gov/tables/Cl-093.txt
+  row_count: 16
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-093.yaml
+- table_id: Cl-094
+  formula: Cl2Mg
+  phase: l
+  title_as_published: Magnesium Chloride (MgCl_{2})  |  | Cl_{2}Mg_{1}(l)
+  url: https://janaf.nist.gov/tables/Cl-094.html
+  download_url: https://janaf.nist.gov/tables/Cl-094.txt
+  row_count: 17
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Cl-094.yaml
+- table_id: Cl-095
+  formula: Cl2Mg
+  phase: cr,l
+  title_as_published: Magnesium Chloride (MgCl_{2})  |  | Cl_{2}Mg_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Cl-095.html
+  download_url: https://janaf.nist.gov/tables/Cl-095.txt
+  row_count: 21
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cl-095.yaml
+- table_id: Cl-096
+  formula: Cl2Mg
+  phase: g
+  title_as_published: Magnesium Chloride (MgCl_{2})  |  | Cl_{2}Mg_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-096.html
+  download_url: https://janaf.nist.gov/tables/Cl-096.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-096.yaml
+- table_id: Cl-098
+  formula: Cl2Na2
+  phase: g
+  title_as_published: Sodium Chloride ((NaCl)_{2})  |  | Cl_{2}Na_{2}(g)
+  url: https://janaf.nist.gov/tables/Cl-098.html
+  download_url: https://janaf.nist.gov/tables/Cl-098.txt
+  row_count: 45
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-098.yaml
+- table_id: Cl-099
+  formula: Cl2Ni
+  phase: cr
+  title_as_published: Nickel Chloride (NiCl_{2})  |  | Cl_{2}Ni_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-099.html
+  download_url: https://janaf.nist.gov/tables/Cl-099.txt
+  row_count: 15
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cl-099.yaml
+- table_id: Cl-100
+  formula: Cl2Ni
+  phase: l
+  title_as_published: Nickel Chloride (NiCl_{2})  |  | Cl_{2}Ni_{1}(l)
+  url: https://janaf.nist.gov/tables/Cl-100.html
+  download_url: https://janaf.nist.gov/tables/Cl-100.txt
+  row_count: 10
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Cl-100.yaml
+- table_id: Cl-101
+  formula: Cl2Ni
+  phase: cr,l
+  title_as_published: Nickel Chloride (NiCl_{2})  |  | Cl_{2}Ni_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Cl-101.html
+  download_url: https://janaf.nist.gov/tables/Cl-101.txt
+  row_count: 14
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Cl-101.yaml
+- table_id: Cl-102
+  formula: Cl2Ni
+  phase: g
+  title_as_published: Nickel Chloride (NiCl_{2})  |  | Cl_{2}Ni_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-102.html
+  download_url: https://janaf.nist.gov/tables/Cl-102.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-102.yaml
+- table_id: Cl-104
+  formula: Cl2OTi
+  phase: g
+  title_as_published: Titanium Chloride Oxide (TiOCl_{2})  |  | Cl_{2}O_{1}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-104.html
+  download_url: https://janaf.nist.gov/tables/Cl-104.txt
+  row_count: 57
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-104.yaml
+- table_id: Cl-118
+  formula: Cl2Si
+  phase: g
+  title_as_published: Dichlorosilylene (SiCl_{2})  |  | Cl_{2}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-118.html
+  download_url: https://janaf.nist.gov/tables/Cl-118.txt
+  row_count: 51
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-118.yaml
+- table_id: Cl-123
+  formula: Cl2Ti
+  phase: cr
+  title_as_published: Titanium Chloride (TiCl_{2})  |  | Cl_{2}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-123.html
+  download_url: https://janaf.nist.gov/tables/Cl-123.txt
+  row_count: 17
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-123.yaml
+- table_id: Cl-124
+  formula: TiCl2
+  phase: g
+  title_as_published: Titanium Chloride (TiCl_{2}) Cl_{2}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-124.html
+  download_url: https://janaf.nist.gov/tables/Cl-124.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-124.yaml
+- table_id: Cl-134
+  formula: Cl3Fe
+  phase: cr
+  title_as_published: Iron Chloride (FeCl_{3})  |  | Cl_{3}Fe_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-134.html
+  download_url: https://janaf.nist.gov/tables/Cl-134.txt
+  row_count: 13
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cl-134.yaml
+- table_id: Cl-135
+  formula: Cl3Fe
+  phase: l
+  title_as_published: Iron Chloride (FeCl_{3})  |  | Cl_{3}Fe_{1}(l)
+  url: https://janaf.nist.gov/tables/Cl-135.html
+  download_url: https://janaf.nist.gov/tables/Cl-135.txt
+  row_count: 10
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Cl-135.yaml
+- table_id: Cl-136
+  formula: Cl3Fe
+  phase: cr,l
+  title_as_published: Iron Chloride (FeCl_{3})  |  | Cl_{3}Fe_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Cl-136.html
+  download_url: https://janaf.nist.gov/tables/Cl-136.txt
+  row_count: 14
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Cl-136.yaml
+- table_id: Cl-137
+  formula: Cl3Fe
+  phase: g
+  title_as_published: Iron Chloride (FeCl_{3})  |  | Cl_{3}Fe_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-137.html
+  download_url: https://janaf.nist.gov/tables/Cl-137.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-137.yaml
+- table_id: Cl-140
+  formula: Cl3OP
+  phase: g
+  title_as_published: Phosphoryl Chloride (OPCl_{3})  |  | Cl_{3}O_{1}P_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-140.html
+  download_url: https://janaf.nist.gov/tables/Cl-140.txt
+  row_count: 57
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-140.yaml
+- table_id: Cl-141
+  formula: Cl3P
+  phase: g
+  title_as_published: Phosphorus Chloride (PCl_{3})  |  | Cl_{3}P_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-141.html
+  download_url: https://janaf.nist.gov/tables/Cl-141.txt
+  row_count: 51
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-141.yaml
+- table_id: Cl-143
+  formula: Cl3Si
+  phase: g
+  title_as_published: Trichlorosilyl (SiCl_{3})  |  | Cl_{3}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-143.html
+  download_url: https://janaf.nist.gov/tables/Cl-143.txt
+  row_count: 59
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-143.yaml
+- table_id: Cl-144
+  formula: Cl3Ti
+  phase: cr
+  title_as_published: Titanium Chloride (TiCl_{3})  |  | Cl_{3}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-144.html
+  download_url: https://janaf.nist.gov/tables/Cl-144.txt
+  row_count: 13
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-144.yaml
+- table_id: Cl-145
+  formula: Cl3Ti
+  phase: g
+  title_as_published: Titanium Chloride (TiCl_{3})  |  | Cl_{3}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-145.html
+  download_url: https://janaf.nist.gov/tables/Cl-145.txt
+  row_count: 57
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-145.yaml
+- table_id: Cl-149
+  formula: Cl4Fe2
+  phase: g
+  title_as_published: Iron Chloride ((FeCl_{2})_{2})  |  | Cl_{4}Fe_{2}(g)
+  url: https://janaf.nist.gov/tables/Cl-149.html
+  download_url: https://janaf.nist.gov/tables/Cl-149.txt
+  row_count: 43
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-149.yaml
+- table_id: Cl-150
+  formula: Cl4Mg2
+  phase: g
+  title_as_published: Magnesium Chloride ((MgCl_{2})_{2})  |  | Cl_{4}Mg_{2}(g)
+  url: https://janaf.nist.gov/tables/Cl-150.html
+  download_url: https://janaf.nist.gov/tables/Cl-150.txt
+  row_count: 55
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-150.yaml
+- table_id: Cl-160
+  formula: Cl4Si
+  phase: g
+  title_as_published: Tetrachlorosilane (SiCl_{4})  |  | Cl_{4}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-160.html
+  download_url: https://janaf.nist.gov/tables/Cl-160.txt
+  row_count: 43
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-160.yaml
+- table_id: Cl-161
+  formula: Cl4Ti
+  phase: cr
+  title_as_published: Titanium Chloride (TiCl_{4})  |  | Cl_{4}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cl-161.html
+  download_url: https://janaf.nist.gov/tables/Cl-161.txt
+  row_count: 6
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cl-161.yaml
+- table_id: Cl-162
+  formula: Cl4Ti
+  phase: l
+  title_as_published: Titanium Chloride (TiCl_{4})  |  | Cl_{4}Ti_{1}(l)
+  url: https://janaf.nist.gov/tables/Cl-162.html
+  download_url: https://janaf.nist.gov/tables/Cl-162.txt
+  row_count: 7
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Cl-162.yaml
+- table_id: Cl-163
+  formula: Cl4Ti
+  phase: cr,l
+  title_as_published: Titanium Chloride (TiCl_{4})  |  | Cl_{4}Ti_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Cl-163.html
+  download_url: https://janaf.nist.gov/tables/Cl-163.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cl-163.yaml
+- table_id: Cl-164
+  formula: Cl4Ti
+  phase: g
+  title_as_published: Titanium Chloride (TiCl_{4})  |  | Cl_{4}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-164.html
+  download_url: https://janaf.nist.gov/tables/Cl-164.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-164.yaml
+- table_id: Cl-177
+  formula: Cl5P
+  phase: g
+  title_as_published: Phosphorus Chloride (PCl_{5})  |  | Cl_{5}P_{1}(g)
+  url: https://janaf.nist.gov/tables/Cl-177.html
+  download_url: https://janaf.nist.gov/tables/Cl-177.txt
+  row_count: 57
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-177.yaml
+- table_id: Cl-186
+  formula: Cl6Fe2
+  phase: g
+  title_as_published: Iron Chloride ((FeCl_{3})_{2})  |  | Cl_{6}Fe_{2}(g)
+  url: https://janaf.nist.gov/tables/Cl-186.html
+  download_url: https://janaf.nist.gov/tables/Cl-186.txt
+  row_count: 44
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Cl-186.yaml
+- table_id: Cr-001
+  formula: Cr
+  phase: ref
+  title_as_published: Chromium (Cr)  |  | Cr_{1}(ref)
+  url: https://janaf.nist.gov/tables/Cr-001.html
+  download_url: https://janaf.nist.gov/tables/Cr-001.txt
+  row_count: 43
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Cr-001.yaml
+- table_id: Cr-002
+  formula: Cr
+  phase: cr
+  title_as_published: Chromium (Cr)  |  | Cr_{1}(cr)
+  url: https://janaf.nist.gov/tables/Cr-002.html
+  download_url: https://janaf.nist.gov/tables/Cr-002.txt
+  row_count: 25
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Cr-002.yaml
+- table_id: Cr-003
+  formula: Cr
+  phase: l
+  title_as_published: Chromium (Cr)  |  | Cr_{1}(l)
+  url: https://janaf.nist.gov/tables/Cr-003.html
+  download_url: https://janaf.nist.gov/tables/Cr-003.txt
+  row_count: 25
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Cr-003.yaml
+- table_id: Cr-004
+  formula: Cr
+  phase: cr,l
+  title_as_published: Chromium (Cr)  |  | Cr_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Cr-004.html
+  download_url: https://janaf.nist.gov/tables/Cr-004.txt
+  row_count: 32
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Cr-004.yaml
+- table_id: Cr-005
+  formula: Cr
+  phase: g
+  title_as_published: Chromium (Cr)  |  | Cr_{1}(g)
+  url: https://janaf.nist.gov/tables/Cr-005.html
+  download_url: https://janaf.nist.gov/tables/Cr-005.txt
+  row_count: 62
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Cr-005.yaml
+- table_id: Cr-014
+  formula: Cr2O3
+  phase: cr
+  title_as_published: Chromium Oxide (Cr_{2}O_{3})  |  | Cr_{2}O_{3}(cr)
+  url: https://janaf.nist.gov/tables/Cr-014.html
+  download_url: https://janaf.nist.gov/tables/Cr-014.txt
+  row_count: 24
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Cr-014.yaml
+- table_id: Cr-015
+  formula: Cr2O3
+  phase: l
+  title_as_published: Chromium Oxide (Cr_{2}O_{3})  |  | Cr_{2}O_{3}(l)
+  url: https://janaf.nist.gov/tables/Cr-015.html
+  download_url: https://janaf.nist.gov/tables/Cr-015.txt
+  row_count: 33
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Cr-015.yaml
+- table_id: Cr-016
+  formula: Cr2O3
+  phase: cr,l
+  title_as_published: Chromium Oxide (Cr_{2}O_{3})  |  | Cr_{2}O_{3}(cr,l)
+  url: https://janaf.nist.gov/tables/Cr-016.html
+  download_url: https://janaf.nist.gov/tables/Cr-016.txt
+  row_count: 36
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Cr-016.yaml
+- table_id: F-001
+  formula: F
+  phase: g
+  title_as_published: Fluorine (F)  |  | F_{1}(g)
+  url: https://janaf.nist.gov/tables/F-001.html
+  download_url: https://janaf.nist.gov/tables/F-001.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-001.yaml
+- table_id: F-004
+  formula: FFe
+  phase: g
+  title_as_published: Iron Fluoride (FeF)  |  | F_{1}Fe_{1}(g)
+  url: https://janaf.nist.gov/tables/F-004.html
+  download_url: https://janaf.nist.gov/tables/F-004.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-004.yaml
+- table_id: F-005
+  formula: FH
+  phase: g
+  title_as_published: Hydrogen Fluoride (HF)  |  | F_{1}H_{1}(g)
+  url: https://janaf.nist.gov/tables/F-005.html
+  download_url: https://janaf.nist.gov/tables/F-005.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-005.yaml
+- table_id: F-006
+  formula: F2H2
+  phase: g
+  title_as_published: Hydrogen Fluoride ((HF)_{2})  |  | F_{2}H_{2}(g)
+  url: https://janaf.nist.gov/tables/F-006.html
+  download_url: https://janaf.nist.gov/tables/F-006.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-006.yaml
+- table_id: F-007
+  formula: F3H3
+  phase: g
+  title_as_published: Hydrogen Fluoride (H_{3}F_{3})  |  | F_{3}H_{3}(g)
+  url: https://janaf.nist.gov/tables/F-007.html
+  download_url: https://janaf.nist.gov/tables/F-007.txt
+  row_count: 45
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-007.yaml
+- table_id: F-008
+  formula: F4H4
+  phase: g
+  title_as_published: Hydrogen Fluoride (H_{4}F_{4})  |  | F_{4}H_{4}(g)
+  url: https://janaf.nist.gov/tables/F-008.html
+  download_url: https://janaf.nist.gov/tables/F-008.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-008.yaml
+- table_id: F-009
+  formula: F5H5
+  phase: g
+  title_as_published: Hydrogen Fluoride (H_{5}F_{5})  |  | F_{5}H_{5}(g)
+  url: https://janaf.nist.gov/tables/F-009.html
+  download_url: https://janaf.nist.gov/tables/F-009.txt
+  row_count: 42
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-009.yaml
+- table_id: F-010
+  formula: F6H6
+  phase: g
+  title_as_published: Hydrogen Fluoride (H_{6}F_{6})  |  | F_{6}H_{6}(g)
+  url: https://janaf.nist.gov/tables/F-010.html
+  download_url: https://janaf.nist.gov/tables/F-010.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-010.yaml
+- table_id: F-011
+  formula: F7H7
+  phase: g
+  title_as_published: Hydrogen Fluoride (H_{7}F_{7})  |  | F_{7}H_{7}(g)
+  url: https://janaf.nist.gov/tables/F-011.html
+  download_url: https://janaf.nist.gov/tables/F-011.txt
+  row_count: 41
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-011.yaml
+- table_id: F-012
+  formula: FHO
+  phase: g
+  title_as_published: Hypofluorous Acid (HOF)  |  | F_{1}H_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/F-012.html
+  download_url: https://janaf.nist.gov/tables/F-012.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-012.yaml
+- table_id: F-017
+  formula: FK
+  phase: cr
+  title_as_published: Potassium Fluoride (KF)  |  | F_{1}K_{1}(cr)
+  url: https://janaf.nist.gov/tables/F-017.html
+  download_url: https://janaf.nist.gov/tables/F-017.txt
+  row_count: 16
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-017.yaml
+- table_id: F-018
+  formula: FK
+  phase: l
+  title_as_published: Potassium Fluoride (KF)  |  | F_{1}K_{1}(l)
+  url: https://janaf.nist.gov/tables/F-018.html
+  download_url: https://janaf.nist.gov/tables/F-018.txt
+  row_count: 21
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/F-018.yaml
+- table_id: F-019
+  formula: FK
+  phase: cr,l
+  title_as_published: Potassium Fluoride (KF)  |  | F_{1}K_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/F-019.html
+  download_url: https://janaf.nist.gov/tables/F-019.txt
+  row_count: 26
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/F-019.yaml
+- table_id: F-020
+  formula: FK
+  phase: g
+  title_as_published: Potassium Fluoride (KF)  |  | F_{1}K_{1}(g)
+  url: https://janaf.nist.gov/tables/F-020.html
+  download_url: https://janaf.nist.gov/tables/F-020.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-020.yaml
+- table_id: F-026
+  formula: FMg
+  phase: g
+  title_as_published: Magnesium Fluoride (MgF)  |  | F_{1}Mg_{1}(g)
+  url: https://janaf.nist.gov/tables/F-026.html
+  download_url: https://janaf.nist.gov/tables/F-026.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-026.yaml
+- table_id: F-033
+  formula: FNa
+  phase: cr
+  title_as_published: Sodium Fluoride (NaF)  |  | F_{1}Na_{1}(cr)
+  url: https://janaf.nist.gov/tables/F-033.html
+  download_url: https://janaf.nist.gov/tables/F-033.txt
+  row_count: 24
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/F-033.yaml
+- table_id: F-034
+  formula: FNa
+  phase: l
+  title_as_published: Sodium Fluoride (NaF)  |  | F_{1}Na_{1}(l)
+  url: https://janaf.nist.gov/tables/F-034.html
+  download_url: https://janaf.nist.gov/tables/F-034.txt
+  row_count: 24
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/F-034.yaml
+- table_id: F-035
+  formula: FNa
+  phase: cr,l
+  title_as_published: Sodium Fluoride (NaF)  |  | F_{1}Na_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/F-035.html
+  download_url: https://janaf.nist.gov/tables/F-035.txt
+  row_count: 31
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/F-035.yaml
+- table_id: F-036
+  formula: FNa
+  phase: g
+  title_as_published: Sodium Fluoride (NaF)  |  | F_{1}Na_{1}(g)
+  url: https://janaf.nist.gov/tables/F-036.html
+  download_url: https://janaf.nist.gov/tables/F-036.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-036.yaml
+- table_id: F-038
+  formula: FOTi
+  phase: g
+  title_as_published: Titanium Fluoride Oxide (OTiF)  |  | F_{1}O_{1}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/F-038.html
+  download_url: https://janaf.nist.gov/tables/F-038.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-038.yaml
+- table_id: F-040
+  formula: FP
+  phase: g
+  title_as_published: Phosphorus Fluoride (PF)  |  | F_{1}P_{1}(g)
+  url: https://janaf.nist.gov/tables/F-040.html
+  download_url: https://janaf.nist.gov/tables/F-040.txt
+  row_count: 51
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-040.yaml
+- table_id: F-048
+  formula: FSi
+  phase: g
+  title_as_published: Fluorosilylidyne (SiF)  |  | F_{1}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/F-048.html
+  download_url: https://janaf.nist.gov/tables/F-048.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-048.yaml
+- table_id: F-051
+  formula: FTi
+  phase: g
+  title_as_published: Titanium Fluoride (TiF)  |  | F_{1}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/F-051.html
+  download_url: https://janaf.nist.gov/tables/F-051.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-051.yaml
+- table_id: F-054
+  formula: F2
+  phase: ref
+  title_as_published: Fluorine (F_{2})  |  | F_{2}(ref)
+  url: https://janaf.nist.gov/tables/F-054.html
+  download_url: https://janaf.nist.gov/tables/F-054.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-054.yaml
+- table_id: F-055
+  formula: F2Fe
+  phase: cr
+  title_as_published: Iron Fluoride (FeF_{2})  |  | F_{2}Fe_{1}(cr)
+  url: https://janaf.nist.gov/tables/F-055.html
+  download_url: https://janaf.nist.gov/tables/F-055.txt
+  row_count: 16
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-055.yaml
+- table_id: F-056
+  formula: F2Fe
+  phase: l
+  title_as_published: Iron Fluoride (FeF_{2})  |  | F_{2}Fe_{1}(l)
+  url: https://janaf.nist.gov/tables/F-056.html
+  download_url: https://janaf.nist.gov/tables/F-056.txt
+  row_count: 21
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/F-056.yaml
+- table_id: F-057
+  formula: F2Fe
+  phase: cr,l
+  title_as_published: Iron Fluoride (FeF_{2})  |  | F_{2}Fe_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/F-057.html
+  download_url: https://janaf.nist.gov/tables/F-057.txt
+  row_count: 25
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/F-057.yaml
+- table_id: F-058
+  formula: FeF2
+  phase: g
+  title_as_published: Iron Fluoride (FeF_{2}) F_{2}Fe_{1}(g)
+  url: https://janaf.nist.gov/tables/F-058.html
+  download_url: https://janaf.nist.gov/tables/F-058.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-058.yaml
+- table_id: F-069
+  formula: F2K2
+  phase: g
+  title_as_published: Potassium Fluoride ((KF)_{2})  |  | F_{2}K_{2}(g)
+  url: https://janaf.nist.gov/tables/F-069.html
+  download_url: https://janaf.nist.gov/tables/F-069.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-069.yaml
+- table_id: F-072
+  formula: F2Mg
+  phase: cr
+  title_as_published: Magnesium Fluoride (MgF_{2})  |  | F_{2}Mg_{1}(cr)
+  url: https://janaf.nist.gov/tables/F-072.html
+  download_url: https://janaf.nist.gov/tables/F-072.txt
+  row_count: 17
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/F-072.yaml
+- table_id: F-073
+  formula: F2Mg
+  phase: l
+  title_as_published: Magnesium Fluoride (MgF_{2})  |  | F_{2}Mg_{1}(l)
+  url: https://janaf.nist.gov/tables/F-073.html
+  download_url: https://janaf.nist.gov/tables/F-073.txt
+  row_count: 23
+  ambiguity_count: 7
+  path: data/literature/compilations/janaf/tables/F-073.yaml
+- table_id: F-074
+  formula: F2Mg
+  phase: cr,l
+  title_as_published: Magnesium Fluoride (MgF_{2})  |  | F_{2}Mg_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/F-074.html
+  download_url: https://janaf.nist.gov/tables/F-074.txt
+  row_count: 26
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/F-074.yaml
+- table_id: F-075
+  formula: F2Mg
+  phase: g
+  title_as_published: Magnesium Fluoride (MgF_{2})  |  | F_{2}Mg_{1}(g)
+  url: https://janaf.nist.gov/tables/F-075.html
+  download_url: https://janaf.nist.gov/tables/F-075.txt
+  row_count: 57
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-075.yaml
+- table_id: F-082
+  formula: F2Na2
+  phase: g
+  title_as_published: Sodium Fluoride ((NaF)_{2})  |  | F_{2}Na_{2}(g)
+  url: https://janaf.nist.gov/tables/F-082.html
+  download_url: https://janaf.nist.gov/tables/F-082.txt
+  row_count: 44
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-082.yaml
+- table_id: F-085
+  formula: OSiF2
+  phase: g
+  title_as_published: Difluorooxosilane (OSiF_{2}) F_{2}O_{1}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/F-085.html
+  download_url: https://janaf.nist.gov/tables/F-085.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-085.yaml
+- table_id: F-086
+  formula: F2OTi
+  phase: g
+  title_as_published: Titanium Fluoride Oxide (OTiF_{2})  |  | F_{2}O_{1}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/F-086.html
+  download_url: https://janaf.nist.gov/tables/F-086.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-086.yaml
+- table_id: F-088
+  formula: PF2
+  phase: g
+  title_as_published: Phosphorus Fluoride (PF_{2}) F_{2}P_{1}(g)
+  url: https://janaf.nist.gov/tables/F-088.html
+  download_url: https://janaf.nist.gov/tables/F-088.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-088.yaml
+- table_id: F-101
+  formula: F2Si
+  phase: g
+  title_as_published: Difluorosilylene (SiF_{2})  |  | F_{2}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/F-101.html
+  download_url: https://janaf.nist.gov/tables/F-101.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-101.yaml
+- table_id: F-106
+  formula: F2Ti
+  phase: g
+  title_as_published: Titanium Fluoride (TiF_{2})  |  | F_{2}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/F-106.html
+  download_url: https://janaf.nist.gov/tables/F-106.txt
+  row_count: 57
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-106.yaml
+- table_id: F-111
+  formula: F3Fe
+  phase: cr
+  title_as_published: Iron Fluoride (FeF_{3})  |  | F_{3}Fe_{1}(cr)
+  url: https://janaf.nist.gov/tables/F-111.html
+  download_url: https://janaf.nist.gov/tables/F-111.txt
+  row_count: 14
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/F-111.yaml
+- table_id: F-112
+  formula: F3Fe
+  phase: g
+  title_as_published: Iron Fluoride (FeF_{3})  |  | F_{3}Fe_{1}(g)
+  url: https://janaf.nist.gov/tables/F-112.html
+  download_url: https://janaf.nist.gov/tables/F-112.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-112.yaml
+- table_id: F-118
+  formula: F3OP
+  phase: g
+  title_as_published: Phosphoryl Fluoride (POF_{3})  |  | F_{3}O_{1}P_{1}(g)
+  url: https://janaf.nist.gov/tables/F-118.html
+  download_url: https://janaf.nist.gov/tables/F-118.txt
+  row_count: 43
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-118.yaml
+- table_id: F-119
+  formula: F3P
+  phase: g
+  title_as_published: Phosphorus Fluoride (PF_{3})  |  | F_{3}P_{1}(g)
+  url: https://janaf.nist.gov/tables/F-119.html
+  download_url: https://janaf.nist.gov/tables/F-119.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-119.yaml
+- table_id: F-124
+  formula: F3Si
+  phase: g
+  title_as_published: Trifluorosilyl (SiF_{3})  |  | F_{3}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/F-124.html
+  download_url: https://janaf.nist.gov/tables/F-124.txt
+  row_count: 43
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-124.yaml
+- table_id: F-125
+  formula: F3Ti
+  phase: cr
+  title_as_published: Titanium Fluoride (TiF_{3})  |  | F_{3}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/F-125.html
+  download_url: https://janaf.nist.gov/tables/F-125.txt
+  row_count: 14
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/F-125.yaml
+- table_id: F-126
+  formula: F3Ti
+  phase: g
+  title_as_published: Titanium Fluoride (TiF_{3})  |  | F_{3}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/F-126.html
+  download_url: https://janaf.nist.gov/tables/F-126.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-126.yaml
+- table_id: F-129
+  formula: F4Mg2
+  phase: g
+  title_as_published: Magnesium Fluoride ((MgF_{2})_{2})  |  | F_{4}Mg_{2}(g)
+  url: https://janaf.nist.gov/tables/F-129.html
+  download_url: https://janaf.nist.gov/tables/F-129.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-129.yaml
+- table_id: F-141
+  formula: F4Si
+  phase: g
+  title_as_published: Tetrafluorosilane (SiF_{4})  |  | F_{4}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/F-141.html
+  download_url: https://janaf.nist.gov/tables/F-141.txt
+  row_count: 42
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-141.yaml
+- table_id: F-142
+  formula: F4Ti
+  phase: cr
+  title_as_published: Titanium Fluoride (TiF_{4})  |  | F_{4}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/F-142.html
+  download_url: https://janaf.nist.gov/tables/F-142.txt
+  row_count: 15
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-142.yaml
+- table_id: F-143
+  formula: F4Ti
+  phase: g
+  title_as_published: Titanium Fluoride (TiF_{4})  |  | F_{4}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/F-143.html
+  download_url: https://janaf.nist.gov/tables/F-143.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-143.yaml
+- table_id: F-148
+  formula: F5P
+  phase: g
+  title_as_published: Phosphorus Fluoride (PF_{5})  |  | F_{5}P_{1}(g)
+  url: https://janaf.nist.gov/tables/F-148.html
+  download_url: https://janaf.nist.gov/tables/F-148.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/F-148.yaml
+- table_id: Fe-003
+  formula: Fe
+  phase: ref
+  title_as_published: Iron (Fe)  |  | Fe_{1}(ref)
+  url: https://janaf.nist.gov/tables/Fe-003.html
+  download_url: https://janaf.nist.gov/tables/Fe-003.txt
+  row_count: 37
+  ambiguity_count: 7
+  path: data/literature/compilations/janaf/tables/Fe-003.yaml
+- table_id: Fe-004
+  formula: Fe
+  phase: cr
+  title_as_published: Iron, Alpha-Delta (Fe)  |  | Fe_{1}(cr)
+  url: https://janaf.nist.gov/tables/Fe-004.html
+  download_url: https://janaf.nist.gov/tables/Fe-004.txt
+  row_count: 19
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Fe-004.yaml
+- table_id: Fe-005
+  formula: Fe
+  phase: cr
+  title_as_published: Iron, Gamma (Fe)  |  | Fe_{1}(cr)
+  url: https://janaf.nist.gov/tables/Fe-005.html
+  download_url: https://janaf.nist.gov/tables/Fe-005.txt
+  row_count: 16
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/Fe-005.yaml
+- table_id: Fe-006
+  formula: Fe
+  phase: l
+  title_as_published: Iron (Fe)  |  | Fe_{1}(l)
+  url: https://janaf.nist.gov/tables/Fe-006.html
+  download_url: https://janaf.nist.gov/tables/Fe-006.txt
+  row_count: 31
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/Fe-006.yaml
+- table_id: Fe-007
+  formula: Fe
+  phase: cr,l
+  title_as_published: Iron (Fe)  |  | Fe_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Fe-007.html
+  download_url: https://janaf.nist.gov/tables/Fe-007.txt
+  row_count: 33
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Fe-007.yaml
+- table_id: Fe-008
+  formula: Fe
+  phase: g
+  title_as_published: Iron (Fe)  |  | Fe_{1}(g)
+  url: https://janaf.nist.gov/tables/Fe-008.html
+  download_url: https://janaf.nist.gov/tables/Fe-008.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Fe-008.yaml
+- table_id: Fe-018
+  formula: FeO
+  phase: cr
+  title_as_published: Iron Oxide (FeO)  |  | Fe_{1}O_{1}(cr)
+  url: https://janaf.nist.gov/tables/Fe-018.html
+  download_url: https://janaf.nist.gov/tables/Fe-018.txt
+  row_count: 13
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Fe-018.yaml
+- table_id: Fe-019
+  formula: FeO
+  phase: l
+  title_as_published: Iron Oxide (FeO)  |  | Fe_{1}O_{1}(l)
+  url: https://janaf.nist.gov/tables/Fe-019.html
+  download_url: https://janaf.nist.gov/tables/Fe-019.txt
+  row_count: 36
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Fe-019.yaml
+- table_id: Fe-020
+  formula: FeO
+  phase: cr,l
+  title_as_published: Iron Oxide (FeO)  |  | Fe_{1}O_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Fe-020.html
+  download_url: https://janaf.nist.gov/tables/Fe-020.txt
+  row_count: 37
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Fe-020.yaml
+- table_id: Fe-021
+  formula: FeO
+  phase: g
+  title_as_published: Iron Oxide (FeO)  |  | Fe_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/Fe-021.html
+  download_url: https://janaf.nist.gov/tables/Fe-021.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Fe-021.yaml
+- table_id: Fe-022
+  formula: FeO4S
+  phase: cr
+  title_as_published: Iron Sulfate (FeSO_{4})  |  | Fe_{1}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Fe-022.html
+  download_url: https://janaf.nist.gov/tables/Fe-022.txt
+  row_count: 18
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Fe-022.yaml
+- table_id: Fe-023
+  formula: FeS
+  phase: cr
+  title_as_published: Iron Sulfide, Troilite (FeS)  |  | Fe_{1}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Fe-023.html
+  download_url: https://janaf.nist.gov/tables/Fe-023.txt
+  row_count: 14
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Fe-023.yaml
+- table_id: Fe-024
+  formula: FeS
+  phase: l
+  title_as_published: Iron Sulfide (FeS)  |  | Fe_{1}S_{1}(l)
+  url: https://janaf.nist.gov/tables/Fe-024.html
+  download_url: https://janaf.nist.gov/tables/Fe-024.txt
+  row_count: 27
+  ambiguity_count: 9
+  path: data/literature/compilations/janaf/tables/Fe-024.yaml
+- table_id: Fe-025
+  formula: FeS
+  phase: cr,l
+  title_as_published: Iron Sulfide, Troilite (FeS)  |  | Fe_{1}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Fe-025.html
+  download_url: https://janaf.nist.gov/tables/Fe-025.txt
+  row_count: 29
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Fe-025.yaml
+- table_id: Fe-026
+  formula: FeS
+  phase: g
+  title_as_published: Iron Sulfide (FeS)  |  | Fe_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/Fe-026.html
+  download_url: https://janaf.nist.gov/tables/Fe-026.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Fe-026.yaml
+- table_id: Fe-027
+  formula: FeS2
+  phase: cr
+  title_as_published: Iron Sulfide, Marcasite (FeS_{2})  |  | Fe_{1}S_{2}(cr)
+  url: https://janaf.nist.gov/tables/Fe-027.html
+  download_url: https://janaf.nist.gov/tables/Fe-027.txt
+  row_count: 12
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Fe-027.yaml
+- table_id: Fe-028
+  formula: FeS2
+  phase: cr
+  title_as_published: Iron Sulfide, Pyrite (FeS_{2})  |  | Fe_{1}S_{2}(cr)
+  url: https://janaf.nist.gov/tables/Fe-028.html
+  download_url: https://janaf.nist.gov/tables/Fe-028.txt
+  row_count: 12
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Fe-028.yaml
+- table_id: Fe-030
+  formula: Fe2O3
+  phase: cr
+  title_as_published: Iron Oxide, Hematite (Fe_{2}O_{3})  |  | Fe_{2}O_{3}(cr)
+  url: https://janaf.nist.gov/tables/Fe-030.html
+  download_url: https://janaf.nist.gov/tables/Fe-030.txt
+  row_count: 20
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Fe-030.yaml
+- table_id: Fe-031
+  formula: Fe2O12S3
+  phase: cr
+  title_as_published: Iron Sulfate (Fe_{2}(SO_{4})_{3})  |  | Fe_{2}O_{1}_{2}S_{3}(cr)
+  url: https://janaf.nist.gov/tables/Fe-031.html
+  download_url: https://janaf.nist.gov/tables/Fe-031.txt
+  row_count: 14
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Fe-031.yaml
+- table_id: H-046
+  formula: HS
+  phase: g
+  title_as_published: Mercapto (HS)  |  | H_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/H-046.html
+  download_url: https://janaf.nist.gov/tables/H-046.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/H-046.yaml
+- table_id: H-063
+  formula: H2O
+  phase: l
+  title_as_published: Water (H_{2}O)  |  | H_{2}O_{1}(l)
+  url: https://janaf.nist.gov/tables/H-063.html
+  download_url: https://janaf.nist.gov/tables/H-063.txt
+  row_count: 10
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/H-063.yaml
+- table_id: H-064
+  formula: H2O
+  phase: g
+  title_as_published: Water (H_{2}O)  |  | H_{2}O_{1}(g)
+  url: https://janaf.nist.gov/tables/H-064.html
+  download_url: https://janaf.nist.gov/tables/H-064.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/H-064.yaml
+- table_id: H-065
+  formula: H2O
+  phase: l,g
+  title_as_published: Water, 1 Bar (H_{2}O)  |  | H_{2}O_{1}(l,g)
+  url: https://janaf.nist.gov/tables/H-065.html
+  download_url: https://janaf.nist.gov/tables/H-065.txt
+  row_count: 16
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/H-065.yaml
+- table_id: H-066
+  formula: H2O
+  phase: l,g
+  title_as_published: Water, 10 Bar (H_{2}O)  |  | H_{2}O_{1}(l,g)
+  url: https://janaf.nist.gov/tables/H-066.html
+  download_url: https://janaf.nist.gov/tables/H-066.txt
+  row_count: 11
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/H-066.yaml
+- table_id: H-067
+  formula: H2O
+  phase: l,g
+  title_as_published: Water, 100 Bar (H_{2}O)  |  | H_{2}O_{1}(l,g)
+  url: https://janaf.nist.gov/tables/H-067.html
+  download_url: https://janaf.nist.gov/tables/H-067.txt
+  row_count: 12
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/H-067.yaml
+- table_id: H-068
+  formula: H2O
+  phase: fl
+  title_as_published: Water, 500 Bar (H_{2}O)  |  | H_{2}O_{1}(fl)
+  url: https://janaf.nist.gov/tables/H-068.html
+  download_url: https://janaf.nist.gov/tables/H-068.txt
+  row_count: 12
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/H-068.yaml
+- table_id: H-069
+  formula: H2O
+  phase: fl
+  title_as_published: Water, 5000 Bar (H_{2}O)  |  | H_{2}O_{1}(fl)
+  url: https://janaf.nist.gov/tables/H-069.html
+  download_url: https://janaf.nist.gov/tables/H-069.txt
+  row_count: 12
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/H-069.yaml
+- table_id: H-075
+  formula: H2O4S
+  phase: cr,l
+  title_as_published: Sulfuric Acid (O_{2}S(OH)_{2})  |  | H_{2}O_{4}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/H-075.html
+  download_url: https://janaf.nist.gov/tables/H-075.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/H-075.yaml
+- table_id: H-076
+  formula: H2O4S
+  phase: g
+  title_as_published: Sulfuric Acid (O_{2}S(OH)_{2})  |  | H_{2}O_{4}S_{1}(g)
+  url: https://janaf.nist.gov/tables/H-076.html
+  download_url: https://janaf.nist.gov/tables/H-076.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/H-076.yaml
+- table_id: H-080
+  formula: H2S
+  phase: g
+  title_as_published: Hydrogen Sulfide (H_{2}S)  |  | H_{2}S_{1}(g)
+  url: https://janaf.nist.gov/tables/H-080.html
+  download_url: https://janaf.nist.gov/tables/H-080.txt
+  row_count: 40
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/H-080.yaml
+- table_id: H-092
+  formula: H4O5S
+  phase: cr,l
+  title_as_published: Sulfuric Acid, Monohydrate (H_{2}SO_{4}^{.}H_{2}O)  |  | H_{4}O_{5}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/H-092.html
+  download_url: https://janaf.nist.gov/tables/H-092.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/H-092.yaml
+- table_id: H-094
+  formula: H6O6S
+  phase: cr,l
+  title_as_published: Sulfuric Acid, Dihydrate (H_{2}SO_{4}^{.}2H_{2}O)  |  | H_{6}O_{6}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/H-094.html
+  download_url: https://janaf.nist.gov/tables/H-094.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/H-094.yaml
+- table_id: H-095
+  formula: H8O7S
+  phase: cr,l
+  title_as_published: Sulfuric Acid, Trihydrate (H_{2}SO_{4}^{.}3H_{2}O)  |  | H_{8}O_{7}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/H-095.html
+  download_url: https://janaf.nist.gov/tables/H-095.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/H-095.yaml
+- table_id: H-096
+  formula: H10O8S
+  phase: cr,l
+  title_as_published: Sulfuric Acid, Tetrahydrate (H_{2}SO_{4}^{.}4H_{2}O)  |  | H_{1}_{0}O_{8}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/H-096.html
+  download_url: https://janaf.nist.gov/tables/H-096.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/H-096.yaml
+- table_id: K-001
+  formula: K
+  phase: ref
+  title_as_published: Potassium (K)  |  | K_{1}(ref)
+  url: https://janaf.nist.gov/tables/K-001.html
+  download_url: https://janaf.nist.gov/tables/K-001.txt
+  row_count: 48
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/K-001.yaml
+- table_id: K-002
+  formula: K
+  phase: cr
+  title_as_published: Potassium (K)  |  | K_{1}(cr)
+  url: https://janaf.nist.gov/tables/K-002.html
+  download_url: https://janaf.nist.gov/tables/K-002.txt
+  row_count: 5
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/K-002.yaml
+- table_id: K-003
+  formula: K
+  phase: l
+  title_as_published: Potassium (K)  |  | K_{1}(l)
+  url: https://janaf.nist.gov/tables/K-003.html
+  download_url: https://janaf.nist.gov/tables/K-003.txt
+  row_count: 11
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/K-003.yaml
+- table_id: K-004
+  formula: K
+  phase: cr,l
+  title_as_published: Potassium (K)  |  | K_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/K-004.html
+  download_url: https://janaf.nist.gov/tables/K-004.txt
+  row_count: 16
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/K-004.yaml
+- table_id: K-005
+  formula: K
+  phase: g
+  title_as_published: Potassium (K)  |  | K_{1}(g)
+  url: https://janaf.nist.gov/tables/K-005.html
+  download_url: https://janaf.nist.gov/tables/K-005.txt
+  row_count: 63
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/K-005.yaml
+- table_id: K-008
+  formula: KO
+  phase: g
+  title_as_published: Potassium Oxide (KO)  |  | K_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/K-008.html
+  download_url: https://janaf.nist.gov/tables/K-008.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/K-008.yaml
+- table_id: K-011
+  formula: K2
+  phase: g
+  title_as_published: Potassium (K_{2})  |  | K_{2}(g)
+  url: https://janaf.nist.gov/tables/K-011.html
+  download_url: https://janaf.nist.gov/tables/K-011.txt
+  row_count: 49
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/K-011.yaml
+- table_id: K-012
+  formula: K2O
+  phase: cr
+  title_as_published: Potassium Oxide (K_{2}O)  |  | K_{2}O_{1}(cr)
+  url: https://janaf.nist.gov/tables/K-012.html
+  download_url: https://janaf.nist.gov/tables/K-012.txt
+  row_count: 14
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/K-012.yaml
+- table_id: K-017
+  formula: K2O4S
+  phase: cr
+  title_as_published: Potassium Sulfate, Alpha (K_{2}SO_{4})  |  | K_{2}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/K-017.html
+  download_url: https://janaf.nist.gov/tables/K-017.txt
+  row_count: 11
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/K-017.yaml
+- table_id: K-018
+  formula: K2O4S
+  phase: cr
+  title_as_published: Potassium Sulfate, Beta (K_{2}SO_{4})  |  | K_{2}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/K-018.html
+  download_url: https://janaf.nist.gov/tables/K-018.txt
+  row_count: 8
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/K-018.yaml
+- table_id: K-019
+  formula: K2O4S
+  phase: l
+  title_as_published: Potassium Sulfate (K_{2}SO_{4})  |  | K_{2}O_{4}S_{1}(l)
+  url: https://janaf.nist.gov/tables/K-019.html
+  download_url: https://janaf.nist.gov/tables/K-019.txt
+  row_count: 21
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/K-019.yaml
+- table_id: K-020
+  formula: K2O4S
+  phase: cr,l
+  title_as_published: Potassium Sulfate (K_{2}SO_{4})  |  | K_{2}O_{4}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/K-020.html
+  download_url: https://janaf.nist.gov/tables/K-020.txt
+  row_count: 25
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/K-020.yaml
+- table_id: K-021
+  formula: K2O4S
+  phase: g
+  title_as_published: Potassium Sulfate (K_{2}SO_{4})  |  | K_{2}O_{4}S_{1}(g)
+  url: https://janaf.nist.gov/tables/K-021.html
+  download_url: https://janaf.nist.gov/tables/K-021.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/K-021.yaml
+- table_id: K-022
+  formula: K2S
+  phase: cr
+  title_as_published: Potassium Sulfide (K_{2}S)  |  | K_{2}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/K-022.html
+  download_url: https://janaf.nist.gov/tables/K-022.txt
+  row_count: 14
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/K-022.yaml
+- table_id: K-023
+  formula: K2S
+  phase: l
+  title_as_published: Potassium Sulfide (K_{2}S)  |  | K_{2}S_{1}(l)
+  url: https://janaf.nist.gov/tables/K-023.html
+  download_url: https://janaf.nist.gov/tables/K-023.txt
+  row_count: 21
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/K-023.yaml
+- table_id: K-024
+  formula: K2S
+  phase: cr,l
+  title_as_published: Potassium Sulfide (K_{2}S) K_{2}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/K-024.html
+  download_url: https://janaf.nist.gov/tables/K-024.txt
+  row_count: 26
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/K-024.yaml
+- table_id: Mg-001
+  formula: Mg
+  phase: ref
+  title_as_published: Magnesium (Mg)  |  | Mg_{1}(ref)
+  url: https://janaf.nist.gov/tables/Mg-001.html
+  download_url: https://janaf.nist.gov/tables/Mg-001.txt
+  row_count: 47
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Mg-001.yaml
+- table_id: Mg-002
+  formula: Mg
+  phase: cr
+  title_as_published: Magnesium (Mg)  |  | Mg_{1}(cr)
+  url: https://janaf.nist.gov/tables/Mg-002.html
+  download_url: https://janaf.nist.gov/tables/Mg-002.txt
+  row_count: 19
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mg-002.yaml
+- table_id: Mg-003
+  formula: Mg
+  phase: l
+  title_as_published: Magnesium (Mg)  |  | Mg_{1}(l)
+  url: https://janaf.nist.gov/tables/Mg-003.html
+  download_url: https://janaf.nist.gov/tables/Mg-003.txt
+  row_count: 15
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Mg-003.yaml
+- table_id: Mg-004
+  formula: Mg
+  phase: cr,l
+  title_as_published: Magnesium (Mg)  |  | Mg_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Mg-004.html
+  download_url: https://janaf.nist.gov/tables/Mg-004.txt
+  row_count: 19
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Mg-004.yaml
+- table_id: Mg-005
+  formula: Mg
+  phase: g
+  title_as_published: Magnesium (Mg)  |  | Mg_{1}(g)
+  url: https://janaf.nist.gov/tables/Mg-005.html
+  download_url: https://janaf.nist.gov/tables/Mg-005.txt
+  row_count: 54
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mg-005.yaml
+- table_id: Mg-008
+  formula: MgO
+  phase: cr
+  title_as_published: Magnesium Oxide (MgO)  |  | Mg_{1}O_{1}(cr)
+  url: https://janaf.nist.gov/tables/Mg-008.html
+  download_url: https://janaf.nist.gov/tables/Mg-008.txt
+  row_count: 32
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mg-008.yaml
+- table_id: Mg-009
+  formula: MgO
+  phase: l
+  title_as_published: Magnesium Oxide (MgO)  |  | Mg_{1}O_{1}(l)
+  url: https://janaf.nist.gov/tables/Mg-009.html
+  download_url: https://janaf.nist.gov/tables/Mg-009.txt
+  row_count: 36
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Mg-009.yaml
+- table_id: Mg-010
+  formula: MgO
+  phase: cr,l
+  title_as_published: Magnesium Oxide (MgO)  |  | Mg_{1}O_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Mg-010.html
+  download_url: https://janaf.nist.gov/tables/Mg-010.txt
+  row_count: 41
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Mg-010.yaml
+- table_id: Mg-011
+  formula: MgO
+  phase: g
+  title_as_published: Magnesium Oxide (MgO)  |  | Mg_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/Mg-011.html
+  download_url: https://janaf.nist.gov/tables/Mg-011.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mg-011.yaml
+- table_id: Mg-018
+  formula: MgO4S
+  phase: cr
+  title_as_published: Magnesium Sulfate (MgSO_{4})  |  | Mg_{1}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Mg-018.html
+  download_url: https://janaf.nist.gov/tables/Mg-018.txt
+  row_count: 21
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mg-018.yaml
+- table_id: Mg-019
+  formula: MgO4S
+  phase: l
+  title_as_published: Magnesium Sulfate (MgSO_{4})  |  | Mg_{1}O_{4}S_{1}(l)
+  url: https://janaf.nist.gov/tables/Mg-019.html
+  download_url: https://janaf.nist.gov/tables/Mg-019.txt
+  row_count: 18
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Mg-019.yaml
+- table_id: Mg-020
+  formula: MgO4S
+  phase: cr,l
+  title_as_published: Magnesium Sulfate (MgSO_{4})  |  | Mg_{1}O_{4}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Mg-020.html
+  download_url: https://janaf.nist.gov/tables/Mg-020.txt
+  row_count: 21
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Mg-020.yaml
+- table_id: Mg-025
+  formula: MgS
+  phase: cr
+  title_as_published: Magnesium Sulfide (MgS)  |  | Mg_{1}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Mg-025.html
+  download_url: https://janaf.nist.gov/tables/Mg-025.txt
+  row_count: 25
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mg-025.yaml
+- table_id: Mg-026
+  formula: MgS
+  phase: g
+  title_as_published: Magnesium Sulfide (MgS)  |  | Mg_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/Mg-026.html
+  download_url: https://janaf.nist.gov/tables/Mg-026.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mg-026.yaml
+- table_id: Mg-027
+  formula: Mg2
+  phase: g
+  title_as_published: Magnesium (Mg_{2})  |  | Mg_{2}(g)
+  url: https://janaf.nist.gov/tables/Mg-027.html
+  download_url: https://janaf.nist.gov/tables/Mg-027.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mg-027.yaml
+- table_id: Mn-001
+  formula: Mn
+  phase: ref
+  title_as_published: Manganese (Mn)  |  | Mn_{1}(ref)
+  url: https://janaf.nist.gov/tables/Mn-001.html
+  download_url: https://janaf.nist.gov/tables/Mn-001.txt
+  row_count: 39
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/Mn-001.yaml
+- table_id: Mn-002
+  formula: Mn
+  phase: cr
+  title_as_published: Manganese (Mn)  |  | Mn_{1}(cr)
+  url: https://janaf.nist.gov/tables/Mn-002.html
+  download_url: https://janaf.nist.gov/tables/Mn-002.txt
+  row_count: 16
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Mn-002.yaml
+- table_id: Mn-003
+  formula: Mn
+  phase: l
+  title_as_published: Manganese (Mn)  |  | Mn_{1}(l)
+  url: https://janaf.nist.gov/tables/Mn-003.html
+  download_url: https://janaf.nist.gov/tables/Mn-003.txt
+  row_count: 22
+  ambiguity_count: 8
+  path: data/literature/compilations/janaf/tables/Mn-003.yaml
+- table_id: Mn-004
+  formula: Mn
+  phase: cr,l
+  title_as_published: Manganese (Mn)  |  | Mn_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Mn-004.html
+  download_url: https://janaf.nist.gov/tables/Mn-004.txt
+  row_count: 24
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Mn-004.yaml
+- table_id: Mn-005
+  formula: Mn
+  phase: g
+  title_as_published: Manganese (Mn)  |  | Mn_{1}(g)
+  url: https://janaf.nist.gov/tables/Mn-005.html
+  download_url: https://janaf.nist.gov/tables/Mn-005.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Mn-005.yaml
+- table_id: Na-001
+  formula: Na
+  phase: ref
+  title_as_published: Sodium (Na)  |  | Na_{1}(ref)
+  url: https://janaf.nist.gov/tables/Na-001.html
+  download_url: https://janaf.nist.gov/tables/Na-001.txt
+  row_count: 45
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Na-001.yaml
+- table_id: Na-002
+  formula: Na
+  phase: cr
+  title_as_published: Sodium (Na)  |  | Na_{1}(cr)
+  url: https://janaf.nist.gov/tables/Na-002.html
+  download_url: https://janaf.nist.gov/tables/Na-002.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Na-002.yaml
+- table_id: Na-003
+  formula: Na
+  phase: l
+  title_as_published: Sodium (Na)  |  | Na_{1}(l)
+  url: https://janaf.nist.gov/tables/Na-003.html
+  download_url: https://janaf.nist.gov/tables/Na-003.txt
+  row_count: 10
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Na-003.yaml
+- table_id: Na-004
+  formula: Na
+  phase: cr,l
+  title_as_published: Sodium (Na)  |  | Na_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Na-004.html
+  download_url: https://janaf.nist.gov/tables/Na-004.txt
+  row_count: 14
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Na-004.yaml
+- table_id: Na-005
+  formula: Na
+  phase: g
+  title_as_published: Sodium (Na)  |  | Na_{1}(g)
+  url: https://janaf.nist.gov/tables/Na-005.html
+  download_url: https://janaf.nist.gov/tables/Na-005.txt
+  row_count: 54
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Na-005.yaml
+- table_id: Na-008
+  formula: NaO
+  phase: g
+  title_as_published: Sodium Oxide (NaO)  |  | Na_{1}O_{1}(g)
+  url: https://janaf.nist.gov/tables/Na-008.html
+  download_url: https://janaf.nist.gov/tables/Na-008.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Na-008.yaml
+- table_id: Na-011
+  formula: Na2
+  phase: g
+  title_as_published: Sodium (Na_{2})  |  | Na_{2}(g)
+  url: https://janaf.nist.gov/tables/Na-011.html
+  download_url: https://janaf.nist.gov/tables/Na-011.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Na-011.yaml
+- table_id: Na-012
+  formula: Na2O
+  phase: cr
+  title_as_published: Sodium Oxide (Na_{2}O)  |  | Na_{2}O_{1}(cr)
+  url: https://janaf.nist.gov/tables/Na-012.html
+  download_url: https://janaf.nist.gov/tables/Na-012.txt
+  row_count: 15
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Na-012.yaml
+- table_id: Na-013
+  formula: Na2O
+  phase: l
+  title_as_published: Sodium Oxide (Na_{2}O)  |  | Na_{2}O_{1}(l)
+  url: https://janaf.nist.gov/tables/Na-013.html
+  download_url: https://janaf.nist.gov/tables/Na-013.txt
+  row_count: 21
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Na-013.yaml
+- table_id: Na-014
+  formula: Na2O
+  phase: cr,l
+  title_as_published: Sodium Oxide (Na_{2}O)  |  | Na_{2}O_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Na-014.html
+  download_url: https://janaf.nist.gov/tables/Na-014.txt
+  row_count: 23
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Na-014.yaml
+- table_id: Na-019
+  formula: Na2O4S
+  phase: cr
+  title_as_published: Sodium Sulfate, Delta (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Na-019.html
+  download_url: https://janaf.nist.gov/tables/Na-019.txt
+  row_count: 10
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Na-019.yaml
+- table_id: Na-020
+  formula: Na2O4S
+  phase: cr
+  title_as_published: Sodium Sulfate, I (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Na-020.html
+  download_url: https://janaf.nist.gov/tables/Na-020.txt
+  row_count: 9
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Na-020.yaml
+- table_id: Na-021
+  formula: Na2O4S
+  phase: cr
+  title_as_published: Sodium Sulfate, III (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Na-021.html
+  download_url: https://janaf.nist.gov/tables/Na-021.txt
+  row_count: 10
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Na-021.yaml
+- table_id: Na-022
+  formula: Na2O4S
+  phase: cr
+  title_as_published: Sodium Sulfate, IV (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Na-022.html
+  download_url: https://janaf.nist.gov/tables/Na-022.txt
+  row_count: 5
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Na-022.yaml
+- table_id: Na-023
+  formula: Na2O4S
+  phase: cr
+  title_as_published: Sodium Sulfate, V (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Na-023.html
+  download_url: https://janaf.nist.gov/tables/Na-023.txt
+  row_count: 9
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Na-023.yaml
+- table_id: Na-024
+  formula: Na2O4S
+  phase: l
+  title_as_published: Sodium Sulfate (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(l)
+  url: https://janaf.nist.gov/tables/Na-024.html
+  download_url: https://janaf.nist.gov/tables/Na-024.txt
+  row_count: 21
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Na-024.yaml
+- table_id: Na-025
+  formula: Na2O4S
+  phase: cr,l
+  title_as_published: Sodium Sulfate (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Na-025.html
+  download_url: https://janaf.nist.gov/tables/Na-025.txt
+  row_count: 26
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Na-025.yaml
+- table_id: Na-026
+  formula: Na2O4S
+  phase: g
+  title_as_published: Sodium Sulfate (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(g)
+  url: https://janaf.nist.gov/tables/Na-026.html
+  download_url: https://janaf.nist.gov/tables/Na-026.txt
+  row_count: 54
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Na-026.yaml
+- table_id: Na-031
+  formula: Na2S
+  phase: cr
+  title_as_published: Sodium Sulfide (Na_{2}S)  |  | Na_{2}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Na-031.html
+  download_url: https://janaf.nist.gov/tables/Na-031.txt
+  row_count: 13
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Na-031.yaml
+- table_id: Na-032
+  formula: Na2S
+  phase: l
+  title_as_published: Sodium Sulfide (Na_{2}S)  |  | Na_{2}S_{1}(l)
+  url: https://janaf.nist.gov/tables/Na-032.html
+  download_url: https://janaf.nist.gov/tables/Na-032.txt
+  row_count: 23
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Na-032.yaml
+- table_id: Na-033
+  formula: Na2S
+  phase: cr,l
+  title_as_published: Sodium Sulfide (Na_{2}S)  |  | Na_{2}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Na-033.html
+  download_url: https://janaf.nist.gov/tables/Na-033.txt
+  row_count: 21
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/Na-033.yaml
+- table_id: Na-034
+  formula: Na2S2
+  phase: cr
+  title_as_published: Sodium Sulfide, Beta (Na_{2}S_{2})  |  | Na_{2}S_{2}(cr)
+  url: https://janaf.nist.gov/tables/Na-034.html
+  download_url: https://janaf.nist.gov/tables/Na-034.txt
+  row_count: 5
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Na-034.yaml
+- table_id: Na-035
+  formula: Na2S2
+  phase: l
+  title_as_published: Sodium Sulfide (Na_{2}S_{2})  |  | Na_{2}S_{2}(l)
+  url: https://janaf.nist.gov/tables/Na-035.html
+  download_url: https://janaf.nist.gov/tables/Na-035.txt
+  row_count: 10
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/Na-035.yaml
+- table_id: Na-036
+  formula: Na2S2
+  phase: cr,l
+  title_as_published: Sodium Sulfide (Na_{2}S_{2})  |  | Na_{2}S_{2}(cr,l)
+  url: https://janaf.nist.gov/tables/Na-036.html
+  download_url: https://janaf.nist.gov/tables/Na-036.txt
+  row_count: 9
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Na-036.yaml
+- table_id: Ni-001
+  formula: Ni
+  phase: ref
+  title_as_published: Nickel (Ni)  |  | Ni_{1}(ref)
+  url: https://janaf.nist.gov/tables/Ni-001.html
+  download_url: https://janaf.nist.gov/tables/Ni-001.txt
+  row_count: 42
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Ni-001.yaml
+- table_id: Ni-002
+  formula: Ni
+  phase: cr
+  title_as_published: Nickel (Ni)  |  | Ni_{1}(cr)
+  url: https://janaf.nist.gov/tables/Ni-002.html
+  download_url: https://janaf.nist.gov/tables/Ni-002.txt
+  row_count: 22
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Ni-002.yaml
+- table_id: Ni-003
+  formula: Ni
+  phase: l
+  title_as_published: Nickel (Ni)  |  | Ni_{1}(l)
+  url: https://janaf.nist.gov/tables/Ni-003.html
+  download_url: https://janaf.nist.gov/tables/Ni-003.txt
+  row_count: 27
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ni-003.yaml
+- table_id: Ni-004
+  formula: Ni
+  phase: cr,l
+  title_as_published: Nickel (Ni)  |  | Ni_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Ni-004.html
+  download_url: https://janaf.nist.gov/tables/Ni-004.txt
+  row_count: 30
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Ni-004.yaml
+- table_id: Ni-005
+  formula: Ni
+  phase: g
+  title_as_published: Nickel (Ni)  |  | Ni_{1}(g)
+  url: https://janaf.nist.gov/tables/Ni-005.html
+  download_url: https://janaf.nist.gov/tables/Ni-005.txt
+  row_count: 58
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ni-005.yaml
+- table_id: Ni-008
+  formula: NiS
+  phase: cr
+  title_as_published: Nickel Sulfide (NiS)  |  | Ni_{1}S_{1}(cr)
+  url: https://janaf.nist.gov/tables/Ni-008.html
+  download_url: https://janaf.nist.gov/tables/Ni-008.txt
+  row_count: 14
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Ni-008.yaml
+- table_id: Ni-009
+  formula: NiS
+  phase: l
+  title_as_published: Nickel Sulfide (NiS)  |  | Ni_{1}S_{1}(l)
+  url: https://janaf.nist.gov/tables/Ni-009.html
+  download_url: https://janaf.nist.gov/tables/Ni-009.txt
+  row_count: 23
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ni-009.yaml
+- table_id: Ni-010
+  formula: NiS
+  phase: cr,l
+  title_as_published: Nickel Sulfide (NiS) Ni_{1}S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Ni-010.html
+  download_url: https://janaf.nist.gov/tables/Ni-010.txt
+  row_count: 32
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Ni-010.yaml
+- table_id: Ni-011
+  formula: NiS
+  phase: g
+  title_as_published: Nickel Sulfide (NiS)  |  | Ni_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/Ni-011.html
+  download_url: https://janaf.nist.gov/tables/Ni-011.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ni-011.yaml
+- table_id: Ni-012
+  formula: NiS2
+  phase: cr
+  title_as_published: Nickel Sulfide (NiS_{2})  |  | Ni_{1}S_{2}(cr)
+  url: https://janaf.nist.gov/tables/Ni-012.html
+  download_url: https://janaf.nist.gov/tables/Ni-012.txt
+  row_count: 11
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ni-012.yaml
+- table_id: Ni-013
+  formula: NiS2
+  phase: l
+  title_as_published: Nickel Sulfide (NiS_{2})  |  | Ni_{1}S_{2}(l)
+  url: https://janaf.nist.gov/tables/Ni-013.html
+  download_url: https://janaf.nist.gov/tables/Ni-013.txt
+  row_count: 11
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ni-013.yaml
+- table_id: Ni-014
+  formula: NiS2
+  phase: cr,l
+  title_as_published: Nickel Sulfide (NiS_{2})  |  | Ni_{1}S_{2}(cr,l)
+  url: https://janaf.nist.gov/tables/Ni-014.html
+  download_url: https://janaf.nist.gov/tables/Ni-014.txt
+  row_count: 11
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ni-014.yaml
+- table_id: Ni-015
+  formula: Ni3S2
+  phase: cr
+  title_as_published: Nickel Sulfide (Ni_{3}S_{2})  |  | Ni_{3}S_{2}(cr)
+  url: https://janaf.nist.gov/tables/Ni-015.html
+  download_url: https://janaf.nist.gov/tables/Ni-015.txt
+  row_count: 13
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Ni-015.yaml
+- table_id: Ni-016
+  formula: Ni3S2
+  phase: l
+  title_as_published: Nickel Sulfide (Ni_{3}S_{2})  |  | Ni_{3}S_{2}(l)
+  url: https://janaf.nist.gov/tables/Ni-016.html
+  download_url: https://janaf.nist.gov/tables/Ni-016.txt
+  row_count: 29
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ni-016.yaml
+- table_id: Ni-017
+  formula: Ni3S2
+  phase: cr,l
+  title_as_published: Nickel Sulfide (Ni_{3}S_{2})  |  | Ni_{3}S_{2}(cr,l)
+  url: https://janaf.nist.gov/tables/Ni-017.html
+  download_url: https://janaf.nist.gov/tables/Ni-017.txt
+  row_count: 31
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Ni-017.yaml
+- table_id: Ni-018
+  formula: Ni3S4
+  phase: cr
+  title_as_published: Nickel Sulfide (Ni_{3}S_{4})  |  | Ni_{3}S_{4}(cr)
+  url: https://janaf.nist.gov/tables/Ni-018.html
+  download_url: https://janaf.nist.gov/tables/Ni-018.txt
+  row_count: 6
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Ni-018.yaml
+- table_id: O-001
+  formula: O
+  phase: g
+  title_as_published: Oxygen (O)  |  | O_{1}(g)
+  url: https://janaf.nist.gov/tables/O-001.html
+  download_url: https://janaf.nist.gov/tables/O-001.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-001.yaml
+- table_id: O-004
+  formula: OP
+  phase: g
+  title_as_published: Phosphorus Oxide (PO)  |  | O_{1}P_{1}(g)
+  url: https://janaf.nist.gov/tables/O-004.html
+  download_url: https://janaf.nist.gov/tables/O-004.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-004.yaml
+- table_id: O-012
+  formula: OSi
+  phase: g
+  title_as_published: Silicon Oxide (SiO)  |  | O_{1}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/O-012.html
+  download_url: https://janaf.nist.gov/tables/O-012.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-012.yaml
+- table_id: O-018
+  formula: OTi
+  phase: cr
+  title_as_published: Titanium Oxide, Alpha (TiO)  |  | O_{1}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/O-018.html
+  download_url: https://janaf.nist.gov/tables/O-018.txt
+  row_count: 20
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/O-018.yaml
+- table_id: O-019
+  formula: OTi
+  phase: cr
+  title_as_published: Titanium Oxide, Beta (TiO)  |  | O_{1}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/O-019.html
+  download_url: https://janaf.nist.gov/tables/O-019.txt
+  row_count: 17
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/O-019.yaml
+- table_id: O-020
+  formula: OTi
+  phase: l
+  title_as_published: Titanium Oxide (TiO)  |  | O_{1}Ti_{1}(l)
+  url: https://janaf.nist.gov/tables/O-020.html
+  download_url: https://janaf.nist.gov/tables/O-020.txt
+  row_count: 34
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/O-020.yaml
+- table_id: O-021
+  formula: OTi
+  phase: cr,l
+  title_as_published: Titanium Oxide (TiO)  |  | O_{1}Ti_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/O-021.html
+  download_url: https://janaf.nist.gov/tables/O-021.txt
+  row_count: 36
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/O-021.yaml
+- table_id: O-022
+  formula: OTi
+  phase: g
+  title_as_published: Titanium Oxide (TiO)  |  | O_{1}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/O-022.html
+  download_url: https://janaf.nist.gov/tables/O-022.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-022.yaml
+- table_id: O-029
+  formula: O2
+  phase: ref
+  title_as_published: Oxygen (O_{2})  |  | O_{2}(ref)
+  url: https://janaf.nist.gov/tables/O-029.html
+  download_url: https://janaf.nist.gov/tables/O-029.txt
+  row_count: 52
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-029.yaml
+- table_id: O-032
+  formula: O2P
+  phase: g
+  title_as_published: Phosphorus Oxide (PO_{2})  |  | O_{2}P_{1}(g)
+  url: https://janaf.nist.gov/tables/O-032.html
+  download_url: https://janaf.nist.gov/tables/O-032.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-032.yaml
+- table_id: O-035
+  formula: O2Si
+  phase: cr
+  title_as_published: Silicon Oxide, Cristobalite, High (SiO_{2})  |  | O_{2}Si_{1}(cr)
+  url: https://janaf.nist.gov/tables/O-035.html
+  download_url: https://janaf.nist.gov/tables/O-035.txt
+  row_count: 22
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/O-035.yaml
+- table_id: O-036
+  formula: O2Si
+  phase: cr
+  title_as_published: Silicon Oxide, Cristobalite, Low (SiO_{2})  |  | O_{2}Si_{1}(cr)
+  url: https://janaf.nist.gov/tables/O-036.html
+  download_url: https://janaf.nist.gov/tables/O-036.txt
+  row_count: 9
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-036.yaml
+- table_id: O-037
+  formula: O2Si
+  phase: cr
+  title_as_published: Silicon Oxide, Quartz (SiO_{2})  |  | O_{2}Si_{1}(cr)
+  url: https://janaf.nist.gov/tables/O-037.html
+  download_url: https://janaf.nist.gov/tables/O-037.txt
+  row_count: 15
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/O-037.yaml
+- table_id: O-038
+  formula: O2Si
+  phase: l
+  title_as_published: Silicon Oxide (SiO_{2})  |  | O_{2}Si_{1}(l)
+  url: https://janaf.nist.gov/tables/O-038.html
+  download_url: https://janaf.nist.gov/tables/O-038.txt
+  row_count: 39
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-038.yaml
+- table_id: O-039
+  formula: O2Si
+  phase: cr,l
+  title_as_published: Silicon Oxide (SiO_{2})  |  | O_{2}Si_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/O-039.html
+  download_url: https://janaf.nist.gov/tables/O-039.txt
+  row_count: 36
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/O-039.yaml
+- table_id: O-040
+  formula: O2Si
+  phase: g
+  title_as_published: Silicon Oxide (SiO_{2})  |  | O_{2}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/O-040.html
+  download_url: https://janaf.nist.gov/tables/O-040.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-040.yaml
+- table_id: O-042
+  formula: O2Ti
+  phase: cr
+  title_as_published: Titanium Oxide, Anatase (TiO_{2})  |  | O_{2}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/O-042.html
+  download_url: https://janaf.nist.gov/tables/O-042.txt
+  row_count: 17
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-042.yaml
+- table_id: O-043
+  formula: O2Ti
+  phase: cr
+  title_as_published: Titanium Oxide, Rutile (TiO_{2})  |  | O_{2}Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/O-043.html
+  download_url: https://janaf.nist.gov/tables/O-043.txt
+  row_count: 20
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/O-043.yaml
+- table_id: O-044
+  formula: O2Ti
+  phase: l
+  title_as_published: Titanium Oxide (TiO_{2})  |  | O_{2}Ti_{1}(l)
+  url: https://janaf.nist.gov/tables/O-044.html
+  download_url: https://janaf.nist.gov/tables/O-044.txt
+  row_count: 29
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/O-044.yaml
+- table_id: O-045
+  formula: O2Ti
+  phase: cr,l
+  title_as_published: Titanium Oxide (TiO_{2})  |  | O_{2}Ti_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/O-045.html
+  download_url: https://janaf.nist.gov/tables/O-045.txt
+  row_count: 34
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/O-045.yaml
+- table_id: O-046
+  formula: O2Ti
+  phase: g
+  title_as_published: Titanium Oxide (TiO_{2})  |  | O_{2}Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/O-046.html
+  download_url: https://janaf.nist.gov/tables/O-046.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-046.yaml
+- table_id: O-071
+  formula: O4SZn
+  phase: cr
+  title_as_published: Zinc Sulfate (ZnSO_{4})  |  | O_{4}S_{1}Zn_{1}(cr)
+  url: https://janaf.nist.gov/tables/O-071.html
+  download_url: https://janaf.nist.gov/tables/O-071.txt
+  row_count: 17
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/O-071.yaml
+- table_id: O-087
+  formula: O6P4
+  phase: g
+  title_as_published: Phosphorus Oxide ((P_{2}O_{3})_{2})  |  | O_{6}P_{4}(g)
+  url: https://janaf.nist.gov/tables/O-087.html
+  download_url: https://janaf.nist.gov/tables/O-087.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-087.yaml
+- table_id: O-094
+  formula: O10P4
+  phase: cr
+  title_as_published: Phosphorus Oxide ((P_{2}O_{5})_{2})  |  | O_{1}_{0}P_{4}(cr)
+  url: https://janaf.nist.gov/tables/O-094.html
+  download_url: https://janaf.nist.gov/tables/O-094.txt
+  row_count: 15
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-094.yaml
+- table_id: O-095
+  formula: O10P4
+  phase: g
+  title_as_published: Phosphorus Oxide ((P_{2}O_{5})_{2})  |  | O_{1}_{0}P_{4}(g)
+  url: https://janaf.nist.gov/tables/O-095.html
+  download_url: https://janaf.nist.gov/tables/O-095.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/O-095.yaml
+- table_id: P-001
+  formula: P
+  phase: ref
+  title_as_published: Phosphorus (P)  |  | P_{1}(ref)
+  url: https://janaf.nist.gov/tables/P-001.html
+  download_url: https://janaf.nist.gov/tables/P-001.txt
+  row_count: 51
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/P-001.yaml
+- table_id: P-002
+  formula: P
+  phase: cr
+  title_as_published: Phosphorus, White (P)  |  | P_{1}(cr)
+  url: https://janaf.nist.gov/tables/P-002.html
+  download_url: https://janaf.nist.gov/tables/P-002.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/P-002.yaml
+- table_id: P-003
+  formula: P
+  phase: l
+  title_as_published: Phosphorus (P)  |  | P_{1}(l)
+  url: https://janaf.nist.gov/tables/P-003.html
+  download_url: https://janaf.nist.gov/tables/P-003.txt
+  row_count: 14
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/P-003.yaml
+- table_id: P-004
+  formula: P
+  phase: cr,l
+  title_as_published: Phosphorus (P)  |  | P_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/P-004.html
+  download_url: https://janaf.nist.gov/tables/P-004.txt
+  row_count: 18
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/P-004.yaml
+- table_id: P-005
+  formula: P
+  phase: cr
+  title_as_published: Phosphorus, Red, IV (P)  |  | P_{1}(cr)
+  url: https://janaf.nist.gov/tables/P-005.html
+  download_url: https://janaf.nist.gov/tables/P-005.txt
+  row_count: 14
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/P-005.yaml
+- table_id: P-006
+  formula: P
+  phase: cr
+  title_as_published: Phosphorus, Red, V (P)  |  | P_{1}(cr)
+  url: https://janaf.nist.gov/tables/P-006.html
+  download_url: https://janaf.nist.gov/tables/P-006.txt
+  row_count: 14
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/P-006.yaml
+- table_id: P-007
+  formula: P
+  phase: cr
+  title_as_published: Phosphorus, Black (P)  |  | P_{1}(cr)
+  url: https://janaf.nist.gov/tables/P-007.html
+  download_url: https://janaf.nist.gov/tables/P-007.txt
+  row_count: 14
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/P-007.yaml
+- table_id: P-008
+  formula: P
+  phase: g
+  title_as_published: Phosphorus (P)  |  | P_{1}(g)
+  url: https://janaf.nist.gov/tables/P-008.html
+  download_url: https://janaf.nist.gov/tables/P-008.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/P-008.yaml
+- table_id: P-011
+  formula: PS
+  phase: g
+  title_as_published: Phosphorus Sulfide (PS)  |  | P_{1}S_{1}(g)
+  url: https://janaf.nist.gov/tables/P-011.html
+  download_url: https://janaf.nist.gov/tables/P-011.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/P-011.yaml
+- table_id: P-012
+  formula: P2
+  phase: g
+  title_as_published: Phosphorus (P_{2})  |  | P_{2}(g)
+  url: https://janaf.nist.gov/tables/P-012.html
+  download_url: https://janaf.nist.gov/tables/P-012.txt
+  row_count: 54
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/P-012.yaml
+- table_id: P-013
+  formula: P4
+  phase: g
+  title_as_published: Phosphorus (P_{4})  |  | P_{4}(g)
+  url: https://janaf.nist.gov/tables/P-013.html
+  download_url: https://janaf.nist.gov/tables/P-013.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/P-013.yaml
+- table_id: P-014
+  formula: P4S3
+  phase: cr
+  title_as_published: Phosphorus Sulfide (P_{4}S_{3})  |  | P_{4}S_{3}(cr)
+  url: https://janaf.nist.gov/tables/P-014.html
+  download_url: https://janaf.nist.gov/tables/P-014.txt
+  row_count: 13
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/P-014.yaml
+- table_id: P-015
+  formula: P4S3
+  phase: l
+  title_as_published: Phosphorus Sulfide (P_{4}S_{3})  |  | P_{4}S_{3}(l)
+  url: https://janaf.nist.gov/tables/P-015.html
+  download_url: https://janaf.nist.gov/tables/P-015.txt
+  row_count: 22
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/P-015.yaml
+- table_id: P-016
+  formula: P4S3
+  phase: cr,l
+  title_as_published: Phosphorus Sulfide (P_{4}S_{3}) P_{4}S_{3}(cr,l)
+  url: https://janaf.nist.gov/tables/P-016.html
+  download_url: https://janaf.nist.gov/tables/P-016.txt
+  row_count: 27
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/P-016.yaml
+- table_id: P-017
+  formula: P4S3
+  phase: g
+  title_as_published: Phosphorus Sulfide (P_{4}S_{3})  |  | P_{4}S_{3}(g)
+  url: https://janaf.nist.gov/tables/P-017.html
+  download_url: https://janaf.nist.gov/tables/P-017.txt
+  row_count: 48
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/P-017.yaml
+- table_id: S-001
+  formula: S
+  phase: ref
+  title_as_published: Sulfur (S)  |  | S_{1}(ref)
+  url: https://janaf.nist.gov/tables/S-001.html
+  download_url: https://janaf.nist.gov/tables/S-001.txt
+  row_count: 40
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/S-001.yaml
+- table_id: S-002
+  formula: S
+  phase: cr
+  title_as_published: Sulfur, Orthorhombic (S)  |  | S_{1}(cr)
+  url: https://janaf.nist.gov/tables/S-002.html
+  download_url: https://janaf.nist.gov/tables/S-002.txt
+  row_count: 10
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/S-002.yaml
+- table_id: S-003
+  formula: S
+  phase: cr
+  title_as_published: Sulfur, Monoclinic (S)  |  | S_{1}(cr)
+  url: https://janaf.nist.gov/tables/S-003.html
+  download_url: https://janaf.nist.gov/tables/S-003.txt
+  row_count: 8
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/S-003.yaml
+- table_id: S-004
+  formula: S
+  phase: l
+  title_as_published: Sulfur (S)  |  | S_{1}(l)
+  url: https://janaf.nist.gov/tables/S-004.html
+  download_url: https://janaf.nist.gov/tables/S-004.txt
+  row_count: 10
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/S-004.yaml
+- table_id: S-005
+  formula: S
+  phase: cr,l
+  title_as_published: Sulfur (S)  |  | S_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/S-005.html
+  download_url: https://janaf.nist.gov/tables/S-005.txt
+  row_count: 13
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/S-005.yaml
+- table_id: S-006
+  formula: S
+  phase: g
+  title_as_published: Sulfur (S)  |  | S_{1}(g)
+  url: https://janaf.nist.gov/tables/S-006.html
+  download_url: https://janaf.nist.gov/tables/S-006.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/S-006.yaml
+- table_id: S-009
+  formula: SiS
+  phase: g
+  title_as_published: Silicon Sulfide (SiS) S_{1}Si_{1}(g)
+  url: https://janaf.nist.gov/tables/S-009.html
+  download_url: https://janaf.nist.gov/tables/S-009.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/S-009.yaml
+- table_id: S-012
+  formula: S2
+  phase: g
+  title_as_published: Sulfur (S_{2})  |  | S_{2}(g)
+  url: https://janaf.nist.gov/tables/S-012.html
+  download_url: https://janaf.nist.gov/tables/S-012.txt
+  row_count: 53
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/S-012.yaml
+- table_id: S-013
+  formula: S2Si
+  phase: cr
+  title_as_published: Silicon Sulfide (SiS_{2})  |  | S_{2}Si_{1}(cr)
+  url: https://janaf.nist.gov/tables/S-013.html
+  download_url: https://janaf.nist.gov/tables/S-013.txt
+  row_count: 13
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/S-013.yaml
+- table_id: S-014
+  formula: S2Si
+  phase: l
+  title_as_published: Silicon Sulfide (SiS_{2})  |  | S_{2}Si_{1}(l)
+  url: https://janaf.nist.gov/tables/S-014.html
+  download_url: https://janaf.nist.gov/tables/S-014.txt
+  row_count: 13
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/S-014.yaml
+- table_id: S-015
+  formula: S2Si
+  phase: cr,l
+  title_as_published: Silicon Sulfide (SiS_{2})  |  | S_{2}Si_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/S-015.html
+  download_url: https://janaf.nist.gov/tables/S-015.txt
+  row_count: 13
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/S-015.yaml
+- table_id: S-016
+  formula: S3
+  phase: g
+  title_as_published: Sulfur (S_{3})  |  | S_{3}(g)
+  url: https://janaf.nist.gov/tables/S-016.html
+  download_url: https://janaf.nist.gov/tables/S-016.txt
+  row_count: 48
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/S-016.yaml
+- table_id: S-017
+  formula: S4
+  phase: g
+  title_as_published: Sulfur (S_{4})  |  | S_{4}(g)
+  url: https://janaf.nist.gov/tables/S-017.html
+  download_url: https://janaf.nist.gov/tables/S-017.txt
+  row_count: 48
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/S-017.yaml
+- table_id: S-018
+  formula: S5
+  phase: g
+  title_as_published: Sulfur (S_{5})  |  | S_{5}(g)
+  url: https://janaf.nist.gov/tables/S-018.html
+  download_url: https://janaf.nist.gov/tables/S-018.txt
+  row_count: 51
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/S-018.yaml
+- table_id: S-019
+  formula: S6
+  phase: g
+  title_as_published: Sulfur (S_{6})  |  | S_{6}(g)
+  url: https://janaf.nist.gov/tables/S-019.html
+  download_url: https://janaf.nist.gov/tables/S-019.txt
+  row_count: 51
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/S-019.yaml
+- table_id: S-020
+  formula: S7
+  phase: g
+  title_as_published: Sulfur (S_{7})  |  | S_{7}(g)
+  url: https://janaf.nist.gov/tables/S-020.html
+  download_url: https://janaf.nist.gov/tables/S-020.txt
+  row_count: 51
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/S-020.yaml
+- table_id: S-021
+  formula: S8
+  phase: g
+  title_as_published: Sulfur (S_{8})  |  | S_{8}(g)
+  url: https://janaf.nist.gov/tables/S-021.html
+  download_url: https://janaf.nist.gov/tables/S-021.txt
+  row_count: 56
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/S-021.yaml
+- table_id: Si-001
+  formula: Si
+  phase: ref
+  title_as_published: Silicon (Si)  |  | Si_{1}(ref)
+  url: https://janaf.nist.gov/tables/Si-001.html
+  download_url: https://janaf.nist.gov/tables/Si-001.txt
+  row_count: 52
+  ambiguity_count: 4
+  path: data/literature/compilations/janaf/tables/Si-001.yaml
+- table_id: Si-002
+  formula: Si
+  phase: cr
+  title_as_published: Silicon (Si)  |  | Si_{1}(cr)
+  url: https://janaf.nist.gov/tables/Si-002.html
+  download_url: https://janaf.nist.gov/tables/Si-002.txt
+  row_count: 23
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Si-002.yaml
+- table_id: Si-003
+  formula: Si
+  phase: l
+  title_as_published: Silicon (Si)  |  | Si_{1}(l)
+  url: https://janaf.nist.gov/tables/Si-003.html
+  download_url: https://janaf.nist.gov/tables/Si-003.txt
+  row_count: 35
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/Si-003.yaml
+- table_id: Si-004
+  formula: Si
+  phase: cr,l
+  title_as_published: Silicon (Si)  |  | Si_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Si-004.html
+  download_url: https://janaf.nist.gov/tables/Si-004.txt
+  row_count: 39
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Si-004.yaml
+- table_id: Si-005
+  formula: Si
+  phase: g
+  title_as_published: Silicon (Si)  |  | Si_{1}(g)
+  url: https://janaf.nist.gov/tables/Si-005.html
+  download_url: https://janaf.nist.gov/tables/Si-005.txt
+  row_count: 63
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Si-005.yaml
+- table_id: Si-008
+  formula: Si2
+  phase: g
+  title_as_published: Silicon (Si_{2})  |  | Si_{2}(g)
+  url: https://janaf.nist.gov/tables/Si-008.html
+  download_url: https://janaf.nist.gov/tables/Si-008.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Si-008.yaml
+- table_id: Si-009
+  formula: Si3
+  phase: g
+  title_as_published: Silicon (Si_{3})  |  | Si_{3}(g)
+  url: https://janaf.nist.gov/tables/Si-009.html
+  download_url: https://janaf.nist.gov/tables/Si-009.txt
+  row_count: 64
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Si-009.yaml
+- table_id: Ti-001
+  formula: Ti
+  phase: ref
+  title_as_published: Titanium (Ti)  |  | Ti_{1}(ref)
+  url: https://janaf.nist.gov/tables/Ti-001.html
+  download_url: https://janaf.nist.gov/tables/Ti-001.txt
+  row_count: 43
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Ti-001.yaml
+- table_id: Ti-002
+  formula: Ti
+  phase: cr
+  title_as_published: Titanium, Alpha (Ti)  |  | Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/Ti-002.html
+  download_url: https://janaf.nist.gov/tables/Ti-002.txt
+  row_count: 16
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ti-002.yaml
+- table_id: Ti-003
+  formula: Ti
+  phase: cr
+  title_as_published: Titanium, Beta (Ti)  |  | Ti_{1}(cr)
+  url: https://janaf.nist.gov/tables/Ti-003.html
+  download_url: https://janaf.nist.gov/tables/Ti-003.txt
+  row_count: 19
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Ti-003.yaml
+- table_id: Ti-004
+  formula: Ti
+  phase: l
+  title_as_published: Titanium (Ti)  |  | Ti_{1}(l)
+  url: https://janaf.nist.gov/tables/Ti-004.html
+  download_url: https://janaf.nist.gov/tables/Ti-004.txt
+  row_count: 34
+  ambiguity_count: 6
+  path: data/literature/compilations/janaf/tables/Ti-004.yaml
+- table_id: Ti-005
+  formula: Ti
+  phase: cr,l
+  title_as_published: Titanium (Ti)  |  | Ti_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Ti-005.html
+  download_url: https://janaf.nist.gov/tables/Ti-005.txt
+  row_count: 39
+  ambiguity_count: 3
+  path: data/literature/compilations/janaf/tables/Ti-005.yaml
+- table_id: Ti-006
+  formula: Ti
+  phase: g
+  title_as_published: Titanium (Ti)  |  | Ti_{1}(g)
+  url: https://janaf.nist.gov/tables/Ti-006.html
+  download_url: https://janaf.nist.gov/tables/Ti-006.txt
+  row_count: 59
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Ti-006.yaml
+- table_id: Zn-001
+  formula: Zn
+  phase: ref
+  title_as_published: Zinc (Zn)  |  | Zn_{1}(ref)
+  url: https://janaf.nist.gov/tables/Zn-001.html
+  download_url: https://janaf.nist.gov/tables/Zn-001.txt
+  row_count: 48
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Zn-001.yaml
+- table_id: Zn-002
+  formula: Zn
+  phase: cr
+  title_as_published: Zinc (Zn)  |  | Zn_{1}(cr)
+  url: https://janaf.nist.gov/tables/Zn-002.html
+  download_url: https://janaf.nist.gov/tables/Zn-002.txt
+  row_count: 11
+  ambiguity_count: 1
+  path: data/literature/compilations/janaf/tables/Zn-002.yaml
+- table_id: Zn-003
+  formula: Zn
+  phase: l
+  title_as_published: Zinc (Zn)  |  | Zn_{1}(l)
+  url: https://janaf.nist.gov/tables/Zn-003.html
+  download_url: https://janaf.nist.gov/tables/Zn-003.txt
+  row_count: 15
+  ambiguity_count: 5
+  path: data/literature/compilations/janaf/tables/Zn-003.yaml
+- table_id: Zn-004
+  formula: Zn
+  phase: cr,l
+  title_as_published: Zinc (Zn)  |  | Zn_{1}(cr,l)
+  url: https://janaf.nist.gov/tables/Zn-004.html
+  download_url: https://janaf.nist.gov/tables/Zn-004.txt
+  row_count: 19
+  ambiguity_count: 2
+  path: data/literature/compilations/janaf/tables/Zn-004.yaml
+- table_id: Zn-005
+  formula: Zn
+  phase: g
+  title_as_published: Zinc (Zn)  |  | Zn_{1}(g)
+  url: https://janaf.nist.gov/tables/Zn-005.html
+  download_url: https://janaf.nist.gov/tables/Zn-005.txt
+  row_count: 54
+  ambiguity_count: 0
+  path: data/literature/compilations/janaf/tables/Zn-005.yaml

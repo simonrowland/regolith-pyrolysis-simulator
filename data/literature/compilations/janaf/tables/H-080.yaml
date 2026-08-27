@@ -1,0 +1,3645 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nist-janaf-4th",
+  "source": {
+    "citation": "Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)",
+    "database": "NIST Standard Reference Database 13",
+    "doi": "10.18434/T42S31",
+    "url": "https://janaf.nist.gov/",
+    "last_data_update": 1998
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "extraction": {
+    "method": "machine parse of official NIST JANAF HTML table via indexed web retrieval; numeric tokens preserved as published",
+    "date": "2026-08-27",
+    "review_status": "machine_transcribed_unreviewed",
+    "network_note": "Direct worker networking unavailable; official NIST page retrieved through indexed web surface."
+  },
+  "table": {
+    "table_id": "H-080",
+    "url": "https://janaf.nist.gov/tables/H-080.html",
+    "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+    "title_as_published": "Hydrogen Sulfide (H_{2}S)  |  | H_{2}S_{1}(g)",
+    "standard_state_as_published": "",
+    "units_as_published": {
+      "temperature": "K",
+      "heat_capacity": "J K^-1 mol^-1",
+      "entropy": "J K^-1 mol^-1",
+      "negative_gibbs_enthalpy_function": "J K^-1 mol^-1",
+      "enthalpy_increment": "kJ mol^-1",
+      "formation_enthalpy": "kJ mol^-1",
+      "formation_gibbs_energy": "kJ mol^-1",
+      "log10_formation_equilibrium_constant": "dimensionless"
+    },
+    "values": [
+      {
+        "temperature": {
+          "value": 0,
+          "as_published": "0",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "0",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "0",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "0",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": null,
+          "as_published": "INFINITE",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "0",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -9.962,
+          "as_published": "-9.962",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "0",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -17.584,
+          "as_published": "-17.584",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "0",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -17.584,
+          "as_published": "-17.584",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "0",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": null,
+          "as_published": "INFINITE",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "0",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 100,
+          "as_published": "100",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "100",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 33.259,
+          "as_published": "33.259",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "100",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 168.972,
+          "as_published": "168.972",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "100",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 235.33,
+          "as_published": "235.330",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "100",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -6.636,
+          "as_published": "-6.636",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "100",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -17.947,
+          "as_published": "-17.947",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "100",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -23.519,
+          "as_published": "-23.519",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "100",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 12.285,
+          "as_published": "12.285",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "100",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 200,
+          "as_published": "200",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 33.38,
+          "as_published": "33.380",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 192.038,
+          "as_published": "192.038",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 208.586,
+          "as_published": "208.586",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -3.31,
+          "as_published": "-3.310",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -18.957,
+          "as_published": "-18.957",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -28.754,
+          "as_published": "-28.754",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 7.51,
+          "as_published": "7.510",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 400,
+          "as_published": "400",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 35.581,
+          "as_published": "35.581",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 215.992,
+          "as_published": "215.992",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 207.115,
+          "as_published": "207.115",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 3.551,
+          "as_published": "3.551",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -24.549,
+          "as_published": "-24.549",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -37.343,
+          "as_published": "-37.343",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 4.876,
+          "as_published": "4.876",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 500,
+          "as_published": "500",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 37.192,
+          "as_published": "37.192",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 224.102,
+          "as_published": "224.102",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 209.726,
+          "as_published": "209.726",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 7.188,
+          "as_published": "7.188",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -27.762,
+          "as_published": "-27.762",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -40.179,
+          "as_published": "-40.179",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 4.197,
+          "as_published": "4.197",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 700,
+          "as_published": "700",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 40.74,
+          "as_published": "40.740",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 237.174,
+          "as_published": "237.174",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 215.777,
+          "as_published": "215.777",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 14.978,
+          "as_published": "14.978",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -32.771,
+          "as_published": "-32.771",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -44.201,
+          "as_published": "-44.201",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 3.298,
+          "as_published": "3.298",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 800,
+          "as_published": "800",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 42.518,
+          "as_published": "42.518",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 242.731,
+          "as_published": "242.731",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 218.804,
+          "as_published": "218.804",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 19.142,
+          "as_published": "19.142",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -34.771,
+          "as_published": "-34.771",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -45.694,
+          "as_published": "-45.694",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 2.984,
+          "as_published": "2.984",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 900,
+          "as_published": "900",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 44.212,
+          "as_published": "44.212",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 247.838,
+          "as_published": "247.838",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 221.75,
+          "as_published": "221.750",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 23.479,
+          "as_published": "23.479",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -89.665,
+          "as_published": "-89.665",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -45.87,
+          "as_published": "-45.870",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 2.662,
+          "as_published": "2.662",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1000,
+          "as_published": "1000",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 45.786,
+          "as_published": "45.786",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 252.579,
+          "as_published": "252.579",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 224.599,
+          "as_published": "224.599",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 27.98,
+          "as_published": "27.980",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.024,
+          "as_published": "-90.024",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -40.984,
+          "as_published": "-40.984",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 2.141,
+          "as_published": "2.141",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1200,
+          "as_published": "1200",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 48.467,
+          "as_published": "48.467",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 261.173,
+          "as_published": "261.173",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 229.993,
+          "as_published": "229.993",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 37.415,
+          "as_published": "37.415",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.465,
+          "as_published": "-90.465",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -31.129,
+          "as_published": "-31.129",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.355,
+          "as_published": "1.355",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1300,
+          "as_published": "1300",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 49.593,
+          "as_published": "49.593",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 265.098,
+          "as_published": "265.098",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 232.544,
+          "as_published": "232.544",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 42.32,
+          "as_published": "42.320",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.584,
+          "as_published": "-90.584",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -26.179,
+          "as_published": "-26.179",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.052,
+          "as_published": "1.052",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1400,
+          "as_published": "1400",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 50.593,
+          "as_published": "50.593",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 268.81,
+          "as_published": "268.810",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 235.003,
+          "as_published": "235.003",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 47.33,
+          "as_published": "47.330",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.656,
+          "as_published": "-90.656",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -21.222,
+          "as_published": "-21.222",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.792,
+          "as_published": "0.792",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1500,
+          "as_published": "1500",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 51.476,
+          "as_published": "51.476",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 272.331,
+          "as_published": "272.331",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 237.375,
+          "as_published": "237.375",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 52.434,
+          "as_published": "52.434",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.693,
+          "as_published": "-90.693",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -16.261,
+          "as_published": "-16.261",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.566,
+          "as_published": "0.566",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1700,
+          "as_published": "1700",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 52.961,
+          "as_published": "52.961",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 278.869,
+          "as_published": "278.869",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 241.879,
+          "as_published": "241.879",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 62.883,
+          "as_published": "62.883",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.699,
+          "as_published": "-90.699",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -6.336,
+          "as_published": "-6.336",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.195,
+          "as_published": "0.195",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1800,
+          "as_published": "1800",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 53.589,
+          "as_published": "53.589",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 281.914,
+          "as_published": "281.914",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 244.019,
+          "as_published": "244.019",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 68.212,
+          "as_published": "68.212",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.681,
+          "as_published": "-90.681",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -1.374,
+          "as_published": "-1.374",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.04,
+          "as_published": "0.040",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1900,
+          "as_published": "1900",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 54.145,
+          "as_published": "54.145",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 284.827,
+          "as_published": "284.827",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 246.091,
+          "as_published": "246.091",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 73.599,
+          "as_published": "73.599",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.656,
+          "as_published": "-90.656",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 3.587,
+          "as_published": "3.587",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.099,
+          "as_published": "-0.099",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "1900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2000,
+          "as_published": "2000",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 54.656,
+          "as_published": "54.656",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 287.617,
+          "as_published": "287.617",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 248.098,
+          "as_published": "248.098",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 79.039,
+          "as_published": "79.039",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.627,
+          "as_published": "-90.627",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 8.547,
+          "as_published": "8.547",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.223,
+          "as_published": "-0.223",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2200,
+          "as_published": "2200",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 55.522,
+          "as_published": "55.522",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 292.868,
+          "as_published": "292.868",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 251.932,
+          "as_published": "251.932",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 90.059,
+          "as_published": "90.059",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.566,
+          "as_published": "-90.566",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 18.461,
+          "as_published": "18.461",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.438,
+          "as_published": "-0.438",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2300,
+          "as_published": "2300",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 55.898,
+          "as_published": "55.898",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 295.345,
+          "as_published": "295.345",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 253.766,
+          "as_published": "253.766",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 95.631,
+          "as_published": "95.631",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.538,
+          "as_published": "-90.538",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 23.416,
+          "as_published": "23.416",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.532,
+          "as_published": "-0.532",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2400,
+          "as_published": "2400",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 56.25,
+          "as_published": "56.250",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 297.731,
+          "as_published": "297.731",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 255.549,
+          "as_published": "255.549",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 101.238,
+          "as_published": "101.238",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.512,
+          "as_published": "-90.512",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 28.37,
+          "as_published": "28.370",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.617,
+          "as_published": "-0.617",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2500,
+          "as_published": "2500",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 56.568,
+          "as_published": "56.568",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 300.034,
+          "as_published": "300.034",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 257.282,
+          "as_published": "257.282",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 106.879,
+          "as_published": "106.879",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.49,
+          "as_published": "-90.490",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 33.323,
+          "as_published": "33.323",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.696,
+          "as_published": "-0.696",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2700,
+          "as_published": "2700",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 57.133,
+          "as_published": "57.133",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 304.409,
+          "as_published": "304.409",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 260.613,
+          "as_published": "260.613",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 118.251,
+          "as_published": "118.251",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.458,
+          "as_published": "-90.458",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 43.227,
+          "as_published": "43.227",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.836,
+          "as_published": "-0.836",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2800,
+          "as_published": "2800",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 57.384,
+          "as_published": "57.384",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 306.492,
+          "as_published": "306.492",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 262.214,
+          "as_published": "262.214",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 123.977,
+          "as_published": "123.977",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.45,
+          "as_published": "-90.450",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 48.178,
+          "as_published": "48.178",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.899,
+          "as_published": "-0.899",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2900,
+          "as_published": "2900",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 57.618,
+          "as_published": "57.618",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 308.51,
+          "as_published": "308.510",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 263.776,
+          "as_published": "263.776",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 129.727,
+          "as_published": "129.727",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.447,
+          "as_published": "-90.447",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 53.129,
+          "as_published": "53.129",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.957,
+          "as_published": "-0.957",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "2900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3000,
+          "as_published": "3000",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 57.84,
+          "as_published": "57.840",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 310.467,
+          "as_published": "310.467",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 265.3,
+          "as_published": "265.300",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 135.5,
+          "as_published": "135.500",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.45,
+          "as_published": "-90.450",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 58.08,
+          "as_published": "58.080",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.011,
+          "as_published": "-1.011",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3200,
+          "as_published": "3200",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 58.245,
+          "as_published": "58.245",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 314.213,
+          "as_published": "314.213",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 268.241,
+          "as_published": "268.241",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 147.109,
+          "as_published": "147.109",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.473,
+          "as_published": "-90.473",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 67.982,
+          "as_published": "67.982",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.11,
+          "as_published": "-1.110",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3300,
+          "as_published": "3300",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 58.43,
+          "as_published": "58.430",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 316.008,
+          "as_published": "316.008",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 269.662,
+          "as_published": "269.662",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 152.943,
+          "as_published": "152.943",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.495,
+          "as_published": "-90.495",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 72.935,
+          "as_published": "72.935",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.154,
+          "as_published": "-1.154",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3400,
+          "as_published": "3400",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 58.605,
+          "as_published": "58.605",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 317.755,
+          "as_published": "317.755",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 271.051,
+          "as_published": "271.051",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 158.795,
+          "as_published": "158.795",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.524,
+          "as_published": "-90.524",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 77.887,
+          "as_published": "77.887",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.197,
+          "as_published": "-1.197",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3500,
+          "as_published": "3500",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 58.773,
+          "as_published": "58.773",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 319.456,
+          "as_published": "319.456",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 272.409,
+          "as_published": "272.409",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 164.664,
+          "as_published": "164.664",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.56,
+          "as_published": "-90.560",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 82.841,
+          "as_published": "82.841",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.236,
+          "as_published": "-1.236",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3700,
+          "as_published": "3700",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.086,
+          "as_published": "59.086",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 322.731,
+          "as_published": "322.731",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 275.042,
+          "as_published": "275.042",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 176.45,
+          "as_published": "176.450",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.656,
+          "as_published": "-90.656",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 92.752,
+          "as_published": "92.752",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.309,
+          "as_published": "-1.309",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3800,
+          "as_published": "3800",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.229,
+          "as_published": "59.229",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 324.308,
+          "as_published": "324.308",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 276.317,
+          "as_published": "276.317",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 182.366,
+          "as_published": "182.366",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.717,
+          "as_published": "-90.717",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 97.71,
+          "as_published": "97.710",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.343,
+          "as_published": "-1.343",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3900,
+          "as_published": "3900",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.371,
+          "as_published": "59.371",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 325.849,
+          "as_published": "325.849",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 277.568,
+          "as_published": "277.568",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 188.296,
+          "as_published": "188.296",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.788,
+          "as_published": "-90.788",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 102.67,
+          "as_published": "102.670",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.375,
+          "as_published": "-1.375",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "3900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4000,
+          "as_published": "4000",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.509,
+          "as_published": "59.509",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 327.354,
+          "as_published": "327.354",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 278.794,
+          "as_published": "278.794",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 194.24,
+          "as_published": "194.240",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.868,
+          "as_published": "-90.868",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 107.631,
+          "as_published": "107.631",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.406,
+          "as_published": "-1.406",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4200,
+          "as_published": "4200",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.768,
+          "as_published": "59.768",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 330.263,
+          "as_published": "330.263",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 281.176,
+          "as_published": "281.176",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 206.168,
+          "as_published": "206.168",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -91.058,
+          "as_published": "-91.058",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 117.561,
+          "as_published": "117.561",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.462,
+          "as_published": "-1.462",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4300,
+          "as_published": "4300",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.89,
+          "as_published": "59.890",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 331.671,
+          "as_published": "331.671",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 282.334,
+          "as_published": "282.334",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 212.151,
+          "as_published": "212.151",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -91.169,
+          "as_published": "-91.169",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 122.529,
+          "as_published": "122.529",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.488,
+          "as_published": "-1.488",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4400,
+          "as_published": "4400",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 60.011,
+          "as_published": "60.011",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 333.05,
+          "as_published": "333.050",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 283.471,
+          "as_published": "283.471",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 218.146,
+          "as_published": "218.146",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -91.29,
+          "as_published": "-91.290",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 127.5,
+          "as_published": "127.500",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.514,
+          "as_published": "-1.514",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4500,
+          "as_published": "4500",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 60.128,
+          "as_published": "60.128",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 334.399,
+          "as_published": "334.399",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 284.588,
+          "as_published": "284.588",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 224.153,
+          "as_published": "224.153",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -91.423,
+          "as_published": "-91.423",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 132.474,
+          "as_published": "132.474",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.538,
+          "as_published": "-1.538",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4700,
+          "as_published": "4700",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 60.346,
+          "as_published": "60.346",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 337.019,
+          "as_published": "337.019",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 286.763,
+          "as_published": "286.763",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 236.2,
+          "as_published": "236.200",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -91.725,
+          "as_published": "-91.725",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 142.431,
+          "as_published": "142.431",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.583,
+          "as_published": "-1.583",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4800,
+          "as_published": "4800",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 60.459,
+          "as_published": "60.459",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 338.291,
+          "as_published": "338.291",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 287.824,
+          "as_published": "287.824",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 242.24,
+          "as_published": "242.240",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -91.893,
+          "as_published": "-91.893",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 147.416,
+          "as_published": "147.416",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.604,
+          "as_published": "-1.604",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4900,
+          "as_published": "4900",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 60.563,
+          "as_published": "60.563",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 339.538,
+          "as_published": "339.538",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 288.866,
+          "as_published": "288.866",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 248.292,
+          "as_published": "248.292",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -92.073,
+          "as_published": "-92.073",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 152.403,
+          "as_published": "152.403",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.625,
+          "as_published": "-1.625",
+          "locator": {
+            "table_id": "H-080",
+            "url": "https://janaf.nist.gov/tables/H-080.html",
+            "download_url": "https://janaf.nist.gov/tables/H-080.txt",
+            "row_temperature_as_published": "4900",
+            "column": "log Kf"
+          }
+        }
+      }
+    ],
+    "parse_ambiguities": []
+  }
+}

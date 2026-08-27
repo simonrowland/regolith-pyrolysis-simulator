@@ -1,0 +1,1954 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nist-janaf-4th",
+  "source": {
+    "citation": "Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)",
+    "database": "NIST Standard Reference Database 13",
+    "doi": "10.18434/T42S31",
+    "url": "https://janaf.nist.gov/",
+    "last_data_update": 1998
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "extraction": {
+    "method": "machine parse of official NIST JANAF HTML table via indexed web retrieval; numeric tokens preserved as published",
+    "date": "2026-08-27",
+    "review_status": "machine_transcribed_unreviewed",
+    "network_note": "Direct worker networking unavailable; official NIST page retrieved through indexed web surface."
+  },
+  "table": {
+    "table_id": "Cl-055",
+    "url": "https://janaf.nist.gov/tables/Cl-055.html",
+    "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+    "title_as_published": "Sodium Chloride (NaCl)  |  | Cl_{1}Na_{1}(cr,l)",
+    "standard_state_as_published": "",
+    "units_as_published": {
+      "temperature": "K",
+      "heat_capacity": "J K^-1 mol^-1",
+      "entropy": "J K^-1 mol^-1",
+      "negative_gibbs_enthalpy_function": "J K^-1 mol^-1",
+      "enthalpy_increment": "kJ mol^-1",
+      "formation_enthalpy": "kJ mol^-1",
+      "formation_gibbs_energy": "kJ mol^-1",
+      "log10_formation_equilibrium_constant": "dimensionless"
+    },
+    "values": [
+      {
+        "temperature": {
+          "value": 0,
+          "as_published": "0",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "0",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "0",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "0",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": null,
+          "as_published": "INFINITE",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "0",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -10.611,
+          "as_published": "-10.611",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "0",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -410.693,
+          "as_published": "-410.693",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "0",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -410.693,
+          "as_published": "-410.693",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "0",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": null,
+          "as_published": "INFINITE",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "0",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 100,
+          "as_published": "100",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "100",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 34.932,
+          "as_published": "34.932",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "100",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 23.723,
+          "as_published": "23.723",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "100",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 114.14,
+          "as_published": "114.140",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "100",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -9.042,
+          "as_published": "-9.042",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "100",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -411.92,
+          "as_published": "-411.920",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "100",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -402.46,
+          "as_published": "-402.460",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "100",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 210.224,
+          "as_published": "210.224",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "100",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 200,
+          "as_published": "200",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 46.873,
+          "as_published": "46.873",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 52.605,
+          "as_published": "52.605",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 76.643,
+          "as_published": "76.643",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -4.807,
+          "as_published": "-4.807",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -411.66,
+          "as_published": "-411.660",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -393.046,
+          "as_published": "-393.046",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 102.653,
+          "as_published": "102.653",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 400,
+          "as_published": "400",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 52.35,
+          "as_published": "52.350",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 87.226,
+          "as_published": "87.226",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 74.122,
+          "as_published": "74.122",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 5.242,
+          "as_published": "5.242",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -413.318,
+          "as_published": "-413.318",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -374.636,
+          "as_published": "-374.636",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 48.922,
+          "as_published": "48.922",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 500,
+          "as_published": "500",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 53.94,
+          "as_published": "53.940",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 99.08,
+          "as_published": "99.080",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 77.966,
+          "as_published": "77.966",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 10.557,
+          "as_published": "10.557",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -412.89,
+          "as_published": "-412.890",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -365.01,
+          "as_published": "-365.010",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 38.132,
+          "as_published": "38.132",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 700,
+          "as_published": "700",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 57.204,
+          "as_published": "57.204",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 117.727,
+          "as_published": "117.727",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 86.786,
+          "as_published": "86.786",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 21.659,
+          "as_published": "21.659",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -411.408,
+          "as_published": "-411.408",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -346.095,
+          "as_published": "-346.095",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 25.826,
+          "as_published": "25.826",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 800,
+          "as_published": "800",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.312,
+          "as_published": "59.312",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 125.498,
+          "as_published": "125.498",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 91.147,
+          "as_published": "91.147",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 27.481,
+          "as_published": "27.481",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -410.346,
+          "as_published": "-410.346",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -336.834,
+          "as_published": "-336.834",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 21.993,
+          "as_published": "21.993",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 900,
+          "as_published": "900",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 61.869,
+          "as_published": "61.869",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 132.627,
+          "as_published": "132.627",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 95.365,
+          "as_published": "95.365",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 33.536,
+          "as_published": "33.536",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -409.038,
+          "as_published": "-409.038",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -327.721,
+          "as_published": "-327.721",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 19.02,
+          "as_published": "19.020",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1000,
+          "as_published": "1000",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 64.865,
+          "as_published": "64.865",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 139.296,
+          "as_published": "139.296",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 99.428,
+          "as_published": "99.428",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 39.868,
+          "as_published": "39.868",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -407.461,
+          "as_published": "-407.461",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -318.768,
+          "as_published": "-318.768",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 16.651,
+          "as_published": "16.651",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1200,
+          "as_published": "1200",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 68.325,
+          "as_published": "68.325",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 177.937,
+          "as_published": "177.937",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 109.886,
+          "as_published": "109.886",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 81.661,
+          "as_published": "81.661",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -472.043,
+          "as_published": "-472.043",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -302.265,
+          "as_published": "-302.265",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 13.157,
+          "as_published": "13.157",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1300,
+          "as_published": "1300",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 67.446,
+          "as_published": "67.446",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 183.367,
+          "as_published": "183.367",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 115.333,
+          "as_published": "115.333",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 88.445,
+          "as_published": "88.445",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -469.224,
+          "as_published": "-469.224",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -288.232,
+          "as_published": "-288.232",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 11.581,
+          "as_published": "11.581",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1400,
+          "as_published": "1400",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 67.07,
+          "as_published": "67.070",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 188.351,
+          "as_published": "188.351",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 120.373,
+          "as_published": "120.373",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 95.169,
+          "as_published": "95.169",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -466.469,
+          "as_published": "-466.469",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -274.413,
+          "as_published": "-274.413",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 10.238,
+          "as_published": "10.238",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1500,
+          "as_published": "1500",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 192.973,
+          "as_published": "192.973",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 125.061,
+          "as_published": "125.061",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 101.869,
+          "as_published": "101.869",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -463.744,
+          "as_published": "-463.744",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -260.79,
+          "as_published": "-260.790",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 9.082,
+          "as_published": "9.082",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1700,
+          "as_published": "1700",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 201.352,
+          "as_published": "201.352",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 133.553,
+          "as_published": "133.553",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 115.257,
+          "as_published": "115.257",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -458.317,
+          "as_published": "-458.317",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -234.077,
+          "as_published": "-234.077",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 7.192,
+          "as_published": "7.192",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1800,
+          "as_published": "1800",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 205.178,
+          "as_published": "205.178",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 137.427,
+          "as_published": "137.427",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 121.952,
+          "as_published": "121.952",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -455.61,
+          "as_published": "-455.610",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -220.964,
+          "as_published": "-220.964",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 6.412,
+          "as_published": "6.412",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1900,
+          "as_published": "1900",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 208.798,
+          "as_published": "208.798",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 141.089,
+          "as_published": "141.089",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 128.646,
+          "as_published": "128.646",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -452.909,
+          "as_published": "-452.909",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -208.002,
+          "as_published": "-208.002",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 5.718,
+          "as_published": "5.718",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "1900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2000,
+          "as_published": "2000",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 212.232,
+          "as_published": "212.232",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 144.561,
+          "as_published": "144.561",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 135.341,
+          "as_published": "135.341",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -450.213,
+          "as_published": "-450.213",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -195.182,
+          "as_published": "-195.182",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 5.098,
+          "as_published": "5.098",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2200,
+          "as_published": "2200",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 218.612,
+          "as_published": "218.612",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 151.008,
+          "as_published": "151.008",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 148.729,
+          "as_published": "148.729",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -444.842,
+          "as_published": "-444.842",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -169.939,
+          "as_published": "-169.939",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 4.035,
+          "as_published": "4.035",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2300,
+          "as_published": "2300",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 221.588,
+          "as_published": "221.588",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 154.012,
+          "as_published": "154.012",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 155.424,
+          "as_published": "155.424",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -442.169,
+          "as_published": "-442.169",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -157.503,
+          "as_published": "-157.503",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 3.577,
+          "as_published": "3.577",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2400,
+          "as_published": "2400",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 224.437,
+          "as_published": "224.437",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 156.888,
+          "as_published": "156.888",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 162.118,
+          "as_published": "162.118",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -439.506,
+          "as_published": "-439.506",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -145.184,
+          "as_published": "-145.184",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 3.16,
+          "as_published": "3.160",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2500,
+          "as_published": "2500",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 66.944,
+          "as_published": "66.944",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 227.17,
+          "as_published": "227.170",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 159.645,
+          "as_published": "159.645",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 168.813,
+          "as_published": "168.813",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -436.855,
+          "as_published": "-436.855",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -132.975,
+          "as_published": "-132.975",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 2.778,
+          "as_published": "2.778",
+          "locator": {
+            "table_id": "Cl-055",
+            "url": "https://janaf.nist.gov/tables/Cl-055.html",
+            "download_url": "https://janaf.nist.gov/tables/Cl-055.txt",
+            "row_temperature_as_published": "2500",
+            "column": "log Kf"
+          }
+        }
+      }
+    ],
+    "parse_ambiguities": [
+      {
+        "line_number": 24,
+        "raw_line": "1073.800  |  | 67.371  |  | 144.002  |  | 102.330  |  | 44.747  |  | CRYSTAL <--> LIQUID",
+        "reason": "expected 8 values; found 6",
+        "locator": {
+          "table_id": "Cl-055",
+          "url": "https://janaf.nist.gov/tables/Cl-055.html"
+        }
+      },
+      {
+        "line_number": 25,
+        "raw_line": "1073.800  |  | 70.668  |  | 170.225  |  | 102.330  |  | 72.905  |  | TRANSITION",
+        "reason": "expected 8 values; found 6",
+        "locator": {
+          "table_id": "Cl-055",
+          "url": "https://janaf.nist.gov/tables/Cl-055.html"
+        }
+      }
+    ]
+  }
+}

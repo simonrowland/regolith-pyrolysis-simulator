@@ -1,0 +1,541 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nist-janaf-4th",
+  "source": {
+    "citation": "Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)",
+    "database": "NIST Standard Reference Database 13",
+    "doi": "10.18434/T42S31",
+    "url": "https://janaf.nist.gov/",
+    "last_data_update": 1998
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "extraction": {
+    "method": "machine parse of official NIST JANAF HTML table via indexed web retrieval; numeric tokens preserved as published",
+    "date": "2026-08-27",
+    "review_status": "machine_transcribed_unreviewed",
+    "network_note": "Direct worker networking unavailable; official NIST page retrieved through indexed web surface."
+  },
+  "table": {
+    "table_id": "Na-022",
+    "url": "https://janaf.nist.gov/tables/Na-022.html",
+    "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+    "title_as_published": "Sodium Sulfate, IV (Na_{2}SO_{4})  |  | Na_{2}O_{4}S_{1}(cr)",
+    "standard_state_as_published": "",
+    "units_as_published": {
+      "temperature": "K",
+      "heat_capacity": "J K^-1 mol^-1",
+      "entropy": "J K^-1 mol^-1",
+      "negative_gibbs_enthalpy_function": "J K^-1 mol^-1",
+      "enthalpy_increment": "kJ mol^-1",
+      "formation_enthalpy": "kJ mol^-1",
+      "formation_gibbs_energy": "kJ mol^-1",
+      "log10_formation_equilibrium_constant": "dimensionless"
+    },
+    "values": [
+      {
+        "temperature": {
+          "value": 400,
+          "as_published": "400",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 145.101,
+          "as_published": "145.101",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 190.263,
+          "as_published": "190.263",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 155.407,
+          "as_published": "155.407",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 13.943,
+          "as_published": "13.943",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -1395.654,
+          "as_published": "-1395.654",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -1228.904,
+          "as_published": "-1228.904",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 160.478,
+          "as_published": "160.478",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 700,
+          "as_published": "700",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 182.933,
+          "as_published": "182.933",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 281.53,
+          "as_published": "281.530",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 190.967,
+          "as_published": "190.967",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 63.394,
+          "as_published": "63.394",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -1394.148,
+          "as_published": "-1394.148",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -1103.508,
+          "as_published": "-1103.508",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 82.345,
+          "as_published": "82.345",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 800,
+          "as_published": "800",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 194.046,
+          "as_published": "194.046",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 306.686,
+          "as_published": "306.686",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 203.879,
+          "as_published": "203.879",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 82.246,
+          "as_published": "82.246",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -1390.999,
+          "as_published": "-1390.999",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -1062.19,
+          "as_published": "-1062.190",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 69.354,
+          "as_published": "69.354",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 900,
+          "as_published": "900",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 204.828,
+          "as_published": "204.828",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 330.166,
+          "as_published": "330.166",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 216.62,
+          "as_published": "216.620",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 102.191,
+          "as_published": "102.191",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -1439.895,
+          "as_published": "-1439.895",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -1020.251,
+          "as_published": "-1020.251",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 59.214,
+          "as_published": "59.214",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1000,
+          "as_published": "1000",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "1000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 215.371,
+          "as_published": "215.371",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "1000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 352.295,
+          "as_published": "352.295",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "1000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 229.091,
+          "as_published": "229.091",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "1000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 123.203,
+          "as_published": "123.203",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "1000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -1433.438,
+          "as_published": "-1433.438",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -973.962,
+          "as_published": "-973.962",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 50.875,
+          "as_published": "50.875",
+          "locator": {
+            "table_id": "Na-022",
+            "url": "https://janaf.nist.gov/tables/Na-022.html",
+            "download_url": "https://janaf.nist.gov/tables/Na-022.txt",
+            "row_temperature_as_published": "1000",
+            "column": "log Kf"
+          }
+        }
+      }
+    ],
+    "parse_ambiguities": [
+      {
+        "line_number": 7,
+        "raw_line": "0  |  |    |  |    |  |    |  |    |  |    |  |    |  |",
+        "reason": "expected 8 values; found 1",
+        "locator": {
+          "table_id": "Na-022",
+          "url": "https://janaf.nist.gov/tables/Na-022.html"
+        }
+      },
+      {
+        "line_number": 8,
+        "raw_line": "100  |  |    |  |    |  |    |  |    |  |    |  |    |  |",
+        "reason": "expected 8 values; found 1",
+        "locator": {
+          "table_id": "Na-022",
+          "url": "https://janaf.nist.gov/tables/Na-022.html"
+        }
+      },
+      {
+        "line_number": 9,
+        "raw_line": "200  |  |    |  |    |  |    |  |    |  |    |  |    |  |",
+        "reason": "expected 8 values; found 1",
+        "locator": {
+          "table_id": "Na-022",
+          "url": "https://janaf.nist.gov/tables/Na-022.html"
+        }
+      },
+      {
+        "line_number": 15,
+        "raw_line": "458.000  |  | 153.331  |  | 210.462  |  | 161.117  |  | 22.600  |  | V <--> IV",
+        "reason": "expected 8 values; found 6",
+        "locator": {
+          "table_id": "Na-022",
+          "url": "https://janaf.nist.gov/tables/Na-022.html"
+        }
+      },
+      {
+        "line_number": 20,
+        "raw_line": "514.000  |  | 160.712  |  | 228.572  |  | 167.491  |  | 31.396  |  | IV <--> I",
+        "reason": "expected 8 values; found 6",
+        "locator": {
+          "table_id": "Na-022",
+          "url": "https://janaf.nist.gov/tables/Na-022.html"
+        }
+      }
+    ]
+  }
+}

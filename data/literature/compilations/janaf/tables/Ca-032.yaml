@@ -1,0 +1,4455 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nist-janaf-4th",
+  "source": {
+    "citation": "Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)",
+    "database": "NIST Standard Reference Database 13",
+    "doi": "10.18434/T42S31",
+    "url": "https://janaf.nist.gov/",
+    "last_data_update": 1998
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "extraction": {
+    "method": "machine parse of official NIST JANAF HTML table via indexed web retrieval; numeric tokens preserved as published",
+    "date": "2026-08-27",
+    "review_status": "machine_transcribed_unreviewed",
+    "network_note": "Direct worker networking unavailable; official NIST page retrieved through indexed web surface."
+  },
+  "table": {
+    "table_id": "Ca-032",
+    "url": "https://janaf.nist.gov/tables/Ca-032.html",
+    "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+    "title_as_published": "Calcium Sulfide (CaS)  |  | Ca_{1}S_{1}(g)",
+    "standard_state_as_published": "",
+    "units_as_published": {
+      "temperature": "K",
+      "heat_capacity": "J K^-1 mol^-1",
+      "entropy": "J K^-1 mol^-1",
+      "negative_gibbs_enthalpy_function": "J K^-1 mol^-1",
+      "enthalpy_increment": "kJ mol^-1",
+      "formation_enthalpy": "kJ mol^-1",
+      "formation_gibbs_energy": "kJ mol^-1",
+      "log10_formation_equilibrium_constant": "dimensionless"
+    },
+    "values": [
+      {
+        "temperature": {
+          "value": 0,
+          "as_published": "0",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "0",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "0",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 0,
+          "as_published": "0.",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "0",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": null,
+          "as_published": "INFINITE",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "0",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -9.358,
+          "as_published": "-9.358",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "0",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 124.385,
+          "as_published": "124.385",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "0",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 124.385,
+          "as_published": "124.385",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "0",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": null,
+          "as_published": "INFINITE",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "0",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 100,
+          "as_published": "100",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "100",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 29.604,
+          "as_published": "29.604",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "100",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 197.623,
+          "as_published": "197.623",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "100",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 262.034,
+          "as_published": "262.034",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "100",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -6.441,
+          "as_published": "-6.441",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "100",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 125.632,
+          "as_published": "125.632",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "100",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 108.719,
+          "as_published": "108.719",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "100",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -56.789,
+          "as_published": "-56.789",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "100",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 200,
+          "as_published": "200",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 32.744,
+          "as_published": "32.744",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 219.086,
+          "as_published": "219.086",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 235.716,
+          "as_published": "235.716",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": -3.326,
+          "as_published": "-3.326",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 124.837,
+          "as_published": "124.837",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 92.045,
+          "as_published": "92.045",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -24.04,
+          "as_published": "-24.040",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 400,
+          "as_published": "400",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 35.897,
+          "as_published": "35.897",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 242.987,
+          "as_published": "242.987",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 233.971,
+          "as_published": "233.971",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 3.606,
+          "as_published": "3.606",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 119.88,
+          "as_published": "119.880",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 60.331,
+          "as_published": "60.331",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -7.878,
+          "as_published": "-7.878",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 500,
+          "as_published": "500",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 36.487,
+          "as_published": "36.487",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 251.066,
+          "as_published": "251.066",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 236.61,
+          "as_published": "236.610",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 7.228,
+          "as_published": "7.228",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 116.808,
+          "as_published": "116.808",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 45.785,
+          "as_published": "45.785",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -4.783,
+          "as_published": "-4.783",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 700,
+          "as_published": "700",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 37.106,
+          "as_published": "37.106",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 263.454,
+          "as_published": "263.454",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 242.604,
+          "as_published": "242.604",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 14.595,
+          "as_published": "14.595",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 111.162,
+          "as_published": "111.162",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 18.389,
+          "as_published": "18.389",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -1.372,
+          "as_published": "-1.372",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 800,
+          "as_published": "800",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 37.336,
+          "as_published": "37.336",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 268.423,
+          "as_published": "268.423",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 245.527,
+          "as_published": "245.527",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 18.317,
+          "as_published": "18.317",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 107.479,
+          "as_published": "107.479",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 5.432,
+          "as_published": "5.432",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.355,
+          "as_published": "-0.355",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 900,
+          "as_published": "900",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 37.624,
+          "as_published": "37.624",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 272.837,
+          "as_published": "272.837",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 248.321,
+          "as_published": "248.321",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 22.064,
+          "as_published": "22.064",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 51.444,
+          "as_published": "51.444",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -6.07,
+          "as_published": "-6.070",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.352,
+          "as_published": "0.352",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1000,
+          "as_published": "1000",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 38.061,
+          "as_published": "38.061",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 276.822,
+          "as_published": "276.822",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 250.975,
+          "as_published": "250.975",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 25.847,
+          "as_published": "25.847",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 49.55,
+          "as_published": "49.550",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -12.362,
+          "as_published": "-12.362",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.646,
+          "as_published": "0.646",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1200,
+          "as_published": "1200",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 39.703,
+          "as_published": "39.703",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 283.888,
+          "as_published": "283.888",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 255.885,
+          "as_published": "255.885",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 33.603,
+          "as_published": "33.603",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 37.265,
+          "as_published": "37.265",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -23.71,
+          "as_published": "-23.710",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.032,
+          "as_published": "1.032",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1300,
+          "as_published": "1300",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 41.007,
+          "as_published": "41.007",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 287.115,
+          "as_published": "287.115",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 258.164,
+          "as_published": "258.164",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 37.636,
+          "as_published": "37.636",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 35.895,
+          "as_published": "35.895",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -28.734,
+          "as_published": "-28.734",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.155,
+          "as_published": "1.155",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1400,
+          "as_published": "1400",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 42.641,
+          "as_published": "42.641",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 290.212,
+          "as_published": "290.212",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 260.344,
+          "as_published": "260.344",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 41.815,
+          "as_published": "41.815",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 34.657,
+          "as_published": "34.657",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -33.659,
+          "as_published": "-33.659",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.256,
+          "as_published": "1.256",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1500,
+          "as_published": "1500",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 44.564,
+          "as_published": "44.564",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 293.218,
+          "as_published": "293.218",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 262.435,
+          "as_published": "262.435",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 46.174,
+          "as_published": "46.174",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 33.581,
+          "as_published": "33.581",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -38.5,
+          "as_published": "-38.500",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.341,
+          "as_published": "1.341",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1700,
+          "as_published": "1700",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 48.971,
+          "as_published": "48.971",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 299.06,
+          "as_published": "299.060",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 266.402,
+          "as_published": "266.402",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 55.519,
+          "as_published": "55.519",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": 32.015,
+          "as_published": "32.015",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -48.001,
+          "as_published": "-48.001",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.475,
+          "as_published": "1.475",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1800,
+          "as_published": "1800",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 51.26,
+          "as_published": "51.260",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 301.924,
+          "as_published": "301.924",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 268.296,
+          "as_published": "268.296",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 60.53,
+          "as_published": "60.530",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -117.123,
+          "as_published": "-117.123",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -50.483,
+          "as_published": "-50.483",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.465,
+          "as_published": "1.465",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 1900,
+          "as_published": "1900",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 53.474,
+          "as_published": "53.474",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 304.756,
+          "as_published": "304.756",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 270.141,
+          "as_published": "270.141",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 65.768,
+          "as_published": "65.768",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -115.961,
+          "as_published": "-115.961",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -46.811,
+          "as_published": "-46.811",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.287,
+          "as_published": "1.287",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "1900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2000,
+          "as_published": "2000",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 55.523,
+          "as_published": "55.523",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 307.552,
+          "as_published": "307.552",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 271.942,
+          "as_published": "271.942",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 71.22,
+          "as_published": "71.220",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -114.603,
+          "as_published": "-114.603",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -43.206,
+          "as_published": "-43.206",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 1.128,
+          "as_published": "1.128",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2200,
+          "as_published": "2200",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 58.863,
+          "as_published": "58.863",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 313.009,
+          "as_published": "313.009",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 275.429,
+          "as_published": "275.429",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 82.677,
+          "as_published": "82.677",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -111.39,
+          "as_published": "-111.390",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -36.217,
+          "as_published": "-36.217",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.86,
+          "as_published": "0.860",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2300,
+          "as_published": "2300",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 60.079,
+          "as_published": "60.079",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 315.654,
+          "as_published": "315.654",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 277.12,
+          "as_published": "277.120",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 88.627,
+          "as_published": "88.627",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -109.598,
+          "as_published": "-109.598",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -32.84,
+          "as_published": "-32.840",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.746,
+          "as_published": "0.746",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2400,
+          "as_published": "2400",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 60.977,
+          "as_published": "60.977",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 318.231,
+          "as_published": "318.231",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 278.78,
+          "as_published": "278.780",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 94.683,
+          "as_published": "94.683",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -107.728,
+          "as_published": "-107.728",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -29.542,
+          "as_published": "-29.542",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.643,
+          "as_published": "0.643",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2500,
+          "as_published": "2500",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 61.569,
+          "as_published": "61.569",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 320.733,
+          "as_published": "320.733",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 280.408,
+          "as_published": "280.408",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 100.812,
+          "as_published": "100.812",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -105.816,
+          "as_published": "-105.816",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -26.324,
+          "as_published": "-26.324",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.55,
+          "as_published": "0.550",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2700,
+          "as_published": "2700",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 61.936,
+          "as_published": "61.936",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 325.492,
+          "as_published": "325.492",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 283.573,
+          "as_published": "283.573",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 113.18,
+          "as_published": "113.180",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -102.004,
+          "as_published": "-102.004",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -20.114,
+          "as_published": "-20.114",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.389,
+          "as_published": "0.389",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2800,
+          "as_published": "2800",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 61.781,
+          "as_published": "61.781",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 327.742,
+          "as_published": "327.742",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 285.111,
+          "as_published": "285.111",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 119.367,
+          "as_published": "119.367",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -100.165,
+          "as_published": "-100.165",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -17.115,
+          "as_published": "-17.115",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.319,
+          "as_published": "0.319",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 2900,
+          "as_published": "2900",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 61.449,
+          "as_published": "61.449",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 329.905,
+          "as_published": "329.905",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 286.619,
+          "as_published": "286.619",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 125.53,
+          "as_published": "125.530",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -98.409,
+          "as_published": "-98.409",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -14.18,
+          "as_published": "-14.180",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.255,
+          "as_published": "0.255",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "2900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3000,
+          "as_published": "3000",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 60.977,
+          "as_published": "60.977",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 331.98,
+          "as_published": "331.980",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 288.096,
+          "as_published": "288.096",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 131.652,
+          "as_published": "131.652",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -96.758,
+          "as_published": "-96.758",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -11.304,
+          "as_published": "-11.304",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.197,
+          "as_published": "0.197",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3200,
+          "as_published": "3200",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.743,
+          "as_published": "59.743",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 335.878,
+          "as_published": "335.878",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 290.963,
+          "as_published": "290.963",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 143.729,
+          "as_published": "143.729",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -93.848,
+          "as_published": "-93.848",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -5.705,
+          "as_published": "-5.705",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.093,
+          "as_published": "0.093",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3300,
+          "as_published": "3300",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 59.036,
+          "as_published": "59.036",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 337.706,
+          "as_published": "337.706",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 292.352,
+          "as_published": "292.352",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 149.669,
+          "as_published": "149.669",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -92.622,
+          "as_published": "-92.622",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -2.97,
+          "as_published": "-2.970",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.047,
+          "as_published": "0.047",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3400,
+          "as_published": "3400",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 58.298,
+          "as_published": "58.298",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 339.457,
+          "as_published": "339.457",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 293.711,
+          "as_published": "293.711",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 155.536,
+          "as_published": "155.536",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -91.564,
+          "as_published": "-91.564",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": -0.269,
+          "as_published": "-0.269",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": 0.004,
+          "as_published": "0.004",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3500,
+          "as_published": "3500",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 57.547,
+          "as_published": "57.547",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 341.136,
+          "as_published": "341.136",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 295.043,
+          "as_published": "295.043",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 161.328,
+          "as_published": "161.328",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.685,
+          "as_published": "-90.685",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 2.403,
+          "as_published": "2.403",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.036,
+          "as_published": "-0.036",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3700,
+          "as_published": "3700",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 56.057,
+          "as_published": "56.057",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 344.293,
+          "as_published": "344.293",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 297.621,
+          "as_published": "297.621",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 172.687,
+          "as_published": "172.687",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -89.494,
+          "as_published": "-89.494",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 7.685,
+          "as_published": "7.685",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.108,
+          "as_published": "-0.108",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3800,
+          "as_published": "3800",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 55.336,
+          "as_published": "55.336",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 345.778,
+          "as_published": "345.778",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 298.868,
+          "as_published": "298.868",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 178.257,
+          "as_published": "178.257",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -89.193,
+          "as_published": "-89.193",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 10.307,
+          "as_published": "10.307",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.142,
+          "as_published": "-0.142",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 3900,
+          "as_published": "3900",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 54.639,
+          "as_published": "54.639",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 347.207,
+          "as_published": "347.207",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 300.09,
+          "as_published": "300.090",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 183.755,
+          "as_published": "183.755",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -89.094,
+          "as_published": "-89.094",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 12.923,
+          "as_published": "12.923",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.173,
+          "as_published": "-0.173",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "3900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4000,
+          "as_published": "4000",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 53.972,
+          "as_published": "53.972",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 348.581,
+          "as_published": "348.581",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 301.285,
+          "as_published": "301.285",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 189.186,
+          "as_published": "189.186",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -89.198,
+          "as_published": "-89.198",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 15.54,
+          "as_published": "15.540",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.203,
+          "as_published": "-0.203",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4200,
+          "as_published": "4200",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 52.73,
+          "as_published": "52.730",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 351.184,
+          "as_published": "351.184",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 303.6,
+          "as_published": "303.600",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 199.854,
+          "as_published": "199.854",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.023,
+          "as_published": "-90.023",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 20.794,
+          "as_published": "20.794",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.259,
+          "as_published": "-0.259",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4300,
+          "as_published": "4300",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 52.159,
+          "as_published": "52.159",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 352.418,
+          "as_published": "352.418",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 304.721,
+          "as_published": "304.721",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 205.098,
+          "as_published": "205.098",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -90.742,
+          "as_published": "-90.742",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 23.441,
+          "as_published": "23.441",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.285,
+          "as_published": "-0.285",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4400,
+          "as_published": "4400",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 51.62,
+          "as_published": "51.620",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 353.611,
+          "as_published": "353.611",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 305.819,
+          "as_published": "305.819",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 210.287,
+          "as_published": "210.287",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -91.66,
+          "as_published": "-91.660",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 26.106,
+          "as_published": "26.106",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.31,
+          "as_published": "-0.310",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4500,
+          "as_published": "4500",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 51.114,
+          "as_published": "51.114",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 354.765,
+          "as_published": "354.765",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 306.894,
+          "as_published": "306.894",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 215.423,
+          "as_published": "215.423",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -92.763,
+          "as_published": "-92.763",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 28.794,
+          "as_published": "28.794",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.334,
+          "as_published": "-0.334",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4700,
+          "as_published": "4700",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 50.194,
+          "as_published": "50.194",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 356.968,
+          "as_published": "356.968",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 308.978,
+          "as_published": "308.978",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 225.552,
+          "as_published": "225.552",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -95.568,
+          "as_published": "-95.568",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 34.254,
+          "as_published": "34.254",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.381,
+          "as_published": "-0.381",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4800,
+          "as_published": "4800",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 49.778,
+          "as_published": "49.778",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 358.02,
+          "as_published": "358.020",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 309.989,
+          "as_published": "309.989",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 230.55,
+          "as_published": "230.550",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -97.253,
+          "as_published": "-97.253",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 37.034,
+          "as_published": "37.034",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.403,
+          "as_published": "-0.403",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 4900,
+          "as_published": "4900",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 49.39,
+          "as_published": "49.390",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 359.042,
+          "as_published": "359.042",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 310.979,
+          "as_published": "310.979",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 235.509,
+          "as_published": "235.509",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -99.117,
+          "as_published": "-99.117",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 39.851,
+          "as_published": "39.851",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.425,
+          "as_published": "-0.425",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "4900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 5000,
+          "as_published": "5000",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 49.027,
+          "as_published": "49.027",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 360.037,
+          "as_published": "360.037",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 311.951,
+          "as_published": "311.951",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 240.429,
+          "as_published": "240.429",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -101.153,
+          "as_published": "-101.153",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 42.707,
+          "as_published": "42.707",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.446,
+          "as_published": "-0.446",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5000",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 5200,
+          "as_published": "5200",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5200",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 48.374,
+          "as_published": "48.374",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5200",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 361.946,
+          "as_published": "361.946",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5200",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 313.837,
+          "as_published": "313.837",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5200",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 250.168,
+          "as_published": "250.168",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5200",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -105.714,
+          "as_published": "-105.714",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5200",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 48.549,
+          "as_published": "48.549",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5200",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.488,
+          "as_published": "-0.488",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5200",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 5300,
+          "as_published": "5300",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5300",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 48.08,
+          "as_published": "48.080",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5300",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 362.865,
+          "as_published": "362.865",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5300",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 314.754,
+          "as_published": "314.754",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5300",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 254.99,
+          "as_published": "254.990",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5300",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -108.226,
+          "as_published": "-108.226",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5300",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 51.539,
+          "as_published": "51.539",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5300",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.508,
+          "as_published": "-0.508",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5300",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 5400,
+          "as_published": "5400",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5400",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.806,
+          "as_published": "47.806",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5400",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 363.761,
+          "as_published": "363.761",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5400",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 315.653,
+          "as_published": "315.653",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5400",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 259.784,
+          "as_published": "259.784",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5400",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -110.882,
+          "as_published": "-110.882",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5400",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 54.578,
+          "as_published": "54.578",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5400",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.528,
+          "as_published": "-0.528",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5400",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 5500,
+          "as_published": "5500",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5500",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.552,
+          "as_published": "47.552",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5500",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 364.636,
+          "as_published": "364.636",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5500",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 316.536,
+          "as_published": "316.536",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5500",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 264.552,
+          "as_published": "264.552",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5500",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -113.673,
+          "as_published": "-113.673",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5500",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 57.668,
+          "as_published": "57.668",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5500",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.548,
+          "as_published": "-0.548",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5500",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 5700,
+          "as_published": "5700",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5700",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 47.095,
+          "as_published": "47.095",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5700",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 366.326,
+          "as_published": "366.326",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5700",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 318.253,
+          "as_published": "318.253",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5700",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 274.016,
+          "as_published": "274.016",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5700",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -119.617,
+          "as_published": "-119.617",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5700",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 64.003,
+          "as_published": "64.003",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5700",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.587,
+          "as_published": "-0.587",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5700",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 5800,
+          "as_published": "5800",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5800",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 46.89,
+          "as_published": "46.890",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5800",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 367.143,
+          "as_published": "367.143",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5800",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 319.089,
+          "as_published": "319.089",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5800",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 278.715,
+          "as_published": "278.715",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5800",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -122.764,
+          "as_published": "-122.764",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5800",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 67.252,
+          "as_published": "67.252",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5800",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.606,
+          "as_published": "-0.606",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5800",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 5900,
+          "as_published": "5900",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5900",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 46.699,
+          "as_published": "46.699",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5900",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 367.943,
+          "as_published": "367.943",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5900",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 319.91,
+          "as_published": "319.910",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5900",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 283.394,
+          "as_published": "283.394",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5900",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -126.014,
+          "as_published": "-126.014",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5900",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 70.556,
+          "as_published": "70.556",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5900",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.625,
+          "as_published": "-0.625",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "5900",
+            "column": "log Kf"
+          }
+        }
+      },
+      {
+        "temperature": {
+          "value": 6000,
+          "as_published": "6000",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "6000",
+            "column": "T/K"
+          }
+        },
+        "heat_capacity": {
+          "value": 46.522,
+          "as_published": "46.522",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "6000",
+            "column": "Cp°"
+          }
+        },
+        "entropy": {
+          "value": 368.727,
+          "as_published": "368.727",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "6000",
+            "column": "S°"
+          }
+        },
+        "negative_gibbs_enthalpy_function": {
+          "value": 320.718,
+          "as_published": "320.718",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "6000",
+            "column": "-[G°-H°(Tr)]/T"
+          }
+        },
+        "enthalpy_increment": {
+          "value": 288.055,
+          "as_published": "288.055",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "6000",
+            "column": "H-H°(Tr)"
+          }
+        },
+        "formation_enthalpy": {
+          "value": -129.358,
+          "as_published": "-129.358",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "6000",
+            "column": "ΔfH°"
+          }
+        },
+        "formation_gibbs_energy": {
+          "value": 73.915,
+          "as_published": "73.915",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "6000",
+            "column": "ΔfG°"
+          }
+        },
+        "log10_formation_equilibrium_constant": {
+          "value": -0.643,
+          "as_published": "-0.643",
+          "locator": {
+            "table_id": "Ca-032",
+            "url": "https://janaf.nist.gov/tables/Ca-032.html",
+            "download_url": "https://janaf.nist.gov/tables/Ca-032.txt",
+            "row_temperature_as_published": "6000",
+            "column": "log Kf"
+          }
+        }
+      }
+    ],
+    "parse_ambiguities": []
+  }
+}
