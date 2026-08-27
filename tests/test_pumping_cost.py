@@ -257,6 +257,21 @@ def test_finite_near_vacuum_target_fails_soft_without_overflow():
 
 
 def test_perfect_vacuum_target_is_fail_soft_infeasible():
+    # b-288 renamed this regime and NOTHING ELSE about this case. Every
+    # behavioural assertion below is unchanged and still passes: fail-soft,
+    # zero energy, infinite pump speed, infinite compression ratio.
+    #
+    # Those two infinities are the argument for the rename. The code was ALREADY
+    # computing this as a physical divergence -- log(ambient/target) -> inf as
+    # target -> 0 -- and then labelling the result "invalid-target-pressure",
+    # which tells an operator their NUMBER was malformed when in fact their GOAL
+    # was impossible. Holding an absolute vacuum against a real atmosphere is a
+    # coherent request with an infinite answer, not a typo.
+    #
+    # The old label also collided with the genuinely-malformed cases (NaN,
+    # negative), which still return "invalid-target-pressure" and are pinned by
+    # test_degenerate_pressure_inputs_fail_soft_infeasible. One label for both
+    # meant the two could not be told apart downstream.
     r = estimate_subambient_pump_cost(
         target_pressure_pa=0.0,
         offgas_mol_per_s=0.1,
@@ -264,7 +279,7 @@ def test_perfect_vacuum_target_is_fail_soft_infeasible():
         ambient_pressure_pa=MARS_DATUM_AMBIENT_PA,
     )
 
-    assert r.regime == "invalid-target-pressure"
+    assert r.regime == "unreachable-absolute-vacuum-target"
     assert r.energy_kWh == 0.0
     assert r.feasible is False
     assert math.isinf(r.required_pump_speed_m3_s)
@@ -674,3 +689,103 @@ def test_a_real_pumping_load_is_still_costed():
     )
     assert result.energy_kWh > 0.0
     assert result.status == "ok"
+
+
+def test_lunar_vacuum_ambient_vents_free_instead_of_reporting_a_missing_pressure():
+    """b-288 / SC-146: ambient 0 is the Moon, not an unfilled field.
+
+    The module docstring already says what should happen on a vacuum body: "the
+    ambient is already below any useful process pressure, so evolved offgas VENTS
+    OUT for free". The vent-free branch implementing that has always been there.
+    A `<= 0.0` guard simply refused before execution could reach it, so the body
+    this simulator exists to model hit "missing-ambient-pressure".
+
+    The absence is the statement: only the five Mars feedstocks declare
+    surface_pressure_mbar (6 mbar). Lunar entries declare none BECAUSE the Moon
+    has none. Rewriting that proven zero into NaN made a real lunar ambient
+    indistinguishable from a field nobody filled in.
+
+    Note this file states the correct rule for the offgas rate a few lines above
+    the guards it fixes -- non-finite is missing, negative is invalid, exactly 0.0
+    is a proven zero -- and then did not apply it to either pressure.
+    """
+
+    from simulator.pumping_cost import estimate_subambient_pump_cost
+
+    for target_pa, label in ((100.0, "a 1 mbar process hold"), (0.0, "a vacuum hold")):
+        cost = estimate_subambient_pump_cost(
+            target_pressure_pa=target_pa,
+            offgas_mol_per_s=2.0,
+            duration_s=3600.0,
+            ambient_pressure_pa=0.0,
+        )
+        assert cost.regime == "vent-free", label
+        assert cost.feasible is True, label
+        assert cost.energy_kWh == pytest.approx(0.0), label
+
+
+def test_absolute_vacuum_target_against_a_real_atmosphere_names_why_it_is_impossible():
+    """b-288: infinite work is a physical verdict, not a malformed input.
+
+    Reached only when ambient > 0, since ambient 0 vents free. Holding absolute
+    zero against a real atmosphere diverges as log(ambient/target) -> inf. That
+    is genuinely infeasible, but reporting it as "invalid-target-pressure" told
+    an operator their number was malformed when in fact their goal was impossible.
+    """
+
+    from simulator.pumping_cost import estimate_subambient_pump_cost
+
+    cost = estimate_subambient_pump_cost(
+        target_pressure_pa=0.0,
+        offgas_mol_per_s=2.0,
+        duration_s=3600.0,
+        ambient_pressure_pa=600.0,
+    )
+    assert cost.feasible is False
+    assert cost.regime == "unreachable-absolute-vacuum-target"
+
+
+def test_pumping_still_refuses_genuinely_unknown_and_impossible_pressures():
+    """b-288 non-target: only the proven zero was admitted.
+
+    Passes both before and after the change. It is here so a later relaxation
+    that admits NaN or a negative pressure -- "for symmetry with the zero case" --
+    goes red. Zero is a physical state; NaN is an absence of knowledge; a negative
+    pressure is not a pressure.
+    """
+
+    import math
+
+    from simulator.pumping_cost import estimate_subambient_pump_cost
+
+    for kwargs, expected in (
+        ({"ambient_pressure_pa": math.nan}, "invalid-ambient-pressure"),
+        ({"ambient_pressure_pa": -1.0}, "invalid-ambient-pressure"),
+        ({"target_pressure_pa": math.nan, "ambient_pressure_pa": 600.0}, "invalid-target-pressure"),
+        ({"target_pressure_pa": -1.0, "ambient_pressure_pa": 600.0}, "invalid-target-pressure"),
+    ):
+        call = {
+            "target_pressure_pa": 100.0,
+            "offgas_mol_per_s": 2.0,
+            "duration_s": 3600.0,
+            "ambient_pressure_pa": 600.0,
+        }
+        call.update(kwargs)
+        cost = estimate_subambient_pump_cost(**call)
+        assert cost.feasible is False
+        assert cost.regime == expected
+
+
+def test_mars_pumping_is_unchanged_by_the_vacuum_relaxation():
+    """b-288: the Mars path is the one that actually costs energy. Pin it."""
+
+    from simulator.pumping_cost import estimate_subambient_pump_cost
+
+    cost = estimate_subambient_pump_cost(
+        target_pressure_pa=100.0,
+        offgas_mol_per_s=2.0,
+        duration_s=3600.0,
+        ambient_pressure_pa=600.0,
+    )
+    assert cost.regime == "pump"
+    assert cost.energy_kWh > 0.0

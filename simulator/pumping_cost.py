@@ -338,10 +338,28 @@ def estimate_subambient_pump_cost(
         return _infeasible_degenerate("invalid-duration")
     if offgas_mol_per_s == 0.0 or duration_s == 0.0:
         return SubambientPumpCost("vent-free", 0.0, 0.0, 0.0, 1.0, True)
-    if not math.isfinite(target_pressure_pa) or target_pressure_pa <= 0.0:
+    # b-288: the same three-category rule stated above for the offgas rate, now
+    # actually applied to the two pressures instead of being stated and then
+    # contradicted two lines later. `<= 0.0` collapsed "we do not know" together
+    # with "it is zero, and zero is the physical state of the body we are built
+    # to model".
+    #
+    #   NaN      -> MISSING, we do not know            -> refuse
+    #   negative -> INVALID, cannot be a real pressure -> refuse
+    #   0.0      -> PROVEN ZERO, true vacuum           -> keep, and let the
+    #               target >= ambient test below route it
+    if math.isnan(target_pressure_pa) or target_pressure_pa < 0.0:
         return _infeasible_degenerate("invalid-target-pressure")
-    if not math.isfinite(ambient_pressure_pa) or ambient_pressure_pa <= 0.0:
+    if math.isnan(ambient_pressure_pa) or ambient_pressure_pa < 0.0:
         return _infeasible_degenerate("invalid-ambient-pressure")
+    # Ambient 0 is the Moon, and the module docstring already says what should
+    # happen there: "the ambient is already below any useful process pressure, so
+    # evolved offgas VENTS OUT for free". With ambient 0 every non-negative
+    # target satisfies target >= ambient, so the existing vent-free branch below
+    # handles it with no new logic -- the behaviour was always correct, the guard
+    # simply refused before reaching it. Lunar feedstocks declare no
+    # surface_pressure_mbar precisely BECAUSE the Moon has none; only the five
+    # Mars entries declare one (6 mbar). That absence is the statement, not a gap.
     if not math.isfinite(gas_temperature_K) or gas_temperature_K <= 0.0:
         return _infeasible_degenerate("invalid-gas-temperature")
 
@@ -349,6 +367,14 @@ def estimate_subambient_pump_cost(
     if target_pressure_pa >= ambient_pressure_pa:
         return SubambientPumpCost("vent-free", 0.0, 0.0, 0.0, 1.0, True)
 
+    if target_pressure_pa == 0.0:
+        # Reached only when ambient > 0 (ambient == 0 vented free above). Holding
+        # an absolute zero against a real atmosphere is not a missing input and
+        # not a bad number -- it is infinite compression work, because
+        # log(ambient/target) diverges as target -> 0. Name that reason rather
+        # than laundering it into "invalid", so an operator asking for a perfect
+        # vacuum on Mars is told what is actually impossible about it.
+        return _infeasible_degenerate("unreachable-absolute-vacuum-target")
     log_ratio = math.log(ambient_pressure_pa) - math.log(target_pressure_pa)
     # (1) Intercooled, equal-pressure-ratio adiabatic stages.
     #
@@ -606,7 +632,10 @@ def _ambient_pressure_pa(
     *,
     ambient_pressure_mbar: float,
 ) -> float:
-    if math.isfinite(ambient_pressure_mbar) and ambient_pressure_mbar > 0.0:
+    # b-288: >= 0.0, not > 0.0. Rewriting a proven zero into NaN made a real
+    # lunar ambient indistinguishable from an absent field, and every caller
+    # downstream then reported it as "missing-ambient-pressure".
+    if math.isfinite(ambient_pressure_mbar) and ambient_pressure_mbar >= 0.0:
         return ambient_pressure_mbar * _PA_PER_MBAR
     return math.nan
 
