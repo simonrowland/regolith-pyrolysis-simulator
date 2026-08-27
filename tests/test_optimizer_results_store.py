@@ -2276,6 +2276,54 @@ def _wall_pressure_refusal_status_payload() -> dict[str, object]:
     )
 
 
+def test_store_refuses_a_feasible_row_that_never_earned_a_certification_field(
+    tmp_path,
+) -> None:
+    """An OMITTED certification allowance must not read as permission.
+
+    The gate was ``any(not allowed for allowed in certification_allowances)``,
+    which fires when a carrier HONESTLY declares False and passes VACUOUSLY on
+    an empty tuple. Every axis in collect_result_trust_carriers appends only
+    when the value is not None, so an omitted field yields exactly that empty
+    tuple. The detector detected honesty, not dishonesty.
+
+    THE VECTOR IS AN ASYMMETRY BETWEEN TWO CARRIER SETS, which is why this is
+    reachable without touching a private attribute. RunReference.__post_init__
+    canonicalises from ITSELF AND ITS TRACE, so provenance asserted only on the
+    product_summary never derives a certification and the reference stays bare.
+    collect_result_trust_carriers, however, DOES read the product_summary -- so
+    the row presents a backend name and an evidence class while carrying no
+    allowance at all, and the sibling axes that would otherwise catch it
+    (backend_name_non_authoritative, missing_evidence_class) are both satisfied.
+
+    Verified by counterfactual: with the old any() this row is admitted with NO
+    rejections at all.
+    """
+    spec = _base_spec()
+    scored = replace(
+        _scored(spec),
+        run_reference=RunReference(
+            status="ok",
+            trace=_admissible_trace(),
+            product_summary={
+                "oxygen_kg": 10.0,
+                "backend_name": "alphamelts",
+                "evidence_class": "melts",
+            },
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    # Named on purpose: asserting only that the write was rejected would also
+    # pass on missing_evidence_class or backend_name_non_authoritative, and
+    # both of those are satisfied here precisely so they cannot mask this one.
+    assert "certification_forbidden" in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
 def test_cached_coating_margin_authority_rederives_stale_false_from_status_payload() -> None:
     margin = _cached_coating_margin(
         False,

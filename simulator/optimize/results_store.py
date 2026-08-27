@@ -936,7 +936,33 @@ def _artifact_authority_rejections(
     reasons = list(trust.disagreement_rejections)
     if not distinct_evidence:
         reasons.append("missing_evidence_class")
-    if any(not allowed for allowed in trust.certification_allowances):
+    # ★ ABSENCE CANNOT PROVE CERTIFICATION. This was
+    # `any(not allowed for allowed in trust.certification_allowances)`, which
+    # fires when a carrier HONESTLY declares False and passes VACUOUSLY when the
+    # field is omitted -- `any(())` is False. Every axis in
+    # collect_result_trust_carriers appends only when the value is not None, so
+    # an omitted field yields an EMPTY tuple, and the field itself defaults to
+    # None on RunReference. The detector therefore detected honesty, not
+    # dishonesty: it selected against the producers that fill the field in.
+    #
+    # The sibling axes already read absence correctly -- an empty backend_names
+    # becomes backend_name_non_authoritative:missing, an empty evidence_classes
+    # becomes missing_evidence_class, and the authority axis above uses exactly
+    # the idiom used here. This converges the odd one out rather than adding a
+    # rule; it also makes DISAGREEING carriers deny, which they should, since
+    # carriers that do not agree have not established certification either.
+    #
+    # ★★ FEASIBILITY IN THIS CACHE IS NOT A TRUST SIGNAL, and tightening this
+    # gate does not make it one. The only backend the project ships is in
+    # CERTIFICATION_DENYLIST, so an honest run cannot satisfy this predicate at
+    # all; what survives here is provenance that CLAIMS a backend the shipped
+    # configuration does not run. This guard removes the rows that got in by
+    # omitting a field, not the ones that assert a consistent claim. Do not read
+    # a cached feasible row as having passed a real check while that remains
+    # true -- a stricter gate makes its own output look more trustworthy, which
+    # is the inference this comment exists to block.
+    certification_allowed = _agreed_carrier_value(trust.certification_allowances)
+    if certification_allowed is not True:
         reasons.append("certification_forbidden")
     requires_inherited_evidence_class = any(trust.inherited_evidence_requirements)
     evidence_candidates: tuple[str | None, ...] = (
