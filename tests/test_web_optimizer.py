@@ -3261,7 +3261,12 @@ def test_wide_winners_table_is_wrapped_in_a_scroll_container(client) -> None:
     assert ".table-scroll" in css and "overflow-x: auto" in css
 
 
-def test_runs_listing_survives_one_unreadable_latest_result(client) -> None:
+@pytest.mark.parametrize(
+    "unreadable_token", ["not_converged", "refused", "not_attempted"]
+)
+def test_runs_listing_survives_one_unreadable_latest_result(
+    client, unreadable_token: str
+) -> None:
     """One bad row in ONE run must not take the whole run library down.
 
     /api/optimizer/runs builds each summary's latest_result through
@@ -3283,28 +3288,30 @@ def test_runs_listing_survives_one_unreadable_latest_result(client) -> None:
     """
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
 
-    healthy_dir = runs_dir / "run-healthy"
+    healthy_dir = runs_dir / f"run-healthy-{unreadable_token}"
     healthy_dir.mkdir(parents=True)
     healthy_store = ResultStore(healthy_dir / "cache.sqlite")
-    healthy_spec = _base_spec(recipe_id="recipe-healthy")
+    healthy_spec = _base_spec(recipe_id=f"recipe-healthy-{unreadable_token}")
     healthy_store.store(
         healthy_spec,
         _scored(healthy_spec, candidate_id="candidate-healthy"),
         created_at="2026-06-01T00:00:00Z",
     )
 
-    unreadable_dir = runs_dir / "run-unreadable"
+    unreadable_dir = runs_dir / f"run-unreadable-latest-{unreadable_token}"
     unreadable_dir.mkdir(parents=True)
     unreadable_store = ResultStore(unreadable_dir / "cache.sqlite")
-    unreadable_spec = _base_spec(recipe_id="recipe-unreadable")
+    unreadable_spec = _base_spec(
+        recipe_id=f"recipe-unreadable-latest-{unreadable_token}"
+    )
     unreadable_store.store(
         unreadable_spec,
         _scored(
             unreadable_spec,
             candidate_id="candidate-unreadable-latest",
             feasible=False,
-            trace={"backend_status": "not_converged"},
-            backend_status="not_converged",
+            trace={"backend_status": unreadable_token},
+            backend_status=unreadable_token,
             backend_authoritative=False,
         ),
         created_at="2026-06-02T00:00:00Z",
@@ -3326,8 +3333,12 @@ def test_runs_listing_survives_one_unreadable_latest_result(client) -> None:
     assert "candidate-unreadable-latest" in candidates
 
 
+@pytest.mark.parametrize(
+    "unreadable_token", ["not_converged", "refused", "not_attempted"]
+)
 def test_detail_page_renders_a_row_whose_backend_token_is_unreadable(
     client,
+    unreadable_token: str,
 ) -> None:
     """END-TO-END: the page must come back 200, not 500.
 
@@ -3337,19 +3348,19 @@ def test_detail_page_renders_a_row_whose_backend_token_is_unreadable(
     guarded against is an operator opening a stored result and getting a 500.
     """
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
-    run_dir = runs_dir / "run-unreadable-token"
+    run_dir = runs_dir / f"run-unreadable-{unreadable_token}"
     run_dir.mkdir(parents=True)
     store = ResultStore(run_dir / "cache.sqlite")
 
-    spec = _base_spec(recipe_id="recipe-unreadable-token")
+    spec = _base_spec(recipe_id=f"recipe-unreadable-{unreadable_token}")
     store.store(
         spec,
         _scored(
             spec,
             candidate_id="candidate-unreadable",
             feasible=False,
-            trace={"backend_status": "not_converged"},
-            backend_status="not_converged",
+            trace={"backend_status": unreadable_token},
+            backend_status=unreadable_token,
             backend_authoritative=False,
         ),
         created_at="2026-06-01T00:00:00Z",
@@ -3357,7 +3368,7 @@ def test_detail_page_renders_a_row_whose_backend_token_is_unreadable(
     key = cache_key(spec)
 
     response = client.get(
-        f"/optimizer/runs/run-unreadable-token/results/{key}"
+        f"/optimizer/runs/run-unreadable-{unreadable_token}/results/{key}"
     )
 
     assert response.status_code == 200, (
