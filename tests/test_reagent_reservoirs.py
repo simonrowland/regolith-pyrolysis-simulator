@@ -232,3 +232,71 @@ def test_oxygen_terminal_accounts_reject_non_o2_species():
             "terminal.oxygen_melt_offgas_stored", {"N2": 1.0}, source="bad oxygen storage",
             material_origin="feedstock",
         )
+
+
+def test_missing_credit_limit_is_a_config_error_not_an_inventory_overdraw():
+    """b-284 / SC-146: no limit configured is not the same as drew past a limit.
+
+    The two OverdraftErrors either side of this branch describe a draw that
+    exceeded a KNOWN bound. This branch says no bound was ever configured, so
+    there is nothing to exceed -- a configuration gap, which under the
+    three-category rule is missing input, not a physical property of the recipe.
+
+    The distinction is load-bearing: the optimizer catches OverdraftError and
+    classifies it as ``inventory_overdraw``, then prunes the candidate as
+    infeasible. Raising a config gap in the overdraw family therefore scored a
+    perfectly good recipe as impossible AND hid the gap, because the operator
+    only ever saw an infeasible candidate.
+
+    Note how little setup this needs. That is the finding: AccountPolicy
+    .reservoir() defaults credit_limit_kg_by_species to {}, so this is the
+    DEFAULT path for any reservoir built without explicit per-species limits,
+    not a corner case someone has to construct.
+    """
+
+    AccountPolicy = _required_attr("simulator.accounting", "AccountPolicy")
+    OverdraftError = _required_attr("simulator.accounting", "OverdraftError")
+    AccountCreditPolicyError = _required_attr(
+        "simulator.accounting", "AccountCreditPolicyError"
+    )
+
+    ledger = _ledger()
+    ledger.set_account_policy(
+        "reservoir.reagent.Na",
+        AccountPolicy.reservoir("reservoir.reagent.Na"),  # no limits -- the default
+    )
+
+    with pytest.raises(AccountCreditPolicyError, match="has no credit limit") as excinfo:
+        ledger.move(
+            "draw_na_without_configured_limit",
+            "reservoir.reagent.Na",
+            "process.reagent_inventory",
+            {"Na": 2.0},
+            reason="b-284 config-gap probe",
+        )
+
+    # NOT in the overdraw family, so the optimizer's
+    # `except (ProposalRejected, OverdraftError)` cannot launder it into
+    # candidate-infeasibility. This is the whole point of the type change.
+    assert not isinstance(excinfo.value, OverdraftError)
+
+    # And it must not classify as an overdraw under EITHER string spelling --
+    # str(exc) or the run-executor's "ClassName: message" form.
+    from simulator.optimize.evaluate import _is_inventory_overdraw_message
+    from simulator.run_executor import _safe_exception_text
+
+    assert _is_inventory_overdraw_message(str(excinfo.value)) is False
+    assert _is_inventory_overdraw_message(_safe_exception_text(excinfo.value)) is False
+
+    # Contrast: a genuine overdraw is still an OverdraftError and still
+    # classifies as one. Narrowing this branch must not cost the real case.
+    plain = _ledger()
+    with pytest.raises(OverdraftError) as real:
+        plain.move(
+            "draw_more_than_exists",
+            "process.cleaned_melt",
+            "process.reagent_inventory",
+            {"Na": 5.0},
+            reason="b-284 genuine-overdraw contrast",
+        )
+    assert _is_inventory_overdraw_message(str(real.value)) is True

@@ -12,6 +12,7 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.accounting.exceptions import (
+    AccountCreditPolicyError,
     AccountingError,
     MaterialOriginError,
     OriginUnresolvedError,
@@ -1653,8 +1654,22 @@ class AtomLedger:
                     )
                 limit = policy.credit_limit_kg_by_species.get(species)
                 if limit is None:
-                    raise OverdraftError(
-                        f"reservoir account {account!r} has no credit limit for {species!r}"
+                    # b-284: NOT an overdraw. The two OverdraftErrors either side
+                    # of this one describe a draw that exceeded a KNOWN bound;
+                    # this one says no bound was ever configured, so there is
+                    # nothing to exceed. Raising it in the overdraw family made
+                    # the optimizer classify a configuration gap as
+                    # inventory_overdraw and prune the candidate as physically
+                    # infeasible -- hiding the gap instead of reporting it.
+                    #
+                    # Reachable by default, not a corner: AccountPolicy.reservoir()
+                    # defaults credit_limit_kg_by_species to {}, so ANY reservoir
+                    # built without explicit per-species limits lands here on its
+                    # first negative draw.
+                    raise AccountCreditPolicyError(
+                        f"reservoir account {account!r} has no credit limit "
+                        f"for {species!r}; configure a credit limit for this "
+                        f"species or use a normal account"
                     )
                 if kg < -limit - tolerance_kg:
                     raise OverdraftError(
