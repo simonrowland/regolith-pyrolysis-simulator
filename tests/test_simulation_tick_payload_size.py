@@ -53,6 +53,27 @@ def _force_internal_analytical(monkeypatch) -> list:
     return captured_tasks
 
 
+# Slope bound for SAWTOOTH growth, in bytes/hour. The two checks below do
+# different jobs and neither subsumes the other:
+#   * the interval check catches MONOTONIC growth of any size, down to
+#     1 byte/hour, and needs no threshold;
+#   * this slope bound catches a rising TREND that a single dip would otherwise
+#     excuse, which the interval check cannot see at all.
+#
+# CALIBRATED FROM MEASURED DATA, not chosen for tidiness. A first attempt at
+# 1.0 byte/hour fired on the real series -- [(3, 46133), (4, 46151), (5, 46149),
+# (6, 46147)], slope 4.0 -- which is a flat ~46.1 KB payload with an 18-byte
+# content step and three of four intervals NEGATIVE. That is correct work, and a
+# guard that fires on correct work gets deleted. The 1.0 figure came from a
+# perfectly monotonic counterfactual, where the interval check already fires.
+#
+# 100 bytes/hour sits ~25x above the measured jitter slope and ~74x below the
+# sawtooth case pinned below (7428). Over a 35-hour run it admits 3.5 KB on a
+# 46 KB payload (7.6%) while rejecting anything that would rebuild the megabyte
+# payloads that made runs unusable.
+SAWTOOTH_SLOPE_BYTES_PER_HOUR = 100.0
+
+
 def _assert_hourly_payload_slope_is_bounded(
     event: str,
     samples: list[tuple[int, int]],
@@ -73,6 +94,23 @@ def _assert_hourly_payload_slope_is_bounded(
         (next_size - size) / (next_hour - hour)
         for (hour, size), (next_hour, next_size) in zip(ordered, ordered[1:])
     ]
+    # The interval check alone is a SAWTOOTH HOLE: it passes as soon as ONE
+    # interval is non-positive, whatever the trend. A payload climbing
+    # 10 KB/hour with a single one-byte dip -- 10 KB to 50 KB over six hours,
+    # least-squares slope 7428 bytes/hour -- passed this gate unchanged, and the
+    # slope it needed was already computed above and used only in the message.
+    # Real payload sizes jitter with content, so a non-positive interval is the
+    # NORMAL case, which made the guard close to vacuous in production exactly
+    # where it mattered: unbounded tick payloads are what made runs unusable.
+    #
+    # Assert the computed trend. Both checks are kept deliberately: the interval
+    # check still rejects a monotonic climb far too gentle to reach this bound
+    # (1 byte/hour), and this bound catches a steep trend the interval check
+    # excuses. See SAWTOOTH_SLOPE_BYTES_PER_HOUR for the calibration.
+    assert slope < SAWTOOTH_SLOPE_BYTES_PER_HOUR, (
+        f"{event} payload grew {slope:.1f} bytes/hour "
+        f"(sawtooth bound {SAWTOOTH_SLOPE_BYTES_PER_HOUR}); samples={ordered}"
+    )
     assert not all(interval_slope > 0.0 for interval_slope in interval_slopes), (
         f"{event} payload grew {slope:.1f} bytes/hour; samples={ordered}"
     )
@@ -425,3 +463,40 @@ def _assert_tick_preserves_vr_totals(tick: dict, sim, mismatches: list[str]) -> 
                 "carrier_authority on the tick"
             )
             break
+
+
+def test_hourly_payload_gate_rejects_sawtooth_growth() -> None:
+    """A single non-positive interval must not excuse a rising trend.
+
+    Regression: the gate asserted only that NOT ALL intervals were positive, so
+    one one-byte dip defeated it entirely. This series climbs 10 KB to 50 KB in
+    six hours -- least-squares slope 7428 bytes/hour -- and passed unchanged.
+    Real payload sizes jitter with content, so a non-positive interval is the
+    normal case; that made the guard close to vacuous exactly where unbounded
+    tick payloads had already made runs unusable.
+    """
+    with pytest.raises(AssertionError, match="grew 7428.3 bytes/hour"):
+        _assert_hourly_payload_slope_is_bounded(
+            "sawtooth",
+            [
+                (1, 10_000),
+                (2, 20_000),
+                (3, 30_000),
+                (4, 29_999),  # the single dip that used to excuse everything
+                (5, 39_999),
+                (6, 49_999),
+            ],
+        )
+
+
+def test_hourly_payload_gate_still_allows_flat_jitter() -> None:
+    """Anti-over-correction: the bound must not fire on correct work.
+
+    A guard that rejects ordinary jitter gets deleted, so this holds the other
+    side of the same edit -- flat content with +/-1 noise has slope 0.0 and must
+    keep passing.
+    """
+    _assert_hourly_payload_slope_is_bounded(
+        "flat-jitter",
+        [(1, 46_000), (2, 46_002), (3, 45_998), (4, 46_001), (5, 45_999), (6, 46_000)],
+    )
