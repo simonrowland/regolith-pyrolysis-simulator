@@ -9,6 +9,16 @@ implementation chunk fires. Evidence base: `T610-imcc-scout/scout.md` (codex, fu
 steer; GO-bounded verdict) — section refs below are into that file. Owner rulings in force:
 shadow source (partial coverage fine); long-tail data beyond central databases WAITS FOR GROK.
 
+**Implementation status (doc audit, 2026-08-28):** this is a spec, and the "CLEARED to fire"
+line above is r2.1 scheduling state, not current status. Code has since landed:
+`simulator/melt_backend/imcc_sf04/` (`kernel.py`, `gas.py`, `adapter.py`) plus
+`tests/test_imcc_kernel.py`, `test_imcc_gas.py`, `test_imcc_adapter.py`,
+`test_imcc_rung3_fixture.py`, and `test_imcc_sp_extension.py`. Read the chunk sequencing in
+§10 as the design order, not as a work queue. Every bare research path below
+(`T610-imcc-scout/`, `HT-C4-anchors/`, `IMCC-impl/`) is relative to
+`docs-private/research/2026-08-09-upstream-mission/`, which is gitignored and absent from a
+clean checkout.
+
 ## 1. Purpose and authority (what this is and is not)
 
 `IMCC-SF04` is an **independent diagnostic shadow** for melt-component activities: a clean-room
@@ -140,6 +150,11 @@ chunk exit — placeholders are named as placeholders)
 2b. **Gas-layer validation** (before rung 3): the in-package gas mass-action layer reproduces
    pure-component vapor pressures vs JANAF-table values within ±0.01 dex on a declared species
    sample. Attribution order for any rung-3 miss: melt kernel → gas layer → transcription.
+   *(Doc audit 2026-08-28: this rung checks the layer against a compilation the layer is itself
+   assembled from, so it is an internal-consistency check in the same sense as the 9 JANAF rows
+   in §4 — not independent validation. Read it alongside the OWNER STRATEGIC REFRAME below, which
+   moves the standard to independent measured data. The repo's extract battery refuses the
+   equivalent rows as `gibbs_table_not_runtime_observable` for exactly this reason.)*
 3. **Workbook regression** (Chunk 5–6): `../VapoRock/data/Schaefer2004/Schaefer2004-MAGMA-valid
    .xlsx` — 8 sheets, 32 gas-species rows × 10 printed T (1500–2500 K); FC87 Table 4 Mercury
    fractional-vaporization endpoints (rounded). Tolerance placeholder ±0.02 dex vs workbook cells

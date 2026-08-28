@@ -60,7 +60,7 @@ is enabled with `REGOLITH_RUN_ENGINE_DETERMINISM=1`.
 **Root cause.** Eleven Objective-C solution classes take `pointerToDouble` from
 a temporary `DoubleVector`, then dereference that pointer in later statements.
 ARC may release the backing object after the full expression. The affected
-implementations are listed in [the prepared upstream patch](thermoengine-mu-lifetime.patch).
+implementations are listed in [the prepared upstream patch](../patches/thermoengine/0002-mu-lifetime.patch).
 Separately, several phase families use class-global `NSCountedSet` instance
 counters keyed by `operationParent`. Phase objects initialize that property to
 an empty string, then every Python `EquilibrateUsingMELTS*` constructor replaces
@@ -82,9 +82,11 @@ namespace is discarded. Native signed-zero formula text is canonicalized. No
 phase solution, mass balance, pin, or golden dataset is changed.
 
 **Upstream status.** The 11-site chemical-potential patch is ready in
-`docs/thermoengine-mu-lifetime.patch` (apply with
-`git apply --unidiff-zero`). It copies values through the retained
-`DoubleVector` API and avoids escaping a raw pointer. It requires an optimized
+`patches/thermoengine/0002-mu-lifetime.patch` (apply with
+`git apply --unidiff-zero`). It is recorded `unapplied` in
+`patches/thermoengine/STATUS`, so the local verify step skips it. It copies
+values through the retained `DoubleVector` API and avoids escaping a raw
+pointer. It requires an optimized
 Release-build regression because ordinary ARC locals do not guarantee precise
 lifetime. A follow-up native patch should give every `Equilibrate` instance a
 private phase-counter namespace and balance counts on teardown, or expose an

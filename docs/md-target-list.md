@@ -13,7 +13,8 @@ while missing absolute density by ~20%. MPS float32 checkpoints are staged md5-v
 on studios 1–2 per the fleet record (~2.55× wall-clock), with a known +0.0079 g/cm³
 MPS-high offset — fine for structural questions, not for cross-checkpoint comparison.
 Checkpoints are NOT the whole story: mace 0.3.16 needs the MPS hotfix recorded at
-`patches/mace/0001` to run on MPS at all, which is applied+verified on **studio-2's
+`patches/mace/0001-mps-device-aware-energy-accumulation.patch` to run on MPS at all,
+which is applied+verified on **studio-2's
 `imcc-md` venv only**; before any MD on another box, run
 `patches/mace/verify-applied.sh <venv-python>` (exit 0 required — absent or
 undeterminable both refuse the launch). **Absolute free energies

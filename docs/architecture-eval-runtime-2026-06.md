@@ -22,7 +22,8 @@ G9.7 addresses (1–3) with **warm worker processes**. PT-1 / `results_store` / 
 ## Runtime shape (implemented)
 
 ```text
-Operator / batch script (cli, run_fidelity_doe, populate_reduced_real_cache)
+Operator / batch script (optimize cli, scripts/run_fidelity_doe.py,
+                         scripts/populate_reduced_real_cache.py)
   |
   v
 Study driver (study.py)  OR  Fidelity harness (fidelity.py)  OR  Precompute script
@@ -83,13 +84,34 @@ Canonical `EvalSpec` v1.1 is defined by `simulator/optimize/evalspec.py::EvalSpe
 @dataclass(frozen=True)
 class WorkerEvalContext:
     backend_name: str
+    feedstock_id: str | None
+    stage0_subprocess_required: bool
     backend: Any          # MeltBackend instance; warmed once
     transport: Any | None = None
 
-def get_worker_runtime() -> WorkerEvalContext | None: ...
-def warm_worker_runtime(backend_name: str) -> WorkerEvalContext: ...
+def warm_workers_enabled() -> bool: ...
+
+def warm_worker_runtime(
+    backend_name: str,
+    *,
+    feedstock_id: str | None = None,
+    feedstocks: Mapping[str, Any] | None = None,
+    stage0_subprocess_required: bool | None = None,
+) -> WorkerEvalContext | None: ...
+
+def get_worker_runtime(
+    *,
+    feedstock_id: str | None = None,
+    stage0_subprocess_required: bool | None = None,
+) -> WorkerEvalContext | None: ...
+
 def clear_worker_runtime() -> None: ...  # tests + rollback
 ```
+
+`feedstock_id` and `stage0_subprocess_required` are part of the context because
+a warmed backend is only reusable for a task whose Stage 0 subprocess
+requirement matches; both warm and get return `None` rather than a context when
+warm workers are disabled or the cached context does not match the request.
 
 **Rules:**
 
@@ -108,7 +130,7 @@ def start(self, config: SimSessionConfig, *, backend: Any | None = None) -> SimS
     # backend set -> skip resolve; still validate policy once at worker warm
 
 # simulator/optimize/evaluate.py
-def evaluate(..., worker_runtime: WorkerEvalContext | None = None) -> ScoredResult:
+def evaluate(..., worker_runtime: Any | None = None) -> ScoredResult:
     # worker_runtime from get_worker_runtime() when called inside pool task
 
 # simulator/run_executor.py
@@ -116,12 +138,19 @@ def execute(
     self,
     config: SimSessionConfig,
     *,
-    worker_runtime: WorkerEvalContext | None = None,
+    worker_runtime: Any | None = None,
 ) -> RunExecution:
     # passes _backend_from_worker_runtime(config, worker_runtime) into SimSession.start(...)
 ```
 
-Pool tasks call `evaluate(...)`; `pool._evaluate_pool_task` passes `worker_runtime=get_worker_runtime(...)`, and `evaluate` falls back to `get_worker_runtime()` when no explicit runtime is supplied.
+The `worker_runtime` parameters are annotated `Any | None` rather than
+`WorkerEvalContext | None` so `run_executor` and `evaluate` do not import the
+optimizer worker module; `_backend_from_worker_runtime` duck-types the context
+and returns `None` when its `backend_name` does not match `config.backend_name`.
+
+Pool tasks call `evaluate(...)`; `pool._evaluate_pool_task` passes
+`worker_runtime=get_worker_runtime(feedstock_id=..., stage0_subprocess_required=...)`,
+and `evaluate` falls back to the same call when no explicit runtime is supplied.
 
 ---
 
@@ -152,7 +181,7 @@ is the right tool — not a second RAM-resident model.
 | Workload | Warm workers W | Why |
 |----------|----------------|-----|
 | Fidelity DOE, Book full job, high `@ hours:1` | **1** | Serial; one warm backend amortizes init across N evals in sequence |
-| Staged high eval | **configured `parallel`** | Staged strategies ask batches up to `config.parallel`; `_evaluate_candidates` passes that value to the worker pool while staged-prefix replay preserves stage dependencies (`study.py:645-678`, `:3175-3183`) |
+| Staged high eval | **configured `parallel`** | Staged strategies ask batches up to `config.parallel` (`study.py` clamps `batch_size = min(config.parallel, config.budget - evaluated)`); `study.py::_evaluate_candidates` receives that value as its `parallel=` argument and passes it to the worker pool, while staged-prefix replay preserves stage dependencies |
 | Internal-analytical (`stub`) / cached-real study `parallel>1` | **min(parallel, cpu)** | Embarrassingly parallel **different** evals; each worker holds one backend for **its** queue |
 | PT-1 precompute grind | **shard workers → merge** | Fill B-layer on miss; warm model only on cache miss path |
 
@@ -212,10 +241,10 @@ spec.
 
 | Test | Gate |
 |------|------|
-| `test_optimizer_pool.py` | Warm repeat ≡ cold; picklable guards unchanged |
-| `test_mass_balance.py` | Feasible warm high eval closes balance |
+| `tests/test_optimizer_pool.py` | Warm repeat ≡ cold; picklable guards unchanged |
+| `tests/test_mass_balance.py` | Feasible warm high eval closes balance |
 | `scripts/profile_eval_hotpath.py` | 2nd eval in worker: init time ≈ 0 |
-| `run_fidelity_doe.py` N=4 | Wall ↓ vs pre-G9.7c baseline; 0 drops |
+| `scripts/run_fidelity_doe.py` N=4 | Wall ↓ vs pre-G9.7c baseline; 0 drops |
 | `REGOLITH_OPTIMIZER_WARM_WORKERS=0` | Bit-identical or within float tolerance vs warm |
 
 G9.7 runtime telemetry is emitted by `scripts/profile_eval_hotpath.py`; `WorkerEvalContext` itself is intentionally limited to backend/transport state.
@@ -231,4 +260,4 @@ G9.7 runtime telemetry is emitted by `scripts/profile_eval_hotpath.py`; `WorkerE
 | [`process-model.md`](process-model.md) | Physics per hour (unchanged) |
 | `docs-private/optimizer-v1-ship-checklist.md` | G9.6, G9.7 gates + worker brief |
 
-When G9.7 ships, add a one-paragraph pointer in `architecture.md` to this document for the batch eval plane.
+G9.7 has shipped; `architecture.md` carries the pointer to this document under "Batch Eval Plane".

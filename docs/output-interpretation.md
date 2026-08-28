@@ -4,24 +4,43 @@ This doc covers how to *read* a run output document. The full JSON shape is pinn
 
 ## Vapor pressure provenance
 
-`vapor_pressure_source_report` tells you which source label produced the vapor pressure for each species in the final equilibrium. Values:
+`vapor_pressure_source_report` tells you which source label produced the vapor pressure for each species in the final equilibrium.
+
+Labels are **colon-separated**: `<authority>:<derivation-term>[:<qualifier>…]`. Only the first segment names the authority, so match on it deliberately rather than comparing whole strings.
+
+Authority segment (the head token):
 
 - `builtin_authoritative` — builtin Antoine + Ellingham `VAPOR_PRESSURE` provider; this is the current authoritative surface consumed by evaporation.
+- `builtin_extrapolation_limited` — same builtin provider, but the underlying fit was evaluated outside its validated range.
+- `builtin_authority_limited` — same builtin provider on a reconstructed (not directly fitted) Ellingham term.
 - `thermoengine` — live MELTS `μ → a` conversion via ThermoEngine transport.
 - `alphamelts_python_api` / `alphamelts_text` — PetThermoTools fallback transports for the AlphaMELTS path.
 - `builtin_fallback` — explicit fallback label, not the default path.
 - `vaporock` — legacy/sentinel label on older or fallback artifacts. Current VapoRock output is diagnostic-only and, when present, lives under `vaporock_full_speciation_Pa`.
 - `kernel_diagnostic` — kernel-recorded sentinel; the species value did not come from any thermochemical authority and should not be treated as a measurement.
 
-The `summary` map gives per-source counts and species-count percentages for the latest vapor surface used by the evaporation path.
+Derivation term (which equilibrium produced the number): `standard_reaction_term`, `liquid_oxide_standard_reaction`, `gas_standard_fugacity`, `pure_component_derived_from_evaluation`.
+
+**Qualifiers are load-bearing, not cosmetic.** A label such as
+`builtin_authoritative:standard_reaction_term:extrapolated_beyond_valid_range_K` has an
+authoritative head token but is still refused for certification: the tokens
+`extrapolated_beyond_valid_range_K` and `pure_component_extrapolated` mark a number computed
+outside the fit's validated range, and `simulator/grind_preflight.py` rejects those regardless
+of head token so process-envelope extrapolation cannot silently certify ledger yields.
+`out_of_gamma_domain` likewise marks an activity-model evaluation outside its domain. Treat a
+qualified label as compute-and-mark output: usable as a diagnostic, not as evidence.
+
+The `summary` map gives per-source counts and species-count percentages for the latest vapor surface used by the evaporation path, keyed by the **full** label — so one species family can appear under several keys that differ only in qualifier.
 
 ## Stage purity report
 
-`stage_purity_report` exposes the designated-vs-impurity split per condenser stage, sourced from `simulator.condensation.stage_purity_report()` against the canonical registry in `simulator/condensation_routing.py`:
+`stage_purity_report` splits each condenser stage's collected mass three ways — `designated_species_kg`, `coproduct_species_kg`, `impurity_species_kg` — sourced from `simulator.condensation.stage_purity_report()` against the canonical registry in `simulator/condensation_routing.py`. The verdict is set from `purity_fraction`:
 
-- **PURE** — designated species ≥95 % of stage total kg. Expected for Stage 3 SiO under default Path A.
-- **MIXED** — 80–95 %. Mild routing drift; usually a sign that a cold spot upstream of the designated condenser caught some flux. Cross-reference `wall_deposit_kg` and the segment cold-spot ledger.
+- **PURE** — designated species strictly **greater than** 95 % of stage total kg. Expected for Stage 3 SiO under default Path A. Exactly 95.0 % reads as MIXED, not PURE.
+- **MIXED** — 80 % ≤ purity ≤ 95 %. Mild routing drift; usually a sign that a cold spot upstream of the designated condenser caught some flux. Cross-reference `wall_deposit_kg` and the segment cold-spot ledger.
 - **CONTAMINATED** — <80 %. Real failure mode. The recipe's selectivity claim does not hold for this stage; check the F1 routing registry and the per-segment wall T.
+
+The registry's accepted species per stage are: Stage 1 Fe condenser `Fe`; Stage 2 Cr oxide harvester `Cr`/`Cr2O3`/`CrO2`/`Mn`; Stage 3 SiO zone `Si`/`SiO`/`SiO2`; Stage 4 alkali/Mg cyclone `Na`/`K`/`Mg`. Stages 0, 5, 6 and 7 (hot duct, vortex dust filter, turbine-compressor, turbine outlet monitor) designate nothing, so anything landing there is by definition off-route.
 
 ## Shuttle refusal history
 
