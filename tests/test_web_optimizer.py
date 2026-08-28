@@ -4127,6 +4127,29 @@ def test_product_ledger_panel_detects_product_content_without_mapping_truthiness
     assert panel["reason"] == "product_yield_table missing"
 
 
+def test_product_ledger_panel_distinguishes_absent_empty_and_populated_outputs(
+) -> None:
+    absent_summary = web_routes._product_ledger_panel({})
+    absent_table = web_routes._product_ledger_panel({"product_ledger_kg": {}})
+    empty_outputs = web_routes._product_ledger_panel({
+        "product_yield_table": {"outputs": []},
+    })
+    populated_outputs = web_routes._product_ledger_panel({
+        "product_yield_table": {
+            "outputs": [{"product_class": "metal_ingots", "kg": 1.0}],
+        },
+    })
+
+    assert absent_summary["reason"] == "product summary missing"
+    assert absent_table["reason"] == "product_yield_table missing"
+    assert empty_outputs["status"] == "inconclusive"
+    assert empty_outputs["reason"] == "product_yield_table outputs empty"
+    assert "reason" not in populated_outputs
+    assert populated_outputs["outputs"] == [
+        {"product_class": "metal_ingots", "kg": 1.0}
+    ]
+
+
 def test_optimizer_result_detail_renders_metadata_only_product_summary_missing(
     client,
     tmp_path,

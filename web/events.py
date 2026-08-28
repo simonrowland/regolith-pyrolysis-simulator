@@ -621,12 +621,25 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
                 )
             ):
                 return False
-        emitted_payload = payload
+        emitted_payload = _browser_socket_payload(event, payload)
         if isinstance(payload, Mapping):
-            emitted_payload = dict(payload)
+            emitted_payload = dict(emitted_payload)
             emitted_payload['run_id'] = run_id
         socketio.emit(event, emitted_payload, room=sid)
         return True
+
+
+def _browser_socket_payload(event: str, payload):
+    if event != 'per_hour_summary' or not isinstance(payload, Mapping):
+        return payload
+    emitted = dict(payload)
+    for key in (
+        'condensation_refusals_by_species',
+        'vapour_batch_summary',
+        'vapour_batch_flux_overlay',
+    ):
+        emitted.pop(key, None)
+    return emitted
 
 
 def recipe_save_context(sid: str) -> dict[str, object]:

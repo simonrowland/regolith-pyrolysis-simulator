@@ -764,6 +764,58 @@ def test_product_badge_uses_extracted_classes_not_residue(
         assert "Reagent bookkeeping residue" in text
 
 
+def test_product_badge_does_not_count_unrecovered_flat_inventory_as_extraction(
+    web_driver,
+):
+    zero_bucket = {"species_kg": {}, "class_total_kg": 0.0}
+    story = {
+        "input": {
+            "feedstock": "test",
+            "feedstock_label": "Test feed",
+            "batch_mass_kg": 1000.0,
+        },
+        **{
+            key: dict(zero_bucket)
+            for key in (
+                "metal_ingots",
+                "glass",
+                "oxygen",
+                "captured_volatiles",
+                "refractory_ceramic",
+                "escaped_to_vacuum",
+                "wall_deposits",
+                "process_residue",
+                "off_spec_condensate",
+                "unclassified",
+            )
+        },
+        "terminal_residue": {
+            "species_kg": {"SiO2": 950.0},
+            "class_total_kg": 950.0,
+        },
+        "unrecovered_process_inventory": {
+            "species_kg": {"SiO": 50.0},
+            "class_total_kg": 50.0,
+        },
+    }
+    payload = {
+        "mass_in_kg": 1000.0,
+        "products": {"SiO": 50.0},
+        "oxygen_kg": 0.0,
+        "oxygen_stored_kg": 0.0,
+        "product_story": story,
+    }
+
+    rendered = _render_product_story(html=web_driver["html"], payload=payload)
+    text = rendered["text"]["product-ledger-content"]
+
+    assert rendered["text"]["product-ledger-state"] == "no-products"
+    assert "Terminal residue — incompletely extracted" in text
+    assert "SiO2 950 kg" in text
+    assert "Unrecovered process inventory" in text
+    assert "SiO 50 kg" in text
+
+
 def test_completion_payload_marks_story_incomplete_without_builder_exception(
     monkeypatch,
 ):

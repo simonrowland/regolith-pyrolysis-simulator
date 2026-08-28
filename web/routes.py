@@ -929,6 +929,9 @@ def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any]:
             panel['status'] = 'inconclusive'
             panel['reason'] = 'product_yield_table outputs missing'
             panel['outputs'] = []
+        elif not product_yield_table['outputs']:
+            panel['status'] = 'inconclusive'
+            panel['reason'] = 'product_yield_table outputs empty'
         panel.setdefault('mass_closure', None)
         panel.setdefault('diagnostics', [])
         unclassified = _unclassified_product_mass(product_summary)

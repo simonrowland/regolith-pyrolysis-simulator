@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
+
+import pytest
 
 import app as app_module
 import web.events as web_events
@@ -48,6 +51,37 @@ def _force_internal_analytical(monkeypatch) -> list:
     )
     monkeypatch.setattr(web_events, "_safe_log", lambda _message: None)
     return captured_tasks
+
+
+def _assert_hourly_payload_slope_is_bounded(
+    event: str,
+    samples: list[tuple[int, int]],
+    *,
+    max_bytes_per_hour: float = 128.0,
+) -> None:
+    ordered = sorted(samples)
+    assert len(ordered) >= 4, (event, ordered)
+    hours = [hour for hour, _size in ordered]
+    sizes = [size for _hour, size in ordered]
+    mean_hour = sum(hours) / len(hours)
+    mean_size = sum(sizes) / len(sizes)
+    denominator = sum((hour - mean_hour) ** 2 for hour in hours)
+    assert denominator > 0, (event, ordered)
+    slope = sum(
+        (hour - mean_hour) * (size - mean_size)
+        for hour, size in ordered
+    ) / denominator
+    assert slope <= max_bytes_per_hour, (
+        f"{event} payload grew {slope:.1f} bytes/hour; samples={ordered}"
+    )
+
+
+def test_hourly_payload_gate_rejects_linear_1000_bytes_per_hour() -> None:
+    with pytest.raises(AssertionError, match="grew 1000.0 bytes/hour"):
+        _assert_hourly_payload_slope_is_bounded(
+            "counterfactual",
+            [(hour, 10_000 + 1_000 * hour) for hour in range(1, 7)],
+        )
 
 
 def test_advisory_js_fetches_on_demand_full_records() -> None:
@@ -182,11 +216,48 @@ def test_vapour_rail_tick_panel_keeps_channel_index_without_full_answers():
 
 def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
     captured_tasks = _force_internal_analytical(monkeypatch)
+    original_drive_session = web_events.drive_session
     original_emit = app_module.socketio.emit
     tick_samples: list[tuple[int, int]] = []
+    wire_samples: list[tuple[str, int | None, int, str]] = []
     mismatches: list[str] = []
 
+    def drive_with_large_hourly_diagnostics(*args, **kwargs):
+        for result in original_drive_session(*args, **kwargs):
+            summary = dict(result.per_hour_summary)
+            hour = int(summary["hour"])
+            summary["condensation_refusals_by_species"] = {
+                "X": {
+                    "status": "refused",
+                    "reason": "antoine_data_unavailable",
+                    "carrier_authority": {
+                        "padding": "x" * (600_000 + 1_000 * hour),
+                    },
+                },
+            }
+            summary["vapour_batch_summary"] = {
+                "n_requested": 1,
+                "n_flux_active": 0,
+                "n_refused": 1,
+                "metadata": {
+                    "padding": "y" * (600_000 + 1_000 * hour),
+                },
+            }
+            yield replace(result, per_hour_summary=summary)
+
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        drive_with_large_hourly_diagnostics,
+    )
+
     def instrumented_emit(event, payload, *args, **kwargs):
+        if isinstance(payload, dict):
+            emitted = dict(payload)
+            serialized = json.dumps(emitted, default=str)
+            hour_value = emitted.get("hour")
+            hour = int(hour_value) if hour_value is not None else None
+            wire_samples.append((event, hour, len(serialized), serialized))
         if event == "simulation_tick" and isinstance(payload, dict):
             emitted = dict(payload)
             tick_samples.append((int(emitted["hour"]), _nbytes(emitted)))
@@ -195,7 +266,14 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             sim = state["session"].simulator if state else None
             if sim is not None:
                 _assert_tick_preserves_vr_totals(emitted, sim, mismatches)
-            if len(tick_samples) >= 6 and state is not None:
+        if event == "per_hour_summary" and isinstance(payload, dict):
+            sid = kwargs.get("room")
+            state = _simulations.get(sid)
+            summary_count = sum(
+                1 for name, _hour, _size, _serialized in wire_samples
+                if name == "per_hour_summary"
+            )
+            if summary_count >= 6 and state is not None:
                 state["running"] = False
         return original_emit(event, payload, *args, **kwargs)
 
@@ -234,10 +312,27 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
                         {"choice": decision.get("recommendation")},
                     )
         assert len(tick_samples) >= 6, tick_samples
-        for hour, size in tick_samples[:6]:
-            assert size < 120_000, (hour, size)
+        for event, hour, size, _serialized in wire_samples:
+            assert size < 120_000, (event, hour, size)
         stable_tail = [size for _hour, size in tick_samples[2:6]]
         assert max(stable_tail) - min(stable_tail) <= 1024, tick_samples
+        for event in ("simulation_tick", "per_hour_summary"):
+            hourly = [
+                (hour, size)
+                for name, hour, size, _serialized in wire_samples
+                if name == event and hour is not None
+            ][:6]
+            _assert_hourly_payload_slope_is_bounded(event, hourly[2:6])
+        assert all(
+            '"padding"' not in serialized
+            for event, _hour, _size, serialized in wire_samples
+            if event in {"simulation_tick", "per_hour_summary"}
+        )
+        active_sids = set(_simulations) - before
+        assert len(active_sids) == 1
+        state = _simulations[active_sids.pop()]
+        captured_summary = state["last_recipe_capture"]["per_hour_summary"]
+        assert '"padding"' in json.dumps(captured_summary, default=str)
         assert mismatches == []
     finally:
         if client.is_connected():

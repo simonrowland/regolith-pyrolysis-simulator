@@ -477,14 +477,11 @@ function renderProductLedgerPanel(payload) {
     // about the DATA and is reserved for a ledger we could not read at all.
     // Mid-run this is honest too: nothing HAS been extracted yet, and it
     // flips to ok the moment any product class becomes non-zero.
-    // ★ COUNT BOTH PAYLOAD SHAPES. A first version of this check read only the
-    // `product_story` classes and badged `no-products` on a completion payload
-    // carrying products in the FLAT shape (`products: {Fe: 12.345, glass: 4.0}`,
-    // `oxygen_kg`) with no story at all -- a guard firing on correct work, caught
-    // by test_completion_payload_renders_product_ledger_and_knudsen_diagnostic.
-    // Both shapes reach this panel, so both have to be counted; over-counting
-    // when both are present is harmless here, because the question is only
-    // "is anything greater than zero", never "how much".
+    // Both payload shapes reach this panel. The structured story is authoritative
+    // when present because it separates extracted products from unrecovered
+    // process inventory; the legacy flat map cannot express that distinction.
+    // Flat products remain the fallback for older/error-degraded payloads whose
+    // story is absent.
     const numeric = (value) => {
         const n = Number(value);
         return Number.isFinite(n) ? n : 0;
@@ -498,15 +495,16 @@ function renderProductLedgerPanel(payload) {
             ? Object.values(mapping).reduce((sum, v) => sum + numeric(v), 0)
             : 0
     );
-    const productClassKg = sumClassTotals(story ? [
+    const storyProductKg = sumClassTotals(story ? [
         story.metal_ingots,
         story.glass,
         story.oxygen,
         story.captured_volatiles,
-    ] : [])
-        + sumValues(extractedFlatProducts)
+    ] : []);
+    const flatProductKg = sumValues(extractedFlatProducts)
         + numeric(data.oxygen_kg)
         + numeric(data.oxygen_stored_kg);
+    const productClassKg = story ? storyProductKg : flatProductKg;
     const feedKg = Number(
         (story && story.input && story.input.batch_mass_kg)
         || data.mass_in_kg
