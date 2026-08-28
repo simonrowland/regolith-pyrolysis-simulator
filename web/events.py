@@ -3068,7 +3068,47 @@ def register_events(socketio):
         ):
             lifecycle_generation = raw_lifecycle_generation
 
-        feedstock_key = data.get('feedstock', 'lunar_mare_low_ti')
+        # A FEEDSTOCK IS A REQUIRED OPERATOR INPUT, NOT A DEFAULTABLE ONE.
+        # This read used to be data.get('feedstock', 'lunar_mare_low_ti'), so a
+        # start that named no feedstock ran a full simulation on lunar mare and
+        # returned a complete product ledger attributed to a feedstock the
+        # operator never chose. The only guard was client-side -- an alert() in
+        # simulator-controls.js that returns before emitting -- so a browser
+        # could not reach it, but any non-browser caller could, and did: emitting
+        # start_simulation with no feedstock key was answered
+        # `{"status": "started", "backend_status": "ok"}`.
+        #
+        # That is the project's three-category rule, category (1): a MISSING
+        # REQUIRED INPUT refuses. It is deliberately NOT the other two -- an
+        # out-of-domain physics result still computes and marks, and a proven
+        # zero still keeps its zero. This gate is about absence of an input only.
+        #
+        # Empty string is treated as missing as well: data.get('feedstock')
+        # returning '' never hit the old default, so an empty selection fell
+        # through to a lookup failure elsewhere rather than a legible refusal.
+        # ONLY the flat browser-shaped payload is gated here. A `single_run`
+        # envelope carries its feedstock as single_run.target_or_recipe, and
+        # _typed_single_run_payload already refuses a missing one with
+        # `invalid_single_run` -- gating it here as well would refuse a start
+        # that DID name its feedstock, which is a guard firing on correct work.
+        # (Caught by test_run_command_plane's socket envelope tests, which is
+        # exactly why they are not edited to agree with this change.)
+        raw_feedstock = data.get('feedstock')
+        feedstock_key = str(raw_feedstock).strip() if raw_feedstock is not None else ''
+        carries_single_run_envelope = isinstance(data.get('single_run'), Mapping)
+        if not feedstock_key and not carries_single_run_envelope:
+            return reject(
+                {
+                    'status': 'error',
+                    'message': (
+                        'Select a feedstock before starting a run; the server '
+                        'will not substitute a default for a required input.'
+                    ),
+                },
+                'feedstock_required',
+            )
+        if not feedstock_key:
+            feedstock_key = 'lunar_mare_low_ti'
         cost_parameters = None
         cost_parameters_recipe_name = None
         try:

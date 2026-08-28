@@ -5247,3 +5247,86 @@ def test_web_pause_resume_is_result_neutral(monkeypatch, tmp_path):
             client.disconnect()
         for sid in list(_simulations):
             _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    "feedstock_field, label",
+    [
+        ({}, "absent"),
+        ({"feedstock": ""}, "empty string"),
+        ({"feedstock": "   "}, "whitespace only"),
+    ],
+)
+def test_start_without_feedstock_refuses_and_names_the_reason(
+    monkeypatch, feedstock_field, label
+):
+    """A missing feedstock must REFUSE, and the refusal must be named.
+
+    The server used to read data.get("feedstock", "lunar_mare_low_ti"), so a
+    start naming no feedstock ran a full simulation on lunar mare and produced a
+    complete product ledger attributed to a feedstock the operator never chose.
+    The only guard was client-side (an alert() in simulator-controls.js that
+    returns before emitting), so a browser could not reach it but any other
+    caller could.
+
+    This asserts the SPECIFIC error_type, not merely "it did not start". A test
+    that accepts any failure would pass on an unrelated exception and would go
+    on passing if the refusal were later replaced by a crash.
+    """
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    assert client.is_connected()
+
+    client.emit(
+        "start_simulation",
+        {"mass_kg": 1000, "speed": 0, "track": "pyrolysis", **feedstock_field},
+    )
+
+    payloads = [
+        (message.get("args") or [{}])[0]
+        for message in client.get_received()
+        if message.get("name") == "simulation_status"
+    ]
+    error_types = {
+        payload.get("error_type")
+        for payload in payloads
+        if isinstance(payload, dict)
+    }
+    assert "feedstock_required" in error_types, (
+        f"start with {label} feedstock should refuse as feedstock_required; "
+        f"got {payloads!r}"
+    )
+    statuses = {
+        payload.get("status") for payload in payloads if isinstance(payload, dict)
+    }
+    assert "started" not in statuses, (
+        f"start with {label} feedstock must not begin a run; got {payloads!r}"
+    )
+
+
+def test_start_with_valid_feedstock_still_starts(monkeypatch):
+    """Positive control for the refusal above.
+
+    Without this, a change that refused EVERY start would leave the refusal
+    tests green while breaking the product entirely.
+    """
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.emit(
+        "start_simulation",
+        {
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+            "track": "pyrolysis",
+        },
+    )
+    statuses = {
+        (message.get("args") or [{}])[0].get("status")
+        for message in client.get_received()
+        if message.get("name") == "simulation_status"
+    }
+    assert "started" in statuses, f"valid feedstock should start; got {statuses!r}"
