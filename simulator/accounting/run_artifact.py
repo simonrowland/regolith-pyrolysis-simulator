@@ -399,6 +399,30 @@ def build_run_artifact(
         }
         if dose_out:
             header["c3_dose"] = dose_out
+    # Reagent dosing is an INPUT and belongs with the other inputs. The header
+    # already carries c3_dose for the C3 alkali credit; additives_kg is the
+    # general case and was simply missing, recorded only under
+    # terminal.run_metadata -- on the OUTPUT side.
+    #
+    # That omission is not cosmetic. effective_config is exhaustive about the
+    # 645 setpoints it covers, so a header diff reads as a complete input
+    # comparison; two runs differing by 119 kg of Mg and 55 kg of K compared
+    # byte-identical across effective_config, recipe_snapshot, target_snapshot,
+    # charge_mass_kg and campaign_chain. The shuttle needs reductant, so those
+    # runs differed 14.6x in headline Fe, and the header said the inputs matched
+    # (observed 2026-08-28 -- it cost hours and a retracted finding).
+    #
+    # Emitted only when a dose actually happened: an empty mapping would assert
+    # "dosed nothing" for runs whose dosing was never recorded at all.
+    additives = run_metadata.get("additives_kg")
+    if isinstance(additives, Mapping):
+        dosed = {
+            str(species): amount
+            for species, amount in additives.items()
+            if amount is not None
+        }
+        if dosed:
+            header["additives_kg"] = dosed
     recipe_snapshot = _recipe_snapshot(runner_payload)
     if recipe_snapshot is not None:
         header["recipe_snapshot"] = recipe_snapshot
