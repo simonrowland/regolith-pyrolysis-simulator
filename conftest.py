@@ -16,6 +16,10 @@ from _pytest_session_safety import (
     install_bounded_execnet_bootstrap,
     install_bounded_gateway_rinfo,
 )
+from tests.e2e.playwright_support import (
+    PLAYWRIGHT_SKIP_MARK,
+    PLAYWRIGHT_SYNC_API,
+)
 
 
 pytest_plugins = ("_pytest_loadgroup_order",)
@@ -68,6 +72,14 @@ def _configure_worker_cache_isolation() -> None:
 
 
 _configure_worker_cache_isolation()
+
+
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    if PLAYWRIGHT_SYNC_API is not None:
+        return
+    for item in items:
+        if item.get_closest_marker("browser_e2e") is not None:
+            item.add_marker(PLAYWRIGHT_SKIP_MARK)
 
 
 # CI-speed (process-scoped VapoRock warm-boot cache): share one VR-5 warm pool

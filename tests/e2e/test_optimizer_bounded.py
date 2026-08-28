@@ -9,20 +9,22 @@ import time
 
 import pytest
 
-from .playwright_support import require_playwright_sync_api
+from .playwright_support import PLAYWRIGHT_SYNC_API
 
-expect = require_playwright_sync_api().expect
+expect = PLAYWRIGHT_SYNC_API.expect if PLAYWRIGHT_SYNC_API is not None else None
 
 pytestmark = [
+    pytest.mark.browser_e2e,
     pytest.mark.serial,
     pytest.mark.xdist_group("e2e-browser"),
 ]
 
-from .browser_harness import (
-    BASE_URL,
-    OPTIMIZER_BOUND_MS,
-    PlaywrightTimeoutError,
-)
+if PLAYWRIGHT_SYNC_API is not None:
+    from .browser_harness import (
+        BASE_URL,
+        OPTIMIZER_BOUND_MS,
+        PlaywrightTimeoutError,
+    )
 
 
 @pytest.mark.timeout(200)

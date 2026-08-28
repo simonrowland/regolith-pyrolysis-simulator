@@ -23,33 +23,35 @@ import re
 
 import pytest
 
-from .playwright_support import require_playwright_sync_api
+from .playwright_support import PLAYWRIGHT_SYNC_API
 
-expect = require_playwright_sync_api().expect
+expect = PLAYWRIGHT_SYNC_API.expect if PLAYWRIGHT_SYNC_API is not None else None
 
 pytestmark = [
+    pytest.mark.browser_e2e,
     pytest.mark.serial,
     pytest.mark.xdist_group("e2e-browser"),
 ]
 
-from .browser_harness import (
-    BASE_URL,
-    OPTIMIZER_BOUND_MS,
-    PAGE_LOAD_MS,
-    RUN_COMPLETE_MS,
-    START_ACK_MS,
-    STATUS_CHANGE_MS,
-    THERMAL_TRAIN_MS,
-    TICK_ADVANCE_MS,
-    PlaywrightTimeoutError,
-    cancel_run_quietly,
-    click_start,
-    select_feedstock,
-    set_max_speed,
-    wait_for_run_state,
-    wait_for_socket_event,
-    wait_for_start_enabled,
-)
+if PLAYWRIGHT_SYNC_API is not None:
+    from .browser_harness import (
+        BASE_URL,
+        OPTIMIZER_BOUND_MS,
+        PAGE_LOAD_MS,
+        RUN_COMPLETE_MS,
+        START_ACK_MS,
+        STATUS_CHANGE_MS,
+        THERMAL_TRAIN_MS,
+        TICK_ADVANCE_MS,
+        PlaywrightTimeoutError,
+        cancel_run_quietly,
+        click_start,
+        select_feedstock,
+        set_max_speed,
+        wait_for_run_state,
+        wait_for_socket_event,
+        wait_for_start_enabled,
+    )
 
 
 @pytest.mark.xfail(

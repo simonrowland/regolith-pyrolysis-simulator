@@ -24,11 +24,10 @@ import urllib.request
 
 import pytest
 
-from .playwright_support import load_playwright_sync_api
+from .playwright_support import PLAYWRIGHT_SYNC_API
 
-_playwright_sync_api = load_playwright_sync_api()
-if _playwright_sync_api is not None:
-    sync_playwright = _playwright_sync_api.sync_playwright
+if PLAYWRIGHT_SYNC_API is not None:
+    sync_playwright = PLAYWRIGHT_SYNC_API.sync_playwright
     from .browser_harness import (
         BASE_URL,
         DECISION_AUTO_ANSWER_JS,

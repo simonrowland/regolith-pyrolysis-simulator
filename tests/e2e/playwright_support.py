@@ -3,6 +3,8 @@
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
 
+import pytest
+
 PLAYWRIGHT_MISSING_REASON = (
     "Playwright distribution is not installed; skipping browser e2e tests"
 )
@@ -21,13 +23,8 @@ def load_playwright_sync_api():
         raise
 
 
-def require_playwright_sync_api():
-    sync_api = load_playwright_sync_api()
-    if sync_api is None:
-        import pytest
-
-        pytest.skip(
-            PLAYWRIGHT_MISSING_REASON,
-            allow_module_level=True,
-        )
-    return sync_api
+PLAYWRIGHT_SYNC_API = load_playwright_sync_api()
+PLAYWRIGHT_SKIP_MARK = pytest.mark.skipif(
+    PLAYWRIGHT_SYNC_API is None,
+    reason=PLAYWRIGHT_MISSING_REASON,
+)
