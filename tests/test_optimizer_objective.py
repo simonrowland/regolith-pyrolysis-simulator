@@ -2793,6 +2793,37 @@ def test_best_tap_coating_summary_uses_tap_hour_not_terminal_deposit() -> None:
     assert "100" not in coating["campaigns_to_resinter"]
 
 
+def test_cumulative_wall_deposit_preserves_signed_deltas_zero_and_absence() -> None:
+    positive = ("stage_1_to_stage_2", "Na")
+    consumed_substrate = ("stage_1_to_stage_2", "SiO2")
+    proven_zero = ("stage_1_to_stage_2", "K")
+    absent = ("stage_1_to_stage_2", "Fe")
+    snapshots = (
+        SimpleNamespace(
+            hour=1,
+            wall_deposit_by_segment_species_delta={
+                positive: 0.75,
+                consumed_substrate: 1.0,
+                proven_zero: 0.0,
+            },
+        ),
+        SimpleNamespace(
+            hour=2,
+            wall_deposit_by_segment_species_delta={consumed_substrate: -0.75},
+        ),
+    )
+
+    cumulative = objective_module._cumulative_wall_deposit_by_segment_species_kg(
+        snapshots,
+        hour=2,
+    )
+
+    assert cumulative[positive] == pytest.approx(0.75)
+    assert cumulative[proven_zero] == 0.0
+    assert cumulative[consumed_substrate] == pytest.approx(0.25)
+    assert absent not in cumulative
+
+
 def test_best_tap_coating_summary_normalizes_through_partial_campaign(
     monkeypatch,
 ) -> None:

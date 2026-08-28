@@ -1997,10 +1997,14 @@ def _cumulative_wall_deposit_by_segment_species_kg(
                 )
             segment, species = str(key[0]), str(key[1])
             amount = _finite_float(kg, f"wall_deposit[{segment!r}][{species!r}]")
-            if amount > _EPS:
-                result[(segment, species)] = result.get((segment, species), 0.0) + amount
-            elif abs(amount) <= _EPS:
-                result.setdefault((segment, species), 0.0)
+            result_key = (segment, species)
+            if abs(amount) <= _EPS:
+                result.setdefault(result_key, 0.0)
+            else:
+                # Signed net wall-inventory deltas are physical: committed wall
+                # reactions consume existing SiO2 or Si into new wall products.
+                # Accumulating the debit preserves that species mass transfer.
+                result[result_key] = result.get(result_key, 0.0) + amount
     return result
 
 

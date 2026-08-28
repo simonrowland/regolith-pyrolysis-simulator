@@ -3351,9 +3351,7 @@ class EvaporationMixin:
         if not isinstance(accounts_kg, Mapping):
             return
         for account, kg in accounts_kg.items():
-            amount = max(0.0, float(kg))
-            if amount <= 1e-12:
-                continue
+            amount = float(kg)
             account_name = str(account)
             if account_name.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):
                 segment = account_name[len(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):]
@@ -3361,7 +3359,12 @@ class EvaporationMixin:
                 segment = account_name
             key = (segment, species)
             deltas = self._last_wall_deposit_by_segment_species_delta
-            deltas[key] = deltas.get(key, 0.0) + amount
+            if abs(amount) <= 1e-12:
+                deltas.setdefault(key, 0.0)
+            else:
+                # The legacy payload has the same signed net-wall-inventory
+                # contract as the per-species kernel diagnostic above.
+                deltas[key] = deltas.get(key, 0.0) + amount
 
     def _record_wall_alkali_binding_diagnostic_state(
         self,
