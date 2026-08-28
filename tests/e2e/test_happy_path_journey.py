@@ -24,7 +24,11 @@ import time
 
 import pytest
 
-from .journey_budget import JOURNEY_TIMEOUT_S, RUN_COMPLETE_TOTAL_MS
+from .journey_budget import (
+    JOURNEY_TIMEOUT_S,
+    RUN_COMPLETE_TOTAL_MS,
+    journey_verdict,
+)
 from .playwright_support import PLAYWRIGHT_SYNC_API
 
 expect = PLAYWRIGHT_SYNC_API.expect if PLAYWRIGHT_SYNC_API is not None else None
@@ -56,13 +60,6 @@ if PLAYWRIGHT_SYNC_API is not None:
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "viscous_p_bulk_transport_out_of_domain is a known product gap pending "
-        "low-pressure transport support"
-    ),
-)
 @pytest.mark.timeout(JOURNEY_TIMEOUT_S)
 def test_happy_path_journey(page, evidence, artifacts_dir):
     step_results: list[tuple[str, bool, str]] = []
@@ -317,10 +314,15 @@ def test_happy_path_journey(page, evidence, artifacts_dir):
     failed_steps = [(s, d) for s, o, d in step_results if not o]
     summary = "\n".join(f"  {s}: {'OK' if o else 'FAIL'} — {d}" for s, o, d in step_results)
     print(f"\n[journey]\n{summary}")
-    if failed_steps:
-        pytest.fail(
-            "JOURNEY FAILED at "
-            + ", ".join(s for s, _ in failed_steps)
-            + "\n\n--- all steps ---\n"
-            + summary
-        )
+    outcome, detail = journey_verdict(step_results)
+    if outcome == "pass":
+        return
+    if outcome == "xfail":
+        pytest.xfail(f"known product gap, owner-gated: {detail}")
+
+    pytest.fail(
+        "JOURNEY FAILED at "
+        + ", ".join(s for s, _ in failed_steps)
+        + "\n\n--- all steps ---\n"
+        + summary
+    )

@@ -52,3 +52,36 @@ JOURNEY_BUDGET_MS = (
 )
 JOURNEY_MARGIN_MS = 120_000
 JOURNEY_TIMEOUT_S = (JOURNEY_BUDGET_MS + JOURNEY_MARGIN_MS) // 1000
+
+# The one journey failure that is excused, quoted from the refusal the product
+# actually emits. BOTH marks must be present: "Knudsen" alone appears in
+# unrelated transport prose, and matching loosely would re-open the hole this
+# closes, by excusing any failure that merely mentions the regime.
+VISCOUS_DOMAIN_REFUSAL_MARKS = ("viscous-flow domain", "Knudsen")
+EXCUSED_STEP = "5-results"
+
+
+def journey_verdict(
+    step_results: list[tuple[str, bool, str]],
+) -> tuple[str, str]:
+    """Decide the journey's outcome from its step ledger.
+
+    Returns ``(outcome, detail)`` where outcome is ``pass``, ``xfail`` or
+    ``fail``. Pure and browser-free so the excuse rule is testable directly
+    rather than only through a multi-minute browser run.
+
+    A blanket xfail marker would absorb ANY failure of the journey, so a
+    regression in a step that passes today -- the optimizer leaderboard, the
+    thermal train -- would be reported as the known gap and nobody would see
+    it. Excuse ONLY the observed gap, and only when it is the SOLE failure.
+    """
+    failed = [(step, detail) for step, ok, detail in step_results if not ok]
+    if not failed:
+        return "pass", ""
+    if len(failed) == 1:
+        step, detail = failed[0]
+        if step == EXCUSED_STEP and all(
+            mark in detail for mark in VISCOUS_DOMAIN_REFUSAL_MARKS
+        ):
+            return "xfail", detail
+    return "fail", ", ".join(step for step, _ in failed)
