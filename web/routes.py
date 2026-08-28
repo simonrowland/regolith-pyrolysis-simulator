@@ -952,11 +952,25 @@ def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any]:
                 })
             panel['diagnostics'] = diagnostics
         return panel
+    # These are the positive product-accounting surfaces emitted by
+    # simulator.optimize.objective.product_summary; coating and authority
+    # metadata alone are not evidence that product accounting ran.
+    has_product_content = any(
+        key in product_summary
+        for key in (
+            'product_ledger_kg',
+            'product_classes',
+            'product_bins',
+            'product_yield_table',
+            'extraction_completeness',
+            'target_species_yield_report',
+        )
+    )
     return {
         'status': 'inconclusive',
         'reason': (
             'product_yield_table missing'
-            if product_summary
+            if has_product_content
             else 'product summary missing'
         ),
         'inputs': [],

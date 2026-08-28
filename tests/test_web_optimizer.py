@@ -4064,17 +4064,80 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert payload["provenance"]["cache_key"] == key
 
 
-def test_optimizer_result_detail_renders_empty_product_summary_inconclusive(
+def test_optimizer_result_detail_renders_missing_product_yield_table_inconclusive(
     client,
     tmp_path,
 ) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
-    run_dir = runs_dir / "run-empty-product-summary"
+    run_dir = runs_dir / "run-missing-product-yield-table"
     run_dir.mkdir(parents=True)
     spec = _base_spec()
     scored = _scored(
         spec,
-        candidate_id="candidate-empty-product-summary",
+        candidate_id="candidate-missing-product-yield-table",
+        feasible=False,
+    )
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        replace(
+            scored,
+            run_reference=replace(
+                scored.run_reference,
+                product_summary={"product_ledger_kg": {}},
+            ),
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    summary_response = client.get("/api/optimizer/runs")
+    response = client.get(
+        f"/optimizer/runs/run-missing-product-yield-table/results/{cache_key(spec)}"
+    )
+
+    assert summary_response.status_code == 200
+    panel = summary_response.get_json()["runs"][0]["latest_result"][
+        "product_ledger_panel"
+    ]
+    assert panel == {
+        "status": "inconclusive",
+        "reason": "product_yield_table missing",
+        "inputs": [],
+        "outputs": [],
+        "mass_closure": None,
+        "diagnostics": [],
+    }
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "candidate-missing-product-yield-table" in html
+    assert "Product inconclusive" in html
+    assert "product_yield_table missing" in html
+
+
+def test_product_ledger_panel_detects_product_content_without_mapping_truthiness(
+) -> None:
+    class FalseyProductSummary(dict[str, object]):
+        def __bool__(self) -> bool:
+            return False
+
+    panel = web_routes._product_ledger_panel(
+        FalseyProductSummary(product_ledger_kg={})
+    )
+
+    assert panel["reason"] == "product_yield_table missing"
+
+
+def test_optimizer_result_detail_renders_metadata_only_product_summary_missing(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-metadata-only-product-summary"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec()
+    scored = _scored(
+        spec,
+        candidate_id="candidate-metadata-only-product-summary",
         feasible=False,
     )
     store = ResultStore(run_dir / "cache.sqlite")
@@ -4089,13 +4152,15 @@ def test_optimizer_result_detail_renders_empty_product_summary_inconclusive(
 
     summary_response = client.get("/api/optimizer/runs")
     response = client.get(
-        f"/optimizer/runs/run-empty-product-summary/results/{cache_key(spec)}"
+        f"/optimizer/runs/run-metadata-only-product-summary/results/{cache_key(spec)}"
     )
 
     assert summary_response.status_code == 200
-    panel = summary_response.get_json()["runs"][0]["latest_result"][
-        "product_ledger_panel"
-    ]
+    latest_result = summary_response.get_json()["runs"][0]["latest_result"]
+    round_tripped_summary = latest_result["run_reference"]["product_summary"]
+    assert round_tripped_summary
+    assert "coating_authoritative" in round_tripped_summary
+    panel = latest_result["product_ledger_panel"]
     assert panel == {
         "status": "inconclusive",
         "reason": "product summary missing",
@@ -4106,7 +4171,7 @@ def test_optimizer_result_detail_renders_empty_product_summary_inconclusive(
     }
     assert response.status_code == 200
     html = response.get_data(as_text=True)
-    assert "candidate-empty-product-summary" in html
+    assert "candidate-metadata-only-product-summary" in html
     assert "Product inconclusive" in html
     assert "product summary missing" in html
 
