@@ -29,6 +29,7 @@ import argparse
 import hashlib
 import copy
 import csv
+import functools
 import itertools
 import json
 import math
@@ -732,14 +733,35 @@ def _apply_leg_mitigation_to_schedule(
         )
 
 
+@functools.lru_cache(maxsize=1)
 def _resolve_kernel_commit_sha() -> str:
-    """Best-effort kernel commit SHA.
+    """Best-effort kernel commit SHA, resolved ONCE per process.
 
-    Returns the current ``HEAD`` of the repo as the kernel marker.  The
-    kernel lives inside the repo at HEAD, so a per-engine SHA would
-    duplicate this value today.  Tests inject ``kernel_commit_sha`` via
-    ``PyrolysisRun.run_metadata_overrides`` so fixtures stay stable
-    when the repo SHA changes.
+    This identifies the code this process is RUNNING, which is not the
+    same thing as the repo's current ``HEAD``.  Python loaded the kernel
+    at import; ``HEAD`` keeps moving afterwards.  Resolving per run made
+    every run after the first mis-stamp itself with whatever the working
+    tree had advanced to since, so a long-lived server stamped hours of
+    runs with commits it had never loaded.
+
+    That is not a cosmetic label.  It attributes a run's numbers to code
+    that never produced them, and it makes DIFFERING RESULTS FROM
+    IDENTICAL CODE look like ordinary code evolution -- the ledger
+    manufactures an innocent explanation for a real divergence.  Observed
+    2026-08-28: two runs whose only recorded difference was this field
+    were separated by a commit range containing nothing but test files.
+
+    Caching here is the honest read AND the cheap one (one subprocess per
+    process, not one per run).  Residual gap, deliberately not papered
+    over: the first call happens at first use rather than at import, so a
+    ``HEAD`` that moves between import and the first run is still
+    mis-stamped.  Narrowing that further needs an import-time capture,
+    which would put a subprocess in the import path.  Neither form
+    captures uncommitted working-tree edits, which never had a SHA.
+
+    Tests inject ``kernel_commit_sha`` via
+    ``PyrolysisRun.run_metadata_overrides`` so fixtures stay stable when
+    the repo SHA changes; that path does not reach this function.
 
     Returns ``"unknown"`` when git is unreachable (CI without a worktree,
     container with stripped ``.git``, etc.) so the runner never raises
