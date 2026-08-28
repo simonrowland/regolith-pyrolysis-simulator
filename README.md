@@ -323,7 +323,11 @@ Modules:
 - `simulator/condensation.py` — the staged condensation-train model.
 - `simulator/condensation_routing.py` — canonical condenser-stage and extraction-product routing.
 - `simulator/extraction.py` — MRE, alkali-shuttle, and Mg-thermite campaign helpers.
-- `simulator/thermal_train.py` — the downstream heat-rejection and oxygen-liquefaction train.
+- `simulator/thermal_train.py` — downstream thermal-train sizing diagnostics (radiators, cold-end
+  cycle, oxygen liquefaction). Deliberately **detached**: it takes recorded flow rates at its
+  boundary, never reads or writes the atom ledger, and never takes a simulator-run object. It
+  sizes the train that would carry a run's output; it is not part of the run. Parameters live in
+  `data/thermal_train_params.yaml`, and the web view is `thermal_train`.
 
 Packages:
 
