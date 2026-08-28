@@ -480,6 +480,65 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
     assert_prefix_replay_equal(cached, study._strip_heavy_result(fresh))
 
 
+def test_prefix_replay_guard_accepts_legitimate_and_rejects_provenance_swap() -> None:
+    patch = RecipePatch.from_nested(
+        {"campaigns": {"C0": {"temp_range_C": [900, 950]}}}
+    ).validated(SCHEMA)
+    base = _scored(patch, candidate_id="staged-prefix-provenance")
+    product_summary = base.run_reference.product_summary
+    verified_reference = RunReference(
+        status="ok",
+        trace={
+            "prefix_state": "verified",
+            "backend_status": "ok",
+            "backend_authoritative": True,
+        },
+        product_summary=product_summary,
+        backend_name="magemin",
+        backend_status="ok",
+        backend_authoritative=True,
+    )
+    verified = replace(base, run_reference=verified_reference)
+    legitimate = replace(
+        base,
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "prefix_state": "verified",
+                "backend_status": "ok",
+                "backend_authoritative": True,
+            },
+            product_summary=product_summary,
+            backend_name="magemin",
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+    assert_prefix_replay_equal(legitimate, verified)
+
+    swapped = replace(
+        base,
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "prefix_state": "swapped",
+                "backend_status": "unavailable",
+                "backend_authoritative": False,
+            },
+            product_summary=product_summary,
+            backend_name="internal-analytical",
+            backend_status="unavailable",
+            backend_authoritative=False,
+        ),
+    )
+    with pytest.raises(StagedReplayViolation):
+        assert_prefix_replay_equal(swapped, verified)
+    assert set(staged_module._run_reference_view(verified_reference)) == {
+        field.name for field in fields(RunReference)
+    }
+
+
 def test_staged_prefix_replay_recomputes_rejected_write_for_second_sibling(
     tmp_path,
 ) -> None:
