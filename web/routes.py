@@ -74,6 +74,15 @@ from simulator.optimize.import_bundle import (
     imported_study_model,
     is_imported_path,
 )
+from simulator.optimize.reoptimize import (
+    GOALS_SOURCE_BUNDLED,
+    GOALS_SOURCE_CURRENT,
+    GOALS_SOURCES,
+    ReoptimizeError,
+    ReoptimizeVocabularyDriftError,
+    load_reoptimize_prefill,
+    plan_reoptimize,
+)
 from simulator.optimize.objective import (
     canonical_objective_metric,
     objective_metric_aliases,
@@ -4967,6 +4976,206 @@ def optimizer_imported_detail(study_id: str):
     except (ImportBundleError, OSError, ValueError):
         return render_template('optimizer_not_found.html'), 404
     return render_template('optimizer_imported.html', imported=model)
+
+
+def _reoptimize_source_dir(
+    origin: str,
+    study_id: str,
+) -> tuple[Path | None, str | None]:
+    root = _optimizer_runs_root()
+    if origin == 'imported':
+        path = root / 'imported' / study_id
+        if not is_imported_path(path, root) or not path.is_dir():
+            return None, 'source study not found'
+        return path, None
+    if origin == 'local':
+        resolved = _optimizer_run_dir_for_id(study_id)
+        if resolved is None:
+            return None, 'source study not found'
+        return resolved[1], None
+    return None, f'unknown origin: {origin}'
+
+
+def _reoptimize_form_context(
+    origin: str,
+    study_id: str,
+    *,
+    error: str | None = None,
+) -> tuple[dict[str, Any] | None, int]:
+    source_dir, source_error = _reoptimize_source_dir(origin, study_id)
+    if source_error is not None or source_dir is None:
+        return None, 404
+    try:
+        prefill = load_reoptimize_prefill(source_dir)
+    except ReoptimizeError as exc:
+        return {
+            'origin': origin,
+            'study_id': study_id,
+            'prefill': None,
+            'reoptimize_error': str(exc),
+            **_optimizer_launch_context(),
+        }, 400
+    return {
+        'origin': origin,
+        'study_id': study_id,
+        'prefill': prefill,
+        'reoptimize_error': error,
+        'goals_source_bundled': GOALS_SOURCE_BUNDLED,
+        'goals_source_current': GOALS_SOURCE_CURRENT,
+        **_optimizer_launch_context(),
+    }, 200
+
+
+def _payload_has_value(payload: Mapping[str, Any], name: str) -> bool:
+    if name not in payload:
+        return False
+    value = payload.get(name)
+    if value is None:
+        return False
+    if isinstance(value, str) and value.strip() == '':
+        return False
+    return True
+
+
+def _parse_reoptimize_request(
+    payload: Mapping[str, Any],
+) -> tuple[optimizer_job_runner.OptimizerJobRequest | None, str | None]:
+    origin = str(_payload_value(payload, 'origin', '') or '')
+    study_id = str(_payload_value(payload, 'study_id', '') or '')
+    goals_source = str(_payload_value(payload, 'goals_source', '') or '')
+    strategy = str(_payload_value(payload, 'strategy', '') or '')
+    if not origin:
+        return None, 'origin is required'
+    if not study_id:
+        return None, 'study_id is required'
+    if not goals_source:
+        return None, 'goals_source is required'
+    if goals_source not in GOALS_SOURCES:
+        return None, 'goals_source must be bundled_profile or current_local_profile'
+    if not strategy:
+        return None, 'strategy is required'
+    if not _payload_has_value(payload, 'fidelity'):
+        return None, 'fidelity is required'
+    if not _payload_has_value(payload, 'budget'):
+        return None, 'budget is required'
+    if not _payload_has_value(payload, 'parallel'):
+        return None, 'parallel is required'
+    if not _payload_has_value(payload, 'seed'):
+        return None, 'seed is required'
+    if strategy not in OPTIMIZER_JOB_STRATEGIES:
+        return None, f'unknown strategy: {strategy}'
+    fidelity = str(
+        canonical_backend_name(str(_payload_value(payload, 'fidelity', '') or ''))
+    )
+    if fidelity not in OPTIMIZER_JOB_FIDELITIES:
+        return None, f'unknown fidelity: {fidelity}'
+    budget, error = _positive_int_payload(
+        payload,
+        'budget',
+        maximum=_optimizer_job_budget_cap(),
+    )
+    if error:
+        return None, error
+    parallel, error = _positive_int_payload(
+        payload,
+        'parallel',
+        maximum=_optimizer_job_parallel_cap(),
+    )
+    if error:
+        return None, error
+    seed, error = _non_negative_int_payload(payload, 'seed', default=0)
+    if error:
+        return None, error
+    if budget is None or parallel is None or seed is None:
+        return None, 'strategy, seed, budget, fidelity, and parallel are required'
+    source_dir, source_error = _reoptimize_source_dir(origin, study_id)
+    if source_error is not None or source_dir is None:
+        return None, source_error or 'source study not found'
+    try:
+        plan = plan_reoptimize(
+            source_dir,
+            goals_source=goals_source,
+            strategy=strategy,
+            seed=seed,
+            budget=budget,
+            fidelity=fidelity,
+            parallel=parallel,
+            data_dir=DATA_DIR,
+        )
+    except ReoptimizeVocabularyDriftError as exc:
+        return None, str(exc)
+    except ReoptimizeError as exc:
+        return None, str(exc)
+    feedstock_profiles = _optimizer_feedstock_profiles_payload()
+    feedstocks = feedstock_profiles.get('feedstocks')
+    if not isinstance(feedstocks, Mapping):
+        feedstocks = {}
+    if plan.feedstock_id not in feedstocks:
+        return None, f'unknown feedstock_id: {plan.feedstock_id}'
+    if plan.goals_source == GOALS_SOURCE_CURRENT:
+        profile_by_id = _optimizer_profile_by_id(feedstock_profiles)
+        if plan.profile_id not in profile_by_id:
+            return None, f'unknown profile_id: {plan.profile_id}'
+        allowed_profiles = feedstocks.get(plan.feedstock_id)
+        if isinstance(allowed_profiles, list) and plan.profile_id not in allowed_profiles:
+            return None, (
+                f'profile_id {plan.profile_id} is not valid for {plan.feedstock_id}'
+            )
+    return optimizer_job_runner.OptimizerJobRequest(
+        feedstock_id=plan.feedstock_id,
+        profile_id=plan.profile_id,
+        strategy=plan.strategy,
+        fidelity=plan.fidelity,
+        budget=plan.budget,
+        parallel=plan.parallel,
+        seed=plan.seed,
+        profile_arg=plan.profile_arg,
+        reoptimized_from=plan.reoptimized_from,
+        goals_source=plan.goals_source,
+    ), None
+
+
+@bp.route('/optimizer/reoptimize/<origin>/<path:study_id>')
+def optimizer_reoptimize_form(origin: str, study_id: str):
+    """Prefill re-optimize run params from manifest + study.profile.yaml."""
+    context, status = _reoptimize_form_context(origin, study_id)
+    if context is None:
+        return render_template('optimizer_not_found.html'), 404
+    return render_template('optimizer_reoptimize.html', **context), status
+
+
+@bp.route('/api/optimizer/reoptimize', methods=['POST'])
+@bp.route('/optimizer/reoptimize', methods=['POST'])
+def optimizer_reoptimize_submit():
+    """Submit a new study from a saved bundle without reading imported sqlite."""
+    payload = _optimizer_job_payload()
+    job_request, error = _parse_reoptimize_request(payload)
+    origin = str(_payload_value(payload, 'origin', '') or '')
+    study_id = str(_payload_value(payload, 'study_id', '') or '')
+    if error is not None or job_request is None:
+        if _wants_json_response():
+            return jsonify({'error': error}), 400
+        context, status = _reoptimize_form_context(origin, study_id, error=error)
+        if context is None:
+            return render_template('optimizer_not_found.html'), 404
+        return render_template('optimizer_reoptimize.html', **context), 400
+
+    job, capacity_error = _submit_optimizer_job(job_request)
+    if capacity_error is not None or job is None:
+        if _wants_json_response():
+            return jsonify({'error': capacity_error}), 429
+        context, status = _reoptimize_form_context(
+            origin, study_id, error=capacity_error
+        )
+        if context is None:
+            return render_template('optimizer_not_found.html'), 404
+        return render_template('optimizer_reoptimize.html', **context), 429
+    if _wants_json_response():
+        return jsonify({'job': job}), 202
+    return render_template(
+        'partials/optimizer_jobs.html',
+        **{**_optimizer_jobs_context(), 'submitted_job': job},
+    ), 202
 
 
 @bp.route('/api/feedstocks')

@@ -34,6 +34,8 @@
             </tr>
         </table>
         <div class="control-buttons">
+            <a class="btn btn-primary"
+               href="{{ url_for('web.optimizer_reoptimize_form', origin='imported', study_id=imported.study_id) }}">Re-optimize</a>
             <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
         </div>
     </div>

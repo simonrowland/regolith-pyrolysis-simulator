@@ -86,6 +86,7 @@ from simulator.optimize.profiles import (
     physics_constraints_from_profile,
     validate_profile,
 )
+from simulator.optimize.reoptimize import GOALS_SOURCES
 from simulator.optimize.recipe import (
     RecipePatch,
     RecipeSchema,
@@ -322,6 +323,8 @@ class StudyConfig:
     seed: int = 0
     warm_start_from: str | Path | Mapping[str, Any] | None = None
     per_eval_timeout_seconds: float | None = None
+    reoptimized_from: str | None = None
+    goals_source: str | None = None
 
 @dataclass(frozen=True)
 class _WarmStartSource:
@@ -539,6 +542,8 @@ def run(
     warm_start_from: str | Path | Mapping[str, Any] | None = None,
     pinned_paths: Sequence[str] | None = None,
     per_eval_timeout_seconds: float | None = None,
+    reoptimized_from: str | None = None,
+    goals_source: str | None = None,
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
@@ -555,6 +560,8 @@ def run(
         seed=seed,
         warm_start_from=warm_start_from,
         per_eval_timeout_seconds=resolve_eval_timeout_seconds(per_eval_timeout_seconds),
+        reoptimized_from=reoptimized_from,
+        goals_source=goals_source,
     )
     pin_seeds(config.seed)
     try:
@@ -5029,6 +5036,22 @@ def _study_summary_payload(
     }
 
 
+def _lineage_fields(config: StudyConfig | None) -> tuple[str | None, str | None]:
+    if config is None:
+        return None, None
+    source = config.reoptimized_from
+    goals = config.goals_source
+    source_text = None if source is None or str(source).strip() == "" else str(source)
+    goals_text = None if goals is None or str(goals).strip() == "" else str(goals)
+    if goals_text is not None and goals_text not in GOALS_SOURCES:
+        raise StudyError(f"unknown goals_source: {goals_text}")
+    if source_text is None and goals_text is None:
+        return None, None
+    if source_text is None or goals_text is None:
+        raise StudyError("reoptimized_from and goals_source must be set together")
+    return source_text, goals_text
+
+
 def _study_manifest_payload(
     *,
     study_id: str,
@@ -5045,6 +5068,7 @@ def _study_manifest_payload(
     replayable: bool,
     prefix_evals_run: int = 0,
 ) -> Mapping[str, Any]:
+    reoptimized_from, goals_source = _lineage_fields(config)
     return {
         "save_schema_version": SAVE_SCHEMA_VERSION,
         "member_schema_version": MEMBER_SCHEMA_VERSION,
@@ -5086,8 +5110,8 @@ def _study_manifest_payload(
         ),
         "study_status": study_status,
         "replayable": bool(replayable),
-        "reoptimized_from": None,
-        "goals_source": None,
+        "reoptimized_from": reoptimized_from,
+        "goals_source": goals_source,
     }
 
 

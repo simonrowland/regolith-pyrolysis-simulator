@@ -66,6 +66,8 @@
                 <input type="hidden" name="fidelity" value="{{ result.fidelity }}">
                 <button class="btn" type="submit">COMPUTE (exact certify)</button>
             </form>
+            <a class="btn"
+               href="{{ url_for('web.optimizer_reoptimize_form', origin='local', study_id=result.run_id) }}">Re-optimize</a>
             <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
         </div>
         <div id="optimizer-certify-job"></div>

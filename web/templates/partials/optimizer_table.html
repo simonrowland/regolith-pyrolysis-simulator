@@ -124,6 +124,8 @@
                 <td>
                     <a class="btn"
                        href="{{ url_for('web.optimizer_result_detail', run_id=entry.run_id, cache_key=entry.cache_key) }}">Open</a>
+                    <a class="btn"
+                       href="{{ url_for('web.optimizer_reoptimize_form', origin='local', study_id=entry.run_id) }}">Re-optimize</a>
                 </td>
             </tr>
             {% endfor %}
