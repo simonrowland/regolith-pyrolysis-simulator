@@ -11,11 +11,14 @@ import web.events as web_events
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
+    METAL_PHASE_ACCOUNT,
     OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
     OXYGEN_CAPTURED_ACCOUNTS,
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    TERMINAL_DRAIN_TAP_ACCOUNT,
 )
 from simulator.accounting.queries import (
     CONDENSATION_TRAIN_ACCOUNT,
@@ -719,6 +722,78 @@ def test_degraded_product_story_badge_uses_canonical_extraction_evidence(
     ) == pytest.approx((0.0, 1.0))
     assert zero_extraction["product_story_status"] == "unavailable"
     assert real_product["product_story_status"] == "unavailable"
+
+
+@pytest.mark.parametrize(
+    ("float_layer_kg", "drain_tap_kg", "expected_state"),
+    [
+        (2.0, 0.0, "no-products"),
+        (0.0, 1.0, "ok"),
+        (2.0, 1.0, "ok"),
+    ],
+)
+def test_product_badge_counts_terminal_metal_tap_not_diagnostic_float_layer(
+    web_driver,
+    float_layer_kg,
+    drain_tap_kg,
+    expected_state,
+):
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {"SiO2": 51.5, "FeO": 13.0, "MgO": 35.5},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    total_metal_kg = float_layer_kg + drain_tap_kg
+    sim.atom_ledger.load_external(
+        METAL_PHASE_ACCOUNT,
+        {"Al": total_metal_kg},
+        source="test extracted metal before stratification",
+        material_origin="feedstock",
+    )
+    if float_layer_kg:
+        sim.atom_ledger.move(
+            "test-diagnostic-float-layer",
+            METAL_PHASE_ACCOUNT,
+            METAL_FLOAT_LAYER_ACCOUNT,
+            {"Al": float_layer_kg},
+            reason="metal_phase_stratification_diagnostic_only_no_tap_gate",
+        )
+    if drain_tap_kg:
+        sim.atom_ledger.move(
+            "test-terminal-drain-tap",
+            METAL_PHASE_ACCOUNT,
+            TERMINAL_DRAIN_TAP_ACCOUNT,
+            {"Al": drain_tap_kg},
+            reason="terminal metal drain tap",
+        )
+
+    payload = web_events._completion_payload(sim)
+    rendered = _render_product_story(html=web_driver["html"], payload=payload)
+    text = rendered["text"]["product-ledger-content"]
+
+    assert rendered["text"]["product-ledger-state"] == expected_state
+    assert payload["extracted_product_kg"] == pytest.approx(drain_tap_kg)
+    assert payload["product_story"]["metal_ingots"]["class_total_kg"] == pytest.approx(
+        drain_tap_kg
+    )
+    assert payload["product_story"]["unrecovered_process_inventory"][
+        "class_total_kg"
+    ] == pytest.approx(float_layer_kg)
+    if float_layer_kg:
+        assert sim.atom_ledger.project_account_kg(METAL_FLOAT_LAYER_ACCOUNT) == {
+            "Al": pytest.approx(float_layer_kg)
+        }
+        assert "Unrecovered process inventory" in text
+        assert f"Al {_display_mass(float_layer_kg)} kg" in text
 
 
 def test_empty_product_classes_render_from_completion_projection(web_driver):

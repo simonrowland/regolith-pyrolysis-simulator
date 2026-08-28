@@ -33,6 +33,7 @@ from simulator.backends import (
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+    EXTRACTED_METAL_PRODUCT_ACCOUNTS,
     METAL_PHASE_ACCOUNTS,
     OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
     OXYGEN_CAPTURED_ACCOUNTS,
@@ -2210,7 +2211,7 @@ def _product_story_extracted_projection(sim, *, account_kg):
     captured_volatiles = {}
     off_spec_condensate = {}
 
-    for account in METAL_PHASE_ACCOUNTS:
+    for account in EXTRACTED_METAL_PRODUCT_ACCOUNTS:
         for species, mass in account_kg.get(account, {}).items():
             if species not in (
                 _PRODUCT_STORY_GLASS_SPECIES
@@ -2448,12 +2449,9 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
             if account == TERMINAL_ESCAPE_ACCOUNT:
                 target = escaped_to_vacuum
             elif account in METAL_PHASE_ACCOUNTS:
-                if species not in (
-                    _PRODUCT_STORY_GLASS_SPECIES
-                    | _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
-                ):
-                    continue
                 target = unrecovered_process_inventory
+            elif account in EXTRACTED_METAL_PRODUCT_ACCOUNTS:
+                continue
             elif account == CONDENSATION_TRAIN_ACCOUNT:
                 continue
             elif account.startswith('process.'):
