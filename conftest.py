@@ -248,3 +248,51 @@ def production_configured_condensation_route(monkeypatch):
         return route(model, evap_flux, melt)
 
     monkeypatch.setattr(CondensationModel, "route", configured_route)
+
+
+@pytest.fixture
+def synthetic_sio_stage_authority(monkeypatch):
+    """Bounded 100 Pa authority for direct SiO stage-routing tests."""
+
+    from simulator import condensation
+    from simulator.state import EvaporationFlux
+
+    pressure_pa = 100.0
+    valid_range_K = (1323.0, 1324.0)
+    original = condensation._try_antoine_psat_pa
+
+    def bounded_pressure(species, temperature_K, **kwargs):
+        resolved_pa, refused = original(species, temperature_K, **kwargs)
+        low_K, high_K = valid_range_K
+        if species == "SiO" and refused and low_K <= temperature_K <= high_K:
+            return pressure_pa, False
+        return resolved_pa, refused
+
+    def flux() -> EvaporationFlux:
+        return EvaporationFlux(
+            species_kg_hr={"SiO": 1.0},
+            total_kg_hr=1.0,
+            carrier_authority_by_species={
+                "SiO": {
+                    "species_id": "SiO",
+                    "pressure": {
+                        "kind": "value",
+                        "pa": pressure_pa,
+                        "valid_range_K": list(valid_range_K),
+                    },
+                    "flux": {"kind": "eligible", "alpha_ref": "test:SiO"},
+                    "is_union_flux_eligible": True,
+                    "is_flux_active": True,
+                    "validation_status": "validated",
+                    "verdict_status": "authoritative",
+                    "certification_ceiling": "validated_point",
+                }
+            },
+        )
+
+    monkeypatch.setattr(
+        condensation,
+        "_try_antoine_psat_pa",
+        bounded_pressure,
+    )
+    return SimpleNamespace(flux=flux)

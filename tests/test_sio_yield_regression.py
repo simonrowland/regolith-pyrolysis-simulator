@@ -39,6 +39,22 @@ GOLDENS = (
 )
 
 
+def _assert_synthetic_sio_route_authority(route) -> None:
+    authority = route.condensation_authority_by_species["SiO"]
+    stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
+        "stage_outcomes", []
+    )
+    assert authority["status"] == "authoritative"
+    assert authority["carrier_authority"]["pressure"] == {
+        "kind": "value",
+        "pa": 100.0,
+        "valid_range_K": [1323.0, 1324.0],
+    }
+    assert {
+        outcome["reason"] for outcome in stage_outcomes
+    }.isdisjoint({"antoine_psat_unavailable_at_T"})
+
+
 def test_sio_alpha_provenance_receipt_and_fixtures_refuse_evaporation_label():
     assert "UNCERTIFIED solid-SiO particle-growth proxy" in SIO_ALPHA_PROVENANCE
     assert "not silicate-melt evaporation evidence" in SIO_ALPHA_PROVENANCE
@@ -440,18 +456,20 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     )
 
 
-def test_band_aware_hkl_route_captures_sio_in_stage_3():
+def test_band_aware_hkl_route_captures_sio_in_stage_3(
+    synthetic_sio_stage_authority,
+):
     sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
     assert sio_data["fit_target"] == "standard_reaction_term"
     assert "pure_component_antoine" not in sio_data
 
     model = CondensationModel(CondensationTrain.create_default())
-
     route = model.route(
-        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        synthetic_sio_stage_authority.flux(),
         MeltState(),
     )
 
+    _assert_synthetic_sio_route_authority(route)
     assert route.condensed_by_stage_species[3]["SiO"] > 0.0
     assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
     # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
@@ -461,6 +479,22 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3():
         0.04275021936015011
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
+
+
+def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
+    model = CondensationModel(CondensationTrain.create_default())
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(),
+    )
+
+    authority = route.condensation_authority_by_species["SiO"]
+    refusal = route.condensation_refusals_by_species["SiO"]
+    assert authority["status"] == "missing"
+    assert authority["authoritative_for_condensation"] is False
+    assert refusal["upstream_authority_status"] == "missing"
+    assert refusal["authoritative_for_condensation"] is False
+    assert route.condensed_by_stage_species == {}
 
 
 def test_route_destinations_sum_to_evolved_budget():
@@ -649,8 +683,11 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
-    assert "cited_hkl_accommodation" in notice["source_classes"]
-    assert "fail_closed_no_direct_sticking_coefficient" in notice["source_classes"]
+    assert notice["source_classes"] == [
+        "cited_high_supersaturation_condensation_limit",
+        "fail_closed_no_direct_sticking_coefficient",
+        "solid_film_growth_proxy_not_evaporation_evidence",
+    ]
     assert notice["species"] == ["SiO"]
     assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
         0.022481955557451427
@@ -700,11 +737,13 @@ def test_per_segment_wall_deposits_sum_to_aggregate_bucket():
     })
 
 
-def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit():
+def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit(
+    synthetic_sio_stage_authority,
+):
     train = CondensationTrain.create_default()
     melt = MeltState()
     melt.temperature_C = 1700.0
-    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+    flux = synthetic_sio_stage_authority.flux()
 
     hot = CondensationModel(train, wall_temperature_C=1500.0)
     hot.configure_operating_conditions(
@@ -730,6 +769,8 @@ def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit():
     hot_route = hot.route(flux, melt)
     cold_route = cold.route(flux, melt)
 
+    _assert_synthetic_sio_route_authority(hot_route)
+    _assert_synthetic_sio_route_authority(cold_route)
     # Cold spots are deliberate wall-deposit accounting signals, not refusals.
     assert not hot_route.cold_spot_warnings
     assert cold_route.cold_spot_warnings
@@ -745,14 +786,16 @@ def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit():
     )
 
 
-def test_cached_condensation_model_uses_updated_liner_temperature():
+def test_cached_condensation_model_uses_updated_liner_temperature(
+    synthetic_sio_stage_authority,
+):
     model = CondensationModel(
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
     )
     melt = MeltState()
     melt.temperature_C = 1700.0
-    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+    flux = synthetic_sio_stage_authority.flux()
 
     cold_route = model.route(flux, melt)
     model.configure_operating_conditions(
@@ -762,6 +805,8 @@ def test_cached_condensation_model_uses_updated_liner_temperature():
     )
     hot_route = model.route(flux, melt)
 
+    _assert_synthetic_sio_route_authority(cold_route)
+    _assert_synthetic_sio_route_authority(hot_route)
     assert cold_route.wall_deposit_by_species["SiO"] > 0.0
     # 2026-07-21 B1 wall-gate fix: the old expectation (hotter liner deposits
     # MORE SiO) was an artifact of the unguarded hot-wall reactive backstop —

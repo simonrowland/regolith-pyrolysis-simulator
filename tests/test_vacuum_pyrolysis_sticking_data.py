@@ -24,6 +24,22 @@ def _load_sticking_data() -> dict:
     return yaml.safe_load(DATA_PATH.read_text(encoding="utf-8"))
 
 
+def _assert_synthetic_sio_route_authority(route) -> None:
+    authority = route.condensation_authority_by_species["SiO"]
+    stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
+        "stage_outcomes", []
+    )
+    assert authority["status"] == "authoritative"
+    assert authority["carrier_authority"]["pressure"] == {
+        "kind": "value",
+        "pa": 100.0,
+        "valid_range_K": [1323.0, 1324.0],
+    }
+    assert {
+        outcome["reason"] for outcome in stage_outcomes
+    }.isdisjoint({"antoine_psat_unavailable_at_T"})
+
+
 def _configure_knudsen_policy(model: CondensationModel) -> CondensationModel:
     model.configure_operating_conditions(
         overhead_pressure_mbar=1.0,
@@ -281,7 +297,10 @@ def test_pressure_isolated_efficiency_refuses_invalid_stage_temperature_bounds(
         )
 
 
-def test_sio_stage_band_flux_uses_cold_wall_gate(monkeypatch):
+def test_sio_stage_band_flux_uses_cold_wall_gate(
+    monkeypatch,
+    synthetic_sio_stage_authority,
+):
     valid_floor_K = _load_sticking_data()["species"]["SiO"]["value"][
         "valid_range_K"
     ][0]
@@ -305,15 +324,15 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(monkeypatch):
         "_series_resistance_deposition_flux_mol_m2_s",
         capture_flux,
     )
-
     model = _configure_knudsen_policy(
         CondensationModel(CondensationTrain.create_default())
     )
     route = model.route(
-        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        synthetic_sio_stage_authority.flux(),
         MeltState(),
     )
 
+    _assert_synthetic_sio_route_authority(route)
     assert route.condensed_for_species("SiO") > 0.0
     assert captured_below_floor_alphas
     assert captured_below_floor_alphas == pytest.approx(
@@ -395,26 +414,41 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     melt = MeltState()
     melt.temperature_C = 1700.0
 
-    def route_sio() -> float:
-        route = model.route(
+    def route_sio():
+        return model.route(
             EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
             melt,
         )
-        return float(route.wall_deposit_by_species["SiO"])
 
-    grounded = route_sio()
+    grounded_route = route_sio()
     monkeypatch.setitem(
         condensation.STICKING_DATA["species"]["SiO"],
         "value",
         0.7,
     )
-    legacy = route_sio()
+    legacy_route = route_sio()
+    grounded = float(grounded_route.wall_deposit_by_species["SiO"])
+    legacy = float(legacy_route.wall_deposit_by_species["SiO"])
 
     # Explicit stage area makes baffle capture compete with wall capture; the
     # grounded lower-alpha case leaves more vapor for the wall sink.
-    assert grounded == pytest.approx(0.9381389451502856, rel=1e-12)
-    assert legacy == pytest.approx(0.8690501976781391, rel=1e-12)
+    # f7bcbf79 removed the fabricated 100 Pa stage pressure. The stage now
+    # records its missing-input pass-through and captures zero; that mass stays
+    # available to this explicitly configured, status-bearing wall path.
+    assert grounded == pytest.approx(0.9572497806398499, rel=1e-12)
+    assert legacy == pytest.approx(0.8899330725303272, rel=1e-12)
     assert grounded > legacy
+    for route in (grounded_route, legacy_route):
+        authority = route.condensation_authority_by_species["SiO"]
+        refusal = route.condensation_refusals_by_species["SiO"]
+        assert authority["status"] == "missing"
+        assert authority["stage_condensed_mass_kg_hr"] == pytest.approx(0.0)
+        assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
+        assert refusal["upstream_authority_status"] == "missing"
+        assert any(
+            outcome["reason"] == "antoine_psat_unavailable_at_T"
+            for outcome in refusal["stage_outcomes"]
+        )
 
 
 def test_capture_budget_regularizer_is_marked_numerical_uncertified():
