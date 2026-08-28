@@ -550,7 +550,25 @@ socket.on('simulation_status', (data) => {
     }
     if (data.message) console.log(data.message);
     if (data.backend_message) console.log(data.backend_message);
-    if (data.status === 'error' && lifecycle.acceptTelemetry) {
+    // ANY TERMINAL OUTCOME MUST HAND THE CONTROLS BACK, NOT JUST A CRASH.
+    // This tested `data.status === 'error'` only, so a run that ERRORED
+    // re-enabled Start while a run that lawfully REFUSED left it disabled
+    // forever -- the operator could not retry without reloading the page.
+    // That is backwards: a refusal is the model declining to extrapolate (a
+    // RESULT), an error is a fault, and the fault case recovered while the
+    // lawful one latched. It is also how a correct fail-close came to be
+    // reported as "the run stalled": terminal-refused, Start greyed out,
+    // ledger showing n/a, nothing to do but reload.
+    //
+    // Keyed on the LIFECYCLE reaching a terminal phase rather than on a list
+    // of status strings, so a terminal state added later cannot silently
+    // re-introduce the latch. simulation_complete keeps its own handler in
+    // simulator-decisions.js; re-enabling is idempotent, so the overlap is
+    // harmless and the two paths do not need to know about each other.
+    if (
+        lifecycle.acceptTelemetry
+        && TERMINAL_LIFECYCLE_STATES.has(lifecycle.state.phase)
+    ) {
         document.getElementById('btn-start').disabled = false;
         document.getElementById('btn-pause').disabled = true;
         document.getElementById('btn-resume').disabled = true;
