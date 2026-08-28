@@ -1,0 +1,136 @@
+schema_version: literature_extract.v1
+source_id: kems-014-drowart-2005
+source:
+  citation: "Drowart, J., Chatillon, C., Hastie, J. & Bonnell, D. (2005), \"High-temperature mass spectrometry: instrumental techniques, ionization cross-sections, pressure measurements, and thermodynamic data\" (IUPAC Technical Report), Pure Appl. Chem. 77:683–737, DOI 10.1351/pac200577040683"
+  doi: 10.1351/pac200577040683
+  year: 2005
+extraction:
+  method: pdftotext -layout of born-digital PAC PDF; Table 2 atomic σm rows for O/Na/Mg/Al/Si/Ar/K/Ca/Fe certified; Table 1 coefficient grid not evaluated; Studio-2 MinerU not ready
+  date: '2026-08-27'
+  worker: tail-close
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/
+review_status: draft
+fidelity_samples:
+  - species: Na
+    observable: gibbs_table
+    observation_id: drowart_2005_table2_atomic_ionization_cross_sections
+    field: Ar_sigma_m_exp_A2
+    value: 2.62
+    locator:
+      page: 706
+      table: '2'
+      note: Table 2 Ar experimental σm 2.62 Å² (Straub/Lindsay-class [146]); prose p. 701 quotes 2.62e-16 cm²
+species:
+  Na:
+    observations:
+    - observation_id: drowart_2005_table2_atomic_ionization_cross_sections
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/tables.md
+        table: '2'
+        page: 705
+      T_range_K: null
+      phase: gas_phase_atoms
+      regime: ionization_cross_section_compilation
+      units: angstrom2
+      values:
+        quantity: maximum_atomic_ionization_cross_section
+        Ar_sigma_m_exp_A2: 2.62
+        conversion_as_published: 1 Å² = 10^{-20} m²
+        method_class: secondary_compilation
+        rows:
+        - element: O
+          sigma_m_Mann_A2: 1.27
+          Em_Mann_eV: 69
+          sigma_m_exp_A2: 1.6
+          ref: '[141]'
+        - element: Na
+          sigma_m_OS_A2: 4.8
+          sigma_m_G_A2: 3.8
+          sigma_m_Mann_A2: 4.02
+          Em_Mann_eV: 14
+          Em_exp_eV: 100
+          sigma_m_exp_A2: 10.5
+          ref: '[145]'
+        - element: Na
+          Em_Mann_eV: 14
+          Em_exp_eV: 14
+          sigma_m_exp_A2: 4.3
+          sigma_m_exp_70eV_A2: 2.01
+          ref: '[158]'
+        - element: Mg
+          sigma_m_Mann_A2: 5.38
+          Em_Mann_eV: 29
+          Em_exp_eV: 20
+          sigma_m_exp_A2: 5.3
+          sigma_m_exp_70eV_A2: 3.07
+          ref: '[149]'
+        - element: Al
+          sigma_m_Mann_A2: 6.18
+          sigma_m_exp_A2: 9.9
+          ref: '[149]'
+        - element: Si
+          sigma_m_Mann_A2: 5.35
+          sigma_m_exp_A2: 6.69
+          sigma_m_exp_70eV_A2: 5.87
+          ref: '[149]'
+        - element: Ar
+          sigma_m_Mann_A2: 2.83
+          Em_exp_eV: 85
+          sigma_m_exp_A2: 2.62
+          sigma_m_exp_70eV_A2: 2.65
+          ref: '[146]'
+        - element: K
+          sigma_m_OS_A2: 12.9
+          sigma_m_G_A2: 5.6
+          sigma_m_Mann_A2: 7.21
+          Em_Mann_eV: 12
+          sigma_m_exp_70eV_A2: 5.9
+          Em_exp: blank_as_printed
+        - element: Ca
+          sigma_m_Mann_A2: 10.44
+          sigma_m_exp_A2: 7.8
+          ref: '[162]'
+        - element: Fe
+          sigma_m_OS_A2: 9.3
+          sigma_m_G_A2: 13.0
+          sigma_m_Mann_A2: 6.3
+          Em_Mann_eV: 35
+          Em_exp_eV: 29
+          sigma_m_exp_A2: 5.34
+          sigma_m_exp_70eV_A2: 4.38
+          ref: '[149]'
+        competing_Na_exp_sigma_m_A2: [10.5, 4.3]
+        note: Two printed Na experimental maxima are competing observations; not averaged. Not a melt measurement.
+      uncertainty:
+        note: 'prose p. 705: ±7% relative / ±15% absolute (1σ) for the fast-atom-beam set [146]'
+    - observation_id: drowart_2005_kems_reporting_requirements
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/tables.md
+        page: 685
+        section: '2. PRINCIPLES OF THE METHOD'
+        note: also §4.3a p. 687–688 and §9 p. 728
+      T_range_K: null
+      phase: methodology_standard
+      regime: kems_effusion
+      units: none
+      values:
+        quantity: iupac_htms_reporting_requirements
+        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: This paper is a methodology standard, not a melt p(T) or α data set. No silicate-melt measurement rows exist to admit.
+        six_criteria_screen_gaps:
+        - ionization_cross_section_or_cancelling_calibration
+        - orifice_clausing_f_equals_aC_over_A
+        - temperature_measurement_method_not_just_a_number
+        - ion_to_neutral_reconstruction_appearance_energy_fragmentation
+        - cell_sample_chemistry_activity_modification
+        - knudsen_equilibrium_vs_langmuir_kinetic
+        - instrument_factor_mass_bias_isotopic_abundance
+        - absolute_vs_relative_pressure_calibration_substance
+        equation_1_as_published: p_j = I+_jk T / S_jk
+        recommended_geometry_report_as_published: f = aC/A ratios be reported for pressure measurements
+        note: "The six-criteria screen tests simulator comparability. Drowart tests KEMS measurement quality. A row can pass all six and still be an uncalibrated ion current. Recommendation (not implemented) — add an orthogonal KEMS-quality gate before a p(T) row may score."
+      uncertainty:
+        note: not applicable

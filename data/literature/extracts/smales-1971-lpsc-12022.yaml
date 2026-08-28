@@ -1,0 +1,191 @@
+schema_version: literature_extract.v1
+source_id: smales-1971-lpsc-12022
+source:
+  citation: Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)", Proceedings of the Second Lunar Science Conference 2, 1253–1258.
+  year: 1971
+extraction:
+  method: 2026-08-27 repaired-table transcription from 150 dpi source-page vision; no figure digitization
+  date: '2026-08-27'
+  worker: extract-ingest
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+review_status: draft
+species:
+  SiO2:
+    observations:
+    - observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+        tables:
+        - '1'
+        - '2'
+        - '3'
+        pages: 1254–1255
+        paragraph: Apollo 12 rock 12022 analytical composition
+      T_range_K: null
+      phase: Apollo_12_lunar_basalt_12022
+      condensed_form:
+        state: crystalline
+        metastable: false
+        basis: explicit_author
+        note: Bulk lunar rock analysis before the DeMaria vaporization experiments; no analysis temperature reported or applicable.
+      standard_state: bulk sample composition as received
+      regime: analytical_composition
+      units: major oxides wt%; trace elements ppm by weight
+      values:
+        quantity: bulk_sample_composition
+        sample: '12022'
+        temperature_as_published: not_reported_not_applicable
+        major_oxide_measurements_wt_pct:
+          SiO2:
+          - method: XRF
+            value: 42.3
+          Al2O3:
+          - method: XRF
+            value: 8.2
+          - method: INAA
+            value: 8.5
+          FeO:
+          - method: XRF
+            value: 21.6
+          - method: GAA
+            value: 21.7
+          MgO:
+          - method: XRF
+            value: 11.9
+          CaO:
+          - method: XRF
+            value: 9.0
+          - method: GAA
+            value: 9.2
+          Na2O:
+          - method: INAA
+            value: 0.23
+          K2O:
+          - method: MSID
+            value: 0.061
+          TiO2:
+          - method: XRF
+            value: 4.9
+          - method: GAA
+            value: 4.8
+          MnO:
+          - method: INAA
+            value: 0.31
+        trace_measurements_ppm:
+          F: [{method: GAA, value: 40}]
+          Na: [{method: INAA, value: 1680}]
+          K: [{method: MSID, value: 510}]
+          Sc: [{method: INAA, value: 59}]
+          Mn: [{method: INAA, value: 2410}]
+          Co: [{method: RNAA, value: 48.5}]
+          Zn: [{method: RNAA, value: 2}]
+          Rb: [{method: RNAA, value: 0.7}, {method: MSID, value: 0.8}]
+          Sr: [{method: GAA, value: 120}, {method: MSID, value: 170}]
+          Ag: [{method: RNAA, value: 0.011}]
+          Cs: [{method: RNAA, value: 0.04}, {method: MSID, value: 0.044}]
+          Ba: [{method: RNAA, value: 54}, {method: MSID, value: 55}]
+          La: [{method: INAA, value_as_published: '~5.5'}]
+          Ce: [{method: MSID, value: 17}]
+          Nd: [{method: MSID, value: 15}]
+          Sm: [{method: INAA, value: 6}, {method: MSID, value: 5.4}]
+          Eu: [{method: INAA, value: 1.0}, {method: MSID, value: 1.3}]
+          Tb: [{method: INAA, value_as_published: '~2.4'}]
+          Dy: [{method: INAA, value: 13}]
+          Ho: [{method: INAA, value_as_published: '~3.1'}]
+          Yb: [{method: INAA, value: 4.9}]
+          Lu: [{method: INAA, value_as_published: '~0.7'}]
+          Hf: [{method: INAA, value_as_published: '~4'}]
+          Ni: [{method: ES, value: 50}]
+          V: [{method: ES, value: 120}]
+          Cu: [{method: ES, value: 5}]
+          Y: [{method: ES, value: 60}]
+          Zr: [{method: ES, value: 200}]
+      uncertainty:
+        note: Table 1 reports method-level precision of INAA ±5%, selected INAA ±20%, RNAA ±5%, GAA ±10%, and MSID ±5%; Table 3 ES ±20%. Table 2 major-oxide uncertainties are not reported. Approximate values remain strings with the printed tilde.
+    - observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+        tables:
+        - '1'
+        - '2'
+        - '3'
+        pages: 1254–1255
+        paragraph: Apollo 12 rock 12065 analytical composition
+      T_range_K: null
+      phase: Apollo_12_lunar_basalt_12065
+      condensed_form:
+        state: crystalline
+        metastable: false
+        basis: explicit_author
+        note: Bulk lunar rock analysis before the DeMaria vaporization experiments; no analysis temperature reported or applicable.
+      standard_state: bulk sample composition as received
+      regime: analytical_composition
+      units: major oxides wt%; trace elements ppm by weight
+      values:
+        quantity: bulk_sample_composition
+        sample: '12065'
+        temperature_as_published: not_reported_not_applicable
+        major_oxide_measurements_wt_pct:
+          SiO2: [{method: XRF, value: 47.1}]
+          Al2O3: [{method: XRF, value: 9.8}]
+          FeO: [{method: XRF, value: 20.0}, {method: GAA, value: 20.3}]
+          MgO: [{method: XRF, value: 9.2}]
+          CaO: [{method: XRF, value: 10.1}, {method: GAA, value: 10.9}]
+          Na2O: [{method: INAA, value: 0.24}]
+          K2O: [{method: MSID, value: 0.063}]
+          TiO2: [{method: XRF, value: 3.1}, {method: GAA, value: 3.4}]
+          MnO: [{method: INAA, value: 0.26}]
+          Cr2O3: [{method: INAA, value: 0.50}]
+        trace_measurements_ppm:
+          F: [{method: GAA, value: 40}]
+          Na: [{method: INAA, value: 1790}]
+          K: [{method: MSID, value: 520}]
+          Sc: [{method: INAA, value: 60}]
+          Cr: [{method: INAA, value: 3400}]
+          Mn: [{method: INAA, value: 2050}]
+          Co: [{method: RNAA, value: 40}]
+          Zn: [{method: RNAA, value: 2}]
+          Rb: [{method: RNAA, value: 1.0}, {method: MSID, value: 1.2}]
+          Sr: [{method: GAA, value: 110}, {method: MSID, value: 115}]
+          Cs: [{method: RNAA, value: 0.054}, {method: MSID, value: 0.06}]
+          Ba: [{method: RNAA, value: 68}, {method: MSID, value: 67}]
+          La: [{method: INAA, value_as_published: '~8'}]
+          Ce: [{method: MSID, value: 16}]
+          Nd: [{method: MSID, value: 14}]
+          Sm: [{method: INAA, value: 5}, {method: MSID, value: 4.7}]
+          Eu: [{method: INAA, value: 0.9}, {method: MSID, value: 0.9}]
+          Tb: [{method: INAA, value_as_published: '~2.3'}]
+          Dy: [{method: INAA, value: 12}]
+          Ho: [{method: INAA, value_as_published: '~2.3'}]
+          Yb: [{method: INAA, value: 4.7}]
+          Lu: [{method: INAA, value_as_published: '~0.6'}]
+          Hf: [{method: INAA, value_as_published: '~4'}]
+          Ni: [{method: ES, value: 20}]
+          V: [{method: ES, value: 150}]
+          Y: [{method: ES, value: 45}]
+          Zr: [{method: ES, value: 180}]
+          Ga: [{method: RNAA, value: 2.8}]
+          Ge: [{method: RNAA, value: 0.02}]
+          As: [{method: RNAA, value: 0.003}]
+          Pd: [{method: RNAA, bound_as_published: '<0.001'}]
+          In: [{method: RNAA, value: 0.0024}]
+          Sb: [{method: RNAA, value: 0.009}]
+          Re: [{method: RNAA, bound_as_published: '<0.001'}]
+          Au: [{method: RNAA, value: 0.0003}]
+      uncertainty:
+        note: Table 1 reports method-level precision of INAA ±5%, selected INAA ±20%, RNAA ±5%, GAA ±10%, and MSID ±5%; Table 3 ES ±20%. Table 2 major-oxide uncertainties are not reported. Approximate values and bounds remain strings exactly as printed.
+fidelity_samples:
+- path: species.SiO2.observations[smales_1971_apollo_12022_bulk_composition_tables1_2_3].values.major_oxide_measurements_wt_pct.SiO2[0].value
+  value: 42.3
+  locator:
+    source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+    table: '2'
+    page: 1254
+- path: species.SiO2.observations[smales_1971_apollo_12065_bulk_composition_tables1_2_3].values.major_oxide_measurements_wt_pct.SiO2[0].value
+  value: 47.1
+  locator:
+    source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+    table: '2'
+    page: 1254

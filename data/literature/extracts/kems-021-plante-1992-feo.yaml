@@ -1,0 +1,320 @@
+schema_version: literature_extract.v1
+source_id: kems-021-plante-1992-feo
+source:
+  citation: >-
+    Plante, E. R., Hastie, J. W. & Kowalska, M. (1992), "Activity of FeO in the
+    FeO-MgO-SiO2 System Determined by High Temperature Mass Spectrometry",
+    ISIJ International 32(12):1276-1279, DOI 10.2355/isijinternational.32.1276
+  doi: 10.2355/isijinternational.32.1276
+  year: 1992
+extraction:
+  method: >-
+    400 dpi pdftoppm crops of Tables 1-2 + eqs. (5)-(6); visual certification;
+    tesseract second reader; MinerU 2.5 HTML tables (studio-3 new-kems-021) third
+    reader. pdftotext layer rejected (scanned HyperGEAR). No figure digitization.
+  date: '2026-08-27'
+  worker: orphans-close
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/
+review_status: draft
+fidelity_samples:
+  - species: FeO
+    observable: activity_coefficient
+    observation_id: plante_1992_table2_feo_activity_coefficient_1973k
+    field: f_at_x_0_1
+    value: 4.04
+    locator:
+      page: 1278
+      table: '2'
+      note: Table 2 f(FeO) at x(FeO)=0.1 as printed
+  - species: Fe
+    observable: rate_series
+    observation_id: plante_1992_table1_ion_intensity_ratios_1973k
+    field: I_Fe_over_I_Mg_at_x_0_15
+    value: 7.04
+    locator:
+      page: 1278
+      table: '1'
+      note: Table 1 I(Fe+)/I(Mg+) at x(FeO)=0.15
+species:
+  FeO:
+    observations:
+    - observation_id: plante_1992_table2_feo_activity_coefficient_1973k
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        table: '2'
+        page: 1278
+        pdf_page_index: 3
+      T_range_K:
+      - 1973.0
+      - 1973.0
+      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Authors (p. 1277) cite Levin Phase Diagrams for Ceramists that all
+          measured compositions were liquid and single-phase at the experimental
+          temperatures. Join x(MgO)/x(SiO2)=1.
+      standard_state: >-
+        Raoultian / pure liquid FeO. Printed Fig. 4 caption and Discussion:
+        "relative to pure liquid FeO as the standard state".
+      regime: kems_effusion
+      units: dimensionless Raoultian f; a = f * x
+      values:
+        quantity: activity_and_raoultian_gamma
+        oxide_formula_as_published: FeO
+        system: FeO-MgO-SiO2
+        join: x(MgO)/x(SiO2)=1
+        gamma_symbol_as_published: f(FeO)
+        gamma_definition: >-
+          Authors' f is the Raoultian activity coefficient. a(FeO)=f(FeO)*x(FeO)
+          by eq. (2) and the Table 2 caption. Conversion shown on each row.
+        T_K_table: 1973.0
+        experimental_T_window_K_as_published: 1850-1980 (highest-FeO sample 1790-1910)
+        T_independence_as_published: essentially independent of temperature between 1850 and 1980 K
+        f_at_x_0_1: 4.04
+        method_class: measured_direct
+        system_class: silicate_melt
+        pO2_as_published: not_tabulated
+        pO2_note: >-
+          O2+ recorded only occasionally and explicitly not required for the
+          activity determinations (p. 1277). Do not invent a pO2 boundary.
+        rows:
+        - x_FeO: 0.1
+          x_MgO: 0.45
+          x_SiO2: 0.45
+          x_MgO_SiO2_inference: (1-x_FeO)/2 on the stated join
+          f: 4.04
+          activity: 0.404
+          arithmetic: a=f*x; 4.04*0.1=0.404
+          in_table1: false
+        - x_FeO: 0.2
+          x_MgO: 0.4
+          x_SiO2: 0.4
+          x_MgO_SiO2_inference: (1-x_FeO)/2 on the stated join
+          f: 3.02
+          activity: 0.604
+          arithmetic: a=f*x; 3.02*0.2=0.604
+          in_table1: false
+        - x_FeO: 0.3
+          x_MgO: 0.35
+          x_SiO2: 0.35
+          x_MgO_SiO2_inference: (1-x_FeO)/2 on the stated join
+          f: 2.33
+          activity: 0.699
+          arithmetic: a=f*x; 2.33*0.3=0.699
+          in_table1: false
+        - x_FeO: 0.4
+          x_MgO: 0.3
+          x_SiO2: 0.3
+          f: 1.85
+          activity: 0.74
+          arithmetic: a=f*x; 1.85*0.4=0.74
+          in_table1: true
+        - x_FeO: 0.5
+          x_MgO: 0.25
+          x_SiO2: 0.25
+          x_MgO_SiO2_inference: (1-x_FeO)/2 on the stated join
+          f: 1.54
+          activity: 0.77
+          arithmetic: a=f*x; 1.54*0.5=0.77
+          in_table1: false
+        - x_FeO: 0.6
+          x_MgO: 0.2
+          x_SiO2: 0.2
+          x_MgO_SiO2_inference: (1-x_FeO)/2 on the stated join
+          f: 1.32
+          activity: 0.792
+          arithmetic: a=f*x; 1.32*0.6=0.792
+          in_table1: false
+        - x_FeO: 0.7
+          x_MgO: 0.15
+          x_SiO2: 0.15
+          f: 1.17
+          activity: 0.819
+          arithmetic: a=f*x; 1.17*0.7=0.819
+          in_table1: true
+        - x_FeO: 0.8
+          x_MgO: 0.1
+          x_SiO2: 0.1
+          f: 1.07
+          activity: 0.856
+          arithmetic: a=f*x; 1.07*0.8=0.856
+          in_table1: true
+        - x_FeO: 0.9
+          x_MgO: 0.05
+          x_SiO2: 0.05
+          f: 1.02
+          activity: 0.918
+          arithmetic: a=f*x; 1.02*0.9=0.918
+          in_table1: true
+        fit_equations_used_by_authors:
+          eq5_as_printed: x(MgO)=0.011+0.22 log{[I(Fe+)x(MgO)]/[I(Mg+)x(FeO)]}
+          eq6_as_printed: x(SiO2)=-0.24+0.69 log{[I(Fe+)x(SiO2)]/[I(SiO+)x(FeO)]}
+          note: >-
+            Table 2 is the analytical integral of Eq. (4) after these least-squares
+            fits to Figs. 2-3. Rows with in_table1=false were not independently
+            ion-ratioed in Table 1. This worker did not re-evaluate the integral.
+        note: >-
+          Positive Raoultian deviation. Do not copy Taylor/Chipman, Kojima or
+          Sakawa from Fig. 4 as this-work.
+      uncertainty:
+        note: Table 2 prints no sigma on f(FeO).
+      equipment:
+        orifice_area:
+          value: 1.963495e-7
+          units: m2
+          diameter_m: 0.0005
+          orifice_shape: circular_effusion
+          inferred: true
+          inference: area = pi (d/2)^2 from stated effusion orifice diameter 0.5 mm
+          locator:
+            page: 1277
+            paragraph: The diameter of the effusion orifice was 0.5 mm
+        clausing_factor:
+          value:
+            numeric: null
+            note: Clausing not stated for the 0.5 mm orifice. Do not invent.
+          locator:
+            page: 1277
+            paragraph: effusion orifice was 0.5 mm
+        cell_material:
+          value: tungsten outer cell with iridium inner cup
+          locator:
+            page: 1277
+            paragraph: evaporation from a tungsten cell in which the sample was in contact with an iridium inner cup
+        sample_surface_area:
+          value:
+            sample_mass_mg_range:
+            - 280
+            - 350
+            note: Mass range as printed. Free-surface area not stated.
+          units: mg_load
+          inferred: true
+          inference: load 280-350 mg stated; area not independently printed
+          locator:
+            page: 1277
+            paragraph: The cell was loaded for each experiment with 280 to 350 mg of sample
+    - observation_id: plante_1992_fig4_activity_figure_only_blocked
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        figure: '4'
+        page: 1278
+      T_range_K:
+      - 1873.0
+      - 2173.0
+      phase: FeO-MgO-SiO2_and_literature_overlays
+      regime: mixed_this_work_and_foreign_overlays
+      units: dimensionless a(FeO)
+      values:
+        quantity: a_FeO_vs_x_FeO
+        status: typed_refusal
+        reason: >-
+          Fig. 4 is a plotted overlay (A this-work; B Taylor & Chipman; C Kojima
+          estimate; D Sakawa; E Raoult). MinerU dumped approximate ~ values.
+          Figure digitization is forbidden. This-work numeric f is Table 2.
+        admission_status: rejected_no_figure_reading
+        method_class: mixed
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable; no tabulated foreign points copied from the figure
+  Fe:
+    observations:
+    - observation_id: plante_1992_table1_ion_intensity_ratios_1973k
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        table: '1'
+        page: 1278
+        pdf_page_index: 3
+      T_range_K:
+      - 1973.0
+      - 1973.0
+      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Same join and T as Table 2. Authors treat Fe+, Mg+, SiO+ as proportional to p(FeO), p(MgO), p(SiO2).
+      regime: kems_effusion
+      units: ion_intensity_ratio_dimensionless
+      values:
+        quantity: I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus
+        I_Fe_over_I_Mg_at_x_0_15: 7.04
+        T_K: 1973.0
+        join: x(MgO)=x(SiO2)
+        method_class: measured_direct
+        system_class: silicate_melt
+        rows:
+        - x_FeO: 0.15
+          x_MgO: 0.425
+          I_Fe_over_I_Mg: 7.04
+          I_Fe_over_I_SiO: 2.33
+        - x_FeO: 0.3
+          x_MgO: 0.35
+          I_Fe_over_I_Mg: 23.61
+          I_Fe_over_I_SiO: 6.5
+        - x_FeO: 0.4
+          x_MgO: 0.3
+          I_Fe_over_I_Mg: 48.41
+          I_Fe_over_I_SiO: 7.83
+        - x_FeO: 0.54
+          x_MgO: 0.23
+          I_Fe_over_I_Mg: 37.2
+          I_Fe_over_I_SiO: 12.04
+        - x_FeO: 0.7
+          x_MgO: 0.15
+          I_Fe_over_I_Mg: 23.29
+          I_Fe_over_I_SiO: 22.85
+        - x_FeO: 0.8
+          x_MgO: 0.1
+          I_Fe_over_I_Mg: 27.11
+          I_Fe_over_I_SiO: 29.05
+        - x_FeO: 0.9
+          x_MgO: 0.05
+          I_Fe_over_I_Mg: 21.64
+          I_Fe_over_I_SiO: 40.3
+        note: >-
+          Absolute partial pressures were not reported. k_i cancelled by the
+          ion-ratio Gibbs-Duhem path. Not an evaporation coefficient.
+      uncertainty:
+        note: Table 1 prints no sigma.
+      equipment:
+        orifice_area:
+          value: 1.963495e-7
+          units: m2
+          diameter_m: 0.0005
+          orifice_shape: circular_effusion
+          inferred: true
+          inference: area = pi (d/2)^2 from stated effusion orifice diameter 0.5 mm
+          locator:
+            page: 1277
+            paragraph: The diameter of the effusion orifice was 0.5 mm
+        cell_material:
+          value: tungsten outer cell with iridium inner cup
+          locator:
+            page: 1277
+            paragraph: iridium inner cup
+    - observation_id: plante_1992_fig1_IT_vs_T_figure_only_blocked
+      type: rate_series
+      locator:
+        figure: '1'
+        page: 1277
+      T_range_K:
+      - 1786.0
+      - 2000.0
+      phase: FeO-MgO-SiO2_xFeO_0_7
+      regime: kems_effusion
+      units: ion_intensity_times_T
+      values:
+        quantity: I_T_vs_1_over_T
+        composition_as_published: x(FeO)=0.7, x(MgO)=0.15
+        status: typed_refusal
+        reason: Fig. 1 is an unlabeled Arrhenius-style plot. MinerU ~ dump rejected. Digitizing forbidden.
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable

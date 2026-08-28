@@ -1,0 +1,436 @@
+schema_version: literature_extract.v1
+source_id: kems-020-hastie-1981-nbsir
+source:
+  citation: >-
+    Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1981), "Alkali Vapor Transport
+    in Coal Conversion and Combustion Systems", NBSIR 81-2279, National Bureau
+    of Standards, May 1981 (interim report)
+  year: 1981
+extraction:
+  method: >-
+    300 dpi pdftoppm of Tables 1-3 (Table 2 rotated landscape); visual
+    certification; tesseract second reader; pdftotext -layout third reader on
+    portrait tables only. Studio-3 MinerU not ready. No figure digitization.
+    Compilation rule: original source credited per Table 2 row; NBSIR is the
+    access path.
+  date: '2026-08-27'
+  worker: orphans-close
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/
+review_status: draft
+fidelity_samples:
+  - species: K
+    observable: psat_series
+    observation_id: hastie_1981_table2_k_logP_coefficients
+    field: illite_A
+    value: 6.286
+    locator:
+      page: 24
+      table: '2'
+      note: Table 2 illite row A as printed (report p. 24)
+  - species: Na
+    observable: psat_series
+    observation_id: hastie_1981_nacl_liquid_logP_prose
+    field: A
+    value: 4.85
+    locator:
+      page: 11
+      paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
+species:
+  K:
+    observations:
+    - observation_id: hastie_1981_table2_k_logP_coefficients
+      type: psat_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        table: '2'
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+      T_range_K:
+      - 1100.0
+      - 2150.0
+      phase: K-bearing_oxide_and_slag_mix
+      condensed_form:
+        state: mixed_solid_and_liquid_as_tabulated
+        metastable: false
+        basis: explicit_author
+        note: Phase column of Table 2; footnote b says phases indicated are solid unless Liquid is printed.
+      standard_state: elemental K(g) as the only K-species (footnote d)
+      regime: kems_effusion
+      units: log10 P(K)/atm coefficients as published
+      values:
+        quantity: log10_P_K_atm_empirical_fit
+        equation_as_printed: log P (atm) = A - B/T + C + D - E
+        illite_A: 6.286
+        method_class: measured_direct
+        system_class: mixed_oxide_slag
+        access_path: NBSIR 81-2279 Table 2
+        compilation_note: >-
+          Campaign summary. Each row's Comments citation is the original
+          experiment. Do not cite this NBSIR as if it were the measurement.
+        pO2_as_published: not_tabulated
+        pO2_note: >-
+          O2 monitored (text p. 22; K2-slag comment initial P_O2 >= P_K) but
+          no O2 column. Figs 4/9/12 are figure-only.
+        rows:
+        - system: K2O-SiO2
+          phases: Solution 44 to ~5 [K2O]
+          T_K_range: [1300, 1800]
+          A: 4.721
+          B: 15624.0
+          C: 9.32
+          C_multiplier: x_K2O_squared
+          original_source: Plante et al. (1975) compared; this summary higher because of orifice effect
+        - system: K2O-Al2O3
+          phases: KAlO2 + K2O.5Al2O3
+          T_K_range: [1300, 1800]
+          A: 5.489
+          B: 15036.0
+          original_source: Plante et al. (1975)
+        - system: K2O-Al2O3
+          phases: K2O.9Al2O3 + Al2O3
+          T_K_range: [1500, 1800]
+          A: 7.487
+          B: 21453.0
+          original_source: Plante et al. (1975)
+        - system: K2O-ZrO2
+          phases: K4Zr5O12-ZrO2
+          T_K_range: [1100, 1450]
+          A: 4.524
+          B: 12873.0
+          original_source: Plante (1977)
+          bound_as_published: could be low by a factor of two (footnote g, large orifice); also K2CO3 contamination
+        - system: K2O-Fe2O3
+          phases: KFeO2-K2O.6Fe2O3
+          T_K_range: [1150, 1450]
+          A: 4.524
+          B: 12873.0
+          original_source: Plante (1979b)
+        - system: K2O-Fe2O3
+          phases: K2O.6Fe2O3-Fe3O4
+          T_K_range: [1200, 1600]
+          A: 7.028
+          B: 16750.0
+          original_source: Plante (1979b)
+        - system: K2O-Al2O3-SiO2 (KAlSiO4)
+          phases: KAlSiO4, K2O.9Al2O3, KAlSi2O6
+          T_K_range: [1400, 1650]
+          A: 8.722
+          B: 20923.0
+          original_source: Plante (1979c, 1980a)
+          note: probably not equilibrated because of slow condensed phase kinetics
+        - system: K2O-Al2O3-SiO2
+          phases: possibly KAlSi2O6, Al2O3, K2O.9Al2O3 ~22[K2O]
+          T_K_range: [1600, 1900]
+          A: 7.068
+          B: 20763.0
+          original_source: Plante (1979c, 1980a)
+          note: evidence of melt formation
+        - system: K2O-Al2O3-SiO2
+          phases: phases uncertain ~17[K2O]
+          T_K_range: [1600, 2000]
+          A: 6.35
+          B: 20693.0
+          original_source: Plante (1979c, 1980a)
+        - system: K2O-Al2O3-SiO2
+          phases: phases uncertain ~11.5[K2O]
+          T_K_range: [1750, 2150]
+          A: 4.667
+          B: 19800.0
+          original_source: Plante (1979c, 1980a)
+        - system: K2O-Al2O3-SiO2
+          phases: Liquid + 3Al2O3.2SiO2 (10.8[K2O]) (mullite)
+          T_K_range: [1800, 2150]
+          A: 4.464
+          B: 20424.0
+          original_source: Plante (1979c, 1980a)
+        - system: simplified Western slags K2O-CaO-Al2O3-SiO2
+          phases: solution + KAlSiO4 at higher K2O
+          T_K_range: [1400, 1900]
+          A: 5.228
+          B: 16794.0
+          C: 0.07887
+          C_as_printed: 7.887 exp-2
+          D: 0.001741
+          D_as_printed: 1.741 exp-3
+          E: 0.01825
+          E_as_printed: 1.825 exp-2
+          original_source: Plante (1980a,b,c,d; 1981)
+          stdev_as_published: ~30 percent
+          max_dev_as_published: ~100 percent
+        - system: real MHD channel slag K1
+          composition_wt_pct:
+            K2O: 19.5
+            Al2O3: 12.1
+            Fe2O3: 14.3
+            CaO: 3.8
+            MgO: 1.0
+            SiO2: 46.8
+            Na2O: 0.5
+          phases: KAlSiO4 major + minor unidentified crystalline + slag
+          T_K_range: [1600, 1800]
+          A: 5.564
+          B: 16650.0
+          original_source: Hastie et al. (1980)
+          note: equation corresponds to [K2O] ~14; Illinois no. 6 / UTSI
+        - system: synthetic Western channel slag
+          composition_wt_pct:
+            K2O: 22.7
+            Al2O3: 24.6
+            Fe2O3: 5.3
+            CaO: 9.3
+            MgO: 3.3
+            SiO2: 34.8
+          phases: KAlSiO4 + glassy phase
+          T_K_range: [1500, 1700]
+          A: 6.818
+          B: 18472.0
+          original_source: Plante and Cook (1978)
+          K2O_during_run_wt_pct_as_published: 18.9-17.6
+        - system: synthetic Eastern channel slag
+          composition_wt_pct:
+            K2O: 23.6
+            Al2O3: 25.5
+            Fe2O3: 12.5
+            CaO: 1.8
+            MgO: 0.6
+            SiO2: 36.0
+          phases: KAlSiO4 + glassy phase
+          T_K_range: [1600, 1750]
+          A: 6.831
+          B: 19056.0
+          original_source: Plante and Cook (1978)
+          K2O_during_run_wt_pct_as_published: 23.3-22.1
+        - system: illite
+          composition_wt_pct:
+            K2O: 7.4
+            Al2O3: 26.0
+            Fe2O3: 4.4
+            MgO: 2.1
+            SiO2: 60.2
+          phases: Liquid
+          T_K_range: [1550, 2085]
+          A: 6.286
+          B: 20642.0
+          original_source: Hastie et al. (1979)
+        - system: low melting synthetic slag K2
+          composition_wt_pct:
+            K2O: 8.7
+            Al2O3: 11.1
+            Fe2O3: 12.0
+            CaO: 13.9
+            MgO: 7.9
+            SiO2: 47.3
+          phases: Liquid
+          T_K_range: [1470, 1820]
+          A: 6.231
+          B: 17863.0
+          original_source: Hastie et al. (1980)
+          note: 6[K2O]; initial P_O2 >= P_K, later fell to the level of K2O
+        note: >-
+          T columns are ranges. A,B,C,D,E stored as printed; P(T) not evaluated.
+          Do not average with the 1975/1978/1979/1980 originals if those later
+          enter the store — competing_observation_do_not_average.
+      uncertainty:
+        note: >-
+          Western slags standard deviation ~30 percent, maximum ~100 percent
+          as printed. ZrO2 row may be low by a factor of two (footnote g).
+          No per-coefficient sigma except those statements.
+      equipment:
+        cell_material:
+          value: KMS (Plante 1979a); TMS apparatus is Pt (section 6.1) but Table 2 footnote d is KMS
+          locator:
+            page: 9
+            paragraph: primary experimental methods KMS and TMS
+        chamber_pressure:
+          value: KMS upper limit ~1e-4 atm as stated for the method (section 6); Table 2 rows are KMS
+          units: atm
+          locator:
+            page: 9
+            paragraph: upper pressure limits of 10^-4 and one atm
+    - observation_id: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
+      type: psat_series
+      locator:
+        figure: '4'
+        page: 51
+        note: also Figs 8-9; caption list report p. 51
+      T_range_K:
+      - 1550.0
+      - 2085.0
+      phase: illite_and_MHD_slag
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: P_K_P_O2_P_SiO_vs_T
+        status: typed_refusal
+        reason: >-
+          Fig. 4 (illite K, O2, SiO) and Figs 8-9 (MHD slag K/O2) are plotted
+          curves. Digitizing forbidden. Table 2 holds the logP coefficients only.
+        admission_status: rejected_no_figure_reading
+        original_source: Hastie et al. (1979) illite; Plante and Cook (1978) slags
+        access_path: NBSIR 81-2279 figures
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+  Na:
+    observations:
+    - observation_id: hastie_1981_nacl_liquid_logP_prose
+      type: psat_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        page: 11
+        published_page: 11
+        pdf_page_index: 17
+        paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
+      T_range_K:
+      - 1300.0
+      - 1300.0
+      phase: NaCl_liquid
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: NaCl(l)=NaCl(g) TMS test case
+      standard_state: NaCl(g) over NaCl(l)
+      regime: transpiration_mass_spectrometry
+      units: log10 P/atm
+      values:
+        quantity: log10_P_NaCl_atm
+        reaction_as_printed: NaCl(l) = NaCl(g)
+        A: 4.85
+        B: 8820.0
+        expression_as_printed: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
+        T_in_equation: kelvin
+        original_source: Bonnell and Hastie (1979)
+        access_path: NBSIR 81-2279 report p. 11
+        compilation_note: Detailed TMS numbers live in Bonnell & Hastie 1979; NBSIR reprints the second-law summary. JANAF 1971 values in parentheses are the compilation, not this experiment.
+        method_class: measured_direct
+        system_class: molten_salt
+        deltaH_v_1300_kcal_per_mol: 40.4
+        deltaH_v_sigma: 0.9
+        deltaS_v_1300_cal_per_deg_mol: 22.2
+        deltaS_v_sigma: 1.4
+        janaf_1971_in_parentheses:
+          deltaH_v_kcal_per_mol: 42.7
+          deltaH_v_sigma: 3.5
+          deltaS_v_cal_per_deg_mol: 24.2
+          deltaS_v_sigma: 0.5
+      uncertainty:
+        A_sigma: 0.3
+        B_sigma: 200.0
+        note: +- as printed on A and B; second-law envelope at 1300 K as printed
+      equipment:
+        cell_material:
+          value: platinum TMS reactor (boat, carrier, probe)
+          locator:
+            page: 9
+            paragraph: all of these components were fabricated from platinum metal
+        chamber_pressure:
+          value:
+            min_atm: 0.2
+            max_atm: 1.0
+            carrier: N2 or Ar
+          units: atm
+          locator:
+            page: 9
+            paragraph: usually operated at total pressures of 0.2 to 1.0 atm
+    - observation_id: hastie_1981_table3_solgasmix_model_not_measurement
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        table: '3'
+        page: 43
+        published_page: 43
+        pdf_page_index: 49
+      T_range_K:
+      - 1400.0
+      - 1400.0
+      phase: soda_lime_silica_glass_model
+      standard_state: Na2O activity as SOLGASMIX input (footnote c infinite reservoir)
+      regime: thermochemical_equilibrium_model
+      units: atm and dimensionless activity
+      values:
+        quantity: SOLGASMIX_alkali_speciation
+        method_class: model_derived
+        system_class: silicate_melt
+        model: SOLGASMIX (Eriksson 1975); data base mainly JANAF (1971)
+        glass_wt_pct:
+          Na2O: 17
+          CaO: 12
+          SiO2: 71
+        T_K: 1400.0
+        P_total_atm: 1.0
+        Na2O_activity_nonideal: 3.4e-8
+        Na2O_activity_ideal: 0.162
+        Na_P_atm_nonideal_N2: 3.1e-7
+        Na_P_atm_ideal_gas: 0.00022
+        Na_P_atm_nonideal_gas: 1.0e-7
+        total_Na_nonideal_gas_atm: 0.011
+        note: >-
+          Not a measurement. Footnote c: infinite supply of glass assumed;
+          activity not affected by vaporization loss. Halogen content is an
+          upper limit (footnote d). Do not score as KEMS p(T) or as measured a(Na2O).
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: model table; no experimental sigma
+    - observation_id: hastie_1981_fig5_glass_Na_figure_only_blocked
+      type: psat_series
+      locator:
+        figure: '5'
+        page: 51
+      T_range_K:
+      - 1200.0
+      - 1700.0
+      phase: soda_lime_silica_glass
+      regime: mixed_kms_tms
+      units: atm
+      values:
+        quantity: P_Na_over_soda_lime_glass
+        status: typed_refusal
+        reason: Fig. 5 is a plotted comparison of KMS/TMS this-work vs Sanders, Cable & Chaudhry and others. Digitizing forbidden.
+        admission_status: rejected_no_figure_reading
+        original_source: this campaign KMS/TMS; overlays are foreign
+        access_path: NBSIR 81-2279 Fig. 5
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+  Na2SO4:
+    observations:
+    - observation_id: hastie_1981_na2so4_second_law_prose
+      type: transition_point
+      locator:
+        page: 12
+        published_page: 12
+        pdf_page_index: 18
+        paragraph: Na2SO4(l) = 2Na + SO2 + O2
+      T_range_K:
+      - 1550.0
+      - 1550.0
+      phase: Na2SO4_liquid
+      regime: transpiration_and_kems
+      units: kcal/mol and cal/deg mol
+      values:
+        quantity: second_law_deltaH_deltaS
+        reaction_as_printed: Na2SO4(l) = 2Na + SO2 + O2
+        T_K: 1550.0
+        deltaH_v_kcal_per_mol: 69.8
+        deltaH_v_sigma: 3.0
+        deltaS_v_cal_per_deg_mol: 27.8
+        deltaS_v_sigma: 3.0
+        original_source: Bonnell and Hastie (1979)
+        access_path: NBSIR 81-2279 report p. 12
+        janaf_1971_in_parentheses:
+          deltaH_v_kcal_per_mol: 71.7
+          deltaH_v_sigma: 0.6
+          deltaS_v_cal_per_deg_mol: 29.7
+        method_class: measured_direct
+        note: Secondary Na2SO4(g) numbers are Kohl et al. (1975) and were not copied.
+      uncertainty:
+        note: +- 3 as printed on both deltaH and deltaS
+      equipment:
+        cell_material:
+          value: platinum TMS/KMS (Bonnell and Hastie 1979)
+          locator:
+            page: 12
+            paragraph: from our TMS and KMS second-law data (see Bonnell and Hastie, 1979)

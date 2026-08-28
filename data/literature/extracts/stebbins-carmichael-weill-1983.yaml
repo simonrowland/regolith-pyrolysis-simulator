@@ -1,0 +1,547 @@
+schema_version: literature_extract.v1
+source_id: stebbins-carmichael-weill-1983
+source:
+  citation: >-
+    Stebbins, J. F., Carmichael, I. S. E. & Weill, D. E. (1983), "The high
+    temperature liquid and glass heat contents and the heats of fusion of
+    diopside, albite, sanidine and nepheline", American Mineralogist 68,
+    717-730.
+  doi: null
+  year: 1983
+extraction:
+  method: repaired_source_pixel_tables
+  date: '2026-08-27'
+  worker: codex-extract-ingest
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
+review_status: draft
+species:
+  CaMgSi2O6:
+    observations:
+      - observation_id: stebbins_1983_diopside_calorimetry_tables_1_7
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
+          tables: ['1', '2', '3', '4', '6', '7']
+          pages: PDF pp. 4-7 / printed pp. 720-723
+        T_range_K: [293.0, 2000.0]
+        phase: CaMgSi2O6_glass_liquid_and_crystalline_diopside
+        standard_state: heat content referred to glass or 300 K state as table-specific; heat of fusion at 1 bar
+        regime: inverse_drop_calorimetry_DSC_and_compiled_calorimetry
+        units: as published
+        values:
+          composition: CaMgSi2O6
+          system: diopside_glass_liquid_and_crystal
+          method_class: measured_and_compiled_calorimetry
+          table_1_inverse_drop_calorimetry:
+            locator: {table: '1', page: PDF p. 4 / printed p. 720}
+            temperature_basis: enthalpies corrected to initial temperature 300 K
+            units: {T: K, enthalpy: cal/mol}
+            samples:
+              - {sample: Di-1, initial_quench_T_K: 1840, unannealed_H981_minus_H300_cal_per_mol: 35385, annealed_H981_minus_H300_cal_per_mol: 37011, predicted_H981_minus_H300_cal_per_mol: 36430}
+              - {sample: Di-2, initial_quench_T_K: 1845, unannealed_H981_minus_H300_cal_per_mol: 35304, annealed_H981_minus_H300_cal_per_mol: 36578}
+              - {sample: Di-3, initial_quench_T_K: 1724, unannealed_H981_minus_H300_cal_per_mol: 35624, annealed_H981_minus_H300_cal_per_mol: 36316}
+              - {sample: Di-4, initial_quench_T_K: 1725, unannealed_H981_minus_H300_cal_per_mol: 35850, annealed_H981_minus_H300_cal_per_mol: 36776}
+            printed_means: {unannealed_H981_minus_H300_cal_per_mol: 35541, annealed_H981_minus_H300_cal_per_mol: 36670}
+            printed_differences: {annealed_minus_unannealed_cal_per_mol: 1129, unannealed_high_T_minus_low_T_cal_per_mol: -392, annealed_minus_predicted_cal_per_mol: 240}
+          table_2_glass_heat_capacity:
+            locator: {table: '2', page: PDF p. 5 / printed p. 721}
+            units: {T: K, Cp: cal/mol/K}
+            point_basis: each published point is the average of 2-4 measurements
+            series:
+              - {T_K: 405.0, Cp_cal_per_mol_K: 46.81}
+              - {T_K: 409.9, Cp_cal_per_mol_K: 47.07}
+              - {T_K: 414.9, Cp_cal_per_mol_K: 47.29}
+              - {T_K: 419.9, Cp_cal_per_mol_K: 47.53}
+              - {T_K: 424.9, Cp_cal_per_mol_K: 47.78}
+              - {T_K: 429.9, Cp_cal_per_mol_K: 48.01}
+              - {T_K: 434.8, Cp_cal_per_mol_K: 48.23}
+              - {T_K: 439.8, Cp_cal_per_mol_K: 48.45}
+              - {T_K: 444.8, Cp_cal_per_mol_K: 48.68}
+              - {T_K: 449.8, Cp_cal_per_mol_K: 48.86}
+              - {T_K: 454.8, Cp_cal_per_mol_K: 49.03}
+              - {T_K: 459.7, Cp_cal_per_mol_K: 49.28}
+              - {T_K: 464.7, Cp_cal_per_mol_K: 49.45}
+              - {T_K: 469.7, Cp_cal_per_mol_K: 49.69}
+              - {T_K: 474.7, Cp_cal_per_mol_K: 49.85}
+              - {T_K: 479.7, Cp_cal_per_mol_K: 50.03}
+              - {T_K: 484.6, Cp_cal_per_mol_K: 50.21}
+              - {T_K: 489.6, Cp_cal_per_mol_K: 50.42}
+              - {T_K: 494.6, Cp_cal_per_mol_K: 50.60}
+              - {T_K: 499.6, Cp_cal_per_mol_K: 50.82}
+              - {T_K: 504.6, Cp_cal_per_mol_K: 51.00}
+              - {T_K: 509.6, Cp_cal_per_mol_K: 51.16}
+              - {T_K: 514.5, Cp_cal_per_mol_K: 51.29}
+              - {T_K: 519.5, Cp_cal_per_mol_K: 51.49}
+              - {T_K: 524.5, Cp_cal_per_mol_K: 51.65}
+              - {T_K: 529.5, Cp_cal_per_mol_K: 51.77}
+              - {T_K: 534.5, Cp_cal_per_mol_K: 51.92}
+              - {T_K: 539.4, Cp_cal_per_mol_K: 52.11}
+              - {T_K: 544.4, Cp_cal_per_mol_K: 52.29}
+              - {T_K: 549.4, Cp_cal_per_mol_K: 52.39}
+              - {T_K: 554.4, Cp_cal_per_mol_K: 52.54}
+              - {T_K: 559.4, Cp_cal_per_mol_K: 52.66}
+              - {T_K: 564.3, Cp_cal_per_mol_K: 52.77}
+              - {T_K: 569.3, Cp_cal_per_mol_K: 52.88}
+              - {T_K: 574.3, Cp_cal_per_mol_K: 53.04}
+              - {T_K: 579.3, Cp_cal_per_mol_K: 53.13}
+              - {T_K: 584.3, Cp_cal_per_mol_K: 53.27}
+              - {T_K: 589.2, Cp_cal_per_mol_K: 53.41}
+              - {T_K: 594.3, Cp_cal_per_mol_K: 53.53}
+              - {T_K: 599.3, Cp_cal_per_mol_K: 53.68}
+              - {T_K: 604.3, Cp_cal_per_mol_K: 53.74}
+              - {T_K: 609.3, Cp_cal_per_mol_K: 53.83}
+              - {T_K: 614.2, Cp_cal_per_mol_K: 54.00}
+              - {T_K: 619.2, Cp_cal_per_mol_K: 54.14}
+              - {T_K: 624.2, Cp_cal_per_mol_K: 54.26}
+              - {T_K: 629.2, Cp_cal_per_mol_K: 54.37}
+              - {T_K: 634.1, Cp_cal_per_mol_K: null, payload_status: CONTESTED, source_readings: [54.48, 54.49]}
+              - {T_K: 639.1, Cp_cal_per_mol_K: 54.61}
+              - {T_K: 644.1, Cp_cal_per_mol_K: 54.70}
+              - {T_K: 649.1, Cp_cal_per_mol_K: 54.78}
+              - {T_K: 654.1, Cp_cal_per_mol_K: 54.87}
+              - {T_K: 659.0, Cp_cal_per_mol_K: 55.07}
+              - {T_K: 664.0, Cp_cal_per_mol_K: 55.19}
+              - {T_K: 669.0, Cp_cal_per_mol_K: null, payload_status: CONTESTED, source_readings: [55.38, 55.39]}
+              - {T_K: 673.9, Cp_cal_per_mol_K: 55.41}
+              - {T_K: 678.9, Cp_cal_per_mol_K: 55.56}
+              - {T_K: 683.9, Cp_cal_per_mol_K: 55.59}
+              - {T_K: 688.8, Cp_cal_per_mol_K: 55.72}
+              - {T_K: 693.8, Cp_cal_per_mol_K: 55.86}
+              - {T_K: 694.9, Cp_cal_per_mol_K: 55.71}
+              - {T_K: 698.8, Cp_cal_per_mol_K: 55.92}
+              - {T_K: 699.9, Cp_cal_per_mol_K: 55.80}
+              - {T_K: 703.7, Cp_cal_per_mol_K: 56.02}
+              - {T_K: 704.8, Cp_cal_per_mol_K: 55.92}
+              - {T_K: 708.7, Cp_cal_per_mol_K: 56.11}
+              - {T_K: 709.8, Cp_cal_per_mol_K: 55.90}
+              - {T_K: 713.6, Cp_cal_per_mol_K: 56.24}
+              - {T_K: 714.7, Cp_cal_per_mol_K: 55.83}
+              - {T_K: 718.6, Cp_cal_per_mol_K: 56.32}
+              - {T_K: 719.7, Cp_cal_per_mol_K: 55.94}
+              - {T_K: 724.7, Cp_cal_per_mol_K: 56.01}
+              - {T_K: 729.6, Cp_cal_per_mol_K: 56.14}
+              - {T_K: 734.6, Cp_cal_per_mol_K: 56.26}
+              - {T_K: 739.6, Cp_cal_per_mol_K: 56.27}
+              - {T_K: 744.5, Cp_cal_per_mol_K: 56.23}
+              - {T_K: 749.5, Cp_cal_per_mol_K: 56.41}
+              - {T_K: 754.5, Cp_cal_per_mol_K: 56.63}
+              - {T_K: 759.4, Cp_cal_per_mol_K: 56.71}
+              - {T_K: 764.4, Cp_cal_per_mol_K: 56.75}
+              - {T_K: 769.4, Cp_cal_per_mol_K: 56.74}
+              - {T_K: 774.3, Cp_cal_per_mol_K: 57.03}
+              - {T_K: 779.3, Cp_cal_per_mol_K: 57.06}
+              - {T_K: 784.3, Cp_cal_per_mol_K: 57.04}
+              - {T_K: 789.2, Cp_cal_per_mol_K: 57.20}
+              - {T_K: 794.2, Cp_cal_per_mol_K: 57.29}
+              - {T_K: 799.1, Cp_cal_per_mol_K: 57.43}
+              - {T_K: 804.1, Cp_cal_per_mol_K: 57.58}
+              - {T_K: 809.1, Cp_cal_per_mol_K: 57.81}
+              - {T_K: 814.0, Cp_cal_per_mol_K: 57.72}
+              - {T_K: 814.7, Cp_cal_per_mol_K: 57.66}
+              - {T_K: 819.0, Cp_cal_per_mol_K: 57.83}
+              - {T_K: 819.6, Cp_cal_per_mol_K: 57.74}
+              - {T_K: 824.7, Cp_cal_per_mol_K: 57.81}
+              - {T_K: 829.6, Cp_cal_per_mol_K: 57.94}
+              - {T_K: 834.6, Cp_cal_per_mol_K: 58.04}
+              - {T_K: 839.5, Cp_cal_per_mol_K: 58.11}
+              - {T_K: 844.5, Cp_cal_per_mol_K: 58.22}
+              - {T_K: 849.5, Cp_cal_per_mol_K: 58.37}
+              - {T_K: 854.4, Cp_cal_per_mol_K: 58.48}
+              - {T_K: 859.4, Cp_cal_per_mol_K: 58.58}
+              - {T_K: 864.3, Cp_cal_per_mol_K: 58.68}
+              - {T_K: 868.3, Cp_cal_per_mol_K: 58.80}
+              - {T_K: 874.2, Cp_cal_per_mol_K: 58.92}
+              - {T_K: 879.2, Cp_cal_per_mol_K: 59.05}
+              - {T_K: 884.2, Cp_cal_per_mol_K: 59.15}
+              - {T_K: 889.1, Cp_cal_per_mol_K: 59.29}
+              - {T_K: 894.1, Cp_cal_per_mol_K: 59.47}
+              - {T_K: 899.0, Cp_cal_per_mol_K: 59.60}
+              - {T_K: 904.0, Cp_cal_per_mol_K: 59.77}
+              - {T_K: 905.5, Cp_cal_per_mol_K: 59.96}
+              - {T_K: 909.0, Cp_cal_per_mol_K: 59.96}
+              - {T_K: 910.4, Cp_cal_per_mol_K: 60.02}
+              - {T_K: 914.0, Cp_cal_per_mol_K: 60.10}
+              - {T_K: 915.4, Cp_cal_per_mol_K: 60.13}
+              - {T_K: 918.9, Cp_cal_per_mol_K: 60.20}
+              - {T_K: 920.3, Cp_cal_per_mol_K: 60.16}
+              - {T_K: 924.0, Cp_cal_per_mol_K: 60.38}
+              - {T_K: 925.3, Cp_cal_per_mol_K: 60.26}
+              - {T_K: 928.9, Cp_cal_per_mol_K: 60.42}
+              - {T_K: 930.2, Cp_cal_per_mol_K: 60.32}
+              - {T_K: 933.9, Cp_cal_per_mol_K: 60.60}
+              - {T_K: 935.2, Cp_cal_per_mol_K: 60.35}
+              - {T_K: 938.8, Cp_cal_per_mol_K: 60.69}
+              - {T_K: 940.2, Cp_cal_per_mol_K: 60.31}
+              - {T_K: 943.8, Cp_cal_per_mol_K: 60.78}
+              - {T_K: 945.1, Cp_cal_per_mol_K: 60.40}
+              - {T_K: 948.7, Cp_cal_per_mol_K: 60.85}
+              - {T_K: 950.1, Cp_cal_per_mol_K: 60.43}
+              - {T_K: 953.7, Cp_cal_per_mol_K: 60.93}
+              - {T_K: 955.0, Cp_cal_per_mol_K: 60.38}
+              - {T_K: 958.6, Cp_cal_per_mol_K: 61.02}
+              - {T_K: 960.0, Cp_cal_per_mol_K: 60.49}
+              - {T_K: 963.6, Cp_cal_per_mol_K: 61.19}
+              - {T_K: 965.0, Cp_cal_per_mol_K: 60.45}
+              - {T_K: 968.5, Cp_cal_per_mol_K: 61.20}
+              - {T_K: 969.9, Cp_cal_per_mol_K: 60.57}
+              - {T_K: 973.5, Cp_cal_per_mol_K: 61.35}
+              - {T_K: 974.9, Cp_cal_per_mol_K: 60.66}
+          table_3_heat_content:
+            locator: {table: '3', page: PDF p. 5 / printed p. 721}
+            units: {T: K, delta_H: cal/mol}
+            reference_state: H_T minus H_glass_300
+            glass_series:
+              - {T_K: 848.5, delta_H_cal_per_mol: 28680}
+              - {T_K: 849.1, delta_H_cal_per_mol: 28810}
+              - {T_K: 984.1, delta_H_cal_per_mol: 37360}
+              - {T_K: 984.4, delta_H_cal_per_mol: 37110}
+              - {T_K: 984.6, delta_H_cal_per_mol: 36880}
+              - {T_K: 985.3, delta_H_cal_per_mol: 37300}
+              - {T_K: 985.6, delta_H_cal_per_mol: 37000}
+            liquid_series:
+              - {T_K: 1680.6, delta_H_cal_per_mol: 91540}
+              - {T_K: 1681.0, delta_H_cal_per_mol: 91310}
+              - {T_K: 1760.4, delta_H_cal_per_mol: 98450}
+              - {T_K: 1760.9, delta_H_cal_per_mol: 98570}
+              - {T_K: 1833.0, delta_H_cal_per_mol: 104200}
+              - {T_K: 1839.8, delta_H_cal_per_mol: 105010}
+              - {T_K: 1840.5, delta_H_cal_per_mol: 104880}
+              - {T_K: 1850.4, delta_H_cal_per_mol: 105880}
+          table_4_heat_content_fit:
+            locator: {table: '4', page: PDF p. 6 / printed p. 722}
+            equation: H_T_minus_H_300 = A*T + B*T^2 + C*T^-1 + D*T^0.5 + E*T^3 + F
+            coefficient_units: table-scaled_as_printed
+            glass: {A_times_1e_minus1: 6.1656, B_times_1e3: 5.2012, C_times_1e_minus5: 3.5233, D_times_1e_minus2: -6.5476, E_times_1e6: 0, F_times_1e_minus3: -8.7986, T_range_K: [405, 975], n_Cp_points: 138, rmsd_Cp_cal_per_mol_K: 0.28, delta_H_T_range_K: [373, 986], n_delta_H_points: 11, rmsd_delta_H_cal_per_mol: 279}
+            liquid: {A_times_1e_minus1: 8.4413, B_times_1e3: 0, C_times_1e_minus5: 0, D_times_1e_minus2: 0, E_times_1e6: 0, F_times_1e_minus3: -50.345, delta_H_T_range_K: [1681, 1850], n_delta_H_points: 8, rmsd_delta_H_cal_per_mol: 169}
+          table_6_heat_of_vitrification:
+            locator: {table: '6', page: PDF p. 7 / printed p. 723}
+            units: {T: K, delta_H_v: kcal/mol}
+            estimates:
+              - {source: Weill et al. (1980a), T_K: 985, original_delta_H_v_kcal_per_mol: 20.46, corrected_to_985_K_kcal_per_mol: 20.46, corrected_to_985_K_with_annealing_kcal_per_mol: 20.46}
+              - {source: Navrotsky and Coons (1976), T_K: 986, original_delta_H_v_kcal_per_mol: 21.00, corrected_to_985_K_kcal_per_mol: 21.00, corrected_to_985_K_with_annealing_kcal_per_mol: 21.00}
+              - {source: Ferrier (1968a), T_K: 353, original_delta_H_v_kcal_per_mol: 22.22, corrected_to_985_K_kcal_per_mol: 22.28, corrected_to_985_K_with_annealing_kcal_per_mol: 21.18}
+              - {source: Tamman (1903), T_K: 293, original_delta_H_v_kcal_per_mol: 20.15, corrected_to_985_K_kcal_per_mol: 20.61, corrected_to_985_K_with_annealing_kcal_per_mol: 19.51}
+          table_7_heat_of_fusion:
+            locator: {table: '7', page: PDF p. 7 / printed p. 723}
+            pressure_bar: 1
+            T_K: 1665
+            units: kcal/mol
+            preferred_estimate: 33.0
+            preferred_uncertainty: 0.5
+            estimate_from_liquid_glass_Cp_and_Tg: 34.1
+            estimate_from_glass_Cp_only: 18.5
+            direct_measurement: 30.7
+            equations_cal_per_mol:
+              - 21.122*T - 1.1320e-4*T^2 - 3.0968e6*T^-1 + 17
+              - 26.117*T - 1.2775e-3*T^2 - 6935
+            simplified_equation_valid_range_K: [900, 2000]
+        uncertainty:
+          note: Per-point Table 2 uncertainty not reported; each point averages 2-4 measurements. Table 7 preferred heat of fusion is 33.0 +/- 0.5 kcal/mol. Two Table 2 cells remain CONTESTED and have null admitted values.
+        equipment: {}
+  NaAlSi3O8:
+    observations:
+      - observation_id: stebbins_1983_albite_analbite_calorimetry_tables_1_7
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
+          tables: ['1', '4', '5', '6', '7']
+          pages: PDF pp. 4-7 / printed pp. 720-723
+        T_range_K: [323.0, 2000.0]
+        phase: NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite
+        standard_state: heat content referred to glass or 300 K state as table-specific; heat of fusion at 1 bar
+        regime: inverse_drop_calorimetry_and_compiled_calorimetry
+        units: as published
+        values:
+          composition: NaAlSi3O8
+          system: albite_glass_liquid_and_analbite_crystal
+          method_class: measured_and_compiled_calorimetry
+          table_1_inverse_drop_calorimetry:
+            locator: {table: '1', page: PDF p. 4 / printed p. 720}
+            temperature_basis: enthalpies corrected to initial temperature 300 K
+            units: {T: K, enthalpy: cal/mol}
+            samples:
+              - {sample: Ab-1, initial_quench_T_K: 1816, unannealed_H981_minus_H300_cal_per_mol: 45293, annealed_H981_minus_H300_cal_per_mol: [46009, 46296], predicted_H981_minus_H300_cal_per_mol: 46145}
+              - {sample: Ab-2, initial_quench_T_K: 1815, unannealed_H981_minus_H300_cal_per_mol: 45558, annealed_H981_minus_H300_cal_per_mol: [46126, 46018]}
+              - {sample: Ab-3, initial_quench_T_K: 1540, unannealed_H981_minus_H300_cal_per_mol: 45796, annealed_H981_minus_H300_cal_per_mol: 45732}
+              - {sample: Ab-4, initial_quench_T_K: 1536, unannealed_H981_minus_H300_cal_per_mol: 45171, annealed_H981_minus_H300_cal_per_mol: 45880}
+            printed_means: {unannealed_H981_minus_H300_cal_per_mol: 45455, annealed_H981_minus_H300_cal_per_mol: 46010}
+            printed_differences: {annealed_minus_unannealed_cal_per_mol: 555, unannealed_high_T_minus_low_T_cal_per_mol: -58, annealed_minus_predicted_cal_per_mol: -135}
+          table_4_heat_content_fit:
+            locator: {table: '4', page: PDF p. 6 / printed p. 722}
+            equation: H_T_minus_H_300 = A*T + B*T^2 + C*T^-1 + D*T^0.5 + E*T^3 + F
+            coefficient_units: table-scaled_as_printed
+            glass: {A_times_1e_minus1: 10.822, B_times_1e3: 3.2327, C_times_1e_minus5: -0.1317, D_times_1e_minus2: -20.61, E_times_1e6: -1.701, F_times_1e_minus3: 3.0297, T_range_K: [307, 968], rmsd_Cp_cal_per_mol_K: 0.42, delta_H_T_range_K: [373, 1205], n_delta_H_points: 30, rmsd_delta_H_cal_per_mol: 131}
+            liquid: {A_times_1e_minus1: 8.820, B_times_1e3: 0, C_times_1e_minus5: 0, D_times_1e_minus2: 0, E_times_1e6: 0, F_times_1e_minus3: -43.070, delta_H_T_range_K: [1249, 1810], n_delta_H_points: 22, rmsd_delta_H_cal_per_mol: 370}
+          table_5_crystalline_analbite_and_albite_liquid:
+            locator: {table: '5', page: PDF p. 6 / printed p. 722}
+            units: {T: K, enthalpy: kcal/mol}
+            crystalline_analbite:
+              - {T_K: 1360.2, measured_H_T_minus_H300_kcal_per_mol: 73.69}
+              - {T_K: 1360.5, measured_H_T_minus_H300_kcal_per_mol: 73.76}
+              - {T_K: 1360.5, measured_H_T_minus_H300_kcal_per_mol: 74.73}
+              - {T_K: 1361.5, measured_H_T_minus_H300_kcal_per_mol: 73.78}
+              - {T_K: 1360.5, printed_mean_H_T_minus_H300_kcal_per_mol: 73.50, payload_status: SOURCE_INTERNAL_ARITHMETIC_CONTRADICTION}
+              - {T_K: 1360.5, measured_H_T_minus_H300_kcal_per_mol: 73.89, predicted_H_T_minus_H300_kcal_per_mol: 73.93}
+              - {T_K: 985.0, measured_H_T_minus_H300_kcal_per_mol: 45.22}
+              - {T_K: 985.0, measured_H_T_minus_H300_kcal_per_mol: 45.44}
+              - {T_K: 985.0, printed_mean_H_T_minus_H300_kcal_per_mol: 45.33, predicted_H_T_minus_H300_kcal_per_mol: 45.25}
+            low_albite_melted_at_T:
+              - {run: 1, T_K: 1413.8, measured_H_T_minus_H300_kcal_per_mol: 81.20, note: heated 120 h; presumably 10-15% crystals in glass}
+              - {run: 2, T_K: 1412.5, measured_H_T_minus_H300_kcal_per_mol: 80.75, note: second drop after 24 h; 10-15% crystals in glass}
+              - {run: mean, T_K: 1413.2, measured_H_T_minus_H300_kcal_per_mol: 80.96, predicted_H_T_minus_H300_kcal_per_mol: 81.57}
+              - {run: 3, T_K: 1702.5, measured_H_T_minus_H300_kcal_per_mol: 107.28, predicted_H_T_minus_H300_kcal_per_mol: 107.09, note: heated 12 h; no crystals observed}
+          table_6_heat_of_vitrification:
+            locator: {table: '6', page: PDF p. 7 / printed p. 723}
+            units: {T: K, delta_H_v: kcal/mol}
+            estimates:
+              - {source: Weill et al. (1980a), T_K: 985, original_delta_H_v_kcal_per_mol: 12.40, corrected_to_985_K_kcal_per_mol: 12.40, corrected_to_985_K_with_annealing_kcal_per_mol: 12.40}
+              - {source: Waldbaum and Robie (1971), T_K: 323, original_delta_H_v_kcal_per_mol: 11.66, corrected_to_985_K_kcal_per_mol: 12.82, corrected_to_985_K_with_annealing_kcal_per_mol: 12.27}
+              - {source: 'Hlabse and Kleppa (1968), Holm and Kleppa (1968)', T_K: 972, original_delta_H_v_kcal_per_mol: 11.67, corrected_to_985_K_kcal_per_mol: 11.67, corrected_to_985_K_with_annealing_kcal_per_mol: 11.67}
+              - {source: Kracek and Neuvonen (1952), T_K: 348, original_delta_H_v_kcal_per_mol: 9.45, corrected_to_985_K_kcal_per_mol: 10.58, corrected_to_985_K_with_annealing_kcal_per_mol: 10.03}
+          table_7_heat_of_fusion:
+            locator: {table: '7', page: PDF p. 7 / printed p. 723}
+            pressure_bar: 1
+            T_K: 1373
+            units: kcal/mol
+            preferred_estimate: 15.0
+            preferred_uncertainty: 0.5
+            estimate_from_liquid_glass_Cp_and_Tg: 15.4
+            estimate_from_glass_Cp_only: 14.0
+            equations_cal_per_mol:
+              - -72.27*T + 1.7531e-2*T^2 + 7.586e5*T^-1 + 3.8116e-3*T^0.5 - 2.9151e-6*T^3 - 53110
+              - 21.195*T - 3.912e-3*T^2 - 6760
+            simplified_equation_valid_range_K: [900, 2000]
+        uncertainty:
+          note: Table 7 preferred heat of fusion is 15.0 +/- 0.5 kcal/mol. Table 5 printed 73.50 mean conflicts with its four printed components; both are preserved.
+        equipment: {}
+  KAlSi3O8:
+    observations:
+      - observation_id: stebbins_1983_sanidine_calorimetry_tables_3_7
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
+          tables: ['3', '4', '6', '7']
+          pages: PDF pp. 5-7 / printed pp. 721-723
+        T_range_K: [293.0, 2000.0]
+        phase: KAlSi3O8_glass_liquid_and_crystalline_sanidine
+        standard_state: heat content referred to glass at 300 K; heat of fusion at 1 bar
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: as published
+        values:
+          composition: KAlSi3O8
+          system: sanidine_glass_liquid_and_crystal
+          method_class: measured_and_compiled_calorimetry
+          table_3_heat_content:
+            locator: {table: '3', page: PDF p. 5 / printed p. 721}
+            units: {T: K, delta_H: cal/mol}
+            reference_state: H_T minus H_glass_300
+            glass_series:
+              - {T_K: 983.5, delta_H_cal_per_mol: 46210}
+              - {T_K: 983.7, delta_H_cal_per_mol: 46420}
+              - {T_K: 1094.2, delta_H_cal_per_mol: 54650}
+              - {T_K: 1095.1, delta_H_cal_per_mol: 55000}
+              - {T_K: 1223.5, delta_H_cal_per_mol: 64660}
+              - {T_K: 1224.1, delta_H_cal_per_mol: 64730}
+            liquid_series:
+              - {T_K: 1342.7, delta_H_cal_per_mol: 73670}
+              - {T_K: 1343.1, delta_H_cal_per_mol: 73520}
+              - {T_K: 1519.6, delta_H_cal_per_mol: 89600}
+              - {T_K: 1520.4, delta_H_cal_per_mol: 89700}
+              - {T_K: 1702.4, delta_H_cal_per_mol: 105400}
+              - {T_K: 1702.4, delta_H_cal_per_mol: 105520}
+              - {T_K: 1862.7, delta_H_cal_per_mol: 120780}
+              - {T_K: 1863.4, delta_H_cal_per_mol: 119880}
+          table_4_heat_content_fit:
+            locator: {table: '4', page: PDF p. 6 / printed p. 722}
+            equation: H_T_minus_H_300 = A*T + B*T^2 + C*T^-1 + D*T^0.5 + E*T^3 + F
+            coefficient_units: table-scaled_as_printed
+            glass: {A_times_1e_minus1: 12.491, B_times_1e3: -4.6099, C_times_1e_minus5: -1.2255, D_times_1e_minus2: -25.388, E_times_1e6: 0, F_times_1e_minus3: 7.3225, T_range_K: [303, 968], n_Cp_points: 78, rmsd_Cp_cal_per_mol_K: 0.42, delta_H_T_range_K: [984, 1224], n_delta_H_points: 6, rmsd_delta_H_cal_per_mol: 368}
+            liquid: {A_times_1e_minus1: 8.950, B_times_1e3: 0, C_times_1e_minus5: 0, D_times_1e_minus2: 0, E_times_1e6: 0, F_times_1e_minus3: -46.568, delta_H_T_range_K: [1343, 1863], n_delta_H_points: 8, rmsd_delta_H_cal_per_mol: 332}
+          table_6_heat_of_vitrification:
+            locator: {table: '6', page: PDF p. 7 / printed p. 723}
+            units: {T: K, delta_H_v: kcal/mol}
+            correction_basis: corrected to 300 K; final column includes annealing estimate
+            estimates:
+              - {source: Waldbaum and Robie (1971), T_K: 323, original_delta_H_v_kcal_per_mol: 10.70, corrected_to_300_K_kcal_per_mol: 10.67, corrected_to_300_K_with_annealing_kcal_per_mol: 10.12}
+              - {source: Tamman (1903), T_K: 293, original_delta_H_v_kcal_per_mol: [23, 5], value_semantics: 23_plus_or_minus_5, corrected_to_300_K_kcal_per_mol: [23, 5], corrected_to_300_K_with_annealing_kcal_per_mol: [23, 5]}
+          table_7_heat_of_fusion:
+            locator: {table: '7', page: PDF p. 7 / printed p. 723}
+            pressure_bar: 1
+            T_K: 1473
+            metastable: true
+            units: kcal/mol
+            preferred_estimate: 13.8
+            preferred_uncertainty: 1.0
+            estimate_from_glass_Cp_only: 11.9
+            equations_cal_per_mol:
+              - -76.23*T + 2.0519e-2*T^2 + 8.2749e5*T^-1 + 3.9701e-3*T^0.5 - 3.9187e-6*T^3 - 58883
+              - 25.429*T - 5.2361e-3*T^2 - 12338
+            simplified_equation_valid_range_K: [900, 2000]
+        uncertainty:
+          note: Table 7 preferred heat of fusion is 13.8 +/- 1.0 kcal/mol. Tamman Table 6 range remains 23 +/- 5, not a midpoint.
+        equipment: {}
+  NaAlSiO4:
+    observations:
+      - observation_id: stebbins_1983_nepheline_calorimetry_tables_3_7
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
+          tables: ['3', '4', '6', '7']
+          pages: PDF pp. 5-7 / printed pp. 721-723
+        T_range_K: [985.0, 2000.0]
+        phase: NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline
+        standard_state: heat content referred to glass at 300 K; heat of fusion at 1 bar
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: as published
+        values:
+          composition: NaAlSiO4
+          system: nepheline_glass_liquid_and_crystal
+          method_class: measured_and_compiled_calorimetry
+          table_3_heat_content:
+            locator: {table: '3', page: PDF p. 5 / printed p. 721}
+            units: {T: K, delta_H: cal/mol}
+            reference_state: H_T minus H_glass_300
+            glass_series:
+              - {T_K: 984.6, delta_H_cal_per_mol: 25967}
+              - {T_K: 984.6, delta_H_cal_per_mol: 25913}
+              - {T_K: 984.6, delta_H_cal_per_mol: 25810}
+            liquid_series:
+              - {T_K: 1815.5, delta_H_cal_per_mol: 68104}
+              - {T_K: 1815.5, delta_H_cal_per_mol: 68052}
+              - {T_K: 1901.9, delta_H_cal_per_mol: 72492}
+              - {T_K: 1901.6, delta_H_cal_per_mol: 72791}
+          table_4_heat_content_fit:
+            locator: {table: '4', page: PDF p. 6 / printed p. 722}
+            equation: H_T_minus_H_300 = A*T + B*T^2 + C*T^-1 + D*T^0.5 + E*T^3 + F
+            coefficient_units: table-scaled_as_printed
+            glass: {A_times_1e_minus1: 4.26, B_times_1e3: 0, C_times_1e_minus5: 0, D_times_1e_minus2: 0, E_times_1e6: 0, F_times_1e_minus3: -16.064, delta_H_T_K: 985, n_delta_H_points: 3, rmsd_delta_H_cal_per_mol: 78}
+            liquid: {A_times_1e_minus1: 5.290, B_times_1e3: 0, C_times_1e_minus5: 0, D_times_1e_minus2: 0, E_times_1e6: 0, F_times_1e_minus3: -27.969, delta_H_T_range_K: [1816, 1902], n_delta_H_points: 4, rmsd_delta_H_cal_per_mol: 226}
+          table_6_heat_of_vitrification:
+            locator: {table: '6', page: PDF p. 7 / printed p. 723}
+            units: {T: K, delta_H_v: kcal/mol}
+            estimates:
+              - {source: Navrotsky et al. (1980), T_K: 985, original_delta_H_v_kcal_per_mol: 6.13, corrected_to_985_K_kcal_per_mol: 6.13, corrected_to_985_K_with_annealing_kcal_per_mol: 6.13}
+          table_7_heat_of_fusion:
+            locator: {table: '7', page: PDF p. 7 / printed p. 723}
+            pressure_bar: 1
+            T_K: 1750
+            metastable: true
+            units: kcal/mol
+            preferred_estimate: 11.7
+            preferred_uncertainty: 0.5
+            equations_cal_per_mol:
+              - 11.795*T - 6.5966e-4*T^2 - 6948
+            simplified_equation_valid_range_K: [900, 2000]
+        uncertainty:
+          note: Table 7 preferred heat of fusion is 11.7 +/- 0.5 kcal/mol; no per-point Table 3 uncertainty is stated.
+        equipment: {}
+  CaAl2Si2O8:
+    observations:
+      - observation_id: stebbins_1983_anorthite_calorimetry_tables_1_7
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
+          tables: ['1', '7']
+          pages: PDF pp. 4 and 7 / printed pp. 720 and 723
+        T_range_K: [981.0, 1862.0]
+        phase: CaAl2Si2O8_glass_and_crystalline_anorthite
+        standard_state: heat content referred to 300 K; heat of fusion at 1 bar
+        regime: inverse_drop_calorimetry_and_compiled_calorimetry
+        units: as published
+        values:
+          composition: CaAl2Si2O8
+          system: anorthite_glass_and_crystal
+          method_class: measured_and_compiled_calorimetry
+          table_1_inverse_drop_calorimetry:
+            locator: {table: '1', page: PDF p. 4 / printed p. 720}
+            temperature_basis: enthalpies corrected to initial temperature 300 K
+            units: {T: K, enthalpy: cal/mol}
+            samples:
+              - {sample: An-1, initial_quench_T_K: 1861, unannealed_H981_minus_H300_cal_per_mol: 46249, annealed_H981_minus_H300_cal_per_mol: 46381, predicted_H981_minus_H300_cal_per_mol: 46357}
+              - {sample: An-2, initial_quench_T_K: 1862, unannealed_H981_minus_H300_cal_per_mol: 46270, annealed_H981_minus_H300_cal_per_mol: 46270}
+            printed_means: {unannealed_H981_minus_H300_cal_per_mol: 46260, annealed_H981_minus_H300_cal_per_mol: 46416, payload_status: SOURCE_INTERNAL_ARITHMETIC_CONTRADICTION}
+            printed_differences: {annealed_minus_unannealed_cal_per_mol: 156, annealed_minus_predicted_cal_per_mol: 59}
+            contradiction_note: Both repair tools read the An-2 annealed cell as 46270; that value and An-1 46381 do not average to the printed mean 46416. All printed values are preserved.
+          table_7_heat_of_fusion:
+            locator: {table: '7', page: PDF p. 7 / printed p. 723}
+            pressure_bar: 1
+            T_K: 1830
+            units: kcal/mol
+            preferred_estimate: 32.4
+            estimate_from_glass_Cp_only: 19.4
+            preferred_estimate_source: Weill et al. (1980b)
+        uncertainty:
+          note: Table 7 states no uncertainty for the anorthite 32.4 kcal/mol preferred estimate. Table 1 printed mean contradiction is preserved without correction.
+        equipment: {}
+fidelity_samples:
+  - species: CaMgSi2O6
+    observable: gibbs_table
+    observation_id: stebbins_1983_diopside_calorimetry_tables_1_7
+    field: table_7_heat_of_fusion
+    value:
+      locator: {table: '7', page: PDF p. 7 / printed p. 723}
+      pressure_bar: 1
+      T_K: 1665
+      units: kcal/mol
+      preferred_estimate: 33.0
+      preferred_uncertainty: 0.5
+      estimate_from_liquid_glass_Cp_and_Tg: 34.1
+      estimate_from_glass_Cp_only: 18.5
+      direct_measurement: 30.7
+      equations_cal_per_mol:
+        - 21.122*T - 1.1320e-4*T^2 - 3.0968e6*T^-1 + 17
+        - 26.117*T - 1.2775e-3*T^2 - 6935
+      simplified_equation_valid_range_K: [900, 2000]
+    locator: {source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md, table: '7', page: PDF p. 7 / printed p. 723, T_K: 1665, uncertainty_kcal_per_mol: 0.5}
+  - species: NaAlSi3O8
+    observable: gibbs_table
+    observation_id: stebbins_1983_albite_analbite_calorimetry_tables_1_7
+    field: table_7_heat_of_fusion
+    value:
+      locator: {table: '7', page: PDF p. 7 / printed p. 723}
+      pressure_bar: 1
+      T_K: 1373
+      units: kcal/mol
+      preferred_estimate: 15.0
+      preferred_uncertainty: 0.5
+      estimate_from_liquid_glass_Cp_and_Tg: 15.4
+      estimate_from_glass_Cp_only: 14.0
+      equations_cal_per_mol:
+        - -72.27*T + 1.7531e-2*T^2 + 7.586e5*T^-1 + 3.8116e-3*T^0.5 - 2.9151e-6*T^3 - 53110
+        - 21.195*T - 3.912e-3*T^2 - 6760
+      simplified_equation_valid_range_K: [900, 2000]
+    locator: {source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md, table: '7', page: PDF p. 7 / printed p. 723, T_K: 1373, uncertainty_kcal_per_mol: 0.5}
+  - species: KAlSi3O8
+    observable: gibbs_table
+    observation_id: stebbins_1983_sanidine_calorimetry_tables_3_7
+    field: table_7_heat_of_fusion
+    value:
+      locator: {table: '7', page: PDF p. 7 / printed p. 723}
+      pressure_bar: 1
+      T_K: 1473
+      metastable: true
+      units: kcal/mol
+      preferred_estimate: 13.8
+      preferred_uncertainty: 1.0
+      estimate_from_glass_Cp_only: 11.9
+      equations_cal_per_mol:
+        - -76.23*T + 2.0519e-2*T^2 + 8.2749e5*T^-1 + 3.9701e-3*T^0.5 - 3.9187e-6*T^3 - 58883
+        - 25.429*T - 5.2361e-3*T^2 - 12338
+      simplified_equation_valid_range_K: [900, 2000]
+    locator: {source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md, table: '7', page: PDF p. 7 / printed p. 723, T_K: 1473, uncertainty_kcal_per_mol: 1.0, metastable: true}
+  - species: NaAlSiO4
+    observable: gibbs_table
+    observation_id: stebbins_1983_nepheline_calorimetry_tables_3_7
+    field: table_7_heat_of_fusion
+    value:
+      locator: {table: '7', page: PDF p. 7 / printed p. 723}
+      pressure_bar: 1
+      T_K: 1750
+      metastable: true
+      units: kcal/mol
+      preferred_estimate: 11.7
+      preferred_uncertainty: 0.5
+      equations_cal_per_mol:
+        - 11.795*T - 6.5966e-4*T^2 - 6948
+      simplified_equation_valid_range_K: [900, 2000]
+    locator: {source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md, table: '7', page: PDF p. 7 / printed p. 723, T_K: 1750, uncertainty_kcal_per_mol: 0.5, metastable: true}

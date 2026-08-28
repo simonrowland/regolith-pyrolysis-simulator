@@ -1,0 +1,275 @@
+schema_version: literature_extract.v1
+source_id: kems-006-zhang-2021
+source:
+  citation: "Zhang et al. (2021), vacuum evaporation of Na, K and Rb from a basaltic silicate melt; diffusion-limited alkali loss. PDF in docs/references/pdfs/99-kems-langmuir/kems-006-zhang-2021.pdf"
+  year: 2021
+extraction:
+  method: pdftotext -layout + visual certification of Tables 1–4 (PDF pp. 71–74); Studio-2 MinerU not ready; no figure digitization
+  date: '2026-08-27'
+  worker: tail-close
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/
+review_status: draft
+fidelity_samples:
+  - species: Na
+    observable: alpha
+    observation_id: zhang_2021_table4_this_study_evaporation_coefficients
+    field: gamma_evaporation_coefficient
+    value: 0.14
+    locator:
+      page: 74
+      table: '4'
+      note: Table 4 Bas1400C γNa 0.14±0.03; pin is the central value as stored
+  - species: Na
+    observable: rate_series
+    observation_id: zhang_2021_table1_residue_compositions
+    field: initial_glass_Na2O_wt_pct
+    value: 2.27
+    locator:
+      page: 71
+      table: '1'
+species:
+  Na:
+    observations:
+    - observation_id: zhang_2021_table1_residue_compositions
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        table: '1'
+        page: 71
+      T_range_K:
+      - 1473.15
+      - 1673.15
+      phase: basaltic_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Vacuum evaporation of a basaltic glass; residues quenched. Zero-time samples are the kinetic t=0 reference.
+      regime: langmuir_free_evaporation
+      units: wt_percent
+      values:
+        quantity: epma_residue_composition_vs_time
+        initial_glass_Na2O_wt_pct: 2.27
+        starting_glass_wt_pct:
+          Na2O: 2.27
+          MgO: 7.09
+          CaO: 11.21
+          TiO2: 1.79
+          SiO2: 45.94
+          Al2O3: 16.00
+          FeO: 10.67
+          K2O: 2.49
+          Rb2O: 1.86
+        starting_Fe3_over_Fetotal: 0.85
+        bdl_as_published: b.d.l.
+        runs:
+        - sample: Bas1400C0m1
+          T_C: 1400
+          t_min: 0
+          Na2O: 1.90
+          K2O: 2.50
+        - sample: Bas1400C15m
+          T_C: 1400
+          t_min: 15
+          Na2O: 0.66
+          K2O: 1.63
+        - sample: Bas1400C30m
+          T_C: 1400
+          t_min: 30
+          Na2O: 0.29
+          K2O: 1.19
+        - sample: Bas1400C60m
+          T_C: 1400
+          t_min: 60
+          Na2O: 0.01
+          K2O: 0.28
+        - sample: Bas1400C90m
+          T_C: 1400
+          t_min: 90
+          Na2O: b.d.l.
+          K2O: 0.05
+        - sample: Bas1200C0h2
+          T_C: 1200
+          t_min: 0
+          Na2O: 2.30
+          K2O: 2.58
+        - sample: Bas1200C1h
+          T_C: 1200
+          t_min: 55
+          Na2O: 1.99
+          K2O: 2.53
+        - sample: Bas1200C4h
+          T_C: 1200
+          t_min: 235
+          Na2O: 1.08
+          K2O: 2.15
+        - sample: Bas1200C10h
+          T_C: 1200
+          t_min: 595
+          Na2O: 0.69
+          K2O: 1.84
+        - sample: Bas1200C40h
+          T_C: 1200
+          t_min: 2395
+          Na2O: 0.10
+          K2O: 1.09
+        note: Full EPMA + isotope grid is in tables.md. b.d.l. not replaced with zero.
+      uncertainty:
+        note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+      equipment:
+        chamber_pressure:
+          value: <1.0e-9
+          units: bar
+          locator:
+            page: 74
+            table: '4'
+            paragraph: P(bar) column Bas1400C / Bas1200C
+    - observation_id: zhang_2021_table4_this_study_evaporation_coefficients
+      type: alpha
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        table: '4'
+        page: 74
+      T_range_K:
+      - 1473.15
+      - 1673.15
+      phase: basaltic_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Authors' γ is the Hertz–Knudsen evaporation coefficient (this store's alpha). Γ is the melt activity coefficient.
+      standard_state: NaO0.5 activity from MELTS-family models; vacuum free evaporation
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_gamma_equals_alpha
+        gas_species: Na(g)
+        material: basaltic_glass_this_study
+        gamma_evaporation_coefficient: 0.14
+        per_temperature:
+        - T_K: 1673.15
+          T_C: 1400
+          P_bar_as_published: <10^{-9}
+          alpha: 0.14
+          alpha_sigma: 0.03
+          Gamma_NaO0.5: 1.9e-4
+          alpha_times_Gamma: 2.62e-5
+        - T_K: 1473.15
+          T_C: 1200
+          P_bar_as_published: <10^{-9}
+          alpha: 0.08
+          alpha_sigma: 0.02
+          Gamma_NaO0.5: 4.1e-5
+          alpha_times_Gamma: 3.20e-6
+        fO2_as_published:
+          starting_glass: log10 fO2 = IW+11.1 = FMQ+6.8 from Fe3+/Fetotal 0.85
+          during_1400_C_run: IW+3.7 to IW+2.6
+          during_1200_C_run: IW+4.6 to IW+2.2
+          kind: modelled_from_Fe_redox_and_alkali_loss_not_imposed
+        prose_best_fit_1200_C: 0.08
+        prose_best_fit_1400_C: 0.14
+        arrhenius_ln_alpha_Gamma_as_published: ln(γNa ΓNaO0.5) = −22239/T + 2.4979
+        note: Starred Table 4 rows are re-analyses of Richter/Yu/Fedkin/Alexander/Sossi and are not copied as this-work measurements.
+      uncertainty:
+        alpha_range_1400_C: [0.11, 0.17]
+        alpha_range_1200_C: [0.06, 0.10]
+        note: ± as printed in Table 4
+      equipment:
+        chamber_pressure:
+          value: <1.0e-9
+          units: bar
+          locator:
+            page: 74
+            table: '4'
+        sample_surface_area:
+          value:
+            R_cm: 0.15
+            note: Table 3 equivalent-sphere radius used in L=vR/D
+          units: cm_radius
+          inferred: true
+          inference: Table 3 lists R = 0.15 cm for all this-study rows; area not independently printed
+          locator:
+            page: 73
+            table: '3'
+    - observation_id: zhang_2021_table3_diffusion_limitation
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        table: '3'
+        page: 73
+      T_range_K:
+      - 1473.15
+      - 1673.15
+      phase: basaltic_silicate_melt
+      regime: langmuir_free_evaporation
+      units: as_published
+      values:
+        quantity: diffusion_limitation_L_equals_vR_over_D
+        Na_1400_C:
+          R_cm: 0.15
+          v_cm_s: 6.6e-5
+          D_cm2_s: 1.98e-5
+          L: 0.5
+          theta_correction: 0.91
+        Na_1200_C:
+          R_cm: 0.15
+          v_cm_s: 1.0e-6
+          D_cm2_s_as_published: '>3.0e-6'
+          L: 0
+          theta_correction: 1
+        note: 1400 °C Na is diffusion-influenced (L=0.5); 1200 °C Na L=0. Bounds stay bounds.
+      uncertainty:
+        note: 1200 °C D and L are inequalities as printed
+  K:
+    observations:
+    - observation_id: zhang_2021_table4_K_evaporation_coefficients
+      type: alpha
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        table: '4'
+        page: 74
+      T_range_K:
+      - 1473.15
+      - 1673.15
+      phase: basaltic_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_gamma_equals_alpha
+        gas_species: K(g)
+        per_temperature:
+        - T_K: 1673.15
+          T_C: 1400
+          P_bar_as_published: <10^{-9}
+          alpha: 0.13
+          alpha_sigma: 0.1
+          Gamma_KO0.5: 8.4e-6
+          alpha_times_Gamma: 1.11e-6
+        - T_K: 1473.15
+          T_C: 1200
+          P_bar_as_published: <10^{-9}
+          alpha: 0.05
+          alpha_sigma: 0.02
+          Gamma_KO0.5: 1.3e-6
+          alpha_times_Gamma: 6.90e-8
+        prose_best_fit_1200_C: 0.054
+        prose_best_fit_1400_C: 0.132
+        contradiction_prose_vs_table4:
+          1200_C: {prose: 0.054, table4: 0.05}
+          1400_C: {prose: 0.132, table4: 0.13}
+          resolution: none_both_printed
+        arrhenius_ln_alpha_Gamma_as_published: ln(γK ΓKO0.5) = −29265/T + 3.4593
+      uncertainty:
+        note: Table 4 ±0.1 at 1400 °C is printed (large); prose 0.132 is a distinct printed value
+      equipment:
+        chamber_pressure:
+          value: <1.0e-9
+          units: bar
+          locator:
+            page: 74
+            table: '4'

@@ -1,0 +1,389 @@
+schema_version: literature_extract.v1
+source_id: kems-035-sauerborn-2005
+source:
+  citation: "Sauerborn, M. (2005), \"Pyrolyse von Metalloxiden und Silikaten unter Vakuum mit konzentrierter Solarstrahlung\", Dissertation, Rheinische Friedrich-Wilhelms-Universität Bonn"
+  year: 2005
+extraction:
+  method: pdftotext -layout of German text-layer PDF + visual certification of Tabellen 2.1, 4.1, 5.1, 5.2, 5.3, 5.4, 5.6, 5.7, 5.8; QMS figures and Abb. 2.2 not digitized
+  date: '2026-08-27'
+  worker: tail-close
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/
+review_status: draft
+fidelity_samples:
+  - species: Na
+    observable: rate_series
+    observation_id: sauerborn_2005_table53_jsc1_run_log
+    field: MS1_Tmax_C
+    value: 1542
+    locator:
+      page: 79
+      table: '5.3'
+      note: maximale Probentemperatur MS1
+  - species: Na
+    observable: rate_series
+    observation_id: sauerborn_2005_table54_ms1_cold_trap_edx
+    field: MS1_foil_Na_atom_pct_mean
+    value: 9.6
+    locator:
+      page: 85
+      table: '5.4'
+species:
+  Na:
+    observations:
+    - observation_id: sauerborn_2005_table21_lunar_soil_element_wt
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        table: '2.1'
+        page: 15
+      T_range_K: null
+      phase: lunar_regolith_compilation_HeVa91
+      regime: compiled_composition
+      units: wt_percent_element
+      values:
+        quantity: bulk_element_wt_pct
+        headers_as_published: 'Element | Hochland-Region (Apollo 14, Apollo 16) | Mare-Region (Apollo 12, Luna)'
+        caption_as_published: 'Atomare Zusammensetzung verschiedener Mondstaubproben unterschiedlicher Mondmissionen und -regionen (in Gew.%.) [HeVa 91].'
+        method_class: secondary_compilation
+        rows:
+        - sample: Apollo 14
+          region: Hochland
+          O: 45.0
+          Si: 22.5
+          Al: 9.3
+          Ca: 7.9
+          Na: 0.5
+          Mg: 5.5
+          Fe: 8.1
+          Ti: 1.0
+          uebrige: 0.3
+        - sample: Apollo 16
+          region: Hochland
+          O: 45.0
+          Si: 21.1
+          Al: 14.2
+          Ca: 11.1
+          Na: 0.4
+          Mg: 3.6
+          Fe: 4.3
+          Ti: 0.4
+          uebrige: 1.0
+        - sample: Apollo 12
+          region: Mare
+          O: 43.0
+          Si: 21.8
+          Al: 7.2
+          Ca: 7.2
+          Na: 0.4
+          Mg: 5.8
+          Fe: 12.1
+          Ti: 1.6
+          uebrige: 0.9
+        - sample: Luna
+          region: Mare
+          O: 43.0
+          Si: 19.9
+          Al: 8.1
+          Ca: 8.9
+          Na: 0.3
+          Mg: 5.3
+          Fe: 13.0
+          Ti: 2.0
+          uebrige: 0.4
+        decimal_comma_as_published: true
+      uncertainty:
+        note: compilation; no uncertainty printed
+    - observation_id: sauerborn_2005_jsc1_composition_figure_only_blocked
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        figure: '2.2'
+        page: 17
+        paragraph: Kapitel 2.1.2
+      T_range_K: null
+      phase: JSC-1_lunar_soil_simulant
+      regime: analytical_composition
+      units: none
+      values:
+        quantity: jsc1_oxide_suite
+        status: typed_refusal
+        reason: JSC-1 bulk oxides appear only in Abbildung 2.2; Table 4.1 points to Kapitel 2.1.2 rather than reprinting numbers. Figure digitization forbidden.
+        MELTS_liquidus_C_as_published: 1264
+        MELTS_liquidus_locator:
+          page: 17
+          paragraph: Eine Untersuchung mit dem Simulationsprogramm MELTS
+        table_41_ca_1265_C: 1265
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+    - observation_id: sauerborn_2005_table53_jsc1_run_log
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        table: '5.3'
+        page: 79
+      T_range_K:
+      - 1698.15
+      - 1853.15
+      phase: JSC-1_solar_furnace_melt
+      condensed_form:
+        state: partially_to_fully_molten_simulant
+        metastable: false
+        basis: explicit_author
+        note: Prose p. 104 MS1/MS2 fully molten; MS4/MS5 residual granulate remained.
+      regime: solar_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: jsc1_run_surface_temperature_log
+        headers_as_published: 'maximale Probentemperatur (Tmax) | Probenmasse | Bestrahlungsdauer der Hochtemperaturphase (Shutter > 10 % geöffnet)'
+        MS1_Tmax_C: 1542
+        MS2_Tmax_C: 1563
+        MS4_Tmax_C: 1425
+        MS5_Tmax_C: 1580
+        runs:
+        - id: MS1
+          Tmax_C: 1542
+          mass_g: 0.717
+          high_T_duration_s: 77
+          t_above_1400_C_s: 31
+        - id: MS2
+          Tmax_C: 1563
+          mass_g: 0.991
+          high_T_duration_s: 55
+          t_above_1400_C_s: 30
+        - id: MS4
+          Tmax_C: 1425
+          mass_g: 1.002
+          high_T_duration_s: 38
+          t_above_1400_C_s: 10
+        - id: MS5
+          Tmax_C: 1580
+          mass_g: 7.856
+          high_T_duration_s: 174
+          t_above_1400_C_s: 45
+        pO2_as_published: not_independently_controlled
+        note: Full heating/cooling-rate grid is in tables.md. Tmax vs Tabelle 5.8 contradiction preserved on the 5.8 observation.
+      uncertainty:
+        note: IR-camera surface temperatures; no printed sigma on Tmax
+      equipment:
+        cell_material:
+          value: plasmagespritzte Aluminiumoxidkeramik (Schale or Tiegel)
+          locator:
+            page: 51
+            table: '4.1'
+        chamber_pressure:
+          value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+          units: mbar
+          locator:
+            page: 68
+            table: '5.1'
+    - observation_id: sauerborn_2005_table54_ms1_cold_trap_edx
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        table: '5.4'
+        page: 85
+      T_range_K:
+      - 1815.15
+      - 1815.15
+      phase: JSC-1_MS1_cold_trap_deposit
+      regime: solar_vacuum_pyrolysis_condensation
+      units: atom_percent_excluding_oxygen
+      values:
+        quantity: cold_trap_edx_atom_pct
+        headers_as_published: 'Na Mg Al Si P K Ca Ti Fe Cu (Atom.%; ohne Sauerstoffanteil)'
+        MS1_foil_Na_atom_pct_mean: 9.6
+        foil_without_splashes:
+          Na: {mean: 9.6, sd: 1.7}
+          Mg: {mean: 0.3, sd: 0.1}
+          Al: {mean: 0.4, sd: 0.1}
+          Si: {mean: 0.4, sd: 0.0}
+          P: {mean: 1.2, sd: 0.0}
+          K: {mean: 0.1, sd: 0.0}
+          Ca: {mean: 0.1, sd: 0.0}
+          Ti: {mean: 0.1, sd: 0.0}
+          Fe: {mean: 0.4, sd: 0.1}
+          Cu: {mean: 87.6, sd: 2.1}
+        splashes:
+          Na: 42.0
+          Mg: 0.4
+          Al: 2.3
+          Si: 0.5
+          P: 9.9
+          K: 1.1
+          Ca: 0.0
+          Ti: 0.0
+          Fe: 0.4
+          Cu: 43.4
+        splash_oxygen_atom_pct_as_published: ueber 65
+        blank_foil_Na_mean: 0.6
+        Tmax_C_from_table53: 1542
+        note: Copper foil; Cu is substrate. Oxygen omitted from the table by author.
+      uncertainty:
+        note: printed Standardabweichung on foil means; splash is a single Wert
+    - observation_id: sauerborn_2005_table58_outgassing_peaks
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        table: '5.8'
+        page: 104
+      T_range_K:
+      - 1073.15
+      - 1853.15
+      phase: JSC-1_and_empty_holder
+      regime: solar_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: ausheiz_peak_duration_and_pressure_ratio
+        headers_as_published: 'Probe | Masse [g] | max. Temp. [°C] | Halbwertsbreite* der Ausheiz-Peaks | Verhältnis zwischen Peak-Höhe und Basisdruck'
+        runs:
+        - id: leerer_Probentraeger
+          mass_g: null
+          Tmax_C: 800
+          halfwidth_preheat_s: 287
+          halfwidth_highT_s: 7
+          peak_to_base_preheat: 1.2
+          peak_to_base_highT: 2.1
+        - id: MS1
+          mass_g: 0.72
+          Tmax_C: 1560
+          halfwidth_preheat_s: 251
+          halfwidth_highT_s: 22
+          peak_to_base_preheat: 4.2
+          peak_to_base_highT: 17.1
+        - id: MS5
+          mass_g: 7.86
+          Tmax_C: 1580
+          halfwidth_preheat_s_as_published: '> 571'
+          halfwidth_highT_s: 56
+          peak_to_base_preheat: 5.4
+          peak_to_base_highT: 6.9
+        contradiction_MS1_Tmax_C:
+          table_5_3: 1542
+          table_5_8: 1560
+          resolution: none_both_printed
+        note: Bound >571 s stays a bound.
+      uncertainty:
+        note: none printed
+    - observation_id: sauerborn_2005_qms_traces_figure_only_blocked
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        figure: '5.1'
+        page: 69
+        note: Abb. 5.1–5.3 and MS QMS/IR time series
+      T_range_K:
+      - 1073.15
+      - 1853.15
+      phase: solar_furnace_chamber_gas
+      regime: qms_chamber
+      units: mbar
+      values:
+        quantity: qms_partial_pressure_time_series
+        status: typed_refusal
+        reason: QMS/IR traces are figures. MinerU markdown dumps of those figures rejected. No printed p_i(T) table.
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+  Fe:
+    observations:
+    - observation_id: sauerborn_2005_table56_ms5c_epma
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        table: '5.6'
+        page: 103
+      T_range_K:
+      - 1853.15
+      - 1853.15
+      phase: JSC-1_MS5c_residue_polished_section
+      condensed_form:
+        state: quenched_partially_molten_residue
+        metastable: false
+        basis: explicit_author
+        note: EMPA of MS5c cross-section; mixed analyses print FeO > 100 wt%. Not a bulk melt composition.
+      regime: post_run_microprobe
+      units: wt_percent
+      values:
+        quantity: epma_spot_analyses_wt_pct
+        headers_as_published: 'Nr. | SiO2 | TiO2 | Al2O3 | Cr2O3 | FeO | MnO | MgO | CaO | Na2O | NiO | Σ | Mineral | Detail-Info'
+        caption_as_published: 'Alle Angaben in Gew.%.'
+        spots_as_published_in_tables_md: true
+        selected_spots:
+        - Nr: 4
+          mineral: Olivin
+          detail: Fo17-Fa83
+          SiO2: 40.34
+          FeO: 15.39
+          MgO: 42.79
+          sum: 99.2
+        - Nr: 7
+          mineral: Plagioklas
+          detail: An71-Al29
+          SiO2: 50.61
+          Al2O3: 30.06
+          CaO: 14.24
+          Na2O: 3.2
+          sum: 99.2
+        - Nr: 1
+          mineral: Mischanalyse
+          detail: Fe mit Chromit
+          FeO: 112.52
+          Cr2O3: 11.75
+          sum: 124.6
+        sum_not_renormalized: true
+        note: Full 29-spot grid is in tables.md. Σ ≠ 100 and FeO 112.52 are printed mixed analyses.
+      uncertainty:
+        note: none printed; mixed-analysis sums >100 are source format, not transcription error
+  O2:
+    observations:
+    - observation_id: sauerborn_2005_table51_oxide_reference_runs
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        table: '5.1'
+        page: 68
+      T_range_K:
+      - 1073.15
+      - 1911.15
+      phase: simple_oxide_and_empty_holder
+      regime: solar_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: reference_run_log
+        headers_as_published: 'ohne Probe | CaO | SiO2 | ZnO'
+        CaO_Tmax_C: 1638
+        SiO2_Tmax_C: 1400
+        ZnO_Tmax_C: 1188
+        empty_Tmax_C: 800
+        masses_g: {CaO: 0.7789, SiO2: 0.6719, ZnO: 0.6072}
+        highT_chamber_peak_mbar: {ohne_Probe: 3.2e-4, CaO: 6.1e-2, SiO2: 3.5e-3, ZnO: 2.7e-2}
+        SiO2_mass_loss_wt_pct_prose: 1.1
+        SiO2_mass_loss_locator: {page: 75, paragraph: Der ermittelte Massenverlust der Probe betrug 1,1 Gew.%}
+        ZnO_t_above_800_C: ILLEGIBLE
+        note: ZnO t(Tmax>800 °C) cell is clipped to a trailing s. Not filled.
+      uncertainty:
+        note: ILLEGIBLE cell not guessed
+    - observation_id: sauerborn_2005_table52_cao_cold_trap_edx
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        table: '5.2'
+        page: 73
+      T_range_K:
+      - 1911.15
+      - 1911.15
+      phase: CaO_cold_trap_on_tantalum
+      regime: solar_vacuum_pyrolysis_condensation
+      units: atom_percent
+      values:
+        quantity: cold_trap_edx_atom_pct
+        headers_as_published: 'O Na Mg Al Si P K Ca Ti Fe Ta'
+        untreated_foil_mean: {O: 17.4, Na: 0.3, Mg: 0.0, Al: 0.0, Si: 0.0, P: 0.8, K: 0.2, Ca: 0.1, Ti: 0.0, Fe: 0.1, Ta: 81.1}
+        CaO_foil: {O: 48.0, Na: 0.3, Mg: 0.0, Al: 0.0, Si: 0.0, P: 0.8, K: 0.0, Ca: 2.0, Ti: 0.0, Fe: 0.0, Ta: 48.9}
+        Tmax_C_from_table51: 1638
+        note: Author states XRD found no pyrolysis products in the CaO residue, only CaO plus post-air Ca(OH)2.
+      uncertainty:
+        note: untreated-foil Standardabweichung printed in tables.md

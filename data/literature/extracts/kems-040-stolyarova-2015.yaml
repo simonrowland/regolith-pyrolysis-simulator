@@ -1,0 +1,106 @@
+schema_version: literature_extract.v1
+source_id: kems-040-stolyarova-2015
+source:
+  citation: "Stolyarova, V. L. (2015), \"Vaporization and Thermodynamics of Glass-Forming Oxide Melts: Mass Spectrometric Study and Modeling\", J. Materials Science and Chemical Engineering 3:81–86, DOI 10.4236/msce.2015.37009"
+  doi: 10.4236/msce.2015.37009
+  year: 2015
+extraction:
+  method: pdftotext -layout + visual certification of Table 1; Figs 1–2 not digitized
+  date: '2026-08-27'
+  worker: tail-close
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-040-stolyarova-2015/
+review_status: draft
+fidelity_samples:
+  - species: SiO
+    observable: rate_series
+    observation_id: stolyarova_2015_table1_vapour_species_map
+    field: quantity
+    value: vapour_species_map_no_numeric_pressures
+    locator:
+      page: 82
+      table: '1'
+species:
+  SiO:
+    observations:
+    - observation_id: stolyarova_2015_table1_vapour_species_map
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-040-stolyarova-2015/tables.md
+        table: '1'
+        page: 82
+      T_range_K:
+      - 1000.0
+      - 1800.0
+      phase: ternary_glass_forming_oxide_melts
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        condensed_phase: glass_forming_oxide_melt
+        note: Table 1 lists vapour species and T windows only. No activities or partial pressures. MoO2/MoO3 are cell-material vapours.
+        systems:
+        - system: MgO-B2O3-SiO2
+          T_K_as_published: 1550-1800
+          vapour_species_as_published: B2O3, SiO, MgB2O4, MoO2, MoO3
+          references: '[9]'
+        - system: CaO-B2O3-SiO2
+          T_K_as_published: '1800'
+          vapour_species_as_published: B2O3, SiO, CaB2O4, MoO2, MoO3
+          references: '[10] [11]'
+        - system: SrO-B2O3-SiO2
+          T_K_as_published: 1720-1800
+          vapour_species_as_published: B2O3, SiO, SrB2O4, MoO2, MoO3
+          references: '[11] [12]'
+        - system: BaO-B2O3-SiO2
+          T_K_as_published: 1650-1730
+          vapour_species_as_published: B2O3, SiO, BaB2O4, MoO2, MoO3
+          references: '[11] [13]'
+        - system: PbO-B2O3-SiO2
+          T_K_as_published: '1100'
+          vapour_species_as_published: PbO, Pb, O2
+          references: '[14]–[16]'
+        - system: ZnO-B2O3-SiO2
+          T_K_as_published: '1250'
+          vapour_species_as_published: Zn, O2
+          references: '[15]–[17]'
+        - system: CdO-B2O3-SiO2
+          T_K_as_published: '1023'
+          vapour_species_as_published: Cd, O2
+          references: '[16] [17]'
+        - system: Bi2O3-B2O3-SiO2
+          T_K_as_published: '1000'
+          vapour_species_as_published: Bi, O2
+          references: '[17]'
+        - system: Bi2O3-GeO2-SiO2
+          T_K_as_published: '1200'
+          vapour_species_as_published: Bi, O2
+          references: '[18]'
+      uncertainty:
+        note: none; no numeric p or a
+      equipment:
+        cell_material:
+          value: molybdenum effusion cells (quartz for PbO-B2O3-SiO2; Ir-plated Mo for Bi systems); two-cell sample vs pure oxide; gold vapour-pressure calibration; 25 eV electron ionization
+          locator:
+            page: 82
+            paragraph: Experimental
+    - observation_id: stolyarova_2015_fig1_2_isoactivity_figure_only_blocked
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        page: 83
+        note: also Fig. 2 p. 84
+      T_range_K:
+      - 1200.0
+      - 1200.0
+      phase: Bi2O3-B2O3-SiO2_and_Bi2O3-GeO2-SiO2
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: Bi2O3_isoactivity_and_excess_gibbs
+        status: typed_refusal
+        reason: Figs 1–2 are contour plots. No tabulated activity points. Digitizing forbidden.
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable

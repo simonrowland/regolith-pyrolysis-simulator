@@ -1,0 +1,276 @@
+schema_version: literature_extract.v1
+source_id: kems-036-sesko-2024
+source:
+  citation: "Šeško, R., Lamboley, K., Cutard, T., Grill, L., Reiss, P. & Cowley, A. (2024), \"Oxygen production by solar vapor-phase pyrolysis of lunar regolith simulant\", Acta Astronautica 224:215–225, DOI 10.1016/j.actaastro.2024.08.009"
+  doi: 10.1016/j.actaastro.2024.08.009
+  year: 2024
+extraction:
+  method: born-digital pdftotext -layout + visual certification of Tables 1–2; MinerU figure-~ dumps rejected; no figure digitization
+  date: '2026-08-27'
+  worker: tail-close
+  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/
+review_status: draft
+fidelity_samples:
+  - species: Na
+    observable: gibbs_table
+    observation_id: sesko_2024_table1_eac1_simulant_composition
+    field: Na2O_wt_pct
+    value: 2.95
+    locator:
+      page: 216
+      table: '1'
+      note: Table 1 EAC-1 column Na2O wt% as printed
+  - species: Na
+    observable: rate_series
+    observation_id: sesko_2024_crucible_deposit_edx
+    field: needle_Na_wt_pct_approximate
+    value: 30
+    locator:
+      page: 221
+      paragraph: experimental_results_deposit_edx
+species:
+  Na:
+    observations:
+    - observation_id: sesko_2024_table1_eac1_simulant_composition
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        table: '1'
+        page: 216
+        paragraph: Regolith and regolith simulant geochemical compositions in % by weight
+      T_range_K: null
+      phase: lunar_regolith_simulant_EAC-1A
+      condensed_form:
+        state: granular_simulant_as_loaded
+        metastable: false
+        basis: explicit_author
+        note: Table 1 header prints EAC-1; body text uses EAC-1A (Alvarez 2017 composition). Starting material for the solar-furnace experiment, not a melt analysis.
+      standard_state: bulk oxide wt% as compiled for FactSage input and as the experimental feedstock
+      regime: analytical_composition
+      units: wt_percent
+      values:
+        quantity: bulk_sample_composition
+        sample: EAC-1
+        sample_aliases:
+        - EAC-1A
+        temperature_as_published: not_reported_not_applicable
+        Na2O_wt_pct: 2.95
+        major_oxide_wt_pct:
+          SiO2: 44.41
+          FeO: 0.00
+          MgO: 12.09
+          CaO: 10.98
+          Al2O3: 12.80
+          TiO2: 2.44
+          Cr2O3: 0.00
+          MnO: 0.20
+          Na2O: 2.95
+          K2O: 1.32
+          Fe2O3: 12.20
+          P2O5: 0.61
+          Total: 100.00
+        composition_basis: Alvarez_2017_as_cited
+        header_as_published: EAC-1
+        body_name_as_published: EAC-1A
+        note: First simulant composition admitted to the extract store. FeO printed 0.00; iron is carried as Fe2O3 12.20.
+      uncertainty:
+        note: no uncertainty printed on Table 1; totals 100.00
+    - observation_id: sesko_2024_table1_literature_feedstock_compositions
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        table: '1'
+        page: 216
+      T_range_K: null
+      phase: lunar_soil_compositions_used_for_factsage
+      regime: compiled_composition
+      units: wt_percent
+      values:
+        quantity: compiled_bulk_compositions
+        method_class: secondary_compilation
+        samples:
+        - sample: '24999'
+          class: Mare
+          source_as_published: Papike et al. [21]
+          major_oxide_wt_pct: {SiO2: 44.61, FeO: 20.83, MgO: 10.97, CaO: 10.87, Al2O3: 10.77, TiO2: 0.99, Cr2O3: 0.42, MnO: 0.28, Na2O: 0.23, K2O: 0.02, Fe2O3: 0.00, P2O5: 0.00, Total: 99.99}
+        - sample: '64501'
+          class: Highland
+          source_as_published: Papike et al. [21]
+          major_oxide_wt_pct: {SiO2: 45.42, FeO: 4.49, MgO: 4.39, CaO: 16.77, Al2O3: 27.85, TiO2: 0.45, Cr2O3: 0.08, MnO: 0.06, Na2O: 0.40, K2O: 0.09, Fe2O3: 0.00, P2O5: 0.00, Total: 100.00}
+        - sample: '70051'
+          class: High-Ti Mare
+          source_as_published: Hill et al. [22]
+          major_oxide_wt_pct: {SiO2: 43.22, FeO: 12.70, MgO: 10.55, CaO: 11.78, Al2O3: 16.08, TiO2: 5.21, Cr2O3: 0.00, MnO: 0.15, Na2O: 0.25, K2O: 0.07, Fe2O3: 0.00, P2O5: 0.00, Total: 100.01}
+        note: Used as FactSage inputs; not measured in this work.
+      uncertainty:
+        note: as printed; 24999 total 99.99 and 70051 total 100.01 are printed
+    - observation_id: sesko_2024_crucible_deposit_edx
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        page: 221
+        paragraph: experimental_results_deposit_edx
+      T_range_K:
+      - 1750.0
+      - 1900.0
+      phase: EAC-1A_solar_pyrolysis_crucible_deposit
+      condensed_form:
+        state: condensate_on_alumina_crucible
+        metastable: false
+        basis: explicit_author
+        note: Post-run EDX of foamy and acicular crystals on the crucible wall, not a melt analysis.
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: wt_percent
+      values:
+        quantity: deposit_edx_wt_pct_ranges
+        gas_species:
+        - Na
+        - K
+        - Si
+        - Fe
+        material: EAC-1A
+        needle_Na_wt_pct_approximate: 30
+        K_wt_pct_range:
+        - 5
+        - 8
+        Si_wt_pct_range:
+        - 7
+        - 20
+        Fe_as_published: traces_in_bottom_brown_layer_not_a_wt_pct
+        deposit_thickness_um: 31.3
+        deposit_thickness_qualifier: optical_cross_section_printed_on_Fig_13
+        typical_deposit_thickness_um_as_published: usually around 30
+        p_chamber_mbar_range:
+        - 1.0e-7
+        - 1.0e-2
+        p_chamber_qualifier: oscillating_range
+        surface_T_K_range:
+        - 1750
+        - 1900
+        sample_mass_g: 10.0
+        pO2_as_published: not_independently_controlled
+        exposure_duration_as_published: not_stated
+        semantics: bound_not_point_ordering
+        note: Ranges stay ranges; approx. 30 wt% Na stays approximate. No species partial pressure. First simulant deposit measurement in the extract store.
+      uncertainty:
+        note: K 5–8 wt% and Si 7–20 wt% are printed ranges; Na is approx. 30 wt%; 31.3 μm is the printed optical label
+      equipment:
+        cell_material:
+          value: alumina ceramic crucible
+          locator:
+            page: 217
+            paragraph: experimental_procedure
+        chamber_pressure:
+          value:
+            min_mbar: 1.0e-7
+            max_mbar: 1.0e-2
+            qualifier: oscillating_range
+          units: mbar
+          locator:
+            page: 217
+            paragraph: During the exposure, vacuum pressure measurements oscillated
+    - observation_id: sesko_2024_fig6_16_figure_only_blocked
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        figure: '6'
+        page: 219
+        note: also Fig. 16 p. 223; MinerU ~ dumps rejected
+      T_range_K:
+      - 1500.0
+      - 3700.0
+      phase: FactSage_Mare_24999_model
+      regime: thermochemical_equilibrium_model
+      units: mass_fraction
+      values:
+        quantity: factsage_yield_grid_figure_only
+        status: typed_refusal
+        reason: Figs 6 and 16 are contour/line figures; MinerU dumped approximate ~ tables; figure digitization is forbidden.
+        method_class: model_derived
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable; no tabulated points
+  O2:
+    observations:
+    - observation_id: sesko_2024_table2_factsage_and_literature_o2_yield
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        table: '2'
+        page: 221
+      T_range_K:
+      - 1500.0
+      - 3700.0
+      phase: FactSage_8_1_equilibrium
+      regime: thermochemical_equilibrium_model
+      units: percent_mass_yield
+      values:
+        quantity: equilibrium_molecular_oxygen_yield
+        method_class: model_derived
+        gas_species: O2
+        this_work_ranges:
+        - composition: Mare, 24999
+          O2_yield_pct_range: [9, 14]
+          T_range_as_published: 1500–3700 K
+        - composition: Highland, 64501
+          O2_yield_pct_range: [7, 9]
+          T_range_as_published: 1500–3700 K
+        - composition: Mare, 70051
+          O2_yield_pct_range: [8, 12]
+          T_range_as_published: 1500–3700 K
+        literature_as_published:
+        - source: '[4,5]'
+          O2_yield: 20%
+          composition: unclear
+          T: ~3000 K
+          comments: O2 dissociation neglected
+        - source: '[6]'
+          O2_yield: 16%
+          composition: Highland
+          T: 2000–2200 K
+        - source: '[6]'
+          O2_yield: 20%
+          composition: Mare
+          T: 2000–2200 K
+        - source: '[6]'
+          O2_yield: 35%
+          composition: Highland
+          T: '>2500 K'
+        - source: '[6]'
+          O2_yield: 25%
+          composition: Mare
+          T: '>2500 K'
+        - source: '[10]'
+          O2_yield: 10%–15%
+          composition: Mare
+          T: 1800–2100 °C / 1300–1400 °C
+        prose_this_work_peak_below_1e-6_mbar_pct: 14
+        prose_melting_regime_peak_at_1e-5_mbar_pct_range: [12, 13]
+        prose_conclusion_range_pct: [6.6, 14.1]
+        semantics: bound_not_point_ordering
+        note: All “This work” yields are FactSage 8.1, not measured. Ranges not collapsed.
+      uncertainty:
+        note: yields published as ranges; no experimental O2 mass collected
+  K:
+    observations:
+    - observation_id: sesko_2024_deposit_K_edx_range
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        page: 221
+        paragraph: both deposit regions showed K concentrations ranging from 5 to 8 wt%
+      T_range_K:
+      - 1750.0
+      - 1900.0
+      phase: EAC-1A_crucible_deposit
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: wt_percent
+      values:
+        quantity: deposit_K_wt_pct_range
+        K_wt_pct_range: [5, 8]
+        material: EAC-1A
+        pO2_as_published: not_independently_controlled
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: printed range 5–8 wt%; no single-point EDX table
