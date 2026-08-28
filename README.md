@@ -77,6 +77,72 @@ Depending on feedstock and route, the simulator tracks or estimates:
 
 The goal is to make the materials ledger visible: not only "how much oxygen," but what else is produced, preserved, lost, or made dangerous.
 
+## What An Operator Can Ask It
+
+Each question below has a surface you can drive today. Where the surface is partial, that is said
+here rather than left for you to discover.
+
+**"Moon rock in, ingots out — what does one batch actually produce?"**
+`python -m simulator.three_product_runner --feedstock <id> --campaign C2A --hours N` reports the
+four product classes of `CLAUDE.md` §5 — metals + O2, pure silica glass, industrial mixed glass,
+refractory ceramic rump — alongside an `ingots_metals` / `oxygen` / `glass` / `captured_volatiles`
+breakdown. It also reports `unclassified`, which is the honesty account: mass the classifier could
+not assign. A growing `unclassified` is a finding about the classifier, not a product.
+
+**"How high can yield go if the furnace is only rated to 1300 °C?"**
+`python -m simulator.optimize --constrained-max` switches the study to yield-under-ceilings mode,
+where wall coating becomes a furnace-lifespan cost rather than a hard gate. Pair it with the
+ceiling you actually have: `--furnace-temp-cap-C`, `--cycle-time-cap-h`, and `--pin DOTTED.PATH`
+to freeze a knob the search may not move. These are optimizer gates over the modelled process,
+not a hardware qualification.
+
+**"Do we need MRE at all?"**
+This is the default rather than a special mode: `c5_enabled` is `False` throughout, so electrolysis
+is opt-in and the no-MRE run is the baseline. The web optimizer's **MRE catalog** field
+(`mre_preset_id`) selects which species set a study may use, so the comparison is a setting rather
+than a rebuild.
+
+**"When is pyrolysis a useful MRE pretreatment rather than a competing process?"**
+The same lever, read the other way: run the `mre_baseline` track against a pyrolysis-then-MRE run
+on the same feedstock and compare the ledgers. `--track {pyrolysis,mre_baseline}` selects which,
+and both write the same output schema, so the two documents are directly comparable.
+
+**"Which feedstocks produce useful Fe, Mg, glass, alkalis, salts, sulfur streams, or oxygen?"**
+`data/feedstocks.yaml` carries 29 keys — 19 modelled in-situ compositions and 10 terrestrial
+simulants. The simulants carry a `class` key and a `provenance` block naming the XRF composition
+citation, because they exist to reproduce lab experiments against the material actually used in
+them — they are not stand-ins for in-situ regolith. Sweeping the catalog is a matter of looping the
+batch runner; nothing in the runner is feedstock-specific.
+
+**"Can I trade recipe knobs against product grade?"**
+Every run emits `stage_purity_report`, the per-stage designated / coproduct / impurity split with a
+PURE / MIXED / CONTAMINATED verdict, so a selectivity claim is checkable per condenser stage. The
+grading policies live in `data/glass_types.yaml` and `data/ceramics_taxonomy.yaml`. The §5
+early-tap option — stop before the SiO release window and tap a mixed industrial glass — is
+`--early-tap` on the three-product runner.
+
+**"Could a crude furnace build a better one?"**
+Partly. `sintered_regolith` is a selectable liner in `data/furnace_materials.yaml`, consumed by the
+campaign, liner-life, and thermal-budget models, so you can run the process under a crude furnace's
+temperature ceiling and see what it costs. The refractory rump is reported every run. **Chaining
+one generation's rump into the next generation's liner is not a modelled loop** — the bootstrap
+chain has to be walked by hand, one run at a time.
+
+**"How much does overhead pO2 suppress SiO boiloff?"**
+`python -m simulator.runner.sio_tsweep` and `sio_yield` drive the temperature/ramp grids directly;
+two worked sweeps are checked in under `docs/sio_tsweep_*.md`.
+
+**"How does Mars CO2 backpressure change the first stage?"**
+Mars feedstocks carrying `surface_pressure_mbar` run Stage 0 against a CO2 pressure floor instead
+of hard vacuum. Airless feedstocks stay on hard vacuum unless a campaign sets a managed atmosphere.
+
+**"Where do volatile streams become hardware or safety constraints?"**
+Per-hour `wall_deposit_delta_kg` / `wall_deposit_cumulative_kg` nest as `{segment: {species: kg}}`,
+so a deposit is attributable to the pipe segment that caught it; `condensation_refusals_by_species`
+records what the deposition model refused to route; and Stage 0 reports foulant disposition by hour
+and group. Both wall maps are empty on a run that evolves nothing — a cold C0 batch reports `{}`,
+which is an absence of flux, not an absence of instrumentation.
+
 ## Interfaces
 
 The web app:
@@ -254,16 +320,6 @@ Two literature stores back that, and the split is load-bearing:
   friends). The engine *consumes* these as reference data, so they produce no scoring rows;
   they refuse as `gibbs_table_not_runtime_observable`. Scoring the engine against a table it
   already reads would be circular. See `data/literature/compilations/README.md`.
-
-Mars feedstocks with `surface_pressure_mbar` run Stage 0/C0 against a CO2 pressure floor instead of hard vacuum. Airless feedstocks still use hard vacuum unless a campaign sets a managed atmosphere.
-
-Useful questions for the current model:
-
-- How much does overhead pO2 suppress SiO boiloff?
-- When is pyrolysis a useful MRE pretreatment rather than a competing process?
-- Which feedstocks produce useful Fe, Mg, glass, alkalis, salts, sulfur streams, or oxygen?
-- Where do volatile streams become hardware or safety constraints?
-- How does Mars CO2 backpressure change the first stage of refining?
 
 ## Development
 
