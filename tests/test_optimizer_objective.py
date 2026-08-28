@@ -1668,6 +1668,43 @@ def test_sso2_owner_recipe_patch_is_named_allowlisted_fe_then_sio() -> None:
     ) == pytest.approx(SSO2_CERTIFIED_PN2_MBAR)
 
 
+def _sso2_sim_alpha_fallback_disabled(*, hours: int = 3):
+    """Same SSO-2 owner recipe with the prototype alpha fallback left at its
+    production default (disabled) — the refusal-direction leg of the b-314
+    both-directions pin. Steps hour by hour and collects each hour's
+    missing-alpha refusal records, because the last-diagnostic slot is
+    volatile (later pipeline stages overwrite it) and a species only appears
+    in an hour where its pressure is positive."""
+    from simulator.optimize import sso2_evidence as _sso2
+    from simulator.runner import PyrolysisRun
+    from simulator.session import SimSession
+
+    patch = _sso2.sso2_owner_recipe_setpoints_patch()
+    dose_kg = _sso2._certified_full_feo_equiv_na_dose_kg(
+        mass_kg=1000.0,
+        backend_name=_sso2.ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        setpoints_patch=patch,
+    )
+    run = PyrolysisRun(
+        feedstock_id=_sso2.SSO2_FEEDSTOCK_ID,
+        campaign="C2A_staged",
+        hours=int(hours),
+        mass_kg=1000.0,
+        backend_name=_sso2.ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        additives_kg={_sso2.SSO2_CERTIFIED_DOSE_SPECIES: dose_kg},
+        setpoints_patch=patch,
+    )
+    session = SimSession().start(run._session_config())
+    _sso2._apply_certified_na_dose(session.simulator)
+    sim = session.simulator
+    missing_alpha_by_hour = []
+    for _ in range(int(hours)):
+        sim.step()
+        diag = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+        missing_alpha_by_hour.append(diag.get("missing_alpha") or {})
+    return sim, missing_alpha_by_hour
+
+
 def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> None:
     execution = build_sso2_owner_recipe_execution(hours=9)
     evidence = sso2_owner_recipe_evidence(execution)
@@ -1714,9 +1751,57 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     fallback = evidence["prototype_alpha_fallback_provenance"]
     # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4) made the typed VapourBatch
     # the eligibility authority: CrO2's policy-only alpha row is a missing
-    # channel contract, not an executable alpha value.  The explicit prototype
-    # fallback opt-in therefore remains visible but must not engage.
+    # channel contract, not an executable alpha value.
+    # 0c6d9811 (b-314) then wired the broad_proxy_not_intrinsic predicate into
+    # flux admission: CrO2's tier-2 proxy (inherited from Cr metal) no longer
+    # satisfies the measured-alpha requirement, so the explicitly gated
+    # alpha=1.0 prototype fallback — which SSO-2 opts into for exactly this
+    # trace species — now engages instead of the proxy silently driving flux
+    # as if it were a measurement.  The engagement is the designed visible
+    # signal; the evidence surface must report it, not hide it.
     assert fallback == {
+        "severity": "warning",
+        "status": "engaged",
+        "policy": "alpha=1.0 prototype fallback",
+        "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
+        "permitted_species": ["CrO2"],
+        "engaged_species": ["CrO2"],
+        "total_engagement_count": 9,
+    }
+    report = _markdown_report(evidence, execution)
+    assert "WARNING prototype_alpha_fallback" in report
+    assert "alpha=1.0 prototype fallback" in report
+    assert "status=`engaged`" in report
+    assert "permitted_species=`CrO2`" in report
+    assert "engaged_species=`CrO2`" in report
+    assert "engagement_count=`9`" in report
+
+    # Refusal direction of the same b-314 pin: with the fallback control at
+    # its production default (disabled), the same recipe must NOT engage the
+    # prototype path and must NOT flux CrO2 on the strength of an unmeasured
+    # alpha — the SC-67 fail-loud refusal names CrO2 in missing_alpha. The
+    # engagement pinned above is therefore strictly the deliberate,
+    # allowlisted, evidence-reported opt-in, never absence resolving toward
+    # the confident answer. (Allowlist boundedness is pinned on the engaged
+    # side by _unmeasured_alpha_fallback_notice itself: it raises if any
+    # non-permitted species engages, and the engaged run's own diagnostic
+    # still records CrO — unmeasured but NOT allowlisted — in missing_alpha.)
+    refusal_sim, refusal_missing_by_hour = _sso2_sim_alpha_fallback_disabled(
+        hours=3
+    )
+    refusal_missing = {}
+    for hourly in refusal_missing_by_hour:
+        refusal_missing.update(hourly)
+    assert "CrO2" in refusal_missing
+    assert refusal_missing["CrO2"]["policy"] == "fail_loud_missing_alpha"
+    # No CrO2 flux transition may exist anywhere in the refusal run.
+    assert not any(
+        transition.reason == "evaporate_CrO2"
+        for transition in refusal_sim.atom_ledger.transitions
+    )
+    from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
+
+    assert _unmeasured_alpha_fallback_notice(refusal_sim) == {
         "severity": "warning",
         "status": "not_engaged",
         "policy": "alpha=1.0 prototype fallback",
@@ -1725,13 +1810,6 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
         "engaged_species": [],
         "total_engagement_count": 0,
     }
-    report = _markdown_report(evidence, execution)
-    assert "WARNING prototype_alpha_fallback" in report
-    assert "alpha=1.0 prototype fallback" in report
-    assert "status=`not_engaged`" in report
-    assert "permitted_species=`CrO2`" in report
-    assert "engaged_species=``" in report
-    assert "engagement_count=`0`" in report
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:

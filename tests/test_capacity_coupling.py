@@ -1148,12 +1148,34 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # `refused` and the three P-carriers stay in the melt. Fe still
         # evaporates (admitted; not flux_dormant). Trio measured at HEAD
         # c777aa73 / verdict 2026-08-17-feo-verdict; not hand-pasted.
+        # 2026-08-28 0c6d9811 (b-314) rebaseline: the broad-proxy alpha rows
+        # are stripped from the provider-facing measured view, so CrO's
+        # tier-2 proxy (alpha=0.9 inherited from metals_cr_family) no longer
+        # satisfies the measured-alpha requirement. This fixture's explicit
+        # allow_unmeasured_alpha_fallback opt-in then drives CrO at the
+        # alpha=1.0 prototype ceiling. SIGN CHECK: the CrO channel flux
+        # scales 1/0.9, i.e. +1/9 of its +0.001389175252095587 kg/hr MC-4A
+        # activation contribution = +1.5435e-4 kg/hr; observed total flux
+        # delta is +1.54308e-4 kg/hr (residual 4e-9 is shared-O2/thermal
+        # feedback). Transport saturation +23.898 points and melt mass
+        # -1.7249e-4 kg are the same 1/9 scaling of the MC-4A +215.129 /
+        # -0.0015528 followers. CrO2 stays transition-free (its oxidizing
+        # leg still has no overhead O2 to debit); the remaining Al-family
+        # proxy heads are <=5.63e-7 Pa. One channel-roster follower: at the
+        # alpha=1.0 ceiling the Al2O channel (proxy alpha=0.3, head 4.8e-10
+        # Pa) lifts its dust flux above the 1e-12 kg ledger-commit floor,
+        # so evaporate_Al2O commits again (33 -> 34 transitions; the same
+        # regrind floor that dropped PO dust at 28 -> 27). Every channel
+        # still fluxes under the fallback — this is a value move plus one
+        # floor-crossing dust transition, not a refusal-driven roster drop.
+        # Trio re-emitted on the studio under the CI grind engines.local.toml
+        # via scripts/emit_studio_pin_values.py; not hand-pasted.
         (
             1,
             1550.0,
-            3.2030672943988354,
-            1299504.7888992433,
-            995.560356926935,
+            3.203221602697998,
+            1299528.6872980625,
+            995.5601844409979,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1190,7 +1212,12 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # evaporate_P2 (stage0_only admission, not a Ca/Ti α refuse). Count
     # 36→33. A return to 36 without a Stage-0 condensation context is
     # the P1-1 hole reopening; a 33→26 drop is the b-136 silent-zero.
-    assert len(sim.atom_ledger.transitions) == 33  # 36 minus evaporate_PO/PO2/P2 (1742cbb8)
+    # b-314 (0c6d9811): 33 -> 34. The Al2O tier-2 proxy (alpha=0.3) no longer
+    # satisfies the measured-alpha requirement; this fixture's opted-in
+    # alpha=1.0 prototype fallback lifts its dust flux above the 1e-12 kg
+    # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
+    # drop: no channel is withdrawn.
+    assert len(sim.atom_ledger.transitions) == 34  # 36 minus evaporate_PO/PO2/P2 (1742cbb8), plus evaporate_Al2O floor-crossing (0c6d9811)
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
