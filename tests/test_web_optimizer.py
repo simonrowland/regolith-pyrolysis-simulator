@@ -3494,21 +3494,95 @@ def test_result_metadata_contains_an_unreadable_backend_only_when_asked() -> Non
     assert contained["backend_active"] == "unreadable"
 
 
+def test_html_and_json_mixed_sense_ranking_is_order_independent(client) -> None:
+    """Both surfaces flag the same pair before HTML selects a representative."""
+    base_runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    candidate_ids = ("candidate-sense-max", "candidate-sense-min")
+    values = {
+        "maximum": (10.0, "maximize", candidate_ids[0]),
+        "minimum": (1.0, "minimize", candidate_ids[1]),
+    }
+    outcomes: list[dict[str, object]] = []
+
+    for order_index, order in enumerate(
+        (("minimum", "maximum"), ("maximum", "minimum"))
+    ):
+        runs_dir = base_runs_dir.parent / f"runs-mixed-sense-{order_index}"
+        client.application.config["OPTIMIZER_RUNS_DIR"] = str(runs_dir)
+        for position, label in enumerate(order):
+            value, sense, candidate_id = values[label]
+            run_dir = runs_dir / f"run-{position}"
+            run_dir.mkdir(parents=True)
+            store = ResultStore(run_dir / "cache.sqlite")
+            spec = _base_spec(recipe_id=f"recipe-{label}")
+            store.store(
+                spec,
+                _scored(
+                    spec,
+                    candidate_id=candidate_id,
+                    objectives=ObjectiveVector(
+                        (
+                            ObjectiveValue(
+                                "oxygen_kg",
+                                sense,
+                                value,
+                                "kg",
+                                ordinal=0,
+                            ),
+                        )
+                    ),
+                ),
+                created_at="2026-06-01T00:00:00Z",
+            )
+
+        html_response = client.get(
+            "/partials/optimizer-table?objective_metric=oxygen_kg"
+        )
+        assert html_response.status_code == 200
+        html_body = html_response.get_data(as_text=True)
+        json_payload = client.get(
+            "/api/optimizer/leaderboard?objective_metric=oxygen_kg"
+        ).get_json()
+        outcomes.append(
+            {
+                "html_candidates": tuple(
+                    candidate_id
+                    for candidate_id in candidate_ids
+                    if candidate_id in html_body
+                ),
+                "html_ambiguous": (
+                    "rows mix minimize and maximize objectives" in html_body
+                ),
+                "json_candidates": tuple(
+                    (
+                        entry["candidate_id"],
+                        bool(entry.get("rank_ambiguous")),
+                    )
+                    for entry in json_payload["entries"]
+                ),
+            }
+        )
+
+    expected = {
+        "html_candidates": ("candidate-sense-max",),
+        "html_ambiguous": True,
+        "json_candidates": (
+            ("candidate-sense-max", True),
+            ("candidate-sense-min", True),
+        ),
+    }
+    assert outcomes == [expected, expected], (
+        "mixed-sense verdict changed with row order or one surface presented "
+        f"a confident rank: {outcomes}"
+    )
+
+
 def test_json_leaderboard_marks_a_mixed_sense_set_ambiguous(client) -> None:
-    """The JSON surface must not rank what the HTML surface calls unrankable.
+    """The JSON surface marks every member of a mixed-sense set ambiguous.
 
-    _leaderboard_entries overwrites selected_sense as it walks rows, then sorted
-    the WHOLE set by whichever sense the last row happened to carry. A minimize
-    row at 1.0 therefore outranked a maximize row at 10.0, and both received an
-    unconditional rank. A value cannot be ordered under minimize and maximize at
-    once.
-
-    ★ The HTML winners table already refused to pretend otherwise, and this is
-    its SIBLING reading the same stored rows. Establishing the invariant on one
-    surface and leaving the other is exactly the diverged-duplicate shape a
-    coherence audit exists to find -- and it did: the earlier rank regression
-    exercised only the HTML path, and only with a single sense, so it could not
-    see this.
+    Earlier coverage falsely claimed the HTML winners table already refused
+    the set. It did not: pair selection discarded one sense before the HTML
+    ambiguity check. The order-sensitive sibling test above covers both paths.
     """
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-mixed-sense-json"

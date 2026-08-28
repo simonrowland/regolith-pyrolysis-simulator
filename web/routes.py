@@ -12,7 +12,7 @@ from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
 import tempfile
-from typing import Any
+from typing import Any, TypeVar
 from urllib.parse import quote, urlsplit
 
 from flask import Blueprint, Response, abort, current_app, render_template, jsonify, request, send_file, send_from_directory, session
@@ -1451,11 +1451,41 @@ def _empty_leaderboard_exclusions() -> dict[str, int]:
     }
 
 
+_RankPayloadT = TypeVar('_RankPayloadT')
+_RANK_AMBIGUOUS_MESSAGE = (
+    'rows mix minimize and maximize objectives; '
+    'no single ranking is valid across them'
+)
+
+
+def _rank_objective_candidates(
+    candidates: list[tuple[_RankPayloadT, float, str, str]],
+) -> tuple[list[tuple[_RankPayloadT, float, str, str]], str | None]:
+    """Apply one objective-sense rule to every leaderboard surface."""
+    senses = {
+        str(sense or 'maximize')
+        for _payload, _value, sense, _key in candidates
+    }
+    if len(senses) > 1:
+        candidates.sort(key=lambda item: (item[2], item[1], item[3]))
+        return candidates, _RANK_AMBIGUOUS_MESSAGE
+
+    sense = next(iter(senses), 'maximize')
+    direction = 1.0 if sense == 'minimize' else -1.0
+    candidates.sort(key=lambda item: (direction * item[1], item[3]))
+    return candidates, None
+
+
 def _collect_ranked_candidates(
     run_rows: list[tuple[str, list[sqlite3.Row]]],
     *,
     objective_metric: str | None,
-) -> tuple[list[tuple[str, sqlite3.Row, float, str]], str | None, dict[str, int]]:
+) -> tuple[
+    list[tuple[str, sqlite3.Row, float, str]],
+    str | None,
+    dict[str, int],
+    str | None,
+]:
     """Rank by numeric objective without parsing result blobs.
 
     Full `_result_metadata` is deferred to the winner(s). Infeasible / missing
@@ -1468,8 +1498,7 @@ def _collect_ranked_candidates(
         if objective_metric is not None
         else None
     )
-    selected_sense = 'maximize'
-    ranked: list[tuple[str, sqlite3.Row, float, str]] = []
+    ranked: list[tuple[tuple[str, sqlite3.Row], float, str, str]] = []
     for run_id, result_rows in run_rows:
         for row in result_rows:
             if not _result_row_feasible(row):
@@ -1490,11 +1519,21 @@ def _collect_ranked_candidates(
             if value is None:
                 excluded_counts['excluded_nonfinite'] += 1
                 continue
-            selected_sense = str(objective.get('sense') or selected_sense)
-            ranked.append((run_id, row, value, selected_sense))
-    reverse = selected_sense != 'minimize'
-    ranked.sort(key=lambda item: item[2], reverse=reverse)
-    return ranked, selected_metric, excluded_counts
+            sense = str(objective.get('sense') or 'maximize')
+            ranked.append(
+                (
+                    (run_id, row),
+                    value,
+                    sense,
+                    f"{run_id}\0{str(_row_value(row, 'cache_key') or '')}",
+                )
+            )
+    ranked, rank_ambiguous = _rank_objective_candidates(ranked)
+    candidates = [
+        (run_id, row, value, sense)
+        for (run_id, row), value, sense, _identity in ranked
+    ]
+    return candidates, selected_metric, excluded_counts, rank_ambiguous
 
 
 def _leaderboard_from_result_rows(
@@ -1504,7 +1543,7 @@ def _leaderboard_from_result_rows(
     limit: int,
     accepted_corpus_versions: tuple[str, ...] | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, dict[str, int]]:
-    rows: list[tuple[dict[str, Any], float, str]] = []
+    rows: list[tuple[dict[str, Any], float, str, str]] = []
     excluded_counts = {
         'excluded_infeasible': 0,
         'excluded_nonfinite': 0,
@@ -1526,8 +1565,6 @@ def _leaderboard_from_result_rows(
         if objective_metric is not None
         else None
     )
-    selected_sense = 'maximize'
-
     for run_id, result_rows in run_rows:
         for row in result_rows:
             if not _result_row_feasible(row):
@@ -1546,7 +1583,7 @@ def _leaderboard_from_result_rows(
             if value is None:
                 excluded_counts['excluded_nonfinite'] += 1
                 continue
-            selected_sense = str(objective.get('sense') or selected_sense)
+            sense = str(objective.get('sense') or 'maximize')
             # ★ ONE UNREADABLE ROW MUST NOT TAKE THE PAGE DOWN. Rendering a row
             # runs its stored provenance through the fidelity vocabulary, which
             # RAISES on a token it does not know -- and stored rows outlive the
@@ -1570,7 +1607,7 @@ def _leaderboard_from_result_rows(
                 )
                 entry['objective_metric'] = selected_metric
                 entry['objective_value'] = value
-                entry['objective_sense'] = selected_sense
+                entry['objective_sense'] = sense
                 entry['data_digest_scope'] = {
                     'mode': 'entry_data_digests',
                     'data_digests': entry.get('eval_spec', {}).get('data_digests') or {},
@@ -1578,32 +1615,20 @@ def _leaderboard_from_result_rows(
             except Exception:
                 excluded_counts['excluded_unreadable'] += 1
                 continue
-            rows.append((entry, value, selected_sense))
+            identity = '\0'.join(
+                str(entry.get(key) or '')
+                for key in ('run_id', 'cache_key', 'candidate_id', 'recipe_id')
+            )
+            rows.append((entry, value, sense, identity))
 
-    # ★ A MIXED-SENSE SET HAS NO VALID SINGLE RANKING, ON THIS SURFACE TOO.
-    # selected_sense is overwritten per row as the loop walks, so this sorted
-    # the WHOLE set by whichever sense the last row happened to carry: a
-    # minimize row at 1.0 outranked a maximize row at 10.0 and both were handed
-    # an unconditional rank. A value cannot be ordered under minimize and
-    # maximize at once.
-    #
-    # The HTML winners table already refuses to pretend otherwise. This is its
-    # sibling reading the SAME stored rows, and the two surfaces disagreed --
-    # the JSON consumer got a confident rank for an undefined comparison while
-    # the operator page said the ranking was ambiguous. Establishing the
-    # invariant on one surface and leaving the other is how the pair diverged.
-    senses = {str(sense or 'maximize') for _entry, _value, sense in rows}
-    rank_ambiguous = len(senses) > 1
-    reverse = selected_sense != 'minimize'
-    rows.sort(key=lambda item: item[1], reverse=reverse)
+    rows, rank_ambiguous = _rank_objective_candidates(rows)
     entries = []
-    for rank, (entry, _value, _sense) in enumerate(rows[:limit], start=1):
+    for rank, (entry, _value, _sense, _identity) in enumerate(
+        rows[:limit], start=1
+    ):
         entry['rank'] = rank
         if rank_ambiguous:
-            entry['rank_ambiguous'] = (
-                'rows mix minimize and maximize objectives; '
-                'no single ranking is valid across them'
-            )
+            entry['rank_ambiguous'] = rank_ambiguous
         entries.append(entry)
     return entries, selected_metric, excluded_counts
 
@@ -2792,9 +2817,11 @@ def _optimizer_winner_entries(
                 profile_id=pair_profile,
             )
             pair_run_rows.append((run_id, scoped))
-        candidates, metric, pair_excluded = _collect_ranked_candidates(
-            pair_run_rows,
-            objective_metric=selected_metric,
+        candidates, metric, pair_excluded, pair_rank_ambiguous = (
+            _collect_ranked_candidates(
+                pair_run_rows,
+                objective_metric=selected_metric,
+            )
         )
         if metric and selected_metric is None:
             selected_metric = metric
@@ -2828,6 +2855,8 @@ def _optimizer_winner_entries(
                 pair_excluded['excluded_unreadable'] += 1
                 continue
             winner = _optimizer_result_view(entry)
+            if pair_rank_ambiguous:
+                winner['rank_ambiguous'] = pair_rank_ambiguous
             break
         for key, count in (pair_excluded or {}).items():
             excluded_totals[key] = excluded_totals.get(key, 0) + int(count)
@@ -2852,49 +2881,37 @@ def _optimizer_winner_entries(
     # previous shape re-queried every run store for every selector pair
     # (O(pairs × run_dirs) sqlite opens) and made /optimizer unusable as runs
     # accumulated. Ranking still collects every pair before truncating.
-    # A set of rows can only be totally ordered if they share one objective
-    # sense: "best" under minimize and "best" under maximize are opposite ends
-    # of the same axis, so a mixed set has NO valid single ranking. Silently
-    # defaulting to maximize would present an undefined order as a confident
-    # one -- the same fail-open shape as ranking by pair position. We still
-    # render (a mixed set must not blank the page) but mark the rank as
-    # ambiguous so the number is not read as authoritative.
-    senses = {
-        str(entry.get('objective_sense') or 'maximize') for entry in entries
-    }
-    rank_ambiguous = len(senses) > 1
-    sense = senses.pop() if len(senses) == 1 else 'maximize'
-    reverse = sense != 'minimize'
-
-    def _rank_key(entry: Mapping[str, Any]) -> float:
-        value = entry.get('objective_value')
-        if (
-            not isinstance(value, (int, float))
-            or isinstance(value, bool)
-            or math.isnan(value)
-        ):
-            # BELT FOR AN UPSTREAM CONTRACT, not a live path today:
-            # _leaderboard_entries only returns rows whose objective passed
-            # _numeric_objective_value, so every entry here currently arrives
-            # with a finite float. This branch exists because that invariant
-            # lives in a DIFFERENT function -- if its filtering ever loosens,
-            # the failure lands here silently as a mis-ranking rather than as
-            # an error. NaN is called out because it is the dangerous shape:
-            # every NaN comparison is False, so sort() would place it at an
-            # arbitrary position, including Rank 1. Unrankable rows go last in
-            # either direction instead.
-            return float('-inf') if reverse else float('inf')
-        return float(value)
-
-    entries.sort(key=_rank_key, reverse=reverse)
-    entries = entries[:limit]
+    rankable_entries = [
+        (
+            entry,
+            float(entry['objective_value']),
+            str(entry.get('objective_sense') or 'maximize'),
+            '\0'.join(
+                str(entry.get(key) or '')
+                for key in ('run_id', 'cache_key', 'candidate_id', 'recipe_id')
+            ),
+        )
+        for entry in entries
+    ]
+    rankable_entries, board_rank_ambiguous = _rank_objective_candidates(
+        rankable_entries
+    )
+    rank_ambiguous = board_rank_ambiguous or next(
+        (
+            str(entry['rank_ambiguous'])
+            for entry, _value, _sense, _identity in rankable_entries
+            if entry.get('rank_ambiguous')
+        ),
+        None,
+    )
+    entries = [
+        entry
+        for entry, _value, _sense, _identity in rankable_entries[:limit]
+    ]
     for rank, entry in enumerate(entries, start=1):
         entry['rank'] = rank
         if rank_ambiguous:
-            entry['rank_ambiguous'] = (
-                'rows mix minimize and maximize objectives; '
-                'no single ranking is valid across them'
-            )
+            entry['rank_ambiguous'] = rank_ambiguous
     return entries, selected_metric, excluded_totals
 
 
