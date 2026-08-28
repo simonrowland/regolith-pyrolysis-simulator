@@ -110,6 +110,12 @@ def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
 
     evidence = yaml.safe_load(evidence_path.read_text(encoding="utf-8"))
     assert evidence["result"] == "pass"
+    assert evidence["method"]["baseline_revision"] == (
+        "cf4a499dff2beee6741f1b4da6fa43b61b6ecaa2"
+    )
+    assert evidence["method"]["candidate_revision"] == (
+        "c4a2213422eb30b6f2f38b68281d9662fc35926d"
+    )
     assert evidence["method"]["compiler_common_mode"] is False
     assert evidence["species_delta"] == {
         "baseline_compiled_species": 227,

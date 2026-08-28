@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Prove t-609 additivity against the actual cf4a499 compiler and catalog.
 
-The baseline and candidate are compiled in isolated Python processes. The
-baseline process imports from an immutable Git archive (or a verified clean
-detached checkout), so this proof cannot exercise the candidate compiler twice.
+The baseline and candidate are compiled in isolated Python processes. Both
+revisions are imported from immutable Git archives (or a verified clean
+detached checkout for the baseline), so later HEAD additions cannot change
+the historic t-609 subject.
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ import yaml
 
 
 BASE_REVISION = "cf4a499dff2beee6741f1b4da6fa43b61b6ecaa2"
+CANDIDATE_REVISION = "c4a2213422eb30b6f2f38b68281d9662fc35926d"
 EXPECTED_ADDITIONS = ("FeO_association_gas", "NiO_gas")
 PO2_GRID_BAR = (1.0e-30, 1.0e-9, 1.0, 100.0)
 ROOT = Path(__file__).resolve().parents[1]
@@ -298,6 +300,24 @@ def _assert_equal(label: str, baseline: Any, candidate: Any) -> None:
         )
 
 
+def _archive_revision(repo_root: Path, revision: str, dest_root: Path) -> None:
+    dest_root.mkdir(parents=True, exist_ok=True)
+    archive_path = dest_root.parent / f"{dest_root.name}.tar"
+    _run(
+        [
+            "git",
+            "archive",
+            "--format=tar",
+            "--output",
+            str(archive_path),
+            revision,
+        ],
+        cwd=repo_root,
+    )
+    with tarfile.open(archive_path, mode="r") as archive:
+        archive.extractall(dest_root, filter="data")
+
+
 def _generate_evidence(
     candidate_root: Path,
     baseline_root: Path | None = None,
@@ -308,6 +328,15 @@ def _generate_evidence(
     base_commit = _run(
         ["git", "rev-parse", f"{BASE_REVISION}^{{commit}}"], cwd=candidate_root
     ).stdout.strip()
+    pinned_candidate = candidate_revision
+    candidate_commit = (
+        _run(
+            ["git", "rev-parse", f"{pinned_candidate}^{{commit}}"],
+            cwd=candidate_root,
+        ).stdout.strip()
+        if pinned_candidate is not None
+        else _run(["git", "rev-parse", "HEAD"], cwd=candidate_root).stdout.strip()
+    )
 
     with tempfile.TemporaryDirectory(prefix="t609-additivity-") as temp_text:
         temp_root = Path(temp_text)
@@ -349,36 +378,22 @@ def _generate_evidence(
                     "baseline root must be a clean detached checkout"
                 )
             baseline = _run_worker(baseline_root, temp_root / "baseline.json")
-            candidate = _run_worker(
-                candidate_root,
-                temp_root / "candidate.json",
-                catalog_path=candidate_catalog_path,
-            )
         else:
             temporary_baseline_root = temp_root / "baseline"
-            temporary_baseline_root.mkdir()
-            baseline_archive = temp_root / "baseline.tar"
-            _run(
-                [
-                    "git",
-                    "archive",
-                    "--format=tar",
-                    "--output",
-                    str(baseline_archive),
-                    base_commit,
-                ],
-                cwd=candidate_root,
-            )
-            with tarfile.open(baseline_archive, mode="r") as archive:
-                archive.extractall(temporary_baseline_root, filter="data")
+            _archive_revision(candidate_root, base_commit, temporary_baseline_root)
             baseline = _run_worker(
                 temporary_baseline_root, temp_root / "baseline.json"
             )
-            candidate = _run_worker(
-                candidate_root,
-                temp_root / "candidate.json",
-                catalog_path=candidate_catalog_path,
+        if pinned_candidate is not None:
+            temporary_candidate_root = temp_root / "candidate"
+            _archive_revision(
+                candidate_root, candidate_commit, temporary_candidate_root
             )
+            candidate = _run_worker(
+                temporary_candidate_root, temp_root / "candidate.json"
+            )
+        else:
+            candidate = _run_worker(candidate_root, temp_root / "candidate.json")
 
     baseline_ids = set(baseline["compiled_species"])
     candidate_ids = set(candidate["compiled_species"])
@@ -440,6 +455,11 @@ def _generate_evidence(
         "result": "pass",
         "method": {
             "baseline_revision": base_commit,
+            **(
+                {"candidate_revision": candidate_commit}
+                if pinned_candidate is not None
+                else {}
+            ),
             "baseline_materialization": (
                 "immutable_git_export_or_verified_clean_detached_checkout"
             ),
@@ -534,7 +554,11 @@ def _main() -> int:
         )
         return 0
 
-    evidence = _generate_evidence(args.candidate_root, args.baseline_root)
+    evidence = _generate_evidence(
+        args.candidate_root,
+        args.baseline_root,
+        candidate_revision=CANDIDATE_REVISION,
+    )
     rendered = _render_evidence(evidence)
     if args.check:
         if (
