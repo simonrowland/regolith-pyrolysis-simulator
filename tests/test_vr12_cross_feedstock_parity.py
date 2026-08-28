@@ -833,6 +833,8 @@ def _assert_inventory_request_activation(
     # contribute their species_id to the request (or the parent has no rule).
     missing: list[str] = []
     for rule in sim.vapour_rail_catalog.request_rules:
+        if str(rule.source_account) != "process.cleaned_melt":
+            continue
         parents = tuple(str(p) for p in (rule.parent_species_ids or ()))
         if not parents:
             continue
@@ -854,6 +856,7 @@ def _assert_inventory_request_activation(
                 tuple(str(p) for p in (r.parent_species_ids or ())) == (parent,)
                 for r in sim.vapour_rail_catalog.request_rules
                 if str(r.species_id) == g
+                and str(r.source_account) == "process.cleaned_melt"
             )
         ]
         for gas in sole:

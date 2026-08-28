@@ -186,7 +186,9 @@ def _t583_receipt(payload: Mapping[str, Any], catalog: Any) -> dict[str, Any]:
     }
 
 
-def _build_snapshot(import_root: Path) -> dict[str, Any]:
+def _build_snapshot(
+    import_root: Path, catalog_path: Path | None = None
+) -> dict[str, Any]:
     root_text = str(import_root.resolve())
     sys.path.insert(0, root_text)
 
@@ -202,7 +204,7 @@ def _build_snapshot(import_root: Path) -> dict[str, Any]:
             f"{imported_catalog} != {expected_catalog}"
         )
 
-    payload_path = import_root / "data" / "vapor_pressures.yaml"
+    payload_path = catalog_path or import_root / "data" / "vapor_pressures.yaml"
     payload = yaml.safe_load(payload_path.read_text(encoding="utf-8"))
     catalog = catalog_module.compile_vapour_rail_catalog(
         payload, emit_u0_request_rules=False
@@ -267,19 +269,24 @@ def _run(command: list[str], *, cwd: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
-def _run_worker(import_root: Path, snapshot_path: Path) -> dict[str, Any]:
-    _run(
-        [
-            sys.executable,
-            "-I",
-            str(Path(__file__).resolve()),
-            "--worker-root",
-            str(import_root),
-            "--worker-output",
-            str(snapshot_path),
-        ],
-        cwd=import_root,
-    )
+def _run_worker(
+    import_root: Path,
+    snapshot_path: Path,
+    *,
+    catalog_path: Path | None = None,
+) -> dict[str, Any]:
+    command = [
+        sys.executable,
+        "-I",
+        str(Path(__file__).resolve()),
+        "--worker-root",
+        str(import_root),
+        "--worker-output",
+        str(snapshot_path),
+    ]
+    if catalog_path is not None:
+        command.extend(("--worker-catalog", str(catalog_path)))
+    _run(command, cwd=import_root)
     return json.loads(snapshot_path.read_text(encoding="utf-8"))
 
 
@@ -292,7 +299,10 @@ def _assert_equal(label: str, baseline: Any, candidate: Any) -> None:
 
 
 def _generate_evidence(
-    candidate_root: Path, baseline_root: Path | None = None
+    candidate_root: Path,
+    baseline_root: Path | None = None,
+    *,
+    candidate_revision: str | None = None,
 ) -> dict[str, Any]:
     candidate_root = candidate_root.resolve()
     base_commit = _run(
@@ -301,6 +311,24 @@ def _generate_evidence(
 
     with tempfile.TemporaryDirectory(prefix="t609-additivity-") as temp_text:
         temp_root = Path(temp_text)
+        candidate_catalog_path = None
+        if candidate_revision is not None:
+            candidate_commit = _run(
+                ["git", "rev-parse", f"{candidate_revision}^{{commit}}"],
+                cwd=candidate_root,
+            ).stdout.strip()
+            candidate_catalog_path = temp_root / "candidate-vapor_pressures.yaml"
+            candidate_catalog_path.write_text(
+                _run(
+                    [
+                        "git",
+                        "show",
+                        f"{candidate_commit}:data/vapor_pressures.yaml",
+                    ],
+                    cwd=candidate_root,
+                ).stdout,
+                encoding="utf-8",
+            )
         if baseline_root is not None:
             baseline_root = baseline_root.resolve()
             baseline_commit = _run(
@@ -321,7 +349,11 @@ def _generate_evidence(
                     "baseline root must be a clean detached checkout"
                 )
             baseline = _run_worker(baseline_root, temp_root / "baseline.json")
-            candidate = _run_worker(candidate_root, temp_root / "candidate.json")
+            candidate = _run_worker(
+                candidate_root,
+                temp_root / "candidate.json",
+                catalog_path=candidate_catalog_path,
+            )
         else:
             temporary_baseline_root = temp_root / "baseline"
             temporary_baseline_root.mkdir()
@@ -342,7 +374,11 @@ def _generate_evidence(
             baseline = _run_worker(
                 temporary_baseline_root, temp_root / "baseline.json"
             )
-            candidate = _run_worker(candidate_root, temp_root / "candidate.json")
+            candidate = _run_worker(
+                candidate_root,
+                temp_root / "candidate.json",
+                catalog_path=candidate_catalog_path,
+            )
 
     baseline_ids = set(baseline["compiled_species"])
     candidate_ids = set(candidate["compiled_species"])
@@ -486,12 +522,13 @@ def _main() -> int:
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--worker-root", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--worker-output", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--worker-catalog", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args()
 
     if args.worker_root is not None:
         if args.worker_output is None:
             parser.error("--worker-root requires --worker-output")
-        snapshot = _build_snapshot(args.worker_root)
+        snapshot = _build_snapshot(args.worker_root, args.worker_catalog)
         args.worker_output.write_text(
             _canonical_json(snapshot) + "\n", encoding="utf-8"
         )

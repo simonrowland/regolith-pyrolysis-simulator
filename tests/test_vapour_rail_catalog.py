@@ -75,6 +75,7 @@ CARRIER_ONLY = {
     "generic_carbonaceous_hydrocarbon",
     "generic_carbonaceous_organic",
     "metallic_FeNi",
+    "organic_tar",
 }
 
 

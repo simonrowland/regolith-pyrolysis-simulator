@@ -19,11 +19,13 @@ method:
   - 100.0
   comparison: exact canonical dataclass values and exception/result values
   float_encoding: IEEE-754 float.hex
+  candidate_revision: 3a36e9bb6ff79a6a3f51ca969d3a2d41c4e800a9
+  candidate_catalog_materialization: immutable_git_blob
 source_digests:
   baseline_catalog_sha256: b4108e9e0b1f99ca4f48e90838d525e5e218380c68c6f0ba799782ef5c9111bf
   baseline_compiler_sha256: 6a64686e2474ba30c82a798335f02866a0d4c85eba0dd5e70a0862dc4e75c419
   candidate_catalog_sha256: fefcd5fa2f3f1ba60c3255504dc33c7e710dbb1f0a60fedff433ef14c7826f5d
-  candidate_compiler_sha256: 6a64686e2474ba30c82a798335f02866a0d4c85eba0dd5e70a0862dc4e75c419
+  candidate_compiler_sha256: 9e2c956beabf9ea5c19e6efc4dee03aa62d6039310566752bc7a531e24d4b3aa
 species_delta:
   baseline_compiled_species: 229
   candidate_compiled_species: 231

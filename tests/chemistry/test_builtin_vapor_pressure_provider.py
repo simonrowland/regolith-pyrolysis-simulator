@@ -3183,6 +3183,7 @@ _REVIEWED_ADDITIVE_CARRIERS = {
     "K2O_gas",
     "Mg2",
     "MgO_gas",
+    "MnO_gas",
     "Na2",
     "Na2O_gas",
     "NiO_gas",

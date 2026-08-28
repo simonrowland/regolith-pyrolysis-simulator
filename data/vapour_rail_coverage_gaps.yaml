@@ -7356,6 +7356,14 @@ entries:
   filed: mc1-wire-cx
   since: '2026-08-05'
 - element: H
+  carrier: H2O
+  contract: C5
+  reason: acquisition-pending
+  missing: end-to-end Stage-0 source debit and terminal.offgas credit proof for the catalog carrier
+  filed: fix-vapour-rail
+  since: '2026-08-28'
+  note: C1-C4 are structurally executable through the catalog H2O row; current conformance source accounts commit no H2O carrier, so C5 remains open.
+- element: H
   carrier: H2O2
   contract: C1-C5
   reason: acquisition-pending
@@ -11008,15 +11016,6 @@ entries:
   note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
     (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
 - element: C
-  carrier: CH4
-  contract: C5
-  reason: acquisition-pending
-  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
-  filed: tddharness-seed
-  since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
-- element: C
   carrier: COS
   contract: C5
   reason: acquisition-pending
@@ -11124,15 +11123,6 @@ entries:
   since: '2026-08-04'
   note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
     (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
-- element: H
-  carrier: CH4
-  contract: C5
-  reason: acquisition-pending
-  missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
-  filed: tddharness-seed
-  since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
 - element: H
   carrier: H2S
   contract: C5

@@ -2651,7 +2651,18 @@ def _compile_source_reaction_activity(
                 f"{identity_account!r} does not match code_metadata "
                 f"{source_account!r}"
             )
-        if evaluator.pressure_observable is PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE:
+        if (
+            evaluator.pressure_observable
+            is PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE
+            or (
+                evaluator.pressure_observable
+                is PressureObservable.TOTAL_MIXTURE_PRESSURE
+                and reaction_id is None
+            )
+        ):
+            # An empirical associated-vapour total (for example NO2/N2O4)
+            # can still be anchored to one pure condensed component without
+            # inventing a source reaction that the correlation never used.
             if _strip_phase_suffix(identity_component) != _strip_phase_suffix(
                 str(row.get("formula", species_id))
             ):

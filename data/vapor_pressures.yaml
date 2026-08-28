@@ -8068,8 +8068,8 @@ families:
             anchor_key: null
           source_reactions: []
           pressure_models:
-          - fit_target: pure_component_psat
-            pressure_kind: pure_component_saturation_pressure
+          - fit_target: total_mixture_pressure
+            pressure_kind: total_mixture_pressure
             species_basis: total_associated_mixture
             valid_domain:
               temperature_K:

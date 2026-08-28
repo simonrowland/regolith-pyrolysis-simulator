@@ -16,6 +16,7 @@ import prove_t609_cross_revision_additivity as shared  # noqa: E402
 
 
 BASE_REVISION = "97969c434cb679d149756cbfd119e40220763d7a"
+CANDIDATE_REVISION = "3a36e9bb6ff79a6a3f51ca969d3a2d41c4e800a9"
 EXPECTED_ADDITIONS = ("CoO_gas", "MnO_gas")
 DEFAULT_EVIDENCE = (
     ROOT / "validation-data" / "pin-evidence" / "t622_additivity_2026-08-12.yaml"
@@ -36,9 +37,15 @@ def _main() -> int:
 
     shared.BASE_REVISION = BASE_REVISION
     shared.EXPECTED_ADDITIONS = EXPECTED_ADDITIONS
-    evidence = shared._generate_evidence(args.candidate_root, args.baseline_root)
+    evidence = shared._generate_evidence(
+        args.candidate_root,
+        args.baseline_root,
+        candidate_revision=CANDIDATE_REVISION,
+    )
     evidence["proof_id"] = "t622_cross_revision_additivity_2026-08-12"
     evidence["generated_by"] = "scripts/prove_t622_cross_revision_additivity.py"
+    evidence["method"]["candidate_revision"] = CANDIDATE_REVISION
+    evidence["method"]["candidate_catalog_materialization"] = "immutable_git_blob"
     rendered = shared._render_evidence(evidence)
 
     if args.check:

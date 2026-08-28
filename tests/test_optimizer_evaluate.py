@@ -1223,19 +1223,24 @@ def test_zero_overhead_flow_knudsen_snapshot_is_not_applicable_pass(
     tmp_path,
 ) -> None:
     trace = _trace(snapshots=(_zero_overhead_flow_snapshot(marked=True),))
+    profile = _knudsen_no_flow_profile()
+    profile["run"] = {**profile["run"], "backend_name": "alphamelts"}
+    profile["fidelities"] = {
+        "fast": {"backend_name": "alphamelts", "hours": 1}
+    }
+    execution = _execution(
+        trace=trace,
+        backend_status="ok",
+        backend_authoritative=True,
+    )
+    execution.session._config = SimpleNamespace(backend_name="alphamelts")
 
     result = evaluate(
         RecipePatch({}),
         "lunar_mare_low_ti",
         "fast",
-        profile=_knudsen_no_flow_profile(),
-        executor=FakeExecutor(
-            _execution(
-                trace=trace,
-                backend_status="ok",
-                backend_authoritative=True,
-            )
-        ),
+        profile=profile,
+        executor=FakeExecutor(execution),
     )
 
     assert result.feasible
@@ -1254,6 +1259,9 @@ def test_zero_overhead_flow_knudsen_snapshot_is_not_applicable_pass(
         current_data_digests=result.eval_spec.data_digests,
     )
     assert result.run_reference is not None
+    assert result.run_reference.backend_name == "alphamelts"
+    assert result.run_reference.evidence_class == "melts"
+    assert result.run_reference.certification_allowed is True
     closure = {"status": "closed", "mass_balance_error_pct": 0.0}
     closed_product_summary = dict(result.run_reference.product_summary)
     product_yield_table = dict(closed_product_summary.get("product_yield_table") or {})

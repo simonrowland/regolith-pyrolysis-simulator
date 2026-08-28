@@ -332,6 +332,10 @@ def test_monomer_partials_labeled_not_as_totals() -> None:
         "species"
     ]["NO2"]
     assert no2["pressure_models"][0]["pressure_kind"] == "total_mixture_pressure"
+    compiled_no2 = compile_vapour_rail_catalog(payload).species["NO2"]
+    assert compiled_no2.pressure_observable.value == "total_mixture_pressure"
+    assert compiled_no2.evaluator is not None
+    assert compiled_no2.code_metadata.hot_train_applicability == "not_applicable"
 
 
 def test_feedstock_presence_covered_rows_have_literature_and_status() -> None:
