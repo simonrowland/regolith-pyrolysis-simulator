@@ -3430,11 +3430,12 @@ def test_thermoengine_timeout_dumps_then_kills_worker(monkeypatch):
     assert transport._worker_connection is None
 
 
-def test_thermoengine_transport_close_is_idempotent():
+def test_thermoengine_transport_close_is_idempotent(monkeypatch):
     events = []
 
     class FakeProcess:
         alive = True
+        pid = 424242
 
         def is_alive(self):
             return self.alive
@@ -3456,6 +3457,12 @@ def test_thermoengine_transport_close_is_idempotent():
         def close(self):
             events.append(('close',))
 
+    monkeypatch.setattr(
+        engine_worker_module.os,
+        'killpg',
+        lambda pid, signum: events.append(('killpg', pid, signum)),
+    )
+
     transport = ThermoEngineTransport(
         activity_converter=activity_from_chem_potential,
     )
@@ -3465,7 +3472,12 @@ def test_thermoengine_transport_close_is_idempotent():
     transport.close()
     transport.close()
 
-    assert events == [('send', None), ('close',), ('join', 1.0)]
+    assert events == [
+        ('send', None),
+        ('close',),
+        ('join', 1.0),
+        ('killpg', 424242, signal.SIGKILL),
+    ]
     assert transport._worker_process is None
     assert transport._worker_connection is None
 
@@ -3578,11 +3590,12 @@ def test_thermoengine_intrinsic_out_of_domain_returns_clean_result():
     assert result.fO2_log is None
 
 
-def test_thermoengine_transport_broken_pipe_closes_worker():
+def test_thermoengine_transport_broken_pipe_closes_worker(monkeypatch):
     events = []
 
     class FakeProcess:
         alive = True
+        pid = 424242
 
         def is_alive(self):
             return self.alive
@@ -3604,6 +3617,12 @@ def test_thermoengine_transport_broken_pipe_closes_worker():
         def close(self):
             events.append(('close',))
 
+    monkeypatch.setattr(
+        engine_worker_module.os,
+        'killpg',
+        lambda pid, signum: events.append(('killpg', pid, signum)),
+    )
+
     transport = ThermoEngineTransport(
         activity_converter=activity_from_chem_potential,
     )
@@ -3617,16 +3636,22 @@ def test_thermoengine_transport_broken_pipe_closes_worker():
             comp_wt={'SiO2': 50.0},
         )
 
-    assert events == [('kill',), ('join', 1.0), ('close',)]
+    assert events == [
+        ('killpg', 424242, signal.SIGKILL),
+        ('join', 0.1),
+        ('join', 1.0),
+        ('close',),
+    ]
     assert transport._worker_process is None
     assert transport._worker_connection is None
 
 
-def test_thermoengine_transport_pipe_close_failure_still_joins_worker():
+def test_thermoengine_transport_pipe_close_failure_still_joins_worker(monkeypatch):
     events = []
 
     class FakeProcess:
         alive = True
+        pid = 424242
 
         def is_alive(self):
             return self.alive
@@ -3649,6 +3674,12 @@ def test_thermoengine_transport_pipe_close_failure_still_joins_worker():
             events.append(('close',))
             raise RuntimeError('pipe close failure')
 
+    monkeypatch.setattr(
+        engine_worker_module.os,
+        'killpg',
+        lambda pid, signum: events.append(('killpg', pid, signum)),
+    )
+
     transport = ThermoEngineTransport(
         activity_converter=activity_from_chem_potential,
     )
@@ -3658,7 +3689,12 @@ def test_thermoengine_transport_pipe_close_failure_still_joins_worker():
     with pytest.raises(RuntimeError, match='pipe close failure'):
         transport.close()
 
-    assert events == [('send', None), ('close',), ('join', 1.0)]
+    assert events == [
+        ('send', None),
+        ('close',),
+        ('join', 1.0),
+        ('killpg', 424242, signal.SIGKILL),
+    ]
     assert transport._worker_process is None
     assert transport._worker_connection is None
 
