@@ -462,17 +462,26 @@ def serialize_vapour_batch(batch: VapourBatch | None) -> dict[str, Any] | None:
         channel = serialize_vapour_answer(answer)
         union_eligible = bool(channel["is_union_flux_eligible"])
         effective_active = species_id in batch.flux_active_species_ids
-        # A channel may be answerable yet dormant under the current epoch.
-        # Batch serialization must expose one unambiguous activation truth.
+        explicit_dormant = species_id in batch.flux_dormant_species_ids
+        # Explicit campaign dormancy outranks an unused channel refusal;
+        # ordinary epoch dormancy still requires a union-eligible answer.
         channel["is_flux_active"] = effective_active
-        channel["is_flux_dormant_by_epoch"] = union_eligible and not effective_active
+        channel["is_flux_dormant_by_epoch"] = explicit_dormant or (
+            union_eligible and not effective_active
+        )
         channels[species_id] = channel
-    refusals = {
+    raw_refusals = {
         species_id: channel
         for species_id, channel in channels.items()
         if channel.get("is_refused")
     }
-    return {
+    refusals = {
+        species_id: channel
+        for species_id, channel in raw_refusals.items()
+        if not channel.get("is_flux_dormant_by_epoch")
+    }
+    metadata = dict(batch.metadata)
+    report = {
         "schema": "vapour_batch.v1",
         "n_requested": len(batch.requested_species_ids),
         "n_flux_active": len(batch.flux_active_species_ids),
@@ -485,8 +494,17 @@ def serialize_vapour_batch(batch: VapourBatch | None) -> dict[str, Any] | None:
         },
         "channels_by_species": channels,
         "refusals_by_species": refusals,
-        "metadata": dict(batch.metadata),
+        "metadata": metadata,
     }
+    if batch.flux_dormant_species_ids:
+        report["flux_dormant_species_ids"] = sorted(
+            batch.flux_dormant_species_ids
+        )
+    if len(raw_refusals) != len(refusals):
+        report["n_channel_refused"] = len(raw_refusals)
+        if "n_refused" in metadata:
+            metadata["n_channel_refused"] = metadata.pop("n_refused")
+    return report
 
 
 def serialize_melt_activity_shadow(
@@ -941,8 +959,9 @@ def flux_pressures_from_batch(
     catalog pressure/flux unions, enforce the batch-active set, then read values
     from ``effective_pressure_source``. An eligible point answer supplies a
     catalog fallback only when that seam has no value.
-    Refusal/upper-bound/zero are typed non-debit states. Before RG-1 the source
-    is the equilibrium backend; the batch remains channel/refusal/set authority.
+    Refusal/upper-bound/zero/dormancy are typed non-debit states. Before RG-1
+    the source is the equilibrium backend; the batch remains channel/refusal/set
+    authority.
     Extrapolated point estimates are named explicitly for status/degraded
     accounting regardless of which numeric source supplies their flux value.
     Absent batch or resolve error → empty flux map + typed failure report;
@@ -1027,6 +1046,9 @@ def flux_pressures_from_batch(
         if answer is None:
             missing_channel_keys.append(species_id)
             channel_states[species_id] = "missing_channel"
+            continue
+        if species_id in batch.flux_dormant_species_ids:
+            channel_states[species_id] = "dormant_by_epoch"
             continue
         catalog_pressure = answer.pressure
         if isinstance(catalog_pressure, PressureValue):

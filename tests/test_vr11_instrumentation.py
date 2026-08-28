@@ -1416,6 +1416,8 @@ def test_serialize_vapour_batch_channels() -> None:
         "pending_validation"
     )
     assert report["channels_by_species"]["Na"]["is_flux_active"] is True
+    assert "n_channel_refused" not in report
+    assert "flux_dormant_species_ids" not in report
 
 
 def test_serialize_vapour_batch_distinguishes_epoch_dormancy() -> None:
@@ -1426,6 +1428,24 @@ def test_serialize_vapour_batch_distinguishes_epoch_dormancy() -> None:
     assert channel["is_union_flux_eligible"] is True
     assert channel["is_flux_active"] is False
     assert channel["is_flux_dormant_by_epoch"] is True
+
+
+def test_serialize_vapour_batch_excludes_dormant_underlying_refusal() -> None:
+    batch = replace(
+        _toy_batch(
+            {"Na", "K", "PO"},
+            refused={"K", "PO"},
+            flux_active=set(),
+        ),
+        flux_dormant_species_ids=frozenset({"Na", "K"}),
+    )
+    report = serialize_vapour_batch(batch)
+    assert report is not None
+    assert report["channels_by_species"]["K"]["is_refused"] is True
+    assert report["channels_by_species"]["K"]["is_flux_dormant_by_epoch"] is True
+    assert report["n_channel_refused"] == 2
+    assert report["n_refused"] == 1
+    assert set(report["refusals_by_species"]) == {"PO"}
 
 
 def test_setpoints_t_cond_audit_covers_operator_overrides() -> None:
