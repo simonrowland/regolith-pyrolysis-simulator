@@ -35,7 +35,12 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">REVIEW</span><span class="badge status-current">current</span><a class="badge" href="carbonaceous-chondrites.html">carbonaceous-chondrites</a></p>
 <p><a href="https://doi.org/10.1016/j.chemer.2017.01.007">doi:10.1016/j.chemer.2017.01.007</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/organics_pyrolysis.yaml:27</code> - iom_stoichiometry.source: source: &quot;REF-005 Alexander 2017 Chemie der Erde; CR IOM C100H75-79O11-17N3-4S1-3 midpoint&quot;</li>
+<li><code>data/organics_pyrolysis.yaml:47</code> - nascent_char.f_char_of_iom_C.source: source: &quot;REF-005 Alexander 2017 inert flash pyrolysis 600-650 C; 25-30 wt% lost as volatiles&quot;</li>
+<li><code>data/organics_pyrolysis.yaml:54</code> - nascent_char.f_char_of_bulk_organic_C.source: source: &quot;REF-005 REF-024 product of Sephton IOM fraction and Alexander inert char fraction&quot;</li>
+</ul>
 </section>
 <section class="entry" id="REF-024">
 <h2>REF-024</h2>
@@ -45,12 +50,16 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/organics_pyrolysis.yaml:34</code> - iom_fraction_of_organic_C.source: source: &quot;REF-024 Sephton 2004 GCA 68:1287, abstract: solvent-insoluble macromolecular material constitutes at least 70% of total organic content&quot;</li>
+<li><code>data/organics_pyrolysis.yaml:54</code> - nascent_char.f_char_of_bulk_organic_C.source: source: &quot;REF-005 REF-024 product of Sephton IOM fraction and Alexander inert char fraction&quot;</li>
+<li><code>data/organics_pyrolysis.yaml:60</code> - nascent_char.hy_py_floor_of_bulk_organic_C.source: source: &quot;REF-024 Sephton 2004 HyPy: 0.70 IOM * 0.56 residue = 0.39; HyPy is the most aggressive release regime, so this is a lower bound on char&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:15</code> - phase_partitions.ci_carbonaceous_chondrite.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:33</code> - phase_partitions.cm_carbonaceous_chondrite.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:51</code> - phase_partitions.ceres_regolith.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:86</code> - lance_oxidation.source: source: &quot;balanced reaction C + O2 -&gt; CO2; REF-024 supplies the residual-char inventory, not the combustion stoichiometry&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:92</code> - burnout_kinetics.labile_chon_unlimited_o2.source: source: &quot;REF-024 sephton_2004_stepped_combustion_temperature_classes&quot;</li>
-<li><code>simulator/core.py:9814</code> - def _oxidized_stage0_products(: Premise: Sephton 2004 (REF-024) partitions organic C into labile</li>
+<li><code>simulator/core.py:10095</code> - def _oxidized_stage0_products(: The earlier text here cited Sephton (REF-024) as authority for applying</li>
+<li><code>simulator/core.py:10097</code> - def _oxidized_stage0_products(: backwards. REF-024 is the 2004 GCA hydropyrolysis study</li>
 </ul>
 </section>
 <section class="entry" id="REF-025">
@@ -62,10 +71,10 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/feedstocks.yaml:1959</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
-<li><code>data/feedstocks.yaml:1989</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
-<li><code>data/feedstocks.yaml:2066</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
-<li><code>data/feedstocks.yaml:2071</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
-<li><code>data/feedstocks.yaml:2095</code> - cm_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-025 Pearson et al. 2006 + Smith &amp; Kaplan 1970 constrain CM organic matter to 2.0 wt% [1.5, 3.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:1988</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:2064</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:2069</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
+<li><code>data/feedstocks.yaml:2092</code> - cm_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-025 Pearson et al. 2006 + Smith &amp; Kaplan 1970 constrain CM organic matter to 2.0 wt% [1.5, 3.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-026">
@@ -77,7 +86,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/feedstocks.yaml:1964</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-028 REF-026 Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&amp;PS 39:3-16; Endress M. &amp; Bischoff A. 1996, GCA 60:3035-3045.&quot;</li>
-<li><code>data/feedstocks.yaml:2071</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
+<li><code>data/feedstocks.yaml:2069</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-027">
@@ -89,8 +98,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/feedstocks.yaml:1959</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
-<li><code>data/feedstocks.yaml:1989</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
-<li><code>data/feedstocks.yaml:2066</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:1988</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:2064</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-028">
@@ -103,7 +112,21 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>data/feedstocks.yaml:1959</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
 <li><code>data/feedstocks.yaml:1964</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-028 REF-026 Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&amp;PS 39:3-16; Endress M. &amp; Bischoff A. 1996, GCA 60:3035-3045.&quot;</li>
-<li><code>data/feedstocks.yaml:1989</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:1988</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-059">
+<h2>REF-059</h2>
+<p class="citation">Voropaev, S.A. et al. (2023). Thermal decomposition of organic matter of carbonaceous chondrites. <em>Solar System Research</em> <strong>57</strong>: 581.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="carbonaceous-chondrites.html">carbonaceous-chondrites</a></p>
+<p><a href="https://doi.org/10.1134/S0038094623050064">doi:10.1134/S0038094623050064</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/organics_pyrolysis.yaml:82</code> - voropaev_2023_release.source: source: &quot;REF-059 Voropaev et al. 2023 Solar System Research 57(6):581 doi:10.1134/S0038094623050064 Tables 1-2&quot;</li>
+<li><code>data/organics_pyrolysis.yaml:193</code> - char_fate.boudouard.source: source: &quot;REF-059 Voropaev et al. 2023: lg Kp = -9001/T + 9.28; Kp=1 at 9001/9.28 = 970 K = 697 C (1-bar crossover; total pressure is not modelled)&quot;</li>
+<li><code>simulator/chemistry/organics_pyrolysis.py:727</code> - def char_fate(: Boudouard Kp is Voropaev&#x27;s 1-bar relation (REF-059). The ~697 C</li>
+<li><code>simulator/chemistry/organics_pyrolysis.py:836</code> - def char_fate(: &quot;1-bar Boudouard crossover is ~697 C (REF-059); Kp has no &quot;</li>
 </ul>
 </section>
 </body>
