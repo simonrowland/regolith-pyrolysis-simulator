@@ -142,10 +142,10 @@ def _temperature_range_warning(
 # the run could emit its first tick. To an operator that is indistinguishable
 # from "the run started and then hung", which is exactly how it was reported.
 #
-# The cache key is (resolved path, mtime_ns, size) rather than the path alone, so
-# editing the data file inside a live session still invalidates -- a bare
-# path-keyed memo would silently serve a stale catalog after an edit, and this
-# file is authority for vapour-rail numbers.
+# Authority data is a fixed process-lifetime snapshot. Reloading after a file
+# metadata change could mix two physics epochs inside one run, while metadata
+# cannot identify content: same-size replacements can preserve mtime. A changed
+# catalog therefore takes effect only after process restart.
 #
 # Sharing the parsed payload is consistent with the convention this project
 # already set: vapor_pressure_legacy_view memoizes by payload CONTENT DIGEST and
@@ -153,17 +153,12 @@ def _temperature_range_warning(
 # read-only". Caching the file READ therefore introduces no new sharing
 # semantics; it only stops us re-deriving an identical digest 12 times per run.
 # Both current call sites are read-only.
-_VAPOR_PAYLOAD_CACHE: dict[tuple[str, int, int], Any] = {}
-
-
-def _vapor_payload_cache_key(yaml_path: Path) -> tuple[str, int, int]:
-    stat = yaml_path.stat()
-    return (str(yaml_path.resolve()), stat.st_mtime_ns, stat.st_size)
+_VAPOR_PAYLOAD_CACHE: dict[str, Any] = {}
 
 
 def _load_vapor_payload(yaml_path: Path) -> Any:
-    """Parse the vapour-pressure YAML once per (path, mtime, size)."""
-    key = _vapor_payload_cache_key(yaml_path)
+    """Parse one fixed vapour-pressure payload per path and process lifetime."""
+    key = str(yaml_path.resolve())
     cached = _VAPOR_PAYLOAD_CACHE.get(key)
     if cached is not None:
         return cached

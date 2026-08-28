@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import math
+import os
 import textwrap
 from pathlib import Path
 
@@ -382,11 +383,54 @@ def test_vapor_pressure_yaml_is_parsed_once_across_calls(monkeypatch):
         assert again is first, "cached payload should be the same object"
     assert calls["n"] == 1, (
         f"vapour YAML re-parsed {calls['n']} times across 6 calls; it must be "
-        "parsed once per (path, mtime, size)"
+        "parsed once per path, per process"
     )
 
-    # An edited file must invalidate: forge a changed mtime/size in the key.
-    forged = (str(fd._DEFAULT_VAPOR_PRESSURES_PATH.resolve()), 1, 1)
-    assert forged not in fd._VAPOR_PAYLOAD_CACHE, (
-        "cache key must include mtime and size so an edited data file is re-read"
-    )
+
+def test_vapor_payload_is_fixed_for_process_lifetime_across_replacements(
+    tmp_path: Path,
+) -> None:
+    from engines.builtin import foulant_disposition as fd
+
+    yaml_path = tmp_path / "vapor.yaml"
+    first_text = "value: aaa\n"
+    collision_text = "value: bbb\n"
+    later_text = "value: ccc\n"
+    assert len(first_text) == len(collision_text) == len(later_text)
+    yaml_path.write_text(first_text, encoding="utf-8")
+    initial_stat = yaml_path.stat()
+    fd._VAPOR_PAYLOAD_CACHE.clear()
+
+    try:
+        first = fd._load_vapor_payload(yaml_path)
+
+        yaml_path.write_text(collision_text, encoding="utf-8")
+        os.utime(
+            yaml_path,
+            ns=(initial_stat.st_atime_ns, initial_stat.st_mtime_ns),
+        )
+        collision_stat = yaml_path.stat()
+        assert collision_stat.st_size == initial_stat.st_size
+        assert collision_stat.st_mtime_ns == initial_stat.st_mtime_ns
+        collision = fd._load_vapor_payload(yaml_path)
+        assert yaml_path.read_text(encoding="utf-8") == collision_text
+        assert collision is first
+        assert collision == {"value": "aaa"}
+
+        yaml_path.write_text(later_text, encoding="utf-8")
+        os.utime(
+            yaml_path,
+            ns=(
+                initial_stat.st_atime_ns,
+                initial_stat.st_mtime_ns + 1_000_000_000,
+            ),
+        )
+        later = fd._load_vapor_payload(yaml_path)
+        assert later is first, "authority payload changed within one process"
+        assert later == {"value": "aaa"}
+
+        fd._VAPOR_PAYLOAD_CACHE.clear()
+        restarted = fd._load_vapor_payload(yaml_path)
+        assert restarted == {"value": "ccc"}
+    finally:
+        fd._VAPOR_PAYLOAD_CACHE.clear()

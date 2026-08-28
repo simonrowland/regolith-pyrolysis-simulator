@@ -312,6 +312,12 @@ class StagedReplay:
 
 
 @dataclass(frozen=True)
+class _StagedPrefixReplayEntry:
+    result: ScoredResult
+    persisted: bool
+
+
+@dataclass(frozen=True)
 class StudyConfig:
     profile: str | Mapping[str, Any]
     feedstock: str
@@ -667,7 +673,7 @@ def run(
     journal_tell_seq = 0
     journal_mode = "w"
     provenance_mode = "w"
-    prefix_replay_cache: dict[str, ScoredResult] = {}
+    prefix_replay_cache: dict[str, _StagedPrefixReplayEntry] = {}
     loop_profile = (
         _profile_for_cache_phase(
             resolved_profile,
@@ -3350,7 +3356,7 @@ def _evaluate_candidates(
     constraints: Any,
     store: ResultStore,
     definitions: Sequence[ObjectiveDefinition],
-    prefix_replay_cache: dict[str, ScoredResult],
+    prefix_replay_cache: dict[str, _StagedPrefixReplayEntry],
     skip_store_lookup: bool = False,
     per_eval_timeout_seconds: float | None = None,
 ) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int]:
@@ -3493,7 +3499,7 @@ def _ensure_staged_prefix_replay(
     constraints: Any,
     store: ResultStore,
     definitions: Sequence[ObjectiveDefinition],
-    prefix_replay_cache: dict[str, ScoredResult],
+    prefix_replay_cache: dict[str, _StagedPrefixReplayEntry],
     per_eval_timeout_seconds: float | None,
 ) -> tuple[ScoredResult | None, bool]:
     if not _is_staged_candidate(candidate):
@@ -3564,7 +3570,10 @@ def _ensure_staged_prefix_replay(
     if not isinstance(prefix_spec, PrefixEvalSpec):
         raise StagedBeamStateError("staged prefix spec was not a PrefixEvalSpec")
     prefix_key = cache_key(prefix_spec)
-    if prefix_key in prefix_replay_cache:
+    replay_entry = prefix_replay_cache.get(prefix_key)
+    if replay_entry is not None:
+        if not replay_entry.persisted:
+            return replay_entry.result, False
         cached = store.lookup(prefix_spec)
         if cached is None:
             raise StagedBeamStateError(f"verified staged prefix vanished: {prefix_key}")
@@ -3572,7 +3581,10 @@ def _ensure_staged_prefix_replay(
 
     cached = store.lookup(prefix_spec)
     if cached is not None:
-        prefix_replay_cache[prefix_key] = cached
+        prefix_replay_cache[prefix_key] = _StagedPrefixReplayEntry(
+            result=cached,
+            persisted=True,
+        )
         return cached, False
 
     fresh = _evaluate_prefix_one(
@@ -3626,13 +3638,19 @@ def _ensure_staged_prefix_replay(
             prefix_key,
             ",".join(exc.reasons),
         )
-        prefix_replay_cache[prefix_key] = light_fresh
+        prefix_replay_cache[prefix_key] = _StagedPrefixReplayEntry(
+            result=light_fresh,
+            persisted=False,
+        )
         return light_fresh, True
     cached = store.lookup(prefix_spec)
     if cached is None:
         raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")
     assert_prefix_replay_equal(cached, light_fresh)
-    prefix_replay_cache[prefix_key] = cached
+    prefix_replay_cache[prefix_key] = _StagedPrefixReplayEntry(
+        result=cached,
+        persisted=True,
+    )
     return cached, True
 
 

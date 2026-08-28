@@ -33,7 +33,7 @@ from simulator.optimize.recipe import (
     c5_sampler_context,
     conditional_context_metadata,
 )
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.strategy import staged as staged_module
 from simulator.optimize.strategy.staged import (
     StagedAllowlistError,
@@ -478,6 +478,55 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
             ),
     )
     assert_prefix_replay_equal(cached, fresh)
+
+
+def test_staged_prefix_replay_reuses_rejected_write_for_second_sibling(
+    tmp_path,
+) -> None:
+    class RejectingPrefixStore(SpyStore):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            self.prefix_write_rejections = 0
+
+        def store(
+            self,
+            eval_spec: EvalSpec,
+            scored: ScoredResult,
+            *,
+            created_at: str,
+        ) -> None:
+            if isinstance(eval_spec, PrefixEvalSpec):
+                self.prefix_write_rejections += 1
+                raise ResultStoreWriteRejected(("test-prefix-write-refusal",))
+            super().store(eval_spec, scored, created_at=created_at)
+
+    store = RejectingPrefixStore(tmp_path / "cache.sqlite")
+    evaluator = SpyEvaluator()
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "internal-analytical",
+        parallel=1,
+        budget=4,
+        out_dir=tmp_path,
+        seed=7,
+        evaluator=evaluator,
+        result_store=store,
+    )
+
+    depth_one_records = [
+        record for record in result.records if "-01-" in record.candidate_id
+    ]
+    prefix_lookups = [
+        spec for spec in store.lookup_specs if isinstance(spec, PrefixEvalSpec)
+    ]
+    assert len(depth_one_records) == 2
+    assert result.prefix_evals_run == 1
+    assert store.prefix_write_rejections == 1
+    assert len(prefix_lookups) == 1
+    assert store.lookup(prefix_lookups[0]) is None
 
 
 def test_staged_prefix_replay_refuses_invented_stage_before_identity(
