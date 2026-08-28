@@ -20,9 +20,11 @@ from __future__ import annotations
 
 import json
 import re
+import time
 
 import pytest
 
+from .journey_budget import JOURNEY_TIMEOUT_S, RUN_COMPLETE_TOTAL_MS
 from .playwright_support import PLAYWRIGHT_SYNC_API
 
 expect = PLAYWRIGHT_SYNC_API.expect if PLAYWRIGHT_SYNC_API is not None else None
@@ -61,7 +63,7 @@ if PLAYWRIGHT_SYNC_API is not None:
         "low-pressure transport support"
     ),
 )
-@pytest.mark.timeout(300)
+@pytest.mark.timeout(JOURNEY_TIMEOUT_S)
 def test_happy_path_journey(page, evidence, artifacts_dir):
     step_results: list[tuple[str, bool, str]] = []
 
@@ -163,22 +165,54 @@ def test_happy_path_journey(page, evidence, artifacts_dir):
     # test fails loudly listing every failed step.
     last_hour = float(detail.split("::", 1)[0])
     step5_ok = False
+    # Each wait re-arms RUN_COMPLETE_MS, so the loop is bounded per-hour but NOT
+    # in total. Hold one deadline across the whole loop and clamp each wait to
+    # what is left, so a run that advances forever is reported by this test
+    # rather than killed by the outer pytest timeout (which harvests nothing).
+    loop_started = time.monotonic()
+    loop_deadline = loop_started + RUN_COMPLETE_TOTAL_MS / 1000.0
+    exhausted_total = False
+    stalled = False
     try:
         while verdict == "ADVANCED":
-            verdict, detail = wait_for_run_state(page, last_hour=last_hour, timeout_ms=RUN_COMPLETE_MS)
+            remaining_ms = int((loop_deadline - time.monotonic()) * 1000)
+            if remaining_ms <= 0:
+                exhausted_total = True
+                break
+            verdict, detail = wait_for_run_state(
+                page,
+                last_hour=last_hour,
+                timeout_ms=min(RUN_COMPLETE_MS, remaining_ms),
+            )
             if verdict == "ADVANCED":
                 last_hour = float(detail.split("::", 1)[0])
                 evidence.harvest_socket_log(phase=f"hour-{last_hour:g}")
     except PlaywrightTimeoutError:
+        stalled = True
         evidence.harvest_socket_log(phase="complete-timeout")
+        cancel_run_quietly(page, evidence)
+        # Report what was actually spent. The elapsed figure is the whole loop,
+        # not one wait's budget, so a run that stalled on hour 7 does not get
+        # described as if it had only ever been given a single window.
+        record(
+            "5-results",
+            False,
+            f"run stalled at Hour: {last_hour} — no further hour within "
+            f"{RUN_COMPLETE_MS // 1000}s (loop elapsed "
+            f"{time.monotonic() - loop_started:.0f}s)",
+        )
+    # Exactly one of these three outcomes records a verdict: stalled (no further
+    # hour), exhausted (advanced forever), or the loop ended on a terminal state.
+    if exhausted_total:
+        evidence.harvest_socket_log(phase="complete-total-exhausted")
         cancel_run_quietly(page, evidence)
         record(
             "5-results",
             False,
-            f"run advanced to Hour: {last_hour} but did not reach 'Complete' within "
-            f"{RUN_COMPLETE_MS // 1000}s at max speed",
+            f"run kept advancing but never reached 'Complete': reached Hour: "
+            f"{last_hour} in {RUN_COMPLETE_TOTAL_MS // 1000}s at max speed",
         )
-    else:
+    elif not stalled:
         if verdict != "COMPLETE":
             evidence.harvest_socket_log(phase="step5-terminal")
             cancel_run_quietly(page, evidence)

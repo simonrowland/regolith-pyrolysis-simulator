@@ -45,17 +45,23 @@ ARTIFACTS_ROOT = E2E_DIR / "artifacts"
 # Bounded waits (milliseconds). Baselines measured by the controller:
 # GET / ~1.1 s, GET /api/runs ~1.2 s, GET /thermal-train ~0.002 s,
 # GET /optimizer ~7 MINUTES (known live defect, fix in flight).
-PAGE_LOAD_MS = 30_000
-SOCKET_CONNECT_MS = 20_000
-FEEDSTOCK_CARD_MS = 15_000
-STATUS_CHANGE_MS = 30_000
-START_ACK_MS = 60_000
-TICK_ADVANCE_MS = 90_000
-RUN_COMPLETE_MS = 180_000
-OPTIMIZER_BOUND_MS = 120_000
-THERMAL_TRAIN_MS = 30_000
-STALL_THRESHOLD_MS = 90_000
-WATCHDOG_WINDOW_MS = 360_000
+from .journey_budget import (  # noqa: F401 -- re-exported for existing importers
+    FEEDSTOCK_CARD_MS,
+    JOURNEY_BUDGET_MS,
+    JOURNEY_MARGIN_MS,
+    JOURNEY_TIMEOUT_S,
+    OPTIMIZER_BOUND_MS,
+    PAGE_LOAD_MS,
+    RUN_COMPLETE_MS,
+    RUN_COMPLETE_TOTAL_MS,
+    SOCKET_CONNECT_MS,
+    STALL_THRESHOLD_MS,
+    START_ACK_MS,
+    STATUS_CHANGE_MS,
+    THERMAL_TRAIN_MS,
+    TICK_ADVANCE_MS,
+    WATCHDOG_WINDOW_MS,
+)
 
 DEFAULT_FEEDSTOCK = "lunar_mare_low_ti"
 
