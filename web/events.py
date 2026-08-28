@@ -2877,10 +2877,19 @@ def _start_background_loop(
                     reason = str(
                         reason or f'{cname}_endpoint_refused'
                     )
+                    # SECOND REFUSAL CONSTRUCTION SITE -- it must explain itself
+                    # too. The first fix for the raw-token status line patched
+                    # only the typed-exception handler above, and this is the
+                    # path a C4 endpoint refusal actually takes, so the operator
+                    # still saw `refused - viscous_p_bulk_transport_out_of_domain`
+                    # in the live app. Caught by the e2e harness, which captured
+                    # the emitted payload verbatim and showed message == reason.
+                    # Two sites build this payload; both go through the shared
+                    # explanation table.
                     refusal_payload = {
                         'status': 'refused',
                         'reason': reason,
-                        'message': reason,
+                        'message': _refusal_message(reason),
                         'backend_status': backend_status,
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,

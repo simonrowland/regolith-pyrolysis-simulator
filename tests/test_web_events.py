@@ -5362,3 +5362,48 @@ def test_refusal_message_explains_without_replacing_the_machine_reason():
     assert web_events._refusal_message(unmapped) == unmapped, (
         "an unmapped reason must surface verbatim rather than be softened"
     )
+
+
+def test_every_refusal_payload_explains_itself_not_just_one_of_them():
+    """EVERY refusal builder must route through the explanation table.
+
+    The first fix for the raw-token status line patched only the typed-exception
+    handler, and the C4 endpoint refusal is built at a SECOND site that still
+    assigned `'message': reason`. So the operator kept seeing
+    `refused - viscous_p_bulk_transport_out_of_domain` in the live app while the
+    unit test for the mapping function passed. The e2e harness caught it by
+    capturing the emitted socket payload verbatim.
+
+    This is a SOURCE-LEVEL guard and that is deliberate: the defect was a MISSED
+    SITE, not wrong logic at a site, so the property worth pinning is "no refusal
+    payload assigns the bare reason as its message" across the whole module. A
+    behavioural test at one site is exactly what failed to catch this. Reaching
+    the C4 branch behaviourally needs a 35-hour simulated run, which does not
+    belong in a unit suite; the e2e harness covers that end.
+    """
+    import re
+    from pathlib import Path
+
+    source = Path(web_events.__file__).read_text(encoding="utf-8")
+
+    # every dict literal that declares itself a refusal
+    refusal_blocks = [
+        m.start() for m in re.finditer(r"'status':\s*'refused'", source)
+    ]
+    assert refusal_blocks, "expected at least one refusal payload in web.events"
+
+    offenders = []
+    for start in refusal_blocks:
+        block = source[start:start + 400]
+        message_line = re.search(r"'message':\s*([^,\n]+)", block)
+        if not message_line:
+            continue
+        expr = message_line.group(1).strip()
+        # the bare token, however it is spelled, is the defect
+        if expr in {"reason", "exc.reason", "str(reason)", "str(exc.reason)"}:
+            offenders.append((start, expr))
+
+    assert not offenders, (
+        "refusal payload(s) emit the raw reason token as the operator-facing "
+        f"message instead of routing through _refusal_message: {offenders}"
+    )
