@@ -587,9 +587,69 @@ def test_overhead_o2_not_double_counted_across_ticks():
         "process.overhead_gas").get("O2", 0.0) == pytest.approx(0.0)
 
 
+def _sio_authoritative_carrier():
+    return {
+        "species_id": "SiO",
+        "pressure": {"kind": "value", "pa": 50.0},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "authoritative",
+        "certification_ceiling": "validated_point",
+        "validation_status": "validated",
+        "is_union_flux_eligible": True,
+        "is_flux_active": True,
+    }
+
+
+def _sio_in_domain_train_sim():
+    """SiO train with an executable wall-saturation row at Stage-3 T."""
+
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sio_antoine = {
+        "A": 11.817,
+        "B": 18700.0,
+        "C": 0.0,
+        "valid_range_K": [1200.0, 2000.0],
+    }
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
+        {
+            "metals": {},
+            "oxide_vapors": {
+                "SiO": {
+                    "parent_oxide": "SiO2",
+                    "molar_mass_g_mol": MOLAR_MASS["SiO"],
+                    "fit_target": "pure_component",
+                    "antoine": dict(sio_antoine),
+                    "pure_component_antoine": dict(sio_antoine),
+                    "valid_range_K": [1200.0, 2000.0],
+                    "stoich_oxide_per_vapor": (
+                        MOLAR_MASS["SiO2"] / MOLAR_MASS["SiO"]
+                    ),
+                    "stoich_O2_per_vapor": (
+                        0.5 * MOLAR_MASS["O2"] / MOLAR_MASS["SiO"]
+                    ),
+                    "condensation_products_mol_per_mol_vapor": {
+                        "Si": 0.5,
+                        "SiO2": 0.5,
+                    },
+                },
+            },
+        },
+    )
+    sim.load_batch("silica", mass_kg=1000.0)
+    return sim
+
+
 def test_partial_sio_condensation_keeps_overhead_gas_in_mass_balance():
-    sim = _sio_train_sim()
-    flux = EvaporationFlux(species_kg_hr={"SiO": 100.0}, total_kg_hr=100.0)
+    sim = _sio_in_domain_train_sim()
+    flux = EvaporationFlux(
+        species_kg_hr={"SiO": 100.0},
+        total_kg_hr=100.0,
+        carrier_authority_by_species={"SiO": _sio_authoritative_carrier()},
+    )
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
@@ -606,10 +666,6 @@ def test_partial_sio_condensation_keeps_overhead_gas_in_mass_balance():
     condensed_total = sum(condensed.values())
 
     assert overhead > 0.0
-    # The 1500 C wall candidate is ~1e-35 kg, below the provider's 1e-12 kg
-    # commit floor. The credited mass therefore closes through the baffle and
-    # overhead accounts without fabricating a positive wall deposit.
-    assert wall_total == pytest.approx(0.0)
     assert "SiO" not in stage_totals
     assert stage_totals["Si"] == pytest.approx(condensed["Si"])
     assert stage_totals["SiO2"] == pytest.approx(condensed["SiO2"])
@@ -618,6 +674,31 @@ def test_partial_sio_condensation_keeps_overhead_gas_in_mass_balance():
     assert products["Si"] == pytest.approx(condensed["Si"])
     assert products["SiO2"] == pytest.approx(condensed["SiO2"])
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
+
+
+def test_sio_condensation_without_saturation_or_carrier_authority_does_not_capture():
+    """Missing Antoine/carrier input must not invent stage capture or a zero."""
+
+    sim = _sio_train_sim()
+    flux = EvaporationFlux(species_kg_hr={"SiO": 100.0}, total_kg_hr=100.0)
+
+    sim._route_to_condensation(flux)
+    sim._update_melt_composition(flux)
+
+    condensed = sim.atom_ledger.kg_by_account("process.condensation_train")
+    overhead = sim.atom_ledger.kg_by_account("process.overhead_gas")
+    stage_totals = sim.train.total_by_species()
+    authority = sim.condensation_model.last_condensation_authority_by_species
+
+    assert "Si" not in condensed
+    assert "SiO2" not in condensed
+    assert "Si" not in stage_totals
+    assert overhead.get("SiO", 0.0) == pytest.approx(100.0)
+    assert str(authority.get("SiO", {}).get("status", "")) in {
+        "missing",
+        "status_bearing",
+        "refused",
+    }
 
 
 def test_step_drains_uncondensed_overhead_vapor_each_tick():
