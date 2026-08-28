@@ -594,7 +594,7 @@ families:
             standard: lamoreaux_hildenbrand_1984_liquid_nao0_5
             gamma: 0.001
             gamma_frame: L&H liquid-NaO0.5 Raoultian (Sossi 2019 magnitude, coherent by
-              provenance — Sossi gamma is defined against L&H K)
+              provenance -- Sossi gamma is defined against L&H K)
             T_K_gamma_anchor: 1673.0
             note: 't-383 lands Pref + keeps table gamma=1e-3; does NOT re-fit gamma to
               DeMaria or enghar (ADR-001; framework §4.3.B/§6.2). Dual-attribution trap
@@ -608,7 +608,7 @@ families:
             class: TE_mu0_liquid_oxide_standard_retired_ADR001
             note: 'Retired TE-v1.0 MELTS liquid-Na2O μ0 + JANAF gas assembly (full-VapoRock
               candidate). Affirmatively contradicted by JANAF-only liquid assembly at
-              −4.121 dex / 112.7 kJ/mol per NaO0.5 at 1429 K. Never certifies; peer/shadow
+              -4.121 dex / 112.7 kJ/mol per NaO0.5 at 1429 K. Never certifies; peer/shadow
               lower bound only (same class as demoted Ca/Mg TE gas_rail).'
           pseudo_antoine_status: inactive_provenance_only
           backsolve:
@@ -650,17 +650,17 @@ families:
               assembly, DOI 10.1063/1.555706; halved to liquid NaO0.5 Raoultian standard reaction;
               DeMaria 1971 retained only as held-out validation
             activity_basis: single-cation NaO0.5 Raoultian activity
-            # Premise: Na2O(l) = 2 Na(g) + 1/2 O2(g); NaO0.5 basis halves ΔG and log10 K.
-            # Algebra: ΔG°/RT = ΔH°298,rxn/(R·T) − Δfef(T); log10 K_r,full = −ΔG°/(RT ln10);
+            # Premise: Na2O(l) = 2 Na(g) + 1/2 O2(g); NaO0.5 basis halves DeltaG and log10 K.
+            # Algebra: DeltaG°/RT = DeltaH°298,rxn/(R·T) - Deltafef(T); log10 K_r,full = -DeltaG°/(RT ln10);
             #   log10 K_r,NaO0.5 = 1/2 log10 K_r,full (atm standard, paper §2.1c).
-            #   ΔH°298,rxn/R = 2·12.88 − (−50.17) = 75.93 kK (Table 4); fef from Table 2
+            #   DeltaH°298,rxn/R = 2·12.88 - (-50.17) = 75.93 kK (Table 4); fef from Table 2
             #   liquid Na2O + Na(g) + O2 segments (verified dual extraction t-383 Step 0).
             # Units: K_r is dimensionless on the 1 atm standard; runtime Pref uses 1 bar
-            #   (100000 Pa). Conversion (Δn_gas = 1.25): log10(P_ref/Pa) = log10 K_r,atm
+            #   (100000 Pa). Conversion (Deltan_gas = 1.25): log10(P_ref/Pa) = log10 K_r,atm
             #   + log10(1e5) + 1.25·log10(1.01325) = log10 K_r,atm + 5.007145765517163.
-            # Sanity: fit residual 1.18e-4 dex on 1405–1600 K grid; denser 5 K grid same
-            #   max|Δ|; Sossi second-hand linear (ΔH=255 kJ/mol, ΔS=0.128 kJ/mol/K) is
-            #   NOT the landed Pref (cross-check only in kems-012) — table assembly is
+            # Sanity: fit residual 1.18e-4 dex on 1405-1600 K grid; denser 5 K grid same
+            #   max|Delta|; Sossi second-hand linear (DeltaH=255 kJ/mol, DeltaS=0.128 kJ/mol/K) is
+            #   NOT the landed Pref (cross-check only in kems-012) -- table assembly is
             #   ~0.62 dex lower at 1429 K than that linear form.
             fit_form: log10(P_Na_Pa)=A-B/(T_K+C)+log10(a_NaO0.5)-0.25*log10(pO2_bar/1bar)
             pressure_standard_Pa: 100000
@@ -718,7 +718,7 @@ families:
                 for 12022); runtime assumes fully liquid activity surface
             heldout_demaria_comparison:
             # Per-sample per-T binding (t-383 Step 3). Residuals reported, never fitted.
-            # σ_log10P = 0.30 dex/pt pre-registered + one correlated cell-calibration offset.
+            # sigma_log10P = 0.30 dex/pt pre-registered + one correlated cell-calibration offset.
             # pO2 from demaria_1971_o2_psat_table1_alkali_range (sample-specific, log-linear).
             # measured pNa from figure-digitized line (extract line_anchor / digitized points).
             - sample: '12022'
@@ -742,7 +742,7 @@ families:
               residual_dex_model_minus_demaria: -0.3527
               domain_status: in_domain
               partial_melt: true
-              note: investigation anchor; extract line_anchor_1429K p=7.93e-2 Pa; |res| near σ=0.30
+              note: investigation anchor; extract line_anchor_1429K p=7.93e-2 Pa; |res| near sigma=0.30
             - sample: '12022'
               T_K: 1475.0
               log10_pO2_bar: -7.2988
@@ -777,7 +777,7 @@ families:
               partial_melt: true
               note: own 12065 composition and Table-1 pO2; measured pNa is a
                 digitized-line extrapolation ~7 K beyond the last digitized
-                12065 point (span ends 1474.93 K) — effective sigma exceeds
+                12065 point (span ends 1474.93 K) -- effective sigma exceeds
                 the per-point 0.30 dex (t-383 final review P2-2)
             - sample: '12065'
               T_K: 1499.0
@@ -791,7 +791,7 @@ families:
               partial_melt: true
               note: own 12065 composition and Table-1 pO2; measured pNa is a
                 digitized-line extrapolation ~24 K beyond the last digitized
-                12065 point (span ends 1474.93 K) — effective sigma exceeds
+                12065 point (span ends 1474.93 K) -- effective sigma exceeds
                 the per-point 0.30 dex (t-383 final review P2-2)
           pure_component_antoine:
             source: REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235);
@@ -809,7 +809,7 @@ families:
           #   p_Na/Pstd = K * a_NaO0.5 * (fO2/Pstd)^-0.25.
           # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
           # multiplies the solved ratio by Pstd=100000 Pa before HKL.
-          # Sanity: lower fO2 increases Na; monatomic ν=−1/4 slope preserved.
+          # Sanity: lower fO2 increases Na; monatomic ν=-1/4 slope preserved.
           pO2_exponent: -0.25
           pO2_reference_bar: 1.0
           boiling_point_C: 883
@@ -820,7 +820,7 @@ families:
             assembly (DOI 10.1063/1.555706), halved to the single-cation NaO0.5 Raoultian
             basis consumed by melt activity. Table gamma_NaO0.5=1e-3 is coherent by
             provenance in the L&H frame (Sossi 2019). DeMaria 12022/12065 are held-out
-            validation with pre-registered σ; residuals are reported, never fitted away.
+            validation with pre-registered sigma; residuals are reported, never fitted away.
             Full-VapoRock/TE-μ0 route is a status-bearing non-authoritative shadow bracket
             only (ADR-001). authority_class remains uncertified (framework §6.5).
 
@@ -866,8 +866,8 @@ families:
             reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                # Minimax |log10 P_fit − log10 P_assembly| on the extracted liquid
-                # grid 1405–1600 K (K precedent). max|res| = 1.18e-4 dex.
+                # Minimax |log10 P_fit - log10 P_assembly| on the extracted liquid
+                # grid 1405-1600 K (K precedent). max|res| = 1.18e-4 dex.
                 A: 11.342243
                 B: 12140.316409
                 C: -163.701
@@ -1758,9 +1758,9 @@ families:
       # b-136 / t-559 (RP3) 2026-08-08 posture rework: Zhang 2014 CaTiO3
       # perovskite activity proxy remains WITHDRAWN as a mis-tagged HKL α for
       # the Ca silicate-melt carrier. Missing α is NOT a missing
-      # pressure — α is a kinetic correction on a pressure we already have.
-      # Fail-closed category: ungrounded kinetic coefficient → compute with
-      # Hertz–Knudsen ideal α=1.0 as an explicit upper bound and mark
+      # pressure -- α is a kinetic correction on a pressure we already have.
+      # Fail-closed category: ungrounded kinetic coefficient -> compute with
+      # Hertz-Knudsen ideal α=1.0 as an explicit upper bound and mark
       # status-bearing (never certifies). Refuse (status=no_data) would convert
       # an unjustified coefficient into an unjustified zero and silently drop
       # rail channels (silent-zero class; b-139/b-149). Mn α=1 monoatomic-class
@@ -1768,7 +1768,7 @@ families:
       evaporation_alpha:
         value: 1.0
         status: analytical_upper_bound
-        source: 'b-136/t-559 2026-08-08: Zhang et al. 2014 GCA 140:365-380 CaTiO3 perovskite activity proxy WITHDRAWN as mis-tagged HKL α for the Ca silicate-melt carrier. No grounded melt-carrier α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient; NOT a silent default. Species-class model is t-561.'
+        source: 'b-136/t-559 2026-08-08: Zhang et al. 2014 GCA 140:365-380 CaTiO3 perovskite activity proxy WITHDRAWN as mis-tagged HKL α for the Ca silicate-melt carrier. No grounded melt-carrier α. Hertz-Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux <= this). NOT a measured coefficient; NOT a silent default. Species-class model is t-561.'
         T_band_K:
         - 1200
         - 2500
@@ -2287,9 +2287,9 @@ families:
       # b-136 / t-559 (RP3) 2026-08-08 posture rework: Zhang 2014 CaTiO3
       # perovskite activity proxy remains WITHDRAWN as a mis-tagged HKL α for
       # the Ti silicate-melt carrier. Missing α is NOT a missing
-      # pressure — α is a kinetic correction on a pressure we already have.
-      # Fail-closed category: ungrounded kinetic coefficient → compute with
-      # Hertz–Knudsen ideal α=1.0 as an explicit upper bound and mark
+      # pressure -- α is a kinetic correction on a pressure we already have.
+      # Fail-closed category: ungrounded kinetic coefficient -> compute with
+      # Hertz-Knudsen ideal α=1.0 as an explicit upper bound and mark
       # status-bearing (never certifies). Refuse (status=no_data) would convert
       # an unjustified coefficient into an unjustified zero and silently drop
       # rail channels (silent-zero class; b-139/b-149). Mn α=1 monoatomic-class
@@ -2297,7 +2297,7 @@ families:
       evaporation_alpha:
         value: 1.0
         status: analytical_upper_bound
-        source: 'b-136/t-559 2026-08-08: Zhang et al. 2014 GCA 140:365-380 CaTiO3 perovskite activity proxy WITHDRAWN as mis-tagged HKL α for the Ti silicate-melt carrier. No grounded melt-carrier α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient; NOT a silent default. Species-class model is t-561.'
+        source: 'b-136/t-559 2026-08-08: Zhang et al. 2014 GCA 140:365-380 CaTiO3 perovskite activity proxy WITHDRAWN as mis-tagged HKL α for the Ti silicate-melt carrier. No grounded melt-carrier α. Hertz-Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux <= this). NOT a measured coefficient; NOT a silent default. Species-class model is t-561.'
         T_band_K:
         - 1200
         - 2500
@@ -2946,13 +2946,13 @@ families:
       # b-136 / t-559 (RP3) 2026-08-08 posture rework: parent Zhang 2014 CaTiO3
       # mis-tagged proxy stays withdrawn. No TiO-specific α was ever
       # grounded. Same fail-closed category as parent: missing kinetic α is not
-      # missing pressure → Hertz–Knudsen ideal α=1.0 as explicit status-bearing
+      # missing pressure -> Hertz-Knudsen ideal α=1.0 as explicit status-bearing
       # upper bound (never certifies). Keeps the channel live so b-145 Ti
       # pressure fixes and refractory rump tracking remain observable.
       evaporation_alpha:
         value: 1.0
         status: analytical_upper_bound
-        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ti_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no TiO-specific HKL α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient. Species-class model is t-561.'
+        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ti_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no TiO-specific HKL α. Hertz-Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux <= this). NOT a measured coefficient. Species-class model is t-561.'
         T_band_K:
         - 1200
         - 2500
@@ -3111,13 +3111,13 @@ families:
       # b-136 / t-559 (RP3) 2026-08-08 posture rework: parent Zhang 2014 CaTiO3
       # mis-tagged proxy stays withdrawn. No TiO2_gas-specific α was ever
       # grounded. Same fail-closed category as parent: missing kinetic α is not
-      # missing pressure → Hertz–Knudsen ideal α=1.0 as explicit status-bearing
+      # missing pressure -> Hertz-Knudsen ideal α=1.0 as explicit status-bearing
       # upper bound (never certifies). Keeps the channel live so b-145 Ti
       # pressure fixes and refractory rump tracking remain observable.
       evaporation_alpha:
         value: 1.0
         status: analytical_upper_bound
-        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ti_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no TiO2_gas-specific HKL α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient. Species-class model is t-561.'
+        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ti_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no TiO2_gas-specific HKL α. Hertz-Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux <= this). NOT a measured coefficient. Species-class model is t-561.'
         T_band_K:
         - 1200
         - 2500
@@ -3293,13 +3293,13 @@ families:
       # b-136 / t-559 (RP3) 2026-08-08 posture rework: parent Zhang 2014 CaTiO3
       # mis-tagged proxy stays withdrawn. No CaO_gas-specific α was ever
       # grounded. Same fail-closed category as parent: missing kinetic α is not
-      # missing pressure → Hertz–Knudsen ideal α=1.0 as explicit status-bearing
+      # missing pressure -> Hertz-Knudsen ideal α=1.0 as explicit status-bearing
       # upper bound (never certifies). Keeps the channel live so b-145 Ti
       # pressure fixes and refractory rump tracking remain observable.
       evaporation_alpha:
         value: 1.0
         status: analytical_upper_bound
-        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ca_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no CaO_gas-specific HKL α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient. Species-class model is t-561.'
+        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ca_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no CaO_gas-specific HKL α. Hertz-Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux <= this). NOT a measured coefficient. Species-class model is t-561.'
         T_band_K:
         - 1200
         - 2500
@@ -4381,13 +4381,13 @@ families:
       # b-136 / t-559 (RP3) 2026-08-08 posture rework: parent Zhang 2014 CaTiO3
       # mis-tagged proxy stays withdrawn. No Ca2-specific α was ever
       # grounded. Same fail-closed category as parent: missing kinetic α is not
-      # missing pressure → Hertz–Knudsen ideal α=1.0 as explicit status-bearing
+      # missing pressure -> Hertz-Knudsen ideal α=1.0 as explicit status-bearing
       # upper bound (never certifies). Keeps the channel live so b-145 Ti
       # pressure fixes and refractory rump tracking remain observable.
       evaporation_alpha:
         value: 1.0
         status: analytical_upper_bound
-        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ca_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no Ca2-specific HKL α. Hertz–Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux ≤ this). NOT a measured coefficient. Species-class model is t-561.'
+        source: 'b-136/t-559 2026-08-08: former status-bearing cascade of metals_ca_family Zhang 2014 CaTiO3 mis-tagged proxy WITHDRAWN; no Ca2-specific HKL α. Hertz-Knudsen ideal α=1.0 retained as explicit upper-bound kinetic ceiling (status_bearing, never certifies; true flux <= this). NOT a measured coefficient. Species-class model is t-561.'
         T_band_K:
         - 1200
         - 2500
@@ -13445,7 +13445,7 @@ families:
             #   composites evaluate the raw Antoine in-domain through 1900 K.
             # Measured base incoherence (unit-activity, pO2=1 bar):
             #   +0.026 dex @1900 K; +0.055 dex @2073 K (1800 °C plant point);
-            #   Na2 pressure inherits ~2× via r_base² (≤0.11 dex @2073 K).
+            #   Na2 pressure inherits ~2x via r_base² (<=0.11 dex @2073 K).
             # Direction: composite LOW vs monatomic-coherent. Coefficient-
             # identity with metals_na_family Na Pref is byte-true; runtime
             # identity holds only inside the L&H fit domain. Pins at 1950 K
@@ -13462,7 +13462,7 @@ families:
                   Composite keeps the pre-existing [1400,1900] process window;
                   L&H base coefficients are extrapolated above 1600 K while the
                   monatomic row uses 1/T OOR tangent continuation. Quantified
-                  base incoherence ≤0.055 dex at 2073 K (1800 °C).
+                  base incoherence <=0.055 dex at 2073 K (1800 °C).
             provenance:
             - source_id: nasa-cea-thermo
               observation_ids:
@@ -13475,7 +13475,7 @@ families:
               note: 'b-151 (2026-08-08): monatomic base Pref retargeted to L&H liquid-NaO0.5
                 unit-activity Antoine (t-383 landed monatomic). Prior base A=5.18586 /
                 B=11127.434869 / C=1000 was the retired pseudo_psat_backsolved_from_vaporock
-                effective-pressure fit (activity already folded at grid compositions) —
+                effective-pressure fit (activity already folded at grid compositions) --
                 dual-attribution class. See docs-private/research/2026-08-08-b151-na-composites/.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_na2o_to_na2_gas
@@ -13486,7 +13486,7 @@ families:
               coefficients:
                 # Aligned with monatomic Na L&H liquid-NaO0.5 Pref (t-383 / b-151 2026-08-08).
                 # Was retired VapoRock pseudo_psat A=5.18586 / B=11127.434869 / C=1000
-                # (activity-folded effective pressure — NOT a unit-activity reference).
+                # (activity-folded effective pressure -- NOT a unit-activity reference).
                 A: 11.342243
                 B: 12140.316409
                 C: -163.701
@@ -13512,12 +13512,12 @@ families:
             #   reference_pressure_model). Composite Na2 = 2 Na(g) exchange, so
             #   runtime then multiplies by a_Na2O once via activity_exponent.
             # Algebra: r_v = (K_exchange * r_base^2.0 * r_O2^0.0)^(1/1),
-            #   K_exchange = exp(-ΔG_exchange/RT); final p_v = r_v * P0 * a^1 * (pO2/pO2_ref)^-0.5.
+            #   K_exchange = exp(-DeltaG_exchange/RT); final p_v = r_v * P0 * a^1 * (pO2/pO2_ref)^-0.5.
             # Unit check: every r and K dimensionless; r_v * P0 is Pa.
             # Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric
             #   base-power limit; at a=1, pO2=pO2_ref this is P_base^2 / P0 * K.
             # DOUBLE-COUNTING BAN (b-151): do NOT re-insert the retired
-            #   pseudo_psat_backsolved_from_vaporock base (A=5.18586…). That fit
+            #   pseudo_psat_backsolved_from_vaporock base (A=5.18586...). That fit
             #   already folded melt activity at grid compositions into an
             #   *effective* pressure. Using it as base_reference then applying
             #   activity_exponent again is the dual-attribution class Ca/Mg/Na
@@ -13644,7 +13644,7 @@ families:
             #   composites evaluate the raw Antoine in-domain through 1900 K.
             # Measured base incoherence (unit-activity, pO2=1 bar):
             #   +0.026 dex @1900 K; +0.055 dex @2073 K (1800 °C plant point);
-            #   Na2 pressure inherits ~2× via r_base² (≤0.11 dex @2073 K).
+            #   Na2 pressure inherits ~2x via r_base² (<=0.11 dex @2073 K).
             # Direction: composite LOW vs monatomic-coherent. Coefficient-
             # identity with metals_na_family Na Pref is byte-true; runtime
             # identity holds only inside the L&H fit domain. Pins at 1950 K
@@ -13661,7 +13661,7 @@ families:
                   Composite keeps the pre-existing [1400,1900] process window;
                   L&H base coefficients are extrapolated above 1600 K while the
                   monatomic row uses 1/T OOR tangent continuation. Quantified
-                  base incoherence ≤0.055 dex at 2073 K (1800 °C).
+                  base incoherence <=0.055 dex at 2073 K (1800 °C).
             provenance:
             - source_id: nasa-cea-thermo
               observation_ids:
@@ -13675,7 +13675,7 @@ families:
               note: 'b-151 (2026-08-08): monatomic base Pref retargeted to L&H liquid-NaO0.5
                 unit-activity Antoine (t-383 landed monatomic). Prior base A=5.18586 /
                 B=11127.434869 / C=1000 was the retired pseudo_psat_backsolved_from_vaporock
-                effective-pressure fit (activity already folded at grid compositions) —
+                effective-pressure fit (activity already folded at grid compositions) --
                 dual-attribution class. See docs-private/research/2026-08-08-b151-na-composites/.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_na2o_to_na2o_gas_gas
@@ -13686,7 +13686,7 @@ families:
               coefficients:
                 # Aligned with monatomic Na L&H liquid-NaO0.5 Pref (t-383 / b-151 2026-08-08).
                 # Was retired VapoRock pseudo_psat A=5.18586 / B=11127.434869 / C=1000
-                # (activity-folded effective pressure — NOT a unit-activity reference).
+                # (activity-folded effective pressure -- NOT a unit-activity reference).
                 A: 11.342243
                 B: 12140.316409
                 C: -163.701
@@ -13718,12 +13718,12 @@ families:
             #   reference_pressure_model). Composite Na2O(g) exchange uses 2 Na,
             #   so runtime multiplies by a_Na2O once via activity_exponent.
             # Algebra: r_v = (K_exchange * r_base^2.0 * r_O2^0.5)^(1/1),
-            #   K_exchange = exp(-ΔG_exchange/RT); final p_v = r_v * P0 * a^1 * (pO2/pO2_ref)^0.
+            #   K_exchange = exp(-DeltaG_exchange/RT); final p_v = r_v * P0 * a^1 * (pO2/pO2_ref)^0.
             # Unit check: every r and K dimensionless; r_v * P0 is Pa.
             # Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric
             #   base-power limit; at a=1, pO2=pO2_ref this is P_base^2 * K * r_O2^0.5 / P0.
             # DOUBLE-COUNTING BAN (b-151): do NOT re-insert the retired
-            #   pseudo_psat_backsolved_from_vaporock base (A=5.18586…). That fit
+            #   pseudo_psat_backsolved_from_vaporock base (A=5.18586...). That fit
             #   already folded melt activity at grid compositions into an
             #   *effective* pressure. Using it as base_reference then applying
             #   activity_exponent again is the dual-attribution class Ca/Mg/Na

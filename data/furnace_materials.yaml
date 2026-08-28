@@ -7,7 +7,7 @@ furnace_materials:
     enabled: true
     source_note: "dense_alumina continuous_C is 1700 C; direct evidence for no-load continuous use."
     # Liner-life diagnostic only (instrument-before-gate). Refractory mapping
-    # anchors to the held-out t-477 validation sidecar (static citation only —
+    # anchors to the held-out t-477 validation sidecar (static citation only --
     # runtime must never load that file). Density stays uncited handbook.
     liner_life_diagnostic:
       refractory_material: Al2O3
@@ -19,7 +19,7 @@ furnace_materials:
         uncited common-handbook projection (~3.97 g/cm3 alpha-Al2O3);
         density is NOT in the held-out validation sidecar
         (data/literature/refractory_vaporization_validation.yaml::alumina_vacuum_screen
-        anchors vapor-pressure physics, not density) — do not invent a primary.
+        anchors vapor-pressure physics, not density) -- do not invent a primary.
         Congruent recession uses this density linearly.
       liner_thickness_mm: 100.0
       wear_budget_fraction: 0.1
@@ -46,7 +46,7 @@ furnace_materials:
         uncited common-handbook projection (~3.97 g/cm3 alpha-Al2O3);
         density is NOT in the held-out validation sidecar
         (data/literature/refractory_vaporization_validation.yaml::alumina_vacuum_screen
-        anchors vapor-pressure physics, not density) — do not invent a primary.
+        anchors vapor-pressure physics, not density) -- do not invent a primary.
         Congruent recession uses this density linearly.
       liner_thickness_mm: 100.0
       wear_budget_fraction: 0.1
@@ -85,7 +85,7 @@ furnace_materials:
         uncited bulk alpha-Al2O3 handbook projection (~3.97 g/cm3) applied as a
         provisional coating density; coating-specific density not cited and not
         present in data/literature/refractory_vaporization_validation.yaml
-        ::alumina_vacuum_screen — do not invent. Congruent recession uses this
+        ::alumina_vacuum_screen -- do not invent. Congruent recession uses this
         density linearly.
       liner_thickness_mm: 5.0
       wear_budget_fraction: 0.5
@@ -115,7 +115,7 @@ furnace_materials:
         density is NOT in the held-out validation sidecar
         (data/literature/refractory_vaporization_validation.yaml
         ::nist_janaf_named_nodes.log10_kf.SiO anchors SiO(g) thermochemistry,
-        not density) — do not invent a primary. Congruent recession uses this
+        not density) -- do not invent a primary. Congruent recession uses this
         density linearly.
       liner_thickness_mm: 100.0
       wear_budget_fraction: 0.1
@@ -176,7 +176,7 @@ furnace_materials:
       density_provenance: >
         uncited common-handbook projection (~3.97 g/cm3 alpha-Al2O3);
         density is NOT in data/literature/refractory_vaporization_validation.yaml
-        ::alumina_vacuum_screen (physics anchor only) — do not invent.
+        ::alumina_vacuum_screen (physics anchor only) -- do not invent.
       liner_thickness_mm: 100.0
       wear_budget_fraction: 0.1
       lowest_useful_temperature_C: 1200.0
@@ -228,7 +228,7 @@ furnace_materials:
       density_provenance: >
         uncited common-handbook projection (~3.58 g/cm3 crystalline MgO);
         density is NOT in data/literature/refractory_vaporization_validation.yaml
-        ::nist_janaf_named_nodes.log10_kf.MgO (thermochemistry anchor only) —
+        ::nist_janaf_named_nodes.log10_kf.MgO (thermochemistry anchor only) --
         do not invent.
       liner_thickness_mm: 100.0
       wear_budget_fraction: 0.1
@@ -254,7 +254,7 @@ furnace_materials:
       density_provenance: >
         uncited common-handbook projection (~2.20 g/cm3 fused silica);
         density is NOT in data/literature/refractory_vaporization_validation.yaml
-        ::nist_janaf_named_nodes.log10_kf.SiO (thermochemistry anchor only) —
+        ::nist_janaf_named_nodes.log10_kf.SiO (thermochemistry anchor only) --
         do not invent.
       liner_thickness_mm: 100.0
       wear_budget_fraction: 0.1
@@ -280,7 +280,7 @@ furnace_materials:
       density_provenance: >
         uncited common-handbook projection (~4.23 g/cm3 rutile TiO2);
         density is NOT in data/literature/refractory_vaporization_validation.yaml
-        ::nist_janaf_named_nodes.log10_kf.TiO2 (thermochemistry anchor only) —
+        ::nist_janaf_named_nodes.log10_kf.TiO2 (thermochemistry anchor only) --
         do not invent.
       liner_thickness_mm: 100.0
       wear_budget_fraction: 0.1

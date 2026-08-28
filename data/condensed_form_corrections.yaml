@@ -10,8 +10,8 @@
 #   - balanced stoichiometry (nu_c, nu_g) is explicit
 #   - solid solutions supply partial-molar G, not pure-endmember bulk fusion
 #
-# Audit (2026-08-09): Costa Fo93Fa7 olivine is NOT correctable here —
-# Mg2SiO4(L) CEA domain starts 2170 K (measurement 1700–1800 K), Fo93Fa7 is a
+# Audit (2026-08-09): Costa Fo93Fa7 olivine is NOT correctable here --
+# Mg2SiO4(L) CEA domain starts 2170 K (measurement 1700-1800 K), Fo93Fa7 is a
 # solid solution, and Fe/SiO channels need partial-molar chemical potentials.
 # Yu C1, Richter-2002 multiphase CAI, and amorphous SiO also lack in-repo
 # same-composition G pairs. Those rows use typed exclusion, not this catalog.
@@ -35,5 +35,5 @@ corrections: {}
 #       observed: "EXAMPLE(cr)"
 #       rail: "EXAMPLE(L)"
 #     provenance:
-#       note: "illustrative only — not wired to any live observation"
+#       note: "illustrative only -- not wired to any live observation"
 #       uncertainty_dex: 0.1

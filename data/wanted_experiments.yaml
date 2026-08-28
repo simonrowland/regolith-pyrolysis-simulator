@@ -2,7 +2,7 @@
 #
 # Owner-framed 2026-08-18: "a datastructure to collect and score physical tests
 # that we'd like to have results for, even as prose." Entries are allowed to be
-# entirely prose in `question` / `acceptance` — the point is that a wanted
+# entirely prose in `question` / `acceptance` -- the point is that a wanted
 # measurement is a RECORDED LIABILITY with a score, not a vague wish. The
 # validating test (tests/test_wanted_experiments.py) checks structure only.
 #
@@ -22,7 +22,7 @@
 #   wanted | partially_satisfied | satisfied | superseded
 #
 # When a result arrives (even a single prose number), record it under `results:`
-# with date + provenance and re-score. A satisfied entry is not deleted — it is
+# with date + provenance and re-score. A satisfied entry is not deleted -- it is
 # the provenance trail for the coefficient it grounded.
 
 schema: wanted_experiments.v1
@@ -34,7 +34,7 @@ experiments:
     claim_class: cardinal
     question: >
       After one complete desktop pyrolysis run, how many grams landed on
-      cold surfaces instead of the designated condenser — total, whole-run,
+      cold surfaces instead of the designated condenser -- total, whole-run,
       one number? A weighed cold finger, foil liner, or removable coupon,
       before/after, is sufficient. This is the FIRST physical anchor the
       coating model would ever have: the validation lake currently holds
@@ -43,7 +43,7 @@ experiments:
       of the North Star that inherits the full multiplicative error budget.
     current_evidence: >
       None in-tree. Owner indicated (2026-08-18) desktop pyrolysis runs may
-      already have produced this — POSSIBLY ALREADY MEASURED; if a number or
+      already have produced this -- POSSIBLY ALREADY MEASURED; if a number or
       even a qualitative observation ("the sight glass fogged by hour 3")
       exists in lab notes, record it here as a result and re-score.
     acceptance: >
@@ -82,10 +82,10 @@ experiments:
     claim_class: cardinal
     question: >
       a(NaO0.5) (or equivalently gamma_Na) in a silicate melt at
-      x_Na2O < 0.05 — the band where lunar mare actually sits (x_Na2O parent
+      x_Na2O < 0.05 -- the band where lunar mare actually sits (x_Na2O parent
       basis 0.00415; 0.00761 on the single-cation NaO0.5 basis) and where
       the IN-TREE record is empty (bench-set published_x_Na2O starts at
-      0.205; lowest KEMS extract found is 0.09 — the global literature has
+      0.205; lowest KEMS extract found is 0.09 -- the global literature has
       not been independently re-certified as empty below 0.05). KEMS, transpiration, or EMF
       method; any composition inside the band helps. Note what DS-005-class
       depletion data CANNOT give us: mass-loss series constrain the product
@@ -94,7 +94,7 @@ experiments:
     current_evidence: >
       In-tree KEMS record empty below x=0.05. CORRECTED after review
       2026-08-19: an earlier note called Mathieu 2011 "circular via Sossi";
-      the provenance arrow is the REVERSE — Mathieu 2011 is the primary
+      the provenance arrow is the REVERSE -- Mathieu 2011 is the primary
       BEHIND Sossi & Fegley 2018 Table 2, and the project anchors to Sossi
       2019 (a different, experimental paper) instead because Mathieu is a
       soda-lime-silica melt. So Mathieu is a genuine dilute-adjacent
@@ -125,7 +125,7 @@ experiments:
       composition-transfer question those cannot.
     current_evidence: >
       DS-001 (Sossi 2019), DS-003 (Richter 2007), DS-005 (Yu 2003),
-      DS-006 (Hashimoto 1983) — validated scale-free, other materials.
+      DS-006 (Hashimoto 1983) -- validated scale-free, other materials.
     acceptance: >
       Residue wt% vs time at declared T and pressure; a bathroom-scale
       version (weigh crucible at intervals) is genuinely usable at the
@@ -144,7 +144,7 @@ experiments:
       Known vapor flux (e.g. a small Na or Zn charge evaporated at set T)
       onto a coupon held at a controlled, varied wall temperature: deposit
       mass vs wall T. Separates the sticking/re-evaporation factor from
-      transport — the pair to MD target D13, which supplies the ordering
+      transport -- the pair to MD target D13, which supplies the ordering
       while this anchors the absolute.
     current_evidence: None in-tree; MD-D13 (t-713) planned for the ordering.
     acceptance: >
@@ -186,7 +186,7 @@ experiments:
       Even coarse offgas speciation vs T (RGA if available; else
       single-gas sensors for H2O / CO2 / SO2) during a desktop bakeout.
       Directly tests Stage-0 speciation ordering AND gives the first
-      measured input to the b-203 offgas-fO2 coupling — including a
+      measured input to the b-203 offgas-fO2 coupling -- including a
       measured log10(Q/K_wgs) strain, i.e. whether the water-gas-shift
       equilibrium assumption holds in THIS furnace, which the module
       deliberately refuses to answer with a rate constant.
@@ -231,7 +231,7 @@ experiments:
       A wall-material coupon (fused silica, alumina, or the rump ceramic)
       held ABOVE the local dew point in the vapor stream for a known
       exposure: mass change and any visible surface alteration. This is the
-      corrosion-side complement of WE-001/WE-005 — hot-wall design trades
+      corrosion-side complement of WE-001/WE-005 -- hot-wall design trades
       condensation fouling for chemical attack, and the attack side
       currently has no rate anchor at all (severity labels only, 27 of 80
       evidence entries uncharacterized). One coupon calibrates the

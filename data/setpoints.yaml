@@ -441,8 +441,8 @@ campaigns:
       target_metal_pressure_bar: 0.01
       MgO_activity: 0.0926
       # b-147 Mg (2026-08-07): TE Pref_GR demoted; roots use JANAF Pref_GF
-      # (gas_fugacity). Higher Pref at fixed T → 0.01 bar window at LOWER T
-      # (moon 1978.564→1892.647 C; asteroid 1840.802→1768.703 C).
+      # (gas_fugacity). Higher Pref at fixed T -> 0.01 bar window at LOWER T
+      # (moon 1978.564->1892.647 C; asteroid 1840.802->1768.703 C).
       phase_basis: "Mg(g) JANAF gas-metal Ellingham Pref_GF / gas_fugacity (b-147; TE gas_rail dormant); no condensed Antoine above 1363.15 K"
       lunar:
         melt_fO2_floor_bar: 1.3e-12

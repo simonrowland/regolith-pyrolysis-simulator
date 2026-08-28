@@ -116,7 +116,7 @@ species:
         evidence_refs:
           - data/vapor_pressures.yaml
   Cr:
-    # si-comparability 2026-08-08: demoted T3→T2. mass_spec residual was only
+    # si-comparability 2026-08-08: demoted T3->T2. mass_spec residual was only
     # molten-metal/pure-element α (not silicate-melt carrier validation); pin
     # withdrawn. VapoRock residual remains (T2).
     tier: T2
@@ -181,8 +181,8 @@ species:
         # not_comparable_condensed_form:crystalline (not form-correctable).
         # Numeric max UNCHANGED at Hashimoto liquid 2073 K; grounding relabel only.
         # old max 1.096910013 (was already Hashimoto liquid after olivine match at 0);
-        # excluded Costa points (multicell series 0.0066–0.2403 dex; the two
-        # single-T rows at 0.0) all sat far below 1.0969 — did not set the ceiling.
+        # excluded Costa points (multicell series 0.0066-0.2403 dex; the two
+        # single-T rows at 0.0) all sat far below 1.0969 -- did not set the ceiling.
         pinned_residual_dex: 1.0969100130080565
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
@@ -212,7 +212,7 @@ species:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
       mass_spec:
         # form589 2026-08-09: Yu C1 unresolved supercooled/two-phase rows excluded
-        # (form_unresolved). Numeric max UNCHANGED — Sossi ferrobasalt liquid.
+        # (form_unresolved). Numeric max UNCHANGED -- Sossi ferrobasalt liquid.
         # old max 0.886056648; Yu residuals were lower and not ceiling-setting.
         pinned_residual_dex: 0.8860566476931632
         evidence_refs:
@@ -259,7 +259,7 @@ species:
       mass_spec:
         # form589 2026-08-09: Richter-2002 partially_molten / mixed-form CAI rows
         # excluded (not_comparable_condensed_form:partially_molten). Residual
-        # TIGHTENS 0.698970004 → 0.520290709 (Richter-2007 liquid at 1873 K).
+        # TIGHTENS 0.698970004 -> 0.520290709 (Richter-2007 liquid at 1873 K).
         # SIGN: form exclusion removes a subliquidus/mixed ceiling, not a Pref retune.
         pinned_residual_dex: 0.5202907093862962
         evidence_refs:
@@ -296,9 +296,9 @@ species:
           - validation-data/pin-evidence/feo_nio_composition_2026-08-10.yaml
           - validation-data/pin-evidence/nio_liquid_reference_fit_grid_2026-08-10.yaml
   Mn:
-    # si-comparability 2026-08-08: demoted T3→T1. The only mass_spec residual
+    # si-comparability 2026-08-08: demoted T3->T1. The only mass_spec residual
     # was molten-metal olette α (not silicate-melt carrier validation); pin
-    # withdrawn. No VapoRock residual pin either — structural catalog only.
+    # withdrawn. No VapoRock residual pin either -- structural catalog only.
     tier: T1
     target_tier: T4
     validations:
@@ -310,7 +310,7 @@ species:
           - validation-data/pin-evidence/mn_mass_spec_melt_first_2026-08-08.yaml
       # mass_spec withdrawn 2026-08-08 (si-comparability): residual was driven
       # solely by molten-metal olette α (Homma/Ohno steel-melt rows). Those
-      # remain as typed not_comparable_system_class exclusions — not silicate-
+      # remain as typed not_comparable_system_class exclusions -- not silicate-
       # melt Mn carrier validation. See
       # docs-private/research/2026-08-08-si-comparability/report.md and
       # validation-data/pin-evidence/mn_mass_spec_melt_first_2026-08-08.yaml
@@ -336,9 +336,9 @@ species:
         # t-383: L&H liquid-NaO0.5 Pref replaces Chase gas_standard_fugacity.
         # Residual vs VapoRock peer WORSENS (REPORT-ONLY, framework §6.3 / ADR-001);
         # no threshold tightening, no γ/Pref retune to improve this pin.
-        # Observed max|Δ| on enghar-matched grid after rail flip: 1.536140186984556
-        # (prior Chase pin 1.4368670475601244; Δ ≈ +0.099 dex from table-assembly
-        # L&H−Chase level shift, not the second-hand linear-form +0.735).
+        # Observed max|Delta| on enghar-matched grid after rail flip: 1.536140186984556
+        # (prior Chase pin 1.4368670475601244; Delta ~= +0.099 dex from table-assembly
+        # L&H-Chase level shift, not the second-hand linear-form +0.735).
         pinned_residual_dex: 1.536140186984556
         evidence_refs:
           - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
@@ -348,9 +348,9 @@ species:
       mass_spec:
         # DeMaria 1971 KEMS Na(g) partial-pressure series over Apollo 12
         # lunar basalt 12022/12065. pO2 recovered from the companion Table 1
-        # O2 series on the same extract (unit conversion atm→bar only).
+        # O2 series on the same extract (unit conversion atm->bar only).
         #
-        # ★ INTERPRETATION (t-743). The APPARATUS reading recorded here on
+        # * INTERPRETATION (t-743). The APPARATUS reading recorded here on
         # 2026-08-26 (commit bd01eaae) is WITHDRAWN the same day: an
         # adversarial pass whose null was "12065 is sound and the engine is
         # genuinely ~2 dex wrong" returned NULL-SUSTAINED. Evidence:
@@ -370,7 +370,7 @@ species:
         # printed Fig. 1 and the MinerU scatter OCR both place the 7.00
         # abscissa pair at ~-6.05 / ~-7.55.
         #
-        # ★ What was WRONG. That 1.417 dex was called "unexplained by
+        # * What was WRONG. That 1.417 dex was called "unexplained by
         # composition", but the 0.125 dex Henry term is the ONLY composition
         # term this engine can express: the runtime vapour path is constant
         # gamma (a = gamma * X, gamma_NaO0.5 = 1e-3), so by construction its
@@ -379,11 +379,11 @@ species:
         # melt chemistry is dead. Given a composition-dependent activity
         # model and the REAL bulk analyses, IMCC-SF04 gives an a(Na2O) ratio
         # of 1.21 dex at 1429 K (extrapolated, sub-liquidus) and 1.06 dex at
-        # 1800 K (in domain) — cutting the residual from 1.417 dex to
+        # 1800 K (in domain) -- cutting the residual from 1.417 dex to
         # ~0.3-0.4 dex, inside the authors' own factor-of-2 plus digitisation
         # sigma.
         #
-        # ★ The two samples are not resolved the same way, so the comparison
+        # * The two samples are not resolved the same way, so the comparison
         # was never composition-vs-composition (b-249, verified in-repo):
         #   - 12065 carries a real cited suite on the extract
         #     (sample_oxide_composition_wt_pct, Wolf/VapoRock Table 2 =
@@ -402,12 +402,12 @@ species:
         # while the proxy is higher Al2O3 and lower TiO2. No external source
         # is needed to see the second half: our own 12065 extract says
         # TiO2 = 3.34 wt%, and the proxy we hand its Apollo 12 twin says
-        # 1.5 — a 2.2x disagreement inside one comparison. The resolver does
+        # 1.5 -- a 2.2x disagreement inside one comparison. The resolver does
         # emit its provenance string, so the asymmetry is discoverable in the
         # artifact; it simply was not read before a physics conclusion was
         # drawn across it.
         #
-        # ★ Smales et al. 1971 (Proc. Lunar Sci. Conf. 2, Table 2 p. 1254,
+        # * Smales et al. 1971 (Proc. Lunar Sci. Conf. 2, Table 2 p. 1254,
         # filed at docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf)
         # supplies the real 12022 suite and settles it. Signed differences
         # (12022 minus 12065, wt%), real pair vs what the proxy asserts:
@@ -424,7 +424,7 @@ species:
         # activity. The proxy did not blur the composition difference; it
         # inverted it.
         #
-        # ★★ And the Henry term itself is source-dependent at a magnitude
+        # ** And the Henry term itself is source-dependent at a magnitude
         # that exceeds the term. DeMaria's own text gives Na2O = 0.36 wt%
         # for their split 12022,57; Smales Table 2 gives 0.23 wt% for 12022:
         #   log10(0.36/0.27) = +0.124939 dex   <- the number pinned here
@@ -438,19 +438,19 @@ species:
         # pattern on K2O: Henry is -0.031 dex on DeMaria's 0.068 and
         # -0.078 dex on Smales' 0.061.
         #
-        # ★ K is NOT an independent witness. Na and K draw on the same free
+        # * K is NOT an independent witness. Na and K draw on the same free
         # oxide / NBO pool, so any real melt-side effect must appear on both;
         # a shared-mechanism observation cannot corroborate the mechanism.
         # IMCC in fact UNDER-predicts the K split (0.47-0.59 dex vs ~1.5 dex
         # visual). That is an open hole in the melt-chemistry account, not
         # evidence for apparatus.
         #
-        # ★ The authors did not licence discarding the y-axis. They excepted
+        # * The authors did not licence discarding the y-axis. They excepted
         # Na and K from the factor-of-2 calibration bound because the split
-        # was TOO LARGE to be absorbed by calibration — i.e. they treated it
+        # was TOO LARGE to be absorbed by calibration -- i.e. they treated it
         # as real.
         #
-        # ★ b-247 (non-additivity) fired here too: an Al2O3-only swap moves
+        # * b-247 (non-additivity) fired here too: an Al2O3-only swap moves
         # a(Na2O) by 0.05-0.16 dex, while the JOINT Si+Mg+Fe+Ti+Al difference
         # supplies 1.06-1.21 dex. Summing one-at-a-time sensitivities is what
         # made composition look dead.
@@ -493,10 +493,10 @@ species:
         # unit-activity probes pin the post-fix catalog so a silent base
         # regression cannot hide. Values are honest current-state (not tuned).
         # Probe: source_activity=1.0, pO2_bar=1.0, CompiledPressureEvaluator.
-        # SIGN: P_after/P_before ≈ +1.95…+6.26 dex over 1400–1950 K (base^2).
+        # SIGN: P_after/P_before ~= +1.95...+6.26 dex over 1400-1950 K (base^2).
         # Domain: composite valid_domain [1400,1900]; 1950 K pin is status-bearing
         # OOR continuation (not in-domain). L&H base fit certified [1405,1600];
-        # beyond that is MARKED EXTRAPOLATION (≤0.055 dex base incoherence @2073 K).
+        # beyond that is MARKED EXTRAPOLATION (<=0.055 dex base incoherence @2073 K).
         unit_activity_probe:
           activity: 1.0
           pO2_bar: 1.0
@@ -527,11 +527,11 @@ species:
     validations:
       structural:
         # b-151 (2026-08-08): same L&H base retarget as Na2. Na2O_gas squares
-        # the monatomic base, so the retired→L&H base gap (~3 dex @1900 K)
+        # the monatomic base, so the retired->L&H base gap (~3 dex @1900 K)
         # becomes ~6 dex here. Honest unit-activity catalog pins; do not tune.
         # Domain: composite valid_domain [1400,1900]; 1950 K pin is status-bearing
         # OOR continuation (not in-domain). L&H base fit certified [1405,1600];
-        # beyond that is MARKED EXTRAPOLATION (≤0.055 dex base incoherence @2073 K).
+        # beyond that is MARKED EXTRAPOLATION (<=0.055 dex base incoherence @2073 K).
         unit_activity_probe:
           activity: 1.0
           pO2_bar: 1.0
@@ -617,7 +617,7 @@ species:
       mass_spec:
         # form589 2026-08-09: Costa Fo93Fa7 crystalline olivine α + Wetzel
         # unresolved amorphous/provenance row excluded. Residual TIGHTENS
-        # 1.297484933 → 0.409862769 (Schaefer-Fegley liquid silica/forsterite
+        # 1.297484933 -> 0.409862769 (Schaefer-Fegley liquid silica/forsterite
         # survey). SIGN: old max was a solid-olivine point, not a melt residual.
         pinned_residual_dex: 0.40986276901889873
         evidence_refs:

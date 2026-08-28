@@ -2,7 +2,7 @@
 # CACHE-INERT. Class-level coefficients are status-bearing and never
 # a measurement. Swap one row without redesigning the source term.
 #
-# Status vocabulary (existing only — no sixth vocabulary):
+# Status vocabulary (existing only -- no sixth vocabulary):
 #   status_bearing_non_authoritative  class-routed non-computed placement
 #   partly_grounded                   sourced shape / floor, magnitude open
 #   not_speciated                     field exists, value refused
@@ -14,7 +14,7 @@ schema: organics_pyrolysis.v1
 output_status: status_bearing_non_authoritative
 
 iom_stoichiometry:
-  # Alexander 2017, Chemie der Erde: CR IOM C100H75–79O11–17N3–4S1–3.
+  # Alexander 2017, Chemie der Erde: CR IOM C100H75-79O11-17N3-4S1-3.
   # Midpoint used as the class template. Carrier atoms still come from
   # the feedstock formula registry (generic_carbonaceous_organic today);
   # this row is the sourced drop-in and the report provenance.
