@@ -236,6 +236,19 @@ _HONEST_NON_OK_BACKEND_STATUSES = frozenset(
 # clause returns True for it directly.
 _STATUSES_CRASH_EVIDENCE_MAY_PROMOTE = frozenset({"ok"})
 
+# ImportError here is BARE ON PURPOSE, and narrowing it to ModuleNotFoundError
+# is a harmful-looking-correct change. 17 sites across the engine adapters and
+# engine_local_config raise a bare ImportError to signal genuine absence, and
+# several of them report MISSING NATIVE DYLIBS ("ThermoEngine dylibs not found:
+# ... run install-engines.py") -- an absence ModuleNotFoundError can never
+# express, because no Python module is missing. Narrowing would tell an operator
+# on a fresh box "engine bug, aborting" instead of "install the engine".
+#
+# The cost of the breadth is a mislabel, not a silent pass: an accidental
+# ImportError (a broken symbol, a circular import) aborts as
+# BACKEND_UNAVAILABLE rather than as an engine bug. Both abort, and both carry
+# the real message, so the failure stays loud and diagnosable either way.
+# test_backends.py pins this; see the dylib-absence case there.
 _TYPED_ABSENCE_EXCEPTION_CLASSES = (
     BackendUnavailableError,
     EngineWorkerUnavailable,
