@@ -1999,6 +1999,8 @@ def _cumulative_wall_deposit_by_segment_species_kg(
             amount = _finite_float(kg, f"wall_deposit[{segment!r}][{species!r}]")
             if amount > _EPS:
                 result[(segment, species)] = result.get((segment, species), 0.0) + amount
+            elif abs(amount) <= _EPS:
+                result.setdefault((segment, species), 0.0)
     return result
 
 

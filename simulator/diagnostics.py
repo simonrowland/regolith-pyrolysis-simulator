@@ -691,27 +691,19 @@ def wall_deposit_sticking_authority_status(
 def coating_summary_with_grounded_authority(
     summary: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Return a coating summary where positive deposits trust provenance only."""
+    """Return a coating summary with authority rederived from its projection."""
 
     result = dict(summary)
     wall_deposit = coating_wall_deposit_payload(result)
     alias_conflicts = coating_wall_deposit_alias_conflicts(result)
     total_kg = _sum_wall_deposit_kg(wall_deposit)
     authority_input = result.get("wall_deposit_sticking_authority")
-    has_pressure_refusal = (
-        isinstance(authority_input, Mapping)
-        and bool(_wall_saturation_pressure_refusals_by_species(authority_input))
+    has_wall_deposit_projection = any(
+        key in result for key in _COATING_WALL_DEPOSIT_KEYS
     )
-    has_authority_evidence = (
-        isinstance(authority_input, Mapping) and bool(authority_input)
-    )
-    if total_kg is None and not alias_conflicts:
-        return result
     if (
-        total_kg is not None
-        and total_kg <= _EPS
-        and not has_pressure_refusal
-        and not has_authority_evidence
+        total_kg is None
+        and has_wall_deposit_projection
         and not alias_conflicts
     ):
         return result
@@ -722,17 +714,9 @@ def coating_summary_with_grounded_authority(
             authority_input if isinstance(authority_input, Mapping) else {},
         )
     else:
-        authority = _wall_deposit_authority_payload(
-            authoritative=False,
-            code=WALL_STICKING_ALPHA_MISSING_CODE,
-            deposited_species=(),
-            uncertified_species=(),
-            provenance={},
-            message=(
-                "Wall-deposit sticking alpha authority missing; provenance is "
-                "missing, so coating and fouling readouts are non-authoritative "
-                "until the coefficient status travels with the deposit."
-            ),
+        authority = wall_deposit_sticking_authority_status(
+            {},
+            authority_input if isinstance(authority_input, Mapping) else {},
         )
 
     if alias_conflicts:

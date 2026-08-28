@@ -1496,16 +1496,31 @@ class _MELTSBackendSupport(MeltBackend):
                 )
 
         sample_warnings: list[str] = []
+        from engines.alphamelts.thermoengine import (
+            ThermoEngineOutOfDomainError,
+        )
+
         def sample_fraction(temperature_C: float) -> float:
-            result = self.equilibrate(
-                float(temperature_C),
-                composition_kg=composition_kg,
-                fO2_log=fO2_log,
-                pressure_bar=pressure_bar,
-                composition_mol=composition_mol,
-                composition_mol_by_account=composition_mol_by_account,
-                species_formula_registry=species_formula_registry,
-            )
+            try:
+                result = self.equilibrate(
+                    float(temperature_C),
+                    composition_kg=composition_kg,
+                    fO2_log=fO2_log,
+                    pressure_bar=pressure_bar,
+                    composition_mol=composition_mol,
+                    composition_mol_by_account=composition_mol_by_account,
+                    species_formula_registry=species_formula_registry,
+                )
+            except ThermoEngineOutOfDomainError as exc:
+                raise LiquidusSampleError(
+                    exc.backend_failure_category,
+                    (str(exc),),
+                    {
+                        'backend_status_reason': exc.cause.value,
+                        'requested_fO2_log': exc.requested,
+                        'solved_fO2_log': exc.solved,
+                    },
+                ) from exc
             if result.status != 'ok':
                 raise LiquidusSampleError(
                     result.status,
