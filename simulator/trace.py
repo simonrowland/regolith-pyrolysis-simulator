@@ -189,8 +189,7 @@ def wall_deposit_by_segment_species_kg(ledger: Any) -> dict[tuple[str, str], flo
         segment = str(account)[len(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):]
         for species, kg in species_kg.items():
             amount = float(kg)
-            if amount > 1e-12:
-                result[(segment, species)] = amount
+            result[(segment, species)] = amount
     return result
 
 

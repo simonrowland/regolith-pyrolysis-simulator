@@ -1519,8 +1519,7 @@ def _coating_authority_status(
     by_segment_species: dict[tuple[str, str], float] = defaultdict(float)
     for (_campaign, segment, species), kg in by_campaign.items():
         amount = _non_negative_number(kg, "wall deposit kg")
-        if amount > _EPS:
-            by_segment_species[(segment, species)] += amount
+        by_segment_species[(segment, species)] += amount
     trace_status = getattr(trace, "wall_deposit_sticking_authority", {}) or {}
     return wall_deposit_sticking_authority_status(
         by_segment_species,

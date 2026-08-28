@@ -3304,7 +3304,7 @@ def _wall_fouling_report(
             else "slow-fouling"
         )
     authority = wall_deposit_sticking_authority_status(
-        positive,
+        wall_deposit_kg,
         alpha_notice or {},
     )
     authoritative = bool(authority.get("authoritative_for_resinter", True))

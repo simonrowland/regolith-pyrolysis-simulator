@@ -2838,6 +2838,32 @@ def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic(
     assert "deposit_rate=0 kg/campaign" in coating.detail
 
 
+def test_optimizer_coating_overlay_preserves_proven_zero_authority() -> None:
+    trace = _trace()
+    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO"): 0.0}
+    trace.wall_zone_by_segment = {"hot_wall": "Hot"}
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "residual_rump_at_stop",
+            target_id="glass-clear-post-fe-v1",
+        ),
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    coating = result.feasibility_margins["coating"]
+    assert coating.feasible is True
+    assert coating.authoritative is True
+    assert coating.status == "available"
+    assert coating.status_reason == ""
+    assert coating.status_payload["sticking_alpha_authority"]["code"] == (
+        "wall_deposit_sticking_alpha_provenance"
+    )
+
+
 def test_runner_wall_fouling_report_emits_continuous_optimizer_margin(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -3307,18 +3333,16 @@ def test_whole_run_not_attempted_aborts_and_is_not_silent_relabel() -> None:
     assert "PHYSICS_REFUSED" in message
 
 
-def test_run_reference_not_attempted_survives_result_store_passthrough() -> None:
-    """Pin: stored ``not_attempted`` survives the fidelity pass-through rail.
+def test_run_reference_not_attempted_survives_result_store_translation() -> None:
+    """Stored ``not_attempted`` survives fidelity translation and persistence.
 
     Production emits this token on the kernel IntentResult rail
     (alphaMELTS mid-run prior-close) and keeps it on stored
     ``RunReference.backend_status`` with ``evidence_class="melts"``.
     ResultStore._deserialize_run_reference reconstructs RunReference,
-    so ``__post_init__`` re-enters ``_fidelity_alias_backend_status``.
-    The token is in ``_FIDELITY_PASSTHROUGH_BACKEND_STATUSES`` because
-    the fidelity alias table was not re-read for refused /
-    not_converged / not_attempted; they stay on the field and are not
-    sent through ``translate_legacy_token``.
+    so ``__post_init__`` re-enters canonical fidelity translation. The
+    backend-status field remains the engine answer while ``runtime_status``
+    carries the translated canonical disposition.
 
     The whole-run optimizer envelope is a different rail: evaluate()
     aborts with EngineBugAbort on the same token (see
@@ -3329,9 +3353,8 @@ def test_run_reference_not_attempted_survives_result_store_passthrough() -> None
     rail *preserves* a stored token so it is not folded into absence
     or raised as UnknownFidelityVocabularyTokenError.
 
-    Invert: drop ``not_attempted`` from
-    ``_FIDELITY_PASSTHROUGH_BACKEND_STATUSES`` and this raises
-    UnknownFidelityVocabularyTokenError on construct / deserialize.
+    Invert: remove the ``not_attempted`` alias-table translation and this
+    raises UnknownFidelityVocabularyTokenError on construct / deserialize.
     """
     reference = evaluate_module.RunReference(
         status="ok",
@@ -3353,6 +3376,57 @@ def test_run_reference_not_attempted_survives_result_store_passthrough() -> None
     assert loaded.backend_status is not None
     assert loaded.backend_status != "unavailable"
     assert loaded.evidence_class == "melts"
+
+
+@pytest.mark.parametrize(
+    "backend_status",
+    (
+        "refused",
+        "not_converged",
+        "not_attempted",
+        "unsupported",
+        "non_authoritative",
+    ),
+)
+def test_run_reference_translates_every_kernel_backend_status(
+    backend_status: str,
+) -> None:
+    reference = evaluate_module.RunReference(
+        status="ok",
+        backend_name="alphamelts",
+        backend_status=backend_status,
+        backend_authoritative=True,
+        evidence_class="melts",
+    )
+
+    assert reference.backend_status == backend_status
+    assert reference.runtime_status == backend_status
+    assert reference.degradation_reason == backend_status
+
+
+@pytest.mark.parametrize(
+    "backend_status",
+    (
+        "refused",
+        "not_converged",
+        "not_attempted",
+        "unsupported",
+        "non_authoritative",
+    ),
+)
+def test_canonical_backend_trace_fields_translate_every_kernel_status(
+    backend_status: str,
+) -> None:
+    trace_fields = evaluate_module._canonical_backend_trace_fields(
+        _execution(
+            backend_status=backend_status,
+            backend_authoritative=True,
+        ),
+        backend_name="alphamelts",
+    )
+    assert trace_fields["backend_status"] == backend_status
+    assert trace_fields["runtime_status"] == backend_status
+    assert trace_fields["degradation_reason"] == backend_status
 
 
 def test_never_installed_engine_importerror_still_aborts_optimizer() -> None:

@@ -22,7 +22,7 @@ from simulator.optimize.study import (
 )
 from simulator.runner import _wall_fouling_report
 from simulator.state import HourSnapshot, PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX
-from simulator.trace import PhysicsTrace
+from simulator.trace import PhysicsTrace, wall_deposit_by_segment_species_kg
 from simulator.vapour_rail.instrumentation import (
     vapour_carrier_authority_status,
 )
@@ -713,6 +713,58 @@ def test_absent_wall_deposit_is_not_certified_but_measured_zero_is(
 
     assert status['authoritative'] is expect_authoritative, why
     assert status['code'] == expect_code, why
+
+
+def test_trace_projection_preserves_measured_zero() -> None:
+    account = f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}hot_wall"
+
+    class ZeroDepositLedger:
+        def kg_by_account(self) -> dict[str, dict[str, float]]:
+            return {account: {"SiO": 0.0}}
+
+        def project_account_kg(self, requested: str) -> dict[str, float]:
+            assert requested == account
+            return {"SiO": 0.0}
+
+    assert wall_deposit_by_segment_species_kg(ZeroDepositLedger()) == {
+        ("hot_wall", "SiO"): 0.0,
+    }
+
+
+def test_zero_delta_preserves_optimizer_coating_authority() -> None:
+    zero_projection = {("hot_wall", "SiO"): 0.0}
+    trace = SimpleNamespace(
+        snapshots=(HourSnapshot(hour=1),),
+        wall_deposit_by_segment_species_delta=(zero_projection,),
+        wall_deposit_sticking_authority=(
+            wall_deposit_sticking_authority_status(zero_projection)
+        ),
+    )
+
+    coating = _constraints("SiO").coating(trace)
+
+    assert coating.feasible is True
+    assert coating.authoritative is True
+    assert coating.status == "available"
+    assert coating.status_reason == ""
+    assert coating.status_payload["code"] == (
+        "wall_deposit_sticking_alpha_provenance"
+    )
+
+
+def test_runner_fouling_authority_receives_unfiltered_zero_projection() -> None:
+    report = _wall_fouling_report(
+        {species: 0.0 for species in ("SiO", "Na", "K", "Mg", "Fe")}
+    )
+
+    assert report["dominant_species"] == "none"
+    assert report["wall_deposit_kg_per_campaign"] == 0.0
+    assert report["campaigns_to_resinter"] == "infinite"
+    assert report["authoritative_for_resinter"] is True
+    assert report["status_reason"] == ""
+    assert report["sticking_alpha_authority"]["code"] == (
+        "wall_deposit_sticking_alpha_provenance"
+    )
 
 
 def test_positive_wall_deposit_still_reaches_the_species_bearing_branch():

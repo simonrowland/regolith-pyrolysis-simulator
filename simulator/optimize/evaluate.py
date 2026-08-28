@@ -241,22 +241,6 @@ _TYPED_ABSENCE_EXCEPTION_CLASSES = (
     EngineWorkerUnavailable,
     ImportError,
 )
-# Honest engine answers that the fidelity backend/status alias table
-# was not re-read for. Keep them on RunReference.backend_status; do
-# not send them through translate_legacy_token.
-_FIDELITY_PASSTHROUGH_BACKEND_STATUSES = frozenset(
-    {
-        "refused",
-        "not_converged",
-        "not_attempted",
-    }
-)
-
-
-def _fidelity_alias_backend_status(status: str | None) -> str | None:
-    if status in _FIDELITY_PASSTHROUGH_BACKEND_STATUSES:
-        return None
-    return status
 
 
 @dataclass(frozen=True)
@@ -386,7 +370,7 @@ class RunReference:
             backend_name=canonical_backend_name(
                 self.backend_name or _carrier_value(self.trace, "backend_name")
             ),
-            backend_status=_fidelity_alias_backend_status(self.backend_status),
+            backend_status=self.backend_status,
             backend_authoritative=self.backend_authoritative,
             evidence_class=self.evidence_class or _carrier_value(self.trace, "evidence_class"),
         )
@@ -5760,12 +5744,9 @@ def _canonical_backend_trace_fields(
     )
     backend_status_reason = _latest_backend_status_reason(run_execution)
     backend_authoritative = _backend_authoritative(run_execution)
-    # refused / not_converged / not_attempted are honest engine answers.
-    # The fidelity translator's backend/status alias set was not re-read
-    # for them; do not fold them into absence or raise as unknown tokens.
     payload = canonicalize_fidelity_emission(
         backend_name=backend_name,
-        backend_status=_fidelity_alias_backend_status(backend_status),
+        backend_status=backend_status,
         backend_authoritative=backend_authoritative,
     )
     if backend_name is not None:

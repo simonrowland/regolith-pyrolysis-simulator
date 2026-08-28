@@ -204,6 +204,26 @@ def test_design_table_simple_rows_translate(family: str, token: str, expected: d
     assert translate_legacy_token(family, token).as_dict() == expected
 
 
+@pytest.mark.parametrize(
+    "status",
+    (
+        "not_converged",
+        "refused",
+        "not_attempted",
+        "unsupported",
+        "non_authoritative",
+    ),
+)
+def test_every_kernel_status_translates_to_runtime_disposition(status: str) -> None:
+    assert translate_legacy_token(
+        "backend/status alias",
+        status,
+    ).as_dict() == {
+        "runtime_status": status,
+        "degradation_reason": status,
+    }
+
+
 def test_canonical_dimension_set_is_exact() -> None:
     assert CANONICAL_DIMENSIONS == (
         "evidence_class",
