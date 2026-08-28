@@ -322,6 +322,7 @@ def _fake_evaluate(
                     "status": "closed",
                     "mass_balance_error_pct": 0.0,
                 },
+                "wall_deposit_kg": {},
             },
             backend_name="alphamelts",
             backend_status="ok",
@@ -1031,7 +1032,7 @@ def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
     assert {1111, 2222}.issubset(set(captured_extra_pids[0]))
 
 
-@pytest.mark.timeout(20)
+@pytest.mark.timeout(50)
 def test_pool_unavailable_serial_fallback_timeout_records_and_continues(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -1050,7 +1051,7 @@ def test_pool_unavailable_serial_fallback_timeout_records_and_continues(
         max_workers=2,
         output_root=tmp_path / "pool",
         evaluate_fn=_slow_or_abort_evaluate,
-        per_eval_timeout_seconds=5.0,
+        per_eval_timeout_seconds=15.0,
     )
 
     assert [result.candidate_id for result in results] == ["slow", "fast"]

@@ -834,6 +834,65 @@ def test_stale_start_error_after_current_generation_is_ignored():
     assert stale["resumeDisabled"] == accepted["resumeDisabled"]
 
 
+@pytest.mark.parametrize(
+    "error_type",
+    [
+        "client_identity_required",
+        "invalid_run_request",
+        "feedstock_required",
+        "invalid_run_input",
+        "invalid_parent_run_id",
+        "run_not_found",
+        "backend_unavailable",
+        "client_disconnected",
+        "invalid_single_run",
+        "global_run_capacity_exhausted",
+        "run_replacement_failed",
+        "run_launch_failed",
+        "run_launch_failed_after_replacement",
+    ],
+)
+def test_prelaunch_errors_without_diagnostic_fields_release_controls(error_type):
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "error",
+                    "message": f"launch rejected: {error_type}",
+                    "error_type": error_type,
+                },
+            },
+        ]
+    )
+
+    assert rendered["final"]["lifecycle"]["phase"] == "terminal-error"
+    assert rendered["final"]["startDisabled"] is False
+    assert rendered["final"]["pauseDisabled"] is True
+    assert rendered["final"]["resumeDisabled"] is True
+    assert rendered["final"]["statusText"] != "Running"
+
+
+def test_prelaunch_error_is_terminal_without_reason_backend_or_error_type():
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "error",
+                    "message": "launch failed",
+                },
+            },
+        ]
+    )
+
+    assert rendered["final"]["lifecycle"]["phase"] == "terminal-error"
+    assert rendered["final"]["startDisabled"] is False
+    assert rendered["final"]["statusText"] == "error — launch failed"
+
+
 def test_replacement_launch_failure_after_cancellation_is_terminal():
     error_text = (
         "error — New run launch failed after prior run run-1 was cancelled"
@@ -1191,3 +1250,74 @@ def test_submillimbar_pressure_survives_socket_emitter_and_dom(
     # and consume it without error (pressure_calls non-empty). The chart-level
     # contract (un-floored y, hover text) belongs to the b-086 zero/floor
     # renderer fix — assert it there when fix/zerofloor integrates, not here.
+
+
+@pytest.mark.parametrize(
+    ("terminal_payload", "label"),
+    [
+        (
+            {
+                "status": "refused",
+                "run_id": "run-1",
+                "reason": "viscous_p_bulk_transport_out_of_domain",
+                "message": "transport model out of domain",
+            },
+            "lawful refusal",
+        ),
+        (
+            {
+                "status": "error",
+                "run_id": "run-1",
+                "reason": "terminal_run_failed",
+                "message": "boom",
+            },
+            "error",
+        ),
+    ],
+)
+def test_any_terminal_outcome_hands_the_controls_back(terminal_payload, label):
+    """After ANY terminal outcome the operator must be able to start again.
+
+    The re-enable was gated on `data.status === 'error'`, so a run that CRASHED
+    returned the controls while a run that lawfully REFUSED left #btn-start
+    disabled forever -- reload-the-page or nothing. That is inverted: a refusal
+    is the model declining to extrapolate (a result), an error is a fault, and
+    only the fault recovered.
+
+    It is also how a correct fail-close came to be reported as a stall: the e2e
+    harness found terminal-refused with Start greyed out and the ledger showing
+    n/a, which is indistinguishable from a dead app.
+
+    The `started` step asserts the button is STILL disabled mid-run, so this
+    cannot pass vacuously on a button that was never disabled -- which is
+    exactly how my first hand-check of this fix fooled me.
+    """
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "started",
+                    "run_id": "run-1",
+                    "backend_status": "ok",
+                },
+            },
+            {"event": "simulation_status", "payload": terminal_payload},
+        ],
+    )
+    steps = rendered["steps"]
+    started_step = [
+        s for s in steps
+        if s["event"] == "simulation_status"
+    ][0]
+    assert started_step["startDisabled"] is True, (
+        "vacuity guard: Start must be disabled while the run is live, "
+        f"otherwise this test proves nothing; got {started_step!r}"
+    )
+    assert rendered["final"]["startDisabled"] is False, (
+        f"after a terminal {label} the operator must be able to start again; "
+        f"Start is still disabled: {rendered['final']!r}"
+    )
+    assert rendered["final"]["pauseDisabled"] is True
+    assert rendered["final"]["resumeDisabled"] is True

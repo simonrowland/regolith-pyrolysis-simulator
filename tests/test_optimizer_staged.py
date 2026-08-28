@@ -33,7 +33,7 @@ from simulator.optimize.recipe import (
     c5_sampler_context,
     conditional_context_metadata,
 )
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.strategy import staged as staged_module
 from simulator.optimize.strategy.staged import (
     StagedAllowlistError,
@@ -477,7 +477,178 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
                 evidence_class="melts",
             ),
     )
-    assert_prefix_replay_equal(cached, fresh)
+    assert_prefix_replay_equal(cached, study._strip_heavy_result(fresh))
+
+
+def test_prefix_replay_guard_accepts_legitimate_and_rejects_provenance_swap() -> None:
+    patch = RecipePatch.from_nested(
+        {"campaigns": {"C0": {"temp_range_C": [900, 950]}}}
+    ).validated(SCHEMA)
+    base = _scored(patch, candidate_id="staged-prefix-provenance")
+    product_summary = base.run_reference.product_summary
+    verified_reference = RunReference(
+        status="ok",
+        trace={
+            "prefix_state": "verified",
+            "backend_status": "ok",
+            "backend_authoritative": True,
+        },
+        product_summary=product_summary,
+        backend_name="magemin",
+        backend_status="ok",
+        backend_authoritative=True,
+    )
+    verified = replace(base, run_reference=verified_reference)
+    legitimate = replace(
+        base,
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "prefix_state": "verified",
+                "backend_status": "ok",
+                "backend_authoritative": True,
+            },
+            product_summary=product_summary,
+            backend_name="magemin",
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+    assert_prefix_replay_equal(legitimate, verified)
+
+    swapped = replace(
+        base,
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "prefix_state": "swapped",
+                "backend_status": "unavailable",
+                "backend_authoritative": False,
+            },
+            product_summary=product_summary,
+            backend_name="internal-analytical",
+            backend_status="unavailable",
+            backend_authoritative=False,
+        ),
+    )
+    with pytest.raises(StagedReplayViolation):
+        assert_prefix_replay_equal(swapped, verified)
+    assert set(staged_module._run_reference_view(verified_reference)) == {
+        field.name for field in fields(RunReference)
+    }
+
+
+def test_staged_prefix_replay_recomputes_rejected_write_for_second_sibling(
+    tmp_path,
+) -> None:
+    class RejectingPrefixStore(SpyStore):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            self.prefix_write_rejections = 0
+
+        def store(
+            self,
+            eval_spec: EvalSpec,
+            scored: ScoredResult,
+            *,
+            created_at: str,
+        ) -> None:
+            if isinstance(eval_spec, PrefixEvalSpec):
+                self.prefix_write_rejections += 1
+                raise ResultStoreWriteRejected(("test-prefix-write-refusal",))
+            super().store(eval_spec, scored, created_at=created_at)
+
+    class ChangingPrefixEvaluator(SpyEvaluator):
+        def __init__(self, generation_log: Path, replay_log: Path) -> None:
+            super().__init__()
+            self.generation_log = generation_log
+            self.replay_log = replay_log
+
+        def __call__(
+            self,
+            patch: RecipePatch,
+            feedstock: str,
+            fidelity: str,
+            *,
+            profile: Mapping[str, Any],
+            candidate_id: str | None = None,
+            staged_replay: study.StagedReplay | None = None,
+            **kwargs: Any,
+        ) -> ScoredResult:
+            result = super().__call__(
+                patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                staged_replay=staged_replay,
+                **kwargs,
+            )
+            if str(candidate_id).startswith("staged-prefix-"):
+                assert result.run_reference is not None
+                generations = (
+                    self.generation_log.read_text(encoding="utf-8").splitlines()
+                    if self.generation_log.exists()
+                    else []
+                )
+                generation = len(generations) + 1
+                with self.generation_log.open("a", encoding="utf-8") as handle:
+                    handle.write(f"{generation}\n")
+                return replace(
+                    result,
+                    run_reference=replace(
+                        result.run_reference,
+                        product_summary={
+                            **result.run_reference.product_summary,
+                            "prefix_generation": generation,
+                        },
+                    ),
+                )
+            if "-01-" in str(candidate_id):
+                assert isinstance(staged_replay, study.StagedReplay)
+                assert staged_replay.prefix_result.run_reference is not None
+                generation = int(
+                    staged_replay.prefix_result.run_reference.product_summary[
+                        "prefix_generation"
+                    ]
+                )
+                with self.replay_log.open("a", encoding="utf-8") as handle:
+                    handle.write(f"{generation}\n")
+            return result
+
+    store = RejectingPrefixStore(tmp_path / "cache.sqlite")
+    generation_log = tmp_path / "fresh-prefix-generations.txt"
+    replay_log = tmp_path / "replayed-prefix-generations.txt"
+    evaluator = ChangingPrefixEvaluator(generation_log, replay_log)
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "internal-analytical",
+        parallel=1,
+        budget=4,
+        out_dir=tmp_path,
+        seed=7,
+        evaluator=evaluator,
+        result_store=store,
+    )
+
+    depth_one_records = [
+        record for record in result.records if "-01-" in record.candidate_id
+    ]
+    prefix_lookups = [
+        spec for spec in store.lookup_specs if isinstance(spec, PrefixEvalSpec)
+    ]
+    assert len(depth_one_records) == 2
+    assert result.prefix_evals_run == 2
+    assert generation_log.read_text(encoding="utf-8").splitlines() == ["1", "2"]
+    assert replay_log.read_text(encoding="utf-8").splitlines() == ["1", "2"]
+    assert store.prefix_write_rejections == 2
+    assert len(prefix_lookups) == 2
+    assert cache_key(prefix_lookups[0]) == cache_key(prefix_lookups[1])
+    assert store.lookup(prefix_lookups[0]) is None
 
 
 def test_staged_prefix_replay_refuses_invented_stage_before_identity(
@@ -564,6 +735,64 @@ def test_staged_runtime_rejects_tampered_prefix_cache(tmp_path) -> None:
             evaluator=SpyEvaluator(),
             result_store=TamperingStore(tmp_path / "cache.sqlite"),
         )
+
+
+def test_staged_prefix_replay_accepts_verified_row_and_rejects_later_overwrite(
+    tmp_path,
+) -> None:
+    clean = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "internal-analytical",
+        parallel=1,
+        budget=4,
+        out_dir=tmp_path / "clean",
+        seed=11,
+        evaluator=SpyEvaluator(),
+        result_store=SpyStore(tmp_path / "clean-cache.sqlite"),
+    )
+
+    assert clean.prefix_evals_run == 1
+    assert len(clean.records) == 4
+
+    class OverwritingPrefixStore(SpyStore):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            self.prefix_overwrites = 0
+
+        def lookup(self, eval_spec: EvalSpec) -> ScoredResult | None:
+            result = super().lookup(eval_spec)
+            if (
+                isinstance(eval_spec, PrefixEvalSpec)
+                and result is not None
+                and self.prefix_overwrites == 0
+            ):
+                ResultStore.store(
+                    self,
+                    eval_spec,
+                    replace(result, notes=(*result.notes, "later-prefix-overwrite")),
+                    created_at="later-writer",
+                )
+                self.prefix_overwrites += 1
+            return result
+
+    overwritten_store = OverwritingPrefixStore(tmp_path / "overwritten-cache.sqlite")
+    with pytest.raises(StagedReplayViolation):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "staged",
+            "internal-analytical",
+            parallel=1,
+            budget=4,
+            out_dir=tmp_path / "overwritten",
+            seed=11,
+            evaluator=SpyEvaluator(),
+            result_store=overwritten_store,
+        )
+
+    assert overwritten_store.prefix_overwrites == 1
 
 
 def test_staged_default_evaluator_fails_loud_without_replay(tmp_path) -> None:

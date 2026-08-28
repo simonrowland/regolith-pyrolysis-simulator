@@ -2369,6 +2369,13 @@ def _closed_loop_snapshot(hour: int, composition_wt_pct: Mapping[str, float]) ->
         mass_in_kg=1000.0,
         mass_out_kg=1000.0,
         mass_balance_error_pct=0.0,
+        # A real HourSnapshot declares this as a typed float defaulting to 0.0.
+        # This double omitted it, and the sub-ambient pumping context refuses on
+        # an ABSENT vented-O2 flow (a missing input is not a proven zero) -- a
+        # refusal that propagates until every candidate is infeasible and the
+        # study returns no winner at all. Carrying the field makes the double
+        # faithful; it is not a workaround for the refusal.
+        O2_vented_mol_hr=0.0,
     )
 
 
@@ -4168,6 +4175,15 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
     assert record.product_summary["wall_deposit_cumulative_kg_by_species"] == {
         "SiO": 0.001
     }
+    assert record.product_summary["coating_authoritative"] is False
+    assert record.product_summary["coating_status"] == "warning"
+    assert record.product_summary["coating_output_status"] == "status_bearing"
+    assert (
+        record.product_summary["wall_deposit_sticking_authority"][
+            "authoritative_for_coating"
+        ]
+        is False
+    )
 
     study._write_leaderboard(
         tmp_path / "leaderboard.csv",
@@ -4205,7 +4221,7 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
     }
 
 
-def test_tap_truncated_partial_coating_projection_fails_loud() -> None:
+def test_tap_truncated_missing_genuine_hour_basis_coating_fields_fails_loud() -> None:
     spec = _scope_spec()
     scored = ScoredResult(
         candidate_id="tap-partial",

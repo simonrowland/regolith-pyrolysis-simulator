@@ -99,11 +99,42 @@ class GateMargin:
     status_payload: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        status_payload = _plain_payload(self.status_payload)
         object.__setattr__(
             self,
             "status_payload",
-            _plain_payload(self.status_payload),
+            status_payload,
         )
+        object.__setattr__(
+            self,
+            "feasible",
+            _normalized_gate_margin_feasibility(
+                self.gate,
+                self.feasible,
+                self.margin,
+                self.threshold,
+                status_payload,
+            ),
+        )
+
+
+def _normalized_gate_margin_feasibility(
+    gate: str,
+    feasible: bool,
+    margin: float,
+    threshold: ThresholdSpec,
+    status_payload: Mapping[str, Any],
+) -> bool:
+    if gate != "coating":
+        return bool(feasible)
+    if (
+        margin == -math.inf
+        or status_payload.get("coating_constraint_mode")
+        == "no_unqualified_deposition"
+        or threshold.id == "coating_max_unqualified_deposit_kg_per_campaign"
+    ):
+        return bool(feasible)
+    return True
 
 
 @dataclass(frozen=True)
@@ -1519,8 +1550,7 @@ def _coating_authority_status(
     by_segment_species: dict[tuple[str, str], float] = defaultdict(float)
     for (_campaign, segment, species), kg in by_campaign.items():
         amount = _non_negative_number(kg, "wall deposit kg")
-        if amount > _EPS:
-            by_segment_species[(segment, species)] += amount
+        by_segment_species[(segment, species)] += amount
     trace_status = getattr(trace, "wall_deposit_sticking_authority", {}) or {}
     return wall_deposit_sticking_authority_status(
         by_segment_species,

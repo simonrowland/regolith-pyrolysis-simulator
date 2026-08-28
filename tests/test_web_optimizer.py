@@ -53,6 +53,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore, _serialize_margins
+from simulator.fidelity_vocabulary import FidelityVocabularyTranslationError
 from web import routes as web_routes
 
 
@@ -785,6 +786,64 @@ def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:
     assert payload["eval_spec"]["mre_max_voltage_V"] == pytest.approx(
         spec.mre_max_voltage_V
     )
+
+
+def test_leaderboard_contains_one_unreadable_row_without_losing_the_page(
+    client,
+) -> None:
+    """One row the vocabulary cannot read must not take the whole board down.
+
+    Rendering a row runs its STORED provenance through the fidelity vocabulary,
+    which RAISES on a token it does not know. Stored rows outlive the vocabulary
+    that wrote them, so a token retired after the row was cached arrives here as
+    an unknown one -- and uncontained, that single row aborted the request and
+    the operator lost every OTHER run's results with it.
+
+    The bad row is written by mutating the STORED payload directly rather than
+    by going through the store, because the write gate would reject it. That is
+    the point: this row cannot be created today, only INHERITED from an older
+    vocabulary, which is exactly the case the containment exists for.
+
+    Asserts the survivor is still ranked AND that the loss is declared. A silent
+    skip would leave the board looking complete while under-reporting it.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-contained"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    good = _base_spec(recipe_id="row-good")
+    bad = _base_spec(recipe_id="row-bad")
+    store.store(good, _scored(good, candidate_id="candidate-good", oxygen=10.0),
+                created_at="2026-06-01T00:00:00Z")
+    store.store(bad, _scored(bad, candidate_id="candidate-bad", oxygen=99.0),
+                created_at="2026-06-01T00:00:00Z")
+
+    # Retire the token on ONE row, the way an older vocabulary would have left it.
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        conn.row_factory = sqlite3.Row
+        for row in conn.execute(
+            "SELECT cache_key, run_reference FROM results"
+        ).fetchall():
+            reference = json.loads(row["run_reference"])
+            if reference.get("product_summary", {}).get("oxygen_kg") != 99.0:
+                continue
+            reference["evidence_class"] = "a-token-this-build-never-heard-of"
+            conn.execute(
+                "UPDATE results SET run_reference = ? WHERE cache_key = ?",
+                (json.dumps(reference), row["cache_key"]),
+            )
+
+    response = client.get(
+        "/api/optimizer/leaderboard?feedstock_id=lunar_mare_low_ti"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    candidates = {entry["candidate_id"] for entry in payload["entries"]}
+    assert "candidate-good" in candidates
+    assert "candidate-bad" not in candidates
+    assert payload["excluded_unreadable"] == 1
 
 
 def test_optimizer_backend_payload_marks_analytical_unavailable() -> None:
@@ -2852,6 +2911,890 @@ def test_optimizer_job_register_marks_dead_running_job_failed_on_rebuild(tmp_pat
     assert meta["status"] == "FAILED"
 
 
+def test_winners_table_pins_one_objective_metric_across_selector_pairs(
+    client,
+) -> None:
+    """Every ranked row must be scored on the SAME metric.
+
+    Each selector pair used to be queried with the caller's objective_metric
+    (usually None), so each pair independently resolved its own PRIMARY
+    objective. A profile whose objective vector is ordered differently resolves
+    a different metric -- and the table then ranked kilograms of oxygen against
+    kilowatt-hours of energy in a single column, which is not a comparison.
+
+    The fixture makes the two pairs disagree on purpose: the strong pair lists
+    energy FIRST, so on its own it would rank on energy_kWh (minimize, 1.0)
+    while the weak pair ranks on oxygen_kg (maximize, 6.0). Ranked on the
+    pinned oxygen axis the strong pair leads at 20.0; ranked on each pair's own
+    axis the weak pair's 6.0 outranks the strong pair's 1.0 and the order
+    inverts.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-metric-pin"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    weak = _base_spec(recipe_id="recipe-weak", feedstock_id="ceres_regolith")
+    strong = _base_spec(recipe_id="recipe-strong", feedstock_id="mars_basalt")
+    store.store(
+        weak,
+        _scored(weak, candidate_id="candidate-weak", oxygen=6.0, energy=1.0),
+        created_at="2026-06-01T00:00:00Z",
+    )
+    store.store(
+        strong,
+        _scored(
+            strong,
+            candidate_id="candidate-strong",
+            objectives=ObjectiveVector(
+                (
+                    # energy first: this pair's OWN primary objective
+                    ObjectiveValue("energy_kWh", "minimize", 1.0, "kWh", ordinal=0),
+                    ObjectiveValue("oxygen_kg", "maximize", 20.0, "kg", ordinal=1),
+                )
+            ),
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    response = client.get("/partials/optimizer-table")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+
+    assert "candidate-strong" in body
+    assert "candidate-weak" in body
+    assert body.index("candidate-strong") < body.index("candidate-weak"), (
+        "pairs were ranked on their own objective metrics, not one pinned axis"
+    )
+
+
+def test_winners_table_declares_rows_it_excluded(client) -> None:
+    """A board that dropped rows must say so; the JSON reader already did.
+
+    The per-pair exclusion counters were unpacked and thrown away, so the page
+    rendered a clean Rank 1..N board while the JSON reader for the same store
+    reported 1094 excluded infeasible rows. The operator had no way to know the
+    board was a filtered view.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-excl-declared"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    spec = _base_spec(recipe_id="recipe-ok", feedstock_id="ceres_regolith")
+    store.store(spec, _scored(spec, candidate_id="candidate-ok", oxygen=9.0),
+                created_at="2026-06-01T00:00:00Z")
+    dud = _base_spec(recipe_id="recipe-dud", feedstock_id="ceres_regolith")
+    store.store(
+        dud,
+        _scored(dud, candidate_id="candidate-dud", oxygen=1.0, feasible=False),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    body = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "candidate-ok" in body
+    assert "excluded from this board" in body, (
+        "board dropped rows without declaring them"
+    )
+    assert "infeasible" in body
+
+
+def test_empty_board_caused_by_exclusions_does_not_claim_nothing_matched(
+    client,
+) -> None:
+    """"Nothing matched your filters" is a different claim from "everything was thrown out".
+
+    The second is the operator's problem to act on; the first tells them to go
+    away. The empty branch made only the reassuring claim.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-excl-empty"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    dud = _base_spec(recipe_id="recipe-dud", feedstock_id="ceres_regolith")
+    store.store(
+        dud,
+        _scored(dud, candidate_id="candidate-dud", oxygen=1.0, feasible=False),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    body = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "No rows could be ranked" in body
+    assert "No stored optimizer winners match the current filters." not in body
+
+
+def test_rows_lacking_the_ranked_metric_are_counted_not_silently_dropped(
+    client,
+) -> None:
+    """Pinning one metric drops pairs that lack it -- and that drop must be counted.
+
+    Pinning the ranked metric across selector pairs is correct, but it makes
+    this path reachable: a pair whose profile carries a different objective now
+    falls out. It fell out through a bare `continue` with no counter, so the
+    board could shrink with nothing to show for it.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-excl-metric"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    # alphabetically first: pins oxygen_kg as the board axis
+    pinner = _base_spec(recipe_id="recipe-pin", feedstock_id="ceres_regolith")
+    store.store(pinner, _scored(pinner, candidate_id="candidate-pin", oxygen=9.0),
+                created_at="2026-06-01T00:00:00Z")
+    # carries NO oxygen_kg at all, so it cannot be ranked on that axis
+    offaxis = _base_spec(recipe_id="recipe-offaxis", feedstock_id="mars_basalt")
+    store.store(
+        offaxis,
+        _scored(
+            offaxis,
+            candidate_id="candidate-offaxis",
+            objectives=ObjectiveVector(
+                (ObjectiveValue("energy_kWh", "minimize", 3.0, "kWh", ordinal=0),)
+            ),
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    body = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "candidate-pin" in body
+    assert "candidate-offaxis" not in body
+    assert "no value for the ranked metric" in body, (
+        "a pair dropped for lacking the ranked metric was not counted"
+    )
+
+
+def test_reported_completeness_is_shown_not_called_missing(client) -> None:
+    """A status the surface does not recognise is not a missing metric.
+
+    Both the table and the detail page gated the number on
+    status == "available" and fell through to "metric missing" for anything
+    else. A stored metric with status "reported" therefore rendered as absent
+    -- while the same row went on printing its metal and oxygen masses.
+
+    The hidden number in the observed case was 0.21 % SiO extraction
+    completeness, which is the Mandate's incomplete-extraction failure mode.
+    The surface erased exactly the evidence that the run had failed and kept
+    the part that looked like success, so this fixture uses that shape
+    verbatim: status "reported", completeness_fraction 0.002125, target SiO.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-completeness-reported"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    spec = _base_spec(recipe_id="recipe-reported")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-reported",
+            oxygen=9.02,
+            product_summary={
+                "product_yield_table": _product_yield_table(),
+                # ★ THE REAL PRODUCER SHAPE, not a flattened stand-in.
+                # extraction_completeness_report puts target_species,
+                # denominator_account and product_bin INSIDE targets[<species>]
+                # and names the aggregate's owner in worst_target_species. The
+                # earlier version of this fixture claimed to use the observed
+                # payload "verbatim" while actually feeding the flat keys the
+                # consumer already read -- so it could not fail if the readout
+                # never learned the nested shape, which it had not. An
+                # independent audit caught that by comparing against the
+                # PRODUCER, which the test never did.
+                "extraction_completeness": {
+                    "status": "reported",
+                    "worst_target_species": "SiO",
+                    "completeness_fraction": 0.002125,
+                    "targets": {
+                        "SiO": {
+                            "status": "reported",
+                            "target_species": "SiO",
+                            "denominator_account": "cleaned_silicate_feed",
+                            "product_bin": "silica_glass",
+                            "completeness_fraction": 0.002125,
+                        },
+                    },
+                },
+            },
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    table = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "candidate-reported" in table
+    assert "0.2125 %" in table, "a reported completeness value was not rendered"
+    assert "metric missing" not in table, (
+        "a metric that is present was reported as missing"
+    )
+    # the non-certified status is disclosed rather than dropped
+    assert "reported" in table
+    # the target the number is ABOUT must survive, not just the number
+    assert "SiO" in table
+    assert "not declared" not in table
+
+
+def test_published_backend_never_reports_a_null_certification_allowance() -> None:
+    """The API may answer yes or no on certification. It may not answer null.
+
+    canonicalize_fidelity_emission leaves certification_allowed as None
+    whenever nothing established one, and the backend object published that
+    null straight out of the API while the tier label beside it resolved the
+    same question to boolean false. A consumer reading a missing allowance as
+    "not forbidden" takes permission from silence -- the fail-open the result
+    store was already corrected for.
+
+    ★ THIS EXERCISES THE READ PATH DIRECTLY, ON PURPOSE. The shape below is no
+    longer writable: the store now refuses a non-authoritative feasible result
+    outright (non_authoritative_backend), so a fixture that goes through
+    ResultStore.store cannot reach this branch and a test built that way passes
+    whether or not the bug is fixed. The rows that DO carry this shape are
+    already on disk, written by a looser earlier path, and reading them back is
+    exactly the surface under test.
+
+    Deliberately NOT asserted: the stored run reference may still carry None
+    for "nobody ever ruled", which test_optimizer_results_store pins. The rule
+    is about the answer handed to a caller, not about storage.
+    """
+    run_reference = {
+        "backend_name": "cached-real",
+        "backend_status": "ok",
+        "backend_real_active": True,
+        "backend_authoritative": False,
+    }
+
+    payload = web_routes._optimizer_backend_payload({}, {}, run_reference)
+
+    allowed = payload["certification_allowed"]
+    assert allowed is not None, (
+        "published backend certification allowance was null; "
+        "a consumer reading absence as permission fails open"
+    )
+    assert allowed is False
+    # and it must not disagree with the tier label rendered beside it
+    assert allowed is payload["tier_label"]["certification_allowed"]
+
+
+def test_product_strip_shows_the_unclassified_mass_beside_the_named_bins(
+    client,
+) -> None:
+    """"Product inconclusive" must come with the number that made it inconclusive.
+
+    The strip tested the unclassified mapping for truthiness, set the status
+    from it, and then dropped the value -- so the card said "unclassified
+    product mass present" while the only figures it printed were the named
+    bins. The unclassified total lived on the detail page's diagnostics table.
+
+    The fixture uses the observed proportions on purpose: 92.27 kg of ingots on
+    the face of the card, and 139.82 kg that could not be classified at all. A
+    product story that omits the LARGEST number in its own ledger is not
+    inconclusive, it is misleading.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-unclassified-strip"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    spec = _base_spec(recipe_id="recipe-unclassified-strip")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-unclassified",
+            product_summary={
+                "product_classes": {
+                    "unclassified": {
+                        "kg_by_species": {
+                            "unspent_K_reagent": 56.0,
+                            "unspent_Na_reagent": 83.6,
+                            "unspent_Mg_reagent": 0.22,
+                        },
+                        "total_kg": 139.82,
+                    },
+                },
+                "product_yield_table": {
+                    "status": "closed",
+                    "outputs": [
+                        {
+                            "kind": "output",
+                            "id": "ingots_metals",
+                            "label": "Ingots/metals",
+                            "kg": 92.27,
+                            "yield_pct": 7.715,
+                        },
+                    ],
+                    "total_input_kg": 1000.0,
+                    "products_out_kg": 92.27,
+                },
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    table = client.get("/partials/optimizer-table").get_data(as_text=True)
+
+    assert "Product inconclusive" in table
+    assert "92.27 kg" in table
+    assert "Unclassified" in table
+    assert "139.8 kg" in table, (
+        "the mass that made the ledger inconclusive was not shown beside the bins"
+    )
+
+
+def test_wide_winners_table_is_wrapped_in_a_scroll_container(client) -> None:
+    """The 15-column table must carry its own horizontal scroll box.
+
+    Measured at 1623px against both a 1440px and a 1280px viewport, the table
+    pushed the whole DOCUMENT sideways -- so the filter controls and every
+    other card moved with it, not only the table.
+
+    ★ HONEST LIMIT OF THIS TEST: it proves the containment element is EMITTED
+    and that the stylesheet defines it. It does NOT prove the overflow is
+    actually contained, because nothing here lays out a viewport or measures a
+    box. Treat a green here as necessary and not sufficient; the measurement
+    belongs in a browser pass. It is still worth pinning, because the failure
+    it guards against is someone removing the wrapper during unrelated markup
+    edits, which is silent and easy.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-scroll-wrap"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+    spec = _base_spec(recipe_id="recipe-scroll-wrap")
+    store.store(spec, _scored(spec, candidate_id="candidate-scroll-wrap"),
+                created_at="2026-06-01T00:00:00Z")
+
+    table = client.get("/partials/optimizer-table").get_data(as_text=True)
+    assert "candidate-scroll-wrap" in table
+    wrap = table.index('class="table-scroll"')
+    assert wrap < table.index('class="composition-table"'), (
+        "the wide table is not inside its scroll container"
+    )
+
+    # NOT client.application.root_path: the test module creates the app, so
+    # Flask roots it at tests/. Anchor on the web package itself.
+    css = (
+        Path(web_routes.__file__).parent / "static" / "css" / "style.css"
+    ).read_text(encoding="utf-8")
+    assert ".table-scroll" in css and "overflow-x: auto" in css
+
+
+@pytest.mark.parametrize(
+    "unreadable_token", ["not_converged", "refused", "not_attempted"]
+)
+def test_runs_listing_survives_one_unreadable_latest_result(
+    client, unreadable_token: str
+) -> None:
+    """One bad row in ONE run must not take the whole run library down.
+
+    /api/optimizer/runs builds each summary's latest_result through
+    _result_metadata. The surrounding try in _read_cache_summary catches
+    sqlite3.Error ONLY, so a stored backend_status the fidelity vocabulary
+    cannot read raised straight through the endpoint and every HEALTHY run went
+    with it.
+
+    ★ THIS GAP SURVIVED MY OWN CONTAINMENT AUDIT for 3582fb38. That audit asked
+    whether each caller of _result_metadata sat inside a `try` -- and this one
+    does. It catches the wrong exception. Presence of a guard is not coverage by
+    that guard, and checking for the former while claiming the latter is a
+    structural test wearing a behavioural claim. An independent reviewer found
+    it by executing the endpoint rather than reading the callers.
+
+    The fixture therefore asserts the thing that actually matters and that a
+    single-run fixture cannot show: a HEALTHY run stored alongside the bad one
+    is still listed.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+
+    healthy_dir = runs_dir / f"run-healthy-{unreadable_token}"
+    healthy_dir.mkdir(parents=True)
+    healthy_store = ResultStore(healthy_dir / "cache.sqlite")
+    healthy_spec = _base_spec(recipe_id=f"recipe-healthy-{unreadable_token}")
+    healthy_store.store(
+        healthy_spec,
+        _scored(healthy_spec, candidate_id="candidate-healthy"),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    unreadable_dir = runs_dir / f"run-unreadable-latest-{unreadable_token}"
+    unreadable_dir.mkdir(parents=True)
+    unreadable_store = ResultStore(unreadable_dir / "cache.sqlite")
+    unreadable_spec = _base_spec(
+        recipe_id=f"recipe-unreadable-latest-{unreadable_token}"
+    )
+    unreadable_store.store(
+        unreadable_spec,
+        _scored(
+            unreadable_spec,
+            candidate_id="candidate-unreadable-latest",
+            feasible=False,
+            trace={"backend_status": unreadable_token},
+            backend_status=unreadable_token,
+            backend_authoritative=False,
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/api/optimizer/runs")
+
+    assert response.status_code == 200, (
+        "one unreadable latest result took the whole runs listing down"
+    )
+    payload = response.get_json()
+    candidates = {
+        (run.get("latest_result") or {}).get("candidate_id")
+        for run in payload.get("runs", [])
+    }
+    assert "candidate-healthy" in candidates, (
+        "the healthy run was lost along with the unreadable one"
+    )
+    assert "candidate-unreadable-latest" in candidates
+
+
+@pytest.mark.parametrize(
+    "unreadable_token", ["not_converged", "refused", "not_attempted"]
+)
+def test_detail_page_renders_a_row_whose_backend_token_is_unreadable(
+    client,
+    unreadable_token: str,
+) -> None:
+    """END-TO-END: the page must come back 200, not 500.
+
+    The companion test asserts the containment SHAPE; this one asserts the
+    consequence, because a shape test passes as soon as the helper exists and
+    would go on passing if the detail model never called it. The failure being
+    guarded against is an operator opening a stored result and getting a 500.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / f"run-unreadable-{unreadable_token}"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    spec = _base_spec(recipe_id=f"recipe-unreadable-{unreadable_token}")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-unreadable",
+            feasible=False,
+            trace={"backend_status": unreadable_token},
+            backend_status=unreadable_token,
+            backend_authoritative=False,
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+    key = cache_key(spec)
+
+    response = client.get(
+        f"/optimizer/runs/run-unreadable-{unreadable_token}/results/{key}"
+    )
+
+    assert response.status_code == 200, (
+        "detail page failed on a stored row the fidelity vocabulary cannot read"
+    )
+    body = response.get_data(as_text=True)
+    assert "candidate-unreadable" in body
+    # ★ 200 IS NOT ENOUGH. Review noted this would also pass if the page
+    # rendered a CERTIFIED badge -- a page that survives by flattering is not
+    # the fix. Assert the marking the containment exists to produce.
+    assert "unreadable" in body
+    assert "UNVERIFIED" in body
+    assert "CERTIFIED" not in body
+
+
+def _unreadable_backend_row() -> dict[str, object]:
+    """Minimal results-table row whose stored provenance the vocabulary refuses.
+
+    Uses a CASE VARIANT rather than a vocabulary member. Every one of the eight
+    intent-result tokens is now readable (d-003 closed that crossover), so the
+    remaining unreadable class is stored or foreign data carrying a token the
+    vocabulary does not recognise. A live IntentResult cannot carry 'Refused' --
+    its constructor validates -- but stored carriers are NOT re-validated on
+    read, which is the same legacy-data channel this containment exists for.
+    """
+    import json as _json
+    return {
+        "cache_key": "key-unreadable",
+        "candidate_id": "candidate-unreadable",
+        "feedstock_id": "lunar_mare_low_ti",
+        "recipe_id": "recipe-unreadable",
+        "profile_id": "oxygen-yield-v1",
+        "fidelity": "fast",
+        "created_at": "2026-06-01T00:00:00Z",
+        "corpus_version": None,
+        "notes": "[]",
+        "objectives": "[]",
+        "feasible": 0,
+        "feasibility_margins": "{}",
+        "eval_spec": "{}",
+        "result_blob": "{}",
+        "run_reference": _json.dumps({
+            "backend_name": "alphamelts",
+            "backend_status": "Refused",
+            "evidence_class": "melts",
+            "backend_authoritative": True,
+        }),
+    }
+
+
+def test_result_metadata_contains_an_unreadable_backend_only_when_asked() -> None:
+    """The detail page renders a bad row; the board keeps DROPPING AND COUNTING it.
+
+    canonicalize_fidelity_emission refuses any backend_status it cannot
+    resolve. This test originally used `not_converged`, which was unreadable
+    because INTENT_RESULT_STATUSES was not a subset of RuntimeStatus; d-003
+    closed that crossover, so all eight intent tokens now resolve and a
+    genuinely unrecognised token is needed instead. The exposure is unchanged:
+    stored carriers are not re-validated on read, so foreign or legacy data can
+    still carry something the vocabulary refuses. _leaderboard_entries catches
+    that and reports excluded_unreadable; _result_detail_model had no
+    equivalent and returned a 500, because the page IS the row and cannot drop
+    itself.
+
+    ★ The containment is OPT-IN, and this test is what pins that. Containing
+    unconditionally would stop _leaderboard_entries ever raising, so its
+    excluded_unreadable counter would silently stop firing for this cause -- a
+    live counter going quietly dead, which is the same defect class it exists to
+    report. So both halves are asserted here: default still RAISES, opt-in
+    contains.
+    """
+    row = {
+        "backend_name": "alphamelts",
+        "backend_status": "Refused",
+        "evidence_class": "melts",
+        "backend_authoritative": True,
+    }
+
+    with pytest.raises(FidelityVocabularyTranslationError):
+        web_routes._optimizer_backend_payload({}, {}, row)
+
+    # ★ DRIVE _result_metadata ITSELF THROUGH BOTH FLAG STATES. An independent
+    # review caught that this test previously called only the inner helpers, so
+    # it was flag-INDEPENDENT: had contain_unreadable_backend defaulted to True,
+    # the leaderboard would have stopped raising and excluded_unreadable would
+    # have died for this cause -- and this test, whose docstring claims to
+    # prevent exactly that, would have stayed green.
+    stored = _unreadable_backend_row()
+    with pytest.raises(FidelityVocabularyTranslationError):
+        web_routes._result_metadata(stored, run_id="run-x")
+    opted_in = web_routes._result_metadata(
+        stored, run_id="run-x", contain_unreadable_backend=True
+    )
+    assert opted_in["backend"]["certification_allowed"] is False
+    assert opted_in["backend"]["backend_active"] == "unreadable"
+
+    contained = web_routes._unreadable_backend_payload("unreadable: token")
+    # every field says the same thing, and none of them flatters
+    assert contained["backend_authoritative"] is False
+    assert contained["backend_real_active"] is False
+    assert contained["certification_allowed"] is False
+    assert contained["tier_label"]["ux_label"] == "UNVERIFIED"
+    # named, not blank: a blank renders as absence, and absence is what gets misread
+    assert contained["backend_active"] == "unreadable"
+
+
+def test_html_and_json_mixed_sense_ranking_is_order_independent(client) -> None:
+    """Both surfaces flag the same pair before HTML selects a representative."""
+    base_runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    candidate_ids = ("candidate-sense-max", "candidate-sense-min")
+    values = {
+        "maximum": (10.0, "maximize", candidate_ids[0]),
+        "minimum": (1.0, "minimize", candidate_ids[1]),
+    }
+    outcomes: list[dict[str, object]] = []
+
+    for order_index, order in enumerate(
+        (("minimum", "maximum"), ("maximum", "minimum"))
+    ):
+        runs_dir = base_runs_dir.parent / f"runs-mixed-sense-{order_index}"
+        client.application.config["OPTIMIZER_RUNS_DIR"] = str(runs_dir)
+        for position, label in enumerate(order):
+            value, sense, candidate_id = values[label]
+            run_dir = runs_dir / f"run-{position}"
+            run_dir.mkdir(parents=True)
+            store = ResultStore(run_dir / "cache.sqlite")
+            spec = _base_spec(recipe_id=f"recipe-{label}")
+            store.store(
+                spec,
+                _scored(
+                    spec,
+                    candidate_id=candidate_id,
+                    objectives=ObjectiveVector(
+                        (
+                            ObjectiveValue(
+                                "oxygen_kg",
+                                sense,
+                                value,
+                                "kg",
+                                ordinal=0,
+                            ),
+                        )
+                    ),
+                ),
+                created_at="2026-06-01T00:00:00Z",
+            )
+
+        html_response = client.get(
+            "/partials/optimizer-table?objective_metric=oxygen_kg"
+        )
+        assert html_response.status_code == 200
+        html_body = html_response.get_data(as_text=True)
+        json_payload = client.get(
+            "/api/optimizer/leaderboard?objective_metric=oxygen_kg"
+        ).get_json()
+        outcomes.append(
+            {
+                "html_candidates": tuple(
+                    candidate_id
+                    for candidate_id in candidate_ids
+                    if candidate_id in html_body
+                ),
+                "html_ambiguous": (
+                    "rows mix minimize and maximize objectives" in html_body
+                ),
+                "json_candidates": tuple(
+                    (
+                        entry["candidate_id"],
+                        bool(entry.get("rank_ambiguous")),
+                    )
+                    for entry in json_payload["entries"]
+                ),
+            }
+        )
+
+    expected = {
+        "html_candidates": ("candidate-sense-max",),
+        "html_ambiguous": True,
+        "json_candidates": (
+            ("candidate-sense-max", True),
+            ("candidate-sense-min", True),
+        ),
+    }
+    assert outcomes == [expected, expected], (
+        "mixed-sense verdict changed with row order or one surface presented "
+        f"a confident rank: {outcomes}"
+    )
+
+
+def test_json_leaderboard_marks_a_mixed_sense_set_ambiguous(client) -> None:
+    """The JSON surface marks every member of a mixed-sense set ambiguous.
+
+    Earlier coverage falsely claimed the HTML winners table already refused
+    the set. It did not: pair selection discarded one sense before the HTML
+    ambiguity check. The order-sensitive sibling test above covers both paths.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-mixed-sense-json"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    maximize = _base_spec(recipe_id="recipe-sense-max")
+    store.store(
+        maximize,
+        _scored(maximize, candidate_id="candidate-sense-max",
+                objectives=ObjectiveVector(
+                    (ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),))),
+        created_at="2026-06-01T00:00:00Z",
+    )
+    minimize = _base_spec(recipe_id="recipe-sense-min")
+    store.store(
+        minimize,
+        _scored(minimize, candidate_id="candidate-sense-min",
+                objectives=ObjectiveVector(
+                    (ObjectiveValue("oxygen_kg", "minimize", 1.0, "kg", ordinal=0),))),
+        created_at="2026-06-01T00:00:00Z",
+    )
+
+    payload = client.get(
+        "/api/optimizer/leaderboard?objective_metric=oxygen_kg"
+    ).get_json()
+    entries = payload["entries"]
+    assert len(entries) == 2
+
+    for entry in entries:
+        assert entry.get("rank_ambiguous"), (
+            f"{entry.get('candidate_id')} was ranked without an ambiguity mark "
+            "across opposing objective senses"
+        )
+
+
+def test_winners_table_ranks_by_score_not_by_selector_pair_order(
+    client,
+) -> None:
+    """Rank 1 must be the best candidate, not the first pair alphabetically.
+
+    The winners table walked selector pairs, took the best row per pair, and
+    then assigned rank by ENUMERATION of that walk -- so Rank 1 was simply the
+    alphabetically-first feedstock. Worse, it stopped the walk once `limit` rows
+    had accumulated, so a later pair holding the actual best could never be
+    collected at all. Observed on a real store: HTML Rank 1 = 6.749 kg beside
+    HTML Rank 8 = 19.955 kg, with 119 of 169 pairs missing entirely.
+
+    The fixture inverts alphabetical order against score on purpose: the pair
+    that sorts FIRST by name carries the LOWER score, so a table that still
+    ranks by pair order puts it at Rank 1 and fails.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-rank-order"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+
+    # sorts FIRST by feedstock name, LOWER score
+    weak = _base_spec(recipe_id="recipe-weak", feedstock_id="ceres_regolith")
+    # sorts LATER by feedstock name, HIGHER score
+    strong = _base_spec(recipe_id="recipe-strong", feedstock_id="mars_basalt")
+    store.store(weak, _scored(weak, candidate_id="candidate-weak", oxygen=6.7),
+                created_at="2026-06-01T00:00:00Z")
+    store.store(strong, _scored(strong, candidate_id="candidate-strong", oxygen=19.9),
+                created_at="2026-06-01T00:00:00Z")
+
+    response = client.get("/partials/optimizer-table")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+
+    # Both rows present, and the STRONGER one is rendered first.
+    assert "candidate-strong" in body
+    assert "candidate-weak" in body
+    assert body.index("candidate-strong") < body.index("candidate-weak"), (
+        "winners table still ranks by selector-pair order, not by score"
+    )
+
+
+def test_optimizer_winner_entries_opens_each_run_store_once(
+    client,
+    monkeypatch,
+) -> None:
+    """The winners table must not re-scan every run store for every pair.
+
+    GET /optimizer used to call _leaderboard_entries(run_dirs) once per
+    selector pair. Each of those calls opened every run store, so the page
+    did O(pairs × run_dirs) sqlite opens. At 169 pairs and 326 runs that is
+    ~55k opens and a multi-minute render. Fixture-size tests hid it because
+    2 pairs × a few dirs collapses to a handful of opens.
+
+    The first repair (one open per run) still left an O(pairs × run_dirs)
+    Python loop: digest-scope on every run for every pair, including empty
+    (run, pair) cells. Opens stayed linear while the page stayed unusable.
+    This fixture is large enough that BOTH nested loops are distinguishable:
+    8 run dirs × 8 unique pairs is 72 inner scans on the old shape.
+
+    Assert on COUNTS, never on wall-clock time. Each run holds a DISTINCT
+    pair so empty (run, pair) cells exist for the old nested walk to visit
+    and for a linear grouped walk to skip.
+    """
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    n_runs = 8
+    for index in range(n_runs):
+        run_dir = runs_dir / f"run-open-count-{index:02d}"
+        run_dir.mkdir(parents=True)
+        store = ResultStore(run_dir / "cache.sqlite")
+        spec = _base_spec(
+            recipe_id=f"recipe-{index:02d}",
+            feedstock_id=f"feedstock-{index:02d}",
+            profile_id=f"profile-{index:02d}",
+        )
+        store.store(
+            spec,
+            _scored(
+                spec,
+                candidate_id=f"candidate-{index:02d}",
+                oxygen=10.0 + index,
+            ),
+            created_at="2026-06-01T00:00:00Z",
+        )
+
+    opens: list[Path] = []
+    query_calls: list[int] = []
+    filter_calls: list[int] = []
+    yaml_loads: list[int] = []
+    real_connect = web_routes._connect_result_store
+    real_query = web_routes._query_result_rows
+    real_interoperable = web_routes.interoperable_corpus_versions
+
+    def counting_connect(cache_path: Path) -> sqlite3.Connection:
+        opens.append(Path(cache_path))
+        return real_connect(cache_path)
+
+    def counting_query(*args: object, **kwargs: object):
+        query_calls.append(1)
+        return real_query(*args, **kwargs)
+
+    def counting_interoperable() -> tuple[str, ...]:
+        yaml_loads.append(1)
+        return real_interoperable()
+
+    monkeypatch.setattr(web_routes, "_connect_result_store", counting_connect)
+    monkeypatch.setattr(web_routes, "_query_result_rows", counting_query)
+    monkeypatch.setattr(
+        web_routes, "interoperable_corpus_versions", counting_interoperable
+    )
+    if hasattr(web_routes, "_filter_rows_to_digest_scope"):
+        real_filter = web_routes._filter_rows_to_digest_scope
+
+        def counting_filter(*args: object, **kwargs: object):
+            filter_calls.append(1)
+            return real_filter(*args, **kwargs)
+
+        monkeypatch.setattr(
+            web_routes, "_filter_rows_to_digest_scope", counting_filter
+        )
+
+    with client.application.test_request_context("/optimizer"):
+        run_dirs = web_routes._optimizer_run_dirs(web_routes._optimizer_runs_root())
+        entries, _metric, _excluded = web_routes._optimizer_winner_entries(
+            run_dirs,
+            feedstock_id=None,
+            profile_id=None,
+            fidelity=None,
+            objective_metric=None,
+            limit=50,
+        )
+
+    n_pairs = n_runs
+    quadratic = n_runs * n_pairs
+    inner_python = len(query_calls) + len(filter_calls)
+    assert len(run_dirs) == n_runs
+    assert len(entries) == n_pairs, (
+        "linear-scan repair returned no ranked rows; a vacuous empty board "
+        "must not pass this count"
+    )
+    assert n_runs <= len(opens) <= n_runs + n_pairs, (
+        f"winner-table store opens should be O(run_dirs)+O(pairs) "
+        f"[{n_runs}..{n_runs + n_pairs}], got {len(opens)}; "
+        f"nested per-pair scan is {n_runs * (1 + n_pairs)}"
+    )
+    assert len(opens) < n_runs * (1 + n_pairs)
+    assert inner_python <= n_runs + n_pairs, (
+        f"per-run/per-pair Python work should be O(run_dirs + pairs)="
+        f"{n_runs + n_pairs}, got {inner_python} "
+        f"(query={len(query_calls)} filter={len(filter_calls)}); "
+        f"nested empty digest-scope is {quadratic}"
+    )
+    assert inner_python < quadratic
+    assert len(yaml_loads) <= 2, (
+        f"corpus-version YAML should load O(1) per winners scan, got "
+        f"{len(yaml_loads)}; per-row _corpus_version_badge re-parse is "
+        f"O(rows)"
+    )
+
+    yaml_loads.clear()
+    with client.application.test_request_context("/api/optimizer/leaderboard"):
+        board, _metric, _scope, _excluded = web_routes._leaderboard_entries(
+            run_dirs,
+            feedstock_id=None,
+            profile_id=None,
+            fidelity=None,
+            objective_metric=None,
+            limit=50,
+        )
+    assert board, "JSON leaderboard scan returned no rows"
+    assert len(yaml_loads) <= 2, (
+        f"corpus-version YAML should load O(1) per leaderboard scan, got "
+        f"{len(yaml_loads)}; per-row re-parse is O(rows)"
+    )
+
+
 def test_optimizer_page_and_table_render_feedstock_profile_winners(
     client,
     tmp_path,
@@ -3121,17 +4064,103 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert payload["provenance"]["cache_key"] == key
 
 
-def test_optimizer_result_detail_renders_empty_product_summary_inconclusive(
+def test_optimizer_result_detail_renders_missing_product_yield_table_inconclusive(
     client,
     tmp_path,
 ) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
-    run_dir = runs_dir / "run-empty-product-summary"
+    run_dir = runs_dir / "run-missing-product-yield-table"
     run_dir.mkdir(parents=True)
     spec = _base_spec()
     scored = _scored(
         spec,
-        candidate_id="candidate-empty-product-summary",
+        candidate_id="candidate-missing-product-yield-table",
+        feasible=False,
+    )
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        replace(
+            scored,
+            run_reference=replace(
+                scored.run_reference,
+                product_summary={"product_ledger_kg": {}},
+            ),
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    summary_response = client.get("/api/optimizer/runs")
+    response = client.get(
+        f"/optimizer/runs/run-missing-product-yield-table/results/{cache_key(spec)}"
+    )
+
+    assert summary_response.status_code == 200
+    panel = summary_response.get_json()["runs"][0]["latest_result"][
+        "product_ledger_panel"
+    ]
+    assert panel == {
+        "status": "inconclusive",
+        "reason": "product_yield_table missing",
+        "inputs": [],
+        "outputs": [],
+        "mass_closure": None,
+        "diagnostics": [],
+    }
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "candidate-missing-product-yield-table" in html
+    assert "Product inconclusive" in html
+    assert "product_yield_table missing" in html
+
+
+def test_product_ledger_panel_detects_product_content_without_mapping_truthiness(
+) -> None:
+    class FalseyProductSummary(dict[str, object]):
+        def __bool__(self) -> bool:
+            return False
+
+    panel = web_routes._product_ledger_panel(
+        FalseyProductSummary(product_ledger_kg={})
+    )
+
+    assert panel["reason"] == "product_yield_table missing"
+
+
+def test_product_ledger_panel_distinguishes_absent_empty_and_populated_outputs(
+) -> None:
+    absent_summary = web_routes._product_ledger_panel({})
+    absent_table = web_routes._product_ledger_panel({"product_ledger_kg": {}})
+    empty_outputs = web_routes._product_ledger_panel({
+        "product_yield_table": {"outputs": []},
+    })
+    populated_outputs = web_routes._product_ledger_panel({
+        "product_yield_table": {
+            "outputs": [{"product_class": "metal_ingots", "kg": 1.0}],
+        },
+    })
+
+    assert absent_summary["reason"] == "product summary missing"
+    assert absent_table["reason"] == "product_yield_table missing"
+    assert empty_outputs["status"] == "inconclusive"
+    assert empty_outputs["reason"] == "product_yield_table outputs empty"
+    assert "reason" not in populated_outputs
+    assert populated_outputs["outputs"] == [
+        {"product_class": "metal_ingots", "kg": 1.0}
+    ]
+
+
+def test_optimizer_result_detail_renders_metadata_only_product_summary_missing(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-metadata-only-product-summary"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec()
+    scored = _scored(
+        spec,
+        candidate_id="candidate-metadata-only-product-summary",
         feasible=False,
     )
     store = ResultStore(run_dir / "cache.sqlite")
@@ -3146,13 +4175,15 @@ def test_optimizer_result_detail_renders_empty_product_summary_inconclusive(
 
     summary_response = client.get("/api/optimizer/runs")
     response = client.get(
-        f"/optimizer/runs/run-empty-product-summary/results/{cache_key(spec)}"
+        f"/optimizer/runs/run-metadata-only-product-summary/results/{cache_key(spec)}"
     )
 
     assert summary_response.status_code == 200
-    panel = summary_response.get_json()["runs"][0]["latest_result"][
-        "product_ledger_panel"
-    ]
+    latest_result = summary_response.get_json()["runs"][0]["latest_result"]
+    round_tripped_summary = latest_result["run_reference"]["product_summary"]
+    assert round_tripped_summary
+    assert "coating_authoritative" in round_tripped_summary
+    panel = latest_result["product_ledger_panel"]
     assert panel == {
         "status": "inconclusive",
         "reason": "product summary missing",
@@ -3163,7 +4194,7 @@ def test_optimizer_result_detail_renders_empty_product_summary_inconclusive(
     }
     assert response.status_code == 200
     html = response.get_data(as_text=True)
-    assert "candidate-empty-product-summary" in html
+    assert "candidate-metadata-only-product-summary" in html
     assert "Product inconclusive" in html
     assert "product summary missing" in html
 

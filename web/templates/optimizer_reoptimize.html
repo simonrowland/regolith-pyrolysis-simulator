@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Re-optimize {{ study_id }} - Regolith Pyrolysis{% endblock %}
+
+{% block content %}
+<section class="main-area">
+    <div class="section-card">
+        <h2>Re-optimize Study</h2>
+        <p class="config-hint">
+            Submits a new study (new study_id, current epoch). Lineage
+            <code>reoptimized_from</code> is recorded for both goal variants.
+            Run params below are prefilled from the saved manifest; change any
+            of them before submitting. They are never inherited behind the form.
+        </p>
+        {% if reoptimize_error %}
+        <p class="config-hint optimizer-job-error">{{ reoptimize_error }}</p>
+        {% endif %}
+        {% if prefill and prefill.drifted_identifiers %}
+        <p class="config-hint optimizer-job-error">
+            Saved profile vocabulary drift:
+            {{ prefill.drifted_identifiers|join(", ") }}.
+            Saved goals cannot be used until those identifiers exist in the
+            current vocabulary; switch to the current local profile instead.
+        </p>
+        {% endif %}
+        {% if prefill %}
+        <table class="param-table">
+            <tr><td>Source study</td><td>{{ prefill.source_study_id }}</td></tr>
+            <tr><td>Feedstock</td><td>{{ prefill.feedstock_id }}</td></tr>
+            <tr><td>Profile</td><td>{{ prefill.profile_id }}</td></tr>
+            <tr><td>Origin</td><td>{{ origin }}</td></tr>
+        </table>
+        <form id="optimizer-reoptimize-form"
+              class="campaign-controls"
+              method="post"
+              action="{{ url_for('web.optimizer_reoptimize_submit') }}"
+              hx-post="{{ url_for('web.optimizer_reoptimize_submit') }}"
+              hx-target="#optimizer-jobs"
+              hx-swap="outerHTML">
+            <input type="hidden" name="origin" value="{{ origin }}">
+            <input type="hidden" name="study_id" value="{{ study_id }}">
+            <div class="ctrl-row">
+                <label for="reoptimize-goals-source">Goals</label>
+                <select id="reoptimize-goals-source" name="goals_source" required>
+                    <option value="{{ goals_source_bundled }}">saved goals</option>
+                    <option value="{{ goals_source_current }}">current local profile</option>
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="reoptimize-strategy">Strategy</label>
+                <select id="reoptimize-strategy" name="strategy" required>
+                    {% for strategy in job_strategy_choices %}
+                    <option value="{{ strategy }}" {% if prefill.strategy == strategy %}selected{% endif %}>{{ strategy }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="reoptimize-fidelity">Fidelity</label>
+                <select id="reoptimize-fidelity" name="fidelity" required>
+                    {% for fidelity in job_fidelity_choices %}
+                    <option value="{{ fidelity }}" {% if prefill.fidelity == fidelity %}selected{% endif %}>{{ fidelity }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="reoptimize-budget">Budget</label>
+                <input id="reoptimize-budget"
+                       name="budget"
+                       type="number"
+                       min="1"
+                       step="1"
+                       value="{{ prefill.budget if prefill.budget is not none else '' }}"
+                       required>
+            </div>
+            <div class="ctrl-row">
+                <label for="reoptimize-parallel">Parallel</label>
+                <input id="reoptimize-parallel"
+                       name="parallel"
+                       type="number"
+                       min="1"
+                       max="{{ job_parallel_cap }}"
+                       step="1"
+                       value="{{ prefill.parallel if prefill.parallel is not none else '' }}"
+                       required>
+            </div>
+            <div class="ctrl-row">
+                <label for="reoptimize-seed">Seed</label>
+                <input id="reoptimize-seed"
+                       name="seed"
+                       type="number"
+                       min="0"
+                       step="1"
+                       value="{{ prefill.seed if prefill.seed is not none else '' }}"
+                       required>
+            </div>
+            <div class="control-buttons">
+                <button class="btn btn-primary" type="submit">Re-optimize</button>
+                <a class="btn" href="{{ url_for('web.optimizer_page') }}">Cancel</a>
+            </div>
+        </form>
+        {% endif %}
+        {% include "partials/optimizer_jobs.html" %}
+    </div>
+</section>
+{% endblock %}

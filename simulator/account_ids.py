@@ -12,6 +12,8 @@ METAL_PHASE_ACCOUNTS = (
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
 )
+TERMINAL_DRAIN_TAP_ACCOUNT = "terminal.drain_tap_material"
+EXTRACTED_METAL_PRODUCT_ACCOUNTS = (TERMINAL_DRAIN_TAP_ACCOUNT,)
 CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 # Writer sweep (2026-07-12): evaporation._project_condensed_stage_collection
 # projects condensation-train credits; extraction._project_condensed_species

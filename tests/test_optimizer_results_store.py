@@ -27,7 +27,7 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
 )
-from simulator.optimize.physics import GateMargin, ThresholdSpec
+from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.result_scope import result_scope_payload, selector_where
 from simulator.optimize.results_store import (
     ResultStore,
@@ -316,6 +316,7 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     scored = _scored(
         spec,
         result_blob={"backend_status": "ok", "hours": [{"hour": 1}], "status": "ok"},
+        product_summary={"oxygen_kg": 10.0, "wall_deposit_kg": {}},
     )
     store = ResultStore(
         tmp_path / "results.sqlite",
@@ -345,6 +346,7 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {
         "backend_name": "alphamelts",
         "oxygen_kg": 10.0,
+        "wall_deposit_kg": {},
     }
 
 
@@ -2233,10 +2235,40 @@ def _cached_coating_margin(
     return _deserialize_margins({"coating": payload})["coating"]
 
 
+def _authoritative_carrier_record(species: str) -> dict[str, object]:
+    """A vapour-carrier record that establishes authority for one species.
+
+    Coating authority requires TWO axes: the alpha/sticking provenance these
+    fixtures already supply, and vapour_carrier_authority_by_species, which is
+    one of _WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS. Supplying only the first left
+    the rederivation correctly reporting
+    "wall_deposit_vapour_carrier_authority_missing", so the tests below were
+    asserting authority on a payload that no longer establishes it. Supplying
+    the vapour axis here lets each test isolate the axis it is actually about
+    rather than tripping over a second, unrelated gap.
+
+    Shape follows vapour_carrier_authority_status: a value-kind pressure with an
+    eligible flux, an authoritative verdict, a certification ceiling that is not
+    "never", a validated status and a live flux.
+    """
+    return {
+        "species_id": species,
+        "pressure": {"kind": "value"},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "authoritative",
+        "certification_ceiling": "melts",
+        "validation_status": "validated",
+        "is_flux_active": True,
+    }
+
+
 def _wall_sticking_status_payload(species: str, *, cited: bool) -> dict[str, object]:
     return wall_deposit_sticking_authority_status(
         {"hot_wall": {species: 0.05}},
         {
+            "vapour_carrier_authority_by_species": {
+                species: _authoritative_carrier_record(species),
+            },
             "alpha_s_provenance_by_species": {
                 species: {
                     "hot_wall": {
@@ -2274,6 +2306,92 @@ def _wall_pressure_refusal_status_payload() -> dict[str, object]:
             }
         },
     )
+
+
+def test_coating_margin_round_trip_uses_one_continuous_feasibility_rule() -> None:
+    constraints = PhysicsConstraintSet()
+    authority = _wall_sticking_status_payload("Fe", cited=True)
+
+    for observed in (0.5, 20.0):
+        fresh = constraints.coating_from_fouling_report(
+            {
+                **authority,
+                "campaigns_to_resinter_total": observed,
+                "authoritative_for_resinter": True,
+                "output_status": "sourced_with_surface_proxy",
+                "status_reason": "",
+            }
+        )
+        loaded = _deserialize_margins(
+            _serialize_margins({"coating": fresh})
+        )["coating"]
+
+        assert fresh.authoritative is loaded.authoritative is True
+        assert fresh.feasible is loaded.feasible is True
+
+    fresh_fail_closed = constraints.coating_from_fouling_report(
+        {
+            "campaigns_to_resinter_total": math.inf,
+            "resinter_threshold_kg": None,
+            "wall_deposit_kg_per_campaign": 0.5,
+            "authoritative_for_resinter": False,
+            "output_status": "non-authoritative-threshold",
+            "status_reason": "resinter threshold is not grounded",
+        }
+    )
+    loaded_fail_closed = _deserialize_margins(
+        _serialize_margins({"coating": fresh_fail_closed})
+    )["coating"]
+
+    assert fresh_fail_closed.feasible is loaded_fail_closed.feasible is False
+
+
+def test_store_refuses_a_feasible_row_that_never_earned_a_certification_field(
+    tmp_path,
+) -> None:
+    """An OMITTED certification allowance must not read as permission.
+
+    The gate was ``any(not allowed for allowed in certification_allowances)``,
+    which fires when a carrier HONESTLY declares False and passes VACUOUSLY on
+    an empty tuple. Every axis in collect_result_trust_carriers appends only
+    when the value is not None, so an omitted field yields exactly that empty
+    tuple. The detector detected honesty, not dishonesty.
+
+    THE VECTOR IS AN ASYMMETRY BETWEEN TWO CARRIER SETS, which is why this is
+    reachable without touching a private attribute. RunReference.__post_init__
+    canonicalises from ITSELF AND ITS TRACE, so provenance asserted only on the
+    product_summary never derives a certification and the reference stays bare.
+    collect_result_trust_carriers, however, DOES read the product_summary -- so
+    the row presents a backend name and an evidence class while carrying no
+    allowance at all, and the sibling axes that would otherwise catch it
+    (backend_name_non_authoritative, missing_evidence_class) are both satisfied.
+
+    Verified by counterfactual: with the old any() this row is admitted with NO
+    rejections at all.
+    """
+    spec = _base_spec()
+    scored = replace(
+        _scored(spec),
+        run_reference=RunReference(
+            status="ok",
+            trace=_admissible_trace(),
+            product_summary={
+                "oxygen_kg": 10.0,
+                "backend_name": "alphamelts",
+                "evidence_class": "melts",
+            },
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    # Named on purpose: asserting only that the write was rejected would also
+    # pass on missing_evidence_class or backend_name_non_authoritative, and
+    # both of those are satisfied here precisely so they cannot mask this one.
+    assert "certification_forbidden" in exc_info.value.reasons
+    assert store.lookup(spec) is None
 
 
 def test_cached_coating_margin_authority_rederives_stale_false_from_status_payload() -> None:
@@ -2345,6 +2463,12 @@ def test_cached_coating_margin_positive_deposit_without_grounding_fails_closed()
             "output_status": "authoritative",
             "deposited_species": ["K"],
             "uncertified_alpha_species": [],
+            # The vapour axis is established so the ALPHA gap is what this test
+            # isolates; without it the rederivation reports the vapour axis
+            # instead and the test stops being about missing grounding.
+            "vapour_carrier_authority_by_species": {
+                "K": _authoritative_carrier_record("K"),
+            },
         },
     )
 

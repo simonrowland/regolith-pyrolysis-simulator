@@ -48,8 +48,34 @@ def _kn_snapshot(
     )
 
 
+def _authoritative_carrier_record(species: str) -> dict[str, object]:
+    """A vapour-carrier record that establishes authority for one species.
+
+    Coating authority needs TWO axes: the alpha/sticking provenance below, and
+    vapour_carrier_authority_by_species, which is one of
+    _WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS. Supplying only the first left the
+    rederivation correctly reporting a missing vapour carrier, so these
+    fixtures asserted authority on a payload that no longer establishes it.
+
+    Same repair as the sibling fixtures in tests/test_optimizer_results_store.py;
+    shape follows vapour_carrier_authority_status.
+    """
+    return {
+        "species_id": species,
+        "pressure": {"kind": "value"},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "authoritative",
+        "certification_ceiling": "melts",
+        "validation_status": "validated",
+        "is_flux_active": True,
+    }
+
+
 def _alpha_notice(species: str, *, cited: bool) -> dict[str, object]:
     return {
+        "vapour_carrier_authority_by_species": {
+            species: _authoritative_carrier_record(species),
+        },
         "alpha_s_provenance_by_species": {
             species: {
                 "hot_wall": {
@@ -318,7 +344,9 @@ def test_clean_zero_wall_deposit_coating_margin_is_feasible_infinity() -> None:
     coating = result.margins["coating"]
     assert result.feasible
     assert coating.feasible
-    assert coating.detail == "no wall deposit"
+    assert coating.detail == (
+        "non-authoritative: grounded coating criterion not enforced; no wall deposit"
+    )
     assert coating.margin == math.inf
     assert coating.observed == math.inf
 

@@ -1999,12 +1999,9 @@ def _number_view(value: Any) -> Any:
 def _run_reference_view(reference: RunReference | None) -> Mapping[str, Any] | None:
     if reference is None:
         return None
-    return {
-        "error_message": reference.error_message,
-        "product_summary": reference.product_summary,
-        "reason": reference.reason,
-        "status": reference.status,
-    }
+    # Fail closed over the whole carrier: new provenance fields must join replay
+    # equality automatically instead of silently creating another trust bypass.
+    return {field.name: getattr(reference, field.name) for field in fields(reference)}
 
 
 __all__ = [

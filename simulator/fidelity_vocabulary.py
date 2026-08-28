@@ -68,11 +68,67 @@ class CacheState(str, Enum):
 
 
 class RuntimeStatus(str, Enum):
+    """Runtime dispositions the fidelity layer can read.
+
+    ★ THE FIVE MEMBERS BELOW THE ORIGINAL LINE EXIST BECAUSE THE INTENT
+    VOCABULARY EMITS THEM AND THIS LAYER COULD NOT READ THEM (d-003).
+    INTENT_RESULT_STATUSES has eight members; this enum had five, and the five
+    that were absent -- not_converged, refused, not_attempted, unsupported,
+    non_authoritative -- made canonicalize_fidelity_emission RAISE. The
+    optimizer writes three of them onto a run reference and the web layer
+    reads that field straight back into canonicalisation, so one layer emitted
+    what the other could not read.
+
+    THEY ARE ADDED RATHER THAN MAPPED ONTO EXISTING MEMBERS because the
+    mapping is not cosmetic. Per the derivation in
+    simulator/chemistry/kernel/dto.py, reporting out_of_domain makes the
+    optimizer PRUNE a candidate as physically infeasible -- a permanent
+    verdict about the recipe -- while unavailable routes to RETRY, a verdict
+    about the tooling. Folding a token onto the wrong one either discards a
+    good recipe on evidence never gathered, or retries forever against a real
+    infeasibility. Each new member is derived below by the same question the
+    dto header asks: WHAT DID WE LEARN ABOUT THE PHYSICS?
+    """
+
     MISSING = "missing"
     OK = "ok"
     UNAVAILABLE = "unavailable"
     OUT_OF_DOMAIN = "out_of_domain"
     NOT_RUN = "not_run"
+
+    #: The engine was present, attempted the solve, and failed to reach
+    #: tolerance. That IS a claim about this operating point, but a weak one --
+    #: a different seed, bracket or budget may converge. Distinct from
+    #: out_of_domain, which asserts the point lies outside calibration and is
+    #: therefore permanent. Must not prune.
+    NOT_CONVERGED = "not_converged"
+
+    #: The engine was present and DECLINED to compute -- a policy refusal,
+    #: e.g. an absolute fO2 imposed on an Fe-free melt. We learned NOTHING
+    #: about the physics of this point, so this sits with unavailable rather
+    #: than out_of_domain despite the engine being there. Treating a refusal
+    #: as a physics claim is exactly the laundering this branch has been
+    #: removing. Must not prune.
+    REFUSED = "refused"
+
+    #: The probe never ran, typically because a prior step closed the
+    #: transport. Nothing was learned. Distinct from not_run, which describes a
+    #: class that was never scheduled, where this describes one that was
+    #: scheduled and skipped.
+    NOT_ATTEMPTED = "not_attempted"
+
+    #: The engine does not implement this operation at all. A statement about
+    #: tooling capability, not about the composition. Nothing learned about the
+    #: physics; retrying the same engine cannot help, but the recipe is
+    #: unjudged. Must not prune.
+    UNSUPPORTED = "unsupported"
+
+    #: A number EXISTS but its provenance does not meet the certification bar.
+    #: This is the one member on a different axis from the rest: the others
+    #: answer whether a result exists, this answers whether an existing result
+    #: may be trusted. It must not be collapsed into missing -- a value is
+    #: present and may legitimately be used where authority is not required.
+    NON_AUTHORITATIVE = "non_authoritative"
 
 
 class LabelSource(str, Enum):
@@ -105,6 +161,15 @@ class DegradationReason(str, Enum):
     UNAVAILABLE = "unavailable"
     OUT_OF_DOMAIN = "out_of_domain"
     NOT_RUN = "not_run"
+    # Paired with the RuntimeStatus members added for d-003. Each keeps its own
+    # reason rather than reusing a near neighbour, because the reason is what a
+    # reader sees when asking WHY a result degraded, and collapsing two causes
+    # into one label is how the distinctions above got lost in the first place.
+    NOT_CONVERGED = "not_converged"
+    REFUSED = "refused"
+    NOT_ATTEMPTED = "not_attempted"
+    UNSUPPORTED = "unsupported"
+    NON_AUTHORITATIVE = "non_authoritative"
 
 
 CERTIFICATION_DENYLIST: frozenset[str] = frozenset(
@@ -345,6 +410,32 @@ _SIMPLE_TRANSLATIONS: Mapping[tuple[str, str], CanonicalFidelityMapping] = Mappi
             runtime_status=RuntimeStatus.NOT_RUN.value,
             degradation_reason=DegradationReason.NOT_RUN.value,
         ),
+        # d-003: the five intent tokens this layer previously could not read.
+        # Adding the enum members alone was INERT -- canonicalisation resolves
+        # through this alias table, so without these entries it kept raising
+        # UnknownFidelityVocabularyTokenError on exactly the tokens the
+        # optimizer writes onto a run reference. Verified by execution before
+        # and after.
+        ("backend/status alias", "not_converged"): CanonicalFidelityMapping(
+            runtime_status=RuntimeStatus.NOT_CONVERGED.value,
+            degradation_reason=DegradationReason.NOT_CONVERGED.value,
+        ),
+        ("backend/status alias", "refused"): CanonicalFidelityMapping(
+            runtime_status=RuntimeStatus.REFUSED.value,
+            degradation_reason=DegradationReason.REFUSED.value,
+        ),
+        ("backend/status alias", "not_attempted"): CanonicalFidelityMapping(
+            runtime_status=RuntimeStatus.NOT_ATTEMPTED.value,
+            degradation_reason=DegradationReason.NOT_ATTEMPTED.value,
+        ),
+        ("backend/status alias", "unsupported"): CanonicalFidelityMapping(
+            runtime_status=RuntimeStatus.UNSUPPORTED.value,
+            degradation_reason=DegradationReason.UNSUPPORTED.value,
+        ),
+        ("backend/status alias", "non_authoritative"): CanonicalFidelityMapping(
+            runtime_status=RuntimeStatus.NON_AUTHORITATIVE.value,
+            degradation_reason=DegradationReason.NON_AUTHORITATIVE.value,
+        ),
     }
 )
 
@@ -405,15 +496,69 @@ def translate_legacy_token(
     )
 
 
-def may_certify(
-    evidence_class: str | EvidenceClass | None,
-    *ordering_inputs: object,
-    **ordering_kwargs: object,
-) -> bool:
-    del ordering_inputs, ordering_kwargs
+def may_certify(evidence_class: str | EvidenceClass | None) -> bool:
+    """Can this KIND of computation EVER be certified? A CLASS property.
+
+    ★ THIS IS NOT A PER-RESULT VERDICT. It answers whether the evidence class
+    is certifiable in principle, and knows nothing about how any particular
+    run went. For "may THIS result be trusted", use
+    result_certification_allowed below (b-270).
+
+    The signature previously accepted *ordering_inputs and **ordering_kwargs
+    and immediately deleted them, which is the conflation made literal: it
+    ACCEPTED per-result context and discarded it, so every caller that wanted
+    a per-result answer silently received a class capability. Those
+    parameters are now gone, which makes "certification cannot be swayed by
+    ordering context" a STRUCTURAL guarantee rather than a behavioural one --
+    a function that cannot receive the inputs cannot be influenced by them.
+    """
     if evidence_class is None:
         return False
     return _evidence_class_value(evidence_class) not in CERTIFICATION_DENYLIST
+
+
+#: The only runtime disposition under which a RESULT may be certified.
+#: Everything else in RuntimeStatus is a caveat of some kind, and a caveated
+#: result has not earned certification whatever its evidence class permits in
+#: principle. Kept as a set derived from the enum rather than a hand-listed
+#: literal so a member added to RuntimeStatus is covered the day it is added
+#: -- the same partition discipline as the degrading/flattering split in the
+#: kernel DTO.
+CERTIFYING_RUNTIME_STATUSES: frozenset[str] = frozenset({RuntimeStatus.OK.value})
+NON_CERTIFYING_RUNTIME_STATUSES: frozenset[str] = (
+    frozenset(member.value for member in RuntimeStatus)
+    - CERTIFYING_RUNTIME_STATUSES
+)
+
+
+def result_certification_allowed(
+    evidence_class: str | EvidenceClass | None,
+    runtime_status: str | RuntimeStatus | None,
+) -> bool:
+    """May THIS RESULT be certified? A PER-RESULT verdict (b-270).
+
+    Both axes must permit: the evidence class must be certifiable in
+    principle AND this particular run must have completed without a caveat.
+
+    ★ ABSENCE IS NOT PERMISSION. A missing runtime status returns False
+    rather than deferring to the class, because a result that cannot say how
+    it went has not earned a certificate. That is the same rule the store
+    already applies on admission, stated once here so callers stop
+    re-deriving it inconsistently.
+
+    Not yet wired into canonicalisation: this lands as a pure helper so the
+    split is pinned by tests before any publisher changes meaning.
+    """
+    if not may_certify(evidence_class):
+        return False
+    if runtime_status is None:
+        return False
+    value = (
+        runtime_status.value
+        if isinstance(runtime_status, RuntimeStatus)
+        else str(runtime_status)
+    )
+    return value in CERTIFYING_RUNTIME_STATUSES
 
 
 def is_ratified_vapour_analytical_evidence_class(

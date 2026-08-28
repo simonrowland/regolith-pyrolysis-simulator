@@ -24,7 +24,10 @@ from simulator.accounting.formulas import (
 )
 from simulator.state import OXIDE_SPECIES
 
-from simulator.chemistry.kernel import BACKEND_STATUS_PRECEDENCE
+from simulator.chemistry.kernel import (
+    BACKEND_STATUS_PRECEDENCE,
+    select_backend_status,
+)
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
 
 
@@ -1935,14 +1938,36 @@ def aggregate_backend_status(
         statuses = []
     latest_signal = _backend_status_signal(latest)
     statuses.append(latest_signal)
-    for status in _BACKEND_STATUS_PRECEDENCE:
-        matches = [signal for signal in statuses if signal.status == status]
-        if matches:
-            for signal in matches:
-                if signal.reason is not None:
-                    return signal
-            return matches[0]
-    return latest_signal
+
+    # ★ THE ORDERING IS THE OWNER'S; ONLY THE SIGNAL PREFERENCE IS OURS.
+    # This walked _BACKEND_STATUS_PRECEDENCE itself and then fell through to
+    # `return latest_signal`, which is the exact position-decides fallthrough
+    # the kernel owner was corrected for: the tuple ranks three tokens, so
+    # history=["refused"] with a later latest="ok" returned OK. A refused Stage
+    # 0 run then printed verdict_b hard_gate_failed=False, layer_a=in_domain --
+    # false-healthy on a gate, from a function whose docstring promises it
+    # mirrors the runner.
+    #
+    # Delegating the token choice to select_backend_status is what makes the
+    # promise true rather than merely asserted. run_executor mirrors the runner
+    # the same way -- it assembles candidates and lets the owner rank them --
+    # which is why it inherited the fix automatically and this function did not.
+    # Re-implementing the owner's new partition here would have repaired the
+    # symptom and preserved the duplication that caused it.
+    #
+    # The module comment above is still honoured: the ORDER has one owner, and
+    # this module keeps its own STRATEGY of preferring a signal that carries a
+    # reason, which is the only reason it needs a separate function at all.
+    winning_status = select_backend_status([signal.status for signal in statuses])
+    if winning_status is None:
+        return latest_signal
+    matches = [signal for signal in statuses if signal.status == winning_status]
+    if not matches:
+        return latest_signal
+    for signal in matches:
+        if signal.reason is not None:
+            return signal
+    return matches[0]
 
 
 def build_harness_verdicts(

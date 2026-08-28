@@ -1,6 +1,7 @@
 <div class="section-card">
     <h3>Feedstock/Profile Winners</h3>
     {% if entries %}
+    <div class="table-scroll">
     <table class="composition-table">
         <thead>
             <tr>
@@ -24,7 +25,7 @@
         <tbody>
             {% for entry in entries %}
             <tr>
-                <td>{{ entry.rank }}</td>
+                <td>{{ entry.rank }}{% if entry.rank_ambiguous %}<span class="range" title="{{ entry.rank_ambiguous }}">&nbsp;?</span>{% endif %}</td>
                 <td>
                     <strong>{{ entry.feedstock_id }}</strong><br>
                     <span class="range">{{ entry.profile_id }}</span>
@@ -81,8 +82,13 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if entry.completeness.status == "available" and entry.completeness.percent is not none %}
-                    <strong>{{ entry.completeness.percent_label }}</strong><br>
+                    {% if entry.completeness.has_value %}
+                    <strong>{{ entry.completeness.percent_label }}</strong>
+                    {% if entry.completeness.qualifier %}
+                    <span class="version-badge version-badge-legacy"
+                          title="stored completeness status">{{ entry.completeness.qualifier }}</span>
+                    {% endif %}
+                    <br>
                     <span class="range">
                         target {{ entry.completeness.target_species or "not declared" }};
                         denominator {{ entry.completeness.denominator or "not declared" }};
@@ -118,12 +124,30 @@
                 <td>
                     <a class="btn"
                        href="{{ url_for('web.optimizer_result_detail', run_id=entry.run_id, cache_key=entry.cache_key) }}">Open</a>
+                    <a class="btn"
+                       href="{{ url_for('web.optimizer_reoptimize_form', origin='local', study_id=entry.run_id) }}">Re-optimize</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
+    {% if excluded_rows %}
+    <div class="empty-hint">
+        {{ excluded_total }} stored row{{ "" if excluded_total == 1 else "s" }}
+        excluded from this board:
+        {% for row in excluded_rows %}{{ row.count }} {{ row.label }}{{ "; " if not loop.last }}{% endfor %}
+    </div>
+    {% endif %}
+    {% else %}
+    {% if excluded_total %}
+    <div class="empty-hint">
+        No rows could be ranked: all {{ excluded_total }} stored row{{ "" if excluded_total == 1 else "s" }}
+        matching the current filters were excluded
+        ({% for row in excluded_rows %}{{ row.count }} {{ row.label }}{{ "; " if not loop.last }}{% endfor %}).
+    </div>
     {% else %}
     <div class="empty-hint">No stored optimizer winners match the current filters.</div>
+    {% endif %}
     {% endif %}
 </div>

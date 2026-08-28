@@ -634,9 +634,10 @@ def _assign_deposit(
     raw_kg: Any,
 ) -> None:
     kg = _finite_float(raw_kg, f"wall_deposit[{segment!r}][{species!r}]")
-    if abs(kg) <= EPSILON_KG:
-        return
     species_kg = nested.setdefault(segment, {})
+    if abs(kg) <= EPSILON_KG:
+        species_kg.setdefault(species, 0.0)
+        return
     species_kg[species] = species_kg.get(species, 0.0) + kg
 
 
@@ -650,7 +651,7 @@ def _add_deposits(left: NestedDeposit, right: NestedDeposit) -> dict[str, dict[s
                     f"negative projected wall inventory for {segment}/{species}"
                 )
             if abs(merged) <= EPSILON_KG:
-                result.get(segment, {}).pop(species, None)
+                result.setdefault(segment, {})[species] = 0.0
             else:
                 result.setdefault(segment, {})[species] = merged
         if not result.get(segment):
@@ -670,7 +671,7 @@ def _subtract_deposits(
         for species, kg in species_kg.items():
             net = result.setdefault(segment, {}).get(species, 0.0) - float(kg)
             if abs(net) <= EPSILON_KG:
-                result.get(segment, {}).pop(species, None)
+                result.setdefault(segment, {})[species] = 0.0
             else:
                 result.setdefault(segment, {})[species] = net
         if not result.get(segment):
@@ -692,9 +693,10 @@ def _freeze_nested_deposit(raw: Any) -> NestedDeposit:
 def _plain_nested_deposit(raw: NestedDeposit) -> dict[str, dict[str, float]]:
     return {
         str(segment): {
-            str(species): float(kg)
+            str(species): (
+                0.0 if abs(float(kg)) <= EPSILON_KG else float(kg)
+            )
             for species, kg in sorted(species_kg.items())
-            if abs(float(kg)) > EPSILON_KG
         }
         for segment, species_kg in sorted(raw.items())
         if species_kg

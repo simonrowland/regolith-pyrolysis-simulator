@@ -7,6 +7,7 @@ from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, wait
 from dataclasses import dataclass, fields, is_dataclass, replace
 from datetime import UTC, datetime
+from simulator.chemistry.kernel import select_backend_status
 import copy
 import errno
 from functools import lru_cache, partial
@@ -781,9 +782,27 @@ def _extract_backend_status(carrier: Any) -> str | None:
 
 
 def _latest_backend_status(value: Any) -> str | None:
+    """Reduce a per-probe sequence to one whole-run status via the OWNER.
+
+    ★ THIS READ value[-1] AND SO ANSWERED BY POSITION. A degrading token
+    followed by a later ok reduced to ok -- unavailable, out_of_domain and
+    refused all lost to recency, which is the exact defect the kernel owner was
+    corrected for. The name says LATEST and that is what it did; what every
+    caller needs is MOST SEVERE.
+
+    It also evaded the one-owner guard in tests/test_backend_status_owner.py,
+    because that guard looks for ranked token literals and a last-item
+    implementation spells no tokens at all. Answering by position is a way of
+    restating the ordering WITHOUT naming it.
+
+    Delegating to select_backend_status is what makes the ownership real rather
+    than asserted; the sequence walk here only assembles candidates.
+    """
     if not isinstance(value, (list, tuple)) or not value:
         return None
-    return _extract_backend_status(value[-1])
+    return select_backend_status(
+        [_extract_backend_status(entry) for entry in value]
+    )
 
 
 def _warm_runtime_spec(tasks: Sequence[_PoolTask]) -> _WarmRuntimeSpec | None:

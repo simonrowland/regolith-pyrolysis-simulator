@@ -3,10 +3,18 @@
 <strong>Product inconclusive</strong><br>
 <span class="range">{{ product.reason }}</span>
 {% endif %}
-{% if product["items"] %}
+{% if product["items"] or product.unclassified_kg_label %}
 <div>
     {% for item in product["items"] %}
-    <span>{{ item.label }} {{ item.kg_label }}{% if item.yield_label != "yield inconclusive" %} ({{ item.yield_label }}){% endif %}</span>{% if not loop.last %}<br>{% endif %}
+    <span>{{ item.label }} {{ item.kg_label }}{% if item.yield_label != "yield inconclusive" %} ({{ item.yield_label }}){% endif %}</span><br>
     {% endfor %}
+    {#
+        Rendered as a peer of the named bins, not as a footnote: on the row
+        that prompted this it was the LARGEST figure in the ledger, and it
+        was previously visible only on the detail page's diagnostics table.
+    #}
+    {% if product.unclassified_kg_label %}
+    <span><strong>Unclassified {{ product.unclassified_kg_label }}</strong></span>
+    {% endif %}
 </div>
 {% endif %}

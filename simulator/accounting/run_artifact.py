@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any
 
+from simulator.backend_names import canonical_backend_name
 from simulator.cost_parameters import canonical_energy_cost_block
 from simulator.engine_local_config import cache_version_for
 
@@ -350,7 +351,19 @@ def build_run_artifact(
             "error_message": runner_payload.get("error_message"),
         }
 
-    backend = run_metadata.get("backend")
+    # Canonicalise the backend identity ON THE WAY INTO THE ARTIFACT. This read
+    # was a raw passthrough, so a run configured with the legacy analytical
+    # alias wrote that retired spelling into a DURABLE artifact header -- and
+    # all three fields below derive from it, so the alias reached the stored
+    # name, the cache_version and the wire token alike. Since the 0.6 migration
+    # the alias is an accepted INPUT only; nothing should serialise it.
+    #
+    # Safe for identities this build does not know: canonical_backend_name folds
+    # recognised aliases and returns anything else unchanged (and None/empty
+    # unchanged), so a new or unregistered backend keeps its own name rather
+    # than being blanked at the boundary.
+    raw_backend = run_metadata.get("backend")
+    backend = canonical_backend_name(raw_backend) if raw_backend else raw_backend
     engine_identity = {
         "name": backend,
         "cache_version": cache_version_for(backend) if backend else None,

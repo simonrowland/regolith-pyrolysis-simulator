@@ -15,7 +15,23 @@ import pathlib
 
 import pytest
 
+from simulator.optimize.backend_status import (
+    latest_backend_status_from_sequence,
+)
+from simulator.optimize.pool import (
+    _latest_backend_status as _pool_latest_backend_status,
+)
+from simulator.optimize.study import (
+    _latest_backend_status as _study_latest_backend_status,
+)
+from simulator.optimize.result_trust import (
+    carrier_backend_status as _carrier_backend_status,
+)
+
 from simulator.chemistry.kernel.dto import (
+    DEGRADING_INTENT_RESULT_STATUSES,
+    FLATTERING_INTENT_RESULT_STATUSES,
+    INTENT_RESULT_STATUSES,
     BACKEND_STATUS_PRECEDENCE,
     select_backend_status,
 )
@@ -475,3 +491,115 @@ def test_the_operator_facing_view_agrees_with_the_engine() -> None:
 
     for carrier, expected in cases:
         assert web_routes._latest_backend_status(carrier) == expected, carrier
+
+
+@pytest.mark.parametrize("degrading", sorted(DEGRADING_INTENT_RESULT_STATUSES))
+def test_a_degrading_status_survives_a_later_ok(degrading: str) -> None:
+    """An earlier per-hour ok followed by a terminal refusal must report the refusal.
+
+    The reducer walked BACKEND_STATUS_PRECEDENCE and then fell through to
+    ``values[-1]`` for anything unranked, so POSITION decided: `refused`,
+    `not_attempted`, `unsupported` and `non_authoritative` were all unranked and
+    all reduced to `ok` whenever a later probe reported one. A refused run
+    reported success.
+
+    ★ The existing parametrised cases could not catch this. They pair `ok` with
+    a token that IS ranked, so the precedence walk always answers before the
+    fallback is reached; the four unranked tokens never appeared in a case at
+    all. This asserts the ordering the old shape could not model -- degrading
+    first, flattering last -- across EVERY degrading member, so a token cannot
+    be fixed individually while its siblings stay broken.
+    """
+    assert select_backend_status([degrading, "ok"]) == degrading
+    # and with the flattering token on both sides, so recency cannot rescue it
+    assert select_backend_status(["ok", degrading, "ok"]) == degrading
+
+
+def test_status_partition_covers_the_vocabulary_exactly() -> None:
+    """A new vocabulary token must not be able to default to unranked.
+
+    DEGRADING is derived by subtracting FLATTERING from INTENT_RESULT_STATUSES
+    rather than being listed, which is what makes a newly added token degrading
+    by default. This pins that derivation: if someone adds a token AND adds it
+    to FLATTERING, that is a deliberate act and this test still passes; if the
+    subtraction is ever replaced by a hand-written list, this fails the moment
+    the two drift.
+    """
+    assert (
+        FLATTERING_INTENT_RESULT_STATUSES | DEGRADING_INTENT_RESULT_STATUSES
+        == set(INTENT_RESULT_STATUSES)
+    )
+    assert not (FLATTERING_INTENT_RESULT_STATUSES & DEGRADING_INTENT_RESULT_STATUSES)
+    assert FLATTERING_INTENT_RESULT_STATUSES == {"ok"}
+
+
+def test_precedence_tuple_is_not_extended_to_cover_the_partition() -> None:
+    """Lengthening the precedence would silently WEAKEN the ownership guard.
+
+    test_precedence_ordering_has_exactly_one_owner flags a production literal
+    only when it contains EVERY ranked token. RANKED_TOKENS is derived from
+    BACKEND_STATUS_PRECEDENCE, so growing that tuple from three to seven makes
+    the subset test strictly harder to trip -- a module restating the original
+    three-token ordering would stop being flagged, and the guard would keep
+    reporting clean while its coverage shrank.
+
+    So the degrading fix deliberately lives in the REDUCER, not the tuple. This
+    pins that decision, because "just add the missing tokens to the precedence"
+    is the obvious next edit and it costs a guard.
+    """
+    assert BACKEND_STATUS_PRECEDENCE == (
+        "unavailable",
+        "out_of_domain",
+        "not_converged",
+    )
+    assert RANKED_TOKENS < DEGRADING_INTENT_RESULT_STATUSES
+
+
+@pytest.mark.parametrize("degrading", sorted(DEGRADING_INTENT_RESULT_STATUSES))
+def test_every_sequence_reducer_agrees_with_the_owner(degrading: str) -> None:
+    """EVERY reducer that answers "what was this run's status" must agree.
+
+    ★ THE AST OWNERSHIP GUARD STRUCTURALLY CANNOT CATCH THESE. It matches
+    modules that spell the ranked tokens in a literal or an if/elif chain -- but
+    pool and study answered with ``value[-1]``, which names no token at all.
+    Answering by POSITION restates the ordering without stating it, so the guard
+    reported one owner while three consumers disagreed with it. A behavioural
+    agreement test is the complement: the guard finds NEW copies that name
+    tokens, this finds copies that answer by position.
+
+    Verified divergence before the fix, from an independent coherence audit:
+
+        unavailable -> ok    owner=unavailable    pool=ok    study=ok
+        out_of_domain -> ok  owner=out_of_domain  pool=ok    study=ok
+
+    The control (ok -> unavailable) agreed even when broken, which is why a
+    single-case test would have missed it: position and severity give the same
+    answer whenever the degrading token happens to come last.
+    """
+    sequence = [{"backend_status": degrading}, {"backend_status": "ok"}]
+    expected = latest_backend_status_from_sequence(sequence)
+    assert expected == degrading, "owner itself regressed"
+
+    assert _pool_latest_backend_status(sequence) == expected, (
+        f"pool reducer disagrees with the owner on {degrading!r}"
+    )
+    assert _study_latest_backend_status(sequence) == expected, (
+        f"study reducer disagrees with the owner on {degrading!r}"
+    )
+    # ★ FOURTH SITE, and the one neither audit reported. result_trust reduced a
+    # per_hour sequence with nested[-1], so a run that refused early and
+    # recovered to ok reported ok -- in the module that decides whether a
+    # result may be TRUSTED, where the failing hour is precisely the hour that
+    # must survive. Found by grepping the SHAPE ([-1] near a status word) after
+    # the audit named three others; the token-matching ownership guard cannot
+    # see any of them.
+    assert _carrier_backend_status(
+        {"per_hour": [{"backend_status": degrading}, {"backend_status": "ok"}]}
+    ) == expected, (
+        f"result_trust carrier reducer disagrees with the owner on {degrading!r}"
+    )
+    # and the control: with the degrading token LAST, position and severity
+    # coincide, so this must pass both before and after any fix
+    control = [{"backend_status": "ok"}, {"backend_status": degrading}]
+    assert _pool_latest_backend_status(control) == degrading
+    assert _study_latest_backend_status(control) == degrading

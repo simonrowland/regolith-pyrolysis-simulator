@@ -47,6 +47,8 @@ class OptimizerJobRequest:
     certify: bool = False
     source_store_path: str | None = None
     certify_cache_key: str | None = None
+    reoptimized_from: str | None = None
+    goals_source: str | None = None
 
 
 class OptimizerJobRunner:
@@ -107,6 +109,8 @@ class OptimizerJobRunner:
                 "certify": bool(request.certify),
                 "source_store_path": request.source_store_path,
                 "certify_cache_key": request.certify_cache_key,
+                "reoptimized_from": request.reoptimized_from,
+                "goals_source": request.goals_source,
                 "pid": None,
                 "status": STATUS_QUEUED,
                 "created_at": now,
@@ -242,6 +246,10 @@ class OptimizerJobRunner:
             )
         else:
             cmd.extend(["--strategy", str(meta["strategy"])])
+        if meta.get("reoptimized_from"):
+            cmd.extend(["--reoptimized-from", str(meta["reoptimized_from"])])
+        if meta.get("goals_source"):
+            cmd.extend(["--goals-source", str(meta["goals_source"])])
         env = os.environ.copy()
         env["OPTIMIZER_RUNS_DIR"] = str(self.runs_root)
         repo_root = Path(__file__).resolve().parents[2]
@@ -321,6 +329,8 @@ class OptimizerJobRunner:
         normalized.setdefault("certify", False)
         normalized.setdefault("source_store_path", None)
         normalized.setdefault("certify_cache_key", None)
+        normalized.setdefault("reoptimized_from", None)
+        normalized.setdefault("goals_source", None)
         normalized.setdefault("pid", None)
         normalized.setdefault("started_at", None)
         normalized.setdefault("completed_at", None)

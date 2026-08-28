@@ -135,10 +135,45 @@ def _temperature_range_warning(
     )
 
 
+# data/vapor_pressures.yaml is ~1.2 MB / 28.7k lines, and PyYAML's pure-python
+# scanner parses it in ~2.7 s. Both readers below used to re-open and re-parse it
+# on EVERY call, so a single web run start paid 8 x _load_vapor_pressures plus
+# 4 x _compiled_carrier_pressure -- >= 22 s of parsing, and ~30-45 s wall, before
+# the run could emit its first tick. To an operator that is indistinguishable
+# from "the run started and then hung", which is exactly how it was reported.
+#
+# Authority data is a fixed process-lifetime snapshot. Reloading after a file
+# metadata change could mix two physics epochs inside one run, while metadata
+# cannot identify content: same-size replacements can preserve mtime. A changed
+# catalog therefore takes effect only after process restart.
+#
+# Sharing the parsed payload is consistent with the convention this project
+# already set: vapor_pressure_legacy_view memoizes by payload CONTENT DIGEST and
+# documents that "the cached dict is shared across callers ... treat it as
+# read-only". Caching the file READ therefore introduces no new sharing
+# semantics; it only stops us re-deriving an identical digest 12 times per run.
+# Both current call sites are read-only.
+_VAPOR_PAYLOAD_CACHE: dict[str, Any] = {}
+
+
+def _load_vapor_payload(yaml_path: Path) -> Any:
+    """Parse one fixed vapour-pressure payload per path and process lifetime."""
+    key = str(yaml_path.resolve())
+    cached = _VAPOR_PAYLOAD_CACHE.get(key)
+    if cached is not None:
+        return cached
+    # CSafeLoader is the libyaml binding and parses this file ~4.2x faster
+    # (0.65 s vs 2.72 s measured); fall back when the C extension is absent.
+    loader = getattr(yaml, "CSafeLoader", None) or yaml.SafeLoader
+    with yaml_path.open(encoding="utf-8") as handle:
+        payload = yaml.load(handle, Loader=loader) or {}
+    _VAPOR_PAYLOAD_CACHE[key] = payload
+    return payload
+
+
 def _load_vapor_pressures(path: Path | None = None) -> Mapping[str, Any]:
     yaml_path = path or _DEFAULT_VAPOR_PRESSURES_PATH
-    with yaml_path.open(encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
+    payload = _load_vapor_payload(yaml_path)
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     return vapor_pressure_legacy_view(payload)
@@ -148,8 +183,7 @@ def _compiled_carrier_pressure(
     carrier_key: str,
     temperature_K: float,
 ) -> tuple[float, tuple[float, float], str | None]:
-    with _DEFAULT_VAPOR_PRESSURES_PATH.open(encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
+    payload = _load_vapor_payload(_DEFAULT_VAPOR_PRESSURES_PATH)
     from simulator.vapour_rail.catalog import compiled_catalog_for
 
     catalog = compiled_catalog_for(payload)

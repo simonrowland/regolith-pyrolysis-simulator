@@ -7,6 +7,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.diagnostics import _coating_wall_deposit_selection
+
 import simulator.condensation as condensation_module
 from simulator.condensation import CondensationModel
 from simulator.core import CondensationTrain, EvaporationFlux, MeltState
@@ -20,7 +22,7 @@ from simulator.optimize.study import (
 )
 from simulator.runner import _wall_fouling_report
 from simulator.state import HourSnapshot, PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX
-from simulator.trace import PhysicsTrace
+from simulator.trace import PhysicsTrace, wall_deposit_by_segment_species_kg
 from simulator.vapour_rail.instrumentation import (
     vapour_carrier_authority_status,
 )
@@ -666,6 +668,116 @@ def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
     assert authority["authoritative_for_deposit_mass"] is False
     assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
+
+
+@pytest.mark.parametrize(
+    'projection, expect_authoritative, expect_code, why',
+    [
+        (
+            {},
+            False,
+            'wall_deposit_coverage_unknown',
+            'absent projection: nothing was measured, so nothing may be certified',
+        ),
+        (
+            {'Hot': {'SiO': 0.0}, 'Rest': {'SiO': 0.0}},
+            True,
+            'wall_deposit_sticking_alpha_provenance',
+            'measured zero: a populated projection totalling zero is a PROVEN zero',
+        ),
+    ],
+    ids=['absent_is_unknown', 'measured_zero_is_proven'],
+)
+def test_absent_wall_deposit_is_not_certified_but_measured_zero_is(
+    projection,
+    expect_authoritative,
+    expect_code,
+    why,
+):
+    """An unmeasured deposit must not certify as clean (b-296).
+
+    deposited_species is derived POSITIVE-ONLY, so an absent projection and a
+    measured zero both arrive at the empty-species branch as an empty tuple.
+    That branch reported "every deposited species carries cited sticking
+    provenance" and set authoritative=True -- vacuously true with no species,
+    which let the system claim a furnace never needs re-sintering on a deposit
+    that was never measured.
+
+    Both halves matter and they pull in opposite directions.  Refusing the
+    empty case outright would be wrong for a genuine clean run: a populated
+    projection summing to zero is a proven zero, and the doctrine keeps proven
+    zeros authoritative.  So the split is on whether the projection carries
+    evidence at all, not on whether any species is positive.
+    """
+    status = wall_deposit_sticking_authority_status(projection)
+
+    assert status['authoritative'] is expect_authoritative, why
+    assert status['code'] == expect_code, why
+
+
+def test_trace_projection_preserves_measured_zero() -> None:
+    account = f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}hot_wall"
+
+    class ZeroDepositLedger:
+        def kg_by_account(self) -> dict[str, dict[str, float]]:
+            return {account: {"SiO": 0.0}}
+
+        def project_account_kg(self, requested: str) -> dict[str, float]:
+            assert requested == account
+            return {"SiO": 0.0}
+
+    assert wall_deposit_by_segment_species_kg(ZeroDepositLedger()) == {
+        ("hot_wall", "SiO"): 0.0,
+    }
+
+
+def test_zero_delta_preserves_optimizer_coating_authority() -> None:
+    zero_projection = {("hot_wall", "SiO"): 0.0}
+    trace = SimpleNamespace(
+        snapshots=(HourSnapshot(hour=1),),
+        wall_deposit_by_segment_species_delta=(zero_projection,),
+        wall_deposit_sticking_authority=(
+            wall_deposit_sticking_authority_status(zero_projection)
+        ),
+    )
+
+    coating = _constraints("SiO").coating(trace)
+
+    assert coating.feasible is True
+    assert coating.authoritative is True
+    assert coating.status == "available"
+    assert coating.status_reason == ""
+    assert coating.status_payload["code"] == (
+        "wall_deposit_sticking_alpha_provenance"
+    )
+
+
+def test_runner_fouling_authority_receives_unfiltered_zero_projection() -> None:
+    report = _wall_fouling_report(
+        {species: 0.0 for species in ("SiO", "Na", "K", "Mg", "Fe")}
+    )
+
+    assert report["dominant_species"] == "none"
+    assert report["wall_deposit_kg_per_campaign"] == 0.0
+    assert report["campaigns_to_resinter"] == "infinite"
+    assert report["authoritative_for_resinter"] is True
+    assert report["status_reason"] == ""
+    assert report["sticking_alpha_authority"]["code"] == (
+        "wall_deposit_sticking_alpha_provenance"
+    )
+
+
+def test_positive_wall_deposit_still_reaches_the_species_bearing_branch():
+    """The b-296 split must not swallow the case it was never about.
+
+    A positive deposit has to keep flowing into the per-species authority
+    logic rather than being answered by either empty-projection branch, so
+    this pins that its verdict is still derived from species evidence.
+    """
+    status = wall_deposit_sticking_authority_status({'Hot': {'SiO': 1.5}})
+
+    assert status['code'] != 'wall_deposit_coverage_unknown'
+    assert tuple(status['deposited_species']) == ('SiO',)
 
 
 @pytest.mark.parametrize(
@@ -1568,3 +1680,97 @@ def test_authority_payload_with_sets_is_pickle_and_json_safe() -> None:
     record = payload["alpha_s_provenance_by_species"]["Fe"]["hot_wall"]
     assert record["tags"] == ["alpha", "beta"]
     assert record["frozen"] == ["delta", "gamma"]
+
+
+def test_unknown_wall_deposit_does_not_inherit_a_proven_zero_authority() -> None:
+    """An UNKNOWN deposit must not render as a never-resinter claim.
+
+    `_sum_nested_numbers` distinguishes three states, and the readout used to
+    collapse two of them:
+
+        {Hot:{}, Hottest:{}, Rest:{}} -> None   deposit UNKNOWN
+        {Hot:{K: 0.0}}                -> 0.0    deposit PROVEN ZERO
+        {Hot:{K: 0.05}}               -> 0.05   deposit POSITIVE
+
+    Authority was `not positive_deposit`, which is True for BOTH None and 0.0.
+    So a row with empty zone maps and no authority record claimed authority and
+    printed "campaigns to resinter: infinite" under status `available` --
+    absence of evidence becoming a never-resinter claim on the Mandate's own
+    failure-mode #2 (furnace coating).
+
+    BOTH halves are pinned here on purpose. Asserting only the unknown case
+    would leave a future change free to "fix" it by refusing the proven zero
+    too, which would destroy a legitimate measured result to silence a warning.
+    """
+    unknown = _coating_readout(
+        {
+            "wall_deposit_kg_by_zone_species": {"Hot": {}, "Hottest": {}, "Rest": {}},
+            "campaigns_to_resinter": "infinite",
+        }
+    )
+    assert unknown["authoritative"] is False
+    assert unknown["status"] == "warning"
+    assert "coverage unknown" in unknown["reason"]
+
+    # A MEASURED zero is a real result and keeps its authority.
+    proven_zero = _coating_readout(
+        {
+            "wall_deposit_kg_by_zone_species": {"Hot": {"K": 0.0}},
+            "campaigns_to_resinter": "infinite",
+        }
+    )
+    assert proven_zero["authoritative"] is True
+    assert proven_zero["status"] == "available"
+
+    # An explicit authority verdict still wins over the derived one.
+    explicit = _coating_readout(
+        {
+            "wall_deposit_kg_by_zone_species": {"Hot": {}},
+            "coating_authoritative": True,
+            "campaigns_to_resinter": "infinite",
+        }
+    )
+    assert explicit["authoritative"] is True
+
+
+def test_measured_zero_alias_conflicts_with_a_positive_alias() -> None:
+    """A measured zero is EVIDENCE; an absent projection is not.
+
+    _coating_wall_deposit_selection filtered aliases to positive values before
+    comparing them, so an alias reporting a measured 0.0 kg against another
+    reporting 0.25 kg raised no conflict: the contradicting evidence was removed
+    before the comparison ran, and the flattering positive value was published
+    as authoritative.
+
+    ★ THE EXISTING ALIAS TEST COULD NOT SEE THIS. It covers empty-versus-positive
+    and positive-versus-positive -- the two cases where the old filter happens to
+    be right -- and omits the one where it is wrong. All three states must be
+    exercised, because the defect lives exactly in the state that was skipped.
+
+    _sum_wall_deposit_kg already distinguishes the three: None for an absent
+    projection, 0.0 for a measured zero, positive otherwise. The bug was one line
+    later, where `(sum or 0.0) > _EPS` collapsed the first two together.
+    """
+    zero_vs_positive = {
+        "wall_deposit_kg_by_segment_species": {"hot_wall": {"Fe": 0.0}},
+        "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.25}},
+    }
+    _selected, conflicts = _coating_wall_deposit_selection(zero_vs_positive)
+    assert conflicts, (
+        "a measured zero did not conflict with a positive alias; contradicting "
+        "evidence was filtered out instead of being reported"
+    )
+
+    # absence is still NOT evidence, so it must still not conflict
+    empty_vs_positive = {
+        "wall_deposit_kg_by_segment_species": {},
+        "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.25}},
+    }
+    assert not _coating_wall_deposit_selection(empty_vs_positive)[1]
+
+    # and agreeing evidence must not be manufactured into a conflict
+    zero_vs_zero = {
+        "wall_deposit_kg_by_segment_species": {"hot_wall": {"Fe": 0.0}},
+        "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.0}},
+    }
+    assert not _coating_wall_deposit_selection(zero_vs_zero)[1]

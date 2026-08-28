@@ -6,6 +6,7 @@ from collections.abc import Callable, Mapping, Sequence
 from contextlib import nullcontext
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
+from simulator.chemistry.kernel import select_backend_status
 import copy
 import csv
 import hashlib
@@ -85,6 +86,7 @@ from simulator.optimize.profiles import (
     physics_constraints_from_profile,
     validate_profile,
 )
+from simulator.optimize.reoptimize import GOALS_SOURCES
 from simulator.optimize.recipe import (
     RecipePatch,
     RecipeSchema,
@@ -181,6 +183,15 @@ _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
         "wall_deposit_kg_by_species",
         "wall_deposit_cumulative_total_kg",
         "wall_deposit_cumulative_kg_by_species",
+        "wall_deposit_sticking_authority",
+    }
+)
+_TAP_COATING_DERIVED_AUTHORITY_FIELDS = frozenset(
+    {
+        "coating_authoritative",
+        "coating_status",
+        "coating_output_status",
+        "coating_status_reason",
         "wall_deposit_sticking_authority",
     }
 )
@@ -321,6 +332,8 @@ class StudyConfig:
     seed: int = 0
     warm_start_from: str | Path | Mapping[str, Any] | None = None
     per_eval_timeout_seconds: float | None = None
+    reoptimized_from: str | None = None
+    goals_source: str | None = None
 
 @dataclass(frozen=True)
 class _WarmStartSource:
@@ -538,6 +551,8 @@ def run(
     warm_start_from: str | Path | Mapping[str, Any] | None = None,
     pinned_paths: Sequence[str] | None = None,
     per_eval_timeout_seconds: float | None = None,
+    reoptimized_from: str | None = None,
+    goals_source: str | None = None,
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
@@ -554,6 +569,8 @@ def run(
         seed=seed,
         warm_start_from=warm_start_from,
         per_eval_timeout_seconds=resolve_eval_timeout_seconds(per_eval_timeout_seconds),
+        reoptimized_from=reoptimized_from,
+        goals_source=goals_source,
     )
     pin_seeds(config.seed)
     try:
@@ -3557,9 +3574,11 @@ def _ensure_staged_prefix_replay(
         raise StagedBeamStateError("staged prefix spec was not a PrefixEvalSpec")
     prefix_key = cache_key(prefix_spec)
     if prefix_key in prefix_replay_cache:
+        verified = prefix_replay_cache[prefix_key]
         cached = store.lookup(prefix_spec)
         if cached is None:
             raise StagedBeamStateError(f"verified staged prefix vanished: {prefix_key}")
+        assert_prefix_replay_equal(cached, verified)
         return cached, False
 
     cached = store.lookup(prefix_spec)
@@ -3585,10 +3604,9 @@ def _ensure_staged_prefix_replay(
         return fresh, True
     _assert_honest_result(fresh, definitions)
     light_fresh = _strip_heavy_result(fresh)
-    # Grind-infra sweep Q2 (completeness): unlike the main/certify sinks, the
-    # staged prefix REQUIRES the row to be cached (it is read back immediately
-    # for replay-equality), so an admission rejection cannot be silently skipped
-    # — surface it loudly with the reason instead of a bare ResultStoreWriteRejected.
+    # A rejected write is non-fatal, but it cannot create a verified replay.
+    # Leave the replay cache empty so a sibling through this prefix recomputes
+    # it instead of claiming that the refused result was persisted and checked.
     try:
         store.store(
             prefix_spec,
@@ -3596,10 +3614,13 @@ def _ensure_staged_prefix_replay(
             created_at=datetime.now(UTC).isoformat(),
         )
     except ResultStoreWriteRejected as exc:
-        raise StagedBeamStateError(
-            f"staged prefix cache write rejected: {prefix_key} "
-            f"reasons={','.join(exc.reasons)}"
-        ) from exc
+        _LOGGER.warning(
+            "staged_prefix_cache_write_rejected prefix_key=%s reasons=%s "
+            "replay_round_trip=skipped_not_verified",
+            prefix_key,
+            ",".join(exc.reasons),
+        )
+        return light_fresh, True
     cached = store.lookup(prefix_spec)
     if cached is None:
         raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")
@@ -4035,7 +4056,9 @@ def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
         error_message=reference.error_message,
         reason=reference.reason,
         trace=_light_backend_status_trace(scored),
-        product_summary=reference.product_summary,
+        product_summary=coating_summary_with_grounded_authority(
+            reference.product_summary
+        ),
         backend_name=reference.backend_name,
         backend_status=_result_backend_status(scored),
         backend_authoritative=reference.backend_authoritative,
@@ -4140,9 +4163,19 @@ def _backend_status_from_trace(trace: Any) -> str | None:
 
 
 def _latest_backend_status(value: Any) -> str | None:
+    """Reduce a per-probe sequence to one whole-run status via the OWNER.
+
+    Same defect and same repair as the pool sibling: this read value[-1], so a
+    degrading token followed by a later ok reduced to ok. Answering by POSITION
+    restates the ordering without naming it, which is also why the one-owner
+    guard could not see it -- that guard matches ranked token literals and a
+    last-item implementation spells none.
+    """
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or not value:
         return None
-    return _backend_status_from_trace(value[-1])
+    return select_backend_status(
+        [_backend_status_from_trace(entry) for entry in value]
+    )
 
 
 def _to_record(
@@ -4305,7 +4338,12 @@ def _apply_tap_coating_product_summary(
     tap_summary: Mapping[str, Any],
 ) -> None:
     terminal_fields = sorted(
-        key for key in _TAP_COATING_PRODUCT_SUMMARY_FIELDS if key in summary
+        key
+        for key in (
+            _TAP_COATING_PRODUCT_SUMMARY_FIELDS
+            - _TAP_COATING_DERIVED_AUTHORITY_FIELDS
+        )
+        if key in summary
     )
     missing = [key for key in terminal_fields if key not in tap_summary]
     if missing:
@@ -4313,6 +4351,8 @@ def _apply_tap_coating_product_summary(
             "tap-truncated coating projection missing hour-basis field(s): "
             + ", ".join(missing)
         )
+    for key in _TAP_COATING_DERIVED_AUTHORITY_FIELDS:
+        summary.pop(key, None)
     for key in _TAP_COATING_PRODUCT_SUMMARY_FIELDS:
         if key in tap_summary:
             summary[key] = tap_summary[key]
@@ -4998,6 +5038,22 @@ def _study_summary_payload(
     }
 
 
+def _lineage_fields(config: StudyConfig | None) -> tuple[str | None, str | None]:
+    if config is None:
+        return None, None
+    source = config.reoptimized_from
+    goals = config.goals_source
+    source_text = None if source is None or str(source).strip() == "" else str(source)
+    goals_text = None if goals is None or str(goals).strip() == "" else str(goals)
+    if goals_text is not None and goals_text not in GOALS_SOURCES:
+        raise StudyError(f"unknown goals_source: {goals_text}")
+    if source_text is None and goals_text is None:
+        return None, None
+    if source_text is None or goals_text is None:
+        raise StudyError("reoptimized_from and goals_source must be set together")
+    return source_text, goals_text
+
+
 def _study_manifest_payload(
     *,
     study_id: str,
@@ -5014,6 +5070,7 @@ def _study_manifest_payload(
     replayable: bool,
     prefix_evals_run: int = 0,
 ) -> Mapping[str, Any]:
+    reoptimized_from, goals_source = _lineage_fields(config)
     return {
         "save_schema_version": SAVE_SCHEMA_VERSION,
         "member_schema_version": MEMBER_SCHEMA_VERSION,
@@ -5055,8 +5112,8 @@ def _study_manifest_payload(
         ),
         "study_status": study_status,
         "replayable": bool(replayable),
-        "reoptimized_from": None,
-        "goals_source": None,
+        "reoptimized_from": reoptimized_from,
+        "goals_source": goals_source,
     }
 
 

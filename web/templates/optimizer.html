@@ -190,6 +190,8 @@
                     <td>
                         <a class="btn"
                            href="{{ url_for('web.optimizer_imported_detail', study_id=imported.study_id) }}">Open</a>
+                        <a class="btn"
+                           href="{{ url_for('web.optimizer_reoptimize_form', origin='imported', study_id=imported.study_id) }}">Re-optimize</a>
                     </td>
                 </tr>
                 {% endfor %}

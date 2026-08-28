@@ -140,7 +140,10 @@ def test_non_authoritative_backend_caps_confidence_at_medium() -> None:
 
     confidence = artifact["terminal"]["confidence"]
     assert confidence["grade"] == "medium"
-    assert "backend not authoritative: stub" in confidence["reasons"]
+    # Echoes the backend supplied two lines up; not an alias contract -- the
+    # subject here is the medium cap, and the sibling test below does the same
+    # with alphamelts.
+    assert "backend not authoritative: internal-analytical" in confidence["reasons"]
 
 
 def test_failed_backend_status_forces_low_confidence() -> None:

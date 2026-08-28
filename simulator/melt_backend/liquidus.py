@@ -8,7 +8,10 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Optional, Tuple
 
-from simulator.melt_backend.base import LiquidFractionInvalidError
+from simulator.melt_backend.base import (
+    LiquidFractionInvalidError,
+    MeltBackendError,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -33,10 +36,38 @@ from simulator.scalar_boundary import is_declared_real_scalar
 # Unit check: all terms in seconds; product is seconds.
 DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 300.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
+# The statuses a SAMPLE may refuse with and still be carried out through the
+# finder, so the caller learns WHICH refusal occurred rather than a generic
+# solver failure.
+#
+# 'refused' is here because ThermoEngine already computes it as the honest
+# category for two of its refusal causes -- FO2_REQUIRES_IRON and
+# FO2_TARGET_NOT_FINITE, per STATUS_BY_REFUSAL_CAUSE in
+# engines/alphamelts/thermoengine.py, whose own _ALLOWED_CAUSE_STATUSES is
+# {out_of_domain, refused}. Those are raised as typed exceptions rather than
+# returned as a status, so before this they fell to the finder's generic
+# guard and became 'not_converged' -- a policy refusal to supply physics
+# reported as an affirmative claim that a solve ran and failed to converge.
+#
+# ★ ORDER OF OPERATIONS MATTERS AND IS NOT COSMETIC (b-300): this set had to
+# widen BEFORE any sampler wraps that category. LiquidusSampleError validates
+# its status against this set, so handing it 'refused' while the set was the
+# old three raised ValueError INSIDE the sampler, which the same generic
+# guard caught, which minted 'not_converged' -- identical behaviour to the
+# bug, with a typed raise sitting in the diff to convince the author it was
+# fixed. Confirmed by execution before the widen.
+#
+# NOT widened with not_attempted, unsupported or non_authoritative: those are
+# provider or intent-level tokens describing whether a probe ran at all, not
+# how a frac_M sample refused. A timeout stays 'not_converged' (see
+# STATUS_BY_TIMEOUT_CAUSE) rather than gaining a token, because a new member
+# here would also have to exist in the kernel vocabulary or IntentResult
+# construction raises.
 LIQUIDUS_REFUSAL_STATUSES = frozenset({
     'not_converged',
     'out_of_domain',
     'unavailable',
+    'refused',
 })
 
 
@@ -58,6 +89,43 @@ class LiquidusSampleError(RuntimeError):
         self.warnings = tuple(str(warning) for warning in warnings)
         self.diagnostics = dict(diagnostics or {})
         super().__init__('; '.join(self.warnings) or self.status)
+
+
+def liquidus_sample_error_from_exception(
+    exc: BaseException,
+) -> LiquidusSampleError | None:
+    """Project a backend failure without trusting exception attributes."""
+
+    if isinstance(exc, LiquidusSampleError):
+        return exc
+    if isinstance(exc, MeltBackendError):
+        status = str(getattr(exc, 'backend_failure_category', '') or '')
+        if status not in LIQUIDUS_REFUSAL_STATUSES:
+            return None
+        reason = (
+            getattr(exc, 'backend_failure_reason_code', None)
+            or getattr(exc, 'backend_status_reason', None)
+            or status
+        )
+    else:
+        from engines.alphamelts.thermoengine import (
+            thermoengine_failure_disposition_from_exception,
+        )
+
+        disposition = thermoengine_failure_disposition_from_exception(exc)
+        status = disposition.status
+        reason = disposition.reason_code
+    diagnostics: dict[str, Any] = {
+        'backend_status': status,
+        'backend_status_reason': str(reason),
+        'backend_failure_reason_code': str(reason),
+        'backend_failure_category': status,
+    }
+    for field_name in ('requested', 'solved'):
+        value = getattr(exc, field_name, None)
+        if value is not None:
+            diagnostics[f'{field_name}_fO2_log'] = value
+    return LiquidusSampleError(status, (str(exc),), diagnostics)
 
 
 @dataclass(frozen=True)
@@ -456,6 +524,18 @@ def find_liquidus_solidus_by_fraction(
             diagnostics=exc.diagnostics,
         )
     except Exception as exc:  # noqa: BLE001 - library-boundary finder guard
+        typed_failure = liquidus_sample_error_from_exception(exc)
+        if typed_failure is not None:
+            return LiquidusSolidusResult(
+                status=typed_failure.status,
+                warnings=tuple([
+                    *smoothing_warnings,
+                    *typed_failure.warnings,
+                ]),
+                samples=tuple(samples),
+                iterations=iterations,
+                diagnostics=typed_failure.diagnostics,
+            )
         return LiquidusSolidusResult(
             status='not_converged',
             warnings=tuple([
@@ -549,6 +629,22 @@ def build_equilibrium_crystallization_path(
     except LiquidFractionInvalidError:
         raise
     except Exception as exc:  # noqa: BLE001 - engine sampler boundary
+        typed_failure = liquidus_sample_error_from_exception(exc)
+        if typed_failure is not None:
+            return EquilibriumCrystallizationPathResult(
+                status=typed_failure.status,
+                warnings=tuple([
+                    *smoothing_warnings,
+                    *(
+                        f'equilibrium crystallization path failed: {warning}'
+                        for warning in typed_failure.warnings
+                    ),
+                ]),
+                liquid_fraction_path=tuple(path),
+                samples=tuple(samples),
+                iterations=len(samples),
+                diagnostics=typed_failure.diagnostics,
+            )
         return EquilibriumCrystallizationPathResult(
             status='not_converged',
             warnings=tuple([

@@ -215,7 +215,21 @@ def diagnostics_to_equilibrium(
         or backend_diagnostics.get('authoritative_for_requested_conditions')
         is False
     )
-    if requested_point_non_authoritative:
+    # A status rewrite may only DEGRADE, never upgrade.  The guard is
+    # ``status == 'ok'`` because 'ok' is the sole flattering token in the
+    # intent-result vocabulary (FLATTERING_INTENT_RESULT_STATUSES in
+    # simulator/chemistry/kernel/dto.py), so rewriting it to
+    # 'out_of_domain' is the only rewrite here that loses no information:
+    #   ok            -> out_of_domain   degrade, correct: the clamp IS the caveat
+    #   refused       -> out_of_domain   UPGRADE: destroys the refusal outright
+    #   unavailable   -> out_of_domain   UPGRADE: same
+    #   not_converged -> out_of_domain   lateral, but drops the non-convergence mark
+    # Unguarded, a provider refusal at a clamped operating point became
+    # byte-indistinguishable from a legitimate clamped computation, so no
+    # downstream category-1 gate could recover it (b-297).  The sibling
+    # promotion in simulator/melt_backend/alphamelts.py already guards this
+    # way; this site was the outlier.
+    if status == 'ok' and requested_point_non_authoritative:
         status = 'out_of_domain'
         backend_diagnostics['backend_status'] = 'out_of_domain'
         backend_diagnostics.setdefault(

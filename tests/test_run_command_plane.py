@@ -1849,7 +1849,7 @@ def test_alias_fidelity_is_canonical_in_persisted_typed_provenance(
 
     submission = client.post(
         "/api/runs",
-        json=_single_run_body({"mass_kg": 1000}, fidelity="internal-analytical"),
+        json=_single_run_body({"mass_kg": 1000}, fidelity="stub"),
     )
     assert submission.status_code == 201
     run_id = submission.get_json()["run_id"]
@@ -1877,7 +1877,13 @@ def test_alias_fidelity_is_canonical_in_persisted_typed_provenance(
         elif isinstance(value, str):
             yield value
 
-    assert "internal-analytical" not in set(strings(artifact))
+    # ★ THE LEGACY SPELLING HERE IS LOAD-BEARING, in both places: this test
+    # feeds the ALIAS in (above) and asserts the alias does NOT survive into
+    # the persisted artifact, while the canonical assertions above require it
+    # to be there. Renaming either one inverts the test -- a sweep did exactly
+    # that, leaving it asserting the canonical token was absent while five
+    # lines up demanding it be present.
+    assert "stub" not in set(strings(artifact))
 
 
 def test_source_run_draft_unknown_is_typed_404(tmp_path):

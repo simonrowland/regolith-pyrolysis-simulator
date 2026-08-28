@@ -254,6 +254,41 @@ def test_liquidus_sample_error_rejects_noncanonical_status():
         LiquidusSampleError('failed', ('engine failed',), {})
 
 
+def test_liquidus_sample_error_carries_a_policy_refusal():
+    """A policy refusal must survive the finder as itself (b-300).
+
+    ThermoEngine already computes 'refused' as the honest category for
+    FO2_REQUIRES_IRON and FO2_TARGET_NOT_FINITE. Before this token was
+    permitted, handing it to LiquidusSampleError raised ValueError INSIDE the
+    sampler, which the finder's generic guard caught and minted as
+    'not_converged' -- so a refusal to supply physics was reported as a solve
+    that ran and failed to converge, and any wrap written without widening
+    this set first would have reproduced the bug while looking like a fix.
+    """
+    error = LiquidusSampleError('refused', ('fo2 requires iron',), {})
+
+    assert error.status == 'refused'
+    assert error.warnings == ('fo2 requires iron',)
+
+
+@pytest.mark.parametrize(
+    'provider_token',
+    ['not_attempted', 'unsupported', 'non_authoritative'],
+)
+def test_liquidus_sample_error_still_rejects_provider_level_tokens(
+    provider_token,
+):
+    """Widening for 'refused' must not have widened for everything (b-300).
+
+    These describe whether a probe ran at all, at the provider or intent
+    level; they are not ways a frac_M sample can refuse. Admitting them here
+    would let a token with no meaning at this seam ride out through the
+    finder onto a LiquidusSolidusResult.
+    """
+    with pytest.raises(ValueError, match='canonical refusal'):
+        LiquidusSampleError(provider_token, (), {})
+
+
 def test_liquidus_result_rejects_contradictory_success_fields():
     with pytest.raises(ValueError, match='inconsistent'):
         LiquidusSolidusResult(

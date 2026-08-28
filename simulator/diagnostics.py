@@ -47,6 +47,15 @@ WALL_VAPOUR_CARRIER_AUTHORITY_MISSING_CODE = (
 WALL_DEPOSIT_ALIAS_CONFLICT_CODE = (
     "wall_deposit_payload_alias_conflict"
 )
+
+# Distinct from WALL_STICKING_ALPHA_NOTICE_CODE on purpose.  That code says
+# "every deposited species carries cited sticking provenance", which is
+# VACUOUSLY TRUE when nothing was deposited *and* when nothing was measured.
+# This code says the second thing out loud: coverage is unknown, so no
+# downstream fouling verdict may be treated as authoritative (b-296).
+WALL_DEPOSIT_COVERAGE_UNKNOWN_CODE = (
+    "wall_deposit_coverage_unknown"
+)
 _COATING_WALL_DEPOSIT_KEYS = (
     "wall_deposit_kg_by_segment_species",
     "wall_deposit_kg_by_zone_species",
@@ -433,6 +442,39 @@ def wall_deposit_sticking_authority_status(
         and not uncertified_species
         and not out_of_domain_species
     ):
+        # deposited_species is derived POSITIVE-ONLY, so an ABSENT projection
+        # and a MEASURED ZERO both arrive here as an empty tuple.  Those are
+        # different claims and only one of them may be certified:
+        #   sum is None  -> nothing was measured; "all deposited species are
+        #                   certified" is vacuously true and must NOT be
+        #                   reported as authoritative, or a furnace that was
+        #                   never inspected reads as never needing re-sinter.
+        #   sum is 0.0   -> the projection was populated and totalled zero.
+        #                   That is a PROVEN ZERO and the doctrine keeps it
+        #                   authoritative; refusing it would turn a genuine
+        #                   clean run into an unknown.
+        # The evidence the positive-only filter discarded is still available
+        # from wall_deposit_kg itself, which is why the discriminator reads
+        # the raw projection rather than deposited_species (b-296; same
+        # three-state collapse fixed one layer down in _coating_wall_deposit_selection).
+        measured_total_kg = _sum_wall_deposit_kg(wall_deposit_kg)
+        if measured_total_kg is None:
+            return _wall_deposit_authority_payload(
+                authoritative=False,
+                code=WALL_DEPOSIT_COVERAGE_UNKNOWN_CODE,
+                deposited_species=(),
+                uncertified_species=(),
+                provenance=_provenance_subset(provenance, provenance_species),
+                surface_geometry_provenance=geometry_notice,
+                geometry_status_bearing=False,
+                message=(
+                    'wall-deposit coverage unknown: no wall_deposit_kg '
+                    'projection was recorded, so no deposited species could '
+                    'be certified and no fouling verdict derived from it is '
+                    'authoritative'
+                ),
+                **carrier_authority_kwargs,
+            )
         return _wall_deposit_authority_payload(
             authoritative=True,
             code=WALL_STICKING_ALPHA_NOTICE_CODE,
@@ -649,27 +691,19 @@ def wall_deposit_sticking_authority_status(
 def coating_summary_with_grounded_authority(
     summary: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Return a coating summary where positive deposits trust provenance only."""
+    """Return a coating summary with authority rederived from its projection."""
 
     result = dict(summary)
     wall_deposit = coating_wall_deposit_payload(result)
     alias_conflicts = coating_wall_deposit_alias_conflicts(result)
     total_kg = _sum_wall_deposit_kg(wall_deposit)
     authority_input = result.get("wall_deposit_sticking_authority")
-    has_pressure_refusal = (
-        isinstance(authority_input, Mapping)
-        and bool(_wall_saturation_pressure_refusals_by_species(authority_input))
+    has_wall_deposit_projection = any(
+        key in result for key in _COATING_WALL_DEPOSIT_KEYS
     )
-    has_authority_evidence = (
-        isinstance(authority_input, Mapping) and bool(authority_input)
-    )
-    if total_kg is None and not alias_conflicts:
-        return result
     if (
-        total_kg is not None
-        and total_kg <= _EPS
-        and not has_pressure_refusal
-        and not has_authority_evidence
+        total_kg is None
+        and has_wall_deposit_projection
         and not alias_conflicts
     ):
         return result
@@ -680,17 +714,9 @@ def coating_summary_with_grounded_authority(
             authority_input if isinstance(authority_input, Mapping) else {},
         )
     else:
-        authority = _wall_deposit_authority_payload(
-            authoritative=False,
-            code=WALL_STICKING_ALPHA_MISSING_CODE,
-            deposited_species=(),
-            uncertified_species=(),
-            provenance={},
-            message=(
-                "Wall-deposit sticking alpha authority missing; provenance is "
-                "missing, so coating and fouling readouts are non-authoritative "
-                "until the coefficient status travels with the deposit."
-            ),
+        authority = wall_deposit_sticking_authority_status(
+            {},
+            authority_input if isinstance(authority_input, Mapping) else {},
         )
 
     if alias_conflicts:
@@ -739,16 +765,35 @@ def _coating_wall_deposit_selection(
     ]
     if not present:
         return None, ()
-    positive = [
+    # ★ A MEASURED ZERO IS EVIDENCE; AN ABSENT PROJECTION IS NOT.
+    # _sum_wall_deposit_kg already distinguishes them -- it returns None when
+    # nothing was found and a float (possibly 0.0) when something was -- but
+    # `(sum or 0.0) > _EPS` collapsed both into "not positive". The conflict
+    # walk then ran over the positive aliases only, so an alias reporting a
+    # MEASURED 0.0 kg against another reporting 0.25 kg raised no conflict at
+    # all: the contradicting evidence was filtered out before the comparison,
+    # and the flattering positive value was published as authoritative.
+    #
+    # The three-state rule (unknown / measured-zero / positive are distinct
+    # authority states) is already this project's invariant on the web coating
+    # readout. This is the same rule applied at the site that SELECTS the
+    # projection, which is where the contradiction actually has to be caught.
+    measured = [
         (key, value)
         for key, value in present
+        if _sum_wall_deposit_kg(value) is not None
+    ]
+    positive = [
+        (key, value)
+        for key, value in measured
         if (_sum_wall_deposit_kg(value) or 0.0) > _EPS
     ]
-    selected_key, selected_value = (positive or present)[0]
+    selected_key, selected_value = (positive or measured or present)[0]
     conflicts = tuple(
         key
-        for key, value in positive[1:]
-        if not _wall_deposit_aliases_equivalent(value, selected_value)
+        for key, value in measured
+        if key != selected_key
+        and not _wall_deposit_aliases_equivalent(value, selected_value)
     )
     if conflicts:
         conflicts = (selected_key, *conflicts)

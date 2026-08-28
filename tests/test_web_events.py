@@ -1883,10 +1883,20 @@ def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
         socket.target()
 
         assert sim._poisoned_hour is None
+        # The message used to BE the token. bb0fc09f made a lawful refusal
+        # explain itself instead, so pinning the token here would pin the
+        # defect. Two assertions, because either alone is weak: the first
+        # fails if we ever regress to emitting a bare token, the second
+        # raises KeyError if the registry entry is dropped -- so a fallback
+        # to the token cannot pass this quietly. The subject of THIS test,
+        # the typed terminal status, is unchanged below.
+        assert statuses[0]["message"] != MRE_MULTI_OXIDE_PARTITION_REFUSAL
         assert statuses == [{
             "status": "refused",
             "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-            "message": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            "message": web_events._REFUSAL_EXPLANATIONS[
+                MRE_MULTI_OXIDE_PARTITION_REFUSAL
+            ],
             "refusal_diagnostic": diagnostic,
             "backend_status": "ok",
             "backend_authoritative": True,
@@ -5247,3 +5257,346 @@ def test_web_pause_resume_is_result_neutral(monkeypatch, tmp_path):
             client.disconnect()
         for sid in list(_simulations):
             _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    "feedstock_field, label",
+    [
+        ({}, "absent"),
+        ({"feedstock": ""}, "empty string"),
+        ({"feedstock": "   "}, "whitespace only"),
+    ],
+)
+def test_start_without_feedstock_refuses_and_names_the_reason(
+    monkeypatch, feedstock_field, label
+):
+    """A missing feedstock must REFUSE, and the refusal must be named.
+
+    The server used to read data.get("feedstock", "lunar_mare_low_ti"), so a
+    start naming no feedstock ran a full simulation on lunar mare and produced a
+    complete product ledger attributed to a feedstock the operator never chose.
+    The only guard was client-side (an alert() in simulator-controls.js that
+    returns before emitting), so a browser could not reach it but any other
+    caller could.
+
+    This asserts the SPECIFIC error_type, not merely "it did not start". A test
+    that accepts any failure would pass on an unrelated exception and would go
+    on passing if the refusal were later replaced by a crash.
+    """
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    assert client.is_connected()
+
+    client.emit(
+        "start_simulation",
+        {"mass_kg": 1000, "speed": 0, "track": "pyrolysis", **feedstock_field},
+    )
+
+    payloads = [
+        (message.get("args") or [{}])[0]
+        for message in client.get_received()
+        if message.get("name") == "simulation_status"
+    ]
+    error_types = {
+        payload.get("error_type")
+        for payload in payloads
+        if isinstance(payload, dict)
+    }
+    assert "feedstock_required" in error_types, (
+        f"start with {label} feedstock should refuse as feedstock_required; "
+        f"got {payloads!r}"
+    )
+    statuses = {
+        payload.get("status") for payload in payloads if isinstance(payload, dict)
+    }
+    assert "started" not in statuses, (
+        f"start with {label} feedstock must not begin a run; got {payloads!r}"
+    )
+
+
+def test_start_with_valid_feedstock_still_starts(monkeypatch):
+    """Positive control for the refusal above.
+
+    Without this, a change that refused EVERY start would leave the refusal
+    tests green while breaking the product entirely.
+    """
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.emit(
+        "start_simulation",
+        {
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+            "track": "pyrolysis",
+        },
+    )
+    statuses = {
+        (message.get("args") or [{}])[0].get("status")
+        for message in client.get_received()
+        if message.get("name") == "simulation_status"
+    }
+    assert "started" in statuses, f"valid feedstock should start; got {statuses!r}"
+
+
+def _socket_single_run_payload(target_or_recipe, **overrides):
+    return {
+        "single_run": {
+            "target_or_recipe": target_or_recipe,
+            "l2_overrides": dict(overrides),
+            "name": "Socket envelope run",
+            "seed": 0,
+            "fidelity": "internal-analytical",
+        },
+    }
+
+
+def test_socket_single_run_envelope_honours_nested_feedstock_and_overrides(
+    monkeypatch,
+):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            _socket_single_run_payload(
+                "mars_basalt",
+                mass_kg=321,
+                speed=0,
+                track="pyrolysis",
+                additives={"C": 100.0},
+            ),
+        )
+        events = client.get_received()
+        states = [
+            _simulations[sid]
+            for sid in set(_simulations) - before
+        ]
+        assert len(states) == 1, events
+        sim = states[0]["session"].simulator
+        assert sim.record.feedstock_key == "mars_basalt"
+        assert sim.record.batch_mass_kg == pytest.approx(321.0)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        _socket_single_run_payload(""),
+        {"single_run": {}},
+        {
+            **_socket_single_run_payload("mars_basalt"),
+            "feedstock": "",
+        },
+    ],
+)
+def test_socket_single_run_envelope_refuses_absent_or_ambiguous_feedstock(
+    monkeypatch, payload
+):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit("start_simulation", payload)
+        statuses = [
+            (message.get("args") or [{}])[0]
+            for message in client.get_received()
+            if message.get("name") == "simulation_status"
+        ]
+        assert not (set(_simulations) - before)
+        assert "started" not in {
+            status.get("status") for status in statuses
+            if isinstance(status, dict)
+        }
+        assert "invalid_single_run" in {
+            status.get("error_type") for status in statuses
+            if isinstance(status, dict)
+        }
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_refusal_message_explains_without_replacing_the_machine_reason():
+    """A lawful refusal explains itself; the token stays authoritative.
+
+    The refusal payload set message=exc.reason, so the operator's status line
+    read `refused - viscous_p_bulk_transport_out_of_domain` -- a raw token that
+    cannot distinguish "the furnace broke" from "the model declined to
+    extrapolate". It was reported as a stall. The run had not stalled; it had
+    correctly refused, because viscous Poiseuille P_bulk has no valid solution
+    in the transitional Knudsen band.
+
+    Two properties matter and are both asserted here:
+      1. the human message is prose, NOT the bare token;
+      2. `reason` is UNCHANGED, so nothing downstream that switches on the
+         machine-readable token is affected by the wording.
+    An unmapped reason must pass through verbatim -- inventing prose for a
+    reason nobody wrote would be a different failure, so that is pinned too.
+    """
+    reason = "viscous_p_bulk_transport_out_of_domain"
+    message = web_events._refusal_message(reason)
+    assert message != reason, "mapped refusal should be explained, not echoed"
+    assert "Knudsen" in message and "mbar" in message, (
+        f"explanation should name the actual domain limit; got {message!r}"
+    )
+    # the machine-readable token must be untouched by the wording layer
+    assert web_events._REFUSAL_EXPLANATIONS[reason] == message
+
+    unmapped = "some_reason_nobody_has_written_prose_for"
+    assert web_events._refusal_message(unmapped) == unmapped, (
+        "an unmapped reason must surface verbatim rather than be softened"
+    )
+
+
+def test_knudsen_refusal_message_uses_actual_geometry_threshold():
+    from simulator.condensation import minimum_pressure_mbar_for_knudsen
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+    from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
+
+    diagnostic = {
+        "gas_temperature_K": 1160.0 + CELSIUS_TO_KELVIN_OFFSET,
+        "pipe_diameter_m": 0.12,
+        "carrier_gas": "N2",
+        "VISCOUS_KNUDSEN_MAX": VISCOUS_KNUDSEN_MAX,
+        "segments": [
+            {"name": "narrow_duct", "characteristic_length_m": 0.01},
+        ],
+    }
+    expected = minimum_pressure_mbar_for_knudsen(
+        gas_temperature_C=1160.0,
+        pipe_diameter_m=0.01,
+        carrier_gas="N2",
+        knudsen_ceiling=VISCOUS_KNUDSEN_MAX,
+    )["minimum_pressure_mbar"]
+
+    message = web_events._refusal_message(
+        "viscous_p_bulk_transport_out_of_domain",
+        diagnostic,
+    )
+
+    assert f"{expected:.2f} mbar" in message
+    assert "0.26 mbar" not in message
+
+
+def test_knudsen_refusal_message_without_geometry_omits_a_number():
+    import re
+
+    message = web_events._refusal_message(
+        "viscous_p_bulk_transport_out_of_domain"
+    )
+
+    assert "Knudsen" in message
+    assert re.search(r"\b\d+(?:\.\d+)?\s*mbar\b", message) is None
+
+
+def test_web_refusal_registry_covers_stable_typed_reasons():
+    expected = {
+        "viscous_p_bulk_transport_out_of_domain",
+        "knudsen_outside_viscous_flow",
+        "knudsen_policy_unconfigured",
+        "invalid_pipe_diameter",
+        "uncertified_melt_resistance_model",
+        "evaporation_flux_configuration_error",
+        "vapour_batch_no_debiting_pressure_outcome",
+        "vapour_batch_builder_missing",
+        "vapour_batch_resolve_failed",
+        "vapour_batch_unavailable",
+        "missing_vapour_batch_flux_pressures_Pa",
+        "invalid_vapour_batch_flux_pressures_Pa",
+        "invalid_overhead_partials_Pa",
+        "invalid_molar_mass_kg_mol",
+        "invalid_available_oxide_kg",
+        "invalid_stoich_by_species",
+        "invalid_melt_surface_area_m2",
+        "invalid_stir_factor",
+        "unavailable",
+        "refused",
+        "not_run",
+        "uncertified_multi_oxide_current_partition",
+        "non_authoritative_fallback_raw_margin_nonpositive",
+        "mre_product_phase_mismatch_refused",
+        "c4_target_window_not_acquired",
+        "c4_process_window_lost",
+        "c4_process_wall_clock_exhausted",
+        "c4_preheat_wall_clock_exhausted",
+    }
+
+    assert expected <= set(web_events._REFUSAL_EXPLANATIONS)
+    for reason in expected:
+        assert web_events._refusal_message(reason) != reason
+
+
+def test_every_refusal_message_call_forwards_available_diagnostic():
+    import ast
+    from pathlib import Path
+
+    source = Path(web_events.__file__).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_refusal_message"
+    ]
+
+    assert len(calls) == 2
+    assert all(len(call.args) == 2 for call in calls)
+
+
+def test_every_refusal_payload_explains_itself_not_just_one_of_them():
+    """EVERY refusal builder must route through the explanation table.
+
+    The first fix for the raw-token status line patched only the typed-exception
+    handler, and the C4 endpoint refusal is built at a SECOND site that still
+    assigned `'message': reason`. So the operator kept seeing
+    `refused - viscous_p_bulk_transport_out_of_domain` in the live app while the
+    unit test for the mapping function passed. The e2e harness caught it by
+    capturing the emitted socket payload verbatim.
+
+    This is a SOURCE-LEVEL guard and that is deliberate: the defect was a MISSED
+    SITE, not wrong logic at a site, so the property worth pinning is "no refusal
+    payload assigns the bare reason as its message" across the whole module. A
+    behavioural test at one site is exactly what failed to catch this. Reaching
+    the C4 branch behaviourally needs a 35-hour simulated run, which does not
+    belong in a unit suite; the e2e harness covers that end.
+    """
+    import re
+    from pathlib import Path
+
+    source = Path(web_events.__file__).read_text(encoding="utf-8")
+
+    # every dict literal that declares itself a refusal
+    refusal_blocks = [
+        m.start() for m in re.finditer(r"'status':\s*'refused'", source)
+    ]
+    assert refusal_blocks, "expected at least one refusal payload in web.events"
+
+    offenders = []
+    for start in refusal_blocks:
+        block = source[start:start + 400]
+        message_line = re.search(r"'message':\s*([^,\n]+)", block)
+        if not message_line:
+            continue
+        expr = message_line.group(1).strip()
+        # the bare token, however it is spelled, is the defect
+        if expr in {"reason", "exc.reason", "str(reason)", "str(exc.reason)"}:
+            offenders.append((start, expr))
+
+    assert not offenders, (
+        "refusal payload(s) emit the raw reason token as the operator-facing "
+        f"message instead of routing through _refusal_message: {offenders}"
+    )

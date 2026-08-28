@@ -11,13 +11,17 @@ import web.events as web_events
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
+    METAL_PHASE_ACCOUNT,
     OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
     OXYGEN_CAPTURED_ACCOUNTS,
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    TERMINAL_DRAIN_TAP_ACCOUNT,
 )
 from simulator.accounting.queries import (
+    CONDENSATION_TRAIN_ACCOUNT,
     PRODUCT_LEDGER_ACCOUNTS,
     TERMINAL_RUMP_REFRACTORY_OXIDES,
 )
@@ -658,6 +662,140 @@ def test_completion_payload_degrades_when_product_classifier_raises(monkeypatch)
     assert payload["terminal_rump_by_species"] == sim._terminal_rump_by_species()
 
 
+def test_degraded_product_story_badge_uses_canonical_extraction_evidence(
+    web_driver,
+    monkeypatch,
+):
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {
+                    "SiO2": 51.5,
+                    "FeO": 13.0,
+                    "MgO": 35.5,
+                },
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    sim.atom_ledger.move(
+        "test-unrecovered-overhead",
+        "process.cleaned_melt",
+        "process.overhead_gas",
+        {"SiO2": 1.0},
+    )
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: (_ for _ in ()).throw(ValueError("rump mismatch")),
+    )
+
+    zero_extraction = web_events._completion_payload(sim)
+    sim.atom_ledger.move(
+        "test-stage-3-glass",
+        "process.cleaned_melt",
+        CONDENSATION_TRAIN_ACCOUNT,
+        {"SiO2": 1.0},
+    )
+    sim._stage_collection_kg_by_source[
+        (CONDENSATION_TRAIN_ACCOUNT, 3, "SiO2")
+    ] = 1.0
+    real_product = web_events._completion_payload(sim)
+
+    states = tuple(
+        _render_product_story(html=web_driver["html"], payload=payload)["text"][
+            "product-ledger-state"
+        ]
+        for payload in (zero_extraction, real_product)
+    )
+
+    assert states == ("no-products", "ok")
+    assert (
+        zero_extraction["extracted_product_kg"],
+        real_product["extracted_product_kg"],
+    ) == pytest.approx((0.0, 1.0))
+    assert zero_extraction["product_story_status"] == "unavailable"
+    assert real_product["product_story_status"] == "unavailable"
+
+
+@pytest.mark.parametrize(
+    ("float_layer_kg", "drain_tap_kg", "expected_state"),
+    [
+        (2.0, 0.0, "no-products"),
+        (0.0, 1.0, "ok"),
+        (2.0, 1.0, "ok"),
+    ],
+)
+def test_product_badge_counts_terminal_metal_tap_not_diagnostic_float_layer(
+    web_driver,
+    float_layer_kg,
+    drain_tap_kg,
+    expected_state,
+):
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {"SiO2": 51.5, "FeO": 13.0, "MgO": 35.5},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    total_metal_kg = float_layer_kg + drain_tap_kg
+    sim.atom_ledger.load_external(
+        METAL_PHASE_ACCOUNT,
+        {"Al": total_metal_kg},
+        source="test extracted metal before stratification",
+        material_origin="feedstock",
+    )
+    if float_layer_kg:
+        sim.atom_ledger.move(
+            "test-diagnostic-float-layer",
+            METAL_PHASE_ACCOUNT,
+            METAL_FLOAT_LAYER_ACCOUNT,
+            {"Al": float_layer_kg},
+            reason="metal_phase_stratification_diagnostic_only_no_tap_gate",
+        )
+    if drain_tap_kg:
+        sim.atom_ledger.move(
+            "test-terminal-drain-tap",
+            METAL_PHASE_ACCOUNT,
+            TERMINAL_DRAIN_TAP_ACCOUNT,
+            {"Al": drain_tap_kg},
+            reason="terminal metal drain tap",
+        )
+
+    payload = web_events._completion_payload(sim)
+    rendered = _render_product_story(html=web_driver["html"], payload=payload)
+    text = rendered["text"]["product-ledger-content"]
+
+    assert rendered["text"]["product-ledger-state"] == expected_state
+    assert payload["extracted_product_kg"] == pytest.approx(drain_tap_kg)
+    assert payload["product_story"]["metal_ingots"]["class_total_kg"] == pytest.approx(
+        drain_tap_kg
+    )
+    assert payload["product_story"]["unrecovered_process_inventory"][
+        "class_total_kg"
+    ] == pytest.approx(float_layer_kg)
+    if float_layer_kg:
+        assert sim.atom_ledger.project_account_kg(METAL_FLOAT_LAYER_ACCOUNT) == {
+            "Al": pytest.approx(float_layer_kg)
+        }
+        assert "Unrecovered process inventory" in text
+        assert f"Al {_display_mass(float_layer_kg)} kg" in text
+
+
 def test_empty_product_classes_render_from_completion_projection(web_driver):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
@@ -681,10 +819,176 @@ def test_empty_product_classes_render_from_completion_projection(web_driver):
     assert payload["product_story"]["glass"]["class_total_kg"] == 0.0
     rendered = _render_product_story(html=web_driver["html"], payload=payload)
     text = rendered["text"]["product-ledger-content"]
-    assert rendered["text"]["product-ledger-state"] == "ok"
+    # This batch is loaded and never run, so nothing was extracted. The badge
+    # must say so: CLAUDE.md section 4 names incomplete extraction as failure
+    # mode #1, and residue that was in the charge all along is not evidence of
+    # production. The subject of THIS test is that empty classes still RENDER
+    # (assertions below); the badge state is incidental to it and was pinned at
+    # "ok" by the defect. See test_product_badge_uses_extracted_classes_not_residue
+    # for the both-directions pin.
+    assert rendered["text"]["product-ledger-state"] == "no-products"
     assert "Metal ingots out" in text
     assert "Glass out" in text
     assert "class total kg: 0 kg" in text
+
+
+@pytest.mark.parametrize(
+    ("story_product", "flat_products", "expected_state"),
+    [
+        ({"refractory_ceramic": 280.0}, {}, "no-products"),
+        ({}, {"unspent_Na_reagent": 280.0}, "no-products"),
+        ({"metal_ingots": 1.0}, {}, "ok"),
+        (None, {"Fe": 1.0}, "ok"),
+    ],
+)
+def test_product_badge_uses_extracted_classes_not_residue(
+    web_driver, story_product, flat_products, expected_state
+):
+    zero_bucket = {"species_kg": {}, "class_total_kg": 0.0}
+    story = None
+    if story_product is not None:
+        buckets = {
+            key: dict(zero_bucket)
+            for key in (
+                "metal_ingots",
+                "glass",
+                "oxygen",
+                "captured_volatiles",
+                "refractory_ceramic",
+                "terminal_residue",
+                "escaped_to_vacuum",
+                "unrecovered_process_inventory",
+                "wall_deposits",
+                "process_residue",
+                "off_spec_condensate",
+                "unclassified",
+            )
+        }
+        for key, value in story_product.items():
+            buckets[key] = {
+                "species_kg": {"test": value},
+                "class_total_kg": value,
+            }
+        story = {
+            "input": {
+                "feedstock": "test",
+                "feedstock_label": "Test feed",
+                "batch_mass_kg": 1000.0,
+            },
+            **buckets,
+        }
+    payload = {
+        "mass_in_kg": 1000.0,
+        "products": flat_products,
+        "oxygen_kg": 0.0,
+        "oxygen_stored_kg": 0.0,
+        "product_story": story,
+        "process_inventory_spent_reductant": {
+            "kg_by_species": {"Na2O": 5.0},
+            "class_total_kg": 5.0,
+            "account": "process.spent_reductant_residue",
+            "disposition": "process_inventory_spent_reductant",
+        },
+    }
+
+    rendered = _render_product_story(html=web_driver["html"], payload=payload)
+    text = rendered["text"]["product-ledger-content"]
+
+    assert rendered["text"]["product-ledger-state"] == expected_state
+    assert "Spent reductant residue" in text
+    if story_product and "refractory_ceramic" in story_product:
+        assert "Refractory ceramic out" in text
+    if any("reagent" in key for key in flat_products):
+        assert "Reagent bookkeeping residue" in text
+
+
+def test_product_badge_does_not_count_unrecovered_flat_inventory_as_extraction(
+    web_driver,
+):
+    zero_bucket = {"species_kg": {}, "class_total_kg": 0.0}
+    story = {
+        "input": {
+            "feedstock": "test",
+            "feedstock_label": "Test feed",
+            "batch_mass_kg": 1000.0,
+        },
+        **{
+            key: dict(zero_bucket)
+            for key in (
+                "metal_ingots",
+                "glass",
+                "oxygen",
+                "captured_volatiles",
+                "refractory_ceramic",
+                "escaped_to_vacuum",
+                "wall_deposits",
+                "process_residue",
+                "off_spec_condensate",
+                "unclassified",
+            )
+        },
+        "terminal_residue": {
+            "species_kg": {"SiO2": 950.0},
+            "class_total_kg": 950.0,
+        },
+        "unrecovered_process_inventory": {
+            "species_kg": {"SiO": 50.0},
+            "class_total_kg": 50.0,
+        },
+    }
+    payload = {
+        "mass_in_kg": 1000.0,
+        "products": {"SiO": 50.0},
+        "oxygen_kg": 0.0,
+        "oxygen_stored_kg": 0.0,
+        "product_story": story,
+    }
+
+    rendered = _render_product_story(html=web_driver["html"], payload=payload)
+    text = rendered["text"]["product-ledger-content"]
+
+    assert rendered["text"]["product-ledger-state"] == "no-products"
+    assert "Terminal residue — incompletely extracted" in text
+    assert "SiO2 950 kg" in text
+    assert "Unrecovered process inventory" in text
+    assert "SiO 50 kg" in text
+
+
+def test_completion_payload_marks_story_incomplete_without_builder_exception(
+    monkeypatch,
+):
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {"SiO2": 51.5, "FeO": 13.0, "MgO": 35.5},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    incomplete_story = {
+        "input": {
+            "feedstock": "s_type",
+            "feedstock_label": "S type",
+            "batch_mass_kg": 1000.0,
+        },
+        "metal_ingots": {"species_kg": {}, "class_total_kg": 0.0},
+    }
+    monkeypatch.setattr(
+        web_events,
+        "_product_story_payload",
+        lambda *_args, **_kwargs: incomplete_story,
+    )
+
+    payload = web_events._completion_payload(sim)
+
+    assert payload["product_story"] == incomplete_story
+    assert payload["product_story_status"] == "incomplete"
 
 
 def test_product_story_requires_designated_stage_provenance(monkeypatch):

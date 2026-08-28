@@ -39,6 +39,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
     _validate_constrained_max_args(args, parser)
+    _validate_reoptimize_args(args, parser)
     try:
         profile = _resolve_profile_arg(args.profile, parser)
         if _has_constrained_max_overlay(args):
@@ -86,6 +87,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 warm_start_from=args.warm_start_from,
                 pinned_paths=args.pin,
                 per_eval_timeout_seconds=args.per_eval_timeout_seconds,
+                reoptimized_from=args.reoptimized_from,
+                goals_source=args.goals_source,
             )
     except (OSError, ProfileValidationError, StudyError, TypeError, ValueError) as exc:
         _write_job_status(
@@ -207,6 +210,17 @@ def _parser() -> argparse.ArgumentParser:
         default=None,
         help="stored result cache_key to certify with --certify",
     )
+    parser.add_argument(
+        "--reoptimized-from",
+        default=None,
+        help="source study_id when this study was launched via re-optimize",
+    )
+    parser.add_argument(
+        "--goals-source",
+        choices=("bundled_profile", "current_local_profile"),
+        default=None,
+        help="which goals were used for a re-optimize launch",
+    )
     return parser
 
 
@@ -231,6 +245,16 @@ def _has_constrained_max_overlay(args: argparse.Namespace) -> bool:
         or args.furnace_temp_cap_C is not None
         or args.cycle_time_cap_h is not None
     )
+
+
+def _validate_reoptimize_args(
+    args: argparse.Namespace,
+    parser: argparse.ArgumentParser,
+) -> None:
+    has_source = args.reoptimized_from is not None
+    has_goals = args.goals_source is not None
+    if has_source != has_goals:
+        parser.error("--reoptimized-from and --goals-source must be set together")
 
 
 def _validate_constrained_max_args(

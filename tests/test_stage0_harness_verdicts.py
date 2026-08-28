@@ -7,6 +7,10 @@ from types import SimpleNamespace
 from typing import Any
 import pytest
 
+from simulator.chemistry.kernel.dto import (
+    DEGRADING_INTENT_RESULT_STATUSES,
+)
+
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.builtin.melt_effect_adjustment import (
     CertifiedPointRefusedError,
@@ -869,6 +873,42 @@ def test_aggregate_backend_status_matches_run_executor():
     not_converged = aggregate_backend_status((), "not_converged")
     assert not_converged.status == "not_converged"
     assert not_converged.reason == "not_converged"
+
+
+@pytest.mark.parametrize(
+    "degrading", sorted(DEGRADING_INTENT_RESULT_STATUSES)
+)
+def test_aggregate_backend_status_agrees_on_every_degrading_token(degrading):
+    """The mirror claim must hold for UNRANKED tokens, which is where it broke.
+
+    ★ WHY test_aggregate_backend_status_matches_run_executor COULD NOT SEE THIS.
+    Its cases are ("ok", "out_of_domain", "ok") + latest "ok", and
+    not_converged alone. Every one of those is a member of
+    BACKEND_STATUS_PRECEDENCE, so the precedence walk returns before the
+    fallthrough is ever reached. The four UNRANKED degrading tokens never
+    appeared in a case at all, and the function's `return latest_signal`
+    fallthrough -- the exact position-decides bug the kernel owner was
+    corrected for -- sat behind a green agreement test.
+
+    Concretely, before the fix:
+        select_backend_status(["refused", "ok"])         -> "refused"
+        melt aggregate_backend_status(["refused"], "ok") -> "ok"
+    and build_harness_verdicts then reported hard_gate_failed=False,
+    layer_a="in_domain" for a refused run.
+
+    Parametrising over EVERY degrading member is what makes the mirror claim
+    checkable rather than asserted: a token cannot be fixed in one reducer and
+    left broken in the other, and a token added to the vocabulary later is
+    covered the day it is added.
+    """
+    history = (degrading,)
+    signal = aggregate_backend_status(history, "ok")
+    assert signal.status == degrading, (
+        f"melt reducer returned {signal.status!r} for history=[{degrading!r}] "
+        "with a later 'ok'; a degrading status lost to position"
+    )
+    # and it must agree with the runner reducer it claims to mirror
+    assert _aggregate_backend_status(history, "ok") == signal.status
 
 
 def test_aggregate_backend_status_preserves_structured_reason():

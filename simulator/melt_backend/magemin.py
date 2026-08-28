@@ -128,6 +128,7 @@ from simulator.engine_pool import (
 )
 from simulator.melt_backend.liquidus import (
     DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
+    LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
 )
@@ -838,7 +839,27 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
             if result.status != 'ok':
                 warning = '; '.join(result.warnings) or result.status
-                raise RuntimeError(warning)
+                # Raise the TYPED sample error so the finder preserves which
+                # kind of refusal this was.  A bare RuntimeError falls through
+                # to the finder's generic library-boundary guard, which mints
+                # 'not_converged' -- turning 'the engine was absent'
+                # (unavailable) or 'the physics is outside the model'
+                # (out_of_domain) into 'the solver failed to converge', an
+                # affirmative claim about a solve that never happened.
+                #
+                # The token fit is exact and checked, not assumed: this
+                # backend's equilibrate() can only return
+                # {ok, out_of_domain, not_converged, unavailable}, so the
+                # non-ok branch yields exactly LIQUIDUS_REFUSAL_STATUSES
+                # {not_converged, out_of_domain, unavailable} and the typed
+                # error's own status validation cannot reject it.  The
+                # AlphaMELTS sampler already raises this way; this site was
+                # the outlier (b-299).
+                raise LiquidusSampleError(
+                    result.status,
+                    tuple(result.warnings),
+                    dict(result.diagnostics or {}),
+                )
             for warning in result.warnings:
                 if warning.startswith('MAGEMin: translated absolute fO2_log'):
                     continue

@@ -12,7 +12,7 @@ from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
 import tempfile
-from typing import Any
+from typing import Any, TypeVar
 from urllib.parse import quote, urlsplit
 
 from flask import Blueprint, Response, abort, current_app, render_template, jsonify, request, send_file, send_from_directory, session
@@ -47,7 +47,10 @@ from simulator.diagnostics import (
     coating_summary_with_grounded_authority,
     coating_wall_deposit_payload,
 )
-from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
+from simulator.fidelity_vocabulary import (
+    FidelityVocabularyTranslationError,
+    canonicalize_fidelity_emission,
+)
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.furnace_materials import (
     PROXY_FURNACE_GROUNDING_TIERS,
@@ -70,6 +73,15 @@ from simulator.optimize.import_bundle import (
     imported_studies,
     imported_study_model,
     is_imported_path,
+)
+from simulator.optimize.reoptimize import (
+    GOALS_SOURCE_BUNDLED,
+    GOALS_SOURCE_CURRENT,
+    GOALS_SOURCES,
+    ReoptimizeError,
+    ReoptimizeVocabularyDriftError,
+    load_reoptimize_prefill,
+    plan_reoptimize,
 )
 from simulator.optimize.objective import (
     canonical_objective_metric,
@@ -453,17 +465,34 @@ def _corpus_version_badge(
     }
 
 
-def _corpus_filter_clause(
-    conn: sqlite3.Connection,
+def _corpus_filter_from_present(
+    present_columns: set[str],
     accepted_versions: tuple[str, ...],
 ) -> tuple[str, tuple[Any, ...]]:
-    if not _table_has_column(conn, 'results', 'corpus_version'):
+    if 'corpus_version' not in present_columns:
         return '1 = 1', ()
     if not accepted_versions:
         return 'corpus_version IS NULL', ()
     placeholders = ', '.join('?' for _ in accepted_versions)
     return (
         f'(corpus_version IS NULL OR corpus_version IN ({placeholders}))',
+        accepted_versions,
+    )
+
+
+def _results_table_columns(conn: sqlite3.Connection) -> set[str]:
+    return {
+        row['name']
+        for row in conn.execute('PRAGMA table_info(results)')
+    }
+
+
+def _corpus_filter_clause(
+    conn: sqlite3.Connection,
+    accepted_versions: tuple[str, ...],
+) -> tuple[str, tuple[Any, ...]]:
+    return _corpus_filter_from_present(
+        _results_table_columns(conn),
         accepted_versions,
     )
 
@@ -720,6 +749,24 @@ def _optimizer_backend_payload(
     )
     payload = backend_resolution_status(_StoredBackendResolutionCarrier(resolution)).as_payload()
     payload.update(canonical)
+    # ★ A PUBLISHED AUTHORITY SURFACE MAY NOT SAY "NOT STATED".
+    # canonicalize_fidelity_emission leaves certification_allowed as None
+    # whenever nothing established one, and this payload published that null
+    # straight out of the API. A consumer that treats a missing allowance as
+    # "not forbidden" then reads permission out of silence -- the same
+    # fail-open the result store was corrected for: an omitted certification
+    # allowance is not permission.
+    #
+    # The tier label already resolves it this way
+    # (bool(canonical.get("certification_allowed", False))); this makes the
+    # backend object agree instead of publishing a third answer. Note the
+    # asymmetry with STORAGE, which is deliberate: a stored run reference may
+    # legitimately record None for "nobody ever ruled", and
+    # test_optimizer_results_store pins that. What must never be null is the
+    # answer handed to a caller asking whether this result may be trusted.
+    payload['certification_allowed'] = bool(
+        canonical.get('certification_allowed', False)
+    )
     payload['tier_label'] = _optimizer_tier_label(
         run_reference,
         result_blob,
@@ -728,11 +775,41 @@ def _optimizer_backend_payload(
     return payload
 
 
+def _unreadable_backend_payload(reason: str) -> dict[str, Any]:
+    """Backend section for a row whose stored provenance the vocabulary refuses.
+
+    Every field a surface reads is present and says the SAME thing: we could not
+    read this. Nothing here may resolve toward the confident answer --
+    authoritative is False, certification is forbidden, and the active backend
+    is named as unreadable rather than left blank, because a blank renders as
+    absence and absence is what got misread everywhere else.
+    """
+    return {
+        'backend_requested': 'unreadable',
+        'backend_active': 'unreadable',
+        'backend_status': 'unreadable',
+        'backend_status_message': reason,
+        'backend_authoritative': False,
+        'backend_real_active': False,
+        'certification_allowed': False,
+        'evidence_class': None,
+        'runtime_status': None,
+        'tier_label': {
+            'tier': 'unknown',
+            'ux_label': 'UNVERIFIED',
+            'certification_allowed': False,
+            'title': reason,
+        },
+    }
+
+
 def _result_metadata(
     row: sqlite3.Row,
     *,
     run_id: str,
     objective_metric: str | None = None,
+    contain_unreadable_backend: bool = False,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     objectives = _objective_items(row)
     selected = _objective_for(objectives, objective_metric)
@@ -746,12 +823,43 @@ def _result_metadata(
     if not isinstance(eval_spec, dict):
         eval_spec = {}
     corpus_version = _corpus_version_value(_row_value(row, 'corpus_version'))
-    corpus_badge = _corpus_version_badge(corpus_version)
+    corpus_badge = _corpus_version_badge(
+        corpus_version,
+        accepted_versions=accepted_corpus_versions,
+    )
     product_summary = run_reference.get('product_summary', {})
     if not isinstance(product_summary, dict):
         product_summary = {}
     product_summary = coating_summary_with_grounded_authority(product_summary)
     constraint_margins = _result_row_constraint_margins(row)
+
+    # ★ A ROW THE VOCABULARY CANNOT READ MUST NOT DECIDE WHO SEES THE PAGE.
+    # canonicalize_fidelity_emission refuses any backend_status it cannot
+    # resolve. INTENT_RESULT_STATUSES used NOT to be a subset of RuntimeStatus,
+    # so tokens the optimizer legitimately produced raised here; d-003 closed
+    # that crossover and all eight now resolve. The remaining exposure is
+    # stored or foreign data carrying an UNRECOGNISED token -- stored carriers
+    # are not re-validated on read. The leaderboard survives that because
+    # _leaderboard_entries catches it and reports excluded_unreadable; the
+    # detail page had no equivalent and returned a 500.
+    #
+    # The flag is EXPLICIT rather than always-contain on purpose. Containing
+    # unconditionally would stop _leaderboard_entries ever raising, so its
+    # excluded_unreadable counter would silently stop firing for this cause --
+    # a live counter quietly going dead, which is the same class of defect as
+    # the ones it was added to report. So the board keeps DROPPING AND COUNTING
+    # such rows, and only the detail page -- which cannot drop itself, being
+    # the row -- renders them marked.
+    try:
+        backend_payload = _optimizer_backend_payload(
+            eval_spec, result_blob, run_reference
+        )
+    except FidelityVocabularyTranslationError as exc:
+        if not contain_unreadable_backend:
+            raise
+        backend_payload = _unreadable_backend_payload(
+            f'stored backend provenance is not readable: {exc}'
+        )
 
     metadata = {
         'run_id': run_id,
@@ -776,7 +884,7 @@ def _result_metadata(
             'product_summary': product_summary,
         },
         'eval_spec': _eval_spec_summary(eval_spec),
-        'backend': _optimizer_backend_payload(eval_spec, result_blob, run_reference),
+        'backend': backend_payload,
         'tier_label': None,
         'previously_ungated': _result_row_previously_ungated(row),
         'constraint_margins': constraint_margins,
@@ -821,6 +929,9 @@ def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any]:
             panel['status'] = 'inconclusive'
             panel['reason'] = 'product_yield_table outputs missing'
             panel['outputs'] = []
+        elif not product_yield_table['outputs']:
+            panel['status'] = 'inconclusive'
+            panel['reason'] = 'product_yield_table outputs empty'
         panel.setdefault('mass_closure', None)
         panel.setdefault('diagnostics', [])
         unclassified = _unclassified_product_mass(product_summary)
@@ -844,11 +955,25 @@ def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any]:
                 })
             panel['diagnostics'] = diagnostics
         return panel
+    # These are the positive product-accounting surfaces emitted by
+    # simulator.optimize.objective.product_summary; coating and authority
+    # metadata alone are not evidence that product accounting ran.
+    has_product_content = any(
+        key in product_summary
+        for key in (
+            'product_ledger_kg',
+            'product_classes',
+            'product_bins',
+            'product_yield_table',
+            'extraction_completeness',
+            'target_species_yield_report',
+        )
+    )
     return {
         'status': 'inconclusive',
         'reason': (
             'product_yield_table missing'
-            if product_summary
+            if has_product_content
             else 'product summary missing'
         ),
         'inputs': [],
@@ -918,7 +1043,27 @@ def _read_cache_summary(cache_path: Path, run_id: str) -> dict[str, Any]:
                 """
             ).fetchone()
             if latest is not None:
-                summary['latest_result'] = _result_metadata(latest, run_id=run_id)
+                # ★ ONE UNREADABLE LATEST MUST NOT TAKE THE WHOLE LISTING DOWN.
+                # This surrounding try catches sqlite3.Error ONLY, so a stored
+                # backend_status the fidelity vocabulary cannot read raised
+                # straight through /api/optimizer/runs and every HEALTHY run in
+                # the listing went with it -- the run library became
+                # unreachable because of one row in one run.
+                #
+                # Contained rather than excluded, for the same reason the detail
+                # page is: at this level the RUN is the entity the operator came
+                # for, and dropping it loses the run itself, not merely a row
+                # inside it. The marked payload says not authoritative, not
+                # real, certification forbidden.
+                #
+                # ★ FOUND BY REVIEW, NOT BY ME. My own containment audit for
+                # 3582fb38 checked whether each caller sat inside a `try`, and
+                # this one does -- but it catches the WRONG EXCEPTION. Presence
+                # of a guard is not coverage by that guard; that check was
+                # structural where it needed to be behavioural.
+                summary['latest_result'] = _result_metadata(
+                    latest, run_id=run_id, contain_unreadable_backend=True
+                )
     except sqlite3.Error as exc:
         summary['error'] = str(exc)
     return summary
@@ -941,73 +1086,212 @@ def _optimizer_run_metadata(run_dir: Path, root: Path) -> dict[str, Any]:
     return metadata
 
 
+_WINNER_RANKING_COLUMNS: tuple[str, ...] = (
+    'cache_key',
+    'candidate_id',
+    'feedstock_id',
+    'recipe_id',
+    'profile_id',
+    'fidelity',
+    'feasible',
+    'feasibility_margins',
+    'failure_category',
+    'objectives',
+    'data_digests',
+    'created_at',
+    'corpus_version',
+)
+
+
+def _fetch_selector_rows(
+    cache_path: Path,
+    *,
+    feedstock_id: str | None,
+    profile_id: str | None,
+    fidelity: str | None,
+    columns: tuple[str, ...] | None = None,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
+) -> list[sqlite3.Row]:
+    if accepted_corpus_versions is None:
+        accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    where, params = _selector_where_without_data_digests(
+        feedstock_id,
+        profile_id=profile_id,
+        fidelity=fidelity,
+    )
+    corpus_where, corpus_params = _corpus_filter_from_present(
+        {'corpus_version'}, accepted_corpus_versions,
+    )
+    select_cols = ', '.join(columns) if columns else '*'
+    sql = (
+        f'SELECT {select_cols} FROM results '
+        f'WHERE {where} AND {corpus_where}'
+    )
+    bind = (*params, *corpus_params)
+    with _connect_result_store(cache_path) as conn:
+        try:
+            return list(conn.execute(sql, bind).fetchall())
+        except sqlite3.OperationalError:
+            present = _results_table_columns(conn)
+            corpus_where, corpus_params = _corpus_filter_from_present(
+                present, accepted_corpus_versions,
+            )
+            if columns is None:
+                select_cols = '*'
+            else:
+                selected = [column for column in columns if column in present]
+                select_cols = ', '.join(selected) if selected else '*'
+            return list(conn.execute(
+                f"""
+                SELECT {select_cols}
+                FROM results
+                WHERE {where} AND {corpus_where}
+                """,
+                (*params, *corpus_params),
+            ).fetchall())
+
+
+def _fetch_full_result_row(
+    cache_path: Path,
+    cache_key: str,
+    *,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
+    has_corpus_version: bool | None = None,
+) -> sqlite3.Row | None:
+    if accepted_corpus_versions is None:
+        accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    with _connect_result_store(cache_path) as conn:
+        if has_corpus_version is None:
+            present = _results_table_columns(conn)
+            has_corpus_version = 'corpus_version' in present
+        corpus_where, corpus_params = _corpus_filter_from_present(
+            {'corpus_version'} if has_corpus_version else set(),
+            accepted_corpus_versions,
+        )
+        return conn.execute(
+            f"""
+            SELECT *
+            FROM results
+            WHERE cache_key = ? AND {corpus_where}
+            LIMIT 1
+            """,
+            (cache_key, *corpus_params),
+        ).fetchone()
+
+
+def _digest_scopes_from_rows(rows: list[sqlite3.Row]) -> list[Mapping[str, str]]:
+    latest: dict[Any, Any] = {}
+    for row in rows:
+        raw = _row_value(row, 'data_digests')
+        created = _row_value(row, 'created_at')
+        if raw not in latest:
+            latest[raw] = created
+            continue
+        prev = latest[raw]
+        if created is None:
+            continue
+        if prev is None or str(created) > str(prev):
+            latest[raw] = created
+    items = list(latest.items())
+    items.sort(
+        key=lambda item: (
+            item[0] is not None,
+            '' if item[0] is None else str(item[0]),
+        )
+    )
+    items.sort(
+        key=lambda item: (
+            item[1] is not None,
+            '' if item[1] is None else str(item[1]),
+        ),
+        reverse=True,
+    )
+    scopes: list[Mapping[str, str]] = []
+    for raw, _created in items:
+        data_digests = _json_value(raw, {})
+        if not isinstance(data_digests, Mapping):
+            continue
+        scopes.append({str(key): str(value) for key, value in data_digests.items()})
+    return scopes
+
+
+def _filter_rows_to_digest_scope(
+    rows: list[sqlite3.Row],
+    *,
+    profile_id: str | None,
+) -> tuple[list[sqlite3.Row], list[Mapping[str, str]]]:
+    digest_scopes = _digest_scopes_from_rows(rows)
+    if not digest_scopes:
+        return [], digest_scopes
+    if len(digest_scopes) == 1 or profile_id:
+        selected_json = _canonical_json(digest_scopes[0])
+        return [
+            row for row in rows
+            if _row_value(row, 'data_digests') == selected_json
+        ], digest_scopes
+    return list(rows), digest_scopes
+
+
+def _scope_selector_rows(
+    rows: list[sqlite3.Row],
+    *,
+    profile_id: str | None,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
+) -> tuple[list[sqlite3.Row], dict[str, Any]]:
+    if accepted_corpus_versions is None:
+        accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    accepted_list = list(accepted_corpus_versions)
+    filtered, digest_scopes = _filter_rows_to_digest_scope(
+        rows,
+        profile_id=profile_id,
+    )
+    if not digest_scopes:
+        return [], {
+            'mode': 'no_current_data_digests',
+            'gui_version': current_code_version(),
+            'accepted_corpus_versions': accepted_list,
+        }
+    if len(digest_scopes) == 1 or profile_id:
+        selected = digest_scopes[0]
+        return filtered, {
+            'mode': 'exact_data_digests',
+            'gui_version': current_code_version(),
+            'accepted_corpus_versions': accepted_list,
+            'data_digests': selected,
+            'available_current_data_digest_count': len(digest_scopes),
+            'narrowed_to_latest': len(digest_scopes) > 1,
+        }
+    return filtered, {
+        'mode': 'multiple_current_data_digests',
+        'gui_version': current_code_version(),
+        'accepted_corpus_versions': accepted_list,
+        'available_current_data_digest_count': len(digest_scopes),
+        'data_digests': digest_scopes,
+    }
+
+
 def _query_result_rows(
     cache_path: Path,
     *,
     feedstock_id: str | None,
     profile_id: str | None,
     fidelity: str | None,
+    accepted_corpus_versions: tuple[str, ...] | None = None,
 ) -> tuple[list[sqlite3.Row], dict[str, Any]]:
-    accepted_corpus_versions = tuple(interoperable_corpus_versions())
-    with _connect_result_store(cache_path) as conn:
-        digest_scopes = _current_selector_data_digest_scopes(
-            conn,
-            feedstock_id=feedstock_id,
-            profile_id=profile_id,
-            fidelity=fidelity,
-            accepted_corpus_versions=accepted_corpus_versions,
-        )
-        if not digest_scopes:
-            return [], {
-                'mode': 'no_current_data_digests',
-                'gui_version': current_code_version(),
-                'accepted_corpus_versions': list(accepted_corpus_versions),
-            }
-        corpus_where, corpus_params = _corpus_filter_clause(conn, accepted_corpus_versions)
-        if len(digest_scopes) == 1 or profile_id:
-            selected = digest_scopes[0]
-            where, params = _selector_where_with_data_digests(
-                feedstock_id,
-                profile_id=profile_id,
-                fidelity=fidelity,
-                data_digests=selected,
-            )
-            rows = conn.execute(
-                f"""
-                SELECT *
-                FROM results
-                WHERE {where} AND {corpus_where}
-                """,
-                (*params, *corpus_params),
-            ).fetchall()
-            return rows, {
-                'mode': 'exact_data_digests',
-                'gui_version': current_code_version(),
-                'accepted_corpus_versions': list(accepted_corpus_versions),
-                'data_digests': selected,
-                'available_current_data_digest_count': len(digest_scopes),
-                'narrowed_to_latest': len(digest_scopes) > 1,
-            }
-        where, params = _selector_where_without_data_digests(
-            feedstock_id,
-            profile_id=profile_id,
-            fidelity=fidelity,
-        )
-        rows = conn.execute(
-            f"""
-            SELECT *
-            FROM results
-            WHERE {where} AND {corpus_where}
-            """,
-            (*params, *corpus_params),
-        ).fetchall()
-        return rows, {
-            'mode': 'multiple_current_data_digests',
-            'gui_version': current_code_version(),
-            'accepted_corpus_versions': list(accepted_corpus_versions),
-            'available_current_data_digest_count': len(digest_scopes),
-            'data_digests': digest_scopes,
-        }
+    if accepted_corpus_versions is None:
+        accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    rows = _fetch_selector_rows(
+        cache_path,
+        feedstock_id=feedstock_id,
+        profile_id=profile_id,
+        fidelity=fidelity,
+        accepted_corpus_versions=accepted_corpus_versions,
+    )
+    return _scope_selector_rows(
+        rows,
+        profile_id=profile_id,
+        accepted_corpus_versions=accepted_corpus_versions,
+    )
 
 
 def _selector_where_without_data_digests(
@@ -1175,39 +1459,130 @@ def _constraint_margin_summary(
     return [margin for margin in margins if margin.get('verdict') != 'pass'][:3]
 
 
-def _leaderboard_entries(
-    run_dirs: list[Path],
+def _empty_leaderboard_exclusions() -> dict[str, int]:
+    return {
+        'excluded_infeasible': 0,
+        'excluded_nonfinite': 0,
+        'excluded_unreadable': 0,
+        'excluded_metric_absent': 0,
+    }
+
+
+_RankPayloadT = TypeVar('_RankPayloadT')
+_RANK_AMBIGUOUS_MESSAGE = (
+    'rows mix minimize and maximize objectives; '
+    'no single ranking is valid across them'
+)
+
+
+def _rank_objective_candidates(
+    candidates: list[tuple[_RankPayloadT, float, str, str]],
+) -> tuple[list[tuple[_RankPayloadT, float, str, str]], str | None]:
+    """Apply one objective-sense rule to every leaderboard surface."""
+    senses = {
+        str(sense or 'maximize')
+        for _payload, _value, sense, _key in candidates
+    }
+    if len(senses) > 1:
+        candidates.sort(key=lambda item: (item[2], item[1], item[3]))
+        return candidates, _RANK_AMBIGUOUS_MESSAGE
+
+    sense = next(iter(senses), 'maximize')
+    direction = 1.0 if sense == 'minimize' else -1.0
+    candidates.sort(key=lambda item: (direction * item[1], item[3]))
+    return candidates, None
+
+
+def _collect_ranked_candidates(
+    run_rows: list[tuple[str, list[sqlite3.Row]]],
     *,
-    feedstock_id: str | None,
-    profile_id: str | None,
-    fidelity: str | None,
+    objective_metric: str | None,
+) -> tuple[
+    list[tuple[str, sqlite3.Row, float, str]],
+    str | None,
+    dict[str, int],
+    str | None,
+]:
+    """Rank by numeric objective without parsing result blobs.
+
+    Full `_result_metadata` is deferred to the winner(s). Infeasible / missing
+    metric / non-finite exclusions are counted here; unreadable provenance is
+    counted when a candidate is materialized.
+    """
+    excluded_counts = _empty_leaderboard_exclusions()
+    selected_metric = (
+        canonical_objective_metric(objective_metric)
+        if objective_metric is not None
+        else None
+    )
+    ranked: list[tuple[tuple[str, sqlite3.Row], float, str, str]] = []
+    for run_id, result_rows in run_rows:
+        for row in result_rows:
+            if not _result_row_feasible(row):
+                excluded_counts['excluded_infeasible'] += 1
+                continue
+            objectives = _objective_items(row)
+            if selected_metric is None:
+                primary = _objective_for(objectives)
+                if primary is not None:
+                    selected_metric = canonical_objective_metric(
+                        str(primary.get('metric'))
+                    )
+            objective = _objective_for(objectives, selected_metric)
+            if objective is None:
+                excluded_counts['excluded_metric_absent'] += 1
+                continue
+            value = _numeric_objective_value(objective)
+            if value is None:
+                excluded_counts['excluded_nonfinite'] += 1
+                continue
+            sense = str(objective.get('sense') or 'maximize')
+            ranked.append(
+                (
+                    (run_id, row),
+                    value,
+                    sense,
+                    f"{run_id}\0{str(_row_value(row, 'cache_key') or '')}",
+                )
+            )
+    ranked, rank_ambiguous = _rank_objective_candidates(ranked)
+    candidates = [
+        (run_id, row, value, sense)
+        for (run_id, row), value, sense, _identity in ranked
+    ]
+    return candidates, selected_metric, excluded_counts, rank_ambiguous
+
+
+def _leaderboard_from_result_rows(
+    run_rows: list[tuple[str, list[sqlite3.Row]]],
+    *,
     objective_metric: str | None,
     limit: int,
-) -> tuple[list[dict[str, Any]], str | None, dict[str, Any], dict[str, int]]:
-    rows: list[tuple[dict[str, Any], float, str]] = []
-    digest_scopes: list[dict[str, Any]] = []
+    accepted_corpus_versions: tuple[str, ...] | None = None,
+) -> tuple[list[dict[str, Any]], str | None, dict[str, int]]:
+    rows: list[tuple[dict[str, Any], float, str, str]] = []
     excluded_counts = {
         'excluded_infeasible': 0,
         'excluded_nonfinite': 0,
+        # A row the vocabulary cannot read is EXCLUDED AND COUNTED, never
+        # silently dropped -- see the containment below.
+        'excluded_unreadable': 0,
+        # A row whose objectives do not carry the SELECTED metric cannot be
+        # ranked on this board's axis. It used to vanish with no counter at
+        # all, which is the same fail-open shape as the others: the board
+        # looked complete while rows were being discarded. This became more
+        # reachable when the winners table started pinning one metric across
+        # every selector pair -- pinning is correct, but it means a pair whose
+        # profile lacks that metric now drops out, and a drop nobody counts is
+        # indistinguishable from a pair that had nothing to show.
+        'excluded_metric_absent': 0,
     }
     selected_metric = (
         canonical_objective_metric(objective_metric)
         if objective_metric is not None
         else None
     )
-    selected_sense = 'maximize'
-    root = _optimizer_runs_root()
-
-    for run_dir in run_dirs:
-        run_id = _optimizer_run_id(run_dir, root)
-        result_rows, digest_scope = _query_result_rows(
-            run_dir / OPTIMIZER_CACHE_NAME,
-            feedstock_id=feedstock_id,
-            profile_id=profile_id,
-            fidelity=fidelity,
-        )
-        digest_scope = {**digest_scope, 'run_id': run_id}
-        digest_scopes.append(digest_scope)
+    for run_id, result_rows in run_rows:
         for row in result_rows:
             if not _result_row_feasible(row):
                 excluded_counts['excluded_infeasible'] += 1
@@ -1219,32 +1594,93 @@ def _leaderboard_entries(
                     selected_metric = canonical_objective_metric(str(primary.get('metric')))
             objective = _objective_for(objectives, selected_metric)
             if objective is None:
+                excluded_counts['excluded_metric_absent'] += 1
                 continue
             value = _numeric_objective_value(objective)
             if value is None:
                 excluded_counts['excluded_nonfinite'] += 1
                 continue
-            selected_sense = str(objective.get('sense') or selected_sense)
-            entry = _result_metadata(
-                row,
-                run_id=run_id,
-                objective_metric=selected_metric,
+            sense = str(objective.get('sense') or 'maximize')
+            # ★ ONE UNREADABLE ROW MUST NOT TAKE THE PAGE DOWN. Rendering a row
+            # runs its stored provenance through the fidelity vocabulary, which
+            # RAISES on a token it does not know -- and stored rows outlive the
+            # vocabulary that wrote them, so a token retired after the row was
+            # cached reaches this loop as an unknown one. Uncontained, a single
+            # such row aborted the whole request and the operator lost every
+            # OTHER run's results to it.
+            #
+            # Contained AND COUNTED, not swallowed: the row drops out of the
+            # board and says so through excluded_unreadable, the same way
+            # infeasible and non-finite rows already declare themselves. A
+            # silent skip here would under-report the board while looking
+            # complete, which is the failure this endpoint is least able to
+            # afford.
+            try:
+                entry = _result_metadata(
+                    row,
+                    run_id=run_id,
+                    objective_metric=selected_metric,
+                    accepted_corpus_versions=accepted_corpus_versions,
+                )
+                entry['objective_metric'] = selected_metric
+                entry['objective_value'] = value
+                entry['objective_sense'] = sense
+                entry['data_digest_scope'] = {
+                    'mode': 'entry_data_digests',
+                    'data_digests': entry.get('eval_spec', {}).get('data_digests') or {},
+                }
+            except Exception:
+                excluded_counts['excluded_unreadable'] += 1
+                continue
+            identity = '\0'.join(
+                str(entry.get(key) or '')
+                for key in ('run_id', 'cache_key', 'candidate_id', 'recipe_id')
             )
-            entry['objective_metric'] = selected_metric
-            entry['objective_value'] = value
-            entry['objective_sense'] = selected_sense
-            entry['data_digest_scope'] = {
-                'mode': 'entry_data_digests',
-                'data_digests': entry.get('eval_spec', {}).get('data_digests') or {},
-            }
-            rows.append((entry, value, selected_sense))
+            rows.append((entry, value, sense, identity))
 
-    reverse = selected_sense != 'minimize'
-    rows.sort(key=lambda item: item[1], reverse=reverse)
+    rows, rank_ambiguous = _rank_objective_candidates(rows)
     entries = []
-    for rank, (entry, _value, _sense) in enumerate(rows[:limit], start=1):
+    for rank, (entry, _value, _sense, _identity) in enumerate(
+        rows[:limit], start=1
+    ):
         entry['rank'] = rank
+        if rank_ambiguous:
+            entry['rank_ambiguous'] = rank_ambiguous
         entries.append(entry)
+    return entries, selected_metric, excluded_counts
+
+
+def _leaderboard_entries(
+    run_dirs: list[Path],
+    *,
+    feedstock_id: str | None,
+    profile_id: str | None,
+    fidelity: str | None,
+    objective_metric: str | None,
+    limit: int,
+) -> tuple[list[dict[str, Any]], str | None, dict[str, Any], dict[str, int]]:
+    digest_scopes: list[dict[str, Any]] = []
+    run_rows: list[tuple[str, list[sqlite3.Row]]] = []
+    root = _optimizer_runs_root()
+    accepted_corpus_versions = tuple(interoperable_corpus_versions())
+
+    for run_dir in run_dirs:
+        run_id = _optimizer_run_id(run_dir, root)
+        result_rows, digest_scope = _query_result_rows(
+            run_dir / OPTIMIZER_CACHE_NAME,
+            feedstock_id=feedstock_id,
+            profile_id=profile_id,
+            fidelity=fidelity,
+            accepted_corpus_versions=accepted_corpus_versions,
+        )
+        digest_scopes.append({**digest_scope, 'run_id': run_id})
+        run_rows.append((run_id, result_rows))
+    entries, selected_metric, excluded_counts = _leaderboard_from_result_rows(
+        run_rows,
+        objective_metric=objective_metric,
+        limit=limit,
+        accepted_corpus_versions=accepted_corpus_versions,
+    )
     return (
         entries,
         selected_metric,
@@ -1974,9 +2410,24 @@ def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
     raw_status = panel.get('status')
     status = str(raw_status or '').strip().lower()
     reason = panel.get('reason')
-    if panel.get('unclassified_product_mass'):
+    # ★ THE UNACCOUNTED MASS IS CARRIED, NOT JUST DETECTED.
+    # This tested the unclassified mapping for truthiness, set the status from
+    # it, and then dropped the number -- so the strip said "unclassified
+    # product mass present" while the only figures it actually printed were the
+    # named bins. On the observed row that meant Ingots/metals 92.27 kg and O2
+    # 9.020 kg on the face of the card, with the 139.82 kg that could not be
+    # classified visible only in the detail page's diagnostics table.
+    #
+    # The unclassified mass was LARGER than the headline product. A product
+    # story that omits the biggest number in the ledger is not inconclusive,
+    # it is misleading, so the total travels with the status that it caused.
+    unclassified_kg = None
+    unclassified = panel.get('unclassified_product_mass')
+    if unclassified:
         status = 'inconclusive'
         reason = 'unclassified product mass present'
+        if isinstance(unclassified, Mapping):
+            unclassified_kg = _float_value(unclassified.get('total_kg'))
     elif status not in {'closed', 'final'}:
         stored_status = status or 'missing'
         status = 'inconclusive'
@@ -1990,6 +2441,12 @@ def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
         'status': status,
         'reason': reason,
         'items': items,
+        'unclassified_kg': unclassified_kg,
+        'unclassified_kg_label': (
+            _format_quantity(unclassified_kg, 'kg')
+            if unclassified_kg is not None
+            else None
+        ),
         'mass_closure': panel.get('mass_closure') or {},
     }
 
@@ -1999,7 +2456,15 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     wall = coating_wall_deposit_payload(result)
     total_kg = _sum_nested_numbers(wall)
     campaigns = result.get('campaigns_to_resinter')
-    positive_deposit = total_kg is not None and total_kg > 0.0
+    # ★ THREE STATES, NOT TWO. _sum_nested_numbers returns None when the zone
+    # maps carry no numbers at all, and 0.0 when they carry a measured zero:
+    #     {Hot:{}, Hottest:{}, Rest:{}} -> None   (deposit UNKNOWN)
+    #     {Hot:{K: 0.0}}                -> 0.0    (deposit PROVEN ZERO)
+    #     {Hot:{K: 0.05}}               -> 0.05   (deposit POSITIVE)
+    # `deposit_known` keeps the first two apart. Collapsing them is what let an
+    # unknown deposit inherit a proven zero's authority below.
+    deposit_known = total_kg is not None
+    positive_deposit = deposit_known and total_kg > 0.0
     authority = _mapping_value(result.get('wall_deposit_sticking_authority'))
     authoritative = result.get('coating_authoritative')
     if authoritative is None and authority:
@@ -2008,8 +2473,21 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
             authority.get('authoritative_for_deposit_mass'),
         )
     parsed_authoritative = _optional_bool(authoritative)
+    # ★ AN UNKNOWN DEPOSIT MUST NOT CLAIM AUTHORITY. This was
+    # `not positive_deposit`, which is True for BOTH a measured zero and a
+    # total absence of deposit data -- so a row with empty zone maps and no
+    # authority record rendered as authoritative and printed
+    # "campaigns to resinter: infinite" under status `available`. Absence of
+    # evidence became a never-resinter claim, on the Mandate's own
+    # failure-mode #2.
+    #
+    # The three categories are handled separately, per the fail-closed rule:
+    #   deposit PROVEN ZERO + no authority -> keep the zero, still authoritative
+    #   deposit UNKNOWN     + no authority -> refuse: not authoritative
+    #   deposit POSITIVE    + no authority -> not authoritative (unchanged)
+    # An explicit authority verdict always wins over all three.
     is_authoritative = (
-        not positive_deposit
+        (deposit_known and not positive_deposit)
         if parsed_authoritative is None
         else parsed_authoritative
     )
@@ -2017,9 +2495,17 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         result.get('coating_status_reason')
         or authority.get('message')
         or (
+            # The warning used to fire only on a POSITIVE deposit, so the
+            # unknown-deposit case lost its flag AND its explanation together:
+            # the readout claimed authority and said nothing about why.
             'wall-deposit sticking alpha authority missing'
             if positive_deposit and parsed_authoritative is None
-            else ''
+            else (
+                'wall-deposit coverage unknown: no deposit data and no '
+                'authority record'
+                if not deposit_known and parsed_authoritative is None
+                else ''
+            )
         )
     )
     if total_kg is None and campaigns in (None, ''):
@@ -2068,6 +2554,50 @@ def _first_mapping(*values: Any) -> Mapping[str, Any]:
     return {}
 
 
+def _completeness_field(
+    metric: Mapping[str, Any],
+    *names: str,
+) -> Any:
+    """Read a completeness attribute from the flat OR the per-target shape.
+
+    ★ THE PRODUCER NESTS THESE AND THE READOUT ONLY LOOKED AT THE TOP LEVEL.
+    extraction_completeness_report emits `worst_target_species` and
+    `completeness_fraction` at the top, but puts `target_species`,
+    `denominator_account` and `product_bin` INSIDE `targets[<species>]` -- see
+    _extraction_completeness_report_payload and
+    _extraction_completeness_target_report in simulator/optimize/physics.py.
+    Reading only the top level returned None for all three, so a real report
+    rendered its number and then "target not declared; denominator not
+    declared; bin not declared" -- the completeness fix showed the value and
+    then disclaimed everything that says what the value is ABOUT.
+
+    The flat lookup is kept first because stored rows predate the nested shape
+    and must keep working; the per-target lookup is the fallback, keyed by
+    worst_target_species since that is the target the aggregate fraction
+    belongs to (aggregation is min_all_targets).
+    """
+    for name in names:
+        value = metric.get(name)
+        if value not in (None, ''):
+            return value
+    worst = metric.get('worst_target_species')
+    targets = metric.get('targets')
+    if not isinstance(targets, Mapping):
+        return None
+    target = targets.get(worst) if worst is not None else None
+    if not isinstance(target, Mapping):
+        # a single-target report needs no worst-target pointer to be readable
+        candidates = [v for v in targets.values() if isinstance(v, Mapping)]
+        target = candidates[0] if len(candidates) == 1 else None
+    if not isinstance(target, Mapping):
+        return None
+    for name in names:
+        value = target.get(name)
+        if value not in (None, ''):
+            return value
+    return None
+
+
 def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     product_summary = _mapping_value(
         _mapping_value(result.get('run_reference')).get('product_summary')
@@ -2082,6 +2612,10 @@ def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     if not metric:
         return {
             'status': 'inconclusive',
+            'has_value': False,
+            'qualifier': 'inconclusive',
+            'percent': None,
+            'percent_label': 'inconclusive',
             'reason': 'extraction completeness metric missing',
         }
 
@@ -2104,21 +2638,46 @@ def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
 
     if percent is None:
         status = 'inconclusive'
+    # ★ A STATUS THE SURFACE DOES NOT RECOGNISE IS NOT A MISSING METRIC.
+    # Both templates gated the number on status == "available" and fell through
+    # to "metric missing" for anything else. A stored metric with
+    # status "reported" therefore rendered as absent -- while the same row went
+    # on printing 92.27 kg of metals and 9.020 kg of O2. The hidden number was
+    # 0.21 % SiO extraction completeness, which is the Mandate's
+    # incomplete-extraction failure mode: the surface erased precisely the
+    # evidence that the run had failed, and kept the part that looked like
+    # success.
+    #
+    # So the rule is: THE NUMBER IS SHOWN WHENEVER THERE IS A NUMBER. Status
+    # becomes a qualifier on the value, not a gate in front of it, and only a
+    # genuinely absent metric may be called missing.
+    #
+    # This decision lives here rather than in the templates because the table
+    # and the detail page had the SAME defect written out twice -- duplicated
+    # presentation logic is what let one surface's gate become two surfaces'
+    # lie.
+    has_value = percent is not None
+    qualifier = None if status == 'available' else status
+    reason = metric.get('reason')
+    if not has_value and not reason:
+        # Truthful default: the metric IS here, it just carries no computable
+        # value. Saying "missing" here would be the same lie one level down.
+        reason = 'metric present but carries no completeness value'
     return {
         'status': status,
+        'has_value': has_value,
+        'qualifier': qualifier,
         'percent': percent,
         'percent_label': _format_quantity(percent, '%')
         if percent is not None
         else 'inconclusive',
-        'target_species': metric.get('target_species') or metric.get('target'),
-        'denominator': (
-            metric.get('denominator_account')
-            or metric.get('denominator')
-            or metric.get('denominator_label')
+        'target_species': _completeness_field(metric, 'target_species', 'target'),
+        'denominator': _completeness_field(
+            metric, 'denominator_account', 'denominator', 'denominator_label'
         ),
-        'allowed_residual': metric.get('allowed_residual'),
-        'product_bin': metric.get('product_bin'),
-        'reason': metric.get('reason'),
+        'allowed_residual': _completeness_field(metric, 'allowed_residual'),
+        'product_bin': _completeness_field(metric, 'product_bin'),
+        'reason': reason,
     }
 
 
@@ -2135,6 +2694,29 @@ def _optimizer_result_view(entry: Mapping[str, Any]) -> dict[str, Any]:
     return view
 
 
+def _selector_pair_key(row: sqlite3.Row) -> tuple[str, str]:
+    return (
+        str(_row_value(row, 'feedstock_id') or ''),
+        str(_row_value(row, 'profile_id') or ''),
+    )
+
+
+def _selector_pairs_from_loaded_rows(
+    loaded: list[list[sqlite3.Row]],
+    *,
+    profile_id: str | None,
+) -> list[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for rows in loaded:
+        scoped, _digest_scopes = _filter_rows_to_digest_scope(
+            rows,
+            profile_id=profile_id,
+        )
+        for row in scoped:
+            pairs.add(_selector_pair_key(row))
+    return sorted(pairs)
+
+
 def _selector_pairs(
     run_dirs: list[Path],
     *,
@@ -2142,20 +2724,51 @@ def _selector_pairs(
     profile_id: str | None,
     fidelity: str | None,
 ) -> list[tuple[str, str]]:
-    pairs: set[tuple[str, str]] = set()
-    for run_dir in run_dirs:
-        rows, _digest_scope = _query_result_rows(
+    loaded = [
+        _fetch_selector_rows(
             run_dir / OPTIMIZER_CACHE_NAME,
             feedstock_id=feedstock_id,
             profile_id=profile_id,
             fidelity=fidelity,
         )
-        for row in rows:
-            pairs.add((
-                str(row['feedstock_id'] or ''),
-                str(row['profile_id'] or ''),
-            ))
-    return sorted(pairs)
+        for run_dir in run_dirs
+    ]
+    return _selector_pairs_from_loaded_rows(loaded, profile_id=profile_id)
+
+
+# Why each exclusion reason is phrased for an OPERATOR rather than reusing the
+# counter key: the key names the code path, the label names the thing that
+# happened to their data. An operator reading "excluded_nonfinite" cannot tell
+# whether that is their problem or ours.
+_EXCLUSION_LABELS: tuple[tuple[str, str], ...] = (
+    ('excluded_infeasible', 'infeasible'),
+    ('excluded_nonfinite', 'objective not a finite number'),
+    ('excluded_unreadable', 'stored provenance could not be read'),
+    ('excluded_metric_absent', 'no value for the ranked metric'),
+)
+
+
+def _exclusion_rows(counts: Mapping[str, int]) -> list[dict[str, Any]]:
+    """Ordered, labelled, zero-suppressed view of the exclusion counters.
+
+    Zero-suppressed because a wall of "0 infeasible, 0 unreadable" trains the
+    operator to ignore the line, and this line only matters when it is not
+    zero. Any counter added later without a label still shows up, under its own
+    key, rather than being silently omitted -- an unlabelled exclusion is still
+    an exclusion the operator is entitled to see.
+    """
+    known = {key for key, _ in _EXCLUSION_LABELS}
+    rows = [
+        {'key': key, 'label': label, 'count': int(counts[key])}
+        for key, label in _EXCLUSION_LABELS
+        if int(counts.get(key) or 0) > 0
+    ]
+    rows.extend(
+        {'key': key, 'label': key, 'count': int(count)}
+        for key, count in sorted(counts.items())
+        if key not in known and int(count or 0) > 0
+    )
+    return rows
 
 
 def _optimizer_winner_entries(
@@ -2166,31 +2779,157 @@ def _optimizer_winner_entries(
     fidelity: str | None,
     objective_metric: str | None,
     limit: int,
-    ) -> tuple[list[dict[str, Any]], str | None]:
+    ) -> tuple[list[dict[str, Any]], str | None, dict[str, int]]:
     entries: list[dict[str, Any]] = []
     selected_metric = objective_metric
-    for pair_feedstock, pair_profile in _selector_pairs(
-        run_dirs,
-        feedstock_id=feedstock_id,
-        profile_id=profile_id,
-        fidelity=fidelity,
-    ):
-        winners, metric, _digest_scope, _excluded_counts = _leaderboard_entries(
-            run_dirs,
-            feedstock_id=pair_feedstock,
-            profile_id=pair_profile,
+    # ★ THE OPERATOR IS TOLD WHAT WAS DROPPED. These counters were unpacked
+    # per pair and thrown away, so the JSON reader reported 1094 excluded
+    # infeasible rows while the page rendered a clean Rank 1..50 board and said
+    # nothing. Worse in the empty case: a table emptied BY EXCLUSIONS read as
+    # "nothing matched the filters", which is a different and far more
+    # reassuring claim than the truth.
+    excluded_totals: dict[str, int] = {}
+    root = _optimizer_runs_root()
+    accepted_corpus_versions = tuple(interoperable_corpus_versions())
+    loaded: list[tuple[str, list[sqlite3.Row]]] = []
+    indexed: list[tuple[str, dict[tuple[str, str], list[sqlite3.Row]]]] = []
+    run_paths: dict[str, tuple[Path, bool]] = {}
+    for run_dir in run_dirs:
+        run_id = _optimizer_run_id(run_dir, root)
+        rows = _fetch_selector_rows(
+            run_dir / OPTIMIZER_CACHE_NAME,
+            feedstock_id=feedstock_id,
+            profile_id=profile_id,
             fidelity=fidelity,
-            objective_metric=objective_metric,
-            limit=1,
+            columns=_WINNER_RANKING_COLUMNS,
+            accepted_corpus_versions=accepted_corpus_versions,
+        )
+        has_corpus_version = bool(rows) and 'corpus_version' in rows[0].keys()
+        run_paths[run_id] = (run_dir, has_corpus_version)
+        loaded.append((run_id, rows))
+        bucket: dict[tuple[str, str], list[sqlite3.Row]] = {}
+        for row in rows:
+            bucket.setdefault(_selector_pair_key(row), []).append(row)
+        indexed.append((run_id, bucket))
+    for pair_feedstock, pair_profile in _selector_pairs_from_loaded_rows(
+        [rows for _run_id, rows in loaded],
+        profile_id=profile_id,
+    ):
+        # ★ EVERY PAIR MUST BE RANKED ON THE SAME METRIC. This passed the
+        # caller's (often None) objective_metric to every pair, so each pair
+        # independently resolved its own primary objective -- and a profile
+        # whose vector is ordered differently resolves a DIFFERENT metric. The
+        # table then ranked kg of oxygen against kWh of energy in one column,
+        # which is not a comparison at all. Feeding the resolved metric forward
+        # pins the axis after the first pair fixes it; a pair whose objectives
+        # lack that metric drops out rather than being ranked on a substitute.
+        pair_run_rows: list[tuple[str, list[sqlite3.Row]]] = []
+        pair_key = (pair_feedstock, pair_profile)
+        for run_id, bucket in indexed:
+            pair_rows = bucket.get(pair_key)
+            if not pair_rows:
+                continue
+            scoped, _digest_scopes = _filter_rows_to_digest_scope(
+                pair_rows,
+                profile_id=pair_profile,
+            )
+            pair_run_rows.append((run_id, scoped))
+        candidates, metric, pair_excluded, pair_rank_ambiguous = (
+            _collect_ranked_candidates(
+                pair_run_rows,
+                objective_metric=selected_metric,
+            )
         )
         if metric and selected_metric is None:
             selected_metric = metric
-        entries.extend(_optimizer_result_view(entry) for entry in winners)
-        if len(entries) >= limit:
+        winner = None
+        for run_id, _row, value, sense in candidates:
+            run_dir, has_corpus_version = run_paths[run_id]
+            full_row = _fetch_full_result_row(
+                run_dir / OPTIMIZER_CACHE_NAME,
+                str(_row['cache_key']),
+                accepted_corpus_versions=accepted_corpus_versions,
+                has_corpus_version=has_corpus_version,
+            )
+            if full_row is None:
+                pair_excluded['excluded_unreadable'] += 1
+                continue
+            try:
+                entry = _result_metadata(
+                    full_row,
+                    run_id=run_id,
+                    objective_metric=selected_metric,
+                    accepted_corpus_versions=accepted_corpus_versions,
+                )
+                entry['objective_metric'] = selected_metric
+                entry['objective_value'] = value
+                entry['objective_sense'] = sense
+                entry['data_digest_scope'] = {
+                    'mode': 'entry_data_digests',
+                    'data_digests': entry.get('eval_spec', {}).get('data_digests') or {},
+                }
+            except Exception:
+                pair_excluded['excluded_unreadable'] += 1
+                continue
+            winner = _optimizer_result_view(entry)
+            if pair_rank_ambiguous:
+                winner['rank_ambiguous'] = pair_rank_ambiguous
             break
+        for key, count in (pair_excluded or {}).items():
+            excluded_totals[key] = excluded_totals.get(key, 0) + int(count)
+        if winner is not None:
+            entries.append(winner)
+
+    # ★ RANK MUST BE SCORE ORDER, AND THAT REQUIRES SEEING EVERY PAIR FIRST.
+    # This used to `break` once `limit` rows had accumulated and then assign
+    # rank by ENUMERATION of the pair walk -- so "Rank 1" was simply the first
+    # selector pair alphabetically, not the best candidate. Observed on a real
+    # store: HTML Rank 1 = 6.749 kg while HTML Rank 8 = 19.955 kg, and 119 of
+    # 169 pairs never appeared at all because the walk stopped at 50. The JSON
+    # leaderboard ranked the same rows correctly, so the two surfaces disagreed
+    # under the same column name.
+    #
+    # The two defects compound: truncating the WALK makes a later sort useless,
+    # because the best candidate can be pair #120 and never be collected. So the
+    # order is collect-all -> sort -> truncate -> rank, which is what
+    # _leaderboard_entries itself does.
+    #
+    # Cost: one store open per run dir, then pair ranking in memory. The
+    # previous shape re-queried every run store for every selector pair
+    # (O(pairs × run_dirs) sqlite opens) and made /optimizer unusable as runs
+    # accumulated. Ranking still collects every pair before truncating.
+    rankable_entries = [
+        (
+            entry,
+            float(entry['objective_value']),
+            str(entry.get('objective_sense') or 'maximize'),
+            '\0'.join(
+                str(entry.get(key) or '')
+                for key in ('run_id', 'cache_key', 'candidate_id', 'recipe_id')
+            ),
+        )
+        for entry in entries
+    ]
+    rankable_entries, board_rank_ambiguous = _rank_objective_candidates(
+        rankable_entries
+    )
+    rank_ambiguous = board_rank_ambiguous or next(
+        (
+            str(entry['rank_ambiguous'])
+            for entry, _value, _sense, _identity in rankable_entries
+            if entry.get('rank_ambiguous')
+        ),
+        None,
+    )
+    entries = [
+        entry
+        for entry, _value, _sense, _identity in rankable_entries[:limit]
+    ]
     for rank, entry in enumerate(entries, start=1):
         entry['rank'] = rank
-    return entries, selected_metric
+        if rank_ambiguous:
+            entry['rank_ambiguous'] = rank_ambiguous
+    return entries, selected_metric, excluded_totals
 
 
 def _optimizer_table_context() -> dict[str, Any]:
@@ -2206,7 +2945,7 @@ def _optimizer_table_context() -> dict[str, Any]:
         ),
         'limit': _request_limit(default=50),
     }
-    entries, selected_metric = _optimizer_winner_entries(
+    entries, selected_metric, excluded_totals = _optimizer_winner_entries(
         run_dirs,
         feedstock_id=filters['feedstock_id'],
         profile_id=filters['profile_id'],
@@ -2218,6 +2957,9 @@ def _optimizer_table_context() -> dict[str, Any]:
     return {
         'runs_dir': str(root),
         'entries': entries,
+        'excluded_counts': excluded_totals,
+        'excluded_rows': _exclusion_rows(excluded_totals),
+        'excluded_total': sum(excluded_totals.values()),
         'imported_entries': imported_studies(root),
         'filters': filters,
         'feedstock_profiles': _optimizer_feedstock_profiles_payload(),
@@ -2455,7 +3197,9 @@ def _result_detail_model(
     row: sqlite3.Row,
 ) -> dict[str, Any]:
     run_id = _optimizer_run_id(run_dir, root)
-    result = _optimizer_result_view(_result_metadata(row, run_id=run_id))
+    result = _optimizer_result_view(
+        _result_metadata(row, run_id=run_id, contain_unreadable_backend=True)
+    )
     eval_spec = _json_value(row['eval_spec'], {})
     if not isinstance(eval_spec, Mapping):
         eval_spec = {}
@@ -3701,6 +4445,29 @@ def vapor_pressure_authority_api():
     return jsonify(payload)
 
 
+@bp.route('/api/advisory-panel-detail')
+def advisory_panel_detail_api():
+    """Full nested VR panel for the compact hourly tick (on-demand)."""
+    client_id = str(session.get('ledger_client_id') or '')
+    if not client_id:
+        return _json_error(
+            'advisory detail requires an initialized browser session', 400
+        )
+    panel = str(request.args.get('panel') or '').strip()
+    if not panel:
+        return _json_error('panel is required', 400)
+    try:
+        from web.events import read_advisory_panel_detail_for_client
+        return jsonify(read_advisory_panel_detail_for_client(client_id, panel))
+    except LookupError as exc:
+        return _json_error(str(exc), 404)
+    except KeyError as exc:
+        identifier = exc.args[0] if exc.args else ''
+        return _json_error(f'unknown advisory panel: {identifier}', 404)
+    except (TypeError, ValueError) as exc:
+        return _json_error(str(exc), 400)
+
+
 @bp.route('/partials/vapor-pressure-authority-panel')
 def vapor_pressure_authority_panel_partial():
     payload = vapor_pressure_authority_payload(
@@ -4243,6 +5010,206 @@ def optimizer_imported_detail(study_id: str):
     except (ImportBundleError, OSError, ValueError):
         return render_template('optimizer_not_found.html'), 404
     return render_template('optimizer_imported.html', imported=model)
+
+
+def _reoptimize_source_dir(
+    origin: str,
+    study_id: str,
+) -> tuple[Path | None, str | None]:
+    root = _optimizer_runs_root()
+    if origin == 'imported':
+        path = root / 'imported' / study_id
+        if not is_imported_path(path, root) or not path.is_dir():
+            return None, 'source study not found'
+        return path, None
+    if origin == 'local':
+        resolved = _optimizer_run_dir_for_id(study_id)
+        if resolved is None:
+            return None, 'source study not found'
+        return resolved[1], None
+    return None, f'unknown origin: {origin}'
+
+
+def _reoptimize_form_context(
+    origin: str,
+    study_id: str,
+    *,
+    error: str | None = None,
+) -> tuple[dict[str, Any] | None, int]:
+    source_dir, source_error = _reoptimize_source_dir(origin, study_id)
+    if source_error is not None or source_dir is None:
+        return None, 404
+    try:
+        prefill = load_reoptimize_prefill(source_dir)
+    except ReoptimizeError as exc:
+        return {
+            'origin': origin,
+            'study_id': study_id,
+            'prefill': None,
+            'reoptimize_error': str(exc),
+            **_optimizer_launch_context(),
+        }, 400
+    return {
+        'origin': origin,
+        'study_id': study_id,
+        'prefill': prefill,
+        'reoptimize_error': error,
+        'goals_source_bundled': GOALS_SOURCE_BUNDLED,
+        'goals_source_current': GOALS_SOURCE_CURRENT,
+        **_optimizer_launch_context(),
+    }, 200
+
+
+def _payload_has_value(payload: Mapping[str, Any], name: str) -> bool:
+    if name not in payload:
+        return False
+    value = payload.get(name)
+    if value is None:
+        return False
+    if isinstance(value, str) and value.strip() == '':
+        return False
+    return True
+
+
+def _parse_reoptimize_request(
+    payload: Mapping[str, Any],
+) -> tuple[optimizer_job_runner.OptimizerJobRequest | None, str | None]:
+    origin = str(_payload_value(payload, 'origin', '') or '')
+    study_id = str(_payload_value(payload, 'study_id', '') or '')
+    goals_source = str(_payload_value(payload, 'goals_source', '') or '')
+    strategy = str(_payload_value(payload, 'strategy', '') or '')
+    if not origin:
+        return None, 'origin is required'
+    if not study_id:
+        return None, 'study_id is required'
+    if not goals_source:
+        return None, 'goals_source is required'
+    if goals_source not in GOALS_SOURCES:
+        return None, 'goals_source must be bundled_profile or current_local_profile'
+    if not strategy:
+        return None, 'strategy is required'
+    if not _payload_has_value(payload, 'fidelity'):
+        return None, 'fidelity is required'
+    if not _payload_has_value(payload, 'budget'):
+        return None, 'budget is required'
+    if not _payload_has_value(payload, 'parallel'):
+        return None, 'parallel is required'
+    if not _payload_has_value(payload, 'seed'):
+        return None, 'seed is required'
+    if strategy not in OPTIMIZER_JOB_STRATEGIES:
+        return None, f'unknown strategy: {strategy}'
+    fidelity = str(
+        canonical_backend_name(str(_payload_value(payload, 'fidelity', '') or ''))
+    )
+    if fidelity not in OPTIMIZER_JOB_FIDELITIES:
+        return None, f'unknown fidelity: {fidelity}'
+    budget, error = _positive_int_payload(
+        payload,
+        'budget',
+        maximum=_optimizer_job_budget_cap(),
+    )
+    if error:
+        return None, error
+    parallel, error = _positive_int_payload(
+        payload,
+        'parallel',
+        maximum=_optimizer_job_parallel_cap(),
+    )
+    if error:
+        return None, error
+    seed, error = _non_negative_int_payload(payload, 'seed', default=0)
+    if error:
+        return None, error
+    if budget is None or parallel is None or seed is None:
+        return None, 'strategy, seed, budget, fidelity, and parallel are required'
+    source_dir, source_error = _reoptimize_source_dir(origin, study_id)
+    if source_error is not None or source_dir is None:
+        return None, source_error or 'source study not found'
+    try:
+        plan = plan_reoptimize(
+            source_dir,
+            goals_source=goals_source,
+            strategy=strategy,
+            seed=seed,
+            budget=budget,
+            fidelity=fidelity,
+            parallel=parallel,
+            data_dir=DATA_DIR,
+        )
+    except ReoptimizeVocabularyDriftError as exc:
+        return None, str(exc)
+    except ReoptimizeError as exc:
+        return None, str(exc)
+    feedstock_profiles = _optimizer_feedstock_profiles_payload()
+    feedstocks = feedstock_profiles.get('feedstocks')
+    if not isinstance(feedstocks, Mapping):
+        feedstocks = {}
+    if plan.feedstock_id not in feedstocks:
+        return None, f'unknown feedstock_id: {plan.feedstock_id}'
+    if plan.goals_source == GOALS_SOURCE_CURRENT:
+        profile_by_id = _optimizer_profile_by_id(feedstock_profiles)
+        if plan.profile_id not in profile_by_id:
+            return None, f'unknown profile_id: {plan.profile_id}'
+        allowed_profiles = feedstocks.get(plan.feedstock_id)
+        if isinstance(allowed_profiles, list) and plan.profile_id not in allowed_profiles:
+            return None, (
+                f'profile_id {plan.profile_id} is not valid for {plan.feedstock_id}'
+            )
+    return optimizer_job_runner.OptimizerJobRequest(
+        feedstock_id=plan.feedstock_id,
+        profile_id=plan.profile_id,
+        strategy=plan.strategy,
+        fidelity=plan.fidelity,
+        budget=plan.budget,
+        parallel=plan.parallel,
+        seed=plan.seed,
+        profile_arg=plan.profile_arg,
+        reoptimized_from=plan.reoptimized_from,
+        goals_source=plan.goals_source,
+    ), None
+
+
+@bp.route('/optimizer/reoptimize/<origin>/<path:study_id>')
+def optimizer_reoptimize_form(origin: str, study_id: str):
+    """Prefill re-optimize run params from manifest + study.profile.yaml."""
+    context, status = _reoptimize_form_context(origin, study_id)
+    if context is None:
+        return render_template('optimizer_not_found.html'), 404
+    return render_template('optimizer_reoptimize.html', **context), status
+
+
+@bp.route('/api/optimizer/reoptimize', methods=['POST'])
+@bp.route('/optimizer/reoptimize', methods=['POST'])
+def optimizer_reoptimize_submit():
+    """Submit a new study from a saved bundle without reading imported sqlite."""
+    payload = _optimizer_job_payload()
+    job_request, error = _parse_reoptimize_request(payload)
+    origin = str(_payload_value(payload, 'origin', '') or '')
+    study_id = str(_payload_value(payload, 'study_id', '') or '')
+    if error is not None or job_request is None:
+        if _wants_json_response():
+            return jsonify({'error': error}), 400
+        context, status = _reoptimize_form_context(origin, study_id, error=error)
+        if context is None:
+            return render_template('optimizer_not_found.html'), 404
+        return render_template('optimizer_reoptimize.html', **context), 400
+
+    job, capacity_error = _submit_optimizer_job(job_request)
+    if capacity_error is not None or job is None:
+        if _wants_json_response():
+            return jsonify({'error': capacity_error}), 429
+        context, status = _reoptimize_form_context(
+            origin, study_id, error=capacity_error
+        )
+        if context is None:
+            return render_template('optimizer_not_found.html'), 404
+        return render_template('optimizer_reoptimize.html', **context), 429
+    if _wants_json_response():
+        return jsonify({'job': job}), 202
+    return render_template(
+        'partials/optimizer_jobs.html',
+        **{**_optimizer_jobs_context(), 'submitted_job': job},
+    ), 202
 
 
 @bp.route('/api/feedstocks')

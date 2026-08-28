@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from simulator.chemistry.kernel import select_backend_status
+
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
@@ -134,7 +136,24 @@ def carrier_backend_status(carrier: Any) -> str | None:
     for key in ("per_hour", "hours"):
         nested = carrier_value(carrier, key)
         if isinstance(nested, Sequence) and not isinstance(nested, (str, bytes)) and nested:
-            status = carrier_backend_status(nested[-1])
+            # ★ THE MOST SEVERE HOUR, NOT THE LAST ONE. This read nested[-1],
+            # so a run that refused at hour 3 and recovered to ok at hour 24
+            # reported ok -- position decided, which is the defect the kernel
+            # owner was corrected for. It matters most here of all: this module
+            # decides whether a result may be TRUSTED, so the hour that failed
+            # is exactly the hour that must survive the reduction.
+            #
+            # Answering by position also restates the ordering WITHOUT naming
+            # a token, which is why the AST ownership guard cannot see sites
+            # like this one; the behavioural agreement test in
+            # tests/test_backend_status_owner.py is what covers them.
+            statuses = [
+                carrier_backend_status(entry)
+                for entry in nested
+            ]
+            status = select_backend_status(
+                [value for value in statuses if value is not None]
+            )
             if status is not None:
                 return status
     for key in ("trace", "backend_diagnostics", "diagnostics"):
