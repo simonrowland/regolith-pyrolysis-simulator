@@ -1008,11 +1008,32 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "series-resistance reference returned no flux -- the test "
         "fixture is not exercising the path it claims to cover"
     )
-    # MC-4A activates CrO2 with a numeric, explicitly non-authoritative alpha
-    # proxy, so every reference species is now batch-eligible at this C0 point.
+    # b-314: MC-4A's numeric CrO2-family alpha rows are tier-2
+    # ``broad_proxy_not_intrinsic`` proxies, not measurements. The restored
+    # gate no longer lets them satisfy the measured-alpha requirement: with
+    # this fixture's explicit ``allow_unmeasured_alpha_fallback`` opt-in they
+    # take the marked alpha=1.0 prototype path (recorded in
+    # ``unmeasured_alpha_fallback_species``) instead of fluxing as measured —
+    # a declared deviation from the reference helper's tagged-proxy value, so
+    # they leave wiring parity. Parity continues for every measured species.
+    flux_diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+    sc67_accounted = set(
+        flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
+    ) | set(flux_diagnostic.get("missing_alpha") or ())
+    non_parity_species = set(reference_flux) & sc67_accounted
+    assert "CrO2" in non_parity_species, (
+        "the broad_proxy_not_intrinsic CrO2 row must not flux as measured; "
+        f"fallback="
+        f"{flux_diagnostic.get('unmeasured_alpha_fallback_species')} "
+        f"missing_alpha={flux_diagnostic.get('missing_alpha')}"
+    )
     assert refused_reference_species == set()
     for species, legacy_value in reference_flux.items():
         if species in refused_reference_species:
+            continue
+        if species in non_parity_species:
+            # Accounted by the restored SC-67 surface (marked fallback or
+            # missing_alpha refusal), not by measured-alpha wiring.
             continue
         kernel_value = kernel_flux.get(species, 0.0)
         tol = max(
@@ -1095,6 +1116,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     steps = 0
     worst_delta_kg_hr = 0.0
     refused_reference_species_seen: set[str] = set()
+    proxy_accounted_species_seen: set[str] = set()
     while not sim.is_complete() and steps < 60:
         if sim.paused_for_decision:
             decision = sim.pending_decision
@@ -1135,8 +1157,30 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
             )
         refused_reference_species_seen.update(refused_reference_species)
 
+        # b-314: tier-2 ``broad_proxy_not_intrinsic`` rows no longer satisfy
+        # the measured-alpha requirement. With the fallback explicitly
+        # enabled for this fixture they take the marked alpha=1.0 prototype
+        # path (recorded in ``unmeasured_alpha_fallback_species``) — a
+        # declared deviation from the reference helper's tagged-proxy value,
+        # so they leave wiring parity rather than parrot it.
+        flux_diagnostic = (
+            getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+        )
+        fallback_reference_species = set(reference_flux) & set(
+            flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
+        )
+        missing_alpha_reference_species = set(reference_flux) & set(
+            flux_diagnostic.get("missing_alpha") or ()
+        )
+        non_parity_species = (
+            fallback_reference_species | missing_alpha_reference_species
+        )
+        proxy_accounted_species_seen.update(non_parity_species)
+
         for species in set(reference_flux) | set(kernel_flux):
             if species in refused_reference_species:
+                continue
+            if species in non_parity_species:
                 continue
             legacy_value = float(reference_flux.get(species, 0.0))
             kernel_value = float(kernel_flux.get(species, 0.0))
@@ -1166,6 +1210,13 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
     if feedstock_key in {"lunar_mare_low_ti", "s_type_asteroid_silicate"}:
         assert "CrO2" in refused_reference_species_seen
+        # b-314: whenever CrO2 carries a flux pressure outside the C0b
+        # predicate refusal, it must be visibly accounted by the restored
+        # SC-67 surface (missing_alpha or the marked prototype fallback) —
+        # never evaporating on a bare proxy as if it were measured.
+        assert "CrO2" in (
+            refused_reference_species_seen | proxy_accounted_species_seen
+        )
     assert worst_delta_kg_hr <= 1.0, (
         f"worst observed parity delta {worst_delta_kg_hr:.6g} kg/hr is "
         f"suspiciously large for a refactor-only change"

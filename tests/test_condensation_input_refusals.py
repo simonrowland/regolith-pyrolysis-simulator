@@ -335,3 +335,305 @@ def test_hkl_surface_flux_healthy_input_unchanged():
     """Continuity: a healthy call still returns the alpha-weighted HKL
     impingement flux (the gate adds refusals, not new physics)."""
     assert _hkl_call() > 0.0
+
+
+# ---------------------------------------------------------------------------
+# b-311: an absent sticking coefficient is not a perfectly non-sticking wall.
+# The two production record-consumption sites previously read a missing /
+# unparseable ``alpha_s`` as 0.0 — indistinguishable from a measured
+# category-3 non-sticking surface, and both report a clean furnace. The
+# sites now refuse absence BY NAME (same ``DepositionInputRefusal`` as
+# b-304); only an explicitly configured 0.0 keeps the category-3 zero.
+# ---------------------------------------------------------------------------
+
+
+def test_required_record_alpha_s_refuses_absent_key():
+    """A record that never carried a sticking coefficient is an unknown,
+    not a measured 0.0."""
+    with pytest.raises(
+        condensation.DepositionInputRefusal,
+        match="parameter=alpha_s",
+    ):
+        condensation._required_record_alpha_s(
+            {"species": "Fe"}, species="Fe", site="test_site"
+        )
+
+
+def test_required_record_alpha_s_refuses_none_value():
+    with pytest.raises(
+        condensation.DepositionInputRefusal,
+        match="no sticking coefficient recorded",
+    ):
+        condensation._required_record_alpha_s(
+            {"alpha_s": None}, species="Fe", site="test_site"
+        )
+
+
+def test_required_record_alpha_s_refuses_unparseable_marked_record():
+    """The ``_coerce_alpha_s`` unparseable branch keeps its b-149 zero+note
+    contract, but the marker now bars the record from the flux path: a
+    coefficient minted out of an unparseable spec is an unknown, not a
+    measurement."""
+    record = condensation._alpha_record(
+        species="Fe",
+        entry={"status": "CITED", "source": "metadata-only, no value"},
+        source="test",
+    )
+    assert record["alpha_s"] == 0.0
+    assert record["alpha_s_unparseable"] is True
+    with pytest.raises(
+        condensation.DepositionInputRefusal,
+        match="unparseable sticking coefficient spec",
+    ):
+        condensation._required_record_alpha_s(
+            record, species="Fe", site="test_site"
+        )
+
+
+def test_required_record_alpha_s_passes_explicit_zero_and_measured_values():
+    """An explicitly configured 0.0 is the category-3 real limit and must
+    NOT refuse; declared values in [0, 1] pass through unchanged."""
+    zero_record = condensation._alpha_record(
+        species="Fe",
+        entry={"value": 0.0, "status": "CITED", "source": "measured"},
+        source="test",
+    )
+    assert condensation._required_record_alpha_s(
+        zero_record, species="Fe", site="test_site"
+    ) == 0.0
+    value_record = condensation._alpha_record(
+        species="Fe",
+        entry={"value": 0.02, "status": "CITED", "source": "measured"},
+        source="test",
+    )
+    assert condensation._required_record_alpha_s(
+        value_record, species="Fe", site="test_site"
+    ) == pytest.approx(0.02)
+
+
+def _configured_model_with_materials(materials):
+    model = condensation.CondensationModel(
+        CondensationTrain.create_default(), materials=materials
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1700.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    return model
+
+
+def test_stage_deposition_refuses_metadata_only_alpha_entry():
+    """Site 1 (stage deposition): a materials entry with no parseable
+    coefficient used to reach the stage loop as a silent 0.0 (clean stage);
+    it now refuses by name through the real route() path."""
+    model = _configured_model_with_materials(
+        {
+            "stages": {
+                1: {
+                    "alpha_s_by_species": {
+                        "Fe": {"status": "CITED", "source": "no value"}
+                    }
+                }
+            }
+        }
+    )
+    with pytest.raises(
+        condensation.DepositionInputRefusal,
+        match="parameter=alpha_s",
+    ):
+        model.route(
+            EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+            MeltState(temperature_C=1700.0),
+        )
+
+
+def test_wall_segment_alpha_refuses_metadata_only_entry():
+    """Site 2 (wall-segment max): a metadata-only wall-surface entry used to
+    read as 0.0 across every segment (clean furnace); it now refuses by
+    name through the real route() path."""
+    model = _configured_model_with_materials(
+        {
+            "wall_surfaces": {
+                "interstage_duct": {
+                    "alpha_s_by_species": {
+                        "Fe": {"status": "CITED", "source": "no value"}
+                    }
+                }
+            }
+        }
+    )
+    assert model._mixed_temperature_wall_candidate_segments("Fe")
+    with pytest.raises(
+        condensation.DepositionInputRefusal,
+        match="parameter=alpha_s",
+    ):
+        model.route(
+            EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+            MeltState(temperature_C=1700.0),
+        )
+
+
+def test_explicit_zero_stage_alpha_stays_category3():
+    """Guard against overreach: an explicitly configured 0.0 stage entry is
+    a declared non-sticking surface, not an absence — the run must route
+    without refusal."""
+    model = _configured_model_with_materials(
+        {
+            "stages": {
+                1: {
+                    "alpha_s_by_species": {
+                        "Fe": {
+                            "value": 0.0,
+                            "status": "CITED",
+                            "source": "measured non-sticking",
+                        }
+                    }
+                }
+            }
+        }
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    # Routed mass closes: condensed + wall + remaining accounts for all Fe.
+    accounted = (
+        route.condensed_for_species("Fe")
+        + route.wall_deposit_by_species.get("Fe", 0.0)
+        + route.remaining_by_species.get("Fe", 0.0)
+        + route.retained_in_source_by_species.get("Fe", 0.0)
+    )
+    assert accounted == pytest.approx(1.0, abs=1e-9)
+
+
+def test_series_flux_zero_local_pressure_stays_zero():
+    """Category 3: no local pressure means no impingement — a true zero,
+    not a refusal."""
+    assert _series_call(P_local_pa=0.0) == 0.0
+
+
+def test_series_flux_zero_driving_pressure_stays_zero():
+    """Category 3: P_local below the wall saturation pressure gives a
+    non-positive driving pressure — a true zero deposit."""
+    assert (
+        condensation._series_resistance_deposition_flux_mol_m2_s(
+            "Na",
+            1e-6,
+            1200.0,
+            0.5,
+            pipe_diameter_m=0.12,
+            T_gas_K=1700.0,
+            overhead_pressure_pa=1000.0,
+        )
+        == 0.0
+    )
+
+
+def test_wall_alpha_s_wrapper_refuses_metadata_only_entry():
+    """Class closure for the per-segment wall-flux query path
+    (``simulator/accounting/queries.py`` calls ``_wall_alpha_s`` and treats
+    ``alpha_s <= 0.0`` as a clean zero deposit): absence/unparseable must
+    refuse at the wrapper, not read as a measured non-sticking surface."""
+    with pytest.raises(
+        condensation.DepositionInputRefusal,
+        match="parameter=alpha_s",
+    ):
+        condensation._wall_alpha_s(
+            "Fe",
+            {
+                "wall_surfaces": {
+                    "interstage_duct": {
+                        "alpha_s_by_species": {
+                            "Fe": {"status": "CITED", "source": "no value"}
+                        }
+                    }
+                }
+            },
+            T_K=1200.0,
+        )
+
+
+def test_wall_alpha_s_wrapper_healthy_and_explicit_zero():
+    """Same wrapper: the cited sidecar Fe value loads, and an explicitly
+    configured 0.0 stays the category-3 real limit (no refusal)."""
+    assert condensation._wall_alpha_s("Fe", T_K=1200.0) == pytest.approx(0.02)
+    assert (
+        condensation._wall_alpha_s(
+            "Fe",
+            {
+                "wall_surfaces": {
+                    "interstage_duct": {
+                        "alpha_s_by_species": {
+                            "Fe": {
+                                "value": 0.0,
+                                "status": "CITED",
+                                "source": "measured non-sticking",
+                            }
+                        }
+                    }
+                }
+            },
+            T_K=1200.0,
+        )
+        == 0.0
+    )
+
+
+def test_arrhenius_alpha_underflow_refuses_out_of_domain():
+    """Secondary b-311 route: A*exp(-B/T) is strictly positive
+    mathematically, so an exact 0.0 is floating-point underflow far below
+    the fit's valid range — out-of-domain, not a non-sticking zero."""
+    spec = {
+        "form": "arrhenius",
+        "A": 0.52,
+        "B": 3685.0,
+        "valid_range_K": [1000.0, 1800.0],
+        "uncertainty_envelope": [0.003, 0.067],
+        "cite": "Wetzel&Gail 2013",
+        "status": "UNCERTIFIED",
+    }
+    with pytest.raises(ValueError, match="underflowed.*out-of-domain"):
+        condensation.alpha_s("Hypothetical", 1.0, {"coefficient_spec": spec})
+
+
+def test_arrhenius_alpha_denormal_above_underflow_still_evaluates():
+    """Just above the underflow point the evaluation still returns the
+    (denormal) value and marks it extrapolated, not a fabricated zero."""
+    spec = {
+        "form": "arrhenius",
+        "A": 0.52,
+        "B": 3685.0,
+        "valid_range_K": [1000.0, 1800.0],
+        "uncertainty_envelope": [0.003, 0.067],
+        "cite": "Wetzel&Gail 2013",
+        "status": "UNCERTIFIED",
+    }
+    context = {"coefficient_spec": spec}
+    value = condensation.alpha_s("Hypothetical", 5.0, context)
+    assert 0.0 < value < 1e-300
+    assert context["alpha_s_evaluation"]["alpha_s_extrapolated"] is True
+
+
+def test_sio_cold_wall_override_survives_underflow_floor():
+    """The documented SiO cold-wall contract (Pound high-supersaturation
+    limit below the Arrhenius validity floor) still owns the underflow
+    zone instead of inheriting the refusal."""
+    spec = {
+        "form": "arrhenius",
+        "A": 0.52,
+        "B": 3685.0,
+        "valid_range_K": [1000.0, 1800.0],
+        "uncertainty_envelope": [0.003, 0.067],
+        "cite": "Wetzel&Gail 2013",
+        "status": "UNCERTIFIED",
+    }
+    context = {"coefficient_spec": spec}
+    assert condensation._condensation_alpha_s("SiO", 1.0, context) == 1.0
+    evaluation = context["alpha_s_evaluation"]
+    assert evaluation["alpha_s_cold_wall_condensation"] is True
+    assert evaluation["alpha_s_form"] == "cold_wall_condensation"

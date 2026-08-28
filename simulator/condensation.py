@@ -747,7 +747,22 @@ def _condensation_alpha_s(
         if 'coefficient_spec' in context
         else _sticking_species_entry(species_name).get('value')
     )
-    value = alpha_s(species_name, T_K, context)
+    try:
+        value = alpha_s(species_name, T_K, context)
+    except _ArrheniusAlphaUnderflow:
+        # The SiO cold-wall override owns T below its documented validity
+        # floor; everywhere else the underflow refusal propagates.
+        override = _sio_cold_wall_condensation_override(
+            species_name,
+            T_K,
+            spec,
+            {'alpha_s': None},
+        )
+        if override is None:
+            raise
+        value, evaluation = override
+        context['alpha_s_evaluation'] = dict(evaluation)
+        return value
     evaluation = dict(context.get('alpha_s_evaluation', {}))
     override = _sio_cold_wall_condensation_override(
         species_name,
@@ -1139,6 +1154,15 @@ def _alpha_s_spec_from_entry(species: str, entry: Any) -> Any:
     return entry
 
 
+class _ArrheniusAlphaUnderflow(ValueError):
+    """Arrhenius alpha_s underflowed to exact 0.0 below its valid domain.
+
+    ValueError subclass so the module's invalid-input contract is unchanged;
+    the distinct type lets the SiO cold-wall override claim temperatures
+    below its documented validity floor without masking the refusal.
+    """
+
+
 def _alpha_s_evaluation(
     species: str,
     T_K: float,
@@ -1239,8 +1263,17 @@ def _alpha_s_evaluation(
                 f'alpha_s({species}): malformed uncertainty_envelope'
             )
         value = A * math.exp(-B / T_K)
-        if not math.isfinite(value) or not 0.0 <= value <= 1.0:
+        if not math.isfinite(value) or value > 1.0:
             raise ValueError(f'alpha_s({species}): evaluated value outside [0, 1]')
+        if value <= 0.0:
+            # A*exp(-B/T) > 0 mathematically; an exact 0.0 is floating-point
+            # underflow far below valid_range_K. That is out-of-domain, not
+            # a measured perfectly non-sticking zero (b-311 secondary).
+            raise _ArrheniusAlphaUnderflow(
+                f'alpha_s({species}): arrhenius evaluation underflowed to '
+                f'0.0 at {T_K:g} K (domain floor {valid_low:g} K); '
+                'out-of-domain, not a non-sticking measurement'
+            )
         extrapolated = not (valid_low <= T_K <= valid_high)
         result = {
             'species': str(species),
@@ -2851,7 +2884,11 @@ class CondensationModel:
                         stage.stage_number, 1.0
                     ),
                     available_kg=remaining_kg,
-                    alpha_s_value=float(stage_alpha_record.get('alpha_s', 0.0)),
+                    alpha_s_value=_required_record_alpha_s(
+                        stage_alpha_record,
+                        species=species,
+                        site='stage_deposition',
+                    ),
                     alpha_record=stage_alpha_record,
                     antoine_extrapolations=antoine_extrapolations,
                     antoine_extrapolation_warnings=(
@@ -3023,7 +3060,11 @@ class CondensationModel:
                     for segment in candidate_segments
                 ]
                 wall_sticking_alpha_by_species[species] = max(
-                    float(record.get('alpha_s', 0.0))
+                    _required_record_alpha_s(
+                        record,
+                        species=species,
+                        site='wall_segment_alpha',
+                    )
                     for record in alpha_records
                 )
                 wall_sticking_alpha_provenance_by_species[species] = {
@@ -4991,6 +5032,41 @@ def _coerce_alpha_s(
     return value
 
 
+def _required_record_alpha_s(
+    record: Mapping[str, Any],
+    *,
+    species: str,
+    site: str,
+) -> float:
+    """Read a recorded sticking coefficient, refusing absence (b-311).
+
+    A record that never carried a coefficient is an UNKNOWN, not a measured
+    perfectly non-sticking surface. Refuse (category 1, same named refusal
+    as b-304) when the ``alpha_s`` key is absent/``None``, or when
+    ``_coerce_alpha_s`` minted the value out of an unparseable spec
+    (``alpha_s_unparseable`` marker) — both previously read as a clean
+    0.0 at the deposition sites. An explicitly configured 0.0 remains the
+    category-3 real limit and passes through.
+    """
+    raw = record.get('alpha_s')
+    if raw is None:
+        raise DepositionInputRefusal(
+            'alpha_s',
+            raw,
+            f'{site}: no sticking coefficient recorded for {species}; '
+            'absence is not a measured non-sticking surface',
+        )
+    if bool(record.get('alpha_s_unparseable', False)):
+        raise DepositionInputRefusal(
+            'alpha_s',
+            record.get('alpha_s_raw_spec', raw),
+            f'{site}: unparseable sticking coefficient spec for {species} '
+            'was coerced to 0.0; an unknown coefficient is not a measured '
+            'non-sticking surface',
+        )
+    return _deposition_finite_scalar('alpha_s', raw)
+
+
 def _alpha_record(
     *,
     species: str,
@@ -5077,12 +5153,20 @@ def _wall_alpha_s(
     segment: PipeSegment | None = None,
     T_K: float | None = None,
 ) -> float:
-    return float(_wall_alpha_record(
-        species,
-        materials,
-        segment=segment,
-        T_K=T_K,
-    )['alpha_s'])
+    # b-311 class closure: the sole caller is the per-segment wall-flux
+    # query (accounting/queries.py), which treats ``alpha_s <= 0.0`` as a
+    # clean zero. Absence/unparseable must refuse here rather than read as
+    # a measured non-sticking surface downstream.
+    return _required_record_alpha_s(
+        _wall_alpha_record(
+            species,
+            materials,
+            segment=segment,
+            T_K=T_K,
+        ),
+        species=species,
+        site='wall_alpha_s',
+    )
 
 
 def _sidecar_alpha_record(species: str, T_K: float | None = None) -> dict[str, Any]:

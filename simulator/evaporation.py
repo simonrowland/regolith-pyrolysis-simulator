@@ -436,8 +436,23 @@ def _assert_runtime_alpha_source_not_vaporock(
 
 
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, Any]:
-    """Load executable alpha specs, preserving dormant pressure-only carriers."""
+    """Load executable alpha specs, preserving dormant pressure-only carriers.
 
+    b-314: a row tagged ``broad_proxy_not_intrinsic`` (tier-2 proxy inherited
+    from another measurement family) is not an intrinsic melt alpha. It stays
+    in this map — the pressure-gating path
+    (``_legacy_evaporation_shadow_pressure_map``) and class diagnostics consume
+    it — but as a provenance-carrying mapping marked with
+    ``alpha_proxy_tag``, never a bare number indistinguishable from a
+    measured coefficient. The provider-facing measured view
+    (``_measured_alpha_control_view``) strips these rows so the SC-67
+    unmeasured-alpha refusal fires instead of a proxy satisfying the gate.
+    """
+
+    from simulator.evaporation_classes import (
+        BROAD_PROXY_NOT_INTRINSIC_TAG,
+        is_broad_proxy_not_intrinsic_row,
+    )
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
@@ -455,10 +470,52 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
             value = parse_alpha_contract(alpha_data)
             if value is None:
                 continue
-            alpha_by_species[species] = (
-                0.0 if species_data.get("flux_dormant") is True else value
-            )
+            if species_data.get("flux_dormant") is True:
+                alpha_by_species[species] = 0.0
+                continue
+            if is_broad_proxy_not_intrinsic_row(alpha_data):
+                payload = (
+                    dict(value)
+                    if isinstance(value, Mapping)
+                    else {"form": "scalar", "value": value}
+                )
+                payload["alpha_proxy_tag"] = BROAD_PROXY_NOT_INTRINSIC_TAG
+                if alpha_data.get("tier") is not None:
+                    payload["alpha_proxy_tier"] = alpha_data.get("tier")
+                if alpha_data.get("source"):
+                    payload["source"] = str(alpha_data.get("source"))
+                alpha_by_species[species] = payload
+                continue
+            alpha_by_species[species] = value
     return alpha_by_species
+
+
+def _measured_alpha_control_view(
+    alpha_by_species: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Provider-facing alpha map with tier-2 broad-proxy rows removed (b-314).
+
+    A row carrying ``alpha_proxy_tag == broad_proxy_not_intrinsic`` is proxy
+    evidence, not a measured intrinsic melt alpha; it must not satisfy the
+    provider's presence-based measured-alpha test
+    (``engines.builtin.evaporation_flux._alpha_is_unmeasured``). Removing it
+    here lets the SC-67 ``missing_alpha`` refusal (or the explicitly gated
+    ``allow_unmeasured_alpha_fallback`` prototype path) fire instead of the
+    proxy driving flux as if it were a measurement. The full loader map —
+    proxy rows included, tag-carrying — remains the pressure-gating and
+    diagnostic view.
+    """
+
+    from simulator.evaporation_classes import BROAD_PROXY_NOT_INTRINSIC_TAG
+
+    return {
+        str(species): spec
+        for species, spec in alpha_by_species.items()
+        if not (
+            isinstance(spec, Mapping)
+            and spec.get("alpha_proxy_tag") == BROAD_PROXY_NOT_INTRINSIC_TAG
+        )
+    }
 
 
 def _load_hkl_upper_bound_transport_species(
@@ -2657,7 +2714,9 @@ class EvaporationMixin:
             'evaporation_series_resistance': dict(
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),
-            'alpha': _load_evaporation_alpha_by_species(self.vapor_pressures),
+            'alpha': _measured_alpha_control_view(
+                _load_evaporation_alpha_by_species(self.vapor_pressures)
+            ),
             'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
                 self.vapor_pressures
             ),
