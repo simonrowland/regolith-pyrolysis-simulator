@@ -53,11 +53,12 @@ species:
     - observation_id: pound_1972_fe_solid_alpha_mccabe
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-003-pound-1972/tables.md
         table: '1'
-        line_range: 279-281
+        page: 142
+        paragraph: Iron, solid; McCabe et al. 1950
       T_range_K:
-      - 1358.0
+      - 1350.0
       - 1520.0
       phase: solid_polycrystalline
       condensed_form:
@@ -76,9 +77,9 @@ species:
         gas_species: Fe(g)
         material: Fisher_Electrolytic_Fe_solid
         technique: Langmuir-Knudsen
-        authors: McCabe et al. [1956]
-        note: OCR table row 'Ircn, solid' / Fisher Electrolytic Fe; α_v = 0.9±0.1; McCabe et al. [1956].
-          Separate Table 1 row from Chromium McCabe et al. [1956] (1318–1563 K, same α_v=0.9±0.1) — both
+        authors: McCabe et al. [1950]
+        note: Repaired Table 1 row for iron, solid; α_v = 0.9±0.1; McCabe et al. [1950].
+          Separate Table 1 row from chromium (1318–1563 K, same α_v=0.9±0.1) — both
           rows are in the source (not a Fe/Cr misread).
       uncertainty:
         alpha_range:

@@ -15,9 +15,12 @@ extraction:
     docs/references/pdfs/99-kems-langmuir/ts1985.pdf (Japanese body + English
     synopsis/table captions). Tabulated coefficients taken from Table 1 and
     Table 2; no figure digitization of Fig. 4. Japanese captions/headers
-    retained alongside translation.
-  date: '2026-08-26'
-  worker: t745-na2o-extracts
+    retained alongside translation. 2026-08-27: Table 2 A,B evaluated at the
+    experimental 1100/1200/1300 °C isotherms into per-point activity rows
+    with composition_mol, C-CO pO2, system_class, and condensed_form so the
+    reproduction battery can score them. Arithmetic is log10(a)=A/T+B only.
+  date: '2026-08-27'
+  worker: transcribe-activity
 review_status: draft
 species:
   Na2O:
@@ -264,6 +267,930 @@ species:
         note: >-
           Order-of-magnitude synopsis endpoints, not Table 2 coefficients.
           60 mol% value has no Table 2 row.
+    - observation_id: ts1985_na2o_table2_X0p40_T1100C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.4 evaluated at 1100 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1373.15, 1373.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.4, SiO2: 0.6}
+        X_Na2O_as_published: 0.4
+        T_C: 1100.0
+        T_K: 1373.15
+        A: -14600.0
+        A_as_printed: '(-1.46 ± 0.02) × 10^4'
+        A_uncertainty: 200.0
+        B: 3.03
+        B_uncertainty: 0.06
+        log10_activity: -7.602487
+        activity: 2.497541e-08
+        activity_arithmetic: log10(a)=A/T+B = -14600.0/1373.15+3.03; a=10**(log10 a)
+        raoultian_gamma: 6.243853e-08
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 2.798409e-12
+        log10_pO2_bar: -11.553089
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1373.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p40_T1200C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.4 evaluated at 1200 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1473.15, 1473.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.4, SiO2: 0.6}
+        X_Na2O_as_published: 0.4
+        T_C: 1200.0
+        T_K: 1473.15
+        A: -14600.0
+        A_as_printed: '(-1.46 ± 0.02) × 10^4'
+        A_uncertainty: 200.0
+        B: 3.03
+        B_uncertainty: 0.06
+        log10_activity: -6.880735
+        activity: 1.316026e-07
+        activity_arithmetic: log10(a)=A/T+B = -14600.0/1473.15+3.03; a=10**(log10 a)
+        raoultian_gamma: 3.290065e-07
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 3.347677e-11
+        log10_pO2_bar: -10.475256
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1473.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p40_T1300C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.4 evaluated at 1300 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.4, SiO2: 0.6}
+        X_Na2O_as_published: 0.4
+        T_C: 1300.0
+        T_K: 1573.15
+        A: -14600.0
+        A_as_printed: '(-1.46 ± 0.02) × 10^4'
+        A_uncertainty: 200.0
+        B: 3.03
+        B_uncertainty: 0.06
+        log10_activity: -6.250742
+        activity: 5.613808e-07
+        activity_arithmetic: log10(a)=A/T+B = -14600.0/1573.15+3.03; a=10**(log10 a)
+        raoultian_gamma: 1.403452e-06
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 2.921107e-10
+        log10_pO2_bar: -9.534453
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1573.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p45_T1100C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.45 evaluated at 1100 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1373.15, 1373.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.45, SiO2: 0.55}
+        X_Na2O_as_published: 0.45
+        T_C: 1100.0
+        T_K: 1373.15
+        A: -11800.0
+        A_as_printed: '(-1.18 ± 0.03) × 10^4'
+        A_uncertainty: 300.0
+        B: 1.79
+        B_uncertainty: 0.06
+        log10_activity: -6.803380
+        activity: 1.572606e-07
+        activity_arithmetic: log10(a)=A/T+B = -11800.0/1373.15+1.79; a=10**(log10 a)
+        raoultian_gamma: 3.494679e-07
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 2.798409e-12
+        log10_pO2_bar: -11.553089
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1373.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p45_T1200C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.45 evaluated at 1200 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1473.15, 1473.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.45, SiO2: 0.55}
+        X_Na2O_as_published: 0.45
+        T_C: 1200.0
+        T_K: 1473.15
+        A: -11800.0
+        A_as_printed: '(-1.18 ± 0.03) × 10^4'
+        A_uncertainty: 300.0
+        B: 1.79
+        B_uncertainty: 0.06
+        log10_activity: -6.220046
+        activity: 6.024951e-07
+        activity_arithmetic: log10(a)=A/T+B = -11800.0/1473.15+1.79; a=10**(log10 a)
+        raoultian_gamma: 1.338878e-06
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 3.347677e-11
+        log10_pO2_bar: -10.475256
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1473.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p45_T1300C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.45 evaluated at 1300 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.45, SiO2: 0.55}
+        X_Na2O_as_published: 0.45
+        T_C: 1300.0
+        T_K: 1573.15
+        A: -11800.0
+        A_as_printed: '(-1.18 ± 0.03) × 10^4'
+        A_uncertainty: 300.0
+        B: 1.79
+        B_uncertainty: 0.06
+        log10_activity: -5.710874
+        activity: 1.945924e-06
+        activity_arithmetic: log10(a)=A/T+B = -11800.0/1573.15+1.79; a=10**(log10 a)
+        raoultian_gamma: 4.324276e-06
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 2.921107e-10
+        log10_pO2_bar: -9.534453
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1573.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p50_T1100C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.5 evaluated at 1100 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1373.15, 1373.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.5, SiO2: 0.5}
+        X_Na2O_as_published: 0.5
+        T_C: 1100.0
+        T_K: 1373.15
+        A: -9800.0
+        A_as_printed: '(-0.98 ± 0.03) × 10^4'
+        A_uncertainty: 300.0
+        B: 1.03
+        B_uncertainty: 0.03
+        log10_activity: -6.106875
+        activity: 7.818527e-07
+        activity_arithmetic: log10(a)=A/T+B = -9800.0/1373.15+1.03; a=10**(log10 a)
+        raoultian_gamma: 1.563705e-06
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 2.798409e-12
+        log10_pO2_bar: -11.553089
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1373.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p50_T1200C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.5 evaluated at 1200 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1473.15, 1473.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.5, SiO2: 0.5}
+        X_Na2O_as_published: 0.5
+        T_C: 1200.0
+        T_K: 1473.15
+        A: -9800.0
+        A_as_printed: '(-0.98 ± 0.03) × 10^4'
+        A_uncertainty: 300.0
+        B: 1.03
+        B_uncertainty: 0.03
+        log10_activity: -5.622411
+        activity: 2.385550e-06
+        activity_arithmetic: log10(a)=A/T+B = -9800.0/1473.15+1.03; a=10**(log10 a)
+        raoultian_gamma: 4.771100e-06
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 3.347677e-11
+        log10_pO2_bar: -10.475256
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1473.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p50_T1300C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.5 evaluated at 1300 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.5, SiO2: 0.5}
+        X_Na2O_as_published: 0.5
+        T_C: 1300.0
+        T_K: 1573.15
+        A: -9800.0
+        A_as_printed: '(-0.98 ± 0.03) × 10^4'
+        A_uncertainty: 300.0
+        B: 1.03
+        B_uncertainty: 0.03
+        log10_activity: -5.199539
+        activity: 6.316268e-06
+        activity_arithmetic: log10(a)=A/T+B = -9800.0/1573.15+1.03; a=10**(log10 a)
+        raoultian_gamma: 1.263254e-05
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 2.921107e-10
+        log10_pO2_bar: -9.534453
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1573.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p55_T1100C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.55 evaluated at 1100 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1373.15, 1373.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.55, SiO2: 0.44999999999999996}
+        X_Na2O_as_published: 0.55
+        T_C: 1100.0
+        T_K: 1373.15
+        A: -7400.0
+        A_as_printed: '(-0.74 ± 0.02) × 10^4'
+        A_uncertainty: 200.0
+        B: 0.06
+        B_uncertainty: 0.01
+        log10_activity: -5.329069
+        activity: 4.687390e-06
+        activity_arithmetic: log10(a)=A/T+B = -7400.0/1373.15+0.06; a=10**(log10 a)
+        raoultian_gamma: 8.522527e-06
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 2.798409e-12
+        log10_pO2_bar: -11.553089
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1373.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p55_T1200C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.55 evaluated at 1200 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1473.15, 1473.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.55, SiO2: 0.44999999999999996}
+        X_Na2O_as_published: 0.55
+        T_C: 1200.0
+        T_K: 1473.15
+        A: -7400.0
+        A_as_printed: '(-0.74 ± 0.02) × 10^4'
+        A_uncertainty: 200.0
+        B: 0.06
+        B_uncertainty: 0.01
+        log10_activity: -4.963249
+        activity: 1.088305e-05
+        activity_arithmetic: log10(a)=A/T+B = -7400.0/1473.15+0.06; a=10**(log10 a)
+        raoultian_gamma: 1.978736e-05
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 3.347677e-11
+        log10_pO2_bar: -10.475256
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1473.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
+    - observation_id: ts1985_na2o_table2_X0p55_T1300C
+      type: activity_coefficient
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: >-
+          Table 2 X_Na2O=0.55 evaluated at 1300 °C. A, B as printed;
+          a = 10**(A/T+B) with T in kelvin. Authors obtained A, B by
+          reading Fig. 4/7 (p. 820).
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          English synopsis: "Na2O-SiO2 melts were equilibrated with molten
+          lead-sodium alloy ... in a graphite crucible". Japanese 融体.
+      standard_state: >-
+        Raoultian / pure liquid Na2O (「ラウール基準の Na2O の活量」).
+      regime: chemical_equilibration_graphite_CO_PbNa
+      units: dimensionless a (Raoultian, liquid Na2O)
+      uncertainty:
+        note: >-
+          Table 2 ± on A and B as printed. Experimental envelope on
+          log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at 1200 °C,
+          ±0.14 at 1300 °C.
+        log10_a_envelope:
+          '1100_C': 0.16
+          '1200_C': 0.15
+          '1300_C': 0.14
+      values:
+        quantity: activity_from_table2_AT_B
+        oxide_formula_as_published: Na2O
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: measured_direct
+        composition_mol: {Na2O: 0.55, SiO2: 0.44999999999999996}
+        X_Na2O_as_published: 0.55
+        T_C: 1300.0
+        T_K: 1573.15
+        A: -7400.0
+        A_as_printed: '(-0.74 ± 0.02) × 10^4'
+        A_uncertainty: 200.0
+        B: 0.06
+        B_uncertainty: 0.01
+        log10_activity: -4.643938
+        activity: 2.270189e-05
+        activity_arithmetic: log10(a)=A/T+B = -7400.0/1573.15+0.06; a=10**(log10 a)
+        raoultian_gamma: 4.127617e-05
+        raoultian_gamma_arithmetic: gamma = a/X_Na2O (not used as battery gamma key)
+        pO2_bar: 2.921107e-10
+        log10_pO2_bar: -9.534453
+        pO2_inference: >-
+          Paper states P_CO = 1 atm in a graphite crucible (C-CO buffer);
+          numeric fO2 is not tabulated. Converted with
+          engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson 1994 via
+          LEPR) at T=1573.15 K and P_CO = 1.01325 bar.
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O runs under P_CO = 1 atm (synopsis; p.816 「CO 分圧は 1 atm」).
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
   Na:
     observations:
     - observation_id: ts1985_gamma_Na_in_Pb_table1
@@ -359,6 +1286,13 @@ species:
       - 1473.15
       - 1473.15
       phase: Na2O-SiO2_binary_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sample is the Na2O-SiO2 melt. Standard state for a_SiO2 is
+          tridymite; that is the activity reference, not the specimen form.
       standard_state: >-
         Pure solid tridymite. Paper p.821: 「SiO2 は 870℃ から 1470℃ では
         トリディマイトが安定であるので、基準状態にはこれを選んだ。」
@@ -370,13 +1304,23 @@ species:
         log10_a_SiO2: 0.15
       values:
         quantity: activity_gibbs_duhem_from_Na2O
+        oxide_formula_as_published: SiO2
+        system: Na2O-SiO2
+        system_class: silicate_melt
+        method_class: derived_gibbs_duhem
         T_C: 1200.0
         T_K: 1473.15
         X_Na2O: 0.5
+        composition_mol: {Na2O: 0.5, SiO2: 0.5}
         activity: 0.00601
         activity_as_printed: 6.01 × 10^{-3}
-        gamma: 0.01202
-        gamma_conversion: γ_SiO2 = a_SiO2 / X_SiO2 with X_SiO2 = 1 - 0.500 = 0.500
+        raoultian_gamma: 0.01202
+        raoultian_gamma_arithmetic: γ_SiO2 = a_SiO2 / X_SiO2 with X_SiO2 = 1 - 0.500 = 0.500
+        pO2_bar: 3.347677e-11
+        log10_pO2_bar: -10.475256
+        pO2_inference: >-
+          Same C-CO buffer as the a_Na2O runs (P_CO = 1 atm, graphite).
+          Numeric fO2 from engines.builtin.cco_redox_buffer at 1473.15 K.
         integration_start: >-
           Gibbs-Duhem started at 1200 °C, X_Na2O = 0.500, a_SiO2 = 6.01e-3
           and integrated the Fig. 4 a_Na2O curve. Not an independent
@@ -384,6 +1328,22 @@ species:
         original_japanese: >-
           Table 1 の結果から求めた 1200℃, X_Na2O=0.500 での SiO2 の活量
           6.01×10^{-3} を始点として、GIBBS-DUHEM の関係により積分した。
+      equipment:
+        cell_material:
+          value: graphite crucible with graphite lid (CO blow onto melt surface)
+          locator:
+            page: 3
+            published_page: 817
+            figure: '1'
+            paragraph: 3-2 実験方法
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          note: a_Na2O / Gibbs-Duhem companion under P_CO = 1 atm.
+          locator:
+            page: 2
+            published_page: 816
+            paragraph: 実験原理 / eq. (4)
 fidelity_samples:
 - species: Na2O
   observable: activity_coefficient
@@ -425,3 +1385,23 @@ fidelity_samples:
     published_page: 821
     paragraph: Gibbs-Duhem start point
     note: Printed a_SiO2 = 6.01e-3 at 1200 °C, X_Na2O=0.500 (tridymite)
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: ts1985_na2o_table2_X0p40_T1200C
+  field: activity
+  value: 1.316026e-07
+  locator:
+    page: 7
+    published_page: 821
+    table: '2'
+    note: Table 2 X_Na2O=0.40 at 1200 °C via log10 a = A/T+B
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: ts1985_na2o_table2_X0p55_T1200C
+  field: A
+  value: -7400.0
+  locator:
+    page: 7
+    published_page: 821
+    table: '2'
+    note: Table 2 X_Na2O=0.55 printed A = (-0.74 ± 0.02)×10^4

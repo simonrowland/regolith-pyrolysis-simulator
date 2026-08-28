@@ -109,9 +109,10 @@ species:
     - observation_id: fedkin_2006_mg_hashimoto_langmuir_table3
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
         table: '3'
-        line_range: 186-197
+        page: 212
+        paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
       T_range_K:
       - 1973.0
       - 2273.0
@@ -128,12 +129,25 @@ species:
         gas_species: Mg(g)
         material: Hashimoto_1983_FCMAS_silicate_melt
         sigma: 0.01
-        note: Table 3 Mg this-work at 1973 K is 0.24±0.01 (OCR content_list); weak T dependence
+        per_temperature:
+        - T_K: 1973.0
+          alpha: 0.24
+          sigma: 0.01
+        - T_K: 2073.0
+          alpha: 0.28
+          sigma: 0.01
+        - T_K: 2173.0
+          alpha: 0.28
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.27
+          sigma: 0.01
+        note: Table 3 Mg this-work values transcribed from the repaired MinerU HTML table; weak T dependence
         missing_for_motzfeldt:
         - orifice_area
         - clausing_factor
       uncertainty:
-        note: ±0.01 on α_Mg (authors visual fit)
+        note: ±0.01 on each α_Mg value as printed in Table 3
       equipment:
         cell_material:
           value: graphite crucible (Hashimoto 1983)

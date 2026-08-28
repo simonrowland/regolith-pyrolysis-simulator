@@ -263,7 +263,9 @@ species:
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
         table: '2'
+        page: PDF pp. 3-4 / printed pp. 517-518
         line_range: 166-168
       T_range_K:
       - 1873.15
@@ -280,16 +282,77 @@ species:
       values:
         alpha: 51.0
         alpha_note: 5 min experimental pin melt 6503-12 (Table 2)
-        olette_alpha_exp_series_6503_12:
-        - t_min: 5
+        olette_alpha_exp_series:
+        - melt: 6503-12
+          pct_Cu0: 1.04
+          t_min: 5
           alpha_exp: 51
-        - t_min: 10
+        - melt: 6503-12
+          pct_Cu0: 1.04
+          t_min: 10
           alpha_exp: 60
-        - t_min: 15
+        - melt: 6503-12
+          pct_Cu0: 1.04
+          t_min: 15
           alpha_exp: 73
-        - t_min: 20
+        - melt: 6503-12
+          pct_Cu0: 1.04
+          t_min: 20
           alpha_exp: 53
+        - melt: 6503-11
+          pct_Cu0: 1.74
+          t_min: 5
+          alpha_exp: 68
+        - melt: 6503-11
+          pct_Cu0: 1.74
+          t_min: 10
+          alpha_exp: 47
+        - melt: 6503-11
+          pct_Cu0: 1.74
+          t_min: 15
+          alpha_exp: 101
+        - melt: 6503-11
+          pct_Cu0: 1.74
+          t_min: 20
+          alpha_exp: 65
+        - melt: 6503-16
+          pct_Cu0: 2.65
+          t_min: 5
+          alpha_exp: 55
+        - melt: 6503-16
+          pct_Cu0: 2.65
+          t_min: 10
+          alpha_exp: 59
+        - melt: 6503-16
+          pct_Cu0: 2.65
+          t_min: 15
+          alpha_exp: 67
+        - melt: 6503-16
+          pct_Cu0: 2.65
+          t_min: 20
+          alpha_exp: 73
+        - melt: 6503-28
+          pct_Cu0: 4.57
+          t_min: 5
+          alpha_exp: 70
+        - melt: 6503-28
+          pct_Cu0: 4.57
+          t_min: 10
+          alpha_exp: 70
+        - melt: 6503-28
+          pct_Cu0: 4.57
+          t_min: 15
+          alpha_exp: 32
+        - melt: 6503-28
+          pct_Cu0: 4.57
+          t_min: 20
+          alpha_exp: 83
         olette_alpha_theo: 143
+        lambda_Cu_by_melt:
+          6503-12: 67
+          6503-11: 70
+          6503-16: 44
+          6503-28: 36
         not_hkl_langmuir_coefficient: true
         gas_species: Cu(g)
         material: molten_Fe_Cu
@@ -354,7 +417,9 @@ species:
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
         table: '3'
+        page: PDF p. 4 / printed p. 518
         line_range: 174-176
       T_range_K:
       - 1873.15
@@ -371,7 +436,24 @@ species:
       values:
         alpha: 19.0
         alpha_note: 5 min experimental pin melt 6503-15 (Table 3)
+        olette_alpha_exp_series:
+        - {melt: 6503-15, pct_Sn0: 0.98, t_min: 5, alpha_exp: 19}
+        - {melt: 6503-15, pct_Sn0: 0.98, t_min: 10, alpha_exp: 24}
+        - {melt: 6503-15, pct_Sn0: 0.98, t_min: 15, alpha_exp: 31}
+        - {melt: 6503-15, pct_Sn0: 0.98, t_min: 20, alpha_exp: 27}
+        - {melt: 6503-14, pct_Sn0: 1.84, t_min: 5, alpha_exp: 23}
+        - {melt: 6503-14, pct_Sn0: 1.84, t_min: 10, alpha_exp: 28}
+        - {melt: 6503-14, pct_Sn0: 1.84, t_min: 15, alpha_exp: 22}
+        - {melt: 6503-14, pct_Sn0: 1.84, t_min: 20, alpha_exp: 24}
+        - {melt: 6504-1, pct_Sn0: 3.13, t_min: 5, alpha_exp: 13}
+        - {melt: 6504-1, pct_Sn0: 3.13, t_min: 10, alpha_exp: 23}
+        - {melt: 6504-1, pct_Sn0: 3.13, t_min: 15, alpha_exp: 33}
+        - {melt: 6504-1, pct_Sn0: 3.13, t_min: 20, alpha_exp: 28}
         olette_alpha_theo: 20
+        lambda_Sn_by_melt:
+          6503-15: 19
+          6503-14: 15
+          6504-1: 18
         not_hkl_langmuir_coefficient: true
         gas_species: Sn(g)
         material: molten_Fe_Sn

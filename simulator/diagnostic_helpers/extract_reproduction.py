@@ -45,11 +45,13 @@ from simulator.chemistry.langmuir_knudsen import (
 )
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    MELT_OXIDE_CATIONS_PER_FORMULA,
     P2O5_ACTIVITY_COEFFICIENT,
     melt_oxide_activity,
     melt_oxide_activity_coefficient,
 )
 from simulator.state import MOLAR_MASS
+from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_STATUSES,
     ORDERING_VERDICT_STATUSES,
@@ -3294,7 +3296,69 @@ def _melt_recipe_mol(
             return None, provenance, "invalid_melt_composition_wt_pct"
         if mol:
             return mol, provenance, None
+    binary_mol, binary_source, binary_error = _binary_system_closure_mol(values)
+    if binary_mol is not None:
+        return binary_mol, binary_source, None
+    if binary_error is not None:
+        return None, "none", binary_error
     return None, "none", "missing_condition:melt_composition"
+
+
+def _binary_system_closure_mol(
+    values: Mapping[str, Any],
+) -> tuple[dict[str, float] | None, str | None, str | None]:
+    """Complete a binary melt composition from its single published mole fraction.
+
+    A two-component system (``system: K2O-SiO2``) is fully determined by one
+    mole fraction: the second component is 1 - x by closure. This is NOT a
+    relaxation of the completeness gate -- it admits only a specification
+    that carries the full information content of the composition, and any
+    system that is not exactly two known oxide components, or that carries no
+    published ``x_<component>_as_published`` value, falls through to the
+    standard missing-composition refusal.
+    """
+
+    system = values.get("system")
+    if not isinstance(system, str) or not system.strip():
+        return None, None, None
+    parts = [part.strip() for part in system.split("-")]
+    if len(parts) != 2 or not all(parts):
+        return None, None, None
+    if any(part not in MELT_OXIDE_CATIONS_PER_FORMULA for part in parts):
+        return None, None, None
+    published: dict[str, tuple[str, float]] = {}
+    for part in parts:
+        key = f"x_{part}_as_published"
+        raw = values.get(key)
+        if raw is None:
+            continue
+        try:
+            x = float(raw)
+        except (TypeError, ValueError):
+            return None, None, f"invalid_{key}"
+        if not math.isfinite(x) or x <= 0.0 or x >= 1.0:
+            return None, None, f"invalid_{key}"
+        published[part] = (key, x)
+    if not published:
+        return None, None, None
+    if len(published) == 2:
+        x_a = published[parts[0]][1]
+        x_b = published[parts[1]][1]
+        if abs(x_a + x_b - 1.0) > 1e-6:
+            return None, None, "invalid_binary_mole_fraction_closure"
+        return (
+            {parts[0]: x_a, parts[1]: x_b},
+            f"extract binary system closure {system} "
+            f"(x_{parts[0]}_as_published+x_{parts[1]}_as_published)",
+            None,
+        )
+    component, (key, x) = next(iter(published.items()))
+    other = parts[0] if parts[1] == component else parts[1]
+    return (
+        {component: x, other: 1.0 - x},
+        f"extract binary system closure {system} from {key} (second component = 1-x)",
+        None,
+    )
 
 
 def _series_has_key(values: Mapping[str, Any], key: str) -> bool:
@@ -3857,7 +3921,7 @@ def _evaluate_ordering(
     if claim is None:
         return _emit(
             verdict="not_evaluable",
-            reason="unsupported_observable:ordering_claim_unparsed",
+            reason=qualitative_payload_skip_reason(obs),
         )
     if claim.get("kind") == "gas_speciation":
         return _emit(
@@ -4308,6 +4372,25 @@ def _evaluate_activity(
                 observable=observable_kind,
             )
         actual = float(result.activity)
+        cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(parent_oxide, 1.0)
+        published_formula = _normalize_oxide_formula(
+            str(values.get("oxide_formula_as_published") or "")
+        )
+        if cations != 1.0 and published_formula == parent_oxide:
+            # The extract publishes the parent-oxide activity (e.g. a_K2O vs
+            # pure liquid K2O); the engine returns the single-cation activity
+            # (a_KO0.5). docs/chemistry-methods.md §3.1: the di-cation
+            # activity is the square of the single-cation one. Compare on the
+            # published basis -- otherwise the residual is a basis mismatch,
+            # not a model-vs-data disagreement.
+            actual = float(result.thermodynamic_parent_activity())
+            runtime["activity_comparison_basis"] = (
+                f"parent_oxide_formula:{parent_oxide} "
+                f"(a_parent = a_single_cation^{cations:g})"
+            )
+            runtime["engine_activity_single_cation"] = float(result.activity)
+        else:
+            runtime["activity_comparison_basis"] = "single_cation"
         runtime.update(result.provenance())
         warning = getattr(result, "warning", None)
         if warning:

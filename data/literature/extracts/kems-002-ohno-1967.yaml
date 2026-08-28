@@ -70,7 +70,9 @@ species:
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
         table: '3'
+        page: PDF p. 4 / printed p. 1167
         paragraph: Evaporation coefficients of Mn, Cu, Sn, Cr and S in molten iron
       T_range_K:
       - 1873.15
@@ -179,7 +181,21 @@ species:
       values:
         alpha: 51.0
         alpha_note: 5 min pin melt 6602-15
+        olette_alpha_exp_series:
+        - {melt: 6602-15, pct_Cu0: 0.94, t_min: 5, alpha_exp: 51}
+        - {melt: 6602-15, pct_Cu0: 0.94, t_min: 10, alpha_exp: 48}
+        - {melt: 6602-15, pct_Cu0: 0.94, t_min: 15, alpha_exp: 50}
+        - {melt: 6603-15, pct_Cu0: 1.92, t_min: 5, alpha_exp: 71}
+        - {melt: 6603-15, pct_Cu0: 1.92, t_min: 10, alpha_exp: 62}
+        - {melt: 6603-15, pct_Cu0: 1.92, t_min: 15, alpha_exp: 65}
+        - {melt: 6603-16, pct_Cu0: 2.90, t_min: 5, alpha_exp: 131}
+        - {melt: 6603-16, pct_Cu0: 2.90, t_min: 10, alpha_exp: 75}
+        - {melt: 6603-16, pct_Cu0: 2.90, t_min: 15, alpha_exp: 82}
         olette_alpha_theo: 143
+        lambda_Cu_by_melt:
+          6602-15: 61
+          6603-15: 54
+          6603-16: 64
         not_hkl_langmuir_coefficient: true
         gas_species: Cu(g)
         material: molten_Fe_Cu
@@ -216,6 +232,52 @@ species:
           K_V: 0.0024
           C_s_over_C_m: 0.92
         K_D_cm_s: 0.025
+        gas_species: Sn(g)
+        material: molten_Fe_Sn
+    - observation_id: ohno_1967_sn_olette_alpha_table3
+      type: alpha
+      locator:
+        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+        table: '3'
+        page: PDF p. 4 / printed p. 1167
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe_Sn_alloy
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Molten-metal / steel-melt α; class-incomparable to silicate-melt rail
+      standard_state: Olette relative evaporation coefficient — NOT HKL α
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      values:
+        alpha: 17.0
+        alpha_note: 5 min experimental pin melt 6602-16
+        olette_alpha_exp_series:
+        - {melt: 6602-16, pct_Sn0: 0.89, t_min: 5, alpha_exp: 17}
+        - {melt: 6602-16, pct_Sn0: 0.89, t_min: 10, alpha_exp: 20}
+        - {melt: 6602-16, pct_Sn0: 0.89, t_min: 15, alpha_exp: 22}
+        - {melt: 6603-17, pct_Sn0: 1.92, t_min: 5, alpha_exp: 35}
+        - {melt: 6603-17, pct_Sn0: 1.92, t_min: 10, alpha_exp: 25}
+        - {melt: 6603-17, pct_Sn0: 1.92, t_min: 15, alpha_exp: 26}
+        - {melt: 6603-18, pct_Sn0: 2.40, t_min: 5, alpha_exp: 12}
+        - {melt: 6603-18, pct_Sn0: 2.40, t_min: 10, alpha_exp: 18}
+        - {melt: 6603-18, pct_Sn0: 2.40, t_min: 15, alpha_exp: 26}
+        gamma0_Sn_by_melt:
+          6602-16: 2.7
+          6603-17: 3.4
+          6603-18: 2.8
+        olette_alpha_theo_by_melt:
+          6602-16: 28
+          6603-17: 35
+          6603-18: 29
+        lambda_Sn_by_melt:
+          6602-16: 26
+          6603-17: 32
+          6603-18: 27
+        not_hkl_langmuir_coefficient: true
         gas_species: Sn(g)
         material: molten_Fe_Sn
   Cr:
@@ -258,7 +320,9 @@ species:
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
         table: '3'
+        page: PDF p. 4 / printed p. 1167
       T_range_K:
       - 1873.15
       - 1873.15
@@ -273,16 +337,21 @@ species:
       units: dimensionless
       values:
         alpha: 2.6
-        alpha_note: 5 min experimental pin melt 6606-1 (OCR melt id 6601-1 in header / 6606-1 in Table
-          1)
+        alpha_note: 5 min experimental pin; Table 3 prints melt 6601-1 while Table 1 prints 6606-1
         olette_alpha_exp_series:
-        - melt: 6606-1
+        - melt: 6601-1
+          cross_table_melt_id: 6606-1
+          identifier_status: SOURCE_INTERNAL_CONTRADICTION
           t_min: 5
           alpha_exp: 2.6
-        - melt: 6606-1
+        - melt: 6601-1
+          cross_table_melt_id: 6606-1
+          identifier_status: SOURCE_INTERNAL_CONTRADICTION
           t_min: 10
           alpha_exp: 2.5
-        - melt: 6606-1
+        - melt: 6601-1
+          cross_table_melt_id: 6606-1
+          identifier_status: SOURCE_INTERNAL_CONTRADICTION
           t_min: 15
           alpha_exp: 3.0
         - melt: 6606-2
@@ -305,9 +374,13 @@ species:
           alpha_exp: 3.3
         olette_alpha_theo: 4.4
         lambda_Cr_by_melt:
-          6606-1: 2.8
+          6601-1: 2.8
           6606-2: 2.6
           6606-3: 3.0
+        cross_table_melt_id:
+          table_1: 6606-1
+          table_3: 6601-1
+          status: SOURCE_INTERNAL_CONTRADICTION
         not_hkl_langmuir_coefficient: true
         gas_species: Cr(g)
         material: molten_Fe_Cr
@@ -358,7 +431,9 @@ species:
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
         table: '3'
+        page: PDF p. 4 / printed p. 1167
         paragraph: α (cond) for Fe-S alloys
       T_range_K:
       - 1873.15
@@ -398,6 +473,33 @@ species:
         - melt: 6510-13
           t_min: 15
           alpha_exp: 6.0
+        - melt: 6505-8
+          t_min: 5
+          alpha_exp: 4.9
+        - melt: 6505-8
+          t_min: 10
+          alpha_exp: 6.3
+        - melt: 6505-8
+          t_min: 15
+          alpha_exp: 5.6
+        - melt: 6510-12
+          t_min: 5
+          alpha_exp: 9.4
+        - melt: 6510-12
+          t_min: 10
+          alpha_exp: 7.8
+        - melt: 6510-12
+          t_min: 15
+          alpha_exp: 7.5
+        - melt: 6510-11
+          t_min: 5
+          alpha_exp: 6.5
+        - melt: 6510-11
+          t_min: 10
+          alpha_exp: 6.2
+        - melt: 6510-11
+          t_min: 15
+          alpha_exp: 6.8
         olette_alpha_theo_over_alpha_cond: 41
         gas_species: S(g)
         material: molten_Fe_S
@@ -503,6 +605,16 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
     table: '3'
     paragraph: α (cond) = 0.2 for Fe-S melts
+- species: Sn
+  observable: alpha
+  observation_id: ohno_1967_sn_olette_alpha_table3
+  field: alpha
+  value: 17.0
+  locator:
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+    table: '3'
+    page: PDF p. 4 / printed p. 1167
+    paragraph: Fe-Sn melt 6602-16 alpha(exp) = 17 at t=5 min
 - species: Mn
   observable: alpha
   observation_id: ohno_1967_mn_olette_alpha_table3

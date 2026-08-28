@@ -2330,15 +2330,15 @@ species:
     - observation_id: sossi_2019_rb_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
+        page: 57
         note: >-
           Table 4 γ_i (this work) for RbO0.5; authors set α_e=1 and compute γ from K*/K
       T_range_K:
       - 1673.15
-      - 1673.15
+      - 1823.15
       phase: silicate_melt_ferrobasalt_FCMAS
       condensed_form:
         state: liquid_melt
@@ -2359,6 +2359,17 @@ species:
         note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
       values:
         gamma: 0.00013
+        per_temperature:
+        - T_K: 1673.15
+          gamma: 0.00013
+          gamma_uncertainty: 1.5e-05
+        - T_K: 1773.15
+          gamma: 7.4e-05
+          gamma_uncertainty: 5.9e-06
+        - T_K: 1823.15
+          gamma: 9.0e-05
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
         quantity: activity_coefficient_this_work
         oxide_formula_as_published: RbO0.5
         gas_species: Rb(g)
@@ -2539,15 +2550,15 @@ species:
     - observation_id: sossi_2019_cu_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
+        page: 57
         note: >-
           Table 4 γ_i (this work) for CuO0.5; authors set α_e=1 and compute γ from K*/K
       T_range_K:
-      - 1673.15
-      - 1673.15
+      - 1573.15
+      - 1923.15
       phase: silicate_melt_ferrobasalt_FCMAS
       condensed_form:
         state: liquid_melt
@@ -2568,6 +2579,25 @@ species:
         note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
       values:
         gamma: 11.8
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 24.0
+          gamma_uncertainty: 6.3
+        - T_K: 1673.15
+          gamma: 11.8
+          gamma_uncertainty: 1.7
+        - T_K: 1773.15
+          gamma: 8.5
+          gamma_uncertainty: 0.1
+        - T_K: 1823.15
+          gamma: 6.4
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        - T_K: 1923.15
+          gamma: 4.2
+          gamma_uncertainty: null
+          source_marker: '*'
+          uncertainty_note: source footnote states this value was extrapolated to 1923.15 K
         quantity: activity_coefficient_this_work
         oxide_formula_as_published: CuO0.5
         gas_species: Cu(g)
@@ -2898,15 +2928,15 @@ species:
     - observation_id: sossi_2019_zn_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
+        page: 57
         note: >-
           Table 4 γ_i (this work) for ZnO; authors set α_e=1 and compute γ from K*/K
       T_range_K:
-      - 1673.15
-      - 1673.15
+      - 1573.15
+      - 1823.15
       phase: silicate_melt_ferrobasalt_FCMAS
       condensed_form:
         state: liquid_melt
@@ -2927,6 +2957,20 @@ species:
         note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
       values:
         gamma: 0.51
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 0.24
+          gamma_uncertainty: 0.02
+        - T_K: 1673.15
+          gamma: 0.51
+          gamma_uncertainty: 0.13
+        - T_K: 1773.15
+          gamma: 0.97
+          gamma_uncertainty: 0.38
+        - T_K: 1823.15
+          gamma: 1.01
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
         quantity: activity_coefficient_this_work
         oxide_formula_as_published: ZnO
         gas_species: Zn(g)
@@ -3107,15 +3151,15 @@ species:
     - observation_id: sossi_2019_ge_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
+        page: 57
         note: >-
           Table 4 γ_i (this work) for GeO2; authors set α_e=1 and compute γ from K*/K
       T_range_K:
-      - 1673.15
-      - 1673.15
+      - 1573.15
+      - 1823.15
       phase: silicate_melt_ferrobasalt_FCMAS
       condensed_form:
         state: liquid_melt
@@ -3136,6 +3180,20 @@ species:
         note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
       values:
         gamma: 0.11
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 0.04
+          gamma_uncertainty: 0.01
+        - T_K: 1673.15
+          gamma: 0.11
+          gamma_uncertainty: 0.01
+        - T_K: 1773.15
+          gamma: 0.18
+          gamma_uncertainty: 0.07
+        - T_K: 1823.15
+          gamma: 0.19
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
         quantity: activity_coefficient_this_work
         oxide_formula_as_published: GeO2
         gas_species: Ge(g)
@@ -3749,14 +3807,14 @@ species:
     - observation_id: sossi_2019_pb_table4_gamma_this_work
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
+        page: 57
         note: >-
           Table 4 γ_i (this work) for PbO; authors set α_e=1 and compute γ from K*/K
       T_range_K:
-      - 1673.15
+      - 1573.15
       - 1673.15
       phase: silicate_melt_ferrobasalt_FCMAS
       condensed_form:
@@ -3777,6 +3835,24 @@ species:
         note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
       values:
         gamma: 0.17
+        per_temperature_by_channel:
+          PbO_caret:
+          - T_K: 1573.15
+            gamma: 0.06
+            gamma_uncertainty: 0.02
+          - T_K: 1673.15
+            gamma: 0.17
+            gamma_uncertainty: null
+            uncertainty_note: no uncertainty printed for this Table 4 cell
+          PbO_hash:
+          - T_K: 1573.15
+            gamma: 0.21
+            gamma_uncertainty: 0.09
+          - T_K: 1673.15
+            gamma: 0.38
+            gamma_uncertainty: null
+            uncertainty_note: no uncertainty printed for this Table 4 cell
+        channel_note: PbO^ and PbO# retained as printed; channel footnote was not recovered from the repaired slice.
         quantity: activity_coefficient_this_work
         oxide_formula_as_published: PbO
         gas_species: Pb(g)

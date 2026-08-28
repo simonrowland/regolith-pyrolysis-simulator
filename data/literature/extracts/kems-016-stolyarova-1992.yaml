@@ -98,7 +98,9 @@ species:
       type: gibbs_table
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
         table: '1'
+        page: PDF p. 2 / printed p. 186
         line_range: 27-45
         paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
       T_range_K:
@@ -151,15 +153,14 @@ species:
           minus_delta_G_kohler: 9.1
           minus_delta_G_wilson: 10.6
         - system: SiO2:CaO:MgO
-          x:
-            SiO2: 0.5
-            CaO: 0.25
-            MgO: 0.25
+          x: null
+          x_as_printed: '0.50:0.25:25'
+          payload_status: SOURCE_INTERNAL_FORMAT_ERROR
           T_K: 1833.0
           minus_delta_G_exp_kcal_mol: 10.3
           minus_delta_G_kohler: 6.2
           minus_delta_G_wilson: null
-          note: OCR '0.50:0.25:25' interpreted as 0.50:0.25:0.25 mol frac
+          note: The source prints 0.50:0.25:25. The missing decimal is not repaired or guessed.
         - system: SiO2:CaO:Al2O3:FeO:MgO
           x:
             SiO2: 0.36

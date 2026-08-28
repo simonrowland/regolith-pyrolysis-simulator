@@ -1319,7 +1319,9 @@ species:
           already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
       values:
         gas_species: Na(g)
-        quantity: partial_pressure_figure_digitized
+        quantity: partial_pressure_figure_digitization_rejected
+        status: typed_refusal
+        reason: Figure-only values are inadmissible for this extraction; no source-tabulated Na pressure points exist.
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         sample: '12022'
@@ -1328,7 +1330,8 @@ species:
         composition_source: 'DeMaria 1971 text (Sample 12022,57 alkaline components paragraph): "0.36
           and 0.068 wt. % of Na2O and K2O, respectively"; full oxide suite reported elsewhere (Smales
           1971). Test fixture matches Na2O=0.36.'
-        figure_digitized: true
+        prior_figure_digitization_present: true
+        admission_status: rejected_no_figure_reading
         series: upper_line_circles
         pre_depletion_only: true
         first_observed_T_K: 1250.0
@@ -1374,7 +1377,7 @@ species:
           p_Pa: 0.0793
           note: Fitted-line evaluation at investigation T (July Na report); consistent with upper-line
             visual digitization. Held-out only.
-        points:
+        inadmissible_figure_digitized_points:
         - T_K: 1428.57
           invT_times_1e4_K_inv: 7.0
           log10_p_atm: -6.05
@@ -1480,7 +1483,9 @@ species:
           already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
       values:
         gas_species: Na(g)
-        quantity: partial_pressure_figure_digitized
+        quantity: partial_pressure_figure_digitization_rejected
+        status: typed_refusal
+        reason: Figure-only values are inadmissible for this extraction; no source-tabulated Na pressure points exist.
         material: Apollo_12_12065
         condensed_phase: lunar_basalt_melt
         sample: '12065'
@@ -1500,7 +1505,8 @@ species:
           not tabulate 12065 bulk oxides (refers differences to composition without numbers). Extracted
           from docs-private/deep-research/literature/wolf-2022-vaporock/mineru/source/vlm/source.md Table
           2 + NOTE [7].
-        figure_digitized: true
+        prior_figure_digitization_present: true
+        admission_status: rejected_no_figure_reading
         series: lower_line_squares
         pre_depletion_only: true
         first_observed_T_K: 1250.0
@@ -1551,7 +1557,7 @@ species:
           p_Pa: 0.00183
           note: Fitted-line evaluation at investigation T (July Na report); consistent with lower-line
             visual digitization. Held-out only.
-        points:
+        inadmissible_figure_digitized_points:
         - T_K: 1474.93
           invT_times_1e4_K_inv: 6.78
           log10_p_atm: -7.05
@@ -1830,17 +1836,6 @@ fidelity_samples:
   value: 0.27
   locator:
     note: Wolf 2022 Table 2 lunar basalt (12065) Na2O=0.27 wt%; Maxwell & Wiik 1971
-- path: species.Na.observations[demaria_1971_na_psat_figure1_sample_12022_digitized].values.points[0].log10_p_atm
-  value: -6.05
-  note: figure-digitized open-circle point invT*1e4=7.00, log10_p_atm=-6.05
-  locator:
-    figure: '1'
-    note: first digitized 12022 point on upper line
-- path: species.Na.observations[demaria_1971_na_psat_figure1_sample_12065_digitized].values.points[0].log10_p_atm
-  value: -7.05
-  note: figure-digitized first 12065 pre-depletion square on lower line
-  locator:
-    figure: '1'
 - species: Fe
   observable: activity_coefficient
   observation_id: demaria_1971_multi_rotating_geometry_absence_b1

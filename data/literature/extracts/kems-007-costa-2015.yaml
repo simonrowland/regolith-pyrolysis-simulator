@@ -40,14 +40,18 @@ species:
       regime: kems_effusion
       units: dimensionless
       values:
-        alpha: 0.02
-        alpha_range:
+        alpha: null
+        alpha_range: null
+        admission_status: rejected_no_figure_reading
+        reason: The source has no numbered numeric table; repaired-table review rejects figure digitization.
+        inadmissible_figure_alpha: 0.02
+        inadmissible_figure_alpha_range:
         - 0.011
         - 0.02
         gas_species: Fe(g)
         material: Fo93Fa7_olivine
         method: Whitman-Motzfeld multi-cell (three Mo Knudsen cells, different orifice sizes)
-        alpha_series_figure_approx:
+        inadmissible_figure_digitized_alpha_series:
         - T_K: 1700.0
           alpha: 0.0165
         - T_K: 1720.0
@@ -70,7 +74,7 @@ species:
           not cell orifices). Partial multi-orifice observation only — do not invent Clausing.
       uncertainty:
         note: high-side of measured D(Fe+) band adopted as conservative pin; figure scatter ~0.011–0.020
-        alpha_range:
+        inadmissible_figure_alpha_range:
         - 0.011
         - 0.02
       equipment:
@@ -140,8 +144,12 @@ species:
       regime: kems_effusion
       units: dimensionless
       values:
-        alpha: 0.02
-        alpha_range:
+        alpha: null
+        alpha_range: null
+        admission_status: rejected_no_figure_reading
+        reason: The source has no numbered numeric table; repaired-table review rejects figure digitization.
+        inadmissible_figure_alpha: 0.02
+        inadmissible_figure_alpha_range:
         - 0.011
         - 0.02
         gas_species: Fe(g)
@@ -177,7 +185,7 @@ species:
           melt free surface.
       uncertainty:
         note: high-side of measured D(Fe+) band; figure scatter ~0.011–0.020
-        alpha_range:
+        inadmissible_figure_alpha_range:
         - 0.011
         - 0.02
       equipment:
@@ -216,13 +224,16 @@ species:
       units: dimensionless
       values:
         alpha: null
-        alpha_range:
+        alpha_range: null
+        admission_status: rejected_no_figure_reading
+        reason: The source has no numbered numeric table; repaired-table review rejects figure digitization.
+        inadmissible_figure_alpha_range:
         - 0.003
         - 0.036
         gas_species: SiO(g)
         material: Fo93Fa7_olivine
         method: Whitman-Motzfeld multi-cell (three Mo Knudsen cells, different orifice sizes)
-        alpha_series_figure_approx:
+        inadmissible_figure_digitized_alpha_series:
         - T_K: 1700.0
           alpha: 0.003
         - T_K: 1725.0
@@ -243,7 +254,7 @@ species:
           Clausing factors not in text. Do not invent.
       uncertainty:
         note: Range from figure band; not a single pin
-        alpha_range:
+        inadmissible_figure_alpha_range:
         - 0.003
         - 0.036
       equipment:
@@ -299,7 +310,10 @@ species:
       units: dimensionless
       values:
         alpha: null
-        alpha_range:
+        alpha_range: null
+        admission_status: rejected_no_figure_reading
+        reason: The source has no numbered numeric table; repaired-table review rejects figure digitization.
+        inadmissible_figure_alpha_range:
         - 0.003
         - 0.036
         gas_species: SiO(g)
@@ -319,7 +333,7 @@ species:
           single pin.
       uncertainty:
         note: Range from figure band; not a single pin
-        alpha_range:
+        inadmissible_figure_alpha_range:
         - 0.003
         - 0.036
       equipment:
@@ -330,55 +344,10 @@ species:
             paragraph: Mo reacts; Ir must be used
             line_range: 259-391
 fidelity_samples:
-- species: Fe
-  observable: alpha
-  observation_id: costa_2015_fe_olivine_kems_alpha_multicell
-  field: alpha
-  value: 0.02
+- path: species.Fe.observations[costa_2015_fe_olivine_kems_alpha_multicell].equipment.multi_orifice_series.value.n_cells
+  value: 3
+  note: Source-stated number of Mo Knudsen cells; figure-derived alpha values are not fidelity anchors.
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
-    figure: vaporization coefficients Fe+ panel high-side ~0.02
-    line_range: '386'
-    note: image 142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
-- species: Fe
-  observable: alpha
-  observation_id: costa_2015_fe_olivine_kems_alpha_multicell
-  field: alpha_range
-  value:
-  - 0.011
-  - 0.02
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
-    figure: Fe+ α band ~0.011–0.020 over 1700–1800 K
-    line_range: '386'
-- species: SiO
-  observable: alpha
-  observation_id: costa_2015_sio_olivine_kems_alpha_multicell
-  field: alpha_range
-  value:
-  - 0.003
-  - 0.036
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
-    figure: SiO+ α band ~0.003–0.036 over 1700–1800 K
-    line_range: '386'
-- species: Fe
-  observable: alpha
-  observation_id: costa_2015_fe_olivine_class_and_motzfeldt_absence_b1
-  field: alpha
-  value: 0.02
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
-    figure: Fe+ α high-side ~0.02
-    line_range: '386'
-- species: SiO
-  observable: alpha
-  observation_id: costa_2015_sio_olivine_class_and_motzfeldt_absence_b1
-  field: alpha_range
-  value:
-  - 0.003
-  - 0.036
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
-    figure: SiO+ α band
-    line_range: '386'
+    paragraph: three Knudsen cells with different orifice sizes
+    line_range: '179-386'

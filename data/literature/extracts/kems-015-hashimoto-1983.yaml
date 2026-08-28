@@ -98,10 +98,9 @@ species:
           hole_diameter: 1.2
         note: 'Primary free-evap experiment behind Fedkin Fe/Mg/SiO α. Spherule free surface evolves with
           mass loss; starting preform given; per-run free-surface series not tabulated as numeric m2 series
-          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). Sphere estimate from starting dia 4
-          mm: 4*pi*r^2 = 5.02655e-05 m2 (rough upper bound only).'
-        sample_surface_area_estimate_m2: 5.02655e-05
-        sample_surface_area_status: ABSENT_NOT_NUMERIC_series_sphere_estimate_only
+          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). No area is estimated from the preform
+          dimensions.'
+        sample_surface_area_status: ABSENT_NOT_NUMERIC_series
       equipment:
         cell_material:
           value: high-purity graphite crucible (atomic-pile grade)
@@ -109,11 +108,14 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: graphite crucible
         sample_surface_area:
-          value: 5.02655e-05
-          units: m2
-          inferred: true
-          inference: rough sphere A=4*pi*r^2 with r=2 mm starting preform diameter 4 mm => 5.02655e-05
-            m2; NOT measured free surface series
+          value:
+            form: molten_spherule
+            starting_preform_mm:
+              height: 4.0
+              diameter: 4.0
+              hole_diameter: 1.2
+            numeric_m2_series: null
+            note: Source states preform dimensions but does not tabulate the evolving molten-spherule area.
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: starting preform height 4 mm diameter 4 mm
@@ -301,10 +303,9 @@ species:
           hole_diameter: 1.2
         note: 'Primary free-evap experiment behind Fedkin Fe/Mg/SiO α. Spherule free surface evolves with
           mass loss; starting preform given; per-run free-surface series not tabulated as numeric m2 series
-          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). Sphere estimate from starting dia 4
-          mm: 4*pi*r^2 = 5.02655e-05 m2 (rough upper bound only).'
-        sample_surface_area_estimate_m2: 5.02655e-05
-        sample_surface_area_status: ABSENT_NOT_NUMERIC_series_sphere_estimate_only
+          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). No area is estimated from the preform
+          dimensions.'
+        sample_surface_area_status: ABSENT_NOT_NUMERIC_series
       equipment:
         cell_material:
           value: high-purity graphite crucible (atomic-pile grade)
@@ -312,11 +313,14 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: graphite crucible
         sample_surface_area:
-          value: 5.02655e-05
-          units: m2
-          inferred: true
-          inference: rough sphere A=4*pi*r^2 with r=2 mm starting preform diameter 4 mm => 5.02655e-05
-            m2; NOT measured free surface series
+          value:
+            form: molten_spherule
+            starting_preform_mm:
+              height: 4.0
+              diameter: 4.0
+              hole_diameter: 1.2
+            numeric_m2_series: null
+            note: Source states preform dimensions but does not tabulate the evolving molten-spherule area.
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: starting preform height 4 mm diameter 4 mm
@@ -381,10 +385,9 @@ species:
           hole_diameter: 1.2
         note: 'Primary free-evap experiment behind Fedkin Fe/Mg/SiO α. Spherule free surface evolves with
           mass loss; starting preform given; per-run free-surface series not tabulated as numeric m2 series
-          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). Sphere estimate from starting dia 4
-          mm: 4*pi*r^2 = 5.02655e-05 m2 (rough upper bound only).'
-        sample_surface_area_estimate_m2: 5.02655e-05
-        sample_surface_area_status: ABSENT_NOT_NUMERIC_series_sphere_estimate_only
+          — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). No area is estimated from the preform
+          dimensions.'
+        sample_surface_area_status: ABSENT_NOT_NUMERIC_series
       equipment:
         cell_material:
           value: high-purity graphite crucible (atomic-pile grade)
@@ -392,11 +395,14 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: graphite crucible
         sample_surface_area:
-          value: 5.02655e-05
-          units: m2
-          inferred: true
-          inference: rough sphere A=4*pi*r^2 with r=2 mm starting preform diameter 4 mm => 5.02655e-05
-            m2; NOT measured free surface series
+          value:
+            form: molten_spherule
+            starting_preform_mm:
+              height: 4.0
+              diameter: 4.0
+              hole_diameter: 1.2
+            numeric_m2_series: null
+            note: Source states preform dimensions but does not tabulate the evolving molten-spherule area.
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: starting preform height 4 mm diameter 4 mm
@@ -427,30 +433,6 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
     paragraph: vacuum level in the chamber was about 10^-4 Torr during the experiments
     line_range: '160'
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_fe_geometry_class_b1
-  field: sample_surface_area_estimate_m2
-  value: 5.02655e-05
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-    paragraph: preform diameter 4 mm
-- species: Mg
-  observable: rate_series
-  observation_id: hashimoto_1983_mg_geometry_class_b1
-  field: sample_surface_area_estimate_m2
-  value: 5.02655e-05
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-    paragraph: preform diameter 4 mm
-- species: SiO
-  observable: rate_series
-  observation_id: hashimoto_1983_sio_geometry_class_b1
-  field: sample_surface_area_estimate_m2
-  value: 5.02655e-05
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-    paragraph: preform diameter 4 mm
 - species: Fe
   observable: rate_series
   observation_id: hashimoto_1983_fcmas_qualitative_volatility_order

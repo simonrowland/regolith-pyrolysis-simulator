@@ -26,6 +26,11 @@ schema_version: 2
 metric: residual_dex
 band_kind: absolute_dex
 points:
+# 2026-08-27 pin withdrawals (not residual moves):
+# - 16 DeMaria Fig.1 Na psat digitized points: extract now
+#   admission_status=rejected_no_figure_reading.
+# - Fedkin Mg table3 T=2123 placeholder: live payload is the
+#   transcribed per-T series 1973/2073/2173/2273.
 - key: fedkin_2006_table3_fe_hashimoto_langmuir:T=1973
   case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
   source_id: fedkin-grossman-ghiorso-2006
@@ -284,16 +289,6 @@ points:
   status: match
   note: Class-comparable residual pin; residual reported, not tuned (si-comparability
     2026-08-08).
-  temperature_K: 2123.0
-- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2123
-  case_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.0791812460476248
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 2123.0
 - key: schaefer_fegley_2004_mg_forsterite_alpha_s_survey:T=2243
   case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
@@ -590,166 +585,6 @@ points:
 # from that same table (self-agreement, b-134 class); it re-enters only
 # as self-agreement-excluded under the std2 provenance guard.
 # --- tp2 fragment ---
-- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1428.57
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 0.31300586081772297
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1428.57
-- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1412.43
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 0.3370624634621697
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1412.43
-- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1379.31
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 0.05194806837879019
-  band_dex: 0.01
-  status: match
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1379.31
-- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1360.54
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 0.24142572765124345
-  band_dex: 0.01
-  status: match
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1360.54
-- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1342.28
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 0.384267760576019
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1342.28
-- key: demaria_1971_na_psat_figure1_sample_12022_digitized:T=1298.7
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12022_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 0.5887527203013809
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1298.7
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1474.93
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 0.9434054318187791
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1474.93
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1459.85
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 0.9856850665339089
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1459.85
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1449.28
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 1.0086742766444063
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1449.28
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1438.85
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 1.0314321012862382
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1438.85
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1428.57
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 1.10405418999761
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1428.57
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1418.44
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 1.1765650864777855
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1418.44
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1398.6
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 1.3211165770794284
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1398.6
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1379.31
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 1.315112142091595
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1379.31
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1351.35
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 1.6299944538786524
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1351.35
-- key: demaria_1971_na_psat_figure1_sample_12065_digitized:T=1324.5
-  case_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
-  source_id: kems-022-demaria-1971
-  observation_type: psat_series
-  species: Na
-  residual_dex: 2.043550129219774
-  band_dex: 0.01
-  status: mismatch
-  note: DeMaria 1971 Table-1 pO2 recovery; residual is reported, not tuned.
-  temperature_K: 1324.5
 # --- tp3 fragment ---
 - key: sossi_2019_k_table4_gamma_this_work:gamma
   case_id: kems-012-sossi-2019::sossi_2019_k_table4_gamma_this_work
@@ -1033,3 +868,342 @@ points:
   status: ordering-fail
   note: 'Ordering FINDING: Hashimoto Fe>(Mg|Si)>Ca>Al; engine held 23/27 pairwise constraints (residual
     -4 pairs). Not tuned.'
+# 2026-08-27 d-006 binary-melt composition gate: ms2000-044 (Tsaplin/Zaitsev)
+# binary Na2O-SiO2 / K2O-SiO2 rows state one mole fraction; the second
+# component is 1-x by closure. The gate now completes such binary
+# specifications instead of refusing them as missing_condition:melt_composition.
+# Alkali-observable comparisons use the documented identity a_parent =
+# a_single_cation^cations (docs/chemistry-methods.md 3.1). 24 SiO2 + 1 Na2O
+# points become comparable; the 22 off-anchor-T alkali rows remain
+# assumed-input (out_of_gamma_domain) with residuals recorded, not certified.
+- key: ms2000_044_na2o_activity_xsio2_0709_t1673:activity
+  case_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0709_t1673
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: Na2O
+  residual_dex: 0.7974484745603244
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1673.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0500_t1473:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0500_t1473
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 1.7139928779205253
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1473.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0543_t1473:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0543_t1473
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 1.5850165007680914
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1473.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0591_t1323:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0591_t1323
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 1.5773535089852415
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1323.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0630_t1323:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1323
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 1.390778375760676
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1323.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0630_t1523:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1523
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 1.2361087209325996
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1523.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0674_t1373:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0674_t1373
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.7017949986839229
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1373.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0722_t1323:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1323
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.17108136807163843
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1323.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0722_t1673:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1673
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.16205674242155
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1673.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0770_t1073:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0770_t1073
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.020611282603714885
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1073.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0811_t1173:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0811_t1173
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.03831727315582838
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1173.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0848_t1573:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0848_t1573
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.040467987605065654
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1573.0
+- key: ms2000_044_sio2_activity_k_system_xsio2_0892_t1723:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0892_t1723
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.03865757816645655
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1723.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0349_t1373:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0349_t1373
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 4.748737003490594
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1373.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0382_t1383:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0382_t1383
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 3.6954778929149623
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1383.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0405_t1423:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0405_t1423
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 3.264815249420232
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1423.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0430_t1473:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0430_t1473
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 2.8577852065535425
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1473.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0477_t1373:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0477_t1373
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 2.2527804270177767
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1373.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0524_t1573:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0524_t1573
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 1.2406147620708052
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1573.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0573_t1473:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0573_t1473
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.756775323832919
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1473.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0625_t1573:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0625_t1573
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.35872424276808706
+  band_dex: 0.01
+  status: mismatch
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
+  temperature_K: 1573.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0671_t1173:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0671_t1173
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.16917143317012504
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1173.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0709_t1673:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0709_t1673
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.01055520322387619
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1673.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0753_t1273:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0753_t1273
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.08535881636203684
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1273.0
+- key: ms2000_044_sio2_activity_na_system_xsio2_0805_t1473:activity
+  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0805_t1473
+  source_id: kems-ms2000-044
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 0.10607047615985558
+  band_dex: 0.01
+  status: match
+  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
+  temperature_K: 1473.0
+
+# 2026-08-27 newly comparable points (studio regen). Existing
+# committed residuals are preserved verbatim. Residuals reported,
+# not tuned. ts1985 SiO2 large dex is the b-309 Raoultian FINDING.
+- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=1973
+  case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.0791812460476248
+  band_dex: 0.01
+  residual: -0.03999999999999998
+  status: mismatch
+  note: Fedkin 2006 Mg Hashimoto/Langmuir table3 per-T transcription (replaces the T=2123 placeholder). Residual reported, not tuned.
+  temperature_K: 1973.0
+- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2073
+  case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.146128035678238
+  band_dex: 0.01
+  residual: -0.08000000000000002
+  status: mismatch
+  note: Fedkin 2006 Mg Hashimoto/Langmuir table3 per-T transcription (replaces the T=2123 placeholder). Residual reported, not tuned.
+  temperature_K: 2073.0
+- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2173
+  case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.146128035678238
+  band_dex: 0.01
+  residual: -0.08000000000000002
+  status: mismatch
+  note: Fedkin 2006 Mg Hashimoto/Langmuir table3 per-T transcription (replaces the T=2123 placeholder). Residual reported, not tuned.
+  temperature_K: 2173.0
+- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2273
+  case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.13033376849500614
+  band_dex: 0.01
+  residual: -0.07
+  status: mismatch
+  note: Fedkin 2006 Mg Hashimoto/Langmuir table3 per-T transcription (replaces the T=2123 placeholder). Residual reported, not tuned.
+  temperature_K: 2273.0
+- key: zhang_2021_table4_K_evaporation_coefficients:T=1473.15
+  case_id: "kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients"
+  source_id: kems-006-zhang-2021
+  observation_type: alpha
+  species: K
+  residual_dex: 0.414973347970818
+  band_dex: 0.01
+  residual: 0.08
+  status: mismatch
+  note: Newly comparable Zhang 2021 Table 4 K evaporation coefficient at 1473.15 K. Residual reported, not tuned.
+  temperature_K: 1473.15
+- key: zhang_2021_table4_K_evaporation_coefficients:T=1673.15
+  case_id: "kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients"
+  source_id: kems-006-zhang-2021
+  observation_type: alpha
+  species: K
+  residual_dex: 0.0
+  band_dex: 0.01
+  residual: 0.0
+  status: match
+  note: Newly comparable Zhang 2021 Table 4 K evaporation coefficient at 1673.15 K. Residual reported, not tuned.
+  temperature_K: 1673.15
+- key: ts1985_sio2_gibbs_duhem_1200C_X0500:activity
+  case_id: "ts1985::ts1985_sio2_gibbs_duhem_1200C_X0500"
+  source_id: ts1985
+  observation_type: activity_coefficient
+  species: SiO2
+  residual_dex: 1.744004273277598
+  band_dex: 0.01
+  residual: 0.3273233333333333
+  status: mismatch
+  note: "b-309: engine assumes ideal Raoultian a_SiO2; measured activity coefficient is ~0.012. Large residual (~1.74 dex) is the FINDING, recorded not tuned."
+  temperature_K: 1473.15

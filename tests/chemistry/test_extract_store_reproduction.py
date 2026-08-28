@@ -62,6 +62,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     observation_system_class,
     parse_ordering_claim,
     parse_published_gamma_range,
+    qualitative_payload_skip_reason,
     self_agreement_excluded,
     rail_alpha_comparability,
     rail_condensed_form_comparability,
@@ -133,10 +134,10 @@ def test_store_yields_adopted_target_type_observations(
     kems = [obs for obs in adopted_observations if obs.source_id.startswith("kems-")]
     # B1 harvest + class-tagged fence rows expanded the KEMS surface; keep the
     # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
-    # 2026-08-26 corpus integration: Sossi remine + metadata completion added
-    # kems-source observations (kems-012 alone now carries 53 adopted rows).
-    assert len(kems) == 198
-    assert len({obs.source_id for obs in kems}) == 20
+    # 2026-08-27 harvest + d-006 gate: KEMS observations/sources are the
+    # live studio battery after snapshot regen.
+    assert len(kems) == 450
+    assert len({obs.source_id for obs in kems}) == 30
     for obs in adopted_observations:
         assert obs.is_priority_winner or obs.adoption_basis == "mass_spec_extract"
         assert obs.source_id
@@ -1301,8 +1302,13 @@ def test_transition_point_is_an_adopted_target_type(
 ) -> None:
     assert "transition_point" in TARGET_TYPES
     rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"]
-    assert len(rows) == 64
-    assert all(obs.is_priority_winner for obs in rows)
+    assert len(rows) == 65
+    # NIST NBP/melting rows are priority winners; kems-020 Hastie Na2SO4
+    # second-law prose is extract-adopted (mass_spec_extract).
+    assert all(
+        obs.is_priority_winner or obs.adoption_basis == "mass_spec_extract"
+        for obs in rows
+    )
     kinds = {str(obs.values.get("property_kind")) for obs in rows}
     assert "normal_boiling_point" in kinds
     assert "melting_point" in kinds
@@ -1513,16 +1519,14 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # qualitative rate bounds add rows without numeric residuals; Sossi Na
     # analytical ceilings remove four comparable points. Counts are live
     # battery, not hand-estimated.
-    # 2026-08-26 corpus integration: five worker slices merged (DeMaria pO2,
-    # Sossi remine, metadata completion, transition_point, observable paths)
-    # plus the DOI-keyed self-agreement guard. Numbers are the LIVE merged
-    # battery, measured after the merge — neither worker's own pinned view.
-    assert coverage["observations"] == len(adopted_observations) == 299
-    assert coverage["comparable"] == 42
-    assert coverage["skipped"] == 257
+    # 2026-08-27 harvest + d-006 binary-melt gate + DeMaria figure-only
+    # withdrawal. Numbers are the LIVE studio battery after snapshot regen.
+    assert coverage["observations"] == len(adopted_observations) == 570
+    assert coverage["comparable"] == 67
+    assert coverage["skipped"] == 503
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 90
-    assert coverage["gap_points"] == 302
+    assert coverage["comparable_points"] == 105
+    assert coverage["gap_points"] == 532
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1544,29 +1548,29 @@ def test_coverage_ledger_is_observation_first_and_exact(
         )
         for key, row in by_type.items()
     } == {
-        "activity_coefficient": (75, 1, 74, 1),
-        "alpha": (60, 16, 44, 40),
-        "gibbs_table": (24, 0, 24, 0),
-        "psat_series": (19, 3, 16, 18),
-        "rate_series": (57, 7, 50, 16),
-        "transition_point": (64, 15, 49, 15),
+        "activity_coefficient": (311, 27, 284, 27),
+        "alpha": (63, 17, 46, 45),
+        "gibbs_table": (33, 0, 33, 0),
+        "psat_series": (23, 1, 22, 2),
+        "rate_series": (75, 7, 68, 16),
+        "transition_point": (65, 15, 50, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
         key: (row["observations"], row["comparable"], row["comparable_points"])
         for key, row in by_family.items()
     } == {
-        "activity_coefficient": (52, 1, 1),
+        "activity_coefficient": (285, 27, 27),
         "activity_self_agreement": (9, 0, 0),
-        "alpha": (60, 16, 40),
+        "alpha": (63, 17, 45),
         "alpha_in_legacy_rate_series": (3, 3, 12),
-        "gibbs_table": (24, 0, 0),
-        "ordering_activity": (14, 0, 0),
-        "ordering_bound": (17, 4, 4),
-        "psat_series": (19, 3, 18),
-        "rate_hkl": (36, 0, 0),
+        "gibbs_table": (33, 0, 0),
+        "ordering_activity": (17, 0, 0),
+        "ordering_bound": (26, 4, 4),
+        "psat_series": (23, 1, 2),
+        "rate_hkl": (45, 0, 0),
         "relative_volatility": (1, 0, 0),
-        "transition_point": (64, 15, 15),
+        "transition_point": (65, 15, 15),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations
@@ -1655,6 +1659,207 @@ def test_gamma_range_path_self_agreement_is_computed_and_never_scored() -> None:
     assert record.actual_value == pytest.approx(1.0)
     assert record.status not in SCORING_STATUSES
     assert evaluation.skip_reason == "typed-refusal:self_agreement_excluded"
+
+
+def _ordering_fixture(
+    *,
+    observation_id: str = "ambiguous_alkali_order",
+    phase: str | None = "silicate_melt",
+    locator: dict | None = None,
+    **value_overrides: object,
+) -> AdoptedObservation:
+    values: dict[str, object] = {
+        "quantity": "qualitative_volatility_order",
+        "system_class": "silicate_melt",
+        "semantics": "bound_not_point_ordering",
+        "composition_wt_pct": {
+            "SiO2": 45.0,
+            "MgO": 10.0,
+            "Al2O3": 15.0,
+            "CaO": 12.0,
+            "FeO": 18.0,
+        },
+    }
+    values.update(value_overrides)
+    return AdoptedObservation(
+        species_id="Na",
+        source_id="fixture-ordering",
+        observation_id=observation_id,
+        obs_type="rate_series",
+        review_status="draft",
+        phase=phase,
+        regime="langmuir_free_evaporation",
+        standard_state=None,
+        T_range_K=(1250.0, 1500.0),
+        units="qualitative bound",
+        uncertainty=None,
+        locator=locator or {"note": "fixture"},
+        values=values,
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="fixture",
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+
+
+def _assert_qualitative_skip(obs: AdoptedObservation, reason: str) -> None:
+    assert parse_ordering_claim(obs) is None
+    assert qualitative_payload_skip_reason(obs) == reason.removeprefix("typed-refusal:")
+    evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
+    assert evaluation.skip_reason == reason
+    assert evaluation.records
+    assert evaluation.records[0].status == "ordering-not-evaluable"
+
+
+def test_ambiguous_ordering_claim_stays_unparsed_refusal() -> None:
+    """Unresolved co-evolution is not a comparable pairwise relation."""
+
+    obs = _ordering_fixture(
+        note=(
+            "Na and K co-evolve in the same window; the source does not "
+            "resolve which is first"
+        ),
+    )
+    _assert_qualitative_skip(
+        obs, "typed-refusal:unsupported_observable:ordering_claim_unparsed"
+    )
+
+
+def test_figure_only_payload_is_not_an_ordering_relation() -> None:
+    """Figure-only rows (d-005) are labeled, not scored as rates or as orderings."""
+
+    obs = _ordering_fixture(
+        observation_id="figure_only_blocked",
+        locator={"figure": "1", "note": "fixture"},
+        quantity="partial_pressure_figure_only",
+        admission_status="rejected_no_figure_reading",
+        note="Absolute P on Fig. 1 only. Not figure-digitized.",
+    )
+    _assert_qualitative_skip(
+        obs, "typed-refusal:unsupported_observable:figure_only_not_digitized"
+    )
+
+
+def test_model_output_is_not_an_ordering_relation() -> None:
+    """SOLGASMIX / FactSage model tables are not measurements and not orderings."""
+
+    obs = _ordering_fixture(
+        observation_id="solgasmix_model",
+        quantity="SOLGASMIX_alkali_speciation",
+        method_class="model_derived",
+        note="Not a measurement. Do not score as KEMS p(T).",
+    )
+    _assert_qualitative_skip(obs, "typed-refusal:model_output_not_measurement")
+
+
+def test_alkali_first_observed_stays_unparsed_ordering() -> None:
+    """Na+/K+ first-ion-species is a real ordering claim without a pairwise counterpart."""
+
+    obs = _ordering_fixture(
+        observation_id="na_first_observed",
+        locator={"figure": "1"},
+        quantity="partial_pressure_figure_only_rapid_depletion",
+        first_observed_T_K=1250.0,
+        gas_species="Na(g)",
+        note="Absolute P on Fig. 1 only. Not figure-digitized.",
+    )
+    _assert_qualitative_skip(
+        obs, "typed-refusal:unsupported_observable:ordering_claim_unparsed"
+    )
+
+
+# Live-battery qualitative rows that used to share ordering_claim_unparsed.
+# Tokens are the payload class; none of these become comparable.
+_LIVE_QUALITATIVE_SKIP_BY_ID = {
+    "stolyarova_1992_al_cas_vapor_ions_and_gibbs": (
+        "unsupported_observable:species_detected_absolute_P_not_tabulated"
+    ),
+    "demaria_1971_al_monatomic_figure7": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "demaria_1971_ca_figure_only_and_measurement_difficulty": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "plante_1992_fig1_IT_vs_T_figure_only_blocked": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "demaria_1971_feo_detected_not_tabulated_P": (
+        "unsupported_observable:species_detected_absolute_P_not_tabulated"
+    ),
+    "matchett_2006_fig11_mare_PT_figure_only_blocked": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "plante_1992_fig4_activity_figure_only_blocked": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "demaria_1971_k_first_observed_figure2": (
+        "unsupported_observable:ordering_claim_unparsed"
+    ),
+    "sesko_2024_deposit_K_edx_range": (
+        "unsupported_observable:deposit_composition_not_species_rate"
+    ),
+    "drowart_2005_kems_reporting_requirements": (
+        "unsupported_observable:methodology_guidance_not_observable"
+    ),
+    "hastie_1981_table3_solgasmix_model_not_measurement": (
+        "model_output_not_measurement"
+    ),
+    "demaria_1971_na_first_observed_figure1": (
+        "unsupported_observable:ordering_claim_unparsed"
+    ),
+    "sauerborn_2005_qms_traces_figure_only_blocked": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "sesko_2024_crucible_deposit_edx": (
+        "unsupported_observable:deposit_composition_not_species_rate"
+    ),
+    "sesko_2024_fig6_16_figure_only_blocked": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "sesko_2024_table2_factsage_and_literature_o2_yield": (
+        "model_output_not_measurement"
+    ),
+    "demaria_1971_si_monatomic_not_reported": (
+        "unsupported_observable:species_not_reported_among_detected"
+    ),
+    "stolyarova_2013_ternary_silicate_vapour_species_map_table1": (
+        "unsupported_observable:vapour_species_map_no_numeric_pressures"
+    ),
+    "stolyarova_2012_ternary_ionic_silicate_vapour_map_table1": (
+        "unsupported_observable:vapour_species_map_no_numeric_pressures"
+    ),
+    "demaria_1971_sio_lunar_basalt_kems_main_cell": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "stolyarova_2015_fig1_2_isoactivity_figure_only_blocked": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "stolyarova_2015_table1_vapour_species_map": (
+        "unsupported_observable:vapour_species_map_no_numeric_pressures"
+    ),
+    "sossi_fegley_2018_table1_pure_oxide_vapour_speciation_index": (
+        "unsupported_observable:pure_oxide_speciation_index"
+    ),
+    "demaria_1971_tio_tio2_figure6_comparable_pressures": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+    "demaria_1971_tio2_figure6_comparable_to_tio": (
+        "unsupported_observable:figure_only_not_digitized"
+    ),
+}
+
+
+def test_live_qualitative_catch_all_is_split_by_payload_class(
+    adopted_observations: list[AdoptedObservation],
+) -> None:
+    by_id = {obs.observation_id: obs for obs in adopted_observations}
+    missing = sorted(set(_LIVE_QUALITATIVE_SKIP_BY_ID) - set(by_id))
+    assert missing == []
+    for observation_id, reason in _LIVE_QUALITATIVE_SKIP_BY_ID.items():
+        obs = by_id[observation_id]
+        assert parse_ordering_claim(obs) is None, observation_id
+        assert qualitative_payload_skip_reason(obs) == reason, observation_id
 
 
 def test_ordering_bound_emits_declared_verdict() -> None:

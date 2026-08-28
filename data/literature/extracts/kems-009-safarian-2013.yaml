@@ -17,7 +17,9 @@ species:
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-009-safarian-2013/tables.md
         section: Hertz-Knudsen / Schrage / vapor velocity / flux (theory review)
+        page: '747'
         line_range: 112-245
         note: Primary theory block; S_cr and p_eff at line 229; flux-ratio figure context 245
       phase: pure_liquid_metal_theory
@@ -26,8 +28,8 @@ species:
       units: as published
       values:
         quantity: pure_metal_vacuum_evaporation_theory
-        weak_evaporation_eta: 1.667
-        weak_evaporation_eta_note: η=α/(1-0.4α) with α=1 → η=1.667 (Muratova & Labuntsov)
+        weak_evaporation_eta: 1.66
+        weak_evaporation_eta_note: Printed weak-evaporation Hertz-Knudsen coefficient; the prior extract's 1.667 arithmetic evaluation is not retained as a source value.
         p_eff_over_p_sat_at_eta_1: 0.193
         S_cr: 0.913
         literature_flux_ratios_vs_max:
@@ -46,8 +48,7 @@ species:
         literature_flux_ratios_vs_max_provenance: Fig.4 / literature free-evaporation flux ratios vs max
           for pure metals (Zn/Fe/Ag/Si context); values 0.92, 0.82, 0.85 as tabulated in extract from
           theory-comparison discussion around lines 241-245
-        weak_evaporation_eta_provenance: η=1/(1-0.4)=1.667 from Muratova & Labuntsov form η=α/(1-0.4α)
-          with α=1 (lines 116-118 region)
+        weak_evaporation_eta_provenance: Safarian and Engh p. 747, printed value 1.66; repaired source-pixel table.
       uncertainty:
         note: theoretical coefficients; pure-metal literature scatter on flux ratios
       equipment:
@@ -101,11 +102,11 @@ fidelity_samples:
   observable: rate_series
   observation_id: safarian_2013_si_pure_langmuir_theory
   field: weak_evaporation_eta
-  value: 1.667
+  value: 1.66
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
-    paragraph: α as unity, η=1.667 is obtained
-    line_range: 116-118
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-009-safarian-2013/tables.md
+    page: '747'
+    paragraph: Hertz-Knudsen evaporation coefficient (weak evaporation, stated) = 1.66
 - species: Si
   observable: rate_series
   observation_id: safarian_2013_si_pure_langmuir_theory
