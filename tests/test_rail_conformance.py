@@ -419,6 +419,75 @@ def _assert_two_way_pin(name: str, observed: float, pinned: float) -> None:
     )
 
 
+# T3 mass_spec ratchets KEMS/Langmuir observables (psat, rate, Langmuir alpha).
+# activity_coefficient / transition_point / gibbs_table are different measurements.
+MASS_SPEC_OBSERVATION_TYPES = frozenset({"psat_series", "rate_series", "alpha"})
+RESIDUAL_BASELINES_PATH = (
+    ROOT / "tests" / "chemistry" / "extract_store_reproduction_residual_baselines.yaml"
+)
+NA2O_ACTIVITY_PIN_KEY = "ms2000_044_na2o_activity_xsio2_0709_t1673:activity"
+
+
+@lru_cache(maxsize=1)
+def _residual_baseline_points() -> tuple[dict[str, Any], ...]:
+    payload = yaml.safe_load(RESIDUAL_BASELINES_PATH.read_text(encoding="utf-8")) or {}
+    points = payload.get("points") or []
+    assert isinstance(points, list), f"{RESIDUAL_BASELINES_PATH}: expected points list"
+    return tuple(points)
+
+
+def _mass_spec_covered_species(
+    rollup: dict[str, dict[str, Any]],
+    live_species: set[str],
+) -> set[str]:
+    return {
+        species_id
+        for species_id in live_species & set(rollup)
+        if rollup[species_id]["max_residual_dex"] is not None
+    }
+
+
+def _mass_spec_expected_species(
+    *,
+    pins: dict[str, Any],
+    live_species: set[str],
+    residual_pins: tuple[dict[str, Any], ...] | list[dict[str, Any]],
+    covered_species: set[str],
+) -> set[str]:
+    """LIVE T3 mass_spec declarations backed by a mass-spec-type residual pin.
+
+    An activity / boiling-point residual pin must not mint a species here.
+    ``covered_species`` is the live mass-spec-type record set: a declared pin
+    whose store record is gone (inadmissible figure, typed skip) does not stay
+    expected. Lost-record detection is ``_assert_mass_spec_pin_record_parity``.
+    """
+
+    declared = {
+        species_id
+        for species_id, row in pins["species"].items()
+        if species_id in live_species and "mass_spec" in row["validations"]
+    }
+    typed_pin_species = {
+        str(pin["species"])
+        for pin in residual_pins
+        if pin.get("observation_type") in MASS_SPEC_OBSERVATION_TYPES
+        and str(pin["species"]) in live_species
+    }
+    return declared & typed_pin_species & covered_species
+
+
+def _assert_mass_spec_pin_record_parity(
+    expected_species: set[str],
+    covered_species: set[str],
+) -> None:
+    assert expected_species, "no live rail species declare mass-spec validation pins"
+    assert expected_species == covered_species, (
+        "mass-spec validation coverage drift: "
+        f"pins_without_records={sorted(expected_species - covered_species)}, "
+        f"records_without_pins={sorted(covered_species - expected_species)}"
+    )
+
+
 @pytest.fixture(scope="module")
 def conformance_sim():
     return _build_sim(
@@ -1202,32 +1271,128 @@ def test_t1_pure_component_clausius_clapeyron_floor(species_id: str) -> None:
 
 
 @pytest.fixture(scope="module")
-def mass_spec_rollup() -> dict[str, dict[str, Any]]:
+def mass_spec_evaluations() -> list[Any]:
+    return [
+        ev
+        for ev in evaluate_all()
+        if ev.observation.obs_type in MASS_SPEC_OBSERVATION_TYPES
+    ]
+
+
+@pytest.fixture(scope="module")
+def mass_spec_rollup(mass_spec_evaluations: list[Any]) -> dict[str, dict[str, Any]]:
     return {
         row["species"]: row
-        for row in rollup_species_error_bars(evaluate_all())
+        for row in rollup_species_error_bars(mass_spec_evaluations)
     }
+
+
+def test_t3_na2o_activity_pin_remains_admitted() -> None:
+    matches = [
+        pin
+        for pin in _residual_baseline_points()
+        if pin.get("key") == NA2O_ACTIVITY_PIN_KEY
+    ]
+    assert matches, (
+        f"Na2O activity pin {NA2O_ACTIVITY_PIN_KEY} was deleted; "
+        "d-006 binary-melt admission must stay in the residual ledger"
+    )
+    pin = matches[0]
+    assert pin["species"] == "Na2O"
+    assert pin["observation_type"] == "activity_coefficient"
+    assert pin["observation_type"] not in MASS_SPEC_OBSERVATION_TYPES
+
+
+def test_t3_guard_still_fires_when_mass_spec_pin_loses_its_record() -> None:
+    expected_species = {"Fe", "K", "Mg", "SiO"}
+    covered_species = {"K", "Mg", "SiO"}
+    with pytest.raises(AssertionError, match=r"pins_without_records=\['Fe'\]"):
+        _assert_mass_spec_pin_record_parity(expected_species, covered_species)
+
+
+def test_t3_activity_residual_pin_does_not_mint_mass_spec_expected_species() -> None:
+    pins = {
+        "species": {
+            "Na": {"validations": {"mass_spec": {"pinned_residual_dex": 1.0}}},
+            "Fe": {"validations": {"mass_spec": {"pinned_residual_dex": 1.0}}},
+        }
+    }
+    residual_pins = (
+        {
+            "key": NA2O_ACTIVITY_PIN_KEY,
+            "observation_type": "activity_coefficient",
+            "species": "Na2O",
+        },
+        {
+            "key": "synthetic_na_activity:activity",
+            "observation_type": "activity_coefficient",
+            "species": "Na",
+        },
+        {
+            "key": "synthetic_fe_psat:T=1800",
+            "observation_type": "psat_series",
+            "species": "Fe",
+        },
+    )
+    expected = _mass_spec_expected_species(
+        pins=pins,
+        live_species={"Na", "Fe"},
+        residual_pins=residual_pins,
+        covered_species={"Na", "Fe"},
+    )
+    assert "Na" not in expected, (
+        "activity residual pin minted Na as a mass-spec expected species"
+    )
+    assert expected == {"Fe"}
+
+
+def test_t3_unfixed_expected_set_names_na_without_mass_spec_record(
+    mass_spec_rollup: dict[str, dict[str, Any]],
+) -> None:
+    """Red-by-revert: every PINS mass_spec key vs mass-spec-type records.
+
+    The assertion must name pins_without_records=['Na'] — Na has a T3
+    mass_spec declaration but no live mass-spec-type store record.
+    """
+
+    unfixed_expected = {
+        species_id
+        for species_id, row in PINS["species"].items()
+        if species_id in LIVE_SPECIES and "mass_spec" in row["validations"]
+    }
+    covered = _mass_spec_covered_species(mass_spec_rollup, set(LIVE_SPECIES))
+    with pytest.raises(AssertionError, match=r"pins_without_records=\['Na'\]"):
+        _assert_mass_spec_pin_record_parity(unfixed_expected, covered)
+
+
+def test_t3_expected_species_come_from_mass_spec_type_pins_only(
+    mass_spec_rollup: dict[str, dict[str, Any]],
+) -> None:
+    covered = _mass_spec_covered_species(mass_spec_rollup, set(LIVE_SPECIES))
+    expected = _mass_spec_expected_species(
+        pins=PINS,
+        live_species=set(LIVE_SPECIES),
+        residual_pins=_residual_baseline_points(),
+        covered_species=covered,
+    )
+    assert "Na" not in expected, (
+        "Na entered expected_species without a mass-spec-type store record; "
+        "an activity residual pin must not mint mass-spec coverage"
+    )
+    _assert_mass_spec_pin_record_parity(expected, covered)
 
 
 def test_t3_mass_spec_residual_pins_are_two_way(
     mass_spec_rollup: dict[str, dict[str, Any]]
 ) -> None:
-    expected_species = {
-        species_id
-        for species_id, row in PINS["species"].items()
-        if species_id in LIVE_SPECIES and "mass_spec" in row["validations"]
-    }
-    externally_covered_species = {
-        species_id
-        for species_id in set(LIVE_SPECIES) & set(mass_spec_rollup)
-        if mass_spec_rollup[species_id]["max_residual_dex"] is not None
-    }
-    assert expected_species, "no live rail species declare mass-spec validation pins"
-    assert expected_species == externally_covered_species, (
-        "mass-spec validation coverage drift: "
-        f"pins_without_records={sorted(expected_species - externally_covered_species)}, "
-        f"records_without_pins={sorted(externally_covered_species - expected_species)}"
+    covered = _mass_spec_covered_species(mass_spec_rollup, set(LIVE_SPECIES))
+    expected_species = _mass_spec_expected_species(
+        pins=PINS,
+        live_species=set(LIVE_SPECIES),
+        residual_pins=_residual_baseline_points(),
+        covered_species=covered,
     )
+    _assert_mass_spec_pin_record_parity(expected_species, covered)
     for species_id in sorted(expected_species):
         row = PINS["species"][species_id]
         observed = float(mass_spec_rollup[species_id]["max_residual_dex"])
