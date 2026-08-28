@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -72,6 +73,17 @@ def _configure_worker_cache_isolation() -> None:
 
 
 _configure_worker_cache_isolation()
+
+
+@pytest.fixture(autouse=True)
+def _isolate_vapor_payload_cache_between_tests():
+    module = sys.modules.get("engines.builtin.foulant_disposition")
+    if module is not None:
+        module._VAPOR_PAYLOAD_CACHE.clear()
+    yield
+    module = sys.modules.get("engines.builtin.foulant_disposition")
+    if module is not None:
+        module._VAPOR_PAYLOAD_CACHE.clear()
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:

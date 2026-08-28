@@ -16,7 +16,7 @@ expect = PLAYWRIGHT_SYNC_API.expect if PLAYWRIGHT_SYNC_API is not None else None
 pytestmark = [
     pytest.mark.browser_e2e,
     pytest.mark.serial,
-    pytest.mark.xdist_group("e2e-browser"),
+    pytest.mark.xdist_group("serial"),
 ]
 
 if PLAYWRIGHT_SYNC_API is not None:
