@@ -77,6 +77,15 @@ HEAVY_ROSTER = frozenset({
      "test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track"),
     ("tests/test_yield_root_cause.py",
      "test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap"),
+    # 2026-08-28: the happy-path journey drives a REAL browser through a REAL
+    # 35-hour run against the live app, so its cost is the product's, not the
+    # test's -- it cannot be shrunk without stopping testing the thing.
+    # MEASURED: 508 s and 553 s on two consecutive runs. Its cap is derived
+    # from the declared step budgets (tests/e2e/journey_budget.py), so it moves
+    # only when a step budget moves, and it must exceed them: at the old 300 s
+    # the journey was killed before it could report, and steps 5-7 had never
+    # once rendered a verdict.
+    ("tests/e2e/test_happy_path_journey.py", "test_happy_path_journey"),
     # gate-2 amendments (2026-07-23): C6-continue lengthened these past the
     # default ceiling; each carries its measured justification at the mark.
     ("tests/test_make_recipe_db_profile.py",
