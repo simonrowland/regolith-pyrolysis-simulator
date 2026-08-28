@@ -1987,9 +1987,14 @@ def _cumulative_wall_deposit_by_segment_species_kg(
     for snapshot in snapshots:
         if _snapshot_hour(snapshot) > hour:
             continue
-        raw = getattr(snapshot, "wall_deposit_by_segment_species_delta", None)
+        # Empty mapping is a measured zero. Missing/None/non-mapping is
+        # unmeasured and must refuse; silent skip prices it as never-fouling.
+        raw = getattr(snapshot, "wall_deposit_by_segment_species_delta", _MISSING)
         if not isinstance(raw, Mapping):
-            continue
+            raise ObjectiveComputationError(
+                "unmeasured wall_deposit_by_segment_species_delta "
+                "cannot be treated as zero deposit"
+            )
         for key, kg in raw.items():
             if not isinstance(key, tuple) or len(key) != 2:
                 raise ObjectiveComputationError(

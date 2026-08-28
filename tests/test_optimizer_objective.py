@@ -1323,6 +1323,103 @@ def test_furnace_amortization_requires_positive_floor_when_multiplier_relaxed() 
     assert fouling > clean
 
 
+_UNMEASURED_WALL_DEPOSIT_REFUSAL = (
+    "unmeasured wall_deposit_by_segment_species_delta "
+    "cannot be treated as zero deposit"
+)
+
+
+def _wall_delta_snapshot(hour: int, delta: object | None, *, present: bool = True):
+    if not present:
+        return SimpleNamespace(hour=hour)
+    return SimpleNamespace(hour=hour, wall_deposit_by_segment_species_delta=delta)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    (
+        pytest.param({}, id="absent"),
+        pytest.param({"wall_deposit_by_segment_species_delta": None}, id="none"),
+        pytest.param({"wall_deposit_by_segment_species_delta": "x"}, id="non-mapping"),
+    ),
+)
+def test_unmeasured_wall_deposit_delta_cannot_be_treated_as_zero_deposit(
+    kwargs: dict[str, object],
+) -> None:
+    snapshot = SimpleNamespace(hour=1, **kwargs)
+    with pytest.raises(ObjectiveComputationError, match=_UNMEASURED_WALL_DEPOSIT_REFUSAL):
+        objective_module._cumulative_wall_deposit_by_segment_species_kg((snapshot,), 1)
+
+
+def test_measured_zero_wall_deposit_still_prices_as_never_fouling() -> None:
+    empty = _wall_delta_snapshot(1, {})
+    zero_entry = _wall_delta_snapshot(1, {("duct", "SiO"): 0.0})
+    empty_deposits = objective_module._cumulative_wall_deposit_by_segment_species_kg(
+        (empty,), 1
+    )
+    zero_deposits = objective_module._cumulative_wall_deposit_by_segment_species_kg(
+        (zero_entry,), 1
+    )
+    assert empty_deposits == {}
+    assert zero_deposits == {}
+    assert objective_module._campaigns_to_resinter(empty_deposits) == "infinite"
+    assert objective_module._has_positive_wall_deposit(empty_deposits) is False
+
+    never_fouling = furnace_amortization_cost_per_run(
+        20.0, math.inf, 500.0, 1.0, has_positive_fouling=False
+    )
+    measured_infinite = furnace_amortization_cost_per_run(
+        20.0, math.inf, 500.0, 1.0, has_positive_fouling=True
+    )
+    assert never_fouling == 0.0
+    assert measured_infinite == 20.0
+
+    summary = objective_module._tap_coating_product_summary(SimpleNamespace(), (empty,), 1)
+    assert summary["campaigns_to_resinter"] == "infinite"
+    assert summary["has_positive_qualified_fouling"] is False
+
+
+def test_unmeasured_wall_deposit_delta_is_distinguishable_from_measured_zero() -> None:
+    measured_zero = objective_module._cumulative_wall_deposit_by_segment_species_kg(
+        (_wall_delta_snapshot(1, {}),), 1
+    )
+    assert measured_zero == {}
+    unmeasured = (
+        _wall_delta_snapshot(1, None, present=False),
+        _wall_delta_snapshot(1, None),
+        _wall_delta_snapshot(1, "x"),
+    )
+    for snapshot in unmeasured:
+        with pytest.raises(
+            ObjectiveComputationError, match=_UNMEASURED_WALL_DEPOSIT_REFUSAL
+        ):
+            objective_module._cumulative_wall_deposit_by_segment_species_kg(
+                (snapshot,), 1
+            )
+
+
+def test_unmeasured_in_window_hour_refuses_and_later_hour_does_not_poison() -> None:
+    measured_zero = _wall_delta_snapshot(1, {})
+    later_unmeasured = _wall_delta_snapshot(2, None, present=False)
+    assert objective_module._cumulative_wall_deposit_by_segment_species_kg(
+        (measured_zero, later_unmeasured), 1
+    ) == {}
+    control = _wall_delta_snapshot(1, {("duct", "SiO"): 0.75})
+    assert objective_module._cumulative_wall_deposit_by_segment_species_kg(
+        (control,), 1
+    ) == {("duct", "SiO"): 0.75}
+    with pytest.raises(ObjectiveComputationError, match=_UNMEASURED_WALL_DEPOSIT_REFUSAL):
+        objective_module._cumulative_wall_deposit_by_segment_species_kg(
+            (control, later_unmeasured), 2
+        )
+    with pytest.raises(ObjectiveComputationError, match=_UNMEASURED_WALL_DEPOSIT_REFUSAL):
+        objective_module._tap_coating_product_summary(
+            SimpleNamespace(),
+            (later_unmeasured,),
+            2,
+        )
+
+
 def test_pareto_front_keeps_nullable_objective_identity() -> None:
     definitions = (
         ObjectiveDefinition("primary", "maximize", "kg", ordinal=0),
