@@ -26,18 +26,21 @@ There is **no top-level `runner.py`** — the CLI is the `simulator.runner` modu
 document to `--output` (parent dirs are created automatically); nothing useful goes to
 stdout. Convention is to drop outputs under `runs/`.
 
-### Common flags (`simulator/runner.py`)
+### Common flags (`simulator/runner/__init__.py`)
+
+`simulator.runner` is a **package** (`simulator/runner/`), not a single module file; the
+CLI and its argument parser live in its `__init__.py`.
 
 | flag | default | meaning |
 |---|---|---|
-| `--feedstock` | *(required)* | key from `data/feedstocks.yaml` |
+| `--feedstock` | *(required unless `--preset` supplies one)* | key from `data/feedstocks.yaml` |
 | `--preset` / `--leg` | *(none)* / `faithful` | load a vacuum-pyrolysis distribution recipe and select its leg |
 | `--compare` / `--observations` | off / preset sidecar | compare selected preset observables against an independent literature sidecar |
 | `--output` | *(required)* | path for the JSON result document |
 | `--campaign` | `C0` | campaign / recipe phase (see §4) |
 | `--hours` | `24` | simulated hours to advance |
 | `--mass-kg` | `1000.0` | batch mass |
-| `--backend` | `internal-analytical` | `internal-analytical` (legacy alias `stub`) or `alphamelts` (see §5) |
+| `--backend` | `internal-analytical` | `internal-analytical` (legacy alias `stub`), `alphamelts`, or `thermoengine` (see §5) |
 | `--track` | `pyrolysis` | or `mre_baseline` |
 | `--additive` | *(none)* | repeatable, e.g. `--additive=C=30` |
 | `--engine` / `--engines` | *(none)* | per-intent engine override / config YAML |
@@ -45,10 +48,18 @@ stdout. Convention is to drop outputs under `runs/`.
 
 ### Output document
 
-Top-level keys (schema pinned by [`docs/runner-output-schema.md`](runner-output-schema.md)):
+The schema is pinned by [`docs/runner-output-schema.md`](runner-output-schema.md) — read that for
+the authoritative key list. The ones you reach for most often:
 `schema_version`, `run_metadata`, `final_state`, `per_hour_summary`,
 `stage_purity_report`, `vapor_pressure_source_report`, `shuttle_refusal_history`,
 `shadow_trace`, `status`, `reason`, `error_message`.
+
+A current run also emits `product_classification`, `terminal_product_taxonomy`,
+`yield_disposition`, `thermal_train_report`, `condensation_refusals_by_species`,
+`pO2_enforcement_by_hour`, `vapour_rail_instrumentation`, `degraded_path_engagement`,
+`melt_redox_gate_floor_fallback_engagement`, `c7_product_report` and
+`c7_refusal_diagnostic`. Do not treat any hand-copied list here as complete —
+enumerate the keys off an actual artifact.
 
 **Check the exit code, not just the file:** a failed or refused run still writes a full
 JSON envelope (`status: "failed"` / `"refused"`) and exits non-zero.
@@ -81,9 +92,16 @@ returns the classified product ledger directly:
 ```python
 from simulator.three_product_runner import run
 ledger = run(feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=24)
-# dict: metals_plus_O2, pure_silica_glass, industrial_mixed_glass,
-#       refractory_ceramic_rump, unclassified
+# The four CLAUDE.md §5 product classes:
+#   metals_plus_O2, pure_silica_glass, industrial_mixed_glass,
+#   refractory_ceramic_rump
+# plus the supporting breakdown:
+#   ingots_metals, oxygen, glass, captured_volatiles,
+#   process_inventory_spent_reductant, unclassified
 ```
+
+`unclassified` is the honesty account: mass the classifier could not assign to a product
+class. A growing `unclassified` is a finding about the classifier, not a product.
 
 Its CLI twin (writes a markdown or JSON report; diagnostic — no threshold enforcement):
 
@@ -132,17 +150,37 @@ printf 'start --feedstock lunar_mare_low_ti --campaign C2A\nadvance\nadvance\nsn
 
 ## 4. Available identifiers
 
-**Feedstocks** (`data/feedstocks.yaml`): `lunar_mare_low_ti`, `lunar_mare_high_ti`,
-`lunar_highland`, `lunar_pkt_kreep_average`, `lunar_spa_kreep_influenced`,
-`targeted_super_kreep_ore`, `s_type_asteroid_silicate`, `m_type_metallic_phase`,
-`m_type_silicate_phase`, `v_type_vesta_hed`, `e_type_enstatite_aubrite`,
-`ci_carbonaceous_chondrite`, `cm_carbonaceous_chondrite`, `ceres_regolith`,
-`comet_nucleus`, `mars_basalt`, `mars_sulfate_rich`, `mars_phyllosilicate_clay`,
-`mars_perchlorate_rich`.
+**Feedstocks** (`data/feedstocks.yaml`, 29 keys). Modelled in-situ compositions
+(no `class` key):
 
-**Campaigns** (`data/setpoints.yaml`): `C0`, `C0b_p_cleanup`, `C2A_continuous`,
-`C2A_staged`, `C2B`, `C3`, `C4`, `C5`, `C6`, `mre_baseline`. The session layer also
-accepts the alias `C2A` → `C2A_continuous`.
+`lunar_mare_low_ti`, `lunar_mare_high_ti`, `lunar_highland`,
+`lunar_pkt_kreep_average`, `lunar_spa_kreep_influenced`, `targeted_super_kreep_ore`,
+`s_type_asteroid_silicate`, `m_type_metallic_phase`, `m_type_silicate_phase`,
+`v_type_vesta_hed`, `e_type_enstatite_aubrite`, `ci_carbonaceous_chondrite`,
+`cm_carbonaceous_chondrite`, `ceres_regolith`, `comet_nucleus`, `mars_basalt`,
+`mars_sulfate_rich`, `mars_phyllosilicate_clay`, `mars_perchlorate_rich`.
+
+Terrestrial simulant compositions, each carrying a `class` key
+(`lunar_simulant` / `mars_simulant`) and a cited XRF provenance block. These exist so
+lab experiments can be reproduced against the material actually used in them — they
+are not stand-ins for in-situ regolith:
+`lunar_highlands_lhs1`, `lunar_highlands_lhs1_yu_2025_reference`, `lunar_mare_lms1`,
+`lunar_mare_oprl2n`, `lunar_highlands_nuw_lht_5m`, `lunar_highlands_nu_lht_2m`,
+`lunar_mare_jsc_1a_legacy`, `lunar_eac_1a`, `lunar_mls_1a`, `mars_global_mgs1`.
+
+The list goes stale as feedstocks land; enumerate `data/feedstocks.yaml` rather than
+trusting this transcription.
+
+**Campaigns** (`data/setpoints.yaml`, 11 keys): `C0`, `C0b_p_cleanup`,
+`C2A_continuous`, `C2A_staged`, `C2B`, `C3`, `C4`, `C5`, `C6`, `C7`, `mre_baseline`.
+`C7` (aluminothermic Ca recovery) is **default-off**.
+
+Campaign *phases* the engine actually advances through are a different vocabulary
+(`simulator.state.CampaignPhase`): `IDLE`, `C0`, `C0B`, `C2A`, `C2A_STAGED`, `C2B`,
+`C3_K`, `C3_NA`, `C4`, `C5`, `C6`, `C7_CA_ALUMINOTHERMIC`, `MRE_BASELINE`, `COMPLETE`.
+The session layer maps the setpoints keys onto them, so `C2A_continuous` → `C2A`,
+`C0b_p_cleanup` → `C0B`, `C2A_staged` → `C2A_STAGED`; the phase names are accepted
+directly too, which is why `--campaign C2A` works.
 
 `data/vapor_pressures.yaml` is loaded automatically (not CLI-selectable).
 
@@ -163,6 +201,12 @@ accepts the alias `C2A` → `C2A_continuous`.
   that vapor physics (liquidus, phase fractions, non-ideal activities; the diagnostic
   authority). Accurate but slow (~6+ min per equilibrium, and the liquidus search is a
   multi-point bracket/bisect), so a full campaign can take hours; opt-in.
+- **`--backend thermoengine`**: the ENKI ThermoEngine MELTS backend as a first-class
+  selection (`ThermoEngineBackend`, `real_backend_family = THERMOENGINE`) rather than a
+  transport mode underneath `alphamelts`. Unlike the AlphaMELTS path it advertises
+  `supports_intrinsic_fO2`. Same cost profile as `alphamelts`, and it needs the native
+  ThermoEngine build from `install-engines.py`; without it the backend resolves
+  unavailable and the run fails loudly rather than silently downgrading.
 - A *fast real-fidelity* path is in progress (the reduced-real MAGEMin cache + `cached-real`
   backend) — the intent is to make the real melt-phase fidelity fast enough to be the
   default.
@@ -182,7 +226,7 @@ accepts the alias `C2A` → `C2A_continuous`.
 
 | command | purpose |
 |---|---|
-| `python -m simulator.optimize.cli --feedstock <id> --strategy {bayes,nsga2,random,screen,staged} --fidelity {stub,fast,high,auto} --budget N` | Phase-O recipe optimizer |
+| `python -m simulator.optimize --feedstock <id> --strategy {bayes,nsga2,random,screen,staged} --fidelity {internal-analytical,fast,high,auto} --budget N` | Phase-O recipe optimizer (`simulator.optimize.cli` is the same entry point; `--fidelity stub` is still accepted and canonicalises to `internal-analytical`) |
 | `python scripts/populate_reduced_real_cache.py --profile <p> --feedstock <id> --campaign <c> --db <path>` | build the reduced-real equilibrium cache from real trajectories |
 | `python scripts/cal_threshold_calibration.py --feedstock <id> --campaign <c> --output-dir <d>` | SG-3 vapor yield-threshold calibration (default `--backend alphamelts`; `--allow-internal-analytical` to use the `internal-analytical` model; legacy flag alias `--allow-stub`) |
 | `python scripts/vaporock_antoine_shadow_matrix.py` | record alphaMELTS/VapoRock vs Antoine shadow vapor pressures |
@@ -191,15 +235,21 @@ accepts the alias `C2A` → `C2A_continuous`.
 
 ## Gotchas
 
-- **No root `runner.py`.** Use the module form `-m simulator.runner`. Stale copies under
-  `.claude/worktrees/` are not the live code.
+- **No root `runner.py`.** Use the module form `-m simulator.runner`. `simulator.runner` is
+  a package directory (`simulator/runner/`), which also carries `sio_yield`, `sio_tsweep`
+  and `sio_wall_sweep` submodules. Stale copies under `.claude/worktrees/` are not the
+  live code.
 - **Always `./.venv/bin/python`**, not a bare `python`.
 - **Run from the repo root** so `data/` and `engines/` resolve; `--output` is relative to
   the current directory.
 - **The default backend is `internal-analytical`** (legacy alias `stub`) — fast, with real Ellingham/Antoine *extraction*
   thermodynamics but **without the silicate-melt solution model**. Pass
-  `--backend alphamelts` for the full melt-phase equilibrium (slow). Each run records its
-  `backend_name` + a `vapor_pressure_source_report`, so the fidelity used is never hidden.
+  `--backend alphamelts` for the full melt-phase equilibrium (slow). Each run records
+  `run_metadata.backend` (plus `backend_status`, `backend_real_active`,
+  `backend_authoritative`, `evidence_class`, and `engines_used`) alongside a
+  `vapor_pressure_source_report`, so the fidelity used is never hidden. Note the runner
+  artifact spells this field `backend`; `backend_name` is the optimizer's EvalSpec field,
+  not a run-document key.
 - **Failed/refused runs still produce a JSON file and a non-zero exit** — gate on the exit
   code (or `status` field), not file existence.
 - **Machine-sensitive goldens regenerate on Studio 1 only.** Engine-touched fixtures

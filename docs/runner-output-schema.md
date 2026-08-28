@@ -55,15 +55,18 @@ python -m simulator.runner \
     --campaign=C0 \
     --hours=24 \
     --output=runs/lunar_mare_24h.json \
+    [--mass-kg=1000] \
     [--additive=C=30] \
     [--engines=config/engines.yaml] \
     [--engine=vapor_pressure:builtin-vapor-pressure] \
-    [--backend=internal-analytical|alphamelts] \
+    [--backend=internal-analytical|alphamelts|thermoengine] \
     [--preset=data/presets/vacuum_pyrolysis/CASE.yaml] \
     [--leg=faithful] \
     [--compare] \
     [--observations=data/literature/OBSERVATIONS.yaml] \
     [--track=pyrolysis|mre_baseline] \
+    [--recipe=RECIPE.yaml] \
+    [--runtime-campaign-overrides=JSON] \
     [--allow-fallback-vapor] \
     [--allow-unmeasured-alpha-fallback] \
     [--force-builtin-vapor-pressure] \
@@ -72,9 +75,17 @@ python -m simulator.runner \
     [--sio-ramp-c-per-hr=15] \
     [--sio-liner-temperature-c=1100] \
     [--sio-po2-mbar=1] \
+    [--include-wall-deposit-rate-diagnostics] \
+    [--write-target-inventory] \
     [--started-at-utc=ISO8601] \
     [--kernel-commit-sha=SHA]
 ```
+
+`--output` is the only strictly required flag; `--feedstock` is optional because
+`--preset` can supply it. `--setpoints-overrides` is a deprecated alias for
+`--runtime-campaign-overrides`. Recipe setpoints are merged before runtime
+campaign overrides, so runtime overrides remain the final word for their fields.
+`python -m simulator.runner --help` is the authoritative flag list.
 
 For completed runs and handled runner failures, the runner writes a JSON
 document to `--output` and exits `0` for `status: ok` or `partial`, or `1` for
@@ -331,7 +342,12 @@ it does not introduce a new schema version.
 * `engines_used.registry` is sourced from
   `ChemistryKernel.registry.capability_summary()` -- the same surface
   used to audit the current builtin-authoritative / VapoRock-shadow
-  `VAPOR_PRESSURE` split.
+  `VAPOR_PRESSURE` split. It is **filtered, not the full registry**: the
+  runner drops `backend_equilibrium` unconditionally, `ca_aluminothermic_step`
+  when the run produced no C7 product report, and `oxygen_bubbler` when the run
+  did not request the O2 bubbler. `engines_used.active` is derived from the
+  same filtered map, so an intent absent from either is not evidence that no
+  provider is registered for it.
 * Handled failure envelopes emit the same base fidelity fields as successful
   runs: `backend_status`, `backend_authoritative`, `backend_real_active`,
   `evidence_class`, `runtime_status`, `label_source`,
@@ -750,18 +766,35 @@ incident, stuck, re-evaporated, and net continuous flux and has
   this runner output yet.
 * `metal_yields_kg` is sourced from `PyrolysisSimulator.product_ledger`
   filtered to a curated list of metal species (see
-  `simulator/runner.py::_METAL_PRODUCT_SPECIES`).  Non-metal products
+  `simulator/runner/__init__.py::_METAL_PRODUCT_SPECIES`).  Non-metal products
   appear in `final_state` and `condensation_train_kg`.
 * Lab-schedule runs may include `pO2_enforcement` on each affected
   per-hour row: `{hour, schedule_id, schedule_time_h, setpoint_mbar,
   achieved_mbar, p_total_mbar, limited_by_total_pressure, status}`.
   The top-level `pO2_enforcement_by_hour` list repeats those rows for
   artifact consumers that do not scan every hour.
-* Staged / diagnostic / real-backend runs may carry these additional
-  conditionally-emitted keys on a per-hour row.  Each appears only when its
-  backing source is populated, so it is absent on a plain internal-analytical (`stub`) backend run;
-  each is whitelisted in
+* These additional keys are conditionally emitted on a per-hour row. Each
+  appears only when its backing source is populated. Most require a staged /
+  diagnostic / real-backend run, but that is **not** a rule you can rely on:
+  `fe_redox_split`, `stage_3_capture`, and `condensation_refusals_by_species`
+  are all present on a plain `internal-analytical` C0 run. Consumers must test
+  for presence, not infer it from the backend. Each is whitelisted in
   `tests/test_runner_smoke.py::PER_HOUR_OPTIONAL_KEYS`:
+  * `p_carrier_bar` / `carrier_identity` -- emitted as a pair when the
+    overhead composition carries a finite positive partial pressure for the
+    run's declared carrier. `p_carrier_bar` is that partial pressure converted
+    mbar -> bar; `carrier_identity` is the canonical `N2` / `Ar` / `CO2` token.
+    `P_total_bar - pO2_bar` is **not** a substitute: total pressure may also
+    include vapor species or a control floor, so a consumer that lacks these
+    keys must report them as not emitted rather than derive them.
+  * `metal_phase_stratification` -- emitted when
+    `HourSnapshot.metal_phase_stratification` is populated by the
+    `METAL_PHASE_STRATIFICATION` diagnostic provider
+    (`engines/builtin/metal_phase_stratification.py`, schema
+    `metal_phase_stratification_v1`).
+  * `condensation_refusals_by_species` -- the per-hour projection of the
+    same typed terminal refusal view carried at top level. Present on plain
+    `internal-analytical` runs.
   * `c2a_staged_gas` -- emitted for staged C2A gas rows when
     `HourSnapshot.c2a_staged_gas` is populated. The value is a JSON-safe copy
     of the staged gas composition map.
@@ -856,7 +889,7 @@ incident, stuck, re-evaporated, and net continuous flux and has
   * `reduced_real_cache_state` -- added downstream of `build_per_hour_summary`
     by `simulator/run_executor.py` (when the simulator's
     `_last_reduced_real_cache_state` is not `None`) and serialized into
-    `per_hour_summary` via `simulator/runner.py`; the reduced-real backend
+    `per_hour_summary` via `simulator/runner/__init__.py`; the reduced-real backend
     cache-state label (string).
 * P6a wall-deposit fields are direct projections of
   `HourSnapshot.wall_deposit_by_segment_species_delta` and the running
@@ -920,8 +953,11 @@ diagnostics but noise for the operator-facing JSON.
 
 ## Web stream parity
 
-`web/events.py` calls `simulator.runner.build_per_hour_summary` for
-every `simulation_tick` so the SocketIO stream emits the *same* per-hour
-shape the CLI commits to fixtures.  Web ticks additionally carry the
-existing `simulation_tick` keys (turbine telemetry, decision payload,
-etc.) -- the runner contract is a strict subset.
+`web/events.py` emits `StepResult.per_hour_summary` on every
+`simulation_tick`.  That field is built by
+`simulator/session.py::SimSession._build_per_hour_summary`, which calls
+`simulator.runner.build_per_hour_summary` -- the same function the CLI uses
+-- so the SocketIO stream emits the *same* per-hour shape the CLI commits to
+fixtures.  Web ticks additionally carry the existing `simulation_tick` keys
+(turbine telemetry, decision payload, etc.) -- the runner contract is a
+strict subset.

@@ -13,11 +13,14 @@ Run the CLI as:
 
 ```bash
 python -m simulator session \
-    --script=recipes/lunar_session.txt \
+    --script=<path/to/script.txt> \
     [--strict] \
     [--started-at-utc=ISO8601] \
     [--kernel-commit-sha=SHA]
 ```
+
+The repository ships no default script directory; `--script` takes whatever
+path you author.
 
 Use `--script=-` to read the recipe from stdin. The harness never prompts,
 never opens a TUI, and never writes simulator ledgers or run artifacts. Stdout
@@ -88,6 +91,7 @@ protocol version bump.
   "frame_type": "start",
   "protocol_version": "1.0.0",
   "backend": "internal-analytical",
+  "backend_active": "InternalAnalyticalBackend",
   "feedstock_id": "lunar_mare_low_ti",
   "campaign": "C0",
   "mass_kg": 1000.0,
@@ -95,8 +99,11 @@ protocol version bump.
 }
 ```
 
-`backend` is the resolved backend name requested by the script. The harness
-does not emit wall-clock timestamps or live git SHAs.
+`backend` is the resolved backend name requested by the script;
+`backend_active` is the class name of the backend object that resolution
+actually produced, so a script can tell the requested name from the live
+implementation. The harness does not emit wall-clock timestamps or live git
+SHAs.
 
 ### Step And Advance
 
@@ -121,16 +128,24 @@ An `advance` command that completes exactly one ordinary step emits:
     "T_C": 75.0,
     "P_total_bar": 0.0,
     "pO2_bar": 0.0,
-    "mass_balance_pct": 2.6e-13,
+    "mass_balance_pct": 1.1e-14,
     "O2_yield_kg_cumulative": 0.0,
     "O2_source_side_potential_kg_cumulative": 0.0,
     "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-    "metal_yields_kg": {},
+    "metal_yields_kg": {"Co": 0.0359, "Ni": 0.2054},
     "condensation_train_kg": {}
   },
   "steps": [{...}]
 }
 ```
+
+**The step payloads in this document are abridged.** A real per-hour summary
+carries roughly forty keys (energy breakdown, shuttle inventory, MRE
+voltage/current, wall deposits, Knudsen observables, and the conditional
+diagnostic keys). The fields shown here are a readable subset chosen to make
+the frame envelope legible; `docs/runner-output-schema.md` "Per-hour summary"
+is the authoritative field list, and the numeric values here are illustrative
+rather than pinned.
 
 An `advance N` command that completes multiple ordinary steps emits:
 
@@ -147,31 +162,19 @@ An `advance N` command that completes multiple ordinary steps emits:
       "T_C": 75.0,
       "P_total_bar": 0.0,
       "pO2_bar": 0.0,
-      "mass_balance_pct": 2.6e-13,
+      "mass_balance_pct": 1.1e-14,
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    }
-  ],
-  "steps": [
-    {
-      "hour": 1,
-      "campaign": "C0",
-      "T_C": 75.0,
-      "P_total_bar": 0.0,
-      "pO2_bar": 0.0,
-      "mass_balance_pct": 2.6e-13,
-      "O2_yield_kg_cumulative": 0.0,
-      "O2_source_side_potential_kg_cumulative": 0.0,
-      "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "metal_yields_kg": {},
+      "metal_yields_kg": {"Co": 0.0359, "Ni": 0.2054},
       "condensation_train_kg": {}
     }
   ]
 }
 ```
+
+A single-step `step` frame carries **both** `step` (the one summary object) and
+`steps` (a one-element list); a multi-step `advance` frame carries `steps` only.
 
 Every object in `steps` is exactly the same per-hour summary shape produced by
 `simulator.runner.build_per_hour_summary` and documented in

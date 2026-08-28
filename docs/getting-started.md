@@ -38,13 +38,17 @@ The launcher binds to `127.0.0.1:3000` by default. Override with `REGOLITH_HOST`
 python3 install-engines.py
 ```
 
-This clones and installs PetThermoTools, Thermobar, PySulfSat, and VapoRock as editable siblings of the repo, then compiles MAGEMin and ThermoEngine from source. The alphaMELTS binary is not bundled; see `engines/alphamelts/` for placement notes. The installer is idempotent: existing builds are reused. PetThermoTools and VapoRock are also declared in `[project.dependencies]` so `pip install -e .` picks them up directly; `install-engines.py` is required only for the compiled engines (MAGEMin, ThermoEngine) and for the editable-sibling clones.
+This clones and installs PetThermoTools, Thermobar, PySulfSat, and VapoRock as editable siblings of the repo, then compiles MAGEMin and ThermoEngine from source. The alphaMELTS binary is not bundled; see `engines/alphamelts/` for placement notes. The installer is idempotent: existing builds are reused.
 
-Skip the native compiles (PetThermoTools + VapoRock only, no MAGEMin / ThermoEngine build):
+Only PetThermoTools is declared in `[project.dependencies]`, so that one comes in with `pip install -e .`. **VapoRock is deliberately *not* a pip dependency**: `import vaporock` hard-requires the native ThermoEngine build (a Cython extension linking system GSL and Objective-C/C dylibs), which pip cannot compile. VapoRock and ThermoEngine are provisioned only by `install-engines.py`, as are MAGEMin and the remaining editable-sibling clones.
+
+Skip the native compiles (editable sibling clones only — PetThermoTools, Thermobar, PySulfSat, VapoRock — with no MAGEMin / ThermoEngine build):
 
 ```bash
 python3 install-engines.py --skip-compiles
 ```
+
+Note that with `--skip-compiles` the VapoRock clone is installed but will still fail to import, because ThermoEngine was not built. Use `python3 install-engines.py --update` to pull the engine clones to their latest upstream commit and rebuild the natives.
 
 With the operational chain installed, the active backend selection log line (see `docs/melt-backends.md`) confirms the selected `MeltBackend`; `run_metadata.engines_used.registry.vapor_pressure` shows `authoritative: "builtin-vapor-pressure"` with VapoRock, when importable, under `shadows`. Silent fallback to backend vapor pressures is forbidden unless `chemistry_kernel.allow_fallback_vapor: true` is set in setpoints.
 
@@ -97,7 +101,7 @@ Key CLI flags:
 | `--campaign` | `C0` | Starting campaign phase |
 | `--hours` | `24` | Simulated hours to run |
 | `--mass-kg` | `1000` | Batch mass in kg |
-| `--backend` | `internal-analytical` | `internal-analytical` (legacy alias `stub`) or `alphamelts`; `auto` only on web/API autodetect |
+| `--backend` | `internal-analytical` | `internal-analytical` (legacy alias `stub`), `alphamelts`, or `thermoengine`; `auto` only on web/API autodetect |
 | `--track` | `pyrolysis` | `pyrolysis` or `mre_baseline` |
 | `--additive` | none | Repeatable: `--additive=Na=12`. Post-V1c the C3 shuttle gate uses Na only; `--additive=K=…` is accepted but ignored by the gate. |
 
@@ -105,14 +109,21 @@ For field definitions in the output JSON, see [`docs/runner-output-schema.md`](r
 
 ### Session script interface
 
-For interactive-style batch runs with explicit operator decisions, use the session harness:
+For interactive-style batch runs with explicit operator decisions, use the session harness. The repository ships **no** default script directory — `--script` takes whatever path you hand it, so write your own:
 
 ```bash
 python3 -m simulator session \
-    --script=recipes/lunar_session.txt
+    --script=my_lunar_session.txt
 ```
 
-Use `--script=-` to read from stdin. See [`docs/session-script-protocol.md`](session-script-protocol.md) for the full script grammar and frame format.
+Use `--script=-` to read from stdin, which is the quickest way to try it:
+
+```bash
+printf 'start --feedstock lunar_mare_low_ti --campaign C2A\nadvance\nsnapshot\nquit\n' \
+  | python3 -m simulator session --script -
+```
+
+See [`docs/session-script-protocol.md`](session-script-protocol.md) for the full script grammar and frame format.
 
 ## What to do next
 
