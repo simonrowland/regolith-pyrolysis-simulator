@@ -1604,7 +1604,7 @@ def test_c3_k_shuttle_not_numeric_liquid_fraction_preserves_legacy_raise(
     )
     provider = BuiltinMetallothermicStepProvider()
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError, match="control_inputs.liquid_fraction is missing"):
         provider.dispatch(
             _c3_k_feo_request(sim, liquid_fraction="not_numeric")
         )
