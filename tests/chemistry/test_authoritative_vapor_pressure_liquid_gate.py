@@ -165,6 +165,10 @@ def test_active_liquid_empty_vapor_pressures_fail_loud(temperature_C):
     with pytest.raises(EvaporationFluxRefusal) as exc_info:
         PyrolysisSimulator._calculate_evaporation(sim, result)
     assert exc_info.value.reason == 'vapour_batch_no_debiting_pressure_outcome'
+    assert exc_info.value.diagnostic['vapour_batch_flux_overlay'][
+        'batch_channel_states'
+    ] == {'K': 'refusal'}
+    assert 'physical-zero proof' in exc_info.value.diagnostic['detail']
     assert refused_batch.requested_species_ids == frozenset({'K'})
     assert refused_batch.channel('K').is_refused
 

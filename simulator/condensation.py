@@ -3383,15 +3383,34 @@ class CondensationModel:
                     existing['stage_outcomes'] = stage_list
                     condensation_refusals_by_species[species] = existing
                 continue
-            # Species-level rollup: pass-through (mass continues; not a hard
-            # species refusal). Consumers gate diagnostics, not flux, on this.
-            primary = outcomes[0]
+            domain_outcome = next(
+                (
+                    outcome
+                    for outcome in outcomes
+                    if str(outcome.get('status') or '') == 'out_of_domain'
+                ),
+                None,
+            )
+            computed_out_of_domain = domain_outcome is not None
+            primary = domain_outcome or outcomes[0]
+            # A marked domain continuation carries computed mass; an ordinary
+            # zero-efficiency outcome is pass-through. Neither is a refusal.
             condensation_refusals_by_species[species] = {
-                'status': 'pass_through',
+                'status': (
+                    'out_of_domain'
+                    if computed_out_of_domain
+                    else 'pass_through'
+                ),
                 'reason': str(primary.get('reason') or 'condensation_efficiency_zero'),
                 'output_status': 'status_bearing',
                 'stage_outcomes': list(outcomes),
             }
+            if computed_out_of_domain:
+                authority = condensation_authority_by_species.get(species)
+                if authority is not None:
+                    authority['status'] = VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
+                    authority['authoritative_for_condensation'] = False
+                    authority['domain_status'] = 'out_of_domain'
 
         for species, authority in condensation_authority_by_species.items():
             input_mass = max(
@@ -4163,10 +4182,12 @@ class CondensationModel:
         pressure/Knudsen coupling.
 
         VR-11 / B3: the finite early-zero exits (non-positive residence
-        or alpha, missing Antoine Psat, nonpositive local pressure,
-        nonpositive reference flux) mint typed pass-through outcomes
-        into ``efficiency_outcomes`` (when provided) rather than
-        returning a silent 0.0 with no consumer channel. Non-finite
+        or alpha, nonpositive local pressure, nonpositive reference flux)
+        mint typed pass-through outcomes into ``efficiency_outcomes`` (when
+        provided) rather than returning a silent 0.0 with no consumer channel.
+        Missing non-SiO Antoine Psat remains pass-through; out-of-domain SiO
+        computes from its declared routing reference and marks the outcome,
+        while missing flowing pressure or routing authority refuses. Non-finite
         ``residence_s`` or ``alpha_s_value`` raise; a later
         available_kg / molar-mass non-finite or non-positive check
         returns 0.0 without minting. Numeric eta for finite valid
@@ -4201,19 +4222,111 @@ class CondensationModel:
 
         # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
         # range errors are typed refusals (b-127), never a fabricated 100 Pa.
+        psat_refusal_detail: dict[str, Any] = {}
         P_local_pa, psat_refused = _try_antoine_psat_pa(
             species,
             T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
             vapor_pressure_data=self.vapor_pressure_data,
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            refusal_detail_out=psat_refusal_detail,
         )
+        out_of_domain_record: dict[str, Any] | None = None
         if psat_refused or P_local_pa is None:
-            return _mint_zero(
-                'antoine_psat_unavailable_at_T',
-                T_cond_C=float(T_cond_C),
-                T_K=float(T_cond_C + CELSIUS_TO_KELVIN_OFFSET),
-            )
+            if species == 'SiO':
+                if psat_refusal_detail.get('reason') == 'catalog_compile_error':
+                    raise DepositionInputRefusal(
+                        'vapor_pressure_data',
+                        species,
+                        'SiO stage saturation pressure catalog refused: '
+                        + str(psat_refusal_detail.get('detail') or 'malformed'),
+                    )
+                flowing_pressure_pa = (
+                    self.wall_species_partial_pressures_pa.get(species)
+                    if self._species_partial_pressures_configured
+                    else None
+                )
+                if flowing_pressure_pa is None:
+                    raise DepositionInputRefusal(
+                        'flowing_pressure_pa',
+                        None,
+                        'required to compute marked SiO capture when stage '
+                        'saturation pressure is out of domain',
+                    )
+                incoming_pressure_pa = _deposition_finite_scalar(
+                    'flowing_pressure_pa', flowing_pressure_pa
+                )
+                if incoming_pressure_pa <= 0.0:
+                    return _mint_zero(
+                        'nonpositive_flowing_pressure',
+                        flowing_pressure_pa=incoming_pressure_pa,
+                    )
+                cold_limit_diagnostic: dict[str, Any] = {}
+                routing_reference = (
+                    _declared_condensation_routing_reference_at_1mbar(
+                        species,
+                        T_cond_C=T_cond_C,
+                        vapor_pressure_data=self.vapor_pressure_data,
+                    )
+                )
+                # SiO disproportionates into lower-volatility Si + SiO2 on a
+                # cold baffle. Its declared T_cond at 1 mbar authorizes this
+                # out-of-domain routing model: (1 mbar)(100 Pa/mbar) = 100 Pa
+                # is provenance, not a substitute for measured flow pressure.
+                # In the high-supersaturation product limit P_sat ~= 0, so
+                # delta_p = P_flow - P_sat ~= P_flow. Unit check is Pa-Pa;
+                # sanity: P_flow=100 Pa reproduces the declared reference and
+                # P_flow->0 gives the proven physical zero handled above.
+                routing_reference_pressure_pa = float(
+                    routing_reference['pressure_pa']
+                )
+                P_local_pa = _wall_deposition_driving_pressure_pa(
+                    species,
+                    incoming_pressure_pa,
+                    T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                    reactive_product_backstop=True,
+                    antoine_extrapolations=antoine_extrapolations,
+                    antoine_extrapolation_warnings=(
+                        antoine_extrapolation_warnings
+                    ),
+                    diagnostic_out=cold_limit_diagnostic,
+                )
+                out_of_domain_record = {
+                    'status': 'out_of_domain',
+                    'reason': (
+                        'stage_saturation_pressure_out_of_domain_computed_with_'
+                        'declared_engineering_route'
+                    ),
+                    'output_status': 'status_bearing',
+                    'species': species,
+                    'stage_number': int(
+                        getattr(stage, 'stage_number', -1)
+                    ),
+                    'T_cond_C': float(T_cond_C),
+                    'T_K': float(T_cond_C + CELSIUS_TO_KELVIN_OFFSET),
+                    'flowing_pressure_pa': incoming_pressure_pa,
+                    'driving_pressure_pa': P_local_pa,
+                    'routing_reference_pressure_pa': (
+                        routing_reference_pressure_pa
+                    ),
+                    'routing_reference_basis': (
+                        'declared_engineering_T_cond_at_1mbar_partial_pressure'
+                    ),
+                    'routing_reference_source': routing_reference['source'],
+                    'saturation_pressure_policy': cold_limit_diagnostic.get(
+                        'wall_saturation_pressure_status'
+                    ),
+                    'eta': 0.0,
+                }
+                if efficiency_outcomes is not None:
+                    efficiency_outcomes.append(out_of_domain_record)
+            else:
+                return _mint_zero(
+                    'antoine_psat_unavailable_at_T',
+                    T_cond_C=float(T_cond_C),
+                    T_K=float(T_cond_C + CELSIUS_TO_KELVIN_OFFSET),
+                )
         if P_local_pa <= 0.0:
             return _mint_zero(
                 'nonpositive_local_pressure',
@@ -4371,7 +4484,10 @@ class CondensationModel:
                 f'condensation efficiency for {species} in stage '
                 f'{int(getattr(stage, "stage_number", -1))} is not finite'
             )
-        return max(0.0, min(1.0, eta))
+        eta = max(0.0, min(1.0, eta))
+        if out_of_domain_record is not None:
+            out_of_domain_record['eta'] = eta
+        return eta
 
 
 def _authoritative_vapour_catalog_payload(
@@ -4389,6 +4505,77 @@ def _authoritative_vapour_catalog_payload(
     ):
         return catalog_payload
     return None
+
+
+def _declared_condensation_routing_reference_at_1mbar(
+    species: str,
+    *,
+    T_cond_C: float,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Return the declared 1 mbar routing reference or refuse its absence."""
+
+    payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
+    families = (payload or {}).get('families', {})
+    matches: list[tuple[str, Any]] = []
+    if isinstance(families, Mapping):
+        for family_id, raw_family in families.items():
+            if not isinstance(raw_family, Mapping):
+                continue
+            physical = raw_family.get('physical_properties', {})
+            species_rows = (
+                physical.get('species', {})
+                if isinstance(physical, Mapping)
+                else {}
+            )
+            if not isinstance(species_rows, Mapping) or species not in species_rows:
+                continue
+            routing = raw_family.get('fiat_routing', {})
+            declared_T_C = (
+                routing.get('condensation_reference_at_1mbar_C')
+                if isinstance(routing, Mapping)
+                else None
+            )
+            matches.append((str(family_id), declared_T_C))
+    if len(matches) != 1:
+        raise DepositionInputRefusal(
+            'condensation_reference_at_1mbar_C',
+            None,
+            f'exactly one declared routing reference is required for {species}',
+        )
+    family_id, raw_reference_T_C = matches[0]
+    if not is_declared_real_scalar(
+        raw_reference_T_C,
+        allow_numeric_str=True,
+    ):
+        raise DepositionInputRefusal(
+            'condensation_reference_at_1mbar_C',
+            raw_reference_T_C,
+            f'declared routing reference is missing or nonnumeric for {species}',
+        )
+    reference_T_C = float(raw_reference_T_C)
+    if (
+        not math.isfinite(reference_T_C)
+        or not math.isclose(
+            reference_T_C,
+            float(T_cond_C),
+            rel_tol=0.0,
+            abs_tol=1.0e-9,
+        )
+    ):
+        raise DepositionInputRefusal(
+            'condensation_reference_at_1mbar_C',
+            raw_reference_T_C,
+            f'declared routing reference does not match T_cond_C for {species}',
+        )
+    return {
+        'pressure_pa': 1.0 * 100.0,
+        'temperature_C': reference_T_C,
+        'source': (
+            'data.vapor_pressures.families.'
+            f'{family_id}.fiat_routing.condensation_reference_at_1mbar_C'
+        ),
+    }
 
 
 def _species_vapor_data(
@@ -5496,14 +5683,20 @@ def _try_antoine_psat_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     enforce_hot_train_applicability: bool = True,
+    refusal_detail_out: MutableMapping[str, Any] | None = None,
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
     ``(None, True)`` means typed refusal — including the case where the
     species has Antoine data somewhere but no segment covers ``T_K``
     (``_antoine_psat_pa`` returns None without raising). Never invent a
-    pressure for that gap (b-127 fabricated 100 Pa).
+    pressure for that gap (b-127 fabricated 100 Pa). ``refusal_detail_out``
+    distinguishes malformed catalog input from a physically out-of-domain
+    evaluator so callers cannot promote both through the same continuation.
     """
+
+    if refusal_detail_out is not None:
+        refusal_detail_out.clear()
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError
     from simulator.vapour_rail.catalog import CatalogCompileError
@@ -5517,14 +5710,38 @@ def _try_antoine_psat_pa(
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             enforce_hot_train_applicability=enforce_hot_train_applicability,
         )
-    except (CatalogCompileError, VaporPressureRangeError) as exc:
+    except CatalogCompileError as exc:
         if (
             antoine_extrapolation_warnings is not None
             and str(exc) not in antoine_extrapolation_warnings
         ):
             antoine_extrapolation_warnings.append(str(exc))
+        if refusal_detail_out is not None:
+            refusal_detail_out.update({
+                'category': 'missing_input',
+                'reason': 'catalog_compile_error',
+                'detail': str(exc),
+            })
+        return None, True
+    except VaporPressureRangeError as exc:
+        if (
+            antoine_extrapolation_warnings is not None
+            and str(exc) not in antoine_extrapolation_warnings
+        ):
+            antoine_extrapolation_warnings.append(str(exc))
+        if refusal_detail_out is not None:
+            refusal_detail_out.update({
+                'category': 'out_of_domain',
+                'reason': 'vapor_pressure_range_error',
+                'detail': str(exc),
+            })
         return None, True
     if pressure_pa is None:
+        if refusal_detail_out is not None:
+            refusal_detail_out.update({
+                'category': 'out_of_domain',
+                'reason': 'uncovered_antoine_segment',
+            })
         return None, True
     return float(pressure_pa), False
 

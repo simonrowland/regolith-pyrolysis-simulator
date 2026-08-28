@@ -148,11 +148,37 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     # product account at this pause; the remainder stays in the real overhead
     # account and is included by the exact all-account P closure above.
     assert offgas_p_atoms > 0.0
+    carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
+    model = session.simulator.condensation_model
+    p_refusals = {
+        species: model.last_condensation_refusals_by_species[species]
+        for species in carriers
+        if (
+            species in model.last_condensation_refusals_by_species
+            and model.last_condensation_refusals_by_species[species]["status"]
+            == "refused"
+        )
+    }
+    assert p_refusals
+    assert all(
+        record["reason"] == "inapplicable_by_declared_predicate"
+        for record in p_refusals.values()
+    )
+    carrier_authority = model.last_condensation_authority_by_species
+    assert set(p_refusals) <= set(carrier_authority)
+    assert all(
+        carrier_authority[species]["carrier_authority"]["extra"][
+            "activity_reason"
+        ]
+        == "out_of_gamma_domain"
+        for species in p_refusals
+    )
+    condensation_train = ledger.kg_by_account("process.condensation_train")
+    assert all(condensation_train.get(species, 0.0) == 0.0 for species in carriers)
     assert final_p_atoms == pytest.approx(initial_p_atoms, rel=1.0e-10, abs=1.0e-10)
     assert ledger.close_report()["balanced"] is True
     assert abs(session.simulator._make_snapshot().mass_balance_error_pct) <= 5.0e-12
 
-    carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
     flux_overlay = session.simulator._last_vapour_batch_flux_overlay
     channel_states = flux_overlay["batch_channel_states"]
     assert carriers <= set(channel_states)
