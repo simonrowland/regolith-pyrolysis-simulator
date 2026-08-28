@@ -1,7 +1,7 @@
 """Pytest fixtures for the Playwright e2e harness.
 
-Plain pytest + playwright.sync_api (no pytest-playwright): the repo is
-pytest-native and .venv already ships the `playwright` package.
+Plain pytest + playwright.sync_api (no pytest-playwright): install the optional
+`e2e` extra plus its Chromium browser before running this harness.
 
 Run ONLY these tests, serially, against the already-running dev server:
 
@@ -16,6 +16,7 @@ shared dev server must run serially.
 
 from __future__ import annotations
 
+import os
 import re
 import sys
 import urllib.error
@@ -53,7 +54,7 @@ def artifacts_dir():
 
 @pytest.fixture(scope="session")
 def live_server():
-    """Fail fast if the controller-owned dev server is not reachable.
+    """Skip if the controller-owned dev server is not reachable.
 
     This harness never starts or kills a server. Requested only by the
     browser fixtures, so in-process tests under tests/e2e/headspace_po2/
@@ -64,9 +65,15 @@ def live_server():
         with urllib.request.urlopen(url, timeout=15) as resp:
             status = getattr(resp, "status", 200)
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
-        pytest.fail(
+        message = (
             f"e2e harness requires the already-running dev server at {url} "
             f"(do not start another; launch config is 'simulator'): {exc}"
+        )
+        if os.environ.get("REGOLITH_E2E_REQUIRE_SERVER") == "1":
+            pytest.fail(message)
+        pytest.skip(
+            message + "; set REGOLITH_E2E_REQUIRE_SERVER=1 to require it",
+            allow_module_level=True,
         )
     if status != 200:
         pytest.fail(f"GET {url} returned HTTP {status}; landing page is not serving")

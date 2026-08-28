@@ -5,7 +5,7 @@ operator. This is the gap `tests/test_web_optimizer.py` does not cover: that
 file calls route functions in-process and never issues an HTTP request.
 
 Stack: **python `playwright.sync_api` + plain pytest** (no `pytest-playwright`).
-The repo is pytest-native and `.venv` already ships `playwright`.
+The browser harness is optional; the physics suite does not require Playwright.
 
 ## The one command
 
@@ -13,7 +13,8 @@ Dev server must already be running at `http://127.0.0.1:3000`. This harness
 never starts or kills a server.
 
 ```bash
-# first time only, if Chromium is missing:
+# first time only:
+.venv/bin/python -m pip install -e ".[e2e]"
 .venv/bin/python -m playwright install chromium
 
 .venv/bin/python -m pytest tests/e2e/test_happy_path_journey.py \
@@ -26,6 +27,10 @@ never starts or kills a server.
 carry `@pytest.mark.xdist_group("e2e-browser")` so a full-suite run still
 serializes them onto one worker. `REGOLITH_E2E_HEADED=1` shows the browser;
 `REGOLITH_E2E_BASE_URL` retargets.
+
+When the dev server is absent, browser tests skip with the launch instructions.
+Set `REGOLITH_E2E_REQUIRE_SERVER=1` in an e2e lane to turn that condition into a
+hard failure so the lane cannot pass vacuously.
 
 Do not collect `tests/e2e/headspace_po2/` with this command — those are
 in-process chemistry tests, not browser tests.

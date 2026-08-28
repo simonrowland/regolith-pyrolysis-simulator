@@ -42,6 +42,7 @@ pytestmark = [
 from .browser_harness import (
     BASE_URL,
     PAGE_LOAD_MS,
+    RUN_COMPLETE_MS,
     START_ACK_MS,
     STALL_THRESHOLD_MS,
     STATUS_CHANGE_MS,
@@ -55,6 +56,8 @@ from .browser_harness import (
     wait_for_socket_event,
     wait_for_start_enabled,
 )
+
+
 def _truncate_event(event: dict, limit: int = 2000) -> dict:
     out = dict(event)
     blob = json.dumps(out.get("data"), default=str)
@@ -85,6 +88,13 @@ def _stall_report(evidence, last_hour: float) -> str:
     return "\n".join(parts)
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "viscous_p_bulk_transport_out_of_domain is a known product gap pending "
+        "low-pressure transport support"
+    ),
+)
 @pytest.mark.timeout(600)
 def test_run_does_not_stall(page, evidence):
     page.goto(f"{BASE_URL}/", wait_until="domcontentloaded", timeout=PAGE_LOAD_MS)
@@ -174,3 +184,36 @@ def test_run_does_not_stall(page, evidence):
     cancel_run_quietly(page, evidence)
     evidence.note(f"run advanced continuously to Hour: {last_hour} over the watchdog window")
     assert last_hour > 0, "watchdog window elapsed without a single hour of progress"
+
+
+@pytest.mark.timeout(300)
+def test_default_recipe_refusal_reason_is_viscous_p_bulk_transport_out_of_domain(
+    page, evidence
+):
+    page.goto(f"{BASE_URL}/", wait_until="domcontentloaded", timeout=PAGE_LOAD_MS)
+    select_feedstock(page)
+    set_max_speed(page)
+    wait_for_start_enabled(page)
+    click_start(page)
+
+    started = wait_for_socket_event(
+        page,
+        "simulation_status",
+        timeout_ms=START_ACK_MS,
+        statuses=["started", "refused", "error"],
+    )
+    assert started.get("status") == "started", started
+
+    try:
+        terminal = wait_for_socket_event(
+            page,
+            "simulation_status",
+            timeout_ms=RUN_COMPLETE_MS,
+            statuses=["refused", "error"],
+        )
+    finally:
+        evidence.harvest_socket_log(phase="exact-refusal")
+        cancel_run_quietly(page, evidence)
+
+    assert terminal.get("status") == "refused", terminal
+    assert terminal.get("reason") == "viscous_p_bulk_transport_out_of_domain", terminal

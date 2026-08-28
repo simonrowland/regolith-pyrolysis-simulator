@@ -253,6 +253,10 @@ def main() -> int:
     print("\nInstall complete.")
     print(f"Run: {python} regolith-pyrolysis-run.py")
     print("Open: http://localhost:3000/")
+    print(
+        "Optional browser e2e: .venv/bin/python -m pip install -e '.[e2e]' && "
+        ".venv/bin/python -m playwright install chromium"
+    )
     return 0
 
 
