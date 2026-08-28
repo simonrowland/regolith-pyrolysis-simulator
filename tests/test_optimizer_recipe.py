@@ -626,7 +626,14 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-17: t-097 (110f03c/a217ce8) owns the Ellingham source-fingerprint
     # move; W-A5a/t-227 adds the composed reviewed electricity/solar defaults.
     # Recomputed from this tree.
-    assert cache_key(spec) == "332e86c4f7c37ca05f784209c5c10d1e3a07bb500ce0c6e4b4b411f3ae1d0123"
+    # 2026-07-31 VR-3 (be07c4d5): optimizer identity drops data/provider
+    # fingerprints; corpus_version is the sole version lever and bumps to
+    # analytical-corpus-2026-07-31-vapour-rail-key-v2. The old 332e86… key
+    # hashed the pre-VR-3 payload (fingerprints present, June corpus). That
+    # payload is unreachable: current canonical_evalspec_json does not
+    # serialize those fingerprints, and the June corpus is not interoperable.
+    # Pin recomputed from this tree's executable cache_key(spec).
+    assert cache_key(spec) == "1eb53246f1216356217463a8d536cf1c2fe9a7c627d36044f5e3444f48fa0243"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

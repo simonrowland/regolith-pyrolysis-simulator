@@ -704,13 +704,22 @@ def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
     active_thermo = []
     for sp_id, sp in catalog.species.items():
+        # 4048432f composes diagnostic math for 251 carriers; 014c2000
+        # separates evaluator presence from hot-train applicability.
+        # Filtering on evaluator is not None pulled 144 extra not_applicable
+        # rows into this list. Hot-train applicability is the reviewed-active
+        # property this test is supposed to pin.
         if sp.evaluator is None:
+            continue
+        if sp.code_metadata.hot_train_applicability == "not_applicable":
             continue
         fam = sp.evaluator.evaluator_family
         if fam in RUNTIME_THERMO_EVALUATOR_FAMILIES:
             active_thermo.append((sp_id, fam, sp.code_metadata.hot_train_applicability))
     # 2026-08-05 MC-4 wave-1 union: recomputed from the compiled catalog by
     # execution (P2O5_gas absent — tombstone restored per b-133).
+    # t-609 (c4a22134) added FeO_association_gas / NiO_gas; t-622 (3a36e9bb)
+    # added MnO_gas / CoO_gas — all hot-train applicable, diagnostic-only.
     assert active_thermo == [
         ("Si", "nasa_cea_9", "applicable"),
         ("TiO", "nasa_cea_9", "applicable"),
@@ -741,6 +750,10 @@ def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -
         ("Si2", "nasa_cea_9", "applicable"),
         ("Si3", "nasa_cea_9", "applicable"),
         ("SiO2_gas", "nasa_cea_9", "applicable"),
+        ("FeO_association_gas", "nasa_cea_9", "applicable"),
+        ("NiO_gas", "nasa_cea_9", "applicable"),
+        ("MnO_gas", "shomate", "applicable"),
+        ("CoO_gas", "shomate", "applicable"),
     ]
     # Production still compiles the pre-existing Antoine / standard_reaction rows.
     assert "Na" in catalog.species

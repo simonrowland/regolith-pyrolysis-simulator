@@ -276,6 +276,15 @@ def test_cro2_evaporation_proxy_absolute_diffusivity_pin():
     assert result.d_ab_m2_s == pytest.approx(0.044866224694514775, rel=1e-12)
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "missing authority: WallSaturationPressureRefusal "
+        "reason=antoine_data_unavailable; CrO2 has no executable "
+        "Antoine/Chapman-Enskog wall-saturation input, so deposition must "
+        "refuse rather than invent DEFAULT_BINARY_DIFFUSION_M2_S"
+    ),
+)
 def test_cro2_condensation_transport_uses_documented_default_fallback():
     helper_result = _chapman_enskog_d_ab_m2_s("CrO2", 1973.0, 1000.0)
     deposition_inputs = {

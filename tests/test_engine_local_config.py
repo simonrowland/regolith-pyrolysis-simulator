@@ -25,6 +25,7 @@ from simulator.reduced_real_determinism import (
     PT1_EQUILIBRIUM_TABLE,
     canonical_json_bytes,
 )
+from simulator.corpus_version import current_corpus_version
 from scripts.rekey_cache_engine_identity import rekey_cache
 
 
@@ -189,7 +190,13 @@ def test_rekey_migration_round_trip_and_idempotency(
     _sample_config(tmp_path, monkeypatch)
     db_path = tmp_path / "cache.sqlite"
     legacy_version = "alphaMELTS subprocess (/Users/me/alphamelts2)"
-    target = "analytical-corpus-2026-06-30-redox-v3-regrind-v1"
+    # VR-3 (be07c4d5) retired the June redox-v3 corpus: optimizer identity
+    # dropped data/provider fingerprints and bumped corpus_version to
+    # analytical-corpus-2026-07-31-vapour-rail-key-v2, declared
+    # non-interoperable with prior epochs. Rekey only accepts an
+    # interoperable target; the old June string is a refused epoch, not a
+    # migration destination.
+    target = current_corpus_version()
     key = {
         "schema_version": "test",
         "artifact": "equilibrium_post_record",

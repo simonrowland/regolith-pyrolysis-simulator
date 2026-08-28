@@ -73,6 +73,52 @@ def test_eval_timeout_rejects_numpy_bool_scalars() -> None:
             resolve_eval_timeout_seconds(value)
 
 
+def test_eval_timeout_does_not_charge_queue_wait_before_execution_start() -> None:
+    """RC-32: timeout bounds execution, not submit-to-start queue latency.
+
+    A future that has been submitted but has not written a start marker must
+    not expire at the eval timeout. Once execution starts, the same elapsed
+    window does expire. A never-started occupying slot still expires at the
+    startup bound so the clock cannot run forever.
+    """
+    future: Future[object] = Future()
+    now = time.monotonic()
+    dummy_task = object()
+    queued = pool_module._expired_futures(
+        {future: dummy_task},  # type: ignore[dict-item]
+        submitted_at={future: now - 5.0},
+        started_at={},
+        timeout_seconds=1.0,
+    )
+    assert queued == ()
+
+    running = pool_module._expired_futures(
+        {future: dummy_task},  # type: ignore[dict-item]
+        submitted_at={future: now - 5.0},
+        started_at={future: now - 1.0},
+        timeout_seconds=1.0,
+    )
+    assert running == (future,)
+
+    startup = pool_module._startup_timeout_seconds(1.0)
+    assert startup == 30.0
+    never_started = pool_module._expired_futures(
+        {future: dummy_task},  # type: ignore[dict-item]
+        submitted_at={future: now - startup},
+        started_at={},
+        timeout_seconds=1.0,
+    )
+    assert never_started == (future,)
+
+
+def _mark_fake_eval_started(task: object) -> None:
+    output_dir = Path(getattr(task, "output_dir"))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / pool_module._EVAL_STARTED_MARKER).write_text(
+        f"{os.getpid()}\n", encoding="utf-8"
+    )
+
+
 @pytest.fixture(autouse=True)
 def _restore_thread_env() -> object:
     snapshot = {name: os.environ.get(name) for name in THREAD_ENV_VARS}
@@ -128,15 +174,15 @@ def test_read_pid_log_drops_recycled_and_dead_pids(tmp_path: Path) -> None:
         proc.wait()
 
 
-def _process_pool_probe() -> int:
-    return os.getpid()
-
-
 def _process_pool_unavailable_reason() -> str | None:
     executor: ProcessPoolExecutor | None = None
     try:
         executor = ProcessPoolExecutor(max_workers=1)
-        future = executor.submit(_process_pool_probe)
+        # Probe with os.getpid, not a test-module function: spawn reimports
+        # the callable's module, and importing this file under co-tenancy
+        # (loadavg 50-100 / 18 CPU) exceeded the 5s probe and skipped the
+        # timeout/abort regressions. os.getpid is stdlib-picklable.
+        future = executor.submit(os.getpid)
         future.result(timeout=5)
     except Exception as exc:
         return f"{type(exc).__name__}: {exc}"
@@ -838,6 +884,7 @@ def test_process_pool_timeout_records_failure_and_continues(
         def submit(self, fn: object, task: object, evaluate_fn: object) -> Future[object]:
             future: Future[object] = Future()
             if getattr(task, "candidate_id", None) == "slow":
+                _mark_fake_eval_started(task)
                 return future
             future.set_result(fn(task, evaluate_fn))
             return future
@@ -910,6 +957,7 @@ def test_process_pool_timeout_records_failure_with_fake_executor(
         def submit(self, fn: object, task: object, evaluate_fn: object) -> Future[object]:
             future: Future[object] = Future()
             if getattr(task, "candidate_id", None) == "slow":
+                _mark_fake_eval_started(task)
                 return future
             future.set_result(fn(task, evaluate_fn))
             return future
@@ -976,9 +1024,11 @@ def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
             log_path = Path(task.output_dir) / ".child-pids"
             log_path.parent.mkdir(parents=True, exist_ok=True)
             if task.candidate_id == "slow":
+                _mark_fake_eval_started(task)
                 log_path.write_text("1111\n", encoding="utf-8")
                 return Future()
             if task.candidate_id == "requeued":
+                _mark_fake_eval_started(task)
                 log_path.write_text("2222\n", encoding="utf-8")
                 return Future()
             future: Future[object] = Future()
@@ -1090,15 +1140,22 @@ def test_process_pool_timeout_kills_worker_process_group(
 
 @pytest.mark.serial  # red under -n auto trains 11-12, green -n0 serial rerun 2026-08-02, timeout/subprocess-timing class
 @pytest.mark.xdist_group("serial")
-@pytest.mark.timeout(10)
+# 30s pytest wall: 2.0s eval timeout + descendant snapshot (0.25s) +
+# terminate grace (up to 5.0s) + replacement-worker spawn/import +
+# 1.3s leaked-child observe sleep + fixture probe. The old 10s mark
+# assumed pre-e65dea7c shutdown(wait=False) teardown. 30s stays well
+# below the 5s worker hang (which must be preempted, not awaited).
+@pytest.mark.timeout(30)
 def test_process_pool_timeout_reaps_normal_subprocess_child(
     tmp_path: Path,
     spawnable_process_pool: None,
 ) -> None:
-    # Hang path sleeps 5s; timeout must stay below that. After the timed-out
-    # worker is reaped, the next eval on max_workers=1 may pay a cold-spawn
-    # import cost (~0.8s under load), so leave headroom above 0.75s while
-    # remaining well under the hang duration.
+    # Hang path sleeps 5s; timeout must stay below that. Execution budget
+    # starts when the worker enters _evaluate_pool_task, not at submit, so
+    # the replacement worker's spawn/import does not steal the 2.0s. After
+    # the timed-out worker is reaped, the next eval on max_workers=1 may
+    # pay a cold-spawn import cost (~0.8s under load) counted as startup,
+    # not as eval timeout.
     results = evaluate_batch(
         [
             PoolEvaluationRequest(
@@ -1870,7 +1927,20 @@ def test_pool_mixed_feasible_infeasible_abort_no_partial_store_no_hang(
             evaluate_fn=_slow_or_abort_evaluate,
         )
 
-    assert time.monotonic() - started < 2.0
+    elapsed = time.monotonic() - started
+    # Pre-e65dea7c, _abort_executor was process.terminate() +
+    # shutdown(wait=False). That returned in well under 2s while
+    # descendants could leak — the old pin encoded that unsafe skip.
+    # Current teardown SIGSTOPs, snapshots descendants for
+    # _DESCENDANT_SNAPSHOT_SECONDS (0.25s, polled until the deadline),
+    # SIGKILLs, then joins up to _WORKER_TERMINATE_GRACE_SECONDS (5.0s)
+    # per in-flight worker. That wait is the required reap, not slack.
+    # The 20s sleeper on candidate "slow" is the sentinel: if abort
+    # failed to preempt, this test would wait the full sleep. Bound
+    # abort-to-return strictly below that sentinel. Also prove the
+    # sleeper did not finish (no artifact) and nothing was stored.
+    assert elapsed < 20.0
+    assert not (tmp_path / "pool" / "eval-000000" / "artifact.txt").exists()
     with sqlite3.connect(store_path) as conn:
         count = conn.execute("SELECT COUNT(*) FROM results").fetchone()[0]
     assert count == 0

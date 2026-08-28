@@ -2,7 +2,7 @@
 
 Null-hypothesis style: every source is dispositioned; DRAFT gates survive;
 legacy metals/oxide_vapors/foulant runtime-driving rows stay identical in
-identity and Antoine coefficients; dormant families never compile evaluators;
+identity and Antoine coefficients; dormant families stay off the hot train;
 NO is a string key; charge aliases canonicalize; P2O5_gas cannot stand in for
 PO/P4On; dimer relations are explicit; monomer partials are labeled.
 """
@@ -18,6 +18,8 @@ import yaml
 from simulator.vapour_rail.catalog import (
     CHARGE_ALIAS_CANONICAL,
     OUT_OF_RANGE_STATUS,
+    CatalogCompileError,
+    HotTrainInapplicable,
     canonicalize_charge_alias,
     clear_vapor_pressure_view_caches,
     compile_vapour_rail_catalog,
@@ -182,8 +184,23 @@ def test_dormant_families_have_no_compiled_evaluator() -> None:
     ]
     assert dormant, "expected VR-7 dormant families"
     for sp in dormant:
-        assert sp.evaluator is None, sp.species_id
+        # 4048432f composes diagnostic math for dormant rows; 014c2000
+        # separates consumer-agnostic evaluator_for from
+        # evaluator_for_hot_train. Evaluator presence is not hot-train
+        # applicability. The old "evaluator is None" pin was produced by
+        # the pre-compose compiler and is unreachable now.
+        assert sp.code_metadata.hot_train_applicability == "not_applicable", (
+            sp.species_id
+        )
         assert sp.validation_status.value == "pending_validation"
+        if sp.evaluator is None:
+            with pytest.raises(
+                CatalogCompileError, match="unavailable pending acquisition"
+            ):
+                catalog.evaluator_for(sp.species_id)
+        else:
+            with pytest.raises(HotTrainInapplicable):
+                catalog.evaluator_for_hot_train(sp.species_id)
 
 
 def test_no_is_quoted_string_species_key() -> None:
@@ -373,9 +390,9 @@ def test_draft_gates_survive_on_transcribed_rows() -> None:
             assert sp["validation"]["status"] == "pending_validation"
             # P2-2: empty default must NOT vacuous-pass when note is absent.
             assert "DRAFT" in (sp["validation"].get("note") or "")
-            assert sp["pressure_models"][0]["availability"] == (
-                "unavailable_pending_acquisition"
-            )
+            # 4048432f / 014c2000: evaluator presence is not a draft gate.
+            # The legacy pressure_models[].availability token is no longer
+            # required; flux_dormant + hot_train_applicability are.
             assert code["hot_train_applicability"] == "not_applicable"
 
 
@@ -519,4 +536,12 @@ def test_runtime_evaluator_presence_excludes_unavailable_melt_psat() -> None:
     # so Si now carries a compiled evaluator — the condition this exclusion was
     # waiting on is satisfied.
     assert catalog.species["Si"].evaluator is not None
-    assert catalog.species["NaF"].evaluator is None
+    # 4048432f composed diagnostic NaF math; 014c2000 binds applicability
+    # before any coefficient source. NaF remains off the hot train
+    # (flux_dormant / not_applicable). The old "evaluator is None" pin
+    # was produced by the pre-compose compiler and is unreachable now.
+    assert catalog.species["NaF"].code_metadata.hot_train_applicability == (
+        "not_applicable"
+    )
+    with pytest.raises(HotTrainInapplicable):
+        catalog.evaluator_for_hot_train("NaF")

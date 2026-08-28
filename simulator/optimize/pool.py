@@ -65,7 +65,14 @@ _CHILD_PID_LOG_ENV = "REGOLITH_OPTIMIZER_CHILD_PID_LOG"
 # Grounded on repo notes: live AlphaMELTS high eval ~=7 min, prior 900 s
 # cap could be tight for precompute; 45 min is >6x observed and configurable.
 DEFAULT_EVAL_TIMEOUT_SECONDS = 45 * 60
+# Must stay 1: submit occupies a worker slot, so time-to-start is spawn rather
+# than queue wait behind another eval. Execution timeout starts at the worker's
+# start marker, not at submit. A never-started occupying slot is bounded by
+# _startup_timeout_seconds (same shape as EngineWorkerPool). Raising this would
+# queue futures whose start marker never appears until a slot frees; charging
+# startup-from-submit would again kill unstarted work.
 _INFLIGHT_PER_WORKER = 1
+_EVAL_STARTED_MARKER = ".eval-started"
 _POOL_POLL_SECONDS = 0.1
 _WORKER_TERMINATE_GRACE_SECONDS = 5.0
 _DESCENDANT_SNAPSHOT_SECONDS = 0.25
@@ -264,6 +271,7 @@ def _evaluate_tasks_in_pool(
     initializer = partial(_initialize_worker, warm_runtime_spec)
     executor = _create_executor(max_workers, initializer)
     futures: dict[Future[Any], _PoolTask] = {}
+    submitted_at: dict[Future[Any], float] = {}
     started_at: dict[Future[Any], float] = {}
     pending_abort: BaseException | None = None
     executor_closed = False
@@ -271,6 +279,7 @@ def _evaluate_tasks_in_pool(
         _submit_until_full(
             executor,
             futures,
+            submitted_at,
             started_at,
             task_queue,
             evaluate_fn,
@@ -283,16 +292,24 @@ def _evaluate_tasks_in_pool(
                 _submit_until_full(
                     executor,
                     futures,
+                    submitted_at,
                     started_at,
                     task_queue,
                     evaluate_fn,
                     max_inflight,
                 )
                 continue
-            wait_timeout = _pool_wait_timeout(futures, started_at, per_eval_timeout_seconds)
+            _refresh_execution_start(futures, started_at)
+            wait_timeout = _pool_wait_timeout(
+                futures,
+                submitted_at,
+                started_at,
+                per_eval_timeout_seconds,
+            )
             done, _ = wait(futures, timeout=wait_timeout, return_when=FIRST_COMPLETED)
             for future in done:
                 task = futures.pop(future)
+                submitted_at.pop(future, None)
                 started_at.pop(future, None)
                 try:
                     outcome = future.result()
@@ -328,20 +345,29 @@ def _evaluate_tasks_in_pool(
                 _submit_until_full(
                     executor,
                     futures,
+                    submitted_at,
                     started_at,
                     task_queue,
                     evaluate_fn,
                     max_inflight,
                 )
-            expired = _expired_futures(futures, started_at, per_eval_timeout_seconds)
+            _refresh_execution_start(futures, started_at)
+            expired = _expired_futures(
+                futures,
+                submitted_at,
+                started_at,
+                per_eval_timeout_seconds,
+            )
             if expired:
                 expired_tasks = [futures.pop(future) for future in expired]
                 for future, task in zip(expired, expired_tasks):
-                    start = started_at.pop(future, time.monotonic())
+                    start = started_at.pop(future, None)
+                    submitted = submitted_at.pop(future, start or time.monotonic())
+                    origin = start if start is not None else submitted
                     results[task.index] = _timeout_result(
                         task,
                         timeout_seconds=per_eval_timeout_seconds or 0.0,
-                        elapsed_seconds=max(0.0, time.monotonic() - start),
+                        elapsed_seconds=max(0.0, time.monotonic() - origin),
                     )
                 requeue = sorted(
                     (task for future, task in futures.items() if future not in expired),
@@ -350,6 +376,7 @@ def _evaluate_tasks_in_pool(
                 abort_tasks = (*expired_tasks, *tuple(requeue))
                 task_queue.extendleft(reversed(requeue))
                 futures.clear()
+                submitted_at.clear()
                 started_at.clear()
                 executor_closed = _best_effort_abort_executor(
                     executor,
@@ -362,6 +389,7 @@ def _evaluate_tasks_in_pool(
                 _submit_until_full(
                     executor,
                     futures,
+                    submitted_at,
                     started_at,
                     task_queue,
                     evaluate_fn,
@@ -618,6 +646,7 @@ def _supervised_pool_task_main(
 def _submit_until_full(
     executor: ProcessPoolExecutor,
     futures: dict[Future[Any], _PoolTask],
+    submitted_at: dict[Future[Any], float],
     started_at: dict[Future[Any], float],
     task_queue: deque[_PoolTask],
     evaluate_fn: Callable[..., ScoredResult],
@@ -628,6 +657,7 @@ def _submit_until_full(
             task = task_queue.popleft()
         except IndexError:
             return
+        _clear_eval_started_marker(task)
         try:
             future = executor.submit(_evaluate_pool_task, task, evaluate_fn)
         except BaseException as exc:
@@ -635,7 +665,8 @@ def _submit_until_full(
                 raise _PoolUnavailableError("could not submit process-pool task") from exc
             raise
         futures[future] = task
-        started_at[future] = time.monotonic()
+        submitted_at[future] = time.monotonic()
+        started_at.pop(future, None)
 
 
 def _initialize_worker(warm_runtime: _WarmRuntimeSpec | str | None = None) -> None:
@@ -659,6 +690,9 @@ def _evaluate_pool_task(
     task: _PoolTask,
     evaluate_fn: Callable[..., ScoredResult],
 ) -> dict[str, Any]:
+    # First observable the parent can see: execution has begun. The eval
+    # timeout budget starts here, not at executor.submit().
+    _mark_eval_started(task)
     output_dir = Path(task.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     child_pid_log = task.child_pid_log or str(_child_pid_log_path(task))
@@ -1088,8 +1122,73 @@ def _create_executor(
         raise
 
 
+def _startup_timeout_seconds(eval_timeout_seconds: float) -> float:
+    """Bound submit → worker-entered-_evaluate_pool_task, not execution.
+
+    Same shape as EngineWorkerPool.startup_timeout_s:
+    30 s is spawn + initializer headroom (cold import under load);
+    300 s caps a wedged pool. Execution still uses eval_timeout_seconds
+    once the start marker is observed.
+    """
+    return min(300.0, max(30.0, float(eval_timeout_seconds)))
+
+
+def _eval_started_marker_path(task: _PoolTask) -> Path:
+    return Path(task.output_dir) / _EVAL_STARTED_MARKER
+
+
+def _mark_eval_started(task: _PoolTask) -> None:
+    path = _eval_started_marker_path(task)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f"{os.getpid()}\n", encoding="utf-8")
+
+
+def _clear_eval_started_marker(task: _PoolTask) -> None:
+    try:
+        _eval_started_marker_path(task).unlink()
+    except FileNotFoundError:
+        return
+    except OSError:
+        return
+
+
+def _process_is_alive(pid: int) -> bool:
+    try:
+        os.kill(int(pid), 0)
+    except ProcessLookupError:
+        return False
+    except OSError:
+        return False
+    return True
+
+
+def _refresh_execution_start(
+    futures: Mapping[Future[Any], _PoolTask],
+    started_at: dict[Future[Any], float],
+) -> None:
+    now = time.monotonic()
+    for future, task in futures.items():
+        if future in started_at:
+            continue
+        try:
+            text = _eval_started_marker_path(task).read_text(encoding="utf-8").strip()
+        except FileNotFoundError:
+            continue
+        except OSError:
+            continue
+        try:
+            pid = int(text.split()[0])
+        except (ValueError, IndexError):
+            pid = None
+        if pid is not None and not _process_is_alive(pid):
+            # Stale marker from a reaped worker of a previous attempt.
+            continue
+        started_at[future] = now
+
+
 def _pool_wait_timeout(
     futures: Mapping[Future[Any], _PoolTask],
+    submitted_at: Mapping[Future[Any], float],
     started_at: Mapping[Future[Any], float],
     timeout_seconds: float | None,
 ) -> float | None:
@@ -1098,26 +1197,39 @@ def _pool_wait_timeout(
     if not futures:
         return _POOL_POLL_SECONDS
     now = time.monotonic()
-    remaining = [
-        max(0.0, timeout_seconds - (now - started_at.get(future, now)))
-        for future in futures
-    ]
+    startup_timeout = _startup_timeout_seconds(timeout_seconds)
+    remaining: list[float] = []
+    for future in futures:
+        start = started_at.get(future)
+        if start is not None:
+            remaining.append(max(0.0, timeout_seconds - (now - start)))
+        else:
+            submitted = submitted_at.get(future, now)
+            remaining.append(max(0.0, startup_timeout - (now - submitted)))
     return min(_POOL_POLL_SECONDS, min(remaining, default=_POOL_POLL_SECONDS))
 
 
 def _expired_futures(
     futures: Mapping[Future[Any], _PoolTask],
+    submitted_at: Mapping[Future[Any], float],
     started_at: Mapping[Future[Any], float],
     timeout_seconds: float | None,
 ) -> tuple[Future[Any], ...]:
     if timeout_seconds is None:
         return ()
     now = time.monotonic()
-    return tuple(
-        future
-        for future in futures
-        if now - started_at.get(future, now) >= timeout_seconds
-    )
+    startup_timeout = _startup_timeout_seconds(timeout_seconds)
+    expired: list[Future[Any]] = []
+    for future in futures:
+        start = started_at.get(future)
+        if start is not None:
+            if now - start >= timeout_seconds:
+                expired.append(future)
+            continue
+        submitted = submitted_at.get(future, now)
+        if now - submitted >= startup_timeout:
+            expired.append(future)
+    return tuple(expired)
 
 
 def _timeout_result(

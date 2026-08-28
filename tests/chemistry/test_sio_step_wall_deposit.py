@@ -685,6 +685,16 @@ def test_wall_deposition_reactivity_class_fails_loud(monkeypatch):
         )
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "missing authority: WallSaturationPressureRefusal "
+        "reason=source_certified_range_refused; "
+        "reactive_product_backstop=False removes the only remaining "
+        "saturation authority, so the path must refuse rather than return "
+        "an unqualified 0.0 clean-wall claim"
+    ),
+)
 def test_stage_scoped_no_reactive_backstop_skips_reactivity_metadata(monkeypatch):
     monkeypatch.delitem(
         condensation_module.STICKING_DATA["reactivity_class_by_species"],
