@@ -337,7 +337,7 @@ conditions the local film is off (`r_gas = 0`) and the flux approaches pure HKL 
 coefficient `D_AB` is per-species Chapman–Enskog; Sherwood carries the **radial** induction-stirring
 enhancement `Sh_eff = 3.66 × √max(1, radial_stir_factor)` (default radial 1.0 → laminar `Sh = 3.66`).
 <!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:654 — continuum R_g branch (Fuchs weight removed; 63df9bd) -->
-<!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1374 — radial Sherwood -->
+<!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1407 — radial Sherwood -->
 
 **Transport-model validity domain (not a Kn safety/coating gate).** Ledger-authoritative yields refuse
 when the flux evaluation's Kn exceeds `VISCOUS_KNUDSEN_MAX` at nonzero overhead, because evolved
@@ -416,7 +416,7 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:2749 — hourly depletion reservoir -->
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:2808 — hourly depletion reservoir -->
 
 ### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 
@@ -482,7 +482,7 @@ species' condensation time constant. Iron is designated to the hottest condenser
 magnesium, sodium, and potassium condensing in progressively cooler stages. SiO that reaches a cold
 surface disproportionates on condensation (`SiO → ½ SiO₂ + ½ Si`), which is why its captured product
 is silica rather than a recoverable monoxide.
-<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2677 — stage routing efficiency -->
+<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2710 — stage routing efficiency -->
 <!-- impl: §5 -> engines/builtin/condensation_route.py BuiltinCondensationRouteProvider.dispatch:142 — SiO product credits -->
 
 The condensation reference temperatures used for this routing (for example, iron at 1250 °C, SiO at
@@ -521,7 +521,7 @@ through the condensation route inside the mass-balance closure. At each wall the
 sink competes against the onward condensed sink, and the split is set by a per-species, per-segment,
 temperature-dependent wall sticking coefficient. The remainder — the capture budget minus the wall
 deposit — is what reaches the designated condenser.
-<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:6173 — wall HKL MT split -->
+<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:6257 — wall HKL MT split -->
 
 Wall re-evaporation is handled by a per-species reactivity class:
 
@@ -551,7 +551,7 @@ transient wall state) are enumerated in [`docs/model-limitations.md`](model-limi
 The Knudsen number is reported per segment as a transport diagnostic and drives cold-spot warnings, but
 it does not gate deposition routing — the transport regimes are treated as continuous, consistent with
 modelling coating as a rate rather than a threshold.
-<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:6582 — wall Kn weighting -->
+<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:6660 — wall Kn weighting -->
 
 ---
 
@@ -821,7 +821,7 @@ refractory carbon after Stage 0. That diagnostic is not ledger-active in the ext
 above; it documents the split that would need to become authoritative before the simplification is
 removed.
 <!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_partition_carbon_diagnostic:1433 — carbon split diagnostic -->
-<!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:533 — carbon bucket partition -->
+<!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:567 — carbon bucket partition -->
 
 ### §10.2 CNOPS handling
 
