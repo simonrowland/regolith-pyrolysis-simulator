@@ -316,6 +316,7 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     scored = _scored(
         spec,
         result_blob={"backend_status": "ok", "hours": [{"hour": 1}], "status": "ok"},
+        product_summary={"oxygen_kg": 10.0, "wall_deposit_kg": {}},
     )
     store = ResultStore(
         tmp_path / "results.sqlite",
@@ -345,6 +346,7 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {
         "backend_name": "alphamelts",
         "oxygen_kg": 10.0,
+        "wall_deposit_kg": {},
     }
 
 

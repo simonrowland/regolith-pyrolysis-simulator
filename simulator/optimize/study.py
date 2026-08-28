@@ -312,12 +312,6 @@ class StagedReplay:
 
 
 @dataclass(frozen=True)
-class _StagedPrefixReplayEntry:
-    result: ScoredResult
-    persisted: bool
-
-
-@dataclass(frozen=True)
 class StudyConfig:
     profile: str | Mapping[str, Any]
     feedstock: str
@@ -673,7 +667,7 @@ def run(
     journal_tell_seq = 0
     journal_mode = "w"
     provenance_mode = "w"
-    prefix_replay_cache: dict[str, _StagedPrefixReplayEntry] = {}
+    prefix_replay_cache: dict[str, ScoredResult] = {}
     loop_profile = (
         _profile_for_cache_phase(
             resolved_profile,
@@ -3356,7 +3350,7 @@ def _evaluate_candidates(
     constraints: Any,
     store: ResultStore,
     definitions: Sequence[ObjectiveDefinition],
-    prefix_replay_cache: dict[str, _StagedPrefixReplayEntry],
+    prefix_replay_cache: dict[str, ScoredResult],
     skip_store_lookup: bool = False,
     per_eval_timeout_seconds: float | None = None,
 ) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int]:
@@ -3499,7 +3493,7 @@ def _ensure_staged_prefix_replay(
     constraints: Any,
     store: ResultStore,
     definitions: Sequence[ObjectiveDefinition],
-    prefix_replay_cache: dict[str, _StagedPrefixReplayEntry],
+    prefix_replay_cache: dict[str, ScoredResult],
     per_eval_timeout_seconds: float | None,
 ) -> tuple[ScoredResult | None, bool]:
     if not _is_staged_candidate(candidate):
@@ -3570,10 +3564,7 @@ def _ensure_staged_prefix_replay(
     if not isinstance(prefix_spec, PrefixEvalSpec):
         raise StagedBeamStateError("staged prefix spec was not a PrefixEvalSpec")
     prefix_key = cache_key(prefix_spec)
-    replay_entry = prefix_replay_cache.get(prefix_key)
-    if replay_entry is not None:
-        if not replay_entry.persisted:
-            return replay_entry.result, False
+    if prefix_key in prefix_replay_cache:
         cached = store.lookup(prefix_spec)
         if cached is None:
             raise StagedBeamStateError(f"verified staged prefix vanished: {prefix_key}")
@@ -3581,10 +3572,7 @@ def _ensure_staged_prefix_replay(
 
     cached = store.lookup(prefix_spec)
     if cached is not None:
-        prefix_replay_cache[prefix_key] = _StagedPrefixReplayEntry(
-            result=cached,
-            persisted=True,
-        )
+        prefix_replay_cache[prefix_key] = cached
         return cached, False
 
     fresh = _evaluate_prefix_one(
@@ -3605,26 +3593,9 @@ def _ensure_staged_prefix_replay(
         return fresh, True
     _assert_honest_result(fresh, definitions)
     light_fresh = _strip_heavy_result(fresh)
-    # The staged prefix normally round-trips through the store: it writes the
-    # row, reads it straight back, and asserts the cached copy replays equal to
-    # the fresh one. That is why an admission rejection used to be raised here
-    # rather than skipped like the main/certify sinks do.
-    #
-    # But refusing to CACHE a result is a normal outcome, not a failure of the
-    # run. Every optimizer profile this project ships names the analytical
-    # backend, which the trust rail correctly declines to admit as
-    # authoritative, so the raise made the staged strategy unusable in the only
-    # configuration that ships (b-271). Build the table; the cache is an
-    # optimisation for the next run, not a precondition for this one.
-    #
-    # What is genuinely lost when the row is refused is the PERSISTENCE
-    # round-trip, and only that. With nothing admitted there is no cached copy
-    # to compare against, so the replay-equality check is VACUOUS rather than
-    # failed — it is recorded as skipped instead of being silently dropped,
-    # because an unrecorded missing verification is how several defects in this
-    # subsystem were written. Within-run beam consistency is preserved by
-    # seeding the in-process replay cache with the fresh result, so later stages
-    # reuse the identical object; only the cross-run speedup is forfeited.
+    # A rejected write is non-fatal, but it cannot create a verified replay.
+    # Leave the replay cache empty so a sibling through this prefix recomputes
+    # it instead of claiming that the refused result was persisted and checked.
     try:
         store.store(
             prefix_spec,
@@ -3638,19 +3609,12 @@ def _ensure_staged_prefix_replay(
             prefix_key,
             ",".join(exc.reasons),
         )
-        prefix_replay_cache[prefix_key] = _StagedPrefixReplayEntry(
-            result=light_fresh,
-            persisted=False,
-        )
         return light_fresh, True
     cached = store.lookup(prefix_spec)
     if cached is None:
         raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")
     assert_prefix_replay_equal(cached, light_fresh)
-    prefix_replay_cache[prefix_key] = _StagedPrefixReplayEntry(
-        result=cached,
-        persisted=True,
-    )
+    prefix_replay_cache[prefix_key] = cached
     return cached, True
 
 
@@ -4081,7 +4045,9 @@ def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
         error_message=reference.error_message,
         reason=reference.reason,
         trace=_light_backend_status_trace(scored),
-        product_summary=reference.product_summary,
+        product_summary=coating_summary_with_grounded_authority(
+            reference.product_summary
+        ),
         backend_name=reference.backend_name,
         backend_status=_result_backend_status(scored),
         backend_authoritative=reference.backend_authoritative,

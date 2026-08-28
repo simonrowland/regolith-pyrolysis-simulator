@@ -477,10 +477,10 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
                 evidence_class="melts",
             ),
     )
-    assert_prefix_replay_equal(cached, fresh)
+    assert_prefix_replay_equal(cached, study._strip_heavy_result(fresh))
 
 
-def test_staged_prefix_replay_reuses_rejected_write_for_second_sibling(
+def test_staged_prefix_replay_recomputes_rejected_write_for_second_sibling(
     tmp_path,
 ) -> None:
     class RejectingPrefixStore(SpyStore):
@@ -500,8 +500,68 @@ def test_staged_prefix_replay_reuses_rejected_write_for_second_sibling(
                 raise ResultStoreWriteRejected(("test-prefix-write-refusal",))
             super().store(eval_spec, scored, created_at=created_at)
 
+    class ChangingPrefixEvaluator(SpyEvaluator):
+        def __init__(self, generation_log: Path, replay_log: Path) -> None:
+            super().__init__()
+            self.generation_log = generation_log
+            self.replay_log = replay_log
+
+        def __call__(
+            self,
+            patch: RecipePatch,
+            feedstock: str,
+            fidelity: str,
+            *,
+            profile: Mapping[str, Any],
+            candidate_id: str | None = None,
+            staged_replay: study.StagedReplay | None = None,
+            **kwargs: Any,
+        ) -> ScoredResult:
+            result = super().__call__(
+                patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                staged_replay=staged_replay,
+                **kwargs,
+            )
+            if str(candidate_id).startswith("staged-prefix-"):
+                assert result.run_reference is not None
+                generations = (
+                    self.generation_log.read_text(encoding="utf-8").splitlines()
+                    if self.generation_log.exists()
+                    else []
+                )
+                generation = len(generations) + 1
+                with self.generation_log.open("a", encoding="utf-8") as handle:
+                    handle.write(f"{generation}\n")
+                return replace(
+                    result,
+                    run_reference=replace(
+                        result.run_reference,
+                        product_summary={
+                            **result.run_reference.product_summary,
+                            "prefix_generation": generation,
+                        },
+                    ),
+                )
+            if "-01-" in str(candidate_id):
+                assert isinstance(staged_replay, study.StagedReplay)
+                assert staged_replay.prefix_result.run_reference is not None
+                generation = int(
+                    staged_replay.prefix_result.run_reference.product_summary[
+                        "prefix_generation"
+                    ]
+                )
+                with self.replay_log.open("a", encoding="utf-8") as handle:
+                    handle.write(f"{generation}\n")
+            return result
+
     store = RejectingPrefixStore(tmp_path / "cache.sqlite")
-    evaluator = SpyEvaluator()
+    generation_log = tmp_path / "fresh-prefix-generations.txt"
+    replay_log = tmp_path / "replayed-prefix-generations.txt"
+    evaluator = ChangingPrefixEvaluator(generation_log, replay_log)
 
     result = study.run(
         PROFILE,
@@ -523,9 +583,12 @@ def test_staged_prefix_replay_reuses_rejected_write_for_second_sibling(
         spec for spec in store.lookup_specs if isinstance(spec, PrefixEvalSpec)
     ]
     assert len(depth_one_records) == 2
-    assert result.prefix_evals_run == 1
-    assert store.prefix_write_rejections == 1
-    assert len(prefix_lookups) == 1
+    assert result.prefix_evals_run == 2
+    assert generation_log.read_text(encoding="utf-8").splitlines() == ["1", "2"]
+    assert replay_log.read_text(encoding="utf-8").splitlines() == ["1", "2"]
+    assert store.prefix_write_rejections == 2
+    assert len(prefix_lookups) == 2
+    assert cache_key(prefix_lookups[0]) == cache_key(prefix_lookups[1])
     assert store.lookup(prefix_lookups[0]) is None
 
 
