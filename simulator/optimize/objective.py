@@ -4095,8 +4095,10 @@ def _wall_deposit_by_segment_species_summary(
             )
         segment, species = str(key[0]), str(key[1])
         amount = _finite_float(kg, f"wall_deposit[{segment!r}][{species!r}]")
-        if amount <= 1e-12:
+        if amount < 0.0:
             continue
+        if amount <= _EPS:
+            amount = 0.0
         species_kg = by_segment.setdefault(segment, {})
         species_kg[species] = species_kg.get(species, 0.0) + amount
     return MappingProxyType({

@@ -1526,11 +1526,6 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
                 authoritative_value = bool(
                     grounded_authority.get("authoritative_for_coating", False)
                 )
-                feasible_value = (
-                    observed_value >= threshold_value - threshold_tolerance
-                    if authoritative_value
-                    else True
-                )
                 status_value = "available" if authoritative_value else "warning"
                 output_status = str(
                     grounded_authority.get("output_status")

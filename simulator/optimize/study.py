@@ -186,6 +186,15 @@ _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
         "wall_deposit_sticking_authority",
     }
 )
+_TAP_COATING_DERIVED_AUTHORITY_FIELDS = frozenset(
+    {
+        "coating_authoritative",
+        "coating_status",
+        "coating_output_status",
+        "coating_status_reason",
+        "wall_deposit_sticking_authority",
+    }
+)
 _COATING_LEADERBOARD_FIELDS: Mapping[str, str] = MappingProxyType(
     {
         "campaigns_to_resinter": "campaigns_to_resinter",
@@ -3565,9 +3574,11 @@ def _ensure_staged_prefix_replay(
         raise StagedBeamStateError("staged prefix spec was not a PrefixEvalSpec")
     prefix_key = cache_key(prefix_spec)
     if prefix_key in prefix_replay_cache:
+        verified = prefix_replay_cache[prefix_key]
         cached = store.lookup(prefix_spec)
         if cached is None:
             raise StagedBeamStateError(f"verified staged prefix vanished: {prefix_key}")
+        assert_prefix_replay_equal(cached, verified)
         return cached, False
 
     cached = store.lookup(prefix_spec)
@@ -4327,7 +4338,12 @@ def _apply_tap_coating_product_summary(
     tap_summary: Mapping[str, Any],
 ) -> None:
     terminal_fields = sorted(
-        key for key in _TAP_COATING_PRODUCT_SUMMARY_FIELDS if key in summary
+        key
+        for key in (
+            _TAP_COATING_PRODUCT_SUMMARY_FIELDS
+            - _TAP_COATING_DERIVED_AUTHORITY_FIELDS
+        )
+        if key in summary
     )
     missing = [key for key in terminal_fields if key not in tap_summary]
     if missing:
@@ -4335,6 +4351,8 @@ def _apply_tap_coating_product_summary(
             "tap-truncated coating projection missing hour-basis field(s): "
             + ", ".join(missing)
         )
+    for key in _TAP_COATING_DERIVED_AUTHORITY_FIELDS:
+        summary.pop(key, None)
     for key in _TAP_COATING_PRODUCT_SUMMARY_FIELDS:
         if key in tap_summary:
             summary[key] = tap_summary[key]

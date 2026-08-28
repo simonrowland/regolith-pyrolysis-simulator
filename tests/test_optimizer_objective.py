@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import math
 from types import SimpleNamespace
+from typing import Mapping
 
 import pytest
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.optimize import study
 import simulator.optimize.objective as objective_module
 from scripts import sso_r_validation_map as validation_map
 from simulator.cost_parameters import CostParameters
+from simulator.optimize.evaluate import RunReference, ScoredResult
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
@@ -2870,6 +2873,54 @@ def test_best_tap_clean_coating_summary_emits_complete_empty_fields() -> None:
     assert coating["campaigns_to_resinter"] == "infinite"
     assert coating["wall_deposit_kg_by_segment_species"] == {}
     assert coating["wall_deposit_kg_by_zone_species"] == {}
+
+
+def test_best_tap_measured_zero_coating_projection_survives_grounding() -> None:
+    snapshots = (
+        _tap_snapshot(
+            1,
+            {"SiO2": 50.0, "CaO": 50.0},
+            wall_delta={("stage_1_to_stage_2", "SiO"): 0.0},
+        ),
+        _tap_snapshot(2, {"SiO2": 20.0, "CaO": 80.0}),
+    )
+    run = _tap_run(snapshots, configured_hours=2)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True}},
+    )
+    _set_profile_hours(profile, 2)
+
+    evidence = compute_objectives(profile, run).evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+    coating = evidence["tap_coating_product_summary"]
+
+    def stripped_summary(summary: dict[str, object]) -> Mapping[str, object]:
+        light = study._strip_heavy_result(
+            ScoredResult(
+                candidate_id=None,
+                eval_spec=None,
+                cache_key=None,
+                feasible=False,
+                run_reference=RunReference(status="ok", product_summary=summary),
+            )
+        )
+        assert light.run_reference is not None
+        return light.run_reference.product_summary
+
+    grounded = stripped_summary(dict(coating))
+    unknown = stripped_summary({"coating_authoritative": True})
+
+    assert coating["wall_deposit_kg_by_segment_species"] == {
+        "stage_1_to_stage_2": {"SiO": 0.0}
+    }
+    assert grounded["coating_authoritative"] is True
+    assert unknown["coating_authoritative"] is False
 
 
 def test_best_tap_coating_summary_carries_violation_present_at_tap_hour() -> None:

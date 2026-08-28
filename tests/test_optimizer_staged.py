@@ -678,6 +678,64 @@ def test_staged_runtime_rejects_tampered_prefix_cache(tmp_path) -> None:
         )
 
 
+def test_staged_prefix_replay_accepts_verified_row_and_rejects_later_overwrite(
+    tmp_path,
+) -> None:
+    clean = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "internal-analytical",
+        parallel=1,
+        budget=4,
+        out_dir=tmp_path / "clean",
+        seed=11,
+        evaluator=SpyEvaluator(),
+        result_store=SpyStore(tmp_path / "clean-cache.sqlite"),
+    )
+
+    assert clean.prefix_evals_run == 1
+    assert len(clean.records) == 4
+
+    class OverwritingPrefixStore(SpyStore):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            self.prefix_overwrites = 0
+
+        def lookup(self, eval_spec: EvalSpec) -> ScoredResult | None:
+            result = super().lookup(eval_spec)
+            if (
+                isinstance(eval_spec, PrefixEvalSpec)
+                and result is not None
+                and self.prefix_overwrites == 0
+            ):
+                ResultStore.store(
+                    self,
+                    eval_spec,
+                    replace(result, notes=(*result.notes, "later-prefix-overwrite")),
+                    created_at="later-writer",
+                )
+                self.prefix_overwrites += 1
+            return result
+
+    overwritten_store = OverwritingPrefixStore(tmp_path / "overwritten-cache.sqlite")
+    with pytest.raises(StagedReplayViolation):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "staged",
+            "internal-analytical",
+            parallel=1,
+            budget=4,
+            out_dir=tmp_path / "overwritten",
+            seed=11,
+            evaluator=SpyEvaluator(),
+            result_store=overwritten_store,
+        )
+
+    assert overwritten_store.prefix_overwrites == 1
+
+
 def test_staged_default_evaluator_fails_loud_without_replay(tmp_path) -> None:
     def no_replay_evaluator(
         patch: RecipePatch,

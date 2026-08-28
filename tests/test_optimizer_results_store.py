@@ -27,7 +27,7 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
 )
-from simulator.optimize.physics import GateMargin, ThresholdSpec
+from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.result_scope import result_scope_payload, selector_where
 from simulator.optimize.results_store import (
     ResultStore,
@@ -2306,6 +2306,44 @@ def _wall_pressure_refusal_status_payload() -> dict[str, object]:
             }
         },
     )
+
+
+def test_coating_margin_round_trip_uses_one_continuous_feasibility_rule() -> None:
+    constraints = PhysicsConstraintSet()
+    authority = _wall_sticking_status_payload("Fe", cited=True)
+
+    for observed in (0.5, 20.0):
+        fresh = constraints.coating_from_fouling_report(
+            {
+                **authority,
+                "campaigns_to_resinter_total": observed,
+                "authoritative_for_resinter": True,
+                "output_status": "sourced_with_surface_proxy",
+                "status_reason": "",
+            }
+        )
+        loaded = _deserialize_margins(
+            _serialize_margins({"coating": fresh})
+        )["coating"]
+
+        assert fresh.authoritative is loaded.authoritative is True
+        assert fresh.feasible is loaded.feasible is True
+
+    fresh_fail_closed = constraints.coating_from_fouling_report(
+        {
+            "campaigns_to_resinter_total": math.inf,
+            "resinter_threshold_kg": None,
+            "wall_deposit_kg_per_campaign": 0.5,
+            "authoritative_for_resinter": False,
+            "output_status": "non-authoritative-threshold",
+            "status_reason": "resinter threshold is not grounded",
+        }
+    )
+    loaded_fail_closed = _deserialize_margins(
+        _serialize_margins({"coating": fresh_fail_closed})
+    )["coating"]
+
+    assert fresh_fail_closed.feasible is loaded_fail_closed.feasible is False
 
 
 def test_store_refuses_a_feasible_row_that_never_earned_a_certification_field(

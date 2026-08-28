@@ -4175,6 +4175,15 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
     assert record.product_summary["wall_deposit_cumulative_kg_by_species"] == {
         "SiO": 0.001
     }
+    assert record.product_summary["coating_authoritative"] is False
+    assert record.product_summary["coating_status"] == "warning"
+    assert record.product_summary["coating_output_status"] == "status_bearing"
+    assert (
+        record.product_summary["wall_deposit_sticking_authority"][
+            "authoritative_for_coating"
+        ]
+        is False
+    )
 
     study._write_leaderboard(
         tmp_path / "leaderboard.csv",
@@ -4212,7 +4221,7 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
     }
 
 
-def test_tap_truncated_partial_coating_projection_fails_loud() -> None:
+def test_tap_truncated_missing_genuine_hour_basis_coating_fields_fails_loud() -> None:
     spec = _scope_spec()
     scored = ScoredResult(
         candidate_id="tap-partial",
