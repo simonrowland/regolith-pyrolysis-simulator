@@ -258,8 +258,84 @@ SC50_VR_PRODUCER_KEYS = (
 )
 
 
-def vapour_rail_instrumentation_panel_payload(sim: Any) -> dict[str, Any]:
-    """VR-11 UI panel: exact-key batch, refusals, solve groups, ceiling."""
+# Hourly simulation_tick must not re-serialise the accumulated VR
+# diagnostic blobs. Compact tick panels keep exact counts + a species
+# index; full nested records are fetched on demand.
+SOCKET_TICK_PANEL_COMPACT = True
+
+_CHANNEL_TICK_KEYS = (
+    "species_id",
+    "is_flux_active",
+    "is_refused",
+    "refusal_code",
+    "validation_status",
+    "verdict_status",
+)
+_REFUSAL_TICK_KEYS = (
+    "status",
+    "reason",
+    "code",
+    "output_status",
+    "upstream_authority_status",
+    "mass_disposition",
+)
+_AUTHORITY_TICK_KEYS = (
+    "status",
+    "mass_closure_error_kg_hr",
+)
+
+
+def _compact_record(record: Any, keys: tuple[str, ...]) -> dict[str, Any]:
+    if not isinstance(record, Mapping):
+        return {"status": "recorded"}
+    return {key: record[key] for key in keys if key in record}
+
+
+def _compact_species_map(
+    mapping: Any, keys: tuple[str, ...]
+) -> dict[str, dict[str, Any]]:
+    if not isinstance(mapping, Mapping):
+        return {}
+    return {
+        str(species): _compact_record(record, keys)
+        for species, record in mapping.items()
+    }
+
+
+def _compact_condensation_refusals(payload: Any) -> dict[str, Any]:
+    if not isinstance(payload, Mapping) or not payload:
+        return {}
+    by_species = _compact_species_map(
+        payload.get("by_species"), _REFUSAL_TICK_KEYS
+    )
+    n_species = payload.get("n_species", len(by_species))
+    return {
+        "schema": payload.get("schema"),
+        "n_species": n_species,
+        "has_refusals": bool(payload.get("has_refusals")),
+        "by_species": by_species,
+    }
+
+
+def _compact_condensation_authority(payload: Any) -> dict[str, Any]:
+    if not isinstance(payload, Mapping) or not payload:
+        return {}
+    by_species = _compact_species_map(
+        payload.get("by_species"), _AUTHORITY_TICK_KEYS
+    )
+    return {
+        "schema": payload.get("schema"),
+        "n_species": payload.get("n_species", len(by_species)),
+        "status_counts": dict(payload.get("status_counts") or {}),
+        "max_mass_closure_error_kg_hr": payload.get(
+            "max_mass_closure_error_kg_hr"
+        ),
+        "by_species": by_species,
+    }
+
+
+def _vapour_rail_instrumentation_panel_full(sim: Any) -> dict[str, Any]:
+    """Full VR-11 panel (on-demand / terminal). Not the hourly tick."""
 
     from simulator.diagnostics import vapour_rail_instrumentation_diagnostic
 
@@ -285,7 +361,8 @@ def vapour_rail_instrumentation_panel_payload(sim: Any) -> dict[str, Any]:
         "solve_bundle_ids": (
             batch.get("solve_bundle_ids") if isinstance(batch, Mapping) else {}
         ),
-        # VR-11: expose exact channel/refusal view (not only counts).
+        # Exact channel/refusal view — full nested records. Tick compact
+        # projects this to an index; sc50_vr_socket_panel_detail returns it.
         "channels_by_species": channels,
         "refusals_by_species": refusals,
         "flux_overlay": payload.get("flux_overlay") or {},
@@ -303,8 +380,37 @@ def vapour_rail_instrumentation_panel_payload(sim: Any) -> dict[str, Any]:
     }
 
 
-def condensation_refusals_panel_payload(sim: Any) -> dict[str, Any]:
-    """B2 consumer: condensation_refusals_by_species for the web tick."""
+def _compact_vapour_rail_instrumentation_panel(
+    payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    compact = dict(payload)
+    compact["tick_view"] = "compact"
+    compact["channels_by_species"] = _compact_species_map(
+        payload.get("channels_by_species"), _CHANNEL_TICK_KEYS
+    )
+    compact["refusals_by_species"] = _compact_species_map(
+        payload.get("refusals_by_species"), _CHANNEL_TICK_KEYS
+    )
+    compact["condensation_refusals"] = _compact_condensation_refusals(
+        payload.get("condensation_refusals")
+    )
+    compact["condensation_authority"] = _compact_condensation_authority(
+        payload.get("condensation_authority")
+    )
+    return compact
+
+
+def vapour_rail_instrumentation_panel_payload(sim: Any) -> dict[str, Any]:
+    """VR-11 UI panel for the hourly tick: counts + compact species index."""
+
+    payload = _vapour_rail_instrumentation_panel_full(sim)
+    if SOCKET_TICK_PANEL_COMPACT:
+        return _compact_vapour_rail_instrumentation_panel(payload)
+    return payload
+
+
+def _condensation_refusals_panel_full(sim: Any) -> dict[str, Any]:
+    """Full B2 refusals panel (on-demand / terminal). Not the hourly tick."""
 
     from simulator.diagnostics import condensation_refusals_diagnostic
 
@@ -320,6 +426,38 @@ def condensation_refusals_panel_payload(sim: Any) -> dict[str, Any]:
             "outcomes (VR-11 B2/B3)."
         ),
     }
+
+
+def condensation_refusals_panel_payload(sim: Any) -> dict[str, Any]:
+    """B2 consumer for the hourly tick: exact counts + compact by_species."""
+
+    payload = _condensation_refusals_panel_full(sim)
+    if not SOCKET_TICK_PANEL_COMPACT:
+        return payload
+    compact = dict(payload)
+    compact["tick_view"] = "compact"
+    compact["by_species"] = _compact_species_map(
+        payload.get("by_species"), _REFUSAL_TICK_KEYS
+    )
+    return compact
+
+
+def sc50_vr_socket_panel_detail(sim: Any, panel: str) -> dict[str, Any]:
+    """Full nested VR panel records for on-demand fetch (not the tick)."""
+
+    key = str(panel or "").strip()
+    if key in {
+        "vapour_rail_instrumentation_panel",
+        "vapour_rail_instrumentation",
+    }:
+        payload = _vapour_rail_instrumentation_panel_full(sim)
+        payload["detail_of"] = "vapour_rail_instrumentation_panel"
+        return payload
+    if key in {"condensation_refusals_panel", "condensation_refusals"}:
+        payload = _condensation_refusals_panel_full(sim)
+        payload["detail_of"] = "condensation_refusals_panel"
+        return payload
+    raise KeyError(key)
 
 
 def sc50_vr_socket_panels(sim: Any) -> dict[str, Any]:

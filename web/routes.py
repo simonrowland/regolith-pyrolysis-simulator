@@ -4402,6 +4402,29 @@ def vapor_pressure_authority_api():
     return jsonify(payload)
 
 
+@bp.route('/api/advisory-panel-detail')
+def advisory_panel_detail_api():
+    """Full nested VR panel for the compact hourly tick (on-demand)."""
+    client_id = str(session.get('ledger_client_id') or '')
+    if not client_id:
+        return _json_error(
+            'advisory detail requires an initialized browser session', 400
+        )
+    panel = str(request.args.get('panel') or '').strip()
+    if not panel:
+        return _json_error('panel is required', 400)
+    try:
+        from web.events import read_advisory_panel_detail_for_client
+        return jsonify(read_advisory_panel_detail_for_client(client_id, panel))
+    except LookupError as exc:
+        return _json_error(str(exc), 404)
+    except KeyError as exc:
+        identifier = exc.args[0] if exc.args else ''
+        return _json_error(f'unknown advisory panel: {identifier}', 404)
+    except (TypeError, ValueError) as exc:
+        return _json_error(str(exc), 400)
+
+
 @bp.route('/partials/vapor-pressure-authority-panel')
 def vapor_pressure_authority_panel_partial():
     payload = vapor_pressure_authority_payload(

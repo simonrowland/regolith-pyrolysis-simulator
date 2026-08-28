@@ -92,6 +92,7 @@ from web.advisory import (
     ceramic_rump_payload,
     industrial_glass_payload,
     oxide_wt_pct_from_kg,
+    sc50_vr_socket_panel_detail,
     sc50_vr_socket_panels,
     vapor_pressure_authority_payload,
     wall_advisory_payload,
@@ -314,6 +315,50 @@ def read_ledger_api_for_client(client_id: str, resource: str, **params):
         if len(matches) != 1:
             raise LookupError("no unique active simulation for this browser session")
         return read_ledger_api(matches[0], resource, **params)
+
+
+def read_advisory_panel_detail(
+    sid: str,
+    panel: str,
+    *,
+    include_run_id: bool = False,
+) -> dict:
+    """Return the full nested VR panel for one live session (on-demand)."""
+    state, lock = _current_simulation_state(sid)
+    if state is None:
+        raise LookupError("no active simulation")
+    run_id = state.get('run_id')
+
+    def read():
+        return sc50_vr_socket_panel_detail(state['session'].simulator, panel)
+
+    def response():
+        payload = read()
+        if include_run_id and isinstance(payload, Mapping):
+            payload = dict(payload)
+            payload['run_id'] = run_id
+        return payload
+
+    if lock is None:
+        return response()
+    with lock:
+        current, _ = _current_simulation_state(sid, run_id)
+        if current is not state:
+            raise LookupError("simulation run changed")
+        return response()
+
+
+def read_advisory_panel_detail_for_client(client_id: str, panel: str):
+    """Resolve the live VR panel detail for one signed Flask browser session."""
+    with _run_command_lock:
+        with _simulations_guard:
+            matches = [
+                sid for sid, state in _simulations.items()
+                if state.get('ledger_client_id') == client_id
+            ]
+        if len(matches) != 1:
+            raise LookupError("no unique active simulation for this browser session")
+        return read_advisory_panel_detail(matches[0], panel, include_run_id=True)
 
 
 # A LAWFUL PHYSICS REFUSAL IS A RESULT, NOT A CRASH -- SAY SO IN WORDS.
@@ -3015,6 +3060,20 @@ def register_events(socketio):
                 resource,
                 include_run_id=True,
                 **params,
+            )
+        except (KeyError, LookupError, TypeError, ValueError) as exc:
+            return {"error": str(exc)}
+
+    @socketio.on('advisory_panel_detail')
+    def handle_advisory_panel_detail(data=None):
+        """Full nested VR diagnostic for the compact tick's on-demand fetch."""
+        try:
+            params = dict(data or {})
+            panel = str(params.get('panel') or '')
+            return read_advisory_panel_detail(
+                request.sid,
+                panel,
+                include_run_id=True,
             )
         except (KeyError, LookupError, TypeError, ValueError) as exc:
             return {"error": str(exc)}

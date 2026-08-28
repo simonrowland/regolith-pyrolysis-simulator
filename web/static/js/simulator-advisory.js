@@ -279,6 +279,49 @@ function appendCeramicLine(parent, label, value) {
     parent.appendChild(line);
 }
 
+function appendOnDemandAdvisoryDetail(parent, panelKey, payload) {
+    if (!parent || !payload || payload.status === 'n/a') return;
+    const details = document.createElement('details');
+    details.className = 'advisory-zone';
+    const summary = document.createElement('summary');
+    summary.textContent = 'Full records for this hour';
+    details.appendChild(summary);
+    const body = document.createElement('pre');
+    body.className = 'advisory-json';
+    body.textContent = (
+        payload.tick_view === 'compact'
+            ? 'Open to load the full nested diagnostic for this hour.'
+            : 'Full nested diagnostic is on this tick payload.'
+    );
+    details.appendChild(body);
+    if (typeof details.addEventListener === 'function') {
+        details.addEventListener('toggle', () => {
+            if (!details.open || body.dataset.loaded === '1') return;
+            if (typeof socket.emit !== 'function') {
+                body.textContent = 'Full records require a live socket.';
+                return;
+            }
+            body.textContent = 'Loading full records…';
+            socket.emit(
+                'advisory_panel_detail',
+                { panel: panelKey },
+                (response) => {
+                    if (!response || response.error) {
+                        body.textContent = (
+                            'Full records unavailable: '
+                            + ((response && response.error) || 'no response')
+                        );
+                        return;
+                    }
+                    body.dataset.loaded = '1';
+                    body.textContent = JSON.stringify(response, null, 2);
+                }
+            );
+        });
+    }
+    parent.appendChild(details);
+}
+
 function advisoryObject(value) {
     return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
 }
@@ -407,7 +450,67 @@ function renderProductLedgerPanel(payload) {
         setAdvisoryEmpty(content, 'product-ledger-state');
         return;
     }
-    updateAdvisoryState('product-ledger-state', 'ok');
+    // "ok" USED TO MEAN "I DREW A TABLE", NOT "THIS RUN PRODUCED ANYTHING".
+    // The badge was set unconditionally once any section rendered, so a run
+    // that ended with 999 of 1000 kg still in the pot and 0.00 kg of every
+    // product was badged `ok` with a 0% mass-balance error beside it. Mass
+    // balance is trivially satisfied when nothing moves, so between them the
+    // two headline indicators presented the mandate's incomplete-extraction
+    // failure mode as a success.
+    //
+    // Extraction is now judged on the PRODUCT CLASSES the mandate names --
+    // metals, glass, oxygen, captured volatiles, refractory ceramic. A run
+    // with feed in the pot and nothing in any of them reads `no-products`,
+    // which is a statement about the RUN, where `n/a` would be a statement
+    // about the DATA and is reserved for a ledger we could not read at all.
+    // Mid-run this is honest too: nothing HAS been extracted yet, and it
+    // flips to ok the moment any product class becomes non-zero.
+    // ★ COUNT BOTH PAYLOAD SHAPES. A first version of this check read only the
+    // `product_story` classes and badged `no-products` on a completion payload
+    // carrying products in the FLAT shape (`products: {Fe: 12.345, glass: 4.0}`,
+    // `oxygen_kg`) with no story at all -- a guard firing on correct work, caught
+    // by test_completion_payload_renders_product_ledger_and_knudsen_diagnostic.
+    // Both shapes reach this panel, so both have to be counted; over-counting
+    // when both are present is harmless here, because the question is only
+    // "is anything greater than zero", never "how much".
+    const numeric = (value) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : 0;
+    };
+    const sumClassTotals = (classes) => classes.reduce(
+        (sum, cls) => sum + (cls ? numeric(cls.class_total_kg) : 0),
+        0,
+    );
+    const sumValues = (mapping) => (
+        mapping && typeof mapping === 'object'
+            ? Object.values(mapping).reduce((sum, v) => sum + numeric(v), 0)
+            : 0
+    );
+    const productClassKg = sumClassTotals(story ? [
+        story.metal_ingots,
+        story.glass,
+        story.oxygen,
+        story.captured_volatiles,
+        story.refractory_ceramic,
+    ] : [])
+        + sumValues(data.products)
+        + numeric(data.oxygen_kg)
+        + numeric(data.oxygen_stored_kg);
+    const feedKg = Number(
+        (story && story.input && story.input.batch_mass_kg)
+        || data.mass_in_kg
+        || 0,
+    );
+    // Threshold is relative to the charge, not absolute: "0.001 kg out of a
+    // tonne" is not an extraction, and a hard epsilon would read differently
+    // for a 1 kg bench charge than for a 1000 kg batch.
+    const extractedSomething = feedKg > 0
+        ? productClassKg > feedKg * 1e-6
+        : productClassKg > 0;
+    updateAdvisoryState(
+        'product-ledger-state',
+        extractedSomething ? 'ok' : 'no-products',
+    );
 }
 
 function renderOverlapEvaporationPanel(payload) {
@@ -670,6 +773,11 @@ function renderVapourRailInstrumentationPanel(payload) {
         appendCeramicLine(content, 'Condensation authority', 'absent');
     }
     appendCeramicLine(content, 'Diagnostic only', String(!!payload.diagnostic_only));
+    appendOnDemandAdvisoryDetail(
+        content,
+        'vapour_rail_instrumentation_panel',
+        payload
+    );
 }
 
 /**
@@ -725,6 +833,11 @@ function renderCondensationRefusalsPanel(payload) {
         appendCeramicLine(content, 'By species', 'absent');
     }
     appendCeramicLine(content, 'Diagnostic only', String(!!payload.diagnostic_only));
+    appendOnDemandAdvisoryDetail(
+        content,
+        'condensation_refusals_panel',
+        payload
+    );
 }
 
 function thermalTrainHeadlineMetric(value, unit) {

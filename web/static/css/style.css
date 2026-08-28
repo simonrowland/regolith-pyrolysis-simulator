@@ -1006,6 +1006,15 @@ input, select, button, textarea { font-family: inherit; }
     color: #9a3412;
 }
 
+/* A completed run that extracted nothing is the mandate's incomplete-extraction
+   failure mode, not a success. It must not wear the same badge as a run that
+   filled the condenser train. Shares the amber of `ambiguous` rather than the
+   red of a hard failure: the run is not broken, it produced no products. */
+.advisory-state-no-products {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
 .advisory-temp-ok,
 .advisory-rollup-usable,
 .advisory-state-ok,
@@ -1073,6 +1082,14 @@ input, select, button, textarea { font-family: inherit; }
     cursor: pointer;
     color: var(--text);
     font-weight: 600;
+}
+
+.advisory-json {
+    overflow: auto;
+    max-height: 24rem;
+    margin: var(--space-2) 0 0;
+    white-space: pre;
+    font-size: var(--fs-sm);
 }
 
 /* A wide table scrolls inside its own box so the PAGE BODY never scrolls
