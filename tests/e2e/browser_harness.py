@@ -13,6 +13,7 @@ waiting is done with Playwright web-first assertions or in-page
 
 from __future__ import annotations
 
+import gzip
 import json
 import os
 import re
@@ -71,12 +72,47 @@ SOCKET_TAP_JS = r"""
     window.__e2eSocketTapInstalled = true;
     window.__e2eSocketLog = [];
     let realIo = null;
-    const serialise = (value) => {
-        try { return JSON.parse(JSON.stringify(value ?? null)); }
-        catch (e) { return String(value); }
+    // Tick payloads are megabytes; keep them out of the in-page log. Always
+    // keep start/status/complete/decision events whole (those are the
+    // operator-visible control plane) and keep a verbatim excerpt around
+    // any out_of_domain token so a stall's payload is the deliverable.
+    const KEEP_FULL_EVENT = /^(start_simulation|simulation_status|simulation_complete|decision_required|make_decision|__tap_)/;
+    const KEY_RE = /^(status|hour|campaign|message|reason|detail|run_id|knudsen|backend|temperature|temp_|yield|error|disposition|ledger_yields|affected_species|overhead|pipe_|carrier|stage|phase)/i;
+    const compactValue = (value) => {
+        let blob;
+        try { blob = JSON.stringify(value ?? null); }
+        catch (e) { return { _unserialisable: String(e) }; }
+        if (blob.length <= 8000) {
+            try { return JSON.parse(blob); } catch (e) { return blob.slice(0, 8000); }
+        }
+        const keep = { _truncated: true, data_bytes: blob.length };
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+            for (const k of Object.keys(value)) {
+                if (!KEY_RE.test(k) && !/out_of_domain/i.test(k)) continue;
+                try {
+                    const piece = JSON.stringify(value[k]);
+                    keep[k] = piece.length <= 4000 ? JSON.parse(piece) : piece.slice(0, 4000);
+                } catch (e) {
+                    keep[k] = String(value[k]).slice(0, 400);
+                }
+            }
+        }
+        const idx = blob.search(/out_of_domain/i);
+        if (idx >= 0) {
+            keep._out_of_domain_excerpt = blob.slice(Math.max(0, idx - 240), Math.min(blob.length, idx + 2000));
+        }
+        keep._preview = blob.slice(0, 300);
+        return keep;
     };
     const record = (entry) => {
         try { window.__e2eSocketLog.push(entry); } catch (e) { /* never break the app */ }
+    };
+    const compactFor = (event, value) => {
+        if (KEEP_FULL_EVENT.test(event || '')) {
+            try { return JSON.parse(JSON.stringify(value ?? null)); }
+            catch (e) { return compactValue(value); }
+        }
+        return compactValue(value);
     };
     const hookSocket = (socket) => {
         if (!socket || socket.__e2eHooked) return socket;
@@ -88,9 +124,11 @@ SOCKET_TAP_JS = r"""
                         ms: Date.now(),
                         dir: 'in',
                         event: event,
-                        data: serialise(args.length === 1 ? args[0] : args),
+                        data: compactFor(event, args.length === 1 ? args[0] : args),
                     });
                 });
+            } else {
+                record({ ms: Date.now(), dir: 'meta', event: '__tap_warning', data: 'socket.onAny missing' });
             }
             const origEmit = socket.emit.bind(socket);
             socket.emit = (event, ...args) => {
@@ -98,11 +136,13 @@ SOCKET_TAP_JS = r"""
                     ms: Date.now(),
                     dir: 'out',
                     event: event,
-                    data: serialise(args.length === 1 ? args[0] : args),
+                    data: compactFor(event, args.length === 1 ? args[0] : args),
                 });
                 return origEmit(event, ...args);
             };
-        } catch (e) { /* never break the app */ }
+        } catch (e) {
+            record({ ms: Date.now(), dir: 'meta', event: '__tap_error', data: String(e) });
+        }
         return socket;
     };
     Object.defineProperty(window, 'io', {
@@ -368,6 +408,22 @@ def new_artifacts_dir() -> Path:
     return path
 
 
+def write_evidence_json(path: Path, payload: dict[str, Any]) -> Path:
+    """Write evidence as JSON, gzipping when the body exceeds 256 KiB.
+
+    Tick streams are large even after in-page compaction. A `.json.gz` next
+    to the screenshots is the artifact; small files stay plain `.json` so
+    they are readable without a decompressor.
+    """
+    raw = json.dumps(payload, indent=2, default=str).encode()
+    if len(raw) >= 256_000:
+        gz_path = path.with_suffix(path.suffix + ".gz") if path.suffix == ".json" else path.with_suffix(".json.gz")
+        gz_path.write_bytes(gzip.compress(raw, compresslevel=6))
+        return gz_path
+    path.write_bytes(raw)
+    return path
+
+
 def wait_for_start_enabled(page: Page) -> None:
     """#btn-start is disabled until the socket.io connection is up."""
     from playwright.sync_api import expect
@@ -486,4 +542,5 @@ __all__ = [
     "wait_for_run_state",
     "wait_for_socket_event",
     "wait_for_start_enabled",
+    "write_evidence_json",
 ]

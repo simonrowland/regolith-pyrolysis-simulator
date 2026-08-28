@@ -16,9 +16,10 @@ shared dev server must run serially.
 
 from __future__ import annotations
 
-import json
 import re
 import sys
+import urllib.error
+import urllib.request
 
 import pytest
 from playwright.sync_api import sync_playwright
@@ -30,6 +31,7 @@ from .browser_harness import (
     SOCKET_TAP_JS,
     EvidenceRecorder,
     new_artifacts_dir,
+    write_evidence_json,
 )
 
 
@@ -50,7 +52,29 @@ def artifacts_dir():
 
 
 @pytest.fixture(scope="session")
-def playwright_instance():
+def live_server():
+    """Fail fast if the controller-owned dev server is not reachable.
+
+    This harness never starts or kills a server. Requested only by the
+    browser fixtures, so in-process tests under tests/e2e/headspace_po2/
+    are unaffected.
+    """
+    url = f"{BASE_URL}/"
+    try:
+        with urllib.request.urlopen(url, timeout=15) as resp:
+            status = getattr(resp, "status", 200)
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        pytest.fail(
+            f"e2e harness requires the already-running dev server at {url} "
+            f"(do not start another; launch config is 'simulator'): {exc}"
+        )
+    if status != 200:
+        pytest.fail(f"GET {url} returned HTTP {status}; landing page is not serving")
+    return BASE_URL
+
+
+@pytest.fixture(scope="session")
+def playwright_instance(live_server):
     with sync_playwright() as pw:
         yield pw
 
@@ -85,11 +109,10 @@ def evidence(page, request, artifacts_dir):
     # Harvest whatever socket state is still readable (best effort — the page
     # may have navigated or crashed).
     recorder.harvest_socket_log(phase="teardown")
-    out = artifacts_dir / f"{test_name}.evidence.json"
     payload = recorder.as_dict()
     payload["test"] = request.node.nodeid
     payload["outcome"] = "failed" if failed else "passed"
-    out.write_text(json.dumps(payload, indent=2, default=str))
+    out = write_evidence_json(artifacts_dir / f"{test_name}.evidence.json", payload)
     if failed:
         try:
             page.screenshot(
@@ -106,3 +129,9 @@ def evidence(page, request, artifacts_dir):
         print("[e2e evidence] captured problems:", file=sys.stderr)
         for problem in problems[:20]:
             print(f"  - {problem}", file=sys.stderr)
+        if not failed:
+            pytest.fail(
+                "silent pass hid captured browser problems — the harness "
+                "must not go green over console/page/network errors:\n  - "
+                + "\n  - ".join(problems[:20])
+            )

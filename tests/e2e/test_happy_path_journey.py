@@ -24,6 +24,11 @@ import re
 import pytest
 from playwright.sync_api import expect
 
+pytestmark = [
+    pytest.mark.serial,
+    pytest.mark.xdist_group("e2e-browser"),
+]
+
 from .browser_harness import (
     BASE_URL,
     OPTIMIZER_BOUND_MS,
@@ -151,6 +156,7 @@ def test_happy_path_journey(page, evidence, artifacts_dir):
             verdict, detail = wait_for_run_state(page, last_hour=last_hour, timeout_ms=RUN_COMPLETE_MS)
             if verdict == "ADVANCED":
                 last_hour = float(detail.split("::", 1)[0])
+                evidence.harvest_socket_log(phase=f"hour-{last_hour:g}")
     except PlaywrightTimeoutError:
         evidence.harvest_socket_log(phase="complete-timeout")
         cancel_run_quietly(page, evidence)

@@ -32,6 +32,12 @@ import json
 import time
 
 import pytest
+from playwright.sync_api import expect
+
+pytestmark = [
+    pytest.mark.serial,
+    pytest.mark.xdist_group("e2e-browser"),
+]
 
 from .browser_harness import (
     BASE_URL,
@@ -49,9 +55,6 @@ from .browser_harness import (
     wait_for_socket_event,
     wait_for_start_enabled,
 )
-from playwright.sync_api import expect
-
-
 def _truncate_event(event: dict, limit: int = 2000) -> dict:
     out = dict(event)
     blob = json.dumps(out.get("data"), default=str)
@@ -135,6 +138,7 @@ def test_run_does_not_stall(page, evidence):
                 pytest.fail(_stall_report(evidence, last_hour))
             if verdict == "ADVANCED":
                 last_hour = float(detail.split("::", 1)[0])
+                evidence.harvest_socket_log(phase=f"hour-{last_hour:g}")
                 continue
             break
     finally:

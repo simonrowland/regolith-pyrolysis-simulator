@@ -10,6 +10,11 @@ import time
 import pytest
 from playwright.sync_api import expect
 
+pytestmark = [
+    pytest.mark.serial,
+    pytest.mark.xdist_group("e2e-browser"),
+]
+
 from .browser_harness import (
     BASE_URL,
     OPTIMIZER_BOUND_MS,
