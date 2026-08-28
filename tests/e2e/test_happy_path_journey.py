@@ -30,7 +30,7 @@ expect = PLAYWRIGHT_SYNC_API.expect if PLAYWRIGHT_SYNC_API is not None else None
 pytestmark = [
     pytest.mark.browser_e2e,
     pytest.mark.serial,
-    pytest.mark.xdist_group("e2e-browser"),
+    pytest.mark.xdist_group("serial"),
 ]
 
 if PLAYWRIGHT_SYNC_API is not None:
@@ -61,7 +61,7 @@ if PLAYWRIGHT_SYNC_API is not None:
         "low-pressure transport support"
     ),
 )
-@pytest.mark.timeout(900)
+@pytest.mark.timeout(300)
 def test_happy_path_journey(page, evidence, artifacts_dir):
     step_results: list[tuple[str, bool, str]] = []
 

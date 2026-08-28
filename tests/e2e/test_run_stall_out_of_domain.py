@@ -40,7 +40,7 @@ expect = PLAYWRIGHT_SYNC_API.expect if PLAYWRIGHT_SYNC_API is not None else None
 pytestmark = [
     pytest.mark.browser_e2e,
     pytest.mark.serial,
-    pytest.mark.xdist_group("e2e-browser"),
+    pytest.mark.xdist_group("serial"),
 ]
 
 if PLAYWRIGHT_SYNC_API is not None:
@@ -100,7 +100,7 @@ def _stall_report(evidence, last_hour: float) -> str:
         "low-pressure transport support"
     ),
 )
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(300)
 def test_run_does_not_stall(page, evidence):
     page.goto(f"{BASE_URL}/", wait_until="domcontentloaded", timeout=PAGE_LOAD_MS)
     select_feedstock(page)

@@ -635,7 +635,10 @@ def build_equilibrium_crystallization_path(
                 status=typed_failure.status,
                 warnings=tuple([
                     *smoothing_warnings,
-                    *typed_failure.warnings,
+                    *(
+                        f'equilibrium crystallization path failed: {warning}'
+                        for warning in typed_failure.warnings
+                    ),
                 ]),
                 liquid_fraction_path=tuple(path),
                 samples=tuple(samples),
