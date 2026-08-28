@@ -1,0 +1,131 @@
+# Distilled publishable evidence for vapour-rail VapoRock residual pins.
+# Private bulk reports remain private; this file retains only pin-bearing rows.
+schema_version: 1
+kind: vapour_rail_engine_crosscheck_pin_evidence
+source_id: current-rail-against-2026-08-03-vaporock-crosscheck-cells
+date: "2026-08-28"
+distilled_date: "2026-08-28"
+generated_by: tests/test_rail_conformance.py::engine_residuals
+source_report:
+  private_path: docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+  sha256: 3124accf77b585c8a1b28721b322206f0939aed6147b0ce895be6565e5fb6825
+  generated_by: scripts/vapour_rail_engine_crosscheck.py
+  generated_at: "2026-08-04T02:53:35.811544+00:00"
+  repository_revision: ede9b6b7851e357cb8616224e6d68b6f457500b5
+  repository_dirty: true
+  rail_catalog_digest_sha256: 826632087ac7b812abc7c5ee492f0083af555e751347607e10b0421eb4d555eb
+rail_recheck:
+  repository_revision: ee18a89aff124a8789edd5096a930513d668989a
+  date: "2026-08-28"
+  method: >-
+    Re-run the live rail at every matched (temperature, fO2) cell retained in
+    the source report, compare against that cell's recorded VapoRock pressure,
+    and take max(abs(log10(P_rail / P_VapoRock))) per species. This is the
+    algorithm used by tests/test_rail_conformance.py::engine_residuals.
+comparison:
+  composition_id: lunar_mare_low_ti
+  composition_digest_sha256: 703a15fe93e2b97f916c07408773e98999b8b56b35be5ececbc5f01a3dd3ecaa
+  pressure_bar: 1.0e-6
+  temperatures_K:
+    [1350.0, 1400.0, 1450.0, 1500.0, 1550.0, 1573.15, 1600.0,
+     1650.0, 1700.0, 1750.0, 1800.0, 1850.0, 1900.0, 1950.0]
+  fo2_log10_bar: [-9.0, -8.0, -7.0]
+  signed_delta: log10(P_rail / P_VapoRock)
+  posture: diagnostic_only; no coefficient was fitted or tuned to this comparison
+external_comparator:
+  package: VapoRock
+  package_version: 1.0.0
+  route: VR-5 warm pool
+  upstream: https://gitlab.com/ENKI-portal/vaporock/
+  queried: true
+  calibrates: false
+  certifies: false
+systematic_sio_oracle:
+  status: evaluator_gap
+  evidence: >-
+    VapoRock supplies the available peer pressure comparison, but neither
+    AlphaMELTS nor MAGEMin supplies an independent absolute gas-pressure path.
+    The checked-in Si/SiO/O2 polynomials still lack the shared condensed SiO2
+    reservoir term required for the bottom-up systematic oracle.
+pin_rows:
+  Al:
+    pinned_residual_dex: 0.48565570074150183
+    temperature_K: 1950.0
+    fo2_log10_bar: -9.0
+    rail_pressure_Pa: 1.5759500799961972e-6
+    vaporock_pressure_Pa: 4.82167748119339e-6
+    signed_delta_dex: -0.48565570074150183
+  Ca:
+    pinned_residual_dex: 0.855639676843498
+    temperature_K: 1350.0
+    fo2_log10_bar: -9.0
+    rail_pressure_Pa: 1.7300574224283165e-14
+    vaporock_pressure_Pa: 2.4122418135985645e-15
+    signed_delta_dex: 0.855639676843498
+  Cr:
+    pinned_residual_dex: 0.2727768111618302
+    temperature_K: 1350.0
+    fo2_log10_bar: -7.0
+    rail_pressure_Pa: 3.425399213535491e-14
+    vaporock_pressure_Pa: 6.4193049122084e-14
+    signed_delta_dex: -0.2727768111618302
+  CrO2:
+    pinned_residual_dex: 0.711041923195987
+    pin_scope: source_report_matched_coverage
+    matched_cells: 33
+    temperature_K: 1500.0
+    fo2_log10_bar: -9.0
+    rail_pressure_Pa: 2.093534521019436e-6
+    vaporock_pressure_Pa: 4.0722853629807075e-7
+    signed_delta_dex: 0.711041923195986
+    source_note: >-
+      This is the maximum current-rail residual over the original source
+      report's 33 matched CrO2 cells. A later private t383 report added a
+      matched 1400 K row with residual 0.7591206934359683 dex. That later cell
+      is not part of the current pin fixture's source coverage, so 0.711 dex is
+      not represented here as a global or full-declared-domain maximum.
+  Fe:
+    pinned_residual_dex: 0.3407931412581238
+    temperature_K: 1750.0
+    fo2_log10_bar: -9.0
+    rail_pressure_Pa: 0.6585350200427053
+    vaporock_pressure_Pa: 0.3004593572618527
+    signed_delta_dex: 0.3407931412581238
+  K:
+    pinned_residual_dex: 2.206760319412937
+    temperature_K: 1350.0
+    fo2_log10_bar: -8.0
+    rail_pressure_Pa: 0.0014482649325844902
+    vaporock_pressure_Pa: 8.996792324427837e-6
+    signed_delta_dex: 2.206760319412937
+  Mg:
+    pinned_residual_dex: 0.14423087563301895
+    temperature_K: 1350.0
+    fo2_log10_bar: -8.0
+    rail_pressure_Pa: 3.863143891396974e-10
+    vaporock_pressure_Pa: 2.7714688971402843e-10
+    signed_delta_dex: 0.14423087563301895
+  Na:
+    pinned_residual_dex: 1.536140186984556
+    temperature_K: 1350.0
+    fo2_log10_bar: -9.0
+    rail_pressure_Pa: 0.017361128513561655
+    vaporock_pressure_Pa: 0.000505170248065318
+    signed_delta_dex: 1.536140186984556
+  SiO:
+    pinned_residual_dex: 0.04091055507277361
+    temperature_K: 1400.0
+    fo2_log10_bar: -8.0
+    rail_pressure_Pa: 1.7132359742064015e-8
+    vaporock_pressure_Pa: 1.8824685970671253e-8
+    signed_delta_dex: -0.04091055507277361
+  Ti:
+    pinned_residual_dex: 0.17562698423078063
+    temperature_K: 1700.0
+    fo2_log10_bar: -9.0
+    rail_pressure_Pa: 4.905845318698467e-15
+    vaporock_pressure_Pa: 7.350905420870711e-15
+    signed_delta_dex: -0.17562698423078063
+publishability:
+  includes: derived numeric comparison rows, engine versions, source hashes, and source revision
+  excludes: private narrative, full engine output, third-party source code, and licence-restricted inputs

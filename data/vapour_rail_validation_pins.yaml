@@ -40,7 +40,7 @@ species:
       vaporock:
         pinned_residual_dex: 0.48565570074150183
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
   Al2:
     tier: T1
     target_tier: T4
@@ -96,7 +96,7 @@ species:
         # validation-data/pin-evidence/ca_vaporock_pref_gf_2026-08-07.yaml
         pinned_residual_dex: 0.855639676843498
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
           - validation-data/pin-evidence/ca_vaporock_pref_gf_2026-08-07.yaml
         internal_notes_refs:
           - docs-private/research/2026-08-07-mc5-ca-fix/report.md
@@ -125,7 +125,7 @@ species:
       vaporock:
         pinned_residual_dex: 0.2727768111618302
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
       # mass_spec withdrawn 2026-08-08 (si-comparability): residual was driven
       # solely by molten-metal / pure-element α (Ohno olette, Pound solid Cr).
       # Those rows remain in the extract store as typed
@@ -151,7 +151,7 @@ species:
         # preserving the source-reaction -> pressure -> HKL coupling path.
         pinned_residual_dex: 0.711041923195987
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
   CrO:
     tier: T1
     target_tier: T4
@@ -173,7 +173,7 @@ species:
       vaporock:
         pinned_residual_dex: 0.3407931412581238
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
       mass_spec:
         # si-comparability 2026-08-08: pure-element solid-Fe Pound rows excluded
         # as not_comparable_system_class; residual tightens to silicate/olivine set.
@@ -209,7 +209,7 @@ species:
       vaporock:
         pinned_residual_dex: 2.206760319412937
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
       mass_spec:
         # form589 2026-08-09: Yu C1 unresolved supercooled/two-phase rows excluded
         # (form_unresolved). Numeric max UNCHANGED -- Sossi ferrobasalt liquid.
@@ -251,7 +251,7 @@ species:
         # validation-data/pin-evidence/mg_vaporock_pref_gf_2026-08-07.yaml
         pinned_residual_dex: 0.14423087563301895
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
           - validation-data/pin-evidence/mg_vaporock_pref_gf_2026-08-07.yaml
         internal_notes_refs:
           - docs-private/research/2026-08-07-mgfix/report.md
@@ -341,7 +341,7 @@ species:
         # L&H-Chase level shift, not the second-hand linear-form +0.735).
         pinned_residual_dex: 1.536140186984556
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
           - validation-data/pin-evidence/na_vaporock_lh_liquid_2026-08-08.yaml
         internal_notes_refs:
           - docs-private/research/2026-08-08-t383-build/report.md
@@ -613,7 +613,7 @@ species:
       vaporock:
         pinned_residual_dex: 0.04091055507277361
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
       mass_spec:
         # form589 2026-08-09: Costa Fo93Fa7 crystalline olivine α + Wetzel
         # unresolved amorphous/provenance row excluded. Residual TIGHTENS
@@ -666,7 +666,7 @@ species:
       vaporock:
         pinned_residual_dex: 0.17562698423078063
         evidence_refs:
-          - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+          - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
   TiO:
     tier: T1
     target_tier: T4
@@ -699,4 +699,4 @@ systematic_sio_oracle:
   required_failure_message: "investigate \u2014 do NOT tune the systematic path to match the incumbent."
   evidence_refs:
     - data/vapor_pressures.yaml#oxide_vapors_sio_family
-    - docs-private/research/2026-08-03-vapour-rail-engine-crosscheck/engine_crosscheck_report.json
+    - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
