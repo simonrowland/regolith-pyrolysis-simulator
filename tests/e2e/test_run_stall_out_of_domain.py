@@ -32,7 +32,10 @@ import json
 import time
 
 import pytest
-from playwright.sync_api import expect
+
+from .playwright_support import require_playwright_sync_api
+
+expect = require_playwright_sync_api().expect
 
 pytestmark = [
     pytest.mark.serial,

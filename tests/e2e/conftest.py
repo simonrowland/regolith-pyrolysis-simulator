@@ -23,17 +23,21 @@ import urllib.error
 import urllib.request
 
 import pytest
-from playwright.sync_api import sync_playwright
 
-from .browser_harness import (
-    BASE_URL,
-    DECISION_AUTO_ANSWER_JS,
-    HEADED,
-    SOCKET_TAP_JS,
-    EvidenceRecorder,
-    new_artifacts_dir,
-    write_evidence_json,
-)
+from .playwright_support import load_playwright_sync_api
+
+_playwright_sync_api = load_playwright_sync_api()
+if _playwright_sync_api is not None:
+    sync_playwright = _playwright_sync_api.sync_playwright
+    from .browser_harness import (
+        BASE_URL,
+        DECISION_AUTO_ANSWER_JS,
+        HEADED,
+        SOCKET_TAP_JS,
+        EvidenceRecorder,
+        new_artifacts_dir,
+        write_evidence_json,
+    )
 
 
 def _sanitise(name: str) -> str:
