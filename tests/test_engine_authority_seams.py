@@ -5,8 +5,10 @@ from types import SimpleNamespace
 import pytest
 
 from engines.alphamelts.thermoengine import (
+    ThermoEngineIsolationError,
     ThermoEngineOutOfDomainError,
     ThermoEngineRefusalCause,
+    ThermoEngineTransport,
 )
 from simulator.coating_lifespan import (
     FoulingTerminalSnapshot,
@@ -14,6 +16,10 @@ from simulator.coating_lifespan import (
 )
 from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
+from simulator.melt_backend.liquidus import (
+    build_equilibrium_crystallization_path,
+    find_liquidus_solidus_by_fraction,
+)
 from simulator.optimize.objective import (
     _coating_authority_status,
     _cumulative_wall_deposit_by_segment_species_kg,
@@ -57,6 +63,97 @@ def test_thermoengine_liquidus_preserves_policy_refusal() -> None:
     )
 
     assert not_converged.status == "not_converged"
+
+
+def test_thermoengine_liquidus_preserves_isolation_policy_refusal() -> None:
+    transport = ThermoEngineTransport(
+        activity_converter=lambda _mu, _mu0, _temperature_K: 1.0,
+    )
+    backend = ThermoEngineBackend()
+    backend._mode = "thermoengine"
+    backend._thermoengine_transport = transport
+
+    refused = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        min_T_C=800.0,
+        max_T_C=900.0,
+        scan_step_C=100.0,
+    )
+
+    assert refused.status == "refused"
+    assert refused.status != "not_converged"
+    assert (
+        refused.diagnostics["backend_status_reason"]
+        == "thermoengine_isolation_required"
+    )
+    assert backend.is_available() is False
+    assert backend._thermoengine_transport is None
+    assert backend.transport_close_count() == 1
+
+
+def test_liquidus_library_boundaries_preserve_typed_policy_refusal() -> None:
+    refusal = ThermoEngineIsolationError(
+        "ThermoEngine equilibrium requires an isolated worker"
+    )
+
+    def refuse_fraction(_temperature_C: float) -> float:
+        raise refusal
+
+    finder_result = find_liquidus_solidus_by_fraction(
+        refuse_fraction,
+        min_T_C=800.0,
+        max_T_C=900.0,
+        scan_step_C=100.0,
+    )
+
+    def refuse_state(_temperature_C: float) -> tuple[float, dict[str, float]]:
+        raise refusal
+
+    path_result = build_equilibrium_crystallization_path(
+        refuse_state,
+        solidus_T_C=800.0,
+        liquidus_T_C=900.0,
+        grid_step_C=100.0,
+    )
+
+    for result in (finder_result, path_result):
+        assert result.status == "refused"
+        assert result.status != "not_converged"
+        assert (
+            result.diagnostics["backend_status_reason"]
+            == "thermoengine_isolation_required"
+        )
+
+
+@pytest.mark.parametrize(
+    ("exception_name", "expected_reason"),
+    [
+        ("ThermoEngineFO2UndefinedError", "thermoengine_fo2_undefined"),
+        ("ThermoEngineNonFiniteField", "thermoengine_nonfinite_field"),
+        ("ThermoEngineFO2OmittedError", "thermoengine_fo2_omitted"),
+    ],
+)
+def test_liquidus_preserves_typed_keep_handle_refusals(
+    exception_name: str,
+    expected_reason: str,
+) -> None:
+    from engines.alphamelts import thermoengine as thermoengine_module
+
+    exception_type = getattr(thermoengine_module, exception_name)
+
+    def refuse_fraction(_temperature_C: float) -> float:
+        raise exception_type("typed row-local refusal")
+
+    result = find_liquidus_solidus_by_fraction(
+        refuse_fraction,
+        min_T_C=800.0,
+        max_T_C=900.0,
+        scan_step_C=100.0,
+    )
+
+    assert result.status == "refused"
+    assert result.status != "not_converged"
+    assert result.diagnostics["backend_status_reason"] == expected_reason
 
 
 def test_grounded_coating_summary_distinguishes_zero_from_absence() -> None:

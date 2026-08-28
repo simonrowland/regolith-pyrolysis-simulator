@@ -687,6 +687,59 @@ def test_provider_liquidus_exception_surfaces_status_reason(intent):
     )
 
 
+@pytest.mark.parametrize(
+    'intent',
+    [
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+    ],
+)
+@pytest.mark.parametrize(
+    ('cause_name', 'expected_status'),
+    [
+        ('FO2_REQUIRES_IRON', 'refused'),
+        ('FO2_OUTSIDE_ATTAINABLE_BRACKET', 'out_of_domain'),
+    ],
+)
+def test_provider_liquidus_exception_preserves_typed_policy_refusal(
+    intent,
+    cause_name,
+    expected_status,
+):
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    backend = _FakeAlphaMELTSBackend(
+        mode=(
+            'thermoengine'
+            if intent is ChemistryIntent.SILICATE_LIQUIDUS
+            else 'python_api'
+        ),
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+
+    def refuse_liquidus(**_kwargs):
+        raise ThermoEngineOutOfDomainError(
+            getattr(ThermoEngineRefusalCause, cause_name)
+        )
+
+    backend.find_liquidus_solidus = refuse_liquidus
+    provider = AlphaMELTSProvider(backend=backend)
+    request = _make_request(
+        intent,
+        composition_mol=_basalt_species_mol(),
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == expected_status
+    assert result.status != 'not_converged'
+    diagnostic = dict(result.diagnostic or {})
+    assert diagnostic.get('backend_status_reason') == cause_name.lower()
+
+
 def test_provider_handles_silicate_equilibrium_intent():
     """Both intents share the same provider entry."""
     backend = _FakeAlphaMELTSBackend(
@@ -1562,3 +1615,41 @@ def test_authoritative_gate_refuses_a_statusless_ec_sample(monkeypatch):
         f'{diagnostic.get("backend_status")!r} warnings={result.warnings[:2]}'
     )
     assert result.transition is None
+
+
+@pytest.mark.parametrize('sample_status', ['refused', 'out_of_domain'])
+def test_authoritative_gate_preserves_returned_ec_sample_refusal(
+    monkeypatch,
+    sample_status,
+):
+    import engines.alphamelts.provider as provider_module
+
+    refused_sample = SimpleNamespace(
+        status=sample_status,
+        liquid_fraction=None,
+        liquid_composition_wt_pct={},
+        warnings=('policy declined',),
+        diagnostics={'backend_status_reason': f'{sample_status}_reason'},
+    )
+    monkeypatch.setattr(provider_module, 'python_api_available', lambda _b: True)
+    monkeypatch.setattr(
+        provider_module,
+        'equilibrate_via_python_api',
+        lambda *_a, **_k: refused_sample,
+    )
+
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            composition_mol=_basalt_species_mol(),
+        )
+    )
+
+    assert result.status == sample_status
+    assert result.status != 'not_converged'
+    diagnostic = dict(result.diagnostic or {})
+    assert diagnostic.get('backend_status_reason') == f'{sample_status}_reason'

@@ -45,6 +45,10 @@ ActivityConverter = Callable[[float, float, float], float]
 class ThermoEngineIsolationError(RuntimeError):
     """Refusal to run native ThermoEngine outside its killable worker."""
 
+    backend_failure_category = 'refused'
+    backend_status_reason = 'thermoengine_isolation_required'
+    backend_failure_reason_code = backend_status_reason
+
 
 class ThermoEngineFO2UndefinedError(ValueError):
     """A finite fO2 diagnostic is physically undefined (zero-ferric liquid).
@@ -54,6 +58,9 @@ class ThermoEngineFO2UndefinedError(ValueError):
     is still the live adapter. Not evidence the adapter is missing.
     """
 
+    backend_failure_category = 'refused'
+    backend_status_reason = 'thermoengine_fo2_undefined'
+    backend_failure_reason_code = backend_status_reason
 
 class ThermoEngineNonFiniteField(ValueError):
     """A required ThermoEngine numeric field was NaN or infinite.
@@ -63,6 +70,9 @@ class ThermoEngineNonFiniteField(ValueError):
     adapter is missing.
     """
 
+    backend_failure_category = 'refused'
+    backend_status_reason = 'thermoengine_nonfinite_field'
+    backend_failure_reason_code = backend_status_reason
 
 class ThermoEngineFO2OmittedError(ValueError):
     """Solved fO2 was omitted without a typed proven-undefined reason.
@@ -72,6 +82,9 @@ class ThermoEngineFO2OmittedError(ValueError):
     the live adapter. Not evidence the adapter is missing.
     """
 
+    backend_failure_category = 'refused'
+    backend_status_reason = 'thermoengine_fo2_omitted'
+    backend_failure_reason_code = backend_status_reason
 
 class ThermoEngineRefusalCause(str, Enum):
     """Closed set of ThermoEngine row-local refusal causes.
@@ -2014,6 +2027,7 @@ __all__ = (
     'THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS',
     'ThermoEngineFO2OmittedError',
     'ThermoEngineFO2UndefinedError',
+    'ThermoEngineIsolationError',
     'ThermoEngineNonFiniteField',
     'ThermoEngineOutOfDomainError',
     'ThermoEnginePayload',

@@ -77,8 +77,10 @@ from simulator.alphamelts_reference_pressure import (
 from simulator.melt_backend.base import LiquidFractionInvalidError
 from simulator.melt_backend.liquidus import (
     EquilibriumCrystallizationPathResult,
+    LiquidusSampleError,
     LiquidusSolidusResult,
     build_equilibrium_crystallization_path,
+    liquidus_sample_error_from_exception,
 )
 
 
@@ -636,13 +638,22 @@ class AlphaMELTSProvider(ChemistryProvider):
             reason = (
                 getattr(exc, 'backend_failure_reason_code', None)
                 or getattr(exc, 'backend_status_reason', None)
+                or getattr(getattr(exc, 'cause', None), 'value', None)
             )
             category = getattr(exc, 'backend_failure_category', None)
-            status = (
-                'out_of_domain'
-                if reason == 'subprocess_pressure_below_minimum'
-                else 'not_converged'
-            )
+            typed_failure = liquidus_sample_error_from_exception(exc)
+            if typed_failure is not None:
+                status = typed_failure.status
+                reason = typed_failure.diagnostics['backend_status_reason']
+                category = typed_failure.diagnostics[
+                    'backend_failure_category'
+                ]
+            else:
+                status = (
+                    'out_of_domain'
+                    if reason == 'subprocess_pressure_below_minimum'
+                    else 'not_converged'
+                )
             result = LiquidusSolidusResult(
                 status=status,
                 warnings=(f'AlphaMELTS liquidus finder failed: {exc}',),
@@ -738,6 +749,15 @@ class AlphaMELTSProvider(ChemistryProvider):
                 species_formula_registry=species_registry,
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            typed_failure = liquidus_sample_error_from_exception(exc)
+            if typed_failure is not None:
+                return mode, completed(EquilibriumCrystallizationPathResult(
+                    status=typed_failure.status,
+                    warnings=(
+                        f'AlphaMELTS EC liquidus finder failed: {exc}',
+                    ),
+                    diagnostics=typed_failure.diagnostics,
+                ))
             return mode, completed(EquilibriumCrystallizationPathResult(
                 status='not_converged',
                 warnings=(f'AlphaMELTS EC liquidus finder failed: {exc}',),
@@ -782,7 +802,25 @@ class AlphaMELTSProvider(ChemistryProvider):
             sample_status = getattr(result, 'status', None) or 'unavailable'
             if sample_status != 'ok':
                 warning = '; '.join(getattr(result, 'warnings', ()) or ())
-                raise RuntimeError(warning or str(sample_status))
+                diagnostics = dict(
+                    getattr(result, 'diagnostics', {}) or {}
+                )
+                reason = (
+                    diagnostics.get('backend_status_reason')
+                    or diagnostics.get('backend_failure_reason_code')
+                    or sample_status
+                )
+                raise LiquidusSampleError(
+                    sample_status,
+                    (warning or str(sample_status),),
+                    {
+                        **diagnostics,
+                        'backend_status': sample_status,
+                        'backend_status_reason': reason,
+                        'backend_failure_reason_code': reason,
+                        'backend_failure_category': sample_status,
+                    },
+                )
             composition = dict(
                 getattr(result, 'liquid_composition_wt_pct', {}) or {}
             )
@@ -840,6 +878,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             liquid_fraction_path=path.liquid_fraction_path,
             samples=path.samples,
             iterations=bounds.iterations + path.iterations,
+            diagnostics=path.diagnostics,
         ))
 
     def _engine_version(self) -> str:

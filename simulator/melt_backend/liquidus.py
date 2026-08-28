@@ -88,6 +88,36 @@ class LiquidusSampleError(RuntimeError):
         super().__init__('; '.join(self.warnings) or self.status)
 
 
+def liquidus_sample_error_from_exception(
+    exc: BaseException,
+) -> LiquidusSampleError | None:
+    """Project a typed backend refusal without inventing a solver failure."""
+
+    if isinstance(exc, LiquidusSampleError):
+        return exc
+    status = str(getattr(exc, 'backend_failure_category', '') or '')
+    if status not in LIQUIDUS_REFUSAL_STATUSES:
+        return None
+    cause = getattr(exc, 'cause', None)
+    reason = (
+        getattr(exc, 'backend_failure_reason_code', None)
+        or getattr(exc, 'backend_status_reason', None)
+        or getattr(cause, 'value', None)
+        or status
+    )
+    diagnostics: dict[str, Any] = {
+        'backend_status': status,
+        'backend_status_reason': str(reason),
+        'backend_failure_reason_code': str(reason),
+        'backend_failure_category': status,
+    }
+    for field_name in ('requested', 'solved'):
+        value = getattr(exc, field_name, None)
+        if value is not None:
+            diagnostics[f'{field_name}_fO2_log'] = value
+    return LiquidusSampleError(status, (str(exc),), diagnostics)
+
+
 @dataclass(frozen=True)
 class MeltFractionSample:
     temperature_C: float
@@ -484,6 +514,18 @@ def find_liquidus_solidus_by_fraction(
             diagnostics=exc.diagnostics,
         )
     except Exception as exc:  # noqa: BLE001 - library-boundary finder guard
+        typed_failure = liquidus_sample_error_from_exception(exc)
+        if typed_failure is not None:
+            return LiquidusSolidusResult(
+                status=typed_failure.status,
+                warnings=tuple([
+                    *smoothing_warnings,
+                    *typed_failure.warnings,
+                ]),
+                samples=tuple(samples),
+                iterations=iterations,
+                diagnostics=typed_failure.diagnostics,
+            )
         return LiquidusSolidusResult(
             status='not_converged',
             warnings=tuple([
@@ -577,6 +619,19 @@ def build_equilibrium_crystallization_path(
     except LiquidFractionInvalidError:
         raise
     except Exception as exc:  # noqa: BLE001 - engine sampler boundary
+        typed_failure = liquidus_sample_error_from_exception(exc)
+        if typed_failure is not None:
+            return EquilibriumCrystallizationPathResult(
+                status=typed_failure.status,
+                warnings=tuple([
+                    *smoothing_warnings,
+                    *typed_failure.warnings,
+                ]),
+                liquid_fraction_path=tuple(path),
+                samples=tuple(samples),
+                iterations=len(samples),
+                diagnostics=typed_failure.diagnostics,
+            )
         return EquilibriumCrystallizationPathResult(
             status='not_converged',
             warnings=tuple([

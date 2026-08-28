@@ -10,6 +10,7 @@ from engines.alphamelts.thermoengine import (
     THERMOENGINE_WARM_CALL_TIMEOUT_S,
     ThermoEngineFO2OmittedError,
     ThermoEngineFO2UndefinedError,
+    ThermoEngineIsolationError,
     ThermoEngineNonFiniteField,
     ThermoEngineOutOfDomainError,
     ThermoEngineRefusalCause,
@@ -123,7 +124,11 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             self._mode = 'thermoengine'
             self._unavailable_reason = None
             return True
-        except (ThermoEngineTimeoutError, ThermoEngineOutOfDomainError) as exc:
+        except (
+            ThermoEngineTimeoutError,
+            ThermoEngineOutOfDomainError,
+            ThermoEngineIsolationError,
+        ) as exc:
             try:
                 self.close()
             except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
@@ -516,6 +521,11 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             # Genuine adapter death. Close is correct.
             self._close_after_failure(exc)
             raise
+        except ThermoEngineIsolationError as exc:
+            # The adapter was never valid for in-process native execution.
+            # Close it, but preserve the policy-refusal type and status fields.
+            self._close_after_failure(exc)
+            raise
         except Exception as exc:
             # Legacy wire / remapped ValueError may still carry an
             # out-of-domain mark. Retype it; never close on OOD.
@@ -527,7 +537,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             # UNTYPED close. Sequential mode may still latch here
             # (builtin TimeoutError remap, unknown child exc_name →
             # RuntimeError, parent-side RuntimeError other than the
-            # typed keep-handles, ThermoEngineIsolationError).
+            # typed keep-handles).
             # Isolated retry remains required. Isolated-mode ceilings
             # (e.g. 12→32) are not a sequential result of the typed
             # keep-handle.
@@ -541,6 +551,7 @@ __all__ = [
     'ThermoEngineBackend',
     'ThermoEngineFO2OmittedError',
     'ThermoEngineFO2UndefinedError',
+    'ThermoEngineIsolationError',
     'ThermoEngineNonFiniteField',
     'ThermoEngineOutOfDomainError',
     'ThermoEngineTimeoutError',

@@ -73,6 +73,7 @@ from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
+    liquidus_sample_error_from_exception,
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
 from simulator.physical_constants import GAS_CONSTANT
@@ -1496,10 +1497,6 @@ class _MELTSBackendSupport(MeltBackend):
                 )
 
         sample_warnings: list[str] = []
-        from engines.alphamelts.thermoengine import (
-            ThermoEngineOutOfDomainError,
-        )
-
         def sample_fraction(temperature_C: float) -> float:
             try:
                 result = self.equilibrate(
@@ -1511,16 +1508,11 @@ class _MELTSBackendSupport(MeltBackend):
                     composition_mol_by_account=composition_mol_by_account,
                     species_formula_registry=species_formula_registry,
                 )
-            except ThermoEngineOutOfDomainError as exc:
-                raise LiquidusSampleError(
-                    exc.backend_failure_category,
-                    (str(exc),),
-                    {
-                        'backend_status_reason': exc.cause.value,
-                        'requested_fO2_log': exc.requested,
-                        'solved_fO2_log': exc.solved,
-                    },
-                ) from exc
+            except Exception as exc:
+                typed_failure = liquidus_sample_error_from_exception(exc)
+                if typed_failure is None:
+                    raise
+                raise typed_failure from exc
             if result.status != 'ok':
                 raise LiquidusSampleError(
                     result.status,
