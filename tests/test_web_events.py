@@ -5330,3 +5330,35 @@ def test_start_with_valid_feedstock_still_starts(monkeypatch):
         if message.get("name") == "simulation_status"
     }
     assert "started" in statuses, f"valid feedstock should start; got {statuses!r}"
+
+
+def test_refusal_message_explains_without_replacing_the_machine_reason():
+    """A lawful refusal explains itself; the token stays authoritative.
+
+    The refusal payload set message=exc.reason, so the operator's status line
+    read `refused - viscous_p_bulk_transport_out_of_domain` -- a raw token that
+    cannot distinguish "the furnace broke" from "the model declined to
+    extrapolate". It was reported as a stall. The run had not stalled; it had
+    correctly refused, because viscous Poiseuille P_bulk has no valid solution
+    in the transitional Knudsen band.
+
+    Two properties matter and are both asserted here:
+      1. the human message is prose, NOT the bare token;
+      2. `reason` is UNCHANGED, so nothing downstream that switches on the
+         machine-readable token is affected by the wording.
+    An unmapped reason must pass through verbatim -- inventing prose for a
+    reason nobody wrote would be a different failure, so that is pinned too.
+    """
+    reason = "viscous_p_bulk_transport_out_of_domain"
+    message = web_events._refusal_message(reason)
+    assert message != reason, "mapped refusal should be explained, not echoed"
+    assert "Knudsen" in message and "mbar" in message, (
+        f"explanation should name the actual domain limit; got {message!r}"
+    )
+    # the machine-readable token must be untouched by the wording layer
+    assert web_events._REFUSAL_EXPLANATIONS[reason] == message
+
+    unmapped = "some_reason_nobody_has_written_prose_for"
+    assert web_events._refusal_message(unmapped) == unmapped, (
+        "an unmapped reason must surface verbatim rather than be softened"
+    )

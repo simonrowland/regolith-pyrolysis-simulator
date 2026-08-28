@@ -316,6 +316,33 @@ def read_ledger_api_for_client(client_id: str, resource: str, **params):
         return read_ledger_api(matches[0], resource, **params)
 
 
+# A LAWFUL PHYSICS REFUSAL IS A RESULT, NOT A CRASH -- SAY SO IN WORDS.
+# The refusal payload used to set message=exc.reason, so the operator's status
+# line read `refused - viscous_p_bulk_transport_out_of_domain`: a raw token with
+# no indication of whether the furnace broke, the app broke, or the model
+# declined to extrapolate. The owner reported exactly this as "the run stalled
+# on OUT_OF_DOMAIN". The run had not stalled; it had refused, correctly.
+#
+# These are explanations only. The machine-readable `reason` is unchanged and
+# stays authoritative -- nothing here decides anything, and an unmapped reason
+# still surfaces its token verbatim rather than being softened into prose.
+_REFUSAL_EXPLANATIONS = {
+    'viscous_p_bulk_transport_out_of_domain': (
+        'Overhead pressure fell below the viscous-flow domain (Knudsen > 0.01, '
+        'about 0.26 mbar for this duct), where the continuum transport model '
+        'has no valid solution. The run stopped rather than extrapolate a '
+        'transport number it cannot support. This is a model-coverage limit, '
+        'not a furnace fault: raise the overhead sweep pressure to stay in the '
+        'viscous band, or await transitional/free-molecular conductance.'
+    ),
+}
+
+
+def _refusal_message(reason: str) -> str:
+    """Operator-facing sentence for a refusal reason; the token when unmapped."""
+    return _REFUSAL_EXPLANATIONS.get(str(reason), str(reason))
+
+
 def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bool:
     with _simulations_guard:
         state = _simulations.get(sid)
@@ -2661,7 +2688,7 @@ def _start_background_loop(
                     error_payload = {
                         'status': 'refused',
                         'reason': exc.reason,
-                        'message': exc.reason,
+                        'message': _refusal_message(exc.reason),
                         'refusal_diagnostic': dict(exc.diagnostic),
                         'backend_status': backend_status,
                         'backend_authoritative': backend_authoritative,
