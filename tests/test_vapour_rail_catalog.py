@@ -185,6 +185,13 @@ def test_t622_cross_revision_additivity_evidence_is_reproducible() -> None:
     ]
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "T622 oxidative-window reference artifact is absent from Git history; "
+        "MUST NOT regenerate it from current simulator output"
+    ),
+)
 def test_t622_oxidative_window_envelope_evidence_is_reproducible() -> None:
     root = Path(__file__).resolve().parents[1]
     output = (
