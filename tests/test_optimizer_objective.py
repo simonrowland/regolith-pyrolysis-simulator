@@ -1385,7 +1385,17 @@ def test_measured_zero_wall_deposit_still_prices_as_never_fouling() -> None:
         (zero_entry,), 1
     )
     assert empty_deposits == {}
-    assert zero_deposits == {}
+    # A MEASURED zero now carries an explicit key; an ABSENT measurement carries
+    # none. This line used to assert both were {} -- i.e. that a measured zero and
+    # a never-measured segment were indistinguishable, which is precisely the
+    # conflation b-306/b-311 exist to remove, and which the sibling test
+    # test_unmeasured_wall_deposit_delta_is_distinguishable_from_measured_zero
+    # asserts must NOT hold. The old value was produced by the pre-3f0491ac
+    # consumer, which dropped near-zero amounts instead of recording them;
+    # after 3f0491ac (signed wall-deposit deltas) it is unreachable. The subject
+    # of this test -- that a measured zero still prices as never-fouling -- is
+    # unchanged and is asserted below.
+    assert zero_deposits == {("duct", "SiO"): 0.0}
     assert objective_module._campaigns_to_resinter(empty_deposits) == "infinite"
     assert objective_module._has_positive_wall_deposit(empty_deposits) is False
 
