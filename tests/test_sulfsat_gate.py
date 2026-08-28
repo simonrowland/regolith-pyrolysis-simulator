@@ -424,7 +424,11 @@ def test_malformed_liquid_composition_returns_unavailable(monkeypatch):
 
     assert captured == {}
     assert result.calibration_status == 'unavailable'
-    assert any('invalid liquid_comp_wt' in w for w in result.warnings)
+    assert result.warnings
+    assert any(
+        'invalid liquid composition' in w and 'SiO2' in w
+        for w in result.warnings
+    )
 
 
 # ---------------------------------------------------------------------------
