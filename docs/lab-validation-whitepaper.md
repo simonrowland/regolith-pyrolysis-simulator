@@ -15,6 +15,17 @@ slot marker, so provenance survives refinement.**
 > commit the table *values* were drawn from — a later stamp-only edit does not
 > change it. When a table is refined against a newer build, bump this stamp and
 > record the per-row code version in Appendix C.
+>
+> **Partial re-verification (doc audit, 2026-08-28).** The v0.5.6 stamp above is
+> NOT bumped, because the run-derived tables (§4 daylight, §5 error budget) were
+> not recompiled. What was re-verified against current `data/vapor_pressures.yaml`
+> and corrected in place: the §2.2 provenance class census (recounted off the
+> Appendix B table itself — 68 rows, 11/13/30/8 plus the 6 dual-class rows 7, 11,
+> 16, 43, 44, 45), the §2.3 alpha rows for Ca/Ti (Zhang 2014 proxy withdrawn), Al,
+> and CrO₂, and Appendix B rows 12, 15, and 68. The CrO₂ row was corrected twice:
+> a first pass restored its numeric α, and a second pass found the accompanying
+> "still refuses" claim to be false against the flux path and rewrote it. Every
+> other table still carries v0.5.6 values.
 
 ---
 
@@ -66,7 +77,13 @@ meaningful validation target for the present corpus.
 
 <!-- SLOT:parameter-provenance source=derivation-audit-findings.md status=refined -->
 
-Class counts: 11 first-principles / 14 literature / 35 assumed / 8 fitted.
+Class counts over the 68 Appendix-B rows: 11 first-principles / 13 literature-pinned /
+30 ASSUMED / 8 FITTED / 6 mixed-or-bounded. The last bucket is not a rounding
+convenience — those six rows (7 Na α physical upper bound; 11 SiO α UNCERTIFIED growth
+proxy plus cited cold-wall limit; 16 Cr/Mn literature-pinned plus explicit class proxy;
+43 sticking sidecar literature-pinned plus UNCERTIFIED; 44 unknown-species α_s
+UNCERTIFIED default; 45 wall-material sidecar plus overrides) carry two provenance
+classes at once and must not be counted as either half alone.
 
 **FITTED entries (8; debt to eliminate under the no-fitting policy):**
 
@@ -108,10 +125,11 @@ Class counts: 11 first-principles / 14 literature / 35 assumed / 8 fitted.
 | Fe | 0.02 (tier 2); recommended band 0.01-0.2 (melt); ~1 (pure metal) | Costa & Jacobson 2015 KEMS Fo93Fa7 olivine Fe+ 0.011-0.020 (1700-1800 K); Ebel 2005 proxy ~0.2 noted high; Safarian & Engh 2013 pure Fe/metal ~1 (weak evap) | From FeO in melt: reduction + oxide kinetics lower vs pure metal. pO2/fO2 sensitive. | banded (Banded) |
 | SiO (from SiO2 melt) | HOT-source proxy `0.52*exp(-3685/T_K)`; range `1000-1800 K`; envelope `[0.003,0.067]`; COLD-WALL condensation below the floor uses `1.0` with band `[0.016,1.0]` | Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803 for solid-SiO particle growth; Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096 for high-supersaturation cold-wall unity condensation | Wetzel's form is not silicate-melt free-evaporation evidence. Runtime retains it as an explicitly UNCERTIFIED hot-source proxy pending a grounded melt coefficient. Cold-wall authority remains separate. | assumption (growth proxy) + cited cold-wall gate |
 | Pure Si (metal) | 1.0 (tier 2, pure_elemental_only); recommended band 0.84-1.0 (per Safarian) | Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 (pure Si vacuum evap branch) | Simulator does not use; SiO from oxide dominates. Confirms alpha~1 for atomic metal evap. | pinned (Yes (for pure metal)) |
-| Ca, Al, Ti | 0.3-0.9 (tier 2, proxies); recommended band 0.1-1.0 (wide) | Zhang et al. 2014 CaTiO3 melt 2005 C (Ca/Ti activity proxies); Schaefer & Fegley 2004 + Shahar & Young 2007 CAI modeling (Al) | Not direct HKL alpha for target species from regolith basalt; activity proxies. Broad uncertainty. | assumption (Assumption / broad proxy) |
+| Al | 0.3 (tier 2, broad proxy); envelope 0.03-1.0; 1700-2273 K | Owner-ratified `proxy_not_intrinsic`: Schaefer & Fegley 2004 + Shahar & Young 2007 CAI modeling | Not a direct HKL alpha for Al from regolith basalt; an activity-derived broad proxy. Inherited unchanged by the AlO/Al2O/Al2/Al2O2/Al2O3(g)/AlO2 gas rows. | assumption (broad proxy) |
+| Ca, Ti | 1.0 `analytical_upper_bound`; envelope 0.01-1.0; 1200-2500 K | None. The Zhang et al. 2014 CaTiO3 perovskite proxy (former Ca 0.9, Ti 0.8 at 2278 K) was **WITHDRAWN** 2026-08-08 (b-136/t-559) as a mis-tagged HKL alpha for the silicate-melt carrier | Not a proxy any more — an explicit Hertz–Knudsen ideal ceiling with no measurement behind it, kept numeric so a refusal cannot become an unjustified zero. Status-bearing, never certifies. Cascades to the CaO, Ca2, TiO, TiO2 gas rows. Species-class model remains t-561. | analytical upper bound (not pinnable) |
 | Cr | 0.9 (tier 1); envelope 0.8–1.0; valid 1318–1563 K | Pound 1972, Table 1, DOI 10.1063/1.3253096, selecting McCabe, Hudson & Paxton 1958 solid-Cr Langmuir/Knudsen comparison | Direct clean 99.9% polycrystalline solid-Cr measurement for Cr(g), not Cr dissolved in silicate melt. Melt activity belongs in `P_sat`; oxygen contamination can lower α. | pinned (direct measurement) |
 | Mn | 1.0 (tier 2 owner-ratified monoatomic-class proxy); envelope 0.5–1.0; liquid-process band 1519–2334.526 K | REF-040 Pound 1972 and REF-017 Safarian & Engh 2013 establish the near-unity clean monoatomic-metal class basis through Fe/Cr and multi-metal free evaporation | Not a Mn-specific or temperature-calibrated measurement. Two independent sweeps found no direct Mn HKL coefficient; Safarian & Engh 2013 full text contains zero Mn value. Medium-high confidence for clean liquid Mn; solid α-Mn remains unmeasured. Melt activity belongs in `P_sat`. | assumption (owner-ratified proxy) |
-| CrO₂ | tier 3 (no value); recommended band N/A (fail-loud unless fallback) | No accessible condensed-phase CrO₂ HKL α; CrO₂ is a gas-phase redox product | SC-67 refusal remains; explicit fallback only. | assumption (Assumption-only) |
+| CrO₂ | 0.9 (envelope 0.48-1.2, 1400-2273.15 K, tier 2, tag `broad_proxy_not_intrinsic`) — and the flux path **does** consume it | No accessible condensed-phase CrO₂ HKL α; CrO₂ is a gas-phase redox product. The 0.9 is inherited wholesale from the Cr metal family, not measured for CrO₂ | **The SC-67 fail-loud refusal no longer fires for CrO₂, and this row previously claimed it did.** Measured 2026-08-28: `_load_evaporation_alpha_by_species(data/vapor_pressures.yaml)` returns `CrO2 -> 0.9`, and `engines/builtin/evaporation_flux.py::_alpha_is_unmeasured` tests key presence only, so CrO₂ never enters `missing_alpha` and never reaches the `chemistry_kernel.allow_unmeasured_alpha_fallback` gate. The `broad_proxy_not_intrinsic` tag is read in exactly one place, `simulator/evaporation_classes.py`, whose own comment says that gate is instrument-only and "NOT wired into flux this chunk". So an ungrounded inherited proxy is silently driving CrO₂ flux — a weaker position than the refusal it replaced, not a stronger one. | ungrounded proxy, admitted unrefused |
 
 ### 2.4 Geometry: evaporation area as a derived quantity
 <!-- Prose + slot when area-geometry lands: area from melt volume + vessel geometry; the shallow-pot aspect-ratio result if it survives. -->
@@ -362,10 +380,10 @@ Full 68-row derivation-chain audit. FITTED rows remain flagged as FITTED because
 | 9 | Alpha | Mg `alpha=0.2`, envelope `[0.1,0.21]` | literature-pinned | `data/vapor_pressures.yaml::metals.Mg.evaporation_alpha` | Medium/high; Mg vapor is material in faithful run. |
 | 10 | Alpha | Fe `alpha=0.02`, envelope `[0.011,0.02]` | literature-pinned | `data/vapor_pressures.yaml::metals.Fe.evaporation_alpha` | High; Fe vapor is material and alpha is small. |
 | 11 | Alpha | SiO HOT-source proxy `alpha=0.52*exp(-3685/T_K)`, range `1000-1800 K`, envelope `[0.003,0.067]`; COLD-WALL condensation below the floor uses Pound 1972 unity, band `[0.016,1.0]` | mixed: UNCERTIFIED solid-film growth proxy plus cited cold-wall limit | `data/vapor_pressures.yaml::oxide_vapors.SiO.evaporation_alpha`; `data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.cold_wall_condensation`; Wetzel & Gail 2013 DOI 10.1051/0004-6361/201220803; Pound 1972 DOI 10.1063/1.3253096 | Very high; Wetzel is not melt evaporation evidence, and direct hot-source/cold-wall measurement gaps remain. |
-| 12 | Alpha | Ca `alpha=0.9`, proxy tag | ASSUMED | `data/vapor_pressures.yaml::metals.Ca.evaporation_alpha` | Medium/high; Ca vapor appears in faithful run. |
+| 12 | Alpha | Ca `alpha=1.0`, `status: analytical_upper_bound`, envelope `[0.01,1.0]`, `1200-2500 K`. Former Zhang 2014 CaTiO3 proxy `0.9` WITHDRAWN 2026-08-08 (b-136/t-559) as mis-tagged HKL alpha | ASSUMED | `data/vapor_pressures.yaml::metals.Ca.evaporation_alpha` (`withdrawn_proxy` block retains the former value) | Medium/high; Ca vapor appears in faithful run, and the ceiling is an upper bound on it. |
 | 13 | Alpha | Al `alpha=0.3`, broad proxy | ASSUMED | `data/vapor_pressures.yaml::metals.Al.evaporation_alpha` | Medium; Al vapor present, broad envelope. |
 | 14 | Alpha | Si `alpha=1.0`, pure elemental only | ASSUMED | `data/vapor_pressures.yaml::metals.Si.evaporation_alpha` | Low in current faithful run; inactive pure-Si branch. |
-| 15 | Alpha | Ti `alpha=0.8`, proxy tag | ASSUMED | `data/vapor_pressures.yaml::metals.Ti.evaporation_alpha` | Low; Ti vapor tiny. |
+| 15 | Alpha | Ti `alpha=1.0`, `status: analytical_upper_bound`, envelope `[0.01,1.0]`, `1200-2500 K`. Former Zhang 2014 CaTiO3 proxy `0.8` WITHDRAWN 2026-08-08 (b-136/t-559) as mis-tagged HKL alpha | ASSUMED | `data/vapor_pressures.yaml::metals.Ti.evaporation_alpha` (`withdrawn_proxy` block retains the former value) | Low; Ti vapor tiny. |
 | 16 | Alpha | Cr `alpha=0.9`, envelope `[0.8,1.0]`, tier 1 direct solid-Cr measurement; Mn `alpha=1.0`, envelope `[0.5,1.0]`, tier 2 owner-ratified monoatomic-class proxy | mixed: literature-pinned plus explicit class proxy | `data/vapor_pressures.yaml::metals.Cr.evaporation_alpha`; `data/vapor_pressures.yaml::metals.Mn.evaporation_alpha`; Pound 1972 DOI 10.1063/1.3253096; Safarian & Engh 2013 DOI 10.1007/s11661-012-1464-2 | Cr is valid only for clean pure-solid free evaporation over 1318–1563 K. Mn is not a Mn-specific measurement; its 1519–2334.526 K band follows the liquid process range, not calibration. Melt activity remains in `P_sat`. |
 | 17 | P_sat runtime | Na selected Antoine at 1700 K `(7.460770,1873.728,-416.372)`, `pure_component_antoine` | FITTED | `data/vapor_pressures.yaml::metals.Na.pure_component_antoine`; selector in `engines/builtin/vapor_pressure.py::vapor_pressure_antoine_coefficients` | Medium for builtin authoritative runtime. |
 | 18 | P_sat runtime | K liquid KO0.5 standard-reaction fit `(10.641294,9965.408779,-123.001)`, Lamoreaux & Hildenbrand 1984 Tables 2/4, DOI 10.1063/1.555706 | FITTED | `data/vapor_pressures.yaml::metals.K.antoine/reaction` | Medium/low for builtin authoritative runtime; held-out DeMaria residual is about +1.24 dex at 1429 K. |
@@ -418,7 +436,7 @@ Full 68-row derivation-chain audit. FITTED rows remain flagged as FITTED because
 | 65 | Gas boundary | Partial-pressure total tolerance `max(1e-12 mbar, 1e-12*scale)` | first-principles | `simulator/state.py:571-585` | Low; validation only. |
 | 66 | Lab overlay | Required closure factor `alpha * area = 0.03969` | FITTED | `campaign analysis 2026-06`, `:112-126` | Very high; paper-derived diagnostic, not allowed as hidden runtime scalar. |
 | 67 | Lab overlay | Forsterite proxy `alpha_c = 0.038 +/- 0.005` | literature-pinned | `campaign analysis 2026-06`, `:112-116`; expanded in `alpha-principles.md` | Very high if lab overlay uses it. |
-| 68 | Lab overlay | `gram_lab` `lab_geometry.sample.exposed_melt_area_m2` is validated and copied into the HKL source-area field before execution; missing area leaves the existing `MeltState` scalar unchanged | ASSUMED | `simulator/condensation.py::gram_lab_exposed_melt_area_bridge`; `simulator/runner.py::_apply_lab_area_bridge` | Very high; the seam is live, while dynamic industrial area remains absent. |
+| 68 | Lab overlay | `gram_lab` `lab_geometry.sample.exposed_melt_area_m2` is validated and copied into the HKL source-area field before execution; missing area leaves the existing `MeltState` scalar unchanged | ASSUMED | `simulator/condensation.py::gram_lab_exposed_melt_area_bridge`; `simulator/runner/__init__.py::_apply_lab_area_bridge` | Very high; the seam is live, while dynamic industrial area remains absent. |
 
 ### Appendix C — Faithful-run artifacts
 <!-- Run digests, preset SHAs, code version per comparison row. -->

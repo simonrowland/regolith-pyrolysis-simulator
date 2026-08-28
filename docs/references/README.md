@@ -15,6 +15,14 @@ Use `--check` for validation only:
 .venv/bin/python docs/references/build_references.py --check
 ```
 
+`--check` writes nothing into `docs/references/`, but it does more than schema
+validation: it recomputes `cited_by`, renders the pages to a scratch directory,
+and byte-compares them against the checked-in files, reporting
+`ERROR: stale generated HTML: <file>` (or `missing` / `unexpected`) for each
+mismatch. It exits non-zero when any error is reported. A stale-HTML error means
+the registry or a source token changed without a regenerate — rerun the
+generator without `--check` to clear it.
+
 ## REF IDs
 
 Each source gets one global, stable ID: `REF-001`, `REF-002`, and so on. IDs

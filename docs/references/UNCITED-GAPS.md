@@ -9,16 +9,26 @@ Scope: `data/vapor_pressures.yaml`, `data/foulant_thermo.yaml`,
 Non-comment `source` / `provenance` fields scanned: 131. Fields carrying at
 least one `REF-NNN`: 75. Fields deliberately left uncited here: 56.
 
+> **Line anchors are as-of 2026-06-14 and have drifted (checked 2026-08-28).**
+> `data/vapor_pressures.yaml` has since grown to 28,732 lines and
+> `data/feedstocks.yaml` to 2,791, so **none of the `vapor_pressures.yaml`
+> anchors below and only `feedstocks.yaml:16` still resolve to the row they
+> describe**. The `foulant_thermo.yaml` and `stage0_carbon_partition.yaml`
+> anchors were re-checked and are correct as printed. Treat the **parameter
+> description**, not the line number, as the identifying key until the audit is
+> re-run. This is anchor drift, not gap closure: no gap below has been shown to
+> be fixed.
+
 ## Vapor Pressure Gaps
 
 | File:line | Parameter | Gap |
 |---|---|---|
 | `data/vapor_pressures.yaml:194` | Ca rough pure-component vapor-pressure value | `LEGACY_DERIVATION_VALUE`; no named table or regression captured. |
-| `data/vapor_pressures.yaml:202` | Ca activity proxy from Zhang et al. 2014 | Citation string names journal/pages, but no verified title/DOI or pull quote found in approved notes. |
+| `data/vapor_pressures.yaml:202` | Ca activity proxy from Zhang et al. 2014 | Citation string names journal/pages, but no verified title/DOI or pull quote found in approved notes. **Superseded 2026-08-08 (b-136/t-559): the proxy was WITHDRAWN as a mis-tagged HKL α, not cited. Ca now carries `α=1.0 analytical_upper_bound` with no source at all — a larger gap than the one recorded here.** |
 | `data/vapor_pressures.yaml:222` | Al legacy pure-component vapor-pressure table/regression | Legacy CRC-style value without named edition/table; do not fabricate. |
 | `data/vapor_pressures.yaml:251` | Pure Si rough legacy dH_vap approximation | Inactive/unvalidated legacy value without named source. |
 | `data/vapor_pressures.yaml:279` | Ti legacy pure-component vapor-pressure table/regression | Legacy CRC-style value without named edition/table. |
-| `data/vapor_pressures.yaml:287` | Ti activity proxy from Zhang et al. 2014 | Citation string names journal/pages, but no verified title/DOI or pull quote found in approved notes. |
+| `data/vapor_pressures.yaml:287` | Ti activity proxy from Zhang et al. 2014 | Citation string names journal/pages, but no verified title/DOI or pull quote found in approved notes. **Superseded 2026-08-08 (b-136/t-559): the proxy was WITHDRAWN as a mis-tagged HKL α, not cited. Ti now carries `α=1.0 analytical_upper_bound` with no source at all — a larger gap than the one recorded here.** |
 | `data/vapor_pressures.yaml:307` | Cr rough pure-component vapor-pressure value | Legacy unvalidated approximation without named table/refit. |
 | `data/vapor_pressures.yaml:327` | Mn rough pure-component vapor-pressure value | Legacy unvalidated approximation without named table/refit. |
 | `data/vapor_pressures.yaml:496` | MgCl2 interval row | Marked ungrounded; NIST fetch failed and CRC/JANAF replacement is pending. |
@@ -43,8 +53,8 @@ Partial sub-reference gaps inside REF-backed vapor rows:
 | File:line | Parameter | Gap |
 |---|---|---|
 | `data/stage0_carbon_partition.yaml:70` | `ungrounded_comet_organic_fraction` | Explicitly ungrounded comet organic fraction. |
-| `data/stage0_carbon_partition.yaml:91` | `guo_2018_rsc_advances_low_rank_char` | Evidence docs mark Guo/char TGA as scenario-only; exact title/DOI not captured. |
-| `data/stage0_carbon_partition.yaml:103` | `doe_osti_5279262` | DOI/authors are present for Essenhigh/Denison ERE, but exact title is not captured in approved notes. |
+| `data/stage0_carbon_partition.yaml:100` | `guo_2018_rsc_advances_low_rank_char` | Evidence docs mark Guo/char TGA as scenario-only; exact title/DOI not captured. (Re-anchored 2026-08-28; was `:91`.) |
+| `data/stage0_carbon_partition.yaml:112` | `doe_osti_5279262` | DOI/authors are present for Essenhigh/Denison ERE, but exact title is not captured in approved notes. (Re-anchored 2026-08-28; was `:103`.) |
 
 ## Feedstock Gaps
 

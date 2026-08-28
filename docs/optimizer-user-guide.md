@@ -20,20 +20,23 @@ Do not treat an `internal-analytical`-backed (legacy `stub`) result as a real pr
 
 Open the app, then go to `/optimizer`.
 
-The page has two surfaces:
+The page has four surfaces:
 
-- The **Feedstock/Profile Winners** table reads stored optimizer results from the configured runs directory.
-- The **Launch Optimizer Job** form submits a disk-backed CLI job and polls job status.
+- **Optimizer Results** — the **Feedstock/Profile Winners** table, which reads stored optimizer results from the configured runs directory.
+- **Launch Optimizer Job** — submits a disk-backed CLI job and polls job status.
+- **Import Study Bundle** — ingests a study bundle produced elsewhere (for example on a Studio box).
+- **Imported Studies** — lists ingested bundles with their status and verification state.
 
 Launch fields:
 
 - **Feedstock**: feedstock id from `data/feedstocks.yaml`.
 - **Profile**: optimizer profile id from `data/optimize_profiles/*.yaml`; the web form rejects a profile that does not belong to the selected feedstock.
-- **Strategy**: one of `random`, `screen`, `bayes`, `nsga2`, `staged`.
-- **Fidelity**: one of `stub`, `fast`, `high`, `auto`.
-- **Budget**: positive integer evaluation count.
+- **Strategy**: one of `random`, `screen`, `bayes`, `nsga2`, `staged`. The form preselects `staged`.
+- **Fidelity**: one of `internal-analytical`, `fast`, `high`, `auto`. The form preselects `high`.
+- **Budget**: positive integer evaluation count; the form starts at `24`.
 - **Parallel**: positive integer worker count; web submission is capped by `OPTIMIZER_JOB_PARALLEL_CAP` or the default cap of `4`.
 - **Seed**: non-negative integer strategy seed.
+- **MRE catalog**: an MRE preset id from the setpoints preset catalog, submitted as `mre_preset_id`. This is the surface for the "do we need MRE at all?" question — it selects which MRE species set the study is allowed to use.
 
 The web job runner launches the same CLI used below. Job detail pages show status, feedstock, profile, strategy, fidelity, budget, parallel count, seed, PID, timestamps, queue position, log tail, and result links when available.
 
@@ -53,21 +56,53 @@ python -m simulator.optimize \
   --seed 0
 ```
 
-Actual flags:
+`python -m simulator.optimize.cli` is the same entry point and takes the same flags.
+
+Actual flags (run `--help` for the authoritative list):
 
 ```text
 --feedstock FEEDSTOCK
 --profile PROFILE
 --strategy {bayes,nsga2,random,screen,staged}
---fidelity {stub,fast,high,auto}
+--fidelity {internal-analytical,fast,high,auto}
 --parallel PARALLEL
 --budget BUDGET
 --out OUT
 --seed SEED
 --warm-start-from PRIOR_RUN_OR_ARTIFACT
+--per-eval-timeout-seconds SECONDS
+--pin DOTTED.PATH
+--constrained-max
+--furnace-temp-cap-C DEGC
+--cycle-time-cap-h HOURS
+--two-phase-certify
+--certify-top-k K
+--certify
+--source-store SOURCE_STORE
+--cache-key CACHE_KEY
 ```
 
-`--feedstock`, `--strategy`, `--fidelity`, and `--budget` are required. `--profile` accepts the built-in profile name, a feedstock profile id, or a YAML profile path. `--warm-start-from` accepts a prior run directory, `cache.sqlite`, or `pareto.json`; omitted means no store warm-start. If `--out` is omitted, the study writes under `runs/<timestamp>`.
+`--feedstock`, `--fidelity`, and `--budget` are always required; `--strategy` is required
+unless `--certify` is set. `--profile` accepts the built-in profile name, a feedstock
+profile id, or a YAML profile path. `--warm-start-from` accepts a prior run directory,
+`cache.sqlite`, or `pareto.json`; omitted means no store warm-start. If `--out` is
+omitted, the study writes under `runs/<timestamp>`.
+
+### Searching under a hardware ceiling
+
+`--constrained-max` switches the study to yield-under-ceilings mode: wall coating becomes
+a furnace-lifespan **cost** rather than a hard gate. Pair it with the ceilings you actually
+have — `--furnace-temp-cap-C` activates the `furnace_temperature` gate at that maximum, and
+`--cycle-time-cap-h` activates the `cycle_time` gate at that maximum run hour. `--pin
+DOTTED.PATH` (repeatable) freezes one optimizer knob at its loaded default so the search
+cannot move it.
+
+`--per-eval-timeout-seconds` sets the per-candidate wall-clock timeout (default 2700 s;
+also settable via `REGOLITH_OPTIMIZER_EVAL_TIMEOUT_SECONDS`).
+
+`--two-phase-certify` runs a coarse explore pass and then exact-certifies the top-K
+(`--certify-top-k`). `--certify` re-certifies a single stored result with an exact
+live fill, addressed by `--source-store` (a `cache.sqlite`) plus `--cache-key`.
 
 On success, the CLI prints:
 
@@ -133,16 +168,20 @@ The web form defaults to `staged`. Use a small budget for smoke checks. Increase
 
 ### Fidelity
 
-Current CLI and web fidelity flags are `stub`, `fast`, `high`, and `auto`.
+Current CLI and web fidelity values are `internal-analytical`, `fast`, `high`, and `auto`.
+`stub` is still accepted as **input** on the CLI — argparse canonicalizes it through
+`canonical_backend_name` before validating — but `internal-analytical` is the canonical
+spelling, the one `--help` prints, the only one the web form offers, and the one that
+lands in stored results.
 
 Operator meaning:
 
 | Flag | Honest interpretation |
 | --- | --- |
-| `stub` | Legacy input alias for fast smoke-path evaluation on the `internal-analytical` model; serialized backend identity is `internal-analytical`. Useful for checking profiles, job wiring, artifacts, and UI. Not a real chemistry result. |
-| `fast` | Fast tier label. The study still checks the EvalSpec cache before running a fresh evaluation. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |
-| `high` | High tier label. Intended for real-backend work when a profile/backend config points there. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |
-| `auto` | Valid fidelity label. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |
+| `internal-analytical` | Fast smoke-path evaluation on the built-in analytical model. Legacy input alias: `stub`. Useful for checking profiles, job wiring, artifacts, and UI. Not a real chemistry result. |
+| `fast` | Fast tier label. The study still checks the EvalSpec cache before running a fresh evaluation. In the checked-in profiles, this tier is also `internal-analytical`-backed. |
+| `high` | High tier label. Intended for real-backend work when a profile/backend config points there. In the checked-in profiles, this tier is also `internal-analytical`-backed. |
+| `auto` | Valid fidelity label. In the checked-in profiles, this tier is also `internal-analytical`-backed. |
 
 There is no literal CLI flag named `cached-real` or `real-alphamelts` in the current code. Cached reuse is controlled by the EvalSpec cache, and every fidelity can hit that cache. A cached result is only as honest as the backend that originally produced it.
 
@@ -160,8 +199,10 @@ The web leaderboard is the **Feedstock/Profile Winners** table. It shows:
 - feasible yes/no
 - study date
 - fidelity
+- cache tier
 - backend badge
 - version badge
+- corpus
 - provenance
 - completeness
 - coating
@@ -181,26 +222,42 @@ Winner selection is deterministic: choose the feasible Pareto point with the bes
 
 ### EvalSpec
 
-Stored results are keyed by `EvalSpec`. The important fields are:
+Stored results are keyed by `EvalSpec`. It carries far more fields than are listed here
+(`simulator.optimize.evaluate.EvalSpec` is the authority); the ones an operator normally
+reasons about are:
 
 - `recipe_id`
-- `feedstock_recipe_digest`
 - `feedstock_id`
 - `profile_id`
 - `fidelity`
-- `code_version`
-- `data_digests`
 - `campaign`
 - `backend_name`
 - `mass_kg`
 - `hours`
-- `stage_ids`
-- `stage_patch`
+- `track`
+- `additives_kg`
 - `c5_enabled`
 - `mre_max_voltage_V`
 - `mre_target_species`
+- `runtime_campaign_overrides`
+- `chemistry_kernel`
+- `cost_parameters`
 
-The cache key is a SHA-256 digest of canonical EvalSpec JSON. Same EvalSpec, same code `VERSION`, and same data digests mean the result can be reused.
+The cache key is a SHA-256 digest of canonical EvalSpec JSON
+(`simulator.optimize.evalspec.canonical_evalspec_json`). Two things about that payload
+matter, because they are the opposite of the intuitive answer:
+
+- **`corpus_version` is the sole data-corpus version lever.** Bump it to make the
+  optimizer rerun.
+- **`code_version` and the data/provider fingerprints are NOT key material.** They are
+  carried as provenance only and deliberately excluded, so that editing a comment in a
+  data YAML — or shipping a new code version — does not miss cache. Do not expect a
+  release bump to invalidate stored optimizer results; it will not.
+
+`physics_constraints` (feasibility thresholds and active gates) *is* first-class key
+material, because a threshold change changes verdicts and must not be served from cache.
+Owner-ratified default `cost_parameters` serialize away, so runs at the defaults share one
+cache identity.
 
 ### Backend Badge
 
@@ -221,6 +278,11 @@ The version badge compares the stored result's code version with the current `VE
 - `unknown`: stored result did not record a version.
 
 Use stale results as historical data, not as fresh optimizer evidence.
+
+The badge is advisory, not enforcement: code version is provenance and not cache-key
+material (see EvalSpec above), so a `stale` result will still be served from cache. Judging
+whether an old result is still trustworthy is the operator's call, which is exactly why the
+badge is shown.
 
 ## Fail-Loud Behavior
 
