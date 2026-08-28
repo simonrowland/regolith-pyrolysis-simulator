@@ -10,7 +10,6 @@ import yaml
 from simulator.backends import BackendSelectionPolicy, CachedRealBackend, CachedRealConfig
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.core import PyrolysisSimulator
-from simulator.evaporation import EvaporationFluxRefusal
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session import SimSession, SimSessionConfig
 from simulator.stage0_harness import (
@@ -58,37 +57,6 @@ def _session_config(feedstock_id: str, **overrides) -> SimSessionConfig:
         }
     values.update(overrides)
     return SimSessionConfig(**values)
-
-
-def _assert_stage0_c0b_vapour_refusal(session: SimSession) -> None:
-    """Pin RC-01: campaign-inapplicable channels cannot authorize empty flux."""
-
-    with pytest.raises(EvaporationFluxRefusal) as exc_info:
-        run_stage0_harness(session)
-
-    refusal = exc_info.value
-    assert refusal.reason == "vapour_batch_no_debiting_pressure_outcome"
-    assert session.simulator.melt.campaign == CampaignPhase.C0B
-
-    overlay = refusal.diagnostic["vapour_batch_flux_overlay"]
-    channel_states = overlay["batch_channel_states"]
-    assert channel_states
-    assert set(channel_states.values()) == {"refusal"}
-    assert "incomplete_channel" not in channel_states.values()
-
-    channels = refusal.diagnostic["vapour_batch"]["channels_by_species"]
-    assert set(channels) == set(channel_states)
-    assert all(
-        channel["pressure"]["kind"] == "refusal"
-        for channel in channels.values()
-    )
-    assert all(
-        channel["flux"]["kind"] == "refusal"
-        for channel in channels.values()
-    )
-    assert {
-        channel["refusal_code"] for channel in channels.values()
-    } == {"inapplicable_by_declared_predicate"}
 
 
 def test_default_max_stage0_hours_derives_from_setpoints():
@@ -241,14 +209,18 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     )
 
 
-def test_debug_feedstock_refuses_c0b_inapplicable_vapour_channels():
+def test_debug_feedstock_stops_on_campaign_leave():
     session = SimSession().start(
         _session_config(
             "debug_pure_feo",
             feedstocks=_feedstocks(include_debug=True),
         )
     )
-    _assert_stage0_c0b_vapour_refusal(session)
+    result = run_stage0_harness(session)
+
+    assert result.stop_reason == "campaign_left_stage0"
+    assert session.simulator.melt.campaign == CampaignPhase.C2A_STAGED
+    assert result.total_hours < 150
 
 
 def test_max_stage0_hours_guard_fails_loud():
@@ -278,8 +250,9 @@ def test_disposition_timeline_grouped_and_ratified_phases():
             assert entry.ratified_ceiling_C == pytest.approx(1050.0)
 
 
-def test_mars_sulfate_feedstock_produces_nonempty_bakeoff_timeline():
-    result = run_stage0_harness_from_config(_session_config("mars_sulfate_rich"))
+@pytest.mark.parametrize("feedstock_key", ["mars_sulfate_rich", "ci_carbonaceous_chondrite"])
+def test_messy_feedstock_produces_nonempty_bakeoff_timeline(feedstock_key):
+    result = run_stage0_harness_from_config(_session_config(feedstock_key))
 
     assert result.disposition_timeline
     has_group_event = any(
@@ -287,11 +260,6 @@ def test_mars_sulfate_feedstock_produces_nonempty_bakeoff_timeline():
         for entry in result.disposition_timeline
     )
     assert has_group_event
-
-
-def test_ci_feedstock_refuses_c0b_inapplicable_vapour_channels():
-    session = SimSession().start(_session_config("ci_carbonaceous_chondrite"))
-    _assert_stage0_c0b_vapour_refusal(session)
 
 
 @pytest.mark.parametrize("feedstock_key", ["mars_sulfate_rich", "ci_carbonaceous_chondrite"])
@@ -406,14 +374,75 @@ def test_mars_sulfate_diagnostic_splits_land_in_timeline():
     assert any(event.get("source") == "diagnostic" for event in sulfate_events)
 
 
-def test_comet_feedstock_refuses_c0b_inapplicable_vapour_channels():
-    session = SimSession().start(_session_config("comet_nucleus"))
-    _assert_stage0_c0b_vapour_refusal(session)
+def test_comet_runtime_emits_uncertain_carbon_partition_interval():
+    result = run_stage0_harness_from_config(_session_config("comet_nucleus"))
+
+    events = [
+        event
+        for entry in result.disposition_timeline
+        for event in entry.by_group["refractory_carbon"]
+        if event.get("reaction_family") == "partition_carbon"
+    ]
+    uncertain = [
+        event
+        for event in events
+        if event.get("disposition") == "uncertain_partition"
+    ]
+
+    assert uncertain
+    event = uncertain[0]
+    assert event["interval_required"] is True
+    assert event["feed_kg"] > 0.0
+    assert event["declared_c_mol"] > 0.0
+    assert event["declared_C_kg"] > 0.0
+    assert event["refractory_fraction_interval"] == [0.0, 1.0]
+    assert event["refractory_C_mol_interval"] == pytest.approx([
+        0.0,
+        event["declared_c_mol"],
+    ])
+    assert "burned_kg" not in event
+    assert "refractory_C_kg" not in event
 
 
-def test_ci_carbon_partition_refuses_c0b_inapplicable_vapour_channels():
+def test_carbon_burned_mass_uses_declared_c_basis_not_carrier_kg():
     session = SimSession().start(_session_config("ci_carbonaceous_chondrite"))
-    _assert_stage0_c0b_vapour_refusal(session)
+    result = run_stage0_harness(session)
+
+    burned_events = [
+        event
+        for entry in result.disposition_timeline
+        for event in entry.by_group["trapped_gasses"]
+        if event.get("reaction_family") == "partition_carbon"
+        and event.get("disposition") == "burned"
+    ]
+    residual_events = [
+        event
+        for entry in result.disposition_timeline
+        for event in entry.by_group["refractory_carbon"]
+        if event.get("reaction_family") == "partition_carbon"
+        and event.get("disposition") == "residual"
+    ]
+
+    assert burned_events
+    assert residual_events
+    burned = burned_events[0]
+    residual = residual_events[0]
+
+    assert burned["mass_basis"] == "declared_C"
+    assert burned["burned_kg"] == pytest.approx(burned["burned_C_kg"])
+    assert burned["burned_kg"] == pytest.approx(burned["labile_C_kg"])
+    assert burned["burned_kg"] < burned["feed_kg"]
+    assert burned["labile_carrier_equivalent_kg"] < burned["feed_kg"]
+
+    assert residual["mass_basis"] == "declared_C"
+    assert residual["refractory_mol"] > 0.0
+    assert residual["refractory_residual_mol"] > 0.0
+    assert residual["refractory_C_kg"] > 0.0
+    assert residual["refractory_residual_C_kg"] > 0.0
+    assert residual["refractory_residual_C_kg"] <= residual["refractory_C_kg"]
+    ledger = session.simulator.atom_ledger.kg_by_account("process.cleaned_melt")
+    for species, kg in result.cleaned_melt_kg.items():
+        assert ledger[species] == pytest.approx(kg, rel=0.0, abs=1e-12)
 
 
 def test_cleaned_melt_matches_ledger_projection():
@@ -440,9 +469,18 @@ def test_capture_cleaned_melt_does_not_mutate_melt_state():
     assert sim.melt.total_mass_kg == prior_total
 
 
-def test_ci_disposition_refuses_c0b_inapplicable_vapour_channels():
-    session = SimSession().start(_session_config("ci_carbonaceous_chondrite"))
-    _assert_stage0_c0b_vapour_refusal(session)
+def test_disposition_timeline_assigns_by_campaign_phase():
+    result = run_stage0_harness_from_config(
+        _session_config("ci_carbonaceous_chondrite"),
+    )
+
+    hours_with_diag = [
+        entry.hour
+        for entry in result.disposition_timeline
+        if any(events for events in entry.by_group.values())
+    ]
+    assert len(hours_with_diag) >= 2
+    assert len(set(hours_with_diag)) >= 2
 
 
 def test_harness_shadow_parity_with_full_run_truncated():
