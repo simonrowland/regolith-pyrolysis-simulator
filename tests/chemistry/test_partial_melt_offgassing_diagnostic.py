@@ -7,6 +7,12 @@ import pytest
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.runner import build_per_hour_summary
+from simulator.vapour_rail.batch import (
+    FluxEligible,
+    PressureValue,
+    VapourAnswer,
+    VapourBatch,
+)
 from tests.chemistry.conftest import _build_sim
 
 
@@ -33,6 +39,38 @@ def _install_flux_dispatch(monkeypatch, sim, rates):
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch_only)
 
 
+def _install_eligible_vapour_batch(sim):
+    """Typed VR-11 seam: equilibrium Pa become flux-eligible batch answers."""
+
+    sim._last_vapour_batch_resolve_error = {}
+
+    def _resolve(equilibrium, *, temperature_K, effective_pressure_source):
+        del temperature_K
+        channels = {
+            species_id: VapourAnswer(
+                species_id=species_id,
+                pressure=PressureValue(pa=float(pressure_pa)),
+                selected_runtime_pressure=PressureValue(pa=float(pressure_pa)),
+                flux=FluxEligible(alpha_ref=f"alpha:{species_id}"),
+                source_label="test_partial_melt_passthrough",
+                formula_id=species_id,
+                source_account="process.cleaned_melt",
+                solve_group_id=f"test:{species_id}",
+                state_fingerprint="state:test",
+                validation_status="pending_validation",
+            )
+            for species_id, pressure_pa in equilibrium.vapor_pressures_Pa.items()
+        }
+        return VapourBatch(
+            requested_species_ids=frozenset(channels),
+            channels_by_species=channels,
+            flux_active_species_ids=frozenset(channels),
+        )
+
+    sim._resolve_evaporation_vapour_batch = _resolve
+    return sim
+
+
 def test_partial_melt_offgassing_diagnostic_warns_on_partition_fallback(
     monkeypatch,
     vapor_pressure_data,
@@ -41,6 +79,7 @@ def test_partial_melt_offgassing_diagnostic_warns_on_partition_fallback(
 ):
     sim = _sim(vapor_pressure_data, feedstocks_data, setpoints_data)
     _install_flux_dispatch(monkeypatch, sim, {'Na': 0.01, 'K': 0.002})
+    _install_eligible_vapour_batch(sim)
 
     equilibrium = EquilibriumResult(
         temperature_C=1150.0,
@@ -74,6 +113,7 @@ def test_partial_melt_offgassing_diagnostic_uses_phase_engine_liquid_comp(
 ):
     sim = _sim(vapor_pressure_data, feedstocks_data, setpoints_data)
     _install_flux_dispatch(monkeypatch, sim, {'Na': 0.01, 'K': 0.002})
+    _install_eligible_vapour_batch(sim)
 
     equilibrium = EquilibriumResult(
         temperature_C=1150.0,
