@@ -127,6 +127,8 @@ def test_purity_no_ledger_provider_or_melt_imports() -> None:
         "dataclasses",
         "dataclasses.dataclass",
         "math",
+        "simulator.scalar_boundary",
+        "simulator.scalar_boundary.is_declared_real_scalar",
     }
     assert all("melt_backend" not in module for module in modules)
     assert all("inventory" not in module for module in modules)
