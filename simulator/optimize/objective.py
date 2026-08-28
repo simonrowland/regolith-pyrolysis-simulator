@@ -1987,13 +1987,27 @@ def _cumulative_wall_deposit_by_segment_species_kg(
     for snapshot in snapshots:
         if _snapshot_hour(snapshot) > hour:
             continue
-        # Empty mapping is a measured zero. Missing/None/non-mapping is
-        # unmeasured and must refuse; silent skip prices it as never-fouling.
+        # ABSENT and MALFORMED are different cases and get different answers.
+        #
+        # A snapshot that never carried the field at all is UNKNOWN COVERAGE, not
+        # a defect: the authority layer already represents that first-class
+        # (wall_deposit_coverage_unknown, non-authoritative) and it does not
+        # hard-block. Coating is a continuous rate-to-lifespan model, not a gate,
+        # so raising here would convert a representable unknown into an abort --
+        # the over-correction the three-category doctrine warns about. Skip it and
+        # let the authority layer mark it.
+        #
+        # A field that is PRESENT but None, a non-Mapping, or the wrong shape is
+        # corrupt input (category 1) and must refuse. Silently treating it as
+        # "no deposits" is fail-open: it prices the furnace as never-fouling on
+        # the strength of data we could not read.
         raw = getattr(snapshot, "wall_deposit_by_segment_species_delta", _MISSING)
+        if raw is _MISSING:
+            continue
         if not isinstance(raw, Mapping):
             raise ObjectiveComputationError(
-                "unmeasured wall_deposit_by_segment_species_delta "
-                "cannot be treated as zero deposit"
+                "malformed wall_deposit_by_segment_species_delta "
+                f"({type(raw).__name__}) cannot be treated as zero deposit"
             )
         for key, kg in raw.items():
             if not isinstance(key, tuple) or len(key) != 2:

@@ -1323,9 +1323,8 @@ def test_furnace_amortization_requires_positive_floor_when_multiplier_relaxed() 
     assert fouling > clean
 
 
-_UNMEASURED_WALL_DEPOSIT_REFUSAL = (
-    "unmeasured wall_deposit_by_segment_species_delta "
-    "cannot be treated as zero deposit"
+_MALFORMED_WALL_DEPOSIT_REFUSAL = (
+    "malformed wall_deposit_by_segment_species_delta"
 )
 
 
@@ -1338,17 +1337,39 @@ def _wall_delta_snapshot(hour: int, delta: object | None, *, present: bool = Tru
 @pytest.mark.parametrize(
     "kwargs",
     (
-        pytest.param({}, id="absent"),
         pytest.param({"wall_deposit_by_segment_species_delta": None}, id="none"),
         pytest.param({"wall_deposit_by_segment_species_delta": "x"}, id="non-mapping"),
+        pytest.param({"wall_deposit_by_segment_species_delta": [1, 2]}, id="list"),
     ),
 )
-def test_unmeasured_wall_deposit_delta_cannot_be_treated_as_zero_deposit(
+def test_malformed_wall_deposit_delta_cannot_be_treated_as_zero_deposit(
     kwargs: dict[str, object],
 ) -> None:
+    """A field that is PRESENT but unreadable is corrupt input and must refuse.
+
+    Treating it as "no deposits" is fail-open: it prices the furnace as
+    never-fouling on the strength of data we could not read.
+    """
     snapshot = SimpleNamespace(hour=1, **kwargs)
-    with pytest.raises(ObjectiveComputationError, match=_UNMEASURED_WALL_DEPOSIT_REFUSAL):
+    with pytest.raises(ObjectiveComputationError, match=_MALFORMED_WALL_DEPOSIT_REFUSAL):
         objective_module._cumulative_wall_deposit_by_segment_species_kg((snapshot,), 1)
+
+
+def test_absent_wall_deposit_delta_is_representable_not_a_refusal() -> None:
+    """★ ABSENT is NOT malformed, and must NOT raise.
+
+    A snapshot that never carried the field is UNKNOWN COVERAGE. The authority
+    layer represents that first-class (wall_deposit_coverage_unknown,
+    non-authoritative) and does not hard-block, because coating is a continuous
+    rate-to-lifespan model rather than a gate. Raising here would convert a
+    representable unknown into an abort -- the over-correction the
+    three-category doctrine warns against, and it would break the seam contract
+    that absence yields {} so the authority layer can mark it.
+    """
+    absent = SimpleNamespace(hour=1)
+    assert objective_module._cumulative_wall_deposit_by_segment_species_kg(
+        (absent,), 1
+    ) == {}
 
 
 def test_measured_zero_wall_deposit_still_prices_as_never_fouling() -> None:
@@ -1384,38 +1405,43 @@ def test_unmeasured_wall_deposit_delta_is_distinguishable_from_measured_zero() -
         (_wall_delta_snapshot(1, {}),), 1
     )
     assert measured_zero == {}
-    unmeasured = (
-        _wall_delta_snapshot(1, None, present=False),
+    malformed = (
         _wall_delta_snapshot(1, None),
         _wall_delta_snapshot(1, "x"),
     )
-    for snapshot in unmeasured:
+    for snapshot in malformed:
         with pytest.raises(
-            ObjectiveComputationError, match=_UNMEASURED_WALL_DEPOSIT_REFUSAL
+            ObjectiveComputationError, match=_MALFORMED_WALL_DEPOSIT_REFUSAL
         ):
             objective_module._cumulative_wall_deposit_by_segment_species_kg(
                 (snapshot,), 1
             )
-
-
-def test_unmeasured_in_window_hour_refuses_and_later_hour_does_not_poison() -> None:
-    measured_zero = _wall_delta_snapshot(1, {})
-    later_unmeasured = _wall_delta_snapshot(2, None, present=False)
+    # ABSENT is the third case and behaves differently on purpose: it yields {}
+    # so the authority layer can mark it wall_deposit_coverage_unknown, rather
+    # than aborting the run.
     assert objective_module._cumulative_wall_deposit_by_segment_species_kg(
-        (measured_zero, later_unmeasured), 1
+        (_wall_delta_snapshot(1, None, present=False),), 1
+    ) == {}
+
+
+def test_malformed_in_window_hour_refuses_and_later_hour_does_not_poison() -> None:
+    measured_zero = _wall_delta_snapshot(1, {})
+    later_malformed = _wall_delta_snapshot(2, None)
+    assert objective_module._cumulative_wall_deposit_by_segment_species_kg(
+        (measured_zero, later_malformed), 1
     ) == {}
     control = _wall_delta_snapshot(1, {("duct", "SiO"): 0.75})
     assert objective_module._cumulative_wall_deposit_by_segment_species_kg(
         (control,), 1
     ) == {("duct", "SiO"): 0.75}
-    with pytest.raises(ObjectiveComputationError, match=_UNMEASURED_WALL_DEPOSIT_REFUSAL):
+    with pytest.raises(ObjectiveComputationError, match=_MALFORMED_WALL_DEPOSIT_REFUSAL):
         objective_module._cumulative_wall_deposit_by_segment_species_kg(
-            (control, later_unmeasured), 2
+            (control, later_malformed), 2
         )
-    with pytest.raises(ObjectiveComputationError, match=_UNMEASURED_WALL_DEPOSIT_REFUSAL):
+    with pytest.raises(ObjectiveComputationError, match=_MALFORMED_WALL_DEPOSIT_REFUSAL):
         objective_module._tap_coating_product_summary(
             SimpleNamespace(),
-            (later_unmeasured,),
+            (later_malformed,),
             2,
         )
 
