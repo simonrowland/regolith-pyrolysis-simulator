@@ -208,33 +208,30 @@ def test_series_flux_finite_out_of_range_regime_factor_clamps_to_bounds():
     assert flux_low == pytest.approx(flux_viscous, rel=1e-12)
 
 
-@pytest.mark.parametrize(
-    "bad_field,bad_value",
-    [
-        ("T_surface_K", float("nan")),
-        ("T_surface_K", float("inf")),
-        ("T_surface_K", -1.0),
-        ("P_local_pa", float("nan")),
-        ("alpha_s", float("nan")),
-        ("pipe_diameter_m", float("nan")),
-        ("T_gas_K", float("nan")),
-        ("T_gas_K", float("inf")),
-    ],
-)
-def test_series_flux_non_finite_inputs_fail_closed(bad_field, bad_value):
-    """Codex /challenge Phase B P1: any non-finite physical input
-    must fail closed (return ``0.0``) rather than propagate ``NaN``
-    or ``+inf`` into the downstream ledger. The mass-balance closure
-    invariant (≤5e-12 % per AGENTS.md) cannot tolerate poisoned fluxes."""
-    flux = _call(**{bad_field: bad_value})
-    assert flux == 0.0
+# b-304 note: the category-1 refusal battery for degenerate inputs to
+# this helper lives in tests/test_condensation_input_refusals.py (the
+# module's refusal-test home). What stays here are the category-3 real
+# limits that must survive the b-304 fix unchanged.
 
 
 def test_series_flux_zero_alpha_returns_zero():
-    """Existing alpha-gate (Tier 3 species without measured alpha) must
-    stay intact. ``alpha_s = 0`` short-circuits the helper before the
-    new regime / sanitisation branches."""
+    """Category 3 (proven zero / real limit), kept deliberately:
+    ``alpha_s == 0.0`` exactly is the physical limit of a perfectly
+    non-sticking surface — the flux law ``J = alpha_s * J_incident``
+    evaluates to a true zero there. The data contract agrees:
+    ``_validate_sticking_value`` admits 0.0 within [0, 1] at load time,
+    so a contract-legal value cannot be refused at runtime. If policy
+    ever wants ``alpha_s = 0`` treated as "no data", that belongs in
+    ``_validate_sticking_value`` at load time, not in this hot path."""
     assert _call(alpha_s=0.0) == 0.0
+
+
+def test_series_flux_zero_local_pressure_returns_zero():
+    """Category 3 continuity (b-304 must not regress this): with no local
+    vapor pressure there is no supersaturation, hence genuinely no
+    deposition. This legitimate no-driving-force zero stays ``0.0`` and
+    is NOT converted into a refusal."""
+    assert _call(P_local_pa=0.0) == 0.0
 
 
 def test_series_flux_below_saturation_returns_zero():

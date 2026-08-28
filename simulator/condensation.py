@@ -5836,6 +5836,96 @@ class WallSaturationPressureRefusal(RuntimeError):
         )
 
 
+class DepositionInputRefusal(ValueError):
+    """Category-1 refusal for degenerate wall-deposition flux inputs.
+
+    Three-category fail-closed rule (b-304): for a deposition model,
+    returning 0.0 on invalid input is failing OPEN — zero wall deposit is
+    the OPTIMISTIC answer and propagates to ``campaigns_to_resinter`` ->
+    "this furnace never needs re-sintering". A zero-diameter pipe is not
+    a pipe that deposits nothing; it is not a pipe. So non-physical
+    geometry/temperatures, sticking coefficients outside [0, 1], and any
+    non-finite input raise instead of minting a silent zero.
+
+    ValueError base matches the module's invalid-input convention
+    (``coating_rate.continuous_wall_deposition_flux``,
+    ``_alpha_s_evaluation``, ``_condensation_efficiency``);
+    ``terminal_refusal`` lets the engine restore the attempted hour
+    (``core._restore_terminal_refusal_hour_state``).
+    """
+
+    terminal_refusal = True
+
+    def __init__(self, parameter: str, value: Any, reason: str) -> None:
+        self.parameter = str(parameter)
+        self.value = value
+        self.reason = str(reason)
+        super().__init__(
+            "deposition_input_refused: "
+            f"parameter={self.parameter} value={self.value!r} "
+            f"reason={self.reason}"
+        )
+
+
+def _deposition_finite_scalar(parameter: str, raw: Any) -> float:
+    """Coerce one deposition-flux input to a finite float or refuse."""
+    if isinstance(raw, bool):
+        raise DepositionInputRefusal(
+            parameter, raw, "must be numeric, not boolean"
+        )
+    try:
+        value = float(raw)
+    except (TypeError, ValueError) as exc:
+        raise DepositionInputRefusal(
+            parameter, raw, "must be numeric"
+        ) from exc
+    if not math.isfinite(value):
+        raise DepositionInputRefusal(parameter, raw, "must be finite")
+    return value
+
+
+def _validate_deposition_flux_inputs(
+    P_local_pa: Any,
+    T_surface_K: Any,
+    alpha_s: Any,
+) -> tuple[float, float, float]:
+    """Category-1 gate shared by the wall-deposition flux helpers.
+
+    Returns the coerced ``(P_local_pa, T_surface_K, alpha_s)`` floats or
+    raises ``DepositionInputRefusal`` naming the offending parameter.
+
+    Deliberately NOT refused here:
+
+    * ``alpha_s == 0.0`` exactly — category-3 real limit (a perfectly
+      non-sticking surface deposits nothing); ``_validate_sticking_value``
+      admits 0.0 within [0, 1] at load time, so a contract-legal value
+      cannot be a runtime refusal. The callers keep its true zero.
+    * finite ``P_local_pa <= 0.0`` — category-3 no-driving-force zero
+      (no supersaturation); the ``driving_pressure_pa <= 0.0`` path
+      downstream owns it. Only non-finite pressure is category 1.
+
+    ``alpha_s > 1.0`` IS refused: the sticking coefficient is a
+    probability, and both the load-time validator and the runtime
+    evaluator (``_alpha_s_evaluation``) already constrain it to [0, 1].
+    """
+    P_local_value = _deposition_finite_scalar("P_local_pa", P_local_pa)
+    T_surface_value = _deposition_finite_scalar("T_surface_K", T_surface_K)
+    alpha_value = _deposition_finite_scalar("alpha_s", alpha_s)
+    if T_surface_value <= 0.0:
+        raise DepositionInputRefusal(
+            "T_surface_K",
+            T_surface_K,
+            "must be above absolute zero",
+        )
+    if not 0.0 <= alpha_value <= 1.0:
+        raise DepositionInputRefusal(
+            "alpha_s",
+            alpha_s,
+            "sticking coefficient must be within [0, 1]",
+        )
+    return P_local_value, T_surface_value, alpha_value
+
+
 def _wall_antoine_temperature_relation(
     species: str,
     T_surface_K: float,
@@ -6029,6 +6119,20 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
+    # b-304: same category-1 gate as the series-resistance helper below.
+    # Pre-fix this helper had NO input gate: alpha_s multiplies the flux
+    # directly, so alpha_s = -1 returned a NEGATIVE deposition flux
+    # (silently un-depositing wall inventory) and non-finite pressure
+    # could mint +inf into the downstream ledger.
+    P_local_pa, T_surface_K, alpha_s = _validate_deposition_flux_inputs(
+        P_local_pa,
+        T_surface_K,
+        alpha_s,
+    )
+    if alpha_s == 0.0:
+        # Category-3 real limit (see the series helper's gate comment):
+        # a perfectly non-sticking surface deposits nothing.
+        return 0.0
     driving_pressure_pa = _wall_deposition_driving_pressure_pa(
         species,
         P_local_pa,
@@ -6131,19 +6235,76 @@ def _series_resistance_deposition_flux_mol_m2_s(
     Sh ≈ 9.0 for backward compatibility. See
     ``_stirring_enhanced_sherwood`` for the Frössling rationale.
 
-    Returns 0 when there is no driving force (physisorber
-    ``P_local <= P_sat`` at ``T_surface``; reactive species use the
-    product-P_sat floor) or when the pipe geometry is degenerate.
+    Returns 0 only for category-3 real limits: no driving force
+    (physisorber ``P_local <= P_sat`` at ``T_surface``; reactive species
+    use the product-P_sat floor) or ``alpha_s == 0.0`` exactly (a
+    perfectly non-sticking surface — see the gate comment below).
+    Category-1 degenerate inputs — non-positive pipe diameter or
+    absolute temperatures, sticking coefficient outside [0, 1], any
+    non-finite input — raise ``DepositionInputRefusal`` instead of
+    returning a silent 0.0: for a deposition model zero wall deposit is
+    the OPTIMISTIC answer (it propagates to ``campaigns_to_resinter`` ->
+    "never re-sinter"), so an invalid question must not mint it (b-304).
     """
-    # Defensive input validation: any non-finite or non-physical input
-    # in this hot path silently propagates through the rate-coefficient
-    # math and out the other side as NaN/inf fluxes that poison the
-    # downstream ledger. Codex pre-0.5.2 Phase B P1 (NaN propagation +
-    # regime_factor escape route). Fail closed at the gate.
-    if pipe_diameter_m <= 0.0 or alpha_s <= 0.0 or T_surface_K <= 0.0:
-        return 0.0
-    if not (math.isfinite(pipe_diameter_m) and math.isfinite(alpha_s)
-            and math.isfinite(P_local_pa) and math.isfinite(T_surface_K)):
+    # b-304 three-category fail-closed discrimination. The pre-b-304 gate
+    # here ("Fail closed at the gate") returned a silent 0.0 for every
+    # degenerate input — but for a deposition model a returned 0.0 is
+    # failing OPEN: zero wall deposit is the OPTIMISTIC answer and
+    # propagates to campaigns_to_resinter -> "this furnace never needs
+    # re-sintering". Split by category:
+    #
+    #   (1) MISSING / INVALID INPUT -> DepositionInputRefusal. A
+    #       zero-diameter pipe is not a pipe that deposits nothing; it
+    #       is not a pipe. Non-positive absolute temperatures, sticking
+    #       coefficients outside [0, 1], and any non-finite input are
+    #       malformed questions, not zero answers. The refusal raises
+    #       even when diagnostic_out is provided: a flagged 0.0 would
+    #       still mint the optimistic zero into the ledger for any
+    #       caller that does not audit the flag, so no flux value is
+    #       minted at all. terminal_refusal = True lets the engine
+    #       restore the attempted hour
+    #       (core._restore_terminal_refusal_hour_state).
+    #   (3) PROVEN ZERO / REAL LIMIT -> keep the zero. alpha_s == 0.0
+    #       exactly is the physical limit of a perfectly non-sticking
+    #       surface: J = alpha_s * J_incident is a true zero there.
+    #       _validate_sticking_value admits 0.0 within [0, 1] at load
+    #       time, so runtime cannot refuse a contract-legal value; if
+    #       policy ever wants alpha_s = 0 treated as "no data", that
+    #       belongs in _validate_sticking_value at load time, not in
+    #       this hot path. The other category-3 zero is
+    #       driving_pressure_pa <= 0.0 below (P_local <= P_sat -> no
+    #       supersaturation -> genuinely no deposition); it stays a
+    #       plain 0.0.
+    P_local_pa, T_surface_K, alpha_s = _validate_deposition_flux_inputs(
+        P_local_pa,
+        T_surface_K,
+        alpha_s,
+    )
+    pipe_diameter_m = _deposition_finite_scalar(
+        "pipe_diameter_m",
+        pipe_diameter_m,
+    )
+    if pipe_diameter_m <= 0.0:
+        raise DepositionInputRefusal(
+            "pipe_diameter_m",
+            pipe_diameter_m,
+            "must be > 0; a zero-diameter pipe is not a pipe",
+        )
+    if T_gas_K is None:
+        effective_T_gas_K = T_surface_K
+    else:
+        # T_gas_K is a temperature input, same category-1 class as
+        # T_surface_K — refuse (pre-b-304 this was another silent 0.0).
+        effective_T_gas_K = _deposition_finite_scalar("T_gas_K", T_gas_K)
+        if effective_T_gas_K <= 0.0:
+            raise DepositionInputRefusal(
+                "T_gas_K",
+                T_gas_K,
+                "must be above absolute zero",
+            )
+    if alpha_s == 0.0:
+        # Category 3 (see above): perfectly non-sticking surface; the
+        # zero is real, not a refusal.
         return 0.0
     driving_pressure_pa = _wall_deposition_driving_pressure_pa(
         species,
@@ -6160,11 +6321,6 @@ def _series_resistance_deposition_flux_mol_m2_s(
     )
     if driving_pressure_pa <= 0.0:
         return 0.0
-
-    _t_gas_raw = float(T_gas_K) if T_gas_K is not None else T_surface_K
-    if not math.isfinite(_t_gas_raw) or _t_gas_raw <= 0.0:
-        return 0.0
-    effective_T_gas_K = _t_gas_raw
 
     # Incoming HKL incidence is J_inc = p/sqrt(2*pi*m*k_B*T_gas), so the
     # kinetic gas temperature belongs in this coefficient. T_surface remains
