@@ -635,12 +635,6 @@ class AlphaMELTSProvider(ChemistryProvider):
                 species_formula_registry=species_registry,
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            reason = (
-                getattr(exc, 'backend_failure_reason_code', None)
-                or getattr(exc, 'backend_status_reason', None)
-                or getattr(getattr(exc, 'cause', None), 'value', None)
-            )
-            category = getattr(exc, 'backend_failure_category', None)
             typed_failure = liquidus_sample_error_from_exception(exc)
             if typed_failure is not None:
                 status = typed_failure.status
@@ -649,11 +643,9 @@ class AlphaMELTSProvider(ChemistryProvider):
                     'backend_failure_category'
                 ]
             else:
-                status = (
-                    'out_of_domain'
-                    if reason == 'subprocess_pressure_below_minimum'
-                    else 'not_converged'
-                )
+                status = 'not_converged'
+                reason = OutOfDomainReason.NOT_CONVERGED.value
+                category = status
             result = LiquidusSolidusResult(
                 status=status,
                 warnings=(f'AlphaMELTS liquidus finder failed: {exc}',),

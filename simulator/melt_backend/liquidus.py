@@ -8,7 +8,10 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Optional, Tuple
 
-from simulator.melt_backend.base import LiquidFractionInvalidError
+from simulator.melt_backend.base import (
+    LiquidFractionInvalidError,
+    MeltBackendError,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -91,20 +94,27 @@ class LiquidusSampleError(RuntimeError):
 def liquidus_sample_error_from_exception(
     exc: BaseException,
 ) -> LiquidusSampleError | None:
-    """Project a typed backend refusal without inventing a solver failure."""
+    """Project a backend failure without trusting exception attributes."""
 
     if isinstance(exc, LiquidusSampleError):
         return exc
-    status = str(getattr(exc, 'backend_failure_category', '') or '')
-    if status not in LIQUIDUS_REFUSAL_STATUSES:
-        return None
-    cause = getattr(exc, 'cause', None)
-    reason = (
-        getattr(exc, 'backend_failure_reason_code', None)
-        or getattr(exc, 'backend_status_reason', None)
-        or getattr(cause, 'value', None)
-        or status
-    )
+    if isinstance(exc, MeltBackendError):
+        status = str(getattr(exc, 'backend_failure_category', '') or '')
+        if status not in LIQUIDUS_REFUSAL_STATUSES:
+            return None
+        reason = (
+            getattr(exc, 'backend_failure_reason_code', None)
+            or getattr(exc, 'backend_status_reason', None)
+            or status
+        )
+    else:
+        from engines.alphamelts.thermoengine import (
+            thermoengine_failure_disposition_from_exception,
+        )
+
+        disposition = thermoengine_failure_disposition_from_exception(exc)
+        status = disposition.status
+        reason = disposition.reason_code
     diagnostics: dict[str, Any] = {
         'backend_status': status,
         'backend_status_reason': str(reason),

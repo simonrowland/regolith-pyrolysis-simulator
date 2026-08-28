@@ -133,10 +133,21 @@ def test_liquidus_library_boundaries_preserve_typed_policy_refusal() -> None:
         ("ThermoEngineFO2OmittedError", "thermoengine_fo2_omitted"),
     ],
 )
-def test_liquidus_preserves_typed_keep_handle_refusals(
+def test_liquidus_preserves_typed_keep_handle_reasons_as_not_converged(
     exception_name: str,
     expected_reason: str,
 ) -> None:
+    """A kept handle preserves the typed REASON; it does not make it a refusal.
+
+    These three are garbage-payload failures -- an undefined fO2 echo, a NaN
+    field, an omitted echo. The engine RAN and returned something unusable,
+    which is `not_converged`. It did not decline to run, which is `refused`.
+    e91ce754 added this test asserting `refused`, and that was the
+    over-correction its own commit message warned against; two independent
+    reviewers reproduced the consequence. The subject of this test -- that the
+    typed reason survives instead of being laundered into a generic failure --
+    is unchanged and is what the assertions below still check.
+    """
     from engines.alphamelts import thermoengine as thermoengine_module
 
     exception_type = getattr(thermoengine_module, exception_name)
@@ -151,8 +162,8 @@ def test_liquidus_preserves_typed_keep_handle_refusals(
         scan_step_C=100.0,
     )
 
-    assert result.status == "refused"
-    assert result.status != "not_converged"
+    assert result.status == "not_converged"
+    assert result.status != "refused"
     assert result.diagnostics["backend_status_reason"] == expected_reason
 
 

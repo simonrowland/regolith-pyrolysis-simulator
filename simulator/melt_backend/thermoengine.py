@@ -18,6 +18,7 @@ from engines.alphamelts.thermoengine import (
     ThermoEngineTimeoutError,
     ThermoEngineTransport,
     reconstruct_thermoengine_out_of_domain_error,
+    thermoengine_failure_disposition_from_exception,
     thermoengine_refusal_cause_from_exception,
     thermoengine_timeout_cause_from_exception,
 )
@@ -119,39 +120,24 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         raise reconstruct_thermoengine_out_of_domain_error(
                             reason
                         )
-                    raise ImportError(reason)
+                    raise RuntimeError(reason)
             self._engine_version = transport.engine_version
             self._mode = 'thermoengine'
             self._unavailable_reason = None
             return True
-        except (
-            ThermoEngineTimeoutError,
-            ThermoEngineOutOfDomainError,
-            ThermoEngineIsolationError,
-        ) as exc:
-            try:
-                self.close()
-            except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
-                exc.add_note(
-                    f'ThermoEngine cleanup also failed: {cleanup_error}'
-                )
-            raise
-        except EngineWorkerTimeout as exc:
-            # Init wall: unfinished computation, not missing library.
-            # Retype onto the closed timeout set before the generic
-            # ImportError wrap below can mint absence.
-            typed = ThermoEngineTimeoutError(
-                ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT,
-                timeout_s=exc.timeout_s,
-            )
-            try:
-                self.close()
-            except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
-                typed.add_note(
-                    f'ThermoEngine cleanup also failed: {cleanup_error}'
-                )
-            raise typed from exc
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            disposition = thermoengine_failure_disposition_from_exception(exc)
+            classified = disposition.exception
+            if disposition.status != 'unavailable':
+                try:
+                    self.close()
+                except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
+                    classified.add_note(
+                        f'ThermoEngine cleanup also failed: {cleanup_error}'
+                    )
+                if classified is exc:
+                    raise
+                raise classified from exc
             self._thermoengine_import_error = exc
             self._close_after_failure(exc)
             raise ImportError(

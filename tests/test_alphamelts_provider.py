@@ -740,6 +740,63 @@ def test_provider_liquidus_exception_preserves_typed_policy_refusal(
     assert diagnostic.get('backend_status_reason') == cause_name.lower()
 
 
+def test_provider_liquidus_exception_discriminates_type_both_directions():
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineIsolationError,
+        ThermoEngineNonFiniteField,
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+
+    backend = _FakeAlphaMELTSBackend(
+        mode='thermoengine',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    request = _make_request(
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        composition_mol=_basalt_species_mol(),
+    )
+
+    def dispatch_raising(exc):
+        def raise_liquidus(**_kwargs):
+            raise exc
+
+        backend.find_liquidus_solidus = raise_liquidus
+        return provider.dispatch(request)
+
+    refused = dispatch_raising(
+        ThermoEngineIsolationError('isolated worker required')
+    )
+    out_of_domain = dispatch_raising(
+        ThermoEngineOutOfDomainError(
+            ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET
+        )
+    )
+    not_converged = dispatch_raising(
+        ThermoEngineNonFiniteField('Liquid GibbsFreeEnergy is nan')
+    )
+    forged = RuntimeError('solver iteration failed')
+    forged.backend_failure_category = 'refused'
+    forged.backend_status_reason = 'forged_refusal'
+    forged.backend_failure_reason_code = 'forged_refusal'
+    forged_result = dispatch_raising(forged)
+
+    assert refused.status == 'refused'
+    assert out_of_domain.status == 'out_of_domain'
+    for result in (not_converged, forged_result):
+        assert result.status == 'not_converged'
+        assert result.status != 'refused'
+    assert (
+        dict(not_converged.diagnostic or {}).get('backend_status_reason')
+        == 'thermoengine_nonfinite_field'
+    )
+    assert (
+        dict(forged_result.diagnostic or {}).get('backend_status_reason')
+        == 'not_converged'
+    )
+
+
 def test_provider_handles_silicate_equilibrium_intent():
     """Both intents share the same provider entry."""
     backend = _FakeAlphaMELTSBackend(

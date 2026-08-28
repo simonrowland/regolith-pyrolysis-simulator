@@ -58,7 +58,7 @@ class ThermoEngineFO2UndefinedError(ValueError):
     is still the live adapter. Not evidence the adapter is missing.
     """
 
-    backend_failure_category = 'refused'
+    backend_failure_category = 'not_converged'
     backend_status_reason = 'thermoengine_fo2_undefined'
     backend_failure_reason_code = backend_status_reason
 
@@ -70,7 +70,7 @@ class ThermoEngineNonFiniteField(ValueError):
     adapter is missing.
     """
 
-    backend_failure_category = 'refused'
+    backend_failure_category = 'not_converged'
     backend_status_reason = 'thermoengine_nonfinite_field'
     backend_failure_reason_code = backend_status_reason
 
@@ -82,7 +82,7 @@ class ThermoEngineFO2OmittedError(ValueError):
     the live adapter. Not evidence the adapter is missing.
     """
 
-    backend_failure_category = 'refused'
+    backend_failure_category = 'not_converged'
     backend_status_reason = 'thermoengine_fo2_omitted'
     backend_failure_reason_code = backend_status_reason
 
@@ -582,6 +582,74 @@ class ThermoEngineOutOfDomainError(ValueError):
     @property
     def backend_failure_category(self) -> str:
         return STATUS_BY_REFUSAL_CAUSE[self.cause]
+
+
+@dataclass(frozen=True)
+class ThermoEngineFailureDisposition:
+    """Type-keyed public disposition for one ThermoEngine failure."""
+
+    status: str
+    reason_code: str
+    exception: BaseException
+
+
+def thermoengine_failure_disposition_from_exception(
+    exc: BaseException,
+) -> ThermoEngineFailureDisposition:
+    """Classify one failure by exception type, never attached attributes."""
+
+    if isinstance(exc, ThermoEngineOutOfDomainError):
+        return ThermoEngineFailureDisposition(
+            status=STATUS_BY_REFUSAL_CAUSE[exc.cause],
+            reason_code=exc.cause.value,
+            exception=exc,
+        )
+    if isinstance(exc, ThermoEngineIsolationError):
+        return ThermoEngineFailureDisposition(
+            status='refused',
+            reason_code='thermoengine_isolation_required',
+            exception=exc,
+        )
+    if isinstance(
+        exc,
+        (
+            ThermoEngineFO2UndefinedError,
+            ThermoEngineNonFiniteField,
+            ThermoEngineFO2OmittedError,
+        ),
+    ):
+        return ThermoEngineFailureDisposition(
+            status='not_converged',
+            reason_code=str(exc.backend_status_reason),
+            exception=exc,
+        )
+    if isinstance(exc, ThermoEngineTimeoutError):
+        return ThermoEngineFailureDisposition(
+            status=STATUS_BY_TIMEOUT_CAUSE[exc.cause],
+            reason_code=exc.cause.value,
+            exception=exc,
+        )
+    if isinstance(exc, EngineWorkerTimeout):
+        normalized = ThermoEngineTimeoutError(
+            ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT,
+            timeout_s=exc.timeout_s,
+        )
+        return ThermoEngineFailureDisposition(
+            status='not_converged',
+            reason_code=normalized.cause.value,
+            exception=normalized,
+        )
+    if isinstance(exc, ImportError):
+        return ThermoEngineFailureDisposition(
+            status='unavailable',
+            reason_code='thermoengine_adapter_unavailable',
+            exception=exc,
+        )
+    return ThermoEngineFailureDisposition(
+        status='not_converged',
+        reason_code='not_converged',
+        exception=exc,
+    )
 
 
 _FO2_ECHO_TOLERANCE = 1.0e-3
@@ -2027,6 +2095,7 @@ __all__ = (
     'THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS',
     'ThermoEngineFO2OmittedError',
     'ThermoEngineFO2UndefinedError',
+    'ThermoEngineFailureDisposition',
     'ThermoEngineIsolationError',
     'ThermoEngineNonFiniteField',
     'ThermoEngineOutOfDomainError',
@@ -2034,6 +2103,7 @@ __all__ = (
     'ThermoEngineRefusalCause',
     'ThermoEngineTimeoutCause',
     'ThermoEngineTimeoutError',
+    'thermoengine_failure_disposition_from_exception',
     'ThermoEngineTransport',
     'classify_thermoengine_refusal_message',
     'classify_thermoengine_timeout_message',
