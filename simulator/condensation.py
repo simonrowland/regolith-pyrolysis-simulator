@@ -6336,20 +6336,14 @@ def _series_resistance_deposition_flux_mol_m2_s(
     if not math.isfinite(k_hkl_per_pa) or k_hkl_per_pa <= 0.0:
         return 0.0
 
-    # Sanitise ``regime_factor`` BEFORE computing mt_weight. NaN or
-    # out-of-range values previously could route the helper into the
-    # pure-HKL early-return branch even in viscous regime (codex
-    # pre-0.5.2 Phase B P1): e.g. ``regime_factor=2.0`` made
+    # Sanitise ``regime_factor`` BEFORE computing mt_weight.
+    # Finite out-of-range still clamps to [0, 1]: regime_factor=2 made
     # ``1.0 - 2.0 = -1.0`` → ``max(0.0, -1.0) = 0.0`` → free-mol
-    # shortcut fires and returns the unbounded HKL flux. Clamp to
-    # ``[0.0, 1.0]`` and treat non-finite as viscous (``f=0.0``) so the
-    # series-resistance branch carries.
-    try:
-        _f = float(regime_factor)
-    except (TypeError, ValueError):
-        _f = 0.0
-    if not math.isfinite(_f):
-        _f = 0.0
+    # shortcut and the unbounded HKL flux (codex pre-0.5.2 Phase B P1).
+    # That clamp is legitimate. Non-finite is not a bound: coercing NaN
+    # to 0.0 (viscous) understates deposition ~120x, and coercing it to
+    # 1.0 re-opens the HKL shortcut. Invalid input must refuse.
+    _f = _deposition_finite_scalar("regime_factor", regime_factor)
     _f = max(0.0, min(1.0, _f))
     mt_weight = 1.0 - _f
 

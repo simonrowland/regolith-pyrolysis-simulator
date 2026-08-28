@@ -8,9 +8,10 @@ sweep flagged that the new helper's regime limits (`f=0` viscous,
 direct unit coverage. This file fills that gap.
 
 References:
- - Phase B P1 (codex challenge): NaN / out-of-range regime_factor and
+ - Phase B P1 (codex challenge): finite out-of-range regime_factor and
    stir_factor must not silently route to either the unbounded HKL value
-   or the max-Sherwood enhancement.
+   or the max-Sherwood enhancement. Non-finite regime_factor refuses
+   (b-312 F5); coercing it to viscous understates coating.
  - Phase B P1 (gstack review subagent): clamp-asymmetry between the
    condensation Sherwood path and the older evaporation linear-multiplier
    path is closed by canonical ``clamp_stir_factor`` in ``simulator/state``.
@@ -23,6 +24,7 @@ import math
 import pytest
 
 from simulator.condensation import (
+    DepositionInputRefusal,
     _series_resistance_deposition_flux_mol_m2_s,
     _stirring_enhanced_sherwood,
 )
@@ -180,16 +182,18 @@ def test_series_flux_stirring_amplifies_viscous_flux():
     "non_finite",
     [float("nan"), float("inf"), float("-inf")],
 )
-def test_series_flux_non_finite_regime_factor_is_treated_as_viscous(non_finite):
-    """Codex /challenge Phase B P1: non-finite ``regime_factor`` (NaN,
-    +/-inf) previously could route the helper into the free-molecular
-    pure-HKL early-return branch even in viscous regime. The
-    sanitisation treats non-finite as viscous (``f=0``) so the
-    series-resistance branch carries — same result as
-    ``regime_factor = 0.0``."""
-    flux_bad = _call(regime_factor=non_finite)
-    flux_viscous = _call(regime_factor=0.0)
-    assert flux_bad == pytest.approx(flux_viscous, rel=1e-12)
+def test_series_flux_non_finite_regime_factor_refuses(non_finite):
+    """b-312 F5: non-finite ``regime_factor`` is category-1 invalid input.
+
+    Pre-fix, NaN was coerced to viscous ``f=0`` so the series-resistance
+    branch carried. That was the cheap error in the wrong direction for
+    a coating model: Fe at 100 Pa / 1200 K / alpha_s=0.5 understated
+    deposition ~120x relative to free-molecular. Mapping NaN to ``f=1``
+    would re-open the unbounded-HKL shortcut the finite clamp exists to
+    stop. Refuse by name instead of picking a bound.
+    """
+    with pytest.raises(DepositionInputRefusal, match="parameter=regime_factor"):
+        _call(regime_factor=non_finite)
 
 
 def test_series_flux_finite_out_of_range_regime_factor_clamps_to_bounds():

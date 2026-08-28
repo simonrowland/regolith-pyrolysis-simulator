@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any, Mapping
 
 _GROUP_DISPLAY_ORDER = (
@@ -20,10 +21,14 @@ _PARTITION_FIELDS = (
 
 
 def _format_kg(value: Any) -> str:
+    if value is None or value == "":
+        return "unmeasured"
     try:
         kg = float(value)
     except (TypeError, ValueError):
-        kg = 0.0
+        return "unmeasured"
+    if not math.isfinite(kg):
+        return "unmeasured"
     if abs(kg) < 1.0e-9:
         return "0"
     if abs(kg) < 1.0:
@@ -53,10 +58,13 @@ def _format_residual_interval(interval: Any) -> str:
 
 
 def _partition_line(payload: Mapping[str, Any]) -> str:
-    fields = [
-        f"{label}={_format_kg(payload.get(key, 0.0))} kg"
-        for key, label in _PARTITION_FIELDS
-    ]
+    fields = []
+    for key, label in _PARTITION_FIELDS:
+        rendered = _format_kg(payload.get(key))
+        if rendered == "unmeasured":
+            fields.append(f"{label}=unmeasured")
+        else:
+            fields.append(f"{label}={rendered} kg")
     fields.append(
         "residual_interval="
         f"{_format_residual_interval(payload.get('residual_interval'))}"

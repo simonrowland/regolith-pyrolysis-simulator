@@ -2664,6 +2664,7 @@ def wall_deposit_candidate_for_surface_kg(
         return 0.0
 
     from simulator.condensation import (
+        DepositionInputRefusal,
         _flowing_species_partial_pressures_pa,
         _knudsen_number,
         _series_resistance_deposition_flux_mol_m2_s,
@@ -2723,7 +2724,27 @@ def wall_deposit_candidate_for_surface_kg(
         return 0.0
 
     T_wall_K = max(float(wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
-    T_gas_K = max(float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
+    try:
+        gas_temperature_C = float(model.gas_temperature_C)
+    except (TypeError, ValueError) as exc:
+        raise DepositionInputRefusal(
+            "T_gas_K",
+            getattr(model, "gas_temperature_C", None),
+            "must be numeric",
+        ) from exc
+    if not math.isfinite(gas_temperature_C):
+        raise DepositionInputRefusal(
+            "T_gas_K",
+            model.gas_temperature_C,
+            "must be finite",
+        )
+    T_gas_K = gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    if T_gas_K <= 0.0:
+        raise DepositionInputRefusal(
+            "T_gas_K",
+            model.gas_temperature_C,
+            "must be above absolute zero",
+        )
     applied_pipe_diameter_m = (
         float(pipe_diameter_m)
         if pipe_diameter_m is not None
@@ -2928,7 +2949,30 @@ def _wall_geometry_conductance_weight(segment: Any) -> float:
     ladder once carrier/regime plumbing is available for lab surfaces.
     """
 
-    area_m2 = max(0.0, float(getattr(segment, "surface_area_m2", 0.0)))
+    try:
+        raw_area = segment.surface_area_m2
+    except AttributeError as exc:
+        raise AccountingError(
+            "wall geometry surface_area_m2 is missing; "
+            "missing area is not proof of zero deposition weight"
+        ) from exc
+    except ValueError as exc:
+        raise AccountingError(
+            f"wall geometry surface_area_m2 is invalid: {exc}; "
+            "invalid area is not proof of zero deposition weight"
+        ) from exc
+    try:
+        area_m2 = float(raw_area)
+    except (TypeError, ValueError) as exc:
+        raise AccountingError(
+            f"wall geometry surface_area_m2 is not numeric: {raw_area!r}; "
+            "unknown area is not proof of zero deposition weight"
+        ) from exc
+    if not math.isfinite(area_m2) or area_m2 <= 0.0:
+        raise AccountingError(
+            f"wall geometry surface_area_m2 is not a positive finite area: "
+            f"{raw_area!r}; invalid area is not proof of zero deposition weight"
+        )
     view_factor = getattr(segment, "view_factor_from_melt", None)
     line_of_sight = getattr(segment, "line_of_sight_to_melt", None)
     if view_factor is None and line_of_sight is None:
@@ -2952,4 +2996,10 @@ def _wall_geometry_conductance_weight(segment: Any) -> float:
                 f"{view_factor!r}; unknown view factor is not proof of zero "
                 f"deposition weight"
             )
-    return area_m2 * max(0.0, min(1.0, view_factor_value))
+        if not 0.0 <= view_factor_value <= 1.0:
+            raise AccountingError(
+                f"wall geometry view_factor_from_melt is outside [0, 1]: "
+                f"{view_factor!r}; invalid view factor is not proof of zero "
+                f"deposition weight"
+            )
+    return area_m2 * view_factor_value

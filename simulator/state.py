@@ -737,6 +737,28 @@ def declared_wall_deposit_accounts(
     )))
 
 
+def _positive_finite_pipe_dimension(segment_name: str, field: str, raw: Any) -> float:
+    """Coerce one pipe-geometry length to a positive finite float or refuse.
+
+    A zero or negative dimension is not a wall that deposits nothing; it
+    is not a wall. The coating rail must not treat invalid geometry as
+    a clean-furnace zero.
+    """
+    try:
+        value = float(raw)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f"PipeSegment {segment_name!r} {field}={raw!r} is not numeric; "
+            "invalid geometry is not a zero-area pipe"
+        ) from exc
+    if not math.isfinite(value) or value <= 0.0:
+        raise ValueError(
+            f"PipeSegment {segment_name!r} {field}={raw!r} must be a "
+            "positive finite value; invalid geometry is not a zero-area pipe"
+        )
+    return value
+
+
 @dataclass(frozen=True)
 class PipeSegment:
     """Interstage pipe segment where cold-wall deposition can occur."""
@@ -758,15 +780,24 @@ class PipeSegment:
 
     @property
     def surface_area_m2(self) -> float:
-        """Cylindrical wall area for the segment."""
+        """Cylindrical wall area for the segment.
+
+        Degenerate geometry is not a zero-area wall. Clamping
+        negative/zero length or declared area to 0.0 omitted the
+        segment from the coating rail and reported a clean furnace.
+        """
 
         if self.declared_area_m2 is not None:
-            return max(0.0, float(self.declared_area_m2))
-        return (
-            math.pi
-            * max(0.0, float(self.inner_diameter_m))
-            * max(0.0, float(self.length_m))
+            return _positive_finite_pipe_dimension(
+                self.name, "declared_area_m2", self.declared_area_m2,
+            )
+        diameter_m = _positive_finite_pipe_dimension(
+            self.name, "inner_diameter_m", self.inner_diameter_m,
         )
+        length_m = _positive_finite_pipe_dimension(
+            self.name, "length_m", self.length_m,
+        )
+        return math.pi * diameter_m * length_m
 
     @property
     def wall_deposit_account(self) -> str:
