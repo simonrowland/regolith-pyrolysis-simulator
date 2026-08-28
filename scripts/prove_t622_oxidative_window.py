@@ -98,6 +98,7 @@ def _source_activity(
     account_mol: dict[str, float],
     temperature_K: float,
 ) -> tuple[float | None, str | None]:
+    # b-189-exempt: existence probe, no pressure read
     evaluator = compiled.evaluator
     if evaluator is None or not evaluator.activity_exponent:
         return None, None
@@ -166,6 +167,7 @@ def _render() -> str:
     species_by_element: dict[str, list] = defaultdict(list)
     raw_rows: dict[str, dict] = {}
     for species_id, compiled in catalog.species.items():
+        # b-189-exempt: existence probe, no pressure read
         if compiled.evaluator is None:
             continue
         if compiled.code_metadata.source_account != "process.cleaned_melt":
@@ -200,6 +202,7 @@ def _render() -> str:
                 for element in TARGETS:
                     results: list[dict] = []
                     for compiled in species_by_element[element]:
+                        # b-189-exempt: offline oxidative-window proof
                         evaluator = compiled.evaluator
                         assert evaluator is not None
                         raw_row = raw_rows[compiled.species_id]

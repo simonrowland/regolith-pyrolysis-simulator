@@ -2124,8 +2124,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             compiled_species = None
             if not A > 0 and self._vapour_rail_catalog is not None:
                 try:
-                    # b-189-exempt: applicability gated at loop top
                     compiled_species = self._vapour_rail_catalog.species[name]
+                    # b-189-exempt: applicability gated at loop top
                     compiled_evaluator = self._vapour_rail_catalog.evaluator_for(
                         name
                     )
