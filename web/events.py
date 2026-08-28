@@ -2196,6 +2196,105 @@ def _product_story_soundness(product_story: object) -> str:
     return 'ok'
 
 
+def _product_story_account_kg(sim):
+    return {
+        account: dict(sim.atom_ledger.project_account_kg(account) or {})
+        for account in PRODUCT_LEDGER_ACCOUNTS
+        if account != C7_AL_CREDIT_ACCOUNT
+    }
+
+
+def _product_story_extracted_projection(sim, *, account_kg):
+    metal_ingots = {}
+    glass = {}
+    captured_volatiles = {}
+    off_spec_condensate = {}
+
+    for account in METAL_PHASE_ACCOUNTS:
+        for species, mass in account_kg.get(account, {}).items():
+            if species not in (
+                _PRODUCT_STORY_GLASS_SPECIES
+                | _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
+            ):
+                _merge_product_story_mass(metal_ingots, species, mass)
+
+    condensation_stage_species = {}
+    for key, mass in (
+        getattr(sim, '_stage_collection_kg_by_source', {}) or {}
+    ).items():
+        if not isinstance(key, tuple) or len(key) != 3:
+            continue
+        source_account, stage_number, species = key
+        if source_account != CONDENSATION_TRAIN_ACCOUNT:
+            continue
+        condensation_stage_species.setdefault(str(species), []).append(
+            (int(stage_number), float(mass))
+        )
+
+    for species, ledger_mass in account_kg.get(
+        CONDENSATION_TRAIN_ACCOUNT, {}
+    ).items():
+        routed = condensation_stage_species.get(str(species), [])
+        routed_total = sum(max(0.0, mass) for _stage, mass in routed)
+        scale = min(1.0, float(ledger_mass) / routed_total) if routed_total else 0.0
+        accounted = 0.0
+        for stage_number, projected_mass in routed:
+            mass = max(0.0, projected_mass) * scale
+            accounted += mass
+            accepted = species in accepted_species_for_stage_number(stage_number)
+            if (
+                accepted
+                and stage_number == 3
+                and species in _PRODUCT_STORY_GLASS_SPECIES
+            ):
+                target = glass
+            elif (
+                accepted
+                and stage_number == 4
+                and species in _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
+            ):
+                target = captured_volatiles
+            elif (
+                (accepted or (stage_number == 4 and species == 'Ca'))
+                and species in METAL_PRODUCT_SPECIES
+            ):
+                target = metal_ingots
+            else:
+                target = off_spec_condensate
+            _merge_product_story_mass(target, species, mass)
+        _merge_product_story_mass(
+            off_spec_condensate,
+            species,
+            max(0.0, float(ledger_mass) - accounted),
+        )
+
+    oxygen = {}
+    oxygen_partition = {}
+    for account in (*OXYGEN_STORED_ACCOUNTS, *OXYGEN_CAPTURED_ACCOUNTS):
+        account_total = 0.0
+        for species, mass in sim.atom_ledger.project_account_kg(account).items():
+            _merge_product_story_mass(oxygen, species, mass)
+            account_total += float(mass)
+        if account_total > 0.0:
+            oxygen_partition[account] = account_total
+
+    return {
+        'metal_ingots': metal_ingots,
+        'glass': glass,
+        'captured_volatiles': captured_volatiles,
+        'oxygen': oxygen,
+        'oxygen_partition': oxygen_partition,
+        'off_spec_condensate': off_spec_condensate,
+    }
+
+
+def _extracted_product_kg(extracted_projection):
+    return sum(
+        sum(float(mass) for mass in extracted_projection[key].values())
+        for key in ('metal_ingots', 'glass', 'oxygen', 'captured_volatiles')
+    )
+
+
 def _completion_payload(sim):
     final_snapshot = sim._make_snapshot()
     terminal_rump_by_species = sim._terminal_rump_by_species()
@@ -2220,6 +2319,11 @@ def _completion_payload(sim):
         terminal_rump_by_class = _terminal_rump_classes_from_species(
             terminal_rump_by_species
         )
+    product_story_account_kg = _product_story_account_kg(sim)
+    extracted_product_projection = _product_story_extracted_projection(
+        sim,
+        account_kg=product_story_account_kg,
+    )
     try:
         product_story = _product_story_payload(
             sim,
@@ -2254,6 +2358,9 @@ def _completion_payload(sim):
             final_snapshot.inventory.stage0_mass_balance_delta_kg, 3),
         'products': {k: round(v, 2)
                      for k, v in sim.product_ledger().items()},
+        'extracted_product_kg': _extracted_product_kg(
+            extracted_product_projection
+        ),
         'product_story': product_story,
         'product_story_status': product_story_status,
         'terminal_slag_kg': round(sim._terminal_slag_kg(), 2),
@@ -2321,18 +2428,18 @@ def _product_story_bucket(species_kg, **details):
 
 def _product_story_payload(sim, *, terminal_rump_by_species):
     classify_products(sim)
-    account_kg = {
-        account: dict(sim.atom_ledger.project_account_kg(account) or {})
-        for account in PRODUCT_LEDGER_ACCOUNTS
-        if account != C7_AL_CREDIT_ACCOUNT
-    }
-    metal_ingots = {}
-    glass = {}
-    captured_volatiles = {}
+    account_kg = _product_story_account_kg(sim)
+    extracted_projection = _product_story_extracted_projection(
+        sim,
+        account_kg=account_kg,
+    )
+    metal_ingots = dict(extracted_projection['metal_ingots'])
+    glass = dict(extracted_projection['glass'])
+    captured_volatiles = dict(extracted_projection['captured_volatiles'])
     escaped_to_vacuum = {}
     unrecovered_process_inventory = {}
     unclassified = {}
-    off_spec_condensate = {}
+    off_spec_condensate = dict(extracted_projection['off_spec_condensate'])
     wall_deposits = {}
     process_residue = {}
 
@@ -2341,14 +2448,12 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
             if account == TERMINAL_ESCAPE_ACCOUNT:
                 target = escaped_to_vacuum
             elif account in METAL_PHASE_ACCOUNTS:
-                target = (
-                    unrecovered_process_inventory
-                    if species in (
-                        _PRODUCT_STORY_GLASS_SPECIES
-                        | _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
-                    )
-                    else metal_ingots
-                )
+                if species not in (
+                    _PRODUCT_STORY_GLASS_SPECIES
+                    | _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
+                ):
+                    continue
+                target = unrecovered_process_inventory
             elif account == CONDENSATION_TRAIN_ACCOUNT:
                 continue
             elif account.startswith('process.'):
@@ -2358,52 +2463,6 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
             else:
                 target = unclassified
             _merge_product_story_mass(target, species, mass)
-
-    condensation_stage_species = {}
-    for key, mass in (
-        getattr(sim, '_stage_collection_kg_by_source', {}) or {}
-    ).items():
-        if not isinstance(key, tuple) or len(key) != 3:
-            continue
-        source_account, stage_number, species = key
-        if source_account != CONDENSATION_TRAIN_ACCOUNT:
-            continue
-        condensation_stage_species.setdefault(str(species), []).append(
-            (int(stage_number), float(mass))
-        )
-
-    for species, ledger_mass in account_kg.get(
-        CONDENSATION_TRAIN_ACCOUNT, {}
-    ).items():
-        routed = condensation_stage_species.get(str(species), [])
-        routed_total = sum(max(0.0, mass) for _stage, mass in routed)
-        scale = min(1.0, float(ledger_mass) / routed_total) if routed_total else 0.0
-        accounted = 0.0
-        for stage_number, projected_mass in routed:
-            mass = max(0.0, projected_mass) * scale
-            accounted += mass
-            accepted = species in accepted_species_for_stage_number(stage_number)
-            if accepted and stage_number == 3 and species in _PRODUCT_STORY_GLASS_SPECIES:
-                target = glass
-            elif (
-                accepted
-                and stage_number == 4
-                and species in _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
-            ):
-                target = captured_volatiles
-            elif (
-                (accepted or (stage_number == 4 and species == 'Ca'))
-                and species in METAL_PRODUCT_SPECIES
-            ):
-                target = metal_ingots
-            else:
-                target = off_spec_condensate
-            _merge_product_story_mass(target, species, mass)
-        _merge_product_story_mass(
-            off_spec_condensate,
-            species,
-            max(0.0, float(ledger_mass) - accounted),
-        )
 
     for account in _PRODUCT_STORY_OXYGEN_ESCAPE_ACCOUNTS:
         for species, mass in sim.atom_ledger.project_account_kg(account).items():
@@ -2438,19 +2497,10 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         )
         _merge_product_story_mass(target, species, mass)
 
-    oxygen_species = {}
-    oxygen_partition = {}
-    for account in (*OXYGEN_STORED_ACCOUNTS, *OXYGEN_CAPTURED_ACCOUNTS):
-        account_total = 0.0
-        for species, mass in sim.atom_ledger.project_account_kg(account).items():
-            _merge_product_story_mass(oxygen_species, species, mass)
-            account_total += float(mass)
-        if account_total > 0.0:
-            oxygen_partition[account] = account_total
-    oxygen = _product_story_bucket(oxygen_species)
+    oxygen = _product_story_bucket(extracted_projection['oxygen'])
     oxygen['partition_kg'] = {
         key: round(float(value), 2)
-        for key, value in oxygen_partition.items()
+        for key, value in extracted_projection['oxygen_partition'].items()
     }
 
     residue_bucket = _product_story_bucket(

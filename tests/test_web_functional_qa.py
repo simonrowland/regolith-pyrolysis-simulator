@@ -18,6 +18,7 @@ from simulator.account_ids import (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.accounting.queries import (
+    CONDENSATION_TRAIN_ACCOUNT,
     PRODUCT_LEDGER_ACCOUNTS,
     TERMINAL_RUMP_REFRACTORY_OXIDES,
 )
@@ -656,6 +657,68 @@ def test_completion_payload_degrades_when_product_classifier_raises(monkeypatch)
         for species, value in sim.product_ledger().items()
     }
     assert payload["terminal_rump_by_species"] == sim._terminal_rump_by_species()
+
+
+def test_degraded_product_story_badge_uses_canonical_extraction_evidence(
+    web_driver,
+    monkeypatch,
+):
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {
+                    "SiO2": 51.5,
+                    "FeO": 13.0,
+                    "MgO": 35.5,
+                },
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    sim.atom_ledger.move(
+        "test-unrecovered-overhead",
+        "process.cleaned_melt",
+        "process.overhead_gas",
+        {"SiO2": 1.0},
+    )
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: (_ for _ in ()).throw(ValueError("rump mismatch")),
+    )
+
+    zero_extraction = web_events._completion_payload(sim)
+    sim.atom_ledger.move(
+        "test-stage-3-glass",
+        "process.cleaned_melt",
+        CONDENSATION_TRAIN_ACCOUNT,
+        {"SiO2": 1.0},
+    )
+    sim._stage_collection_kg_by_source[
+        (CONDENSATION_TRAIN_ACCOUNT, 3, "SiO2")
+    ] = 1.0
+    real_product = web_events._completion_payload(sim)
+
+    states = tuple(
+        _render_product_story(html=web_driver["html"], payload=payload)["text"][
+            "product-ledger-state"
+        ]
+        for payload in (zero_extraction, real_product)
+    )
+
+    assert states == ("no-products", "ok")
+    assert (
+        zero_extraction["extracted_product_kg"],
+        real_product["extracted_product_kg"],
+    ) == pytest.approx((0.0, 1.0))
+    assert zero_extraction["product_story_status"] == "unavailable"
+    assert real_product["product_story_status"] == "unavailable"
 
 
 def test_empty_product_classes_render_from_completion_projection(web_driver):

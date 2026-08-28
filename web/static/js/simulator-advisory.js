@@ -389,6 +389,45 @@ function setAdvisoryEmpty(content, stateId) {
     content.textContent = 'n/a';
 }
 
+function didRunExtractAnything(data, story, extractedFlatProducts) {
+    const numeric = (value) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : 0;
+    };
+    const sumClassTotals = (classes) => classes.reduce(
+        (sum, cls) => sum + (cls ? numeric(cls.class_total_kg) : 0),
+        0,
+    );
+    const sumValues = (mapping) => (
+        mapping && typeof mapping === 'object'
+            ? Object.values(mapping).reduce((sum, value) => sum + numeric(value), 0)
+            : 0
+    );
+    const hasCanonicalMass = data.extracted_product_kg !== undefined
+        && data.extracted_product_kg !== null
+        && Number.isFinite(Number(data.extracted_product_kg));
+    const extractedKg = hasCanonicalMass
+        ? Number(data.extracted_product_kg)
+        : story
+            ? sumClassTotals([
+                story.metal_ingots,
+                story.glass,
+                story.oxygen,
+                story.captured_volatiles,
+            ])
+            : sumValues(extractedFlatProducts)
+                + numeric(data.oxygen_kg)
+                + numeric(data.oxygen_stored_kg);
+    const feedKg = Number(
+        (story && story.input && story.input.batch_mass_kg)
+        || data.mass_in_kg
+        || 0,
+    );
+    return feedKg > 0
+        ? extractedKg > feedKg * 1e-6
+        : extractedKg > 0;
+}
+
 function renderProductLedgerPanel(payload) {
     const content = document.getElementById('product-ledger-content');
     if (!content) return;
@@ -477,48 +516,11 @@ function renderProductLedgerPanel(payload) {
     // about the DATA and is reserved for a ledger we could not read at all.
     // Mid-run this is honest too: nothing HAS been extracted yet, and it
     // flips to ok the moment any product class becomes non-zero.
-    // Both payload shapes reach this panel. The structured story is authoritative
-    // when present because it separates extracted products from unrecovered
-    // process inventory; the legacy flat map cannot express that distinction.
-    // Flat products remain the fallback for older/error-degraded payloads whose
-    // story is absent.
-    const numeric = (value) => {
-        const n = Number(value);
-        return Number.isFinite(n) ? n : 0;
-    };
-    const sumClassTotals = (classes) => classes.reduce(
-        (sum, cls) => sum + (cls ? numeric(cls.class_total_kg) : 0),
-        0,
-    );
-    const sumValues = (mapping) => (
-        mapping && typeof mapping === 'object'
-            ? Object.values(mapping).reduce((sum, v) => sum + numeric(v), 0)
-            : 0
-    );
-    const storyProductKg = sumClassTotals(story ? [
-        story.metal_ingots,
-        story.glass,
-        story.oxygen,
-        story.captured_volatiles,
-    ] : []);
-    const flatProductKg = sumValues(extractedFlatProducts)
-        + numeric(data.oxygen_kg)
-        + numeric(data.oxygen_stored_kg);
-    const productClassKg = story ? storyProductKg : flatProductKg;
-    const feedKg = Number(
-        (story && story.input && story.input.batch_mass_kg)
-        || data.mass_in_kg
-        || 0,
-    );
-    // Threshold is relative to the charge, not absolute: "0.001 kg out of a
-    // tonne" is not an extraction, and a hard epsilon would read differently
-    // for a 1 kg bench charge than for a 1000 kg batch.
-    const extractedSomething = feedKg > 0
-        ? productClassKg > feedKg * 1e-6
-        : productClassKg > 0;
     updateAdvisoryState(
         'product-ledger-state',
-        extractedSomething ? 'ok' : 'no-products',
+        didRunExtractAnything(data, story, extractedFlatProducts)
+            ? 'ok'
+            : 'no-products',
     );
 }
 

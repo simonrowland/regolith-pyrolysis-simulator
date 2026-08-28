@@ -56,8 +56,6 @@ def _force_internal_analytical(monkeypatch) -> list:
 def _assert_hourly_payload_slope_is_bounded(
     event: str,
     samples: list[tuple[int, int]],
-    *,
-    max_bytes_per_hour: float = 128.0,
 ) -> None:
     ordered = sorted(samples)
     assert len(ordered) >= 4, (event, ordered)
@@ -71,7 +69,11 @@ def _assert_hourly_payload_slope_is_bounded(
         (hour - mean_hour) * (size - mean_size)
         for hour, size in ordered
     ) / denominator
-    assert slope <= max_bytes_per_hour, (
+    interval_slopes = [
+        (next_size - size) / (next_hour - hour)
+        for (hour, size), (next_hour, next_size) in zip(ordered, ordered[1:])
+    ]
+    assert not all(interval_slope > 0.0 for interval_slope in interval_slopes), (
         f"{event} payload grew {slope:.1f} bytes/hour; samples={ordered}"
     )
 
@@ -82,6 +84,27 @@ def test_hourly_payload_gate_rejects_linear_1000_bytes_per_hour() -> None:
             "counterfactual",
             [(hour, 10_000 + 1_000 * hour) for hour in range(1, 7)],
         )
+
+
+def test_hourly_payload_gate_rejects_smallest_sustained_growth_and_allows_jitter(
+) -> None:
+    with pytest.raises(AssertionError, match="grew 1.0 bytes/hour"):
+        _assert_hourly_payload_slope_is_bounded(
+            "counterfactual",
+            [(hour, 10_000 + hour) for hour in range(1, 7)],
+        )
+
+    _assert_hourly_payload_slope_is_bounded(
+        "bounded-jitter",
+        [
+            (1, 10_000),
+            (2, 10_001),
+            (3, 9_999),
+            (4, 9_999),
+            (5, 10_001),
+            (6, 10_000),
+        ],
+    )
 
 
 def test_advisory_js_fetches_on_demand_full_records() -> None:
