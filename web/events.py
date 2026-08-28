@@ -56,7 +56,11 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.campaigns import CampaignManager
-from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
+from simulator.condensation import (
+    KnudsenRegimeRefusal,
+    minimum_pressure_mbar_for_knudsen,
+    stage_purity_report,
+)
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.cost_parameters import (
     default_cost_parameters_block,
@@ -69,6 +73,7 @@ from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.optimize.recipe import recipe_schema_version
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError, _deep_merge_setpoints
@@ -82,6 +87,7 @@ from simulator.session import (
 from simulator.state import MOLAR_MASS
 from simulator.three_product_report import METAL_PRODUCT_SPECIES, classify_products
 from simulator.trace import PhysicsTrace
+from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
 # Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
 # runner share ONE per-hour summary builder.  ``SimSession.advance()``
 # owns that runner-format summary and returns it in ``StepResult``; this
@@ -373,19 +379,228 @@ def read_advisory_panel_detail_for_client(client_id: str, panel: str):
 # still surfaces its token verbatim rather than being softened into prose.
 _REFUSAL_EXPLANATIONS = {
     'viscous_p_bulk_transport_out_of_domain': (
-        'Overhead pressure fell below the viscous-flow domain (Knudsen > 0.01, '
-        'about 0.26 mbar for this duct), where the continuum transport model '
-        'has no valid solution. The run stopped rather than extrapolate a '
-        'transport number it cannot support. This is a model-coverage limit, '
-        'not a furnace fault: raise the overhead sweep pressure to stay in the '
-        'viscous band, or await transitional/free-molecular conductance.'
+        'Overhead pressure fell below the viscous-flow domain. The minimum '
+        'valid mbar threshold depends on the actual duct geometry and gas '
+        'temperature. The run stopped rather than extrapolate a Knudsen-domain '
+        'transport number it cannot support.'
+    ),
+    'knudsen_outside_viscous_flow': (
+        'The condensation train is outside its viscous-flow Knudsen domain. '
+        'The minimum valid mbar threshold depends on the actual duct geometry '
+        'and gas temperature; the model refused to extrapolate.'
+    ),
+    'knudsen_policy_unconfigured': (
+        'The run has no configured Knudsen-regime policy, so condensation '
+        'routing refused instead of assuming a transport regime.'
+    ),
+    'invalid_pipe_diameter': (
+        'The configured pipe diameter is missing or invalid, so the transport '
+        'regime cannot be evaluated.'
+    ),
+    'uncertified_melt_resistance_model': (
+        'Melt-side resistance was requested without certified species- and '
+        'state-specific transport inputs, so evaporation flux was refused.'
+    ),
+    'evaporation_flux_configuration_error': (
+        'Evaporation-flux configuration is invalid; the run refused instead '
+        'of calculating with unsupported transport inputs.'
+    ),
+    'vapour_batch_no_debiting_pressure_outcome': (
+        'The vapour batch supplied no authoritative debiting pressure for any '
+        'requested channel, so empty flux cannot be treated as physical zero.'
+    ),
+    'vapour_batch_builder_missing': (
+        'The vapour-batch builder is unavailable, so authoritative evaporation '
+        'pressures cannot be constructed.'
+    ),
+    'vapour_batch_resolve_failed': (
+        'The vapour-batch request could not be resolved; the run refused '
+        'instead of falling back to an unreviewed pressure source.'
+    ),
+    'vapour_batch_unavailable': (
+        'The vapour-batch provider returned no typed result, so evaporation '
+        'flux is unavailable.'
+    ),
+    'vapour_batch_resolution_error': (
+        'Vapour-batch resolution failed without a more specific typed reason.'
+    ),
+    'missing_vapour_batch_flux_pressures_Pa': (
+        'The authoritative vapour-batch pressure map is missing; legacy '
+        'pressure fields are not permitted to drive evaporation flux.'
+    ),
+    'invalid_vapour_batch_flux_pressures_Pa': (
+        'The vapour-batch pressure map contains an invalid numeric value.'
+    ),
+    'invalid_overhead_partials_Pa': (
+        'The overhead partial-pressure map contains an invalid numeric value.'
+    ),
+    'invalid_molar_mass_kg_mol': (
+        'The evaporation request contains an invalid molar-mass value.'
+    ),
+    'invalid_available_oxide_kg': (
+        'The evaporation request contains an invalid available-oxide mass.'
+    ),
+    'invalid_stoich_by_species': (
+        'The evaporation request contains invalid species stoichiometry.'
+    ),
+    'invalid_melt_surface_area_m2': (
+        'Melt surface area is invalid, so evaporation capacity cannot be '
+        'computed.'
+    ),
+    'invalid_stir_factor': (
+        'The configured stir factor is outside the supported numeric domain.'
+    ),
+    'evaporation_flux_refused': (
+        'The evaporation-flux provider refused without a more specific typed '
+        'reason.'
+    ),
+    'evaporation_flux_unavailable': (
+        'The evaporation-flux provider is unavailable for this request.'
+    ),
+    'evaporation_flux_not_run': (
+        'The evaporation-flux provider did not run for this request.'
+    ),
+    'unavailable': (
+        'The requested physics provider is unavailable for this calculation.'
+    ),
+    'refused': (
+        'The requested physics provider refused without a more specific typed '
+        'reason.'
+    ),
+    'not_run': (
+        'The requested physics provider did not run for this calculation.'
+    ),
+    'uncertified_multi_oxide_current_partition': (
+        'MRE would require an uncertified multi-oxide current partition, so '
+        'the electrolysis step refused.'
+    ),
+    'non_authoritative_fallback_raw_margin_nonpositive': (
+        'The MRE fallback has no positive authoritative voltage margin for the '
+        'requested reduction.'
+    ),
+    'mre_product_phase_mismatch_refused': (
+        'MRE cannot certify the requested product phase for the reducible '
+        'oxide, so the step refused.'
+    ),
+    'c4_target_window_not_acquired': (
+        'C4 did not acquire its configured temperature window before the '
+        'acquisition limit.'
+    ),
+    'c4_process_window_lost': (
+        'C4 left its configured process window before completing the endpoint.'
+    ),
+    'c4_process_wall_clock_exhausted': (
+        'C4 exhausted its process wall-clock limit while still in the target '
+        'window.'
+    ),
+    'c4_preheat_wall_clock_exhausted': (
+        'C4 exhausted its preheat wall-clock budget before establishing the '
+        'target window.'
+    ),
+    'campaign_endpoint_refused': (
+        'The campaign endpoint refused because its required process state was '
+        'not established.'
+    ),
+    'c4_endpoint_refused': (
+        'C4 refused because its required endpoint state was not established.'
     ),
 }
 
 
-def _refusal_message(reason: str) -> str:
+_DYNAMIC_KNUDSEN_REFUSAL_REASONS = frozenset({
+    'knudsen_outside_viscous_flow',
+    'viscous_p_bulk_transport_out_of_domain',
+})
+
+
+def _knudsen_pressure_basis(diagnostic: object) -> dict[str, object] | None:
+    if not isinstance(diagnostic, Mapping):
+        return None
+    candidates = [diagnostic]
+    for key in (
+        'binding_transport_state',
+        'knudsen_regime_diagnostic',
+        'transport_diagnostic',
+    ):
+        nested = diagnostic.get(key)
+        if isinstance(nested, Mapping):
+            candidates.append(nested)
+    for candidate in candidates:
+        raw_temperature = candidate.get('gas_temperature_C')
+        temperature_is_kelvin = raw_temperature is None
+        if temperature_is_kelvin:
+            raw_temperature = candidate.get(
+                'gas_temperature_K', candidate.get('T_gas_K')
+            )
+        raw_diameter = candidate.get('pipe_diameter_m')
+        carrier_gas = candidate.get('carrier_gas')
+        try:
+            temperature_C = float(raw_temperature)
+            if temperature_is_kelvin:
+                temperature_C -= CELSIUS_TO_KELVIN_OFFSET
+            diameter_m = float(raw_diameter)
+        except (TypeError, ValueError):
+            continue
+        if (
+            not math.isfinite(temperature_C)
+            or not math.isfinite(diameter_m)
+            or diameter_m <= 0.0
+            or not isinstance(carrier_gas, str)
+            or not carrier_gas.strip()
+        ):
+            continue
+        segment_lengths = [diameter_m]
+        segments = candidate.get('segments')
+        if isinstance(segments, (list, tuple)):
+            for segment in segments:
+                if not isinstance(segment, Mapping):
+                    continue
+                try:
+                    length = float(segment.get('characteristic_length_m'))
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(length) and length > 0.0:
+                    segment_lengths.append(length)
+        kwargs: dict[str, object] = {
+            'knudsen_ceiling': VISCOUS_KNUDSEN_MAX,
+        }
+        raw_ceiling = candidate.get(
+            'VISCOUS_KNUDSEN_MAX', candidate.get('knudsen_ceiling')
+        )
+        if raw_ceiling is not None:
+            try:
+                ceiling = float(raw_ceiling)
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(ceiling) or ceiling <= 0.0:
+                continue
+            kwargs['knudsen_ceiling'] = ceiling
+        try:
+            return minimum_pressure_mbar_for_knudsen(
+                gas_temperature_C=temperature_C,
+                pipe_diameter_m=min(segment_lengths),
+                carrier_gas=carrier_gas.strip(),
+                **kwargs,
+            )
+        except (KeyError, TypeError, ValueError):
+            continue
+    return None
+
+
+def _refusal_message(reason: str, diagnostic: object = None) -> str:
     """Operator-facing sentence for a refusal reason; the token when unmapped."""
-    return _REFUSAL_EXPLANATIONS.get(str(reason), str(reason))
+    token = str(reason)
+    message = _REFUSAL_EXPLANATIONS.get(token, token)
+    if token not in _DYNAMIC_KNUDSEN_REFUSAL_REASONS:
+        return message
+    basis = _knudsen_pressure_basis(diagnostic)
+    if basis is None:
+        return message
+    minimum_mbar = float(basis['minimum_pressure_mbar'])
+    return (
+        f'{message} For this geometry, the computed minimum is '
+        f'{minimum_mbar:.2f} mbar.'
+    )
 
 
 def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bool:
@@ -1913,6 +2128,61 @@ def _per_tick_backend_resolution(
     return status, reason, authoritative
 
 
+_PRODUCT_STORY_REQUIRED_BUCKETS = (
+    'metal_ingots',
+    'glass',
+    'oxygen',
+    'captured_volatiles',
+    'refractory_ceramic',
+    'terminal_residue',
+    'escaped_to_vacuum',
+    'unrecovered_process_inventory',
+    'wall_deposits',
+    'process_residue',
+    'off_spec_condensate',
+    'unclassified',
+)
+
+
+def _product_story_soundness(product_story: object) -> str:
+    if not isinstance(product_story, Mapping):
+        return 'unavailable'
+    input_record = product_story.get('input')
+    if not isinstance(input_record, Mapping):
+        return 'incomplete'
+    if any(
+        not isinstance(input_record.get(key), str)
+        or not str(input_record[key]).strip()
+        for key in ('feedstock', 'feedstock_label')
+    ):
+        return 'incomplete'
+    raw_batch_mass = input_record.get('batch_mass_kg')
+    try:
+        batch_mass = float(raw_batch_mass)
+    except (TypeError, ValueError):
+        return 'incomplete'
+    if not math.isfinite(batch_mass) or batch_mass < 0.0:
+        return 'invalid'
+    for key in _PRODUCT_STORY_REQUIRED_BUCKETS:
+        bucket = product_story.get(key)
+        if not isinstance(bucket, Mapping):
+            return 'incomplete'
+        if not isinstance(bucket.get('species_kg'), Mapping):
+            return 'incomplete'
+        if 'class_total_kg' not in bucket:
+            return 'incomplete'
+        raw_total = bucket['class_total_kg']
+        if isinstance(raw_total, bool):
+            return 'invalid'
+        try:
+            total = float(raw_total)
+        except (TypeError, ValueError):
+            return 'invalid'
+        if not math.isfinite(total) or total < 0.0:
+            return 'invalid'
+    return 'ok'
+
+
 def _completion_payload(sim):
     final_snapshot = sim._make_snapshot()
     terminal_rump_by_species = sim._terminal_rump_by_species()
@@ -1942,7 +2212,7 @@ def _completion_payload(sim):
             sim,
             terminal_rump_by_species=terminal_rump_by_species,
         )
-        product_story_status = 'ok'
+        product_story_status = _product_story_soundness(product_story)
     except Exception as exc:  # noqa: BLE001 -- optional presentation boundary
         _safe_log(f'Product story unavailable; raw completion retained: {exc}')
         product_story = None
@@ -2733,7 +3003,7 @@ def _start_background_loop(
                     error_payload = {
                         'status': 'refused',
                         'reason': exc.reason,
-                        'message': _refusal_message(exc.reason),
+                        'message': _refusal_message(exc.reason, exc.diagnostic),
                         'refusal_diagnostic': dict(exc.diagnostic),
                         'backend_status': backend_status,
                         'backend_authoritative': backend_authoritative,
@@ -2889,7 +3159,7 @@ def _start_background_loop(
                     refusal_payload = {
                         'status': 'refused',
                         'reason': reason,
-                        'message': _refusal_message(reason),
+                        'message': _refusal_message(reason, diagnostic),
                         'backend_status': backend_status,
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
@@ -3155,6 +3425,26 @@ def register_events(socketio):
                 'status': 'error',
                 'message': 'start_simulation payload must be an object',
             }, 'invalid_run_request')
+        if 'single_run' in data:
+            try:
+                command_payload, parsed_single_run_context = (
+                    _typed_single_run_payload(data)
+                )
+            except RunCommandError as exc:
+                if command_mode:
+                    raise
+                return reject(
+                    {
+                        'status': 'error',
+                        'message': str(exc),
+                        **exc.payload,
+                    },
+                    exc.error_type,
+                    exc.status_code,
+                )
+            data = command_payload
+            if single_run_context is None:
+                single_run_context = parsed_single_run_context
         raw_lifecycle_generation = data.get('lifecycle_generation')
         if (
             isinstance(raw_lifecycle_generation, int)
@@ -3181,17 +3471,13 @@ def register_events(socketio):
         # Empty string is treated as missing as well: data.get('feedstock')
         # returning '' never hit the old default, so an empty selection fell
         # through to a lookup failure elsewhere rather than a legible refusal.
-        # ONLY the flat browser-shaped payload is gated here. A `single_run`
-        # envelope carries its feedstock as single_run.target_or_recipe, and
-        # _typed_single_run_payload already refuses a missing one with
-        # `invalid_single_run` -- gating it here as well would refuse a start
-        # that DID name its feedstock, which is a guard firing on correct work.
-        # (Caught by test_run_command_plane's socket envelope tests, which is
-        # exactly why they are not edited to agree with this change.)
+        # Socket `single_run` envelopes are flattened through the same typed
+        # parser as the HTTP command plane above. At this point every request
+        # has one canonical top-level feedstock field; no envelope is evidence
+        # for a feedstock unless its contents were actually validated.
         raw_feedstock = data.get('feedstock')
         feedstock_key = str(raw_feedstock).strip() if raw_feedstock is not None else ''
-        carries_single_run_envelope = isinstance(data.get('single_run'), Mapping)
-        if not feedstock_key and not carries_single_run_envelope:
+        if not feedstock_key:
             return reject(
                 {
                     'status': 'error',
@@ -3202,8 +3488,6 @@ def register_events(socketio):
                 },
                 'feedstock_required',
             )
-        if not feedstock_key:
-            feedstock_key = 'lunar_mare_low_ti'
         cost_parameters = None
         cost_parameters_recipe_name = None
         try:

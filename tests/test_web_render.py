@@ -834,6 +834,65 @@ def test_stale_start_error_after_current_generation_is_ignored():
     assert stale["resumeDisabled"] == accepted["resumeDisabled"]
 
 
+@pytest.mark.parametrize(
+    "error_type",
+    [
+        "client_identity_required",
+        "invalid_run_request",
+        "feedstock_required",
+        "invalid_run_input",
+        "invalid_parent_run_id",
+        "run_not_found",
+        "backend_unavailable",
+        "client_disconnected",
+        "invalid_single_run",
+        "global_run_capacity_exhausted",
+        "run_replacement_failed",
+        "run_launch_failed",
+        "run_launch_failed_after_replacement",
+    ],
+)
+def test_prelaunch_errors_without_diagnostic_fields_release_controls(error_type):
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "error",
+                    "message": f"launch rejected: {error_type}",
+                    "error_type": error_type,
+                },
+            },
+        ]
+    )
+
+    assert rendered["final"]["lifecycle"]["phase"] == "terminal-error"
+    assert rendered["final"]["startDisabled"] is False
+    assert rendered["final"]["pauseDisabled"] is True
+    assert rendered["final"]["resumeDisabled"] is True
+    assert rendered["final"]["statusText"] != "Running"
+
+
+def test_prelaunch_error_is_terminal_without_reason_backend_or_error_type():
+    rendered = _render_status_strip(
+        sequence=[
+            {"event": "start_click", "payload": {}},
+            {
+                "event": "simulation_status",
+                "payload": {
+                    "status": "error",
+                    "message": "launch failed",
+                },
+            },
+        ]
+    )
+
+    assert rendered["final"]["lifecycle"]["phase"] == "terminal-error"
+    assert rendered["final"]["startDisabled"] is False
+    assert rendered["final"]["statusText"] == "error — launch failed"
+
+
 def test_replacement_launch_failure_after_cancellation_is_terminal():
     error_text = (
         "error — New run launch failed after prior run run-1 was cancelled"

@@ -15,6 +15,8 @@ from simulator.diagnostics import (
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from web.advisory import (
+    _compact_condensation_refusals,
+    _compact_record,
     condensation_refusals_panel_payload,
     vapour_rail_instrumentation_panel_payload,
 )
@@ -113,6 +115,33 @@ def test_condensation_refusals_tick_panel_keeps_counts_without_nested_blobs():
     )
 
 
+def test_compact_condensation_refusals_does_not_invent_absent_answers():
+    compact = _compact_condensation_refusals({
+        "by_species": {
+            "SiO": {"status": "refused", "reason": "test_refusal"},
+        },
+    })
+
+    assert compact["n_species"] == 1
+    assert compact["by_species"]["SiO"]["status"] == "refused"
+    assert "has_refusals" not in compact
+    assert compact["has_refusals_status"] == "unavailable"
+
+    proven_zero = _compact_condensation_refusals({
+        "has_refusals": False,
+        "by_species": {},
+    })
+    assert proven_zero["has_refusals"] is False
+    assert "has_refusals_status" not in proven_zero
+
+
+def test_compact_record_does_not_invent_success_for_invalid_shape():
+    assert _compact_record("not-a-record", ("status", "reason")) == {
+        "status": "unavailable",
+        "reason": "non_mapping_record",
+    }
+
+
 def test_vapour_rail_tick_panel_keeps_channel_index_without_full_answers():
     channel = {
         "species_id": "Na",
@@ -153,24 +182,24 @@ def test_vapour_rail_tick_panel_keeps_channel_index_without_full_answers():
 
 def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
     captured_tasks = _force_internal_analytical(monkeypatch)
-    original_emit = web_events._emit_if_current
-    tick_sizes: list[int] = []
+    original_emit = app_module.socketio.emit
+    tick_samples: list[tuple[int, int]] = []
     mismatches: list[str] = []
 
-    def instrumented_emit(socketio, sid, run_id, event, payload):
+    def instrumented_emit(event, payload, *args, **kwargs):
         if event == "simulation_tick" and isinstance(payload, dict):
             emitted = dict(payload)
-            emitted["run_id"] = run_id
-            tick_sizes.append(_nbytes(emitted))
+            tick_samples.append((int(emitted["hour"]), _nbytes(emitted)))
+            sid = kwargs.get("room")
             state = _simulations.get(sid)
             sim = state["session"].simulator if state else None
             if sim is not None:
                 _assert_tick_preserves_vr_totals(emitted, sim, mismatches)
-            if len(tick_sizes) >= 6 and state is not None:
+            if len(tick_samples) >= 6 and state is not None:
                 state["running"] = False
-        return original_emit(socketio, sid, run_id, event, payload)
+        return original_emit(event, payload, *args, **kwargs)
 
-    monkeypatch.setattr(web_events, "_emit_if_current", instrumented_emit)
+    monkeypatch.setattr(app_module.socketio, "emit", instrumented_emit)
 
     app = app_module.create_app()
     http = app.test_client()
@@ -191,7 +220,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             },
         )
         rounds = 0
-        while len(tick_sizes) < 6 and rounds < 40:
+        while len(tick_samples) < 6 and rounds < 40:
             rounds += 1
             if not captured_tasks:
                 break
@@ -204,12 +233,11 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
                         "make_decision",
                         {"choice": decision.get("recommendation")},
                     )
-        assert len(tick_sizes) >= 6, tick_sizes
-        first = tick_sizes[0]
-        sixth = tick_sizes[5]
-        assert first < 120_000, first
-        assert sixth < 120_000, sixth
-        assert sixth <= 2 * first + 4096, (first, sixth, tick_sizes)
+        assert len(tick_samples) >= 6, tick_samples
+        for hour, size in tick_samples[:6]:
+            assert size < 120_000, (hour, size)
+        stable_tail = [size for _hour, size in tick_samples[2:6]]
+        assert max(stable_tail) - min(stable_tail) <= 1024, tick_samples
         assert mismatches == []
     finally:
         if client.is_connected():

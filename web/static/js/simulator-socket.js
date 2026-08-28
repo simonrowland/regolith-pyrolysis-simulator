@@ -357,11 +357,18 @@ function reduceSimulatorLifecycle(current, event) {
         phase === SimulatorLifecycleState.STARTING
         || phase === SimulatorLifecycleState.REPLACING
     );
-    const startCorrelated = status === 'started' || Boolean(data.error_type);
     if (
-        startCorrelated
+        status === 'started'
         && generation !== current.generation
         && (pending || generation !== null)
+    ) {
+        return _lifecycleResult(current, null, false, false);
+    }
+    if (
+        status === 'error'
+        && generation !== null
+        && generation !== current.generation
+        && (pending || Boolean(data.error_type))
     ) {
         return _lifecycleResult(current, null, false, false);
     }
@@ -383,7 +390,7 @@ function reduceSimulatorLifecycle(current, event) {
         );
     }
 
-    if (status === 'error' && data.error_type && pending) {
+    if (status === 'error' && pending) {
         if (data.prior_run_cancelled === true) {
             const next = _lifecycleState(
                 current,

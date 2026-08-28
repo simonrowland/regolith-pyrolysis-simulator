@@ -417,7 +417,17 @@ function renderProductLedgerPanel(payload) {
         if (appendAdvisorySection(content, 'Off-spec condenser capture', story.off_spec_condensate, 'kg')) sections += 1;
         if (appendAdvisorySection(content, 'Unclassified output', story.unclassified, 'kg')) sections += 1;
     }
-    if (appendAdvisorySection(content, 'Products', data.products, 'kg')) sections += 1;
+    const extractedFlatProducts = {};
+    const reagentBookkeepingResidue = {};
+    const products = advisoryObject(data.products) || {};
+    for (const [key, value] of Object.entries(products)) {
+        const target = /^(?:unspent|consumed)_.+_reagent$/.test(key)
+            ? reagentBookkeepingResidue
+            : extractedFlatProducts;
+        target[key] = value;
+    }
+    if (appendAdvisorySection(content, 'Products', extractedFlatProducts, 'kg')) sections += 1;
+    if (appendAdvisorySection(content, 'Reagent bookkeeping residue', reagentBookkeepingResidue, 'kg')) sections += 1;
 
     const oxygen = {};
     for (const key of ['oxygen_kg', 'oxygen_stored_kg', 'oxygen_vented_kg']) {
@@ -458,9 +468,11 @@ function renderProductLedgerPanel(payload) {
     // two headline indicators presented the mandate's incomplete-extraction
     // failure mode as a success.
     //
-    // Extraction is now judged on the PRODUCT CLASSES the mandate names --
-    // metals, glass, oxygen, captured volatiles, refractory ceramic. A run
-    // with feed in the pot and nothing in any of them reads `no-products`,
+    // Extraction is now judged on classes that prove material left the pot --
+    // metals, glass, oxygen, and captured volatiles. Refractory rump remains
+    // a legitimate reported product class, but while it is still in the pot it
+    // is residue, not evidence that extraction happened. A run with feed in
+    // the pot and nothing in an extracted class reads `no-products`,
     // which is a statement about the RUN, where `n/a` would be a statement
     // about the DATA and is reserved for a ledger we could not read at all.
     // Mid-run this is honest too: nothing HAS been extracted yet, and it
@@ -491,9 +503,8 @@ function renderProductLedgerPanel(payload) {
         story.glass,
         story.oxygen,
         story.captured_volatiles,
-        story.refractory_ceramic,
     ] : [])
-        + sumValues(data.products)
+        + sumValues(extractedFlatProducts)
         + numeric(data.oxygen_kg)
         + numeric(data.oxygen_stored_kg);
     const feedKg = Number(

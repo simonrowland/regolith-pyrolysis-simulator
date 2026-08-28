@@ -681,10 +681,124 @@ def test_empty_product_classes_render_from_completion_projection(web_driver):
     assert payload["product_story"]["glass"]["class_total_kg"] == 0.0
     rendered = _render_product_story(html=web_driver["html"], payload=payload)
     text = rendered["text"]["product-ledger-content"]
-    assert rendered["text"]["product-ledger-state"] == "ok"
+    # This batch is loaded and never run, so nothing was extracted. The badge
+    # must say so: CLAUDE.md section 4 names incomplete extraction as failure
+    # mode #1, and residue that was in the charge all along is not evidence of
+    # production. The subject of THIS test is that empty classes still RENDER
+    # (assertions below); the badge state is incidental to it and was pinned at
+    # "ok" by the defect. See test_product_badge_uses_extracted_classes_not_residue
+    # for the both-directions pin.
+    assert rendered["text"]["product-ledger-state"] == "no-products"
     assert "Metal ingots out" in text
     assert "Glass out" in text
     assert "class total kg: 0 kg" in text
+
+
+@pytest.mark.parametrize(
+    ("story_product", "flat_products", "expected_state"),
+    [
+        ({"refractory_ceramic": 280.0}, {}, "no-products"),
+        ({}, {"unspent_Na_reagent": 280.0}, "no-products"),
+        ({"metal_ingots": 1.0}, {}, "ok"),
+        (None, {"Fe": 1.0}, "ok"),
+    ],
+)
+def test_product_badge_uses_extracted_classes_not_residue(
+    web_driver, story_product, flat_products, expected_state
+):
+    zero_bucket = {"species_kg": {}, "class_total_kg": 0.0}
+    story = None
+    if story_product is not None:
+        buckets = {
+            key: dict(zero_bucket)
+            for key in (
+                "metal_ingots",
+                "glass",
+                "oxygen",
+                "captured_volatiles",
+                "refractory_ceramic",
+                "terminal_residue",
+                "escaped_to_vacuum",
+                "unrecovered_process_inventory",
+                "wall_deposits",
+                "process_residue",
+                "off_spec_condensate",
+                "unclassified",
+            )
+        }
+        for key, value in story_product.items():
+            buckets[key] = {
+                "species_kg": {"test": value},
+                "class_total_kg": value,
+            }
+        story = {
+            "input": {
+                "feedstock": "test",
+                "feedstock_label": "Test feed",
+                "batch_mass_kg": 1000.0,
+            },
+            **buckets,
+        }
+    payload = {
+        "mass_in_kg": 1000.0,
+        "products": flat_products,
+        "oxygen_kg": 0.0,
+        "oxygen_stored_kg": 0.0,
+        "product_story": story,
+        "process_inventory_spent_reductant": {
+            "kg_by_species": {"Na2O": 5.0},
+            "class_total_kg": 5.0,
+            "account": "process.spent_reductant_residue",
+            "disposition": "process_inventory_spent_reductant",
+        },
+    }
+
+    rendered = _render_product_story(html=web_driver["html"], payload=payload)
+    text = rendered["text"]["product-ledger-content"]
+
+    assert rendered["text"]["product-ledger-state"] == expected_state
+    assert "Spent reductant residue" in text
+    if story_product and "refractory_ceramic" in story_product:
+        assert "Refractory ceramic out" in text
+    if any("reagent" in key for key in flat_products):
+        assert "Reagent bookkeeping residue" in text
+
+
+def test_completion_payload_marks_story_incomplete_without_builder_exception(
+    monkeypatch,
+):
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {"SiO2": 51.5, "FeO": 13.0, "MgO": 35.5},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    incomplete_story = {
+        "input": {
+            "feedstock": "s_type",
+            "feedstock_label": "S type",
+            "batch_mass_kg": 1000.0,
+        },
+        "metal_ingots": {"species_kg": {}, "class_total_kg": 0.0},
+    }
+    monkeypatch.setattr(
+        web_events,
+        "_product_story_payload",
+        lambda *_args, **_kwargs: incomplete_story,
+    )
+
+    payload = web_events._completion_payload(sim)
+
+    assert payload["product_story"] == incomplete_story
+    assert payload["product_story_status"] == "incomplete"
 
 
 def test_product_story_requires_designated_stage_provenance(monkeypatch):

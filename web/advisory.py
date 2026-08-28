@@ -287,7 +287,10 @@ _AUTHORITY_TICK_KEYS = (
 
 def _compact_record(record: Any, keys: tuple[str, ...]) -> dict[str, Any]:
     if not isinstance(record, Mapping):
-        return {"status": "recorded"}
+        return {
+            "status": "unavailable",
+            "reason": "non_mapping_record",
+        }
     return {key: record[key] for key in keys if key in record}
 
 
@@ -309,12 +312,16 @@ def _compact_condensation_refusals(payload: Any) -> dict[str, Any]:
         payload.get("by_species"), _REFUSAL_TICK_KEYS
     )
     n_species = payload.get("n_species", len(by_species))
-    return {
+    compact = {
         "schema": payload.get("schema"),
         "n_species": n_species,
-        "has_refusals": bool(payload.get("has_refusals")),
         "by_species": by_species,
     }
+    if "has_refusals" in payload:
+        compact["has_refusals"] = bool(payload["has_refusals"])
+    else:
+        compact["has_refusals_status"] = "unavailable"
+    return compact
 
 
 def _compact_condensation_authority(payload: Any) -> dict[str, Any]:
