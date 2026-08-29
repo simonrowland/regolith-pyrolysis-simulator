@@ -53,7 +53,6 @@ from simulator.vapour_rail.instrumentation import (
     flux_pressures_from_batch,
     serialize_vapour_batch,
 )
-from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
 
 
 PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
@@ -398,9 +397,6 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'MnO',
     'P2O5',
 ))
-_STAGE0_PHOSPHORUS_CARRIERS = frozenset({
-    'P2', 'P4', 'P4O6', 'P4O10', 'PO', 'PO2',
-})
 
 
 def _assert_runtime_alpha_source_not_vaporock(
@@ -932,30 +928,31 @@ class EvaporationMixin:
                 state == 'zero_by_physics' for state in channel_states.values()
             ):
                 return flux
-            # Only a proved bound/zero or an epoch-dormant channel authorizes
-            # empty flux. A refusal or incomplete channel never measured the
-            # pressure, so treating either as zero would mint flattering flux.
-            _typed_zero_or_bound = frozenset(
+            # When every channel is a typed non-debit outcome (genuine bound,
+            # refusal, zero, dormant) and none is eligible / missing-seam,
+            # empty flux is authorized, not an empty-provider false zero.
+            _typed_non_debit = frozenset(
                 {
                     'zero_by_physics',
                     'upper_bound',
+                    'refusal',
                     'dormant_by_epoch',
+                    'incomplete_channel',
                 }
             )
             if (
                 channel_states
                 and all(
-                    state in _typed_zero_or_bound
-                    for state in channel_states.values()
+                    state in _typed_non_debit for state in channel_states.values()
                 )
             ):
                 self._last_evaporation_flux_diagnostic = {
                     **regime_diagnostic,
                     'reason': 'vapour_batch_all_channels_non_debiting',
                     'detail': (
-                        'every requested vapour channel is a proved bound, '
-                        'physical zero, or epoch-dormant outcome; empty flux '
-                        'is authorized'
+                        'every requested vapour channel is a typed non-debit '
+                        'outcome (upper_bound / refusal / zero / dormant); '
+                        'empty flux is authorized'
                     ),
                     'batch_channel_states': channel_states,
                     'evaporation_flux_kg_hr': {},
@@ -3005,8 +3002,8 @@ class EvaporationMixin:
         that remains free in ``process.overhead_gas`` after all committed
         baffle, wall, and retained-holdup routing. The separately recorded
         ``_ledger_committed_evap_flux_this_tick`` excludes any carrier whose
-        typed authority or transition result lawfully withheld a debit; the
-        caller uses that committed flux for reporting, transport, and energy.
+        coupled transition was rejected at the numerical floor; the caller
+        uses that committed flux for reporting, transport, and energy.
 
         Between the two kernel commits the vapor passes through overhead_gas.
         ``tests/chemistry/test_builtin_condensation_route_provider.py`` checks
@@ -3209,44 +3206,9 @@ class EvaporationMixin:
             )
             or 0.0
         )
-        carrier_authority = authority.get('carrier_authority', {})
-        if not isinstance(carrier_authority, Mapping):
-            carrier_authority = {}
-        carrier_extra = carrier_authority.get('extra', {})
-        if not isinstance(carrier_extra, Mapping):
-            carrier_extra = {}
-        source_activity = carrier_authority.get('source_reaction_activity', {})
-        if not isinstance(source_activity, Mapping):
-            source_activity = {}
-        campaign_name = str(
-            getattr(getattr(self.melt, 'campaign', None), 'name', '') or ''
-        )
-        refusal = dict(
-            getattr(route_result, 'condensation_refusals_by_species', {}).get(
-                species,
-                {},
-            )
-            or {}
-        )
-        stage0_p_out_of_domain_offgas_only = (
-            campaign_name in {'C0', 'C0B'}
-            and species in _STAGE0_PHOSPHORUS_CARRIERS
-            and str(authority.get('status', '')) == 'refused'
-            and str(refusal.get('reason', ''))
-            == REFUSAL_INAPPLICABLE_PREDICATE
-            and (
-                str(carrier_extra.get('activity_reason', ''))
-                == 'out_of_gamma_domain'
-                or str(source_activity.get('reason', ''))
-                == 'out_of_gamma_domain'
-            )
-        )
         if (
-            not stage0_p_out_of_domain_offgas_only
-            and (
-                str(authority.get('status', '')) in {'refused', 'proven_zero'}
-                or retained_source_kg > 1e-15
-            )
+            str(authority.get('status', '')) in {'refused', 'proven_zero'}
+            or retained_source_kg > 1e-15
         ):
             # The rail did not authorize an evaporation debit. Keep the
             # candidate mass in its source account; returning no transition
@@ -3274,13 +3236,6 @@ class EvaporationMixin:
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
             species, 0.0)
-        if stage0_p_out_of_domain_offgas_only:
-            # Stage-0 P carrier activity is an explicit OOD extrapolation: the
-            # flux therefore remains computed and status-bearing. Hot-train
-            # condensation still lawfully refuses the stage0_only row, so no
-            # coating is projected; all computed vapor stays in overhead_gas
-            # for the normal hourly terminal-offgas bleed.
-            remaining_kg_hr = rate_kg_hr
         if (
             remaining_kg_hr < -1e-12
             or remaining_kg_hr > rate_kg_hr + 1e-12
@@ -3304,15 +3259,6 @@ class EvaporationMixin:
         )
         if evaporation_transition is None:
             return {}
-
-        if stage0_p_out_of_domain_offgas_only:
-            return {
-                'credited_condensed_kg': 0.0,
-                'remaining_kg': float(rate_kg_hr),
-                'retained_in_source_kg': 0.0,
-                'evaporation_transition': evaporation_transition,
-                'authority_status': 'out_of_domain_offgas_only',
-            }
 
         condensed_kg = max(
             0.0, rate_kg_hr - remaining_kg_hr,

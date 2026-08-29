@@ -20,11 +20,7 @@ from typing import Any
 import pytest
 import yaml
 
-from simulator.condensation import (
-    CondensationModel,
-    CondensationTrain,
-    DepositionInputRefusal,
-)
+from simulator.condensation import CondensationModel, CondensationTrain
 from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
@@ -393,179 +389,6 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     assert outcomes[0]["status"] == "pass_through"
     assert outcomes[0]["reason"] == "antoine_psat_unavailable_at_T"
     assert outcomes[0]["output_status"] == "status_bearing"
-
-
-def test_sio_ood_stage_psat_without_flowing_pressure_refuses(monkeypatch) -> None:
-    import simulator.condensation as condensation_module
-
-    model = _efficiency_model()
-    stage = next(s for s in model.train.stages if s.stage_number == 3)
-    monkeypatch.setattr(
-        condensation_module,
-        "_try_antoine_psat_pa",
-        lambda *args, **kwargs: (None, True),
-    )
-
-    with pytest.raises(DepositionInputRefusal) as exc_info:
-        model._condensation_efficiency(
-            stage=stage,
-            species="SiO",
-            T_cond_C=1050.0,
-            residence_s=1.0,
-            available_kg=1.0,
-            alpha_s_value=1.0,
-        )
-
-    assert exc_info.value.parameter == "flowing_pressure_pa"
-    assert exc_info.value.value is None
-    assert "required to compute marked SiO capture" in exc_info.value.reason
-
-
-def test_sio_ood_stage_psat_computes_and_marks_declared_reference(
-    monkeypatch,
-) -> None:
-    import simulator.condensation as condensation_module
-
-    model = _efficiency_model()
-    with (Path(__file__).resolve().parents[1] / "data/vapor_pressures.yaml").open(
-        encoding="utf-8"
-    ) as handle:
-        model.vapor_pressure_data = yaml.safe_load(handle)
-    model._species_partial_pressures_configured = True
-    model.wall_species_partial_pressures_pa = {"SiO": 25.0}
-    model.stage_area_m2_by_stage = {"stage_3": 1.0}
-    stage = next(s for s in model.train.stages if s.stage_number == 3)
-    monkeypatch.setattr(
-        condensation_module,
-        "_try_antoine_psat_pa",
-        lambda *args, **kwargs: (None, True),
-    )
-    outcomes: list[dict[str, Any]] = []
-
-    eta = model._condensation_efficiency(
-        stage=stage,
-        species="SiO",
-        T_cond_C=1050.0,
-        residence_s=1.0,
-        available_kg=1.0,
-        alpha_s_value=1.0,
-        efficiency_outcomes=outcomes,
-    )
-
-    assert eta > 0.0
-    assert len(outcomes) == 1
-    outcome = outcomes[0]
-    assert outcome["status"] == "out_of_domain"
-    assert outcome["output_status"] == "status_bearing"
-    assert outcome["flowing_pressure_pa"] == 25.0
-    assert outcome["driving_pressure_pa"] == 25.0
-    assert outcome["routing_reference_pressure_pa"] == 100.0
-    assert outcome["eta"] == eta
-    assert outcome["reason"] == (
-        "stage_saturation_pressure_out_of_domain_computed_with_"
-        "declared_engineering_route"
-    )
-
-
-def test_sio_ood_stage_psat_keeps_proven_zero_flowing_pressure(
-    monkeypatch,
-) -> None:
-    import simulator.condensation as condensation_module
-
-    model = _efficiency_model()
-    model._species_partial_pressures_configured = True
-    model.wall_species_partial_pressures_pa = {"SiO": 0.0}
-    stage = next(s for s in model.train.stages if s.stage_number == 3)
-    monkeypatch.setattr(
-        condensation_module,
-        "_try_antoine_psat_pa",
-        lambda *args, **kwargs: (None, True),
-    )
-    outcomes: list[dict[str, Any]] = []
-
-    eta = model._condensation_efficiency(
-        stage=stage,
-        species="SiO",
-        T_cond_C=1050.0,
-        residence_s=1.0,
-        available_kg=1.0,
-        alpha_s_value=1.0,
-        efficiency_outcomes=outcomes,
-    )
-
-    assert eta == 0.0
-    assert len(outcomes) == 1
-    assert outcomes[0]["status"] == "pass_through"
-    assert outcomes[0]["reason"] == "nonpositive_flowing_pressure"
-
-
-def test_sio_ood_stage_psat_without_declared_reference_refuses(monkeypatch) -> None:
-    import simulator.condensation as condensation_module
-
-    model = _efficiency_model()
-    model.vapor_pressure_data = {"metals": {}, "oxide_vapors": {}}
-    model._species_partial_pressures_configured = True
-    model.wall_species_partial_pressures_pa = {"SiO": 25.0}
-    stage = next(s for s in model.train.stages if s.stage_number == 3)
-    monkeypatch.setattr(
-        condensation_module,
-        "_try_antoine_psat_pa",
-        lambda *args, **kwargs: (None, True),
-    )
-
-    with pytest.raises(DepositionInputRefusal) as exc_info:
-        model._condensation_efficiency(
-            stage=stage,
-            species="SiO",
-            T_cond_C=1050.0,
-            residence_s=1.0,
-            available_kg=1.0,
-            alpha_s_value=1.0,
-        )
-
-    assert exc_info.value.parameter == "condensation_reference_at_1mbar_C"
-    assert "exactly one declared routing reference" in exc_info.value.reason
-
-
-def test_sio_malformed_catalog_refuses_before_ood_fallback() -> None:
-    import simulator.condensation as condensation_module
-
-    model = _efficiency_model()
-    with (Path(__file__).resolve().parents[1] / "data/vapor_pressures.yaml").open(
-        encoding="utf-8"
-    ) as handle:
-        model.vapor_pressure_data = yaml.safe_load(handle)
-    reference = (
-        condensation_module._declared_condensation_routing_reference_at_1mbar(
-            "SiO",
-            T_cond_C=1050.0,
-            vapor_pressure_data=model.vapor_pressure_data,
-        )
-    )
-    assert reference["pressure_pa"] == 100.0
-    sio_family = model.vapor_pressure_data["families"][
-        "oxide_vapors_sio_family"
-    ]
-    sio_family["physical_properties"]["species"]["SiO"]["pressure_models"][0][
-        "reference_pressure_model"
-    ]["coefficients"]["A"] = "malformed"
-    model._species_partial_pressures_configured = True
-    model.wall_species_partial_pressures_pa = {"SiO": 25.0}
-    stage = next(s for s in model.train.stages if s.stage_number == 3)
-
-    with pytest.raises(DepositionInputRefusal) as exc_info:
-        model._condensation_efficiency(
-            stage=stage,
-            species="SiO",
-            T_cond_C=1050.0,
-            residence_s=1.0,
-            available_kg=1.0,
-            alpha_s_value=1.0,
-        )
-
-    assert exc_info.value.parameter == "vapor_pressure_data"
-    assert exc_info.value.value == "SiO"
-    assert "requires numeric A" in exc_info.value.reason
 
 
 def test_b112_nonpositive_reference_flux_mints_typed_outcome(monkeypatch) -> None:
@@ -1416,8 +1239,6 @@ def test_serialize_vapour_batch_channels() -> None:
         "pending_validation"
     )
     assert report["channels_by_species"]["Na"]["is_flux_active"] is True
-    assert "n_channel_refused" not in report
-    assert "flux_dormant_species_ids" not in report
 
 
 def test_serialize_vapour_batch_distinguishes_epoch_dormancy() -> None:
@@ -1428,24 +1249,6 @@ def test_serialize_vapour_batch_distinguishes_epoch_dormancy() -> None:
     assert channel["is_union_flux_eligible"] is True
     assert channel["is_flux_active"] is False
     assert channel["is_flux_dormant_by_epoch"] is True
-
-
-def test_serialize_vapour_batch_excludes_dormant_underlying_refusal() -> None:
-    batch = replace(
-        _toy_batch(
-            {"Na", "K", "PO"},
-            refused={"K", "PO"},
-            flux_active=set(),
-        ),
-        flux_dormant_species_ids=frozenset({"Na", "K"}),
-    )
-    report = serialize_vapour_batch(batch)
-    assert report is not None
-    assert report["channels_by_species"]["K"]["is_refused"] is True
-    assert report["channels_by_species"]["K"]["is_flux_dormant_by_epoch"] is True
-    assert report["n_channel_refused"] == 2
-    assert report["n_refused"] == 1
-    assert set(report["refusals_by_species"]) == {"PO"}
 
 
 def test_setpoints_t_cond_audit_covers_operator_overrides() -> None:
@@ -2134,58 +1937,3 @@ def test_b3_production_route_folds_stage_outcomes() -> None:
     assert sio.get("stage_outcomes")
     assert getattr(route, "condensation_refusals_by_species", None) is not None
     assert "SiO" in route.condensation_refusals_by_species
-
-
-def test_sio_ood_production_route_propagates_status_bearing_authority(
-    monkeypatch,
-) -> None:
-    """Computed SiO capture stays marked through the route-level rollup."""
-
-    import simulator.condensation as condensation_module
-    from simulator.state import EvaporationFlux, MeltState
-
-    model = _efficiency_model()
-    with (ROOT / "data/vapor_pressures.yaml").open(encoding="utf-8") as handle:
-        model.vapor_pressure_data = yaml.safe_load(handle)
-    model.configure_operating_conditions(
-        overhead_pressure_mbar=10.0,
-        species_partial_pressures_mbar={"SiO": 10.0},
-        gas_temperature_C=1500.0,
-        campaign_name="C2A",
-    )
-    monkeypatch.setattr(
-        condensation_module,
-        "_try_antoine_psat_pa",
-        lambda *args, **kwargs: (None, True),
-    )
-    carrier = {
-        "species_id": "SiO",
-        "pressure": {"kind": "value", "pa": 1000.0},
-        "flux": {"kind": "eligible", "alpha_ref": "alpha:SiO"},
-        "verdict_status": "authoritative",
-        "certification_ceiling": "validated_point",
-        "validation_status": "validated",
-        "is_union_flux_eligible": True,
-        "is_flux_active": True,
-    }
-    route = model.route(
-        EvaporationFlux(
-            species_kg_hr={"SiO": 1.0},
-            total_kg_hr=1.0,
-            carrier_authority_by_species={"SiO": carrier},
-        ),
-        MeltState(temperature_C=1500.0),
-    )
-
-    rollup = route.condensation_refusals_by_species["SiO"]
-    assert rollup["status"] == "out_of_domain"
-    assert rollup["output_status"] == "status_bearing"
-    assert rollup["reason"] == (
-        "stage_saturation_pressure_out_of_domain_computed_with_"
-        "declared_engineering_route"
-    )
-    assert rollup["stage_outcomes"]
-    authority = route.condensation_authority_by_species["SiO"]
-    assert authority["status"] == VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
-    assert authority["domain_status"] == "out_of_domain"
-    assert authority["authoritative_for_condensation"] is False

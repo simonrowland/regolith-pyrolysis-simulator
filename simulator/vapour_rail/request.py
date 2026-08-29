@@ -834,6 +834,11 @@ def _predicate_active(
 
     predicate = rule.applicability_predicate
     stage = (state.stage if state else None) or ""
+    if stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids:
+        return (
+            False,
+            "c0b_p_cleanup admits only P2O5-sourced carrier rules",
+        )
     active, detail = applicability_verdict(
         predicate,
         process_phase=(state.process_phase if state else None),
@@ -1875,20 +1880,11 @@ def resolve_vapour_batch(
             f"extra={sorted(frozenset(answers) - requested)}"
         )
 
-    rule_by_species = {rule.species_id: rule for rule in rules}
     union_eligible = frozenset(
         species_id
         for species_id, answer in answers.items()
         if answer.is_flux_active
     )
-    campaign_inactive = frozenset()
-    if state is not None and state.stage == "c0b_p_cleanup":
-        campaign_inactive = frozenset(
-            species_id
-            for species_id in requested
-            if "P2O5" not in rule_by_species[species_id].parent_species_ids
-        )
-    campaign_eligible = union_eligible - campaign_inactive
     # Answerability is not activation authority. Pre-RG keeps the species set
     # supplied by the typed effective-pressure seam, but only after refusal
     # closure proves every *remaining debit claim* is catalog-eligible.
@@ -1896,7 +1892,7 @@ def resolve_vapour_batch(
     # FluxDiagnosticUpperBound, ZeroByPhysics) demote the seam claim rather
     # than hard-fail the batch.
     # True refusals among claimed species still hard-fail construction.
-    # RG-1 may activate the campaign-eligible manifest/catalog union after its
+    # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
         claimed = flux_activation_context.effective_pressure_species_ids
@@ -1907,18 +1903,16 @@ def resolve_vapour_batch(
             and not answers[species_id].is_refused
             and not answers[species_id].is_flux_active
         )
-        required_debit_claims = (
-            claimed - demoted_non_debiting - campaign_inactive
-        )
+        required_debit_claims = claimed - demoted_non_debiting
         missing_effective = required_debit_claims - union_eligible
         if missing_effective:
             raise VapourRequestConstructionError(
                 "pre-RG effective-pressure channels are not flux-eligible: "
                 f"{sorted(missing_effective)}"
             )
-        flux_active = claimed & campaign_eligible
+        flux_active = claimed & union_eligible
     elif flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_RG_MANIFEST:
-        flux_active = campaign_eligible
+        flux_active = union_eligible
     else:  # FluxActivationContext rejects this; retain a fail-closed guard.
         raise VapourRequestConstructionError(
             f"unsupported flux activation epoch: {flux_activation_context.epoch!r}"
@@ -1930,7 +1924,6 @@ def resolve_vapour_batch(
         channels_by_species=answers,
         solve_bundle_ids=bundles,
         flux_active_species_ids=flux_active,
-        flux_dormant_species_ids=campaign_inactive,
         metadata=MappingProxyType(
             {
                 "refusal_closure_fixed_point": bool(closure.reached_fixed_point),
@@ -1938,9 +1931,7 @@ def resolve_vapour_batch(
                 "n_requested": len(requested),
                 "n_refused": sum(1 for a in answers.values() if a.is_refused),
                 "n_flux_active": len(flux_active),
-                "n_flux_dormant_by_epoch": len(
-                    (union_eligible - flux_active) | campaign_inactive
-                ),
+                "n_flux_dormant_by_epoch": len(union_eligible - flux_active),
                 "flux_activation_epoch": flux_activation_context.epoch,
                 "n_solve_bundles": len(bundles),
             }

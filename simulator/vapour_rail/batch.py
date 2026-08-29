@@ -210,9 +210,6 @@ class VapourBatch:
         default_factory=lambda: MappingProxyType({})
     )
     flux_active_species_ids: frozenset[str] = frozenset()
-    # Declared campaign/epoch selectors may prove a channel cannot debit even
-    # when its unused pressure path would otherwise refuse.
-    flux_dormant_species_ids: frozenset[str] = frozenset()
     metadata: Mapping[str, Any] = field(
         default_factory=lambda: MappingProxyType({})
     )
@@ -239,11 +236,6 @@ class VapourBatch:
             self, "flux_active_species_ids", frozenset(self.flux_active_species_ids)
         )
         object.__setattr__(
-            self,
-            "flux_dormant_species_ids",
-            frozenset(self.flux_dormant_species_ids),
-        )
-        object.__setattr__(
             self, "metadata", MappingProxyType(dict(self.metadata))
         )
 
@@ -254,20 +246,6 @@ class VapourBatch:
             raise IncompleteVapourBatchError(
                 "channels_by_species.keys() must equal requested_species_ids; "
                 f"missing={missing}, extra={extra}"
-            )
-        invalid_dormant = self.flux_dormant_species_ids - requested
-        if invalid_dormant:
-            raise IncompleteVapourBatchError(
-                "flux_dormant_species_ids must be requested channels; "
-                f"extra={sorted(invalid_dormant)}"
-            )
-        active_and_dormant = (
-            self.flux_active_species_ids & self.flux_dormant_species_ids
-        )
-        if active_and_dormant:
-            raise IncompleteVapourBatchError(
-                "vapour channels cannot be both flux-active and dormant; "
-                f"overlap={sorted(active_and_dormant)}"
             )
         for species_id, answer in channels.items():
             if answer.species_id != species_id:

@@ -70,7 +70,6 @@ from simulator.vapour_rail.instrumentation import (
     flux_pressures_from_batch,
     serialize_melt_activity_shadow,
     serialize_vapour_answer,
-    serialize_vapour_batch,
 )
 from simulator.vapour_rail.u0_manifest import load_u0_manifest
 
@@ -618,137 +617,11 @@ def test_stage0_p_markers_activate_only_p2o5_sourced_rules() -> None:
             ),
             ledger_snapshot={"process.cleaned_melt": {"NaCl": 1.0}},
             state=state,
-            catalog_species=(
-                _stub_catalog_species("NaCl")
-                if stage == "c0b_p_cleanup"
-                else None
-            ),
             flux_activation_context=_rg_activation_context(),
         )
-        if stage == "c0b_p_cleanup":
-            assert not non_p_batch.channel("NaCl").is_refused
-            assert "NaCl" not in non_p_batch.flux_active_species_ids
-        else:
-            assert non_p_batch.channel("NaCl").refusal_code == (
-                REFUSAL_INAPPLICABLE_PREDICATE
-            )
-
-
-def test_c0b_inactivity_dominates_non_p_refusal_while_p_refusal_remains() -> None:
-    dormant_rule = RequestRule(
-        species_id="NaCl",
-        source_account="process.cleaned_melt",
-        parent_species_ids=frozenset({"NaCl"}),
-        required_source_atoms=frozenset({"Na", "Cl"}),
-        solve_group_id="nacl_test",
-        applicability_predicate="applicable",
-        request_rule_kind="source_inventory_present",
-        origin="catalog",
-        formula_id="NaCl",
-        has_pressure_evaluator=True,
-        has_alpha=True,
-        has_route=True,
-        has_formula=True,
-        validation_status="pending_validation",
-    )
-    inactive_refused_rule = RequestRule(
-        species_id="K",
-        source_account="process.stage0_foulant",
-        parent_species_ids=frozenset({"TRIGGER"}),
-        required_source_atoms=frozenset({"Cl"}),
-        solve_group_id="k_test",
-        applicability_predicate="applicable",
-        request_rule_kind="source_inventory_present",
-        origin="catalog",
-        formula_id="K",
-        has_pressure_evaluator=True,
-        has_alpha=True,
-        has_route=True,
-        has_formula=True,
-        validation_status="pending_validation",
-    )
-    active_refused_rule = RequestRule(
-        species_id="PO",
-        source_account="process.stage0_foulant",
-        parent_species_ids=frozenset({"P2O5"}),
-        required_source_atoms=frozenset({"Cl"}),
-        solve_group_id="po_test",
-        applicability_predicate="applicable",
-        request_rule_kind="source_inventory_present",
-        origin="catalog",
-        formula_id="PO",
-        has_pressure_evaluator=True,
-        has_alpha=True,
-        has_route=True,
-        has_formula=True,
-        validation_status="pending_validation",
-    )
-    rules = (dormant_rule, inactive_refused_rule, active_refused_rule)
-    ledger_snapshot = {
-        "process.cleaned_melt": {"NaCl": 1.0},
-        "process.stage0_foulant": {"TRIGGER": 1.0, "P2O5": 1.0},
-    }
-    state = VapourResolveState(
-        temperature_K=1873.15,
-        process_phase="hot_train",
-        stage="c0b_p_cleanup",
-    )
-
-    def resolve(activation_context: FluxActivationContext) -> VapourBatch:
-        return resolve_vapour_batch(
-            rules=rules,
-            ledger_snapshot=ledger_snapshot,
-            state=state,
-            catalog_species=_stub_catalog_species("NaCl"),
-            flux_activation_context=activation_context,
+        assert non_p_batch.channel("NaCl").refusal_code == (
+            REFUSAL_INAPPLICABLE_PREDICATE
         )
-
-    for activation_context in (
-        _pre_rg_activation_context("NaCl", "K"),
-        _rg_activation_context(),
-    ):
-        batch = resolve(activation_context)
-
-        dormant = batch.channel("NaCl")
-        assert not dormant.is_refused
-        assert isinstance(dormant.pressure, PressureValue)
-        assert isinstance(dormant.flux, FluxEligible)
-        assert "NaCl" not in batch.flux_active_species_ids
-        assert batch.flux_dormant_species_ids == frozenset({"K", "NaCl"})
-
-        inactive_refused = batch.channel("K")
-        assert inactive_refused.is_refused
-        assert inactive_refused.refusal_code == REFUSAL_ABSENT_SOURCE_ATOM
-
-        refused = batch.channel("PO")
-        assert refused.is_refused
-        assert refused.refusal_code == REFUSAL_ABSENT_SOURCE_ATOM
-        assert isinstance(refused.pressure, PressureRefusal)
-        assert isinstance(refused.flux, FluxRefusal)
-
-        flux_pressures, overlay = flux_pressures_from_batch(
-            batch,
-            effective_pressure_source=EffectivePressureSource("c0b_p_only", {}),
-        )
-        assert flux_pressures == {}
-        assert overlay["batch_channel_states"] == {
-            "K": "dormant_by_epoch",
-            "NaCl": "dormant_by_epoch",
-            "PO": "refusal",
-        }
-        serialized = serialize_vapour_batch(batch)
-        assert serialized is not None
-        assert serialized["n_channel_refused"] == 2
-        assert serialized["n_refused"] == 1
-        assert serialized["metadata"]["n_channel_refused"] == 2
-        assert "n_refused" not in serialized["metadata"]
-        assert batch.metadata["n_refused"] == 2
-
-    with pytest.raises(
-        VapourRequestConstructionError,
-        match="pre-RG effective-pressure channels are not flux-eligible",
-    ):
-        resolve(_pre_rg_activation_context("PO"))
 
 
 # ---------------------------------------------------------------------------

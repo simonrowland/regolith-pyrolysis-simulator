@@ -124,11 +124,7 @@ _DECLARED_REAL_SCALAR_CONTROL_INPUTS = frozenset(
 )
 
 
-def _validate_control_input_real_scalars(
-    data: Mapping[str, Any],
-    *,
-    provider_validated_fields: frozenset[str] = frozenset(),
-) -> None:
+def _validate_control_input_real_scalars(data: Mapping[str, Any]) -> None:
     """Reject any non-real-scalar for controls the schema declares numeric.
 
     Named for what it does. It was `_validate_control_input_booleans`, and its
@@ -151,8 +147,6 @@ def _validate_control_input_real_scalars(
 
     for field_name, value in (data or {}).items():
         if field_name not in _DECLARED_REAL_SCALAR_CONTROL_INPUTS:
-            continue
-        if field_name in provider_validated_fields:
             continue
         if value is not None and not is_declared_real_scalar(
             value,
@@ -376,19 +370,7 @@ class IntentRequest:
                 raise TypeError("fO2_log must be numeric")
             object.__setattr__(self, "fO2_log", float(self.fO2_log))
         object.__setattr__(self, "fe_redox_policy", str(self.fe_redox_policy))
-        # Electrolysis owns one typed invalid-control doctrine for these four
-        # physical controls. Defer their scalar coercion to that authoritative
-        # provider so booleans join non-finite/negative values in the same
-        # MRE_INVALID_CONTROL_REFUSAL before energy or transition work.
-        provider_validated_fields = (
-            frozenset({"voltage_V", "current_A", "dt_hr", "pO2_bar"})
-            if self.intent is ChemistryIntent.ELECTROLYSIS_STEP
-            else frozenset()
-        )
-        _validate_control_input_real_scalars(
-            self.control_inputs,
-            provider_validated_fields=provider_validated_fields,
-        )
+        _validate_control_input_real_scalars(self.control_inputs)
         object.__setattr__(self, "control_inputs", _freeze_str_any(self.control_inputs))
 
 
