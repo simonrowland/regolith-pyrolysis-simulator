@@ -415,20 +415,17 @@ _COMPILE_CACHE_ORDER: list[str] = []
 _COMPILE_IDENTITY_HINTS: OrderedDict[
     tuple[int, bool], tuple[Mapping[str, Any], bytes, str]
 ] = OrderedDict()
-# Same-owner fast hit after the compile-time payload snapshot, effective
-# manifest, and external extract stat signatures still match. This avoids
-# payload-sized marshal/digest/extract-ref walks on every warm lookup while
-# preserving in-place mutation and file-change misses. Semantic cache identity
-# remains the SHA-256 content key below.
+# Same-owner fast hit after both the owner tree and external extract stat
+# signatures match. This avoids rebuilding the external dependency vector on
+# every warm lookup while preserving in-place mutation and file-change misses.
 _COMPILE_FAST_HINTS: OrderedDict[
     tuple[int, bool],
     tuple[
         Mapping[str, Any],
-        Mapping[str, Any] | None,
+        bytes,
         tuple[str, ...],
         tuple[tuple[str, tuple[int, int, int, int, int]], ...],
         str,
-        Mapping[str, Any] | None,
     ],
 ] = OrderedDict()
 # key: content-digest of payload; value: schema-v1 projection dict
@@ -1847,6 +1844,21 @@ def clear_vapour_rail_compile_cache() -> None:
     _COMPILE_FAST_HINTS.clear()
 
 
+def _compile_owner_fingerprint(
+    payload: Mapping[str, Any],
+    *,
+    emit_u0_request_rules: bool,
+    effective_u0_manifest: Mapping[str, Any] | None,
+) -> bytes | None:
+    vector: dict[str, Any] = {
+        "payload": payload,
+        "emit_u0_request_rules": bool(emit_u0_request_rules),
+    }
+    if emit_u0_request_rules:
+        vector["u0_manifest"] = effective_u0_manifest
+    return _compile_input_fingerprint(vector)
+
+
 def _thermo_source_signatures(
     source_ids: tuple[str, ...],
 ) -> tuple[tuple[str, tuple[int, int, int, int, int]], ...]:
@@ -1865,12 +1877,11 @@ def _remember_compile_fast_hint(
     payload: Mapping[str, Any],
     *,
     emit_u0_request_rules: bool,
+    owner_fingerprint: bytes | None,
     input_vector: Mapping[str, Any],
     content_key: str,
-    snapshot: Mapping[str, Any] | None,
-    effective_manifest: Mapping[str, Any] | None,
 ) -> None:
-    if snapshot is None:
+    if owner_fingerprint is None:
         return
     raw_dependencies = input_vector.get("thermo_extract_observations")
     source_ids = tuple(sorted(raw_dependencies)) if isinstance(raw_dependencies, Mapping) else ()
@@ -1878,68 +1889,14 @@ def _remember_compile_fast_hint(
     locator = (id(payload), bool(emit_u0_request_rules))
     _COMPILE_FAST_HINTS[locator] = (
         payload,
-        snapshot,
+        owner_fingerprint,
         source_ids,
         signatures,
         content_key,
-        effective_manifest,
     )
     _COMPILE_FAST_HINTS.move_to_end(locator)
     while len(_COMPILE_FAST_HINTS) > _COMPILE_CACHE_MAX:
         _COMPILE_FAST_HINTS.popitem(last=False)
-
-
-def _snapshot_uses_deep_equality(snapshot: Mapping[str, Any]) -> bool:
-    """Mini fixtures can afford C-level ``==``; the production catalog cannot.
-
-    Mutation tests edit nested values on a one-family fixture. Walking the
-    production tree on every warm hit is the payload-sized work the cache
-    exists to avoid (~0.7 ms isolated, several ms under load).
-    """
-
-    families = snapshot.get("families")
-    if not isinstance(families, Mapping):
-        return True
-    return len(families) <= 4
-
-
-def _fast_hint_owner_matches(
-    payload: Mapping[str, Any],
-    *,
-    effective_manifest: Mapping[str, Any] | None,
-    fast_hint: tuple[
-        Mapping[str, Any],
-        Mapping[str, Any] | None,
-        tuple[str, ...],
-        tuple[tuple[str, tuple[int, int, int, int, int]], ...],
-        str,
-        Mapping[str, Any] | None,
-    ],
-) -> bool:
-    """Return whether a same-owner warm hit can skip payload-sized identity work.
-
-    Premise: the payload object itself is the trusted owner revision after a
-    successful compile. Mini fixtures still deep-compare against the
-    compile-time deepcopy so nested in-place edits miss. The production
-    catalog (~6000 nested maps) trusts object identity plus schema_version
-    and families-object identity: hot-reload loads a new YAML dict, and the
-    nested-mutation tests use one-family fixtures. Unit: ``is`` is O(1);
-    ``==`` on a mini fixture is microseconds. Sanity: replacing the families
-    mapping or schema_version still misses.
-    """
-
-    stored_payload, snapshot, source_ids, signatures, _content_key, stored_manifest = (
-        fast_hint
-    )
-    if stored_payload is not payload or snapshot is None:
-        return False
-    if stored_manifest is not effective_manifest and stored_manifest != effective_manifest:
-        return False
-    if payload.get("schema_version") != snapshot.get("schema_version"):
-        return False
-    if _snapshot_uses_deep_equality(snapshot) and payload != snapshot:
-        return False
-    return signatures == _thermo_source_signatures(source_ids)
 
 
 def compiled_catalog_for(
@@ -1993,11 +1950,6 @@ def compile_vapour_rail_catalog(
     boundary to seed the verified snapshot hint and skip canonical re-digesting
     on repeated lookups. The U0 manifest YAML load is separately memoized in
     ``load_u0_manifest``.
-
-    Default (unkeyed) warm hits reuse a compile-time payload snapshot rather
-    than re-marshaling the owner tree. Extract-ref validation, schema checks,
-    and the canonical digest still run on the cold / miss path; they are not
-    unique to the warm path.
     """
 
     if not isinstance(payload, Mapping):
@@ -2010,12 +1962,19 @@ def compile_vapour_rail_catalog(
     effective_manifest = _resolve_effective_u0_manifest(
         u0_manifest, emit_u0_request_rules=emit_u0_request_rules
     )
+    owner_fingerprint = _compile_owner_fingerprint(
+        payload,
+        emit_u0_request_rules=emit_u0_request_rules,
+        effective_u0_manifest=effective_manifest,
+    )
     locator = (id(payload), bool(emit_u0_request_rules))
     fast_hint = _COMPILE_FAST_HINTS.get(locator)
-    if fast_hint is not None and _fast_hint_owner_matches(
-        payload,
-        effective_manifest=effective_manifest,
-        fast_hint=fast_hint,
+    if (
+        owner_fingerprint is not None
+        and fast_hint is not None
+        and fast_hint[0] is payload
+        and fast_hint[1] == owner_fingerprint
+        and fast_hint[3] == _thermo_source_signatures(fast_hint[2])
     ):
         fast_key = fast_hint[4]
         if content_key is not None and content_key != fast_key:
@@ -2060,10 +2019,9 @@ def compile_vapour_rail_catalog(
             _remember_compile_fast_hint(
                 payload,
                 emit_u0_request_rules=emit_u0_request_rules,
+                owner_fingerprint=owner_fingerprint,
                 input_vector=input_vector,
                 content_key=cache_key,
-                snapshot=cached._catalog_payload,
-                effective_manifest=effective_manifest,
             )
             return cached
     if payload.get("schema_version") != SCHEMA_VERSION:
@@ -2242,10 +2200,9 @@ def compile_vapour_rail_catalog(
     _remember_compile_fast_hint(
         payload,
         emit_u0_request_rules=emit_u0_request_rules,
+        owner_fingerprint=owner_fingerprint,
         input_vector=input_vector,
         content_key=cache_key,
-        snapshot=result._catalog_payload,
-        effective_manifest=effective_manifest,
     )
     return result
 
