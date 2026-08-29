@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Prove t-609 additivity against the actual cf4a499 compiler and catalog.
 
-The baseline and candidate are compiled in isolated Python processes. Both
-revisions are imported from immutable Git archives (or a verified clean
-detached checkout for the baseline), so later HEAD additions cannot change
-the historic t-609 subject.
+The baseline and the t-609 landing revision are compiled in isolated Python
+processes from immutable Git archives (or a verified clean detached checkout
+for the baseline). The candidate is c4a22134, not HEAD, so later lawful
+catalog additions cannot change the historic t-609 subject.
 """
 
 from __future__ import annotations
@@ -323,41 +323,30 @@ def _generate_evidence(
     baseline_root: Path | None = None,
     *,
     candidate_revision: str | None = None,
+    candidate_materialization: str = "revision_archive",
 ) -> dict[str, Any]:
     candidate_root = candidate_root.resolve()
+    if not candidate_revision:
+        raise ProofFailure(
+            "refusing unpinned live-catalog comparison; pass the historic "
+            f"candidate_revision being proved (t-609: {CANDIDATE_REVISION})"
+        )
+    if candidate_materialization not in {"revision_archive", "catalog_blob"}:
+        raise ProofFailure(
+            f"unknown candidate materialization {candidate_materialization!r}; "
+            "expected 'revision_archive' or 'catalog_blob'"
+        )
+
     base_commit = _run(
         ["git", "rev-parse", f"{BASE_REVISION}^{{commit}}"], cwd=candidate_root
     ).stdout.strip()
-    pinned_candidate = candidate_revision
-    candidate_commit = (
-        _run(
-            ["git", "rev-parse", f"{pinned_candidate}^{{commit}}"],
-            cwd=candidate_root,
-        ).stdout.strip()
-        if pinned_candidate is not None
-        else _run(["git", "rev-parse", "HEAD"], cwd=candidate_root).stdout.strip()
-    )
+    candidate_commit = _run(
+        ["git", "rev-parse", f"{candidate_revision}^{{commit}}"],
+        cwd=candidate_root,
+    ).stdout.strip()
 
     with tempfile.TemporaryDirectory(prefix="t609-additivity-") as temp_text:
         temp_root = Path(temp_text)
-        candidate_catalog_path = None
-        if candidate_revision is not None:
-            candidate_commit = _run(
-                ["git", "rev-parse", f"{candidate_revision}^{{commit}}"],
-                cwd=candidate_root,
-            ).stdout.strip()
-            candidate_catalog_path = temp_root / "candidate-vapor_pressures.yaml"
-            candidate_catalog_path.write_text(
-                _run(
-                    [
-                        "git",
-                        "show",
-                        f"{candidate_commit}:data/vapor_pressures.yaml",
-                    ],
-                    cwd=candidate_root,
-                ).stdout,
-                encoding="utf-8",
-            )
         if baseline_root is not None:
             baseline_root = baseline_root.resolve()
             baseline_commit = _run(
@@ -384,7 +373,7 @@ def _generate_evidence(
             baseline = _run_worker(
                 temporary_baseline_root, temp_root / "baseline.json"
             )
-        if pinned_candidate is not None:
+        if candidate_materialization == "revision_archive":
             temporary_candidate_root = temp_root / "candidate"
             _archive_revision(
                 candidate_root, candidate_commit, temporary_candidate_root
@@ -393,7 +382,23 @@ def _generate_evidence(
                 temporary_candidate_root, temp_root / "candidate.json"
             )
         else:
-            candidate = _run_worker(candidate_root, temp_root / "candidate.json")
+            candidate_catalog_path = temp_root / "candidate-vapor_pressures.yaml"
+            candidate_catalog_path.write_text(
+                _run(
+                    [
+                        "git",
+                        "show",
+                        f"{candidate_commit}:data/vapor_pressures.yaml",
+                    ],
+                    cwd=candidate_root,
+                ).stdout,
+                encoding="utf-8",
+            )
+            candidate = _run_worker(
+                candidate_root,
+                temp_root / "candidate.json",
+                catalog_path=candidate_catalog_path,
+            )
 
     baseline_ids = set(baseline["compiled_species"])
     candidate_ids = set(candidate["compiled_species"])
@@ -457,7 +462,7 @@ def _generate_evidence(
             "baseline_revision": base_commit,
             **(
                 {"candidate_revision": candidate_commit}
-                if pinned_candidate is not None
+                if candidate_materialization == "revision_archive"
                 else {}
             ),
             "baseline_materialization": (
@@ -558,6 +563,7 @@ def _main() -> int:
         args.candidate_root,
         args.baseline_root,
         candidate_revision=CANDIDATE_REVISION,
+        candidate_materialization="revision_archive",
     )
     rendered = _render_evidence(evidence)
     if args.check:

@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from copy import deepcopy
 import csv
+import importlib.util
 import math
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -83,6 +85,38 @@ def _yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
 
 
+def _load_t609_proof():
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "scripts"
+        / "prove_t609_cross_revision_additivity.py"
+    )
+    spec = importlib.util.spec_from_file_location(
+        "prove_t609_cross_revision_additivity", path
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _family_species_ids(text: str) -> set[str]:
+    payload = yaml.safe_load(text)
+    ids: set[str] = set()
+    for family in payload.get("families", {}).values():
+        species = (family.get("physical_properties") or {}).get("species") or {}
+        ids.update(str(species_id) for species_id in species)
+    return ids
+
+
+def _git_show(root: Path, revision: str, path: str) -> str:
+    return subprocess.check_output(
+        ["git", "show", f"{revision}:{path}"],
+        cwd=root,
+        text=True,
+    )
+
+
 def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
     root = Path(__file__).resolve().parents[1]
     evidence_path = (
@@ -136,6 +170,119 @@ def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
     assert evidence["t583_coverage"]["total_t583_compositions_covered"] == 251
 
 
+def test_t609_additivity_pin_is_the_t609_landing_not_the_live_catalog() -> None:
+    """t-622 already added MnO/CoO. Widening EXPECTED_ADDITIONS would hide that."""
+
+    root = Path(__file__).resolve().parents[1]
+    proof = _load_t609_proof()
+    assert proof.EXPECTED_ADDITIONS == ("FeO_association_gas", "NiO_gas")
+    assert proof.CANDIDATE_REVISION == (
+        "c4a2213422eb30b6f2f38b68281d9662fc35926d"
+    )
+    head = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=root, text=True
+    ).strip()
+    assert proof.CANDIDATE_REVISION != head
+
+    base_ids = _family_species_ids(
+        _git_show(root, proof.BASE_REVISION, "data/vapor_pressures.yaml")
+    )
+    t609_ids = _family_species_ids(
+        _git_show(root, proof.CANDIDATE_REVISION, "data/vapor_pressures.yaml")
+    )
+    live_ids = _family_species_ids(
+        (root / "data" / "vapor_pressures.yaml").read_text(encoding="utf-8")
+    )
+    assert sorted(t609_ids - base_ids) == list(proof.EXPECTED_ADDITIONS)
+    later = live_ids - t609_ids
+    assert {"CoO_gas", "MnO_gas"} <= later
+
+
+def test_t609_additivity_proof_ignores_a_further_catalog_addition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A later lawful Extra_gas in the live tree must not change t-609's delta."""
+
+    root = Path(__file__).resolve().parents[1]
+    proof = _load_t609_proof()
+    baseline_ids = ("Preexisting_A", "Preexisting_B")
+    t609_ids = (*baseline_ids, *proof.EXPECTED_ADDITIONS)
+    live_ids = (*t609_ids, "MnO_gas", "CoO_gas", "Extra_gas")
+    worker_roots: list[str] = []
+
+    def _snapshot(ids: tuple[str, ...]) -> dict:
+        compiled = {species_id: {"id": species_id} for species_id in ids}
+        evaluations = {species_id: [] for species_id in ids}
+        return {
+            "catalog_sha256": "0" * 64,
+            "compiler_sha256": "1" * 64,
+            "compiled_species": compiled,
+            "evaluations": evaluations,
+            "counts": {
+                "compiled_species": len(ids),
+                "evaluator_species": 0,
+                "evaluation_cases": 0,
+                "exceptions": 0,
+            },
+            "t583": {
+                "status_only_species": [f"status_{index}" for index in range(151)],
+                "status_only_ledger_pair_compositions": 250,
+                "existing_executable_species": ["H2S"],
+                "existing_executable_ledger_pair_compositions": 1,
+                "total_compositions": 251,
+            },
+        }
+
+    def fake_run(command: list[str], *, cwd: Path) -> SimpleNamespace:
+        if command[:2] == ["git", "rev-parse"]:
+            spec = command[2].replace("^{commit}", "")
+            resolved = {
+                proof.BASE_REVISION: proof.BASE_REVISION,
+                proof.CANDIDATE_REVISION: proof.CANDIDATE_REVISION,
+                "HEAD": "0" * 40,
+            }[spec]
+            return SimpleNamespace(stdout=resolved + "\n")
+        raise AssertionError(f"unexpected command {command} in {cwd}")
+
+    def fake_archive(_repo_root: Path, revision: str, dest_root: Path) -> None:
+        dest_root.mkdir(parents=True, exist_ok=True)
+        (dest_root / "revision").write_text(revision, encoding="utf-8")
+
+    def fake_worker(
+        import_root: Path,
+        _snapshot_path: Path,
+        *,
+        catalog_path: Path | None = None,
+    ) -> dict:
+        worker_roots.append(import_root.name)
+        if catalog_path is not None:
+            raise AssertionError("t-609 archive path must not use a catalog blob")
+        if import_root.resolve() == root.resolve():
+            return _snapshot(live_ids)
+        if import_root.name == "baseline":
+            return _snapshot(baseline_ids)
+        if import_root.name == "candidate":
+            return _snapshot(t609_ids)
+        raise AssertionError(f"unexpected worker root {import_root}")
+
+    monkeypatch.setattr(proof, "_run", fake_run)
+    monkeypatch.setattr(proof, "_archive_revision", fake_archive)
+    monkeypatch.setattr(proof, "_run_worker", fake_worker)
+
+    with pytest.raises(proof.ProofFailure, match="refusing unpinned live-catalog"):
+        proof._generate_evidence(root)
+
+    evidence = proof._generate_evidence(
+        root,
+        candidate_revision=proof.CANDIDATE_REVISION,
+        candidate_materialization="revision_archive",
+    )
+    assert evidence["species_delta"]["additions"] == list(proof.EXPECTED_ADDITIONS)
+    assert evidence["species_delta"]["removals"] == []
+    assert worker_roots == ["baseline", "candidate"]
+    assert "Extra_gas" not in evidence["added_species_digests"]
+
+
 def test_t622_cross_revision_additivity_evidence_is_reproducible() -> None:
     root = Path(__file__).resolve().parents[1]
     evidence_path = (
@@ -185,27 +332,15 @@ def test_t622_cross_revision_additivity_evidence_is_reproducible() -> None:
     ]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "T622 oxidative-window reference artifact is absent from Git history; "
-        "MUST NOT regenerate it from current simulator output"
-    ),
-)
-def test_t622_oxidative_window_envelope_evidence_is_reproducible() -> None:
+def test_t622_oxidative_window_envelope_evidence_is_reproducible(
+    tmp_path: Path,
+) -> None:
     root = Path(__file__).resolve().parents[1]
-    output = (
-        root
-        / "docs-private"
-        / "research"
-        / "2026-08-12-t622-mno-coo"
-        / "oxidative-window-envelope.csv"
-    )
+    output = tmp_path / "oxidative-window-envelope.csv"
     completed = subprocess.run(
         [
             sys.executable,
             str(root / "scripts" / "prove_t622_oxidative_window.py"),
-            "--check",
             "--output",
             str(output),
         ],

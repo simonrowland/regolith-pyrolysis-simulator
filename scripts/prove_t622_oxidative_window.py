@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Re-run and compactly summarize the t-605 oxidative sweep for t-622."""
+"""Re-run and compactly summarize the t-605 oxidative sweep for t-622.
+
+The catalog payload is the t-622 landing revision, not HEAD, so later lawful
+species additions cannot change the historic MnO/CoO window subject.
+"""
 
 from __future__ import annotations
 
@@ -10,6 +14,7 @@ import io
 import math
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 import yaml
@@ -31,6 +36,7 @@ from simulator.vapour_rail.domain_policy import (  # noqa: E402
 )
 
 
+CANDIDATE_REVISION = "3a36e9bb6ff79a6a3f51ca969d3a2d41c4e800a9"
 DEFAULT_OUTPUT = (
     ROOT
     / "docs-private"
@@ -150,8 +156,24 @@ def _maximum(values):
     return max(present) if present else None
 
 
+def _historic_catalog_payload(root: Path, revision: str) -> dict:
+    completed = subprocess.run(
+        ["git", "show", f"{revision}:data/vapor_pressures.yaml"],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        raise SystemExit(
+            f"t-622 catalog revision {revision} is not recoverable in {root}: "
+            f"{(completed.stderr or completed.stdout).strip()}"
+        )
+    return yaml.safe_load(completed.stdout)
+
+
 def _render() -> str:
-    payload = yaml.safe_load((ROOT / "data" / "vapor_pressures.yaml").read_text())
+    payload = _historic_catalog_payload(ROOT, CANDIDATE_REVISION)
     feedstocks = yaml.safe_load((ROOT / "data" / "feedstocks.yaml").read_text())
     composition = feedstocks["lunar_mare_low_ti"]["composition_wt_pct"]
     account_mol = {
@@ -449,7 +471,12 @@ def _main() -> int:
     args = parser.parse_args()
     rendered = _render()
     if args.check:
-        if not args.output.is_file() or args.output.read_text() != rendered:
+        if not args.output.is_file():
+            raise SystemExit(
+                f"oxidative-window reference is absent: {args.output}; "
+                "will not synthesize a golden from current output"
+            )
+        if args.output.read_text() != rendered:
             raise SystemExit(f"stale oxidative-window evidence: {args.output}")
     else:
         args.output.parent.mkdir(parents=True, exist_ok=True)

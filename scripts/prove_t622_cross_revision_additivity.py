@@ -41,6 +41,7 @@ def _main() -> int:
         args.candidate_root,
         args.baseline_root,
         candidate_revision=CANDIDATE_REVISION,
+        candidate_materialization="catalog_blob",
     )
     evidence["proof_id"] = "t622_cross_revision_additivity_2026-08-12"
     evidence["generated_by"] = "scripts/prove_t622_cross_revision_additivity.py"
