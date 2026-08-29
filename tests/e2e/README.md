@@ -21,11 +21,12 @@ never starts or kills a server.
     tests/e2e/test_no_feedstock_alert.py \
     tests/e2e/test_run_stall_out_of_domain.py \
     tests/e2e/test_optimizer_bounded.py \
-    tests/e2e/test_run_control_journey.py -n0 -v
+    tests/e2e/test_run_control_journey.py \
+    tests/e2e/test_alternate_branch_journey.py -n0 -v
 ```
 
-`-n0` overrides the repo-wide `-n auto` xdist default. These four tests also
-carry `@pytest.mark.xdist_group("e2e-browser")` so a full-suite run still
+`-n0` overrides the repo-wide `-n auto` xdist default. These tests also
+carry `@pytest.mark.xdist_group("serial")` so a full-suite run still
 serializes them onto one worker. `REGOLITH_E2E_HEADED=1` shows the browser;
 `REGOLITH_E2E_BASE_URL` retargets.
 
@@ -45,9 +46,13 @@ in-process chemistry tests, not browser tests.
 | `test_run_stall_out_of_domain.py` | Defect (b): run starts then stalls / OUT_OF_DOMAIN | Server must answer within 60s; then no 90s no-progress window across 360s. A true stall dumps the **verbatim socket.io tail**. A terminal `refused`/`error` also fails, with the socket payload as the deliverable |
 | `test_optimizer_bounded.py` | Defect (c): `/optimizer` historically ~7 min | Bounded 120s goto; blows up instead of hanging; then asserts leaderboard rows |
 | `test_run_control_journey.py` | Pause / resume / cancel / restart in one session | Pause ACK + hour frozen one advance window · resume ACK + hour advances · command-plane cancel hands Start back · second Start is a new `run_id` that ticks |
+| `test_alternate_branch_journey.py` | Non-recommended Branch One | PATH_AB stays recommended `A_staged` · BRANCH_ONE_TWO → `one` (skip C4) · campaign chain has `C2A_STAGED`, no `C4` · run to a terminal · product ledger has numbers |
 
-Decision modals are auto-answered with the recommended option (MutationObserver,
-not a sleep). No fixed sleeps anywhere for synchronisation.
+Decision modals are auto-answered with the recommended option by default
+(MutationObserver, not a sleep). `test_alternate_branch_journey.py` overrides
+that via `decision_auto_answer_js({"BRANCH_ONE_TWO": "one"})`;
+unspecified types still take the recommendation. No fixed sleeps anywhere for
+synchronisation.
 
 ## Evidence captured on every test
 

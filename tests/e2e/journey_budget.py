@@ -85,6 +85,26 @@ CONTROL_JOURNEY_BUDGET_MS = (
 )
 CONTROL_JOURNEY_TIMEOUT_S = (CONTROL_JOURNEY_BUDGET_MS + JOURNEY_MARGIN_MS) // 1000
 
+# Alternate decision-branch journey: land + feedstock + start + first tick +
+# advance loop to a terminal. Does NOT visit /optimizer or /thermal-train.
+# PATH_AB stays A_staged; BRANCH_ONE_TWO = one (skip C4; complete when C5 is
+# off). Same advance-loop total as the happy path so a run that keeps moving
+# is reported here, not killed by the outer pytest timeout.
+#
+#   land 30 + feedstock 15 + socket 20 + status 30 + ack 60
+#   + first tick 90 + advance loop 600
+#   = 845 s declared; + 120 s margin for page load and browser teardown.
+BRANCH_JOURNEY_BUDGET_MS = (
+    PAGE_LOAD_MS
+    + FEEDSTOCK_CARD_MS
+    + SOCKET_CONNECT_MS
+    + STATUS_CHANGE_MS
+    + START_ACK_MS
+    + TICK_ADVANCE_MS
+    + RUN_COMPLETE_TOTAL_MS
+)
+BRANCH_JOURNEY_TIMEOUT_S = (BRANCH_JOURNEY_BUDGET_MS + JOURNEY_MARGIN_MS) // 1000
+
 # The one journey failure that is excused, quoted from the refusal the product
 # actually emits. BOTH marks must be present: "Knudsen" alone appears in
 # unrelated transport prose, and matching loosely would re-open the hole this

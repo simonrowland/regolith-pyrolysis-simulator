@@ -95,6 +95,16 @@ HEAVY_ROSTER = frozenset({
     # and a 300 s cap would kill the test before step 8 can report.
     ("tests/e2e/test_run_control_journey.py",
      "test_pause_resume_cancel_restart_journey"),
+    # 2026-08-29: alternate-branch browser journey (BRANCH_ONE_TWO = one).
+    # MEASURED 190.49 s on the committed A_staged+one path (Complete at hour
+    # 34). Cap is derived from declared step budgets in
+    # tests/e2e/journey_budget.py (845 s + 120 s margin = 965 s) so a slower
+    # host, or the longer Path B chain (scouted at 638 s, still inside C3_NA
+    # at hour 81), can still report. A 300 s cap would kill those runs
+    # before the ledger step can report — same class as the happy-path
+    # journey.
+    ("tests/e2e/test_alternate_branch_journey.py",
+     "test_alternate_branch_journey"),
     # gate-2 amendments (2026-07-23): C6-continue lengthened these past the
     # default ceiling; each carries its measured justification at the mark.
     ("tests/test_make_recipe_db_profile.py",

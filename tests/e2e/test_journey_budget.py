@@ -132,3 +132,32 @@ def test_control_journey_budget_is_the_sum_of_its_parts() -> None:
 def test_pause_hold_is_not_shorter_than_one_advance_window() -> None:
     """A shorter hold would pass if the next hour is merely slow."""
     assert budget.PAUSE_HOLD_MS >= budget.TICK_ADVANCE_MS
+
+
+def test_branch_journey_cap_exceeds_its_declared_step_budget() -> None:
+    assert budget.BRANCH_JOURNEY_TIMEOUT_S * 1000 > budget.BRANCH_JOURNEY_BUDGET_MS, (
+        f"branch-journey cap {budget.BRANCH_JOURNEY_TIMEOUT_S}s does not exceed "
+        f"the declared step budget {budget.BRANCH_JOURNEY_BUDGET_MS / 1000}s"
+    )
+
+
+def test_branch_journey_budget_is_the_sum_of_its_parts() -> None:
+    expected = (
+        budget.PAGE_LOAD_MS
+        + budget.FEEDSTOCK_CARD_MS
+        + budget.SOCKET_CONNECT_MS
+        + budget.STATUS_CHANGE_MS
+        + budget.START_ACK_MS
+        + budget.TICK_ADVANCE_MS
+        + budget.RUN_COMPLETE_TOTAL_MS
+    )
+    assert budget.BRANCH_JOURNEY_BUDGET_MS == expected
+
+
+def test_branch_journey_does_not_include_optimizer_or_thermal_train() -> None:
+    """This journey stays on /; those pages belong to the happy path."""
+    assert budget.BRANCH_JOURNEY_BUDGET_MS == (
+        budget.JOURNEY_BUDGET_MS
+        - budget.OPTIMIZER_BOUND_MS
+        - budget.THERMAL_TRAIN_MS
+    )

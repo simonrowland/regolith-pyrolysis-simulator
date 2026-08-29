@@ -46,6 +46,8 @@ ARTIFACTS_ROOT = E2E_DIR / "artifacts"
 # GET / ~1.1 s, GET /api/runs ~1.2 s, GET /thermal-train ~0.002 s,
 # GET /optimizer ~7 MINUTES (known live defect, fix in flight).
 from .journey_budget import (  # noqa: F401 -- re-exported for existing importers
+    BRANCH_JOURNEY_BUDGET_MS,
+    BRANCH_JOURNEY_TIMEOUT_S,
     CONTROL_JOURNEY_BUDGET_MS,
     CONTROL_JOURNEY_TIMEOUT_S,
     FEEDSTOCK_CARD_MS,
@@ -195,6 +197,75 @@ DECISION_AUTO_ANSWER_JS = r"""
     try { observer.observe(document, { childList: true, subtree: true }); } catch (e) { /* ignore */ }
 })();
 """
+
+# Same observer as DECISION_AUTO_ANSWER_JS, but a named option per decision
+# type can override the recommended `.btn-primary`. Unspecified types still
+# click the recommendation. Placeholder __CHOICES__ is replaced with a JSON
+# object by decision_auto_answer_js().
+DECISION_CHOICE_AUTO_ANSWER_JS_TEMPLATE = r"""
+(() => {
+    if (window.__e2eDecisionHookInstalled) return;
+    window.__e2eDecisionHookInstalled = true;
+    window.__e2eDecisions = [];
+    const CHOICES = __CHOICES__;
+    const handle = () => {
+        const modal = document.getElementById('decision-modal');
+        if (!modal || modal.__e2eHandled) return;
+        modal.__e2eHandled = true;
+        let text = '';
+        try { text = modal.innerText.slice(0, 800); } catch (e) { /* ignore */ }
+        let type = '';
+        try {
+            const h3 = modal.querySelector('h3');
+            const raw = h3 ? (h3.textContent || '') : '';
+            const m = raw.match(/Decision Required:\s*(\S+)/);
+            if (m) type = m[1];
+        } catch (e) { /* ignore */ }
+        const wanted = (type && Object.prototype.hasOwnProperty.call(CHOICES, type))
+            ? String(CHOICES[type]) : '';
+        let clicked = null;
+        if (wanted) {
+            const buttons = Array.from(modal.querySelectorAll('button'));
+            clicked = buttons.find((b) => (b.textContent || '').trim() === wanted) || null;
+        }
+        if (!clicked) {
+            clicked = modal.querySelector('.btn-primary') || modal.querySelector('.btn');
+        }
+        const choice = clicked ? (clicked.textContent || '').trim() : null;
+        window.__e2eDecisions.push({
+            ms: Date.now(),
+            text: text,
+            type: type,
+            wanted: wanted || null,
+            answered: !!(clicked),
+            choice: choice,
+        });
+        if (clicked) clicked.click();
+    };
+    const observer = new MutationObserver(handle);
+    try { observer.observe(document, { childList: true, subtree: true }); } catch (e) { /* ignore */ }
+})();
+"""
+
+
+def decision_auto_answer_js(choices: dict[str, str] | None = None) -> str:
+    """Init script for the decision modal.
+
+    Default (no ``choices``): identical to ``DECISION_AUTO_ANSWER_JS`` —
+    click the recommended ``.btn-primary``. Existing journeys rely on that.
+
+    With a mapping of decision-type name to option label (for example
+    ``{"PATH_AB": "B", "BRANCH_ONE_TWO": "one"}``), those types click the
+    matching button; any type not in the map still takes the recommendation.
+    """
+    if not choices:
+        return DECISION_AUTO_ANSWER_JS
+    payload = json.dumps(
+        {str(key): str(value) for key, value in choices.items()},
+        separators=(",", ":"),
+    )
+    return DECISION_CHOICE_AUTO_ANSWER_JS_TEMPLATE.replace("__CHOICES__", payload)
+
 
 # Predicate used by wait_for_function while a run is live. Returns false while
 # nothing changed; returns a tagged string as soon as the run ADVANCES past
@@ -613,6 +684,7 @@ def cancel_run_quietly(page: Page, evidence: EvidenceRecorder) -> None:
 __all__ = [
     "ARTIFACTS_ROOT",
     "BASE_URL",
+    "BRANCH_JOURNEY_TIMEOUT_S",
     "CONTROL_JOURNEY_TIMEOUT_S",
     "DECISION_AUTO_ANSWER_JS",
     "DEFAULT_FEEDSTOCK",
@@ -635,6 +707,7 @@ __all__ = [
     "click_pause",
     "click_resume",
     "click_start",
+    "decision_auto_answer_js",
     "new_artifacts_dir",
     "pause_hold_verdict",
     "select_feedstock",

@@ -9,7 +9,8 @@ Run ONLY these tests, serially, against the already-running dev server:
         tests/e2e/test_no_feedstock_alert.py \
         tests/e2e/test_run_stall_out_of_domain.py \
         tests/e2e/test_optimizer_bounded.py \
-        tests/e2e/test_run_control_journey.py -n0 -v
+        tests/e2e/test_run_control_journey.py \
+        tests/e2e/test_alternate_branch_journey.py -n0 -v
 
 -n0 overrides the repo-wide `-n auto` (xdist): browser tests against one
 shared dev server must run serially.
@@ -31,10 +32,10 @@ if PLAYWRIGHT_SYNC_API is not None:
     sync_playwright = PLAYWRIGHT_SYNC_API.sync_playwright
     from .browser_harness import (
         BASE_URL,
-        DECISION_AUTO_ANSWER_JS,
         HEADED,
         SOCKET_TAP_JS,
         EvidenceRecorder,
+        decision_auto_answer_js,
         new_artifacts_dir,
         write_evidence_json,
     )
@@ -98,10 +99,19 @@ def browser(playwright_instance):
 
 
 @pytest.fixture()
-def context(browser):
+def decision_choices():
+    """Override in a test module to pick non-recommended decision options.
+
+    Default None keeps DECISION_AUTO_ANSWER_JS (click `.btn-primary`).
+    """
+    return None
+
+
+@pytest.fixture()
+def context(browser, decision_choices):
     ctx = browser.new_context(viewport={"width": 1600, "height": 1000})
     ctx.add_init_script(SOCKET_TAP_JS)
-    ctx.add_init_script(DECISION_AUTO_ANSWER_JS)
+    ctx.add_init_script(decision_auto_answer_js(decision_choices))
     yield ctx
     ctx.close()
 
