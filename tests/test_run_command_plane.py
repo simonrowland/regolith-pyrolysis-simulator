@@ -13,6 +13,11 @@ from web import events as web_events
 from web import routes as web_routes
 from web.run_store import RunArtifactStore, persist_run_artifact
 
+# Thread-rendezvous guards throughout this module: these bound a HANG, they do not
+# assert a latency. Any test that means to claim "within N seconds" should use its own
+# explicit figure and say so, rather than borrowing this one.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 def _runner_document(status: str = "ok") -> dict[str, object]:
     return {
@@ -492,7 +497,16 @@ def test_start_racing_disconnect_cannot_publish_orphan(tmp_path, monkeypatch):
 
     def blocking_backend(_name):
         ready_to_publish.set()
-        assert release_start.wait(timeout=2.0)
+        # RENDEZVOUS GUARD, not a latency claim. This wait only asks "has the other
+        # thread got here yet"; nothing about the system under test is expressed by
+        # how long it takes. A tight bound therefore cannot fail informatively -- it
+        # can only fire when the machine is busy, which is what happened: under a
+        # loaded xdist suite this test failed on `ready_to_publish.wait(timeout=2.0)`
+        # returning False while passing in 5.0-6.8s in isolation, three times out of
+        # three. Note line ~520 already gives the SAME rendezvous 10.0s via
+        # starter.join, so the old 2.0 was not a considered figure. Sized to never
+        # fire on a healthy run while still bounding a genuine hang.
+        assert release_start.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         return backend
 
     monkeypatch.setitem(handler.__globals__, "_get_backend", blocking_backend)
@@ -514,7 +528,8 @@ def test_start_racing_disconnect_cannot_publish_orphan(tmp_path, monkeypatch):
 
     starter = threading.Thread(target=start)
     starter.start()
-    assert ready_to_publish.wait(timeout=2.0)
+    # Same rendezvous guard as in blocking_backend above; see the note there.
+    assert ready_to_publish.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
     web_events._disconnect_simulation_client(_Socket(), sid)
     release_start.set()
     starter.join(timeout=10.0)
