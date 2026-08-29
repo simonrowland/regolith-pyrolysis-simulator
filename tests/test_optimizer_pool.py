@@ -533,6 +533,52 @@ def _grandchild_then_hang_evaluate(
     )
 
 
+# Reap-test timing budget. 2026-08-29: the committed values were
+# limit=2.0 / child=3.0 / hang=5.0 / post-wait=1.3, which is knife-edge in BOTH
+# directions, and the second direction is the dangerous one.
+#
+#   FAIL-LOUD edge: the post-reap eval must finish inside the limit. Measured
+#   on an idle laptop by bracketing (limit 2.0 -> timed out at 2.001 s; limit
+#   2.5 and 3.0 -> passed), so its true cost is 2.0-2.5 s against a 2.0 s
+#   limit. The test's own comment budgeted "~0.8s under load". The cost has
+#   grown ~3x past what the bound was chosen for, so the bound now fails on an
+#   IDLE machine, never mind a loaded one.
+#
+#   VACUOUS-PASS edge: the survivor assertion runs at limit + post-wait =
+#   3.3 s, and an unreaped child wrote at 3.0 s. That is 0.3 s of margin. Any
+#   scheduling jitter puts the assertion BEFORE the write, so a broken reaper
+#   would leave no file and the test would pass while proving nothing. A
+#   vacuous pass is worse than the flake, because it is silent.
+#
+# The fix is to scale the fixtures apart, not to nudge one bound. THREE
+# ordering constraints, and the child sleep is bounded on BOTH sides -- a first
+# attempt here set CHILD below LIMIT, which made the child finish and write its
+# file BEFORE the reaper ever acted, turning a green test red for a reason that
+# had nothing to do with reaping:
+#
+#   post_reap_eval_cost (2.0-2.5 s idle; allow ~4x for 24-way xdist
+#       self-contention) < LIMIT (15 s)
+#           -> eval[1] recovers on the same worker. Fail-loud edge.
+#   LIMIT (15 s) < HANG (30 s)
+#           -> eval[0] is still hanging when the wall fires, so it times out.
+#   LIMIT (15 s) < CHILD (20 s) < LIMIT + POST_WAIT (30 s)
+#           -> the child is STILL ALIVE at reap time, so killing it is what
+#              stops the file appearing (5 s margin); and if the reaper misses
+#              it, the child writes at 20 s and the assertion at 30 s sees the
+#              file (10 s margin). Both halves are needed: violate the left and
+#              the reaper is never tested, violate the right and a broken
+#              reaper passes silently.
+#
+# Test wall: 15 (eval[0] killed) + ~2.5 (eval[1]) + 15 (post-wait) + spawn
+# overhead ~= 35 s, so the per-test timeout goes 10 -> 120 to stay clear of the
+# same class of margin failure. Still under the 300 s global default, so this
+# needs no suite-shape roster entry.
+_REAP_LIMIT_S = 15.0
+_REAP_HANG_S = 30.0
+_REAP_CHILD_SLEEP_S = 20.0
+_REAP_POST_WAIT_S = 15.0
+
+
 def _normal_child_then_hang_evaluate(
     patch: RecipePatch,
     feedstock_id: str,
@@ -557,21 +603,32 @@ def _normal_child_then_hang_evaluate(
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     survivor = out / "normal-child-survived.txt"
+    pid_log = out / "normal-child.pid"
     subprocess.Popen(
         [
             sys.executable,
             "-c",
             (
-                "import pathlib, sys, time; "
-                # Stay alive beyond the 2.0s worker timeout below. If the
-                # reaper misses this child, it writes before the assertion.
-                "time.sleep(3.0); "
+                "import os, pathlib, sys, time; "
+                # Record the pid FIRST, before any sleep. "The survivor file
+                # was not written" is a weak oracle -- it is satisfied by a
+                # child that was merely SIGSTOPped and leaked, because a
+                # stopped process never reaches its write. The pid lets the
+                # test assert the child is GONE rather than just quiet.
+                "pathlib.Path(sys.argv[2]).write_text("
+                "str(os.getpid()), encoding='utf-8'); "
+                # Then sleep, then write. If the reaper kills this child the
+                # file never appears; if the reaper MISSES it, the file must
+                # appear before the assertion runs, or that assertion proves
+                # nothing. See _REAP_* derivation above the test.
+                f"time.sleep({_REAP_CHILD_SLEEP_S}); "
                 "pathlib.Path(sys.argv[1]).write_text('alive', encoding='utf-8')"
             ),
             str(survivor),
+            str(pid_log),
         ],
     )
-    time.sleep(5.0)
+    time.sleep(_REAP_HANG_S)
     return _fake_evaluate(
         patch,
         feedstock_id,
@@ -1090,15 +1147,15 @@ def test_process_pool_timeout_kills_worker_process_group(
 
 @pytest.mark.serial  # red under -n auto trains 11-12, green -n0 serial rerun 2026-08-02, timeout/subprocess-timing class
 @pytest.mark.xdist_group("serial")
-@pytest.mark.timeout(10)
+@pytest.mark.timeout(120)
 def test_process_pool_timeout_reaps_normal_subprocess_child(
     tmp_path: Path,
     spawnable_process_pool: None,
 ) -> None:
-    # Hang path sleeps 5s; timeout must stay below that. After the timed-out
-    # worker is reaped, the next eval on max_workers=1 may pay a cold-spawn
-    # import cost (~0.8s under load), so leave headroom above 0.75s while
-    # remaining well under the hang duration.
+    # Timing budget and its derivation live at _REAP_LIMIT_S above. In short:
+    # eval[0] hangs and must be killed; eval[1] must then recover on the same
+    # single worker; and an UNREAPED child must still write its survivor file
+    # before the assertion, or that assertion is vacuous.
     results = evaluate_batch(
         [
             PoolEvaluationRequest(
@@ -1118,10 +1175,10 @@ def test_process_pool_timeout_reaps_normal_subprocess_child(
         max_workers=1,
         output_root=tmp_path,
         evaluate_fn=_normal_child_then_hang_evaluate,
-        per_eval_timeout_seconds=2.0,
+        per_eval_timeout_seconds=_REAP_LIMIT_S,
     )
 
-    time.sleep(1.3)
+    time.sleep(_REAP_POST_WAIT_S)
     assert [result.candidate_id for result in results] == [
         "spawns-normal-child",
         "fast-after-timeout",
@@ -1132,6 +1189,21 @@ def test_process_pool_timeout_reaps_normal_subprocess_child(
     assert results[1].feasible is True
     assert results[1].failure_category is None
     assert not (tmp_path / "eval-000000" / "normal-child-survived.txt").exists()
+
+    # ...and the child must be GONE, not merely silent. 2026-08-29: with only
+    # the survivor-file assertion above, this test passed against a reaper
+    # broken at four sites (process-group kill downgraded to a single-pid
+    # kill, every descendant sweep disabled). It passed because the reaper's
+    # SIGSTOP still froze the child, and a frozen child never reaches its
+    # write -- so the oracle could not tell "reaped" from "leaked but
+    # stopped", which is arguably the worse outcome of the two.
+    # os.kill(pid, 0) succeeds on a stopped process and raises
+    # ProcessLookupError only when the pid is really gone.
+    pid_log = tmp_path / "eval-000000" / "normal-child.pid"
+    assert pid_log.exists(), 'child never recorded its pid; fixture is broken'
+    child_pid = int(pid_log.read_text(encoding='utf-8'))
+    with pytest.raises(ProcessLookupError):
+        os.kill(child_pid, 0)
 
 
 @pytest.mark.timeout(10)
