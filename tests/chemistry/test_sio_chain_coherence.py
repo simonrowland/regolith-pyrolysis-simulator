@@ -144,12 +144,48 @@ def test_sio_chain_closes_evolved_to_stage_wall_and_terminal_products():
 
 
 def test_sio_evolved_is_invariant_to_wall_temperature_at_fixed_po2_mode():
+    wall_t_sweep_c = (1050.0, 1300.0, 1400.0, 1500.0)
     evolved = []
-    for liner_temperature_c in (1050.0, 1300.0, 1400.0, 1500.0):
+    for liner_temperature_c in wall_t_sweep_c:
         report, diagnostics = _report_at_wall_T(liner_temperature_c)
         evolved.append(float(report["sio_evolved_kg"]))
         assert abs(diagnostics["mass_balance_error_pct"]) <= MAX_BALANCE_ERR_PCT
 
-    assert evolved == pytest.approx(
-        [PHASE3BIS_SIO_EVOLVED_KG] * len(evolved), rel=0.0, abs=5e-11
+    # Two SEPARATE claims, asserted separately. 2026-08-29: they used to be one
+    # pytest.approx([pin] * 4), which cannot distinguish "the invariant broke"
+    # from "the snapshot moved" -- and the second was masking the first.
+    #
+    # CLAIM 1, the property this test exists for: SiO evolution is independent
+    # of wall temperature at fixed pO2 mode. Measured on the current tree it is
+    # not merely close, it is BIT-IDENTICAL across all four liner setpoints:
+    #     1050 C / 1300 C / 1400 C / 1500 C -> 1.05260475258e-05 each,
+    #     spread exactly 0.0, mass-balance error 1.14e-14 %.
+    # This is the cheap, durable claim. It must never be relaxed to buy a green.
+    spread = max(evolved) - min(evolved)
+    assert spread <= 5e-11, (
+        f'SiO evolution is NOT invariant to wall temperature at fixed pO2: '
+        f'spread {spread:.6g} kg across {wall_t_sweep_c}, values {evolved}'
+    )
+
+    # CLAIM 2, the absolute magnitude, which is a SNAPSHOT and ages. Pinned at
+    # 4705a2fd (2026-08-01, REPIN round 4) under the repaired MAGEMin config;
+    # 245 commits later, 25 of them touching condensation.py/evaporation.py,
+    # the tree evolves 1.05260475258e-05 kg, i.e. +2.0092%.
+    #
+    # Deliberately left RED rather than regenerated. Regenerating a pin BECAUSE
+    # it is red is a tautology -- it records nothing except that the code
+    # changed. A regen is legitimate only once an identified correctness fix is
+    # known to have moved the right answer, and that attribution across the 25
+    # rail commits has not been done. Owner-gated with the b-302 regen batch;
+    # the failure message says which claim is red so nobody has to re-derive
+    # this.
+    assert evolved[0] == pytest.approx(
+        PHASE3BIS_SIO_EVOLVED_KG, rel=0.0, abs=5e-11
+    ), (
+        f'SiO evolution magnitude has drifted from its 2026-08-01 snapshot '
+        f'({PHASE3BIS_SIO_EVOLVED_KG:.11e} -> {evolved[0]:.11e}, '
+        f'{(evolved[0] - PHASE3BIS_SIO_EVOLVED_KG) / PHASE3BIS_SIO_EVOLVED_KG * 100:+.4f}%). '
+        f'The wall-temperature INVARIANT above still holds exactly, so this is '
+        f'a stale snapshot, not a physics regression. Do not regenerate without '
+        f'attributing the drift.'
     )
