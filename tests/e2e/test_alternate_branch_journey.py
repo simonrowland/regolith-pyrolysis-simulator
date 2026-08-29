@@ -376,12 +376,67 @@ def test_alternate_branch_journey(page, evidence, artifacts_dir):
                     f"; simulation_complete mass_in_kg={mass_in} "
                     f"oxygen_kg={payload.get('oxygen_kg', payload.get('oxygen_stored_kg'))}"
                 )
-            if step7_ok:
+            # The ledger check above is "does it contain a digit", which an
+            # ALL-ZERO ledger satisfies. 2026-08-29: that is the same shape as
+            # the defects this harness keeps finding -- a check that resolves
+            # toward the confident answer. The mandate's story is "a pot of
+            # dirt in, a ledger of ingots + glass + O2 + ceramic out", so a run
+            # that renders 5548 characters of zeros is a FAILURE of that story
+            # while passing a digit search.
+            #
+            # campaign_complete_summary carries the same facts as structured
+            # data, so assert on that rather than scraping rendered text: one
+            # event per campaign, each with species_extracted and the rump.
+            per_campaign = [
+                (e["data"] or {})
+                for e in evidence.socket_events
+                if e.get("event") == "campaign_complete_summary"
+            ]
+            extracted_total: dict[str, float] = {}
+            campaign_lines = []
+            for summary in per_campaign:
+                species = summary.get("species_extracted") or {}
+                if isinstance(species, dict):
+                    for name, kg in species.items():
+                        try:
+                            extracted_total[name] = (
+                                extracted_total.get(name, 0.0) + float(kg)
+                            )
+                        except (TypeError, ValueError):
+                            continue
+                campaign_lines.append(
+                    f"{summary.get('campaign')}:"
+                    f"{ {k: v for k, v in (species or {}).items()} }"
+                )
+            grand_total = sum(extracted_total.values())
+            # Deliberately NOT a per-class floor. Several mandate product
+            # classes are legitimately zero on this path -- the recipe does not
+            # target them -- and asserting each non-zero would manufacture a red
+            # for correct behaviour. What must hold is that the run extracted
+            # SOMETHING: an all-zero ledger means the pot of dirt is still a pot
+            # of dirt, and that is the failure the digit search cannot see.
+            if grand_total <= 0.0:
+                record(
+                    "7-results",
+                    False,
+                    "run completed but extracted NOTHING: every campaign's "
+                    f"species_extracted is empty across {len(per_campaign)} "
+                    f"campaign(s) ({'; '.join(campaign_lines)}). The ledger "
+                    f"rendered {len(ledger_text)} characters of zeros.",
+                )
+                step7_ok = False
+            else:
+                # Record the actual product story, not a character count. A
+                # human reading this evidence should be able to see WHAT the
+                # run made without re-running it.
                 record(
                     "7-results",
                     True,
                     f"product ledger populated ({len(ledger_text)} chars); "
-                    f"chain={chain_text}{payload_detail}",
+                    f"chain={chain_text}{payload_detail}; "
+                    f"extracted_total_kg={grand_total:.4f} "
+                    f"by_species={ {k: round(v, 4) for k, v in sorted(extracted_total.items())} }; "
+                    f"per_campaign=[{'; '.join(campaign_lines)}]",
                 )
 
     shot_name = "branch-journey-complete.png" if step7_ok else "branch-journey-terminal-FAILED.png"
