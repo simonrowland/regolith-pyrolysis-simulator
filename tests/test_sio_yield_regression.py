@@ -247,9 +247,11 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
 # adjudication; prior values were generated against the broken-liquidus job
 # tree (lunar 1.03186545664e-05 / mars 1.03950472208e-05).
 # docs-private/research/2026-08-02-train13-adjudication.md
+# Rebaselined 2026-08-28 after 090d0481/a34318c made the live SiO2(g)
+# draw debit the same SiO2 pool used by the SiO-yield chain.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.03187282595e-05,
-    "mars_basalt": 1.03956433809e-05,
+    "lunar_mare_low_ti": 1.05260475258e-05,
+    "mars_basalt": 1.0653327814e-05,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -292,9 +294,11 @@ BASELINE_STAGE4_SIO2_KG = {
 # adjudication; prior values were generated against the broken-liquidus job
 # tree (lunar 6.73114533926e-06 / mars 6.78097843708e-06).
 # docs-private/research/2026-08-02-train13-adjudication.md
+# Rebaselined 2026-08-28 after f7bcbf79 removed fabricated stage pressure
+# and b42d14ed carried per-carrier authority into the wall-routing model.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 6.73119341581e-06,
-    "mars_basalt": 6.78136729408e-06,
+    "lunar_mare_low_ti": 2.7647811046e-06,
+    "mars_basalt": 2.78557947276e-06,
 }
 
 

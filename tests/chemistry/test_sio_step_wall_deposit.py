@@ -208,8 +208,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
     # adjudication; prior value was generated against the broken-liquidus job
     # tree (4.439448640582e-06). docs-private/research/2026-08-02-train13-adjudication.md
+    # Rebaselined 2026-08-28 after f7bcbf79, 090d0481/a34318c, and
+    # 028791da; the post-RC-09a wall-budget audit closes within its guard.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        4.439481519259e-06, rel=1e-9
+        8.282110875636e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9

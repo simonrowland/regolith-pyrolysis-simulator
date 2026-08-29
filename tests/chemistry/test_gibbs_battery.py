@@ -174,15 +174,15 @@ def test_partition_splits_own_input_from_independent() -> None:
     part = partition_gibbs_tables()
     # 2026-08-26 corpus integration: the store grew (Sossi remine added Table-5
     # thermochemical rows as kems gibbs coverage; metadata completion added
-    # observations). The non-kems partition — the battery's subject — did NOT
-    # move: 1690 = 1617 own-input + 73 independent, unchanged.
-    assert part["observations_total"] == 2032
-    assert part["gibbs_table_total"] == 1714
-    assert part["gibbs_table_kems"] == 24
-    assert part["gibbs_table_non_kems"] == 1690
-    assert part["engine_own_input"] + part["independent_tabulation"] == 1690
+    # observations). The own-input partition remained pinned while later
+    # extracts added seven independently tabulated rows.
+    assert part["observations_total"] == 2310
+    assert part["gibbs_table_total"] == 1730
+    assert part["gibbs_table_kems"] == 33
+    assert part["gibbs_table_non_kems"] == 1697
+    assert part["engine_own_input"] + part["independent_tabulation"] == 1697
     assert part["engine_own_input"] == 1617
-    assert part["independent_tabulation"] == 73
+    assert part["independent_tabulation"] == 80
     assert part["by_source"]["nasa-cea-thermo"]["n"] == 1615
     assert part["by_source"]["nasa-cea-thermo"]["provenance_class"] == (
         PROVENANCE_ENGINE_OWN_INPUT

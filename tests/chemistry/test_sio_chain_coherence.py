@@ -106,7 +106,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
 # adjudication; prior value was generated against the broken-liquidus job
 # tree (1.03186545664e-05). docs-private/research/2026-08-02-train13-adjudication.md
-PHASE3BIS_SIO_EVOLVED_KG = 1.03187282595e-05
+# Rebaselined 2026-08-28 after 090d0481/a34318c made the live SiO2(g)
+# draw debit the same SiO2 pool used by the SiO-yield chain.
+PHASE3BIS_SIO_EVOLVED_KG = 1.05260475258e-05
 
 
 @lru_cache(maxsize=None)
