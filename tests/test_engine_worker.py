@@ -135,6 +135,111 @@ def test_queue_pool_keeps_draining_while_one_slot_hangs():
             hung.result(timeout=1.0)
 
 
+def test_submit_with_no_live_consumer_refuses_instead_of_hanging_forever():
+    """A queued item with no consumer must refuse, not park the caller forever.
+
+    2026-08-29, found by regolith-main and reproduced here. `timeout_s` is NOT
+    a wall on `submit`: it is stashed in the queue item and enforced later by
+    `_consume` -> `worker.call`. So the wall is enforced BY THE CONSUMER
+    THREAD, and with no consumer alive there is no wall at all -- the future
+    is never completed. `magemin.py::_call_magemin` awaits that future with no
+    timeout (deliberately, because it trusts this wall), so the caller parks in
+    `waiter.acquire()` at 0.0% CPU indefinitely.
+
+    Measured before the fix: retire the only consumer, then submit. `_closed`
+    was still False so the old guard passed, and the future was still `pending`
+    after 5x its 1 s wall with `done()` False. The discriminator that separates
+    this from a slow call is CPU: load cannot produce a 0.0% CPU stop, because
+    a starved process still burns CPU whenever it is scheduled.
+
+    The guard keys on "is any consumer alive", NOT on elapsed time, so it
+    cannot fire on a merely busy pool: a busy consumer is an alive consumer,
+    and a legitimately long queue wait keeps every thread alive.
+    """
+    pool = EngineWorkerPool(lambda _index: _test_worker(), size=1)
+    try:
+        # Sanity first, so a refusal below is the induced state and not a
+        # broken fixture.
+        assert pool.submit(_points()[0], timeout_s=2.0).result(timeout=10.0)
+
+        # Retire the only consumer the way close() does, but WITHOUT marking
+        # the pool closed -- that is the state the old guard could not see.
+        pool._queue.put(None)
+        deadline = time.monotonic() + 5.0
+        while (
+            any(thread.is_alive() for thread in pool._threads)
+            and time.monotonic() < deadline
+        ):
+            time.sleep(0.01)
+        assert not any(thread.is_alive() for thread in pool._threads)
+        assert not pool._closed, 'fixture must exercise the not-closed path'
+
+        with pytest.raises(RuntimeError, match='no live consumer') as exc_info:
+            pool.submit(_points()[1], timeout_s=1.0)
+
+        # EXACT type, not isinstance. EngineWorkerUnavailable subclasses
+        # RuntimeError, so `pytest.raises(RuntimeError)` alone accepts it --
+        # and the absence classifiers key on that exact type
+        # (optimize/evaluate.py, backends.py, run_executor.py), routing it to
+        # a fallback. A guard that raised it here would turn "the pool is
+        # broken" into "quietly use analytical curves instead of native
+        # results", which is the defect shape this project keeps catching: a
+        # working fake standing in for a broken real, green the whole way.
+        # The implementation comment makes plain-RuntimeError the contract, so
+        # the test has to pin it. Caught by review 2026-08-29: without this
+        # line, mutating the guard to raise EngineWorkerUnavailable still
+        # passed.
+        assert type(exc_info.value) is RuntimeError, (
+            f'guard must raise a PLAIN RuntimeError, not '
+            f'{type(exc_info.value).__name__}'
+        )
+    finally:
+        pool.close(cancel_pending=True)
+
+
+def test_pool_thread_names_stay_unique_across_concurrently_live_pools():
+    """Two live pools must never both name a thread `...slot-0`.
+
+    2026-08-29 forensics regression. The name used to be
+    `engine-worker-slot-{index}` with no pool identity, and THREE production
+    sites build pools in one process (melt_backend/magemin.py,
+    melt_backend/vaporock.py, optimize/pool.py). So any process with two warm
+    backends showed two live threads both called `engine-worker-slot-0`, and a
+    `sample` of a hung process read as "two threads on one slot sharing one
+    queue" -- when it is really two independent pools holding a
+    `queue.Queue` each. That misreading happened to a careful investigator
+    within an hour of looking at a real stack.
+
+    The name is written in exactly one place and read NOWHERE in the tree, so
+    stack forensics is its only consumer, and a rename that drops pool
+    identity is the only way to regress it. Both pools here use the SAME
+    worker name, which is the harder case: uniqueness has to come from the
+    per-process pool sequence, not from the backend differing.
+    """
+    pool_a = EngineWorkerPool(lambda _index: _test_worker(), size=2)
+    pool_b = EngineWorkerPool(lambda _index: _test_worker(), size=2)
+    try:
+        names_a = [thread.name for thread in pool_a._threads]
+        names_b = [thread.name for thread in pool_b._threads]
+
+        # Uniqueness is the point of the fix.
+        assert not set(names_a) & set(names_b), (
+            f'pool thread names collide across live pools: '
+            f'{sorted(set(names_a) & set(names_b))}'
+        )
+        assert len(set(names_a + names_b)) == 4
+
+        # ...but a unique OPAQUE name would be useless to the investigator it
+        # exists for, so the readable parts must survive too: which backend,
+        # and which slot.
+        for index, name in enumerate(names_a + names_b):
+            slot = index % 2
+            assert name.endswith(f'-test engine-slot-{slot}'), name
+    finally:
+        pool_a.close(cancel_pending=True)
+        pool_b.close(cancel_pending=True)
+
+
 def test_submit_racing_close_is_completed_or_rejected_without_orphan():
     pool = EngineWorkerPool(lambda _index: _test_worker(), size=1)
     original_put = pool._queue.put

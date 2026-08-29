@@ -45,6 +45,19 @@ INHERIT_PROCESS_GROUP_ENV = 'REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP'
 _LIVE_ENGINE_POOLS: weakref.WeakSet[Any] = weakref.WeakSet()
 _ENGINE_POOL_REGISTRY_LOCK = threading.Lock()
 _ENGINE_POOL_ATEXIT_REGISTERED = False
+# Monotonic per-process pool counter, for thread naming only. Reuses the
+# registry lock rather than adding a second one: both guard the same
+# "a pool is coming into existence" moment, and the increment is O(1).
+_ENGINE_POOL_SEQ = 0
+
+
+def _next_engine_pool_seq() -> int:
+    """Hand out the next per-process pool number (thread naming only)."""
+    global _ENGINE_POOL_SEQ
+
+    with _ENGINE_POOL_REGISTRY_LOCK:
+        _ENGINE_POOL_SEQ += 1
+        return _ENGINE_POOL_SEQ
 
 
 def _register_engine_pool(pool: 'EngineWorkerPool') -> None:
@@ -654,13 +667,33 @@ class EngineWorkerPool:
         self._lifecycle_lock = threading.Lock()
         self._close_complete = threading.Event()
         self._cancel_pending = threading.Event()
+        self._pool_seq = _next_engine_pool_seq()
         _register_engine_pool(self)
         ready: queue.Queue[tuple[int, Optional[BaseException]]] = queue.Queue()
         for index, worker in enumerate(self._workers):
             thread = threading.Thread(
                 target=self._start_and_consume,
                 args=(index, worker, ready),
-                name=f'engine-worker-slot-{index}',
+                # Name carries POOL identity, not just the slot index.
+                # 2026-08-29: the old `engine-worker-slot-{index}` was not
+                # unique across pools, and three production sites build pools
+                # in one process (melt_backend/magemin.py, melt_backend/
+                # vaporock.py, optimize/pool.py) — so two warm backends always
+                # yield two live threads both named `engine-worker-slot-0`.
+                # A `sample` of a hung process therefore reads as "two threads
+                # on one slot sharing one queue" when it is in fact two
+                # independent pools with a `queue.Queue` each; that misreading
+                # happened to a careful investigator within an hour of looking.
+                # The name is set here and read NOWHERE else in the tree, so
+                # its ONLY job is stack forensics — which is precisely the job
+                # it was failing. Mirror `_pool_debug`'s `pool[{worker.name}#
+                # {index}]` shape so a stack and a debug line name the same
+                # thing, and add the per-process pool sequence so two pools of
+                # the SAME backend stay distinguishable.
+                name=(
+                    f'engine-pool{self._pool_seq}'
+                    f'-{worker.name}-slot-{index}'
+                ),
                 daemon=True,
             )
             thread.start()
@@ -682,6 +715,41 @@ class EngineWorkerPool:
         with self._lifecycle_lock:
             if self._closed:
                 raise RuntimeError('engine worker pool is closed')
+            # A queued item MUST have someone who will run it. `timeout_s` is
+            # not a wall on this call -- it is stashed in the queue item and
+            # enforced later by `_consume` -> `worker.call`. So the wall is
+            # enforced by the consumer thread, and with no consumer alive
+            # there is no wall at all: the future is never completed, and a
+            # caller awaiting it (magemin.py `_call_magemin` awaits with NO
+            # timeout, by design, precisely because it trusts this wall) parks
+            # in `waiter.acquire()` at 0.0% CPU forever.
+            #
+            # 2026-08-29, reproduced: retire the only consumer, then submit --
+            # `_closed` is still False so the old guard passed, and the future
+            # was still `pending` after 5x its 1 s wall, `done()` False. That
+            # is the shape of a 15-minute 0.0%-CPU block observed on a quiet
+            # box by the peer controller. Load cannot produce a 0.0% CPU stop:
+            # a starved process still burns CPU when scheduled, so a condvar
+            # wait at 0.0% is a logical block, not contention.
+            #
+            # Fail fast and typed instead. This cannot fire on a merely BUSY
+            # pool -- a busy consumer is an alive consumer, and a legitimately
+            # long queue wait keeps every thread alive. It fires only when no
+            # thread remains that could ever complete the future.
+            #
+            # Deliberately a plain RuntimeError, matching the `is closed`
+            # guard immediately above -- both are lifecycle refusals of the
+            # same kind. NOT EngineWorkerUnavailable: that type is read
+            # downstream as engine ABSENCE and routes to a fallback, which
+            # would convert this loud refusal into a quiet substitution of
+            # analytical curves for native results. A hang is bad; wrong
+            # numbers that nobody notices are worse.
+            if not any(thread.is_alive() for thread in self._threads):
+                raise RuntimeError(
+                    f'engine worker pool has no live consumer to run this '
+                    f'request ({len(self._threads)} slot(s), all exited); '
+                    f'submitting would leave the future permanently pending'
+                )
             future: Future = Future()
             self._queue.put((future, request, timeout_s))
         return future
