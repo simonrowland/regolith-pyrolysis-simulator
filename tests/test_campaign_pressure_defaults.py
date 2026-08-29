@@ -117,6 +117,114 @@ def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
     )
 
 
+def _campaigns_with_continuum_bounds() -> dict[str, dict]:
+    """Every campaign declaring a continuum_pressure_bounds block."""
+    out = {}
+    for name, campaign in (_setpoints().get("campaigns") or {}).items():
+        if not isinstance(campaign, dict):
+            continue
+        bounds = campaign.get("continuum_pressure_bounds")
+        if isinstance(bounds, dict) and "derived_pN2_floor_mbar" in bounds:
+            out[name] = campaign
+    return out
+
+
+def _n2_continuum_floor_mbar(bounds: dict) -> float:
+    """Hard-sphere kinetic-theory continuum floor, from the block's OWN inputs.
+
+    lambda = k_B*T / (sqrt(2)*pi*sigma^2*p) and Kn = lambda/D, so requiring
+    Kn <= Kn_max gives p >= k_B*T / (sqrt(2)*pi*sigma^2*Kn_max*D).
+    Units: [J/K * K] / ([m^2] * [m]) = J/m^3 = Pa; /100 for mbar.
+    Sanity (known value): the same expression gives an N2 mean free path of
+    64.2 nm at 1 bar / 25 C against the textbook ~65 nm.
+    """
+    sigma_n2_m = 3.798e-10
+    T_K = float(bounds["gas_temperature_C"]) + 273.15
+    return (
+        1.380649e-23 * T_K
+        / (
+            math.sqrt(2.0) * math.pi * sigma_n2_m**2
+            * float(bounds["pipe_diameter_m"]) * float(bounds["knudsen_max"])
+        )
+        / 100.0
+    )
+
+
+@pytest.mark.parametrize("campaign_name", sorted(_campaigns_with_continuum_bounds()))
+def test_declared_continuum_floor_matches_its_own_derivation(campaign_name):
+    """Every declared floor must equal the formula at its OWN co-located inputs.
+
+    2026-08-29: this derivation was pinned for C6 only
+    (test_c6_continuum_derivation_uses_selected_static_hold_temperature), while
+    C4 carries an identical block and had no check at all. Parametrising over
+    the declaring campaigns closes that gap and gives any future campaign the
+    same guard for free, instead of it depending on someone remembering to add
+    a bespoke test.
+
+    This asserts the block is INTERNALLY consistent. Whether the campaign's
+    operating setpoint respects that floor is a separate question, pinned
+    below.
+    """
+    bounds = _campaigns_with_continuum_bounds()[campaign_name]["continuum_pressure_bounds"]
+    assert bounds.get("carrier_gas") == "N2", (
+        f"{campaign_name}: the derivation hard-codes the N2 collision diameter; "
+        f"a non-N2 carrier needs its own sigma, got {bounds.get('carrier_gas')!r}"
+    )
+    assert bounds["derived_pN2_floor_mbar"] == pytest.approx(
+        _n2_continuum_floor_mbar(bounds), abs=5e-7
+    ), (
+        f"{campaign_name}: derived_pN2_floor_mbar disagrees with the formula "
+        f"evaluated at this block's own gas_temperature_C / pipe_diameter_m / "
+        f"knudsen_max"
+    )
+
+
+def test_campaign_default_pressure_versus_its_own_continuum_floor():
+    """Pins WHICH campaigns run a default below their own declared floor.
+
+    ★ This pins a DEFECT, not an expectation. b-326: C4 and C6 both declare a
+    continuum floor and both set p_total_mbar_default BELOW it --
+
+        C4  floor 0.348846 mbar   default 0.2   -> 1.74x below, implied Kn 0.0174
+        C6  floor 0.300374 mbar   default 0.2   -> 1.50x below, implied Kn 0.0150
+
+    against a declared knudsen_max of 0.01. The consequence is real: the
+    viscous-flow refusal that makes C4 unreachable is CORRECT -- the recipe is
+    asking for a pressure its own derivation forbids.
+
+    Resolving it is a physics call (either the 0.2 defaults are wrong, or these
+    campaigns knowingly operate transitional and need a conductance model
+    rather than a continuum P_bulk), so it is owner-gated and NOT fixed here.
+
+    Pinned as the exact violating SET rather than left red or xfailed, because
+    the set is what carries information: fixing one campaign, or a third
+    campaign regressing, both change it and both fail this test. An xfail would
+    stay silent through either.
+    """
+    known_violations = {"C4", "C6"}
+
+    violations = {}
+    for name, campaign in _campaigns_with_continuum_bounds().items():
+        default_mbar = campaign.get("p_total_mbar_default")
+        if default_mbar is None:
+            continue
+        floor = _n2_continuum_floor_mbar(campaign["continuum_pressure_bounds"])
+        if float(default_mbar) < floor:
+            violations[name] = (float(default_mbar), floor)
+
+    assert set(violations) == known_violations, (
+        f"the set of campaigns running below their own continuum floor has "
+        f"CHANGED (b-326). Now {sorted(violations)}, previously "
+        f"{sorted(known_violations)}. If a campaign was fixed, drop it from "
+        f"known_violations; if a new one regressed, that is a live defect. "
+        f"Detail: "
+        + "; ".join(
+            f"{n}: default {d} mbar vs floor {f:.6f} mbar ({f / d:.2f}x below)"
+            for n, (d, f) in sorted(violations.items())
+        )
+    )
+
+
 def test_campaign_pressure_default_override_reaches_melt_state():
     setpoints = deepcopy(_setpoints())
     setpoints["campaigns"]["C2B"]["pO2_mbar_default"] = 0.75
