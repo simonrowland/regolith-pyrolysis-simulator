@@ -436,8 +436,12 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     #     changes shape here because the cache-sensitive engagement block
     #     moved out of the hashed payload (b-238, above).
     #     Recomputed on the CI machine class (mac-studio-256-1, ci-jobs tree).
+    # Rebaselined after 644fac1a changed out-of-domain C0/C0b transport from
+    # broad refusal to compute-and-mark. The C2A/C4 Knudsen safety gate is
+    # retained; this digest still excludes only the cache-sensitive block
+    # above.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "368c71334cd96c450ae82171eb07dc5064addad0637ccbf83bbabe7eede839a8"
+        "6c352f56a0c94ce476c22bc0c9cba4b1da0624e84f99035a779c670a47aa4807"
     )
 
 
