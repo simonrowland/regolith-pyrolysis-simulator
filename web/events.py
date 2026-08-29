@@ -964,6 +964,47 @@ def _persist_terminal(
     return artifact
 
 
+def _emit_to_live_socketio(socketio, event, payload, *, room):
+    """Emit through whichever SocketIO instance is actually attached.
+
+    app.py does `socketio = SocketIO()` at module scope and calls init_app()
+    inside create_app(), then runs the server as __main__. A later
+    `from app import socketio` (web/routes.py does exactly this) therefore
+    imports a SECOND, never-initialised SocketIO whose `.server` is None --
+    the classic dual-import trap. Socket HANDLERS are fine because they are
+    handed the live instance at registration; the HTTP command plane is not.
+
+    That dud object was already being passed down this path. It only became
+    visible when a caller finally tried to `.emit()` on it and the cancel
+    route started returning HTTP 500 (AttributeError: 'NoneType' has no
+    attribute 'emit') on an endpoint that had previously worked.
+
+    So resolve the attached instance from the Flask app rather than trusting
+    the argument, and treat "no live socket server" as nothing to notify
+    rather than as a failure -- a cancel that persisted correctly must not be
+    reported to the operator as a 500 because no dashboard was listening.
+    """
+    candidates = []
+    if getattr(socketio, 'server', None) is not None:
+        candidates.append(socketio)
+    try:
+        from flask import current_app, has_app_context
+
+        if has_app_context():
+            attached = (current_app.extensions or {}).get('socketio')
+            if attached is not None and getattr(attached, 'server', None) is not None:
+                candidates.append(attached)
+    except Exception:  # pragma: no cover - flask absent or app torn down
+        pass
+    for candidate in candidates:
+        try:
+            candidate.emit(event, payload, room=room)
+            return True
+        except Exception:  # pragma: no cover - a dead transport is not a run failure
+            continue
+    return False
+
+
 def _cancel_simulation_state(
     socketio,
     sid: str,
@@ -1023,7 +1064,8 @@ def _cancel_simulation_state(
         # ending nobody had walked: found by the run-control e2e journey
         # (2026-08-28), reproduced twice, and confirmed here by reading this
         # function and both helpers it calls -- none of them emit.
-        socketio.emit(
+        _emit_to_live_socketio(
+            socketio,
             'simulation_status',
             {
                 'status': 'cancelled',

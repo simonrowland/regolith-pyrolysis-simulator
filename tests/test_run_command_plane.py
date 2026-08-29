@@ -2167,6 +2167,13 @@ def test_cancel_tells_the_dashboard_not_only_the_caller(tmp_path, monkeypatch):
     emitted: list[tuple] = []
 
     class _CapturingSocketIO:
+        # `server` is set because a genuinely attached SocketIO always has one;
+        # `server is None` IS the dud signature the resolver screens out. The
+        # first version of this stub omitted it, which made it an unfaithful
+        # fake -- it stood in for a live instance while looking like the broken
+        # one, and it passed while production returned HTTP 500.
+        server = object()
+
         def emit(self, event, payload=None, **kwargs):
             emitted.append((event, payload, kwargs))
 
@@ -2206,3 +2213,98 @@ def test_cancel_tells_the_dashboard_not_only_the_caller(tmp_path, monkeypatch):
     assert kwargs.get("room") == sid, (
         "a terminal status delivered to the wrong room reaches no dashboard"
     )
+
+
+def test_cancel_emit_survives_the_dud_socketio_the_http_route_imports(tmp_path):
+    """The emit must reach the ATTACHED SocketIO, not the one passed in.
+
+    My first version of this fix asserted the emit with a capturing STUB, which
+    passed while production returned HTTP 500. app.py does
+    `socketio = SocketIO()` at module scope, init_app()s it inside create_app(),
+    and runs as __main__ -- so web/routes.py's `from app import socketio`
+    imports a SECOND, never-initialised instance whose `.server` is None. Socket
+    handlers get the live one at registration; the HTTP command plane does not.
+
+    The dud was already being passed down this path harmlessly. Calling .emit()
+    on it turned a working cancel into
+    `AttributeError: 'NoneType' object has no attribute 'emit'`.
+
+    A stub cannot see this: it is a working fake standing in for a broken real.
+    This test reproduces the real shape -- dud argument, live instance reachable
+    only via app.extensions -- so the regression cannot come back.
+    """
+    emitted: list[tuple] = []
+
+    class _DudSocketIO:
+        server = None
+
+        def emit(self, *args, **kwargs):
+            raise AttributeError("'NoneType' object has no attribute 'emit'")
+
+    class _AttachedSocketIO:
+        server = object()
+
+        def emit(self, event, payload=None, **kwargs):
+            emitted.append((event, payload, kwargs))
+
+    app = app_module.create_app()
+    app.extensions = dict(app.extensions or {})
+    app.extensions["socketio"] = _AttachedSocketIO()
+
+    store = RunArtifactStore(tmp_path / "runs")
+    sid = "cancel-dud"
+    state, _ = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    run_id = state["run_id"]
+
+    with app.app_context():
+        result = web_events._cancel_simulation_state(
+            _DudSocketIO(),
+            sid,
+            reason="operator_cancelled",
+            run_id=run_id,
+        )
+
+    assert result == {"run_id": run_id, "status": "cancelled", "cancelled": True}
+    status_events = [p for e, p, _ in emitted if e == "simulation_status"]
+    assert status_events, (
+        "the emit did not fall through to the attached SocketIO; with the dud "
+        "argument this is exactly the HTTP 500 the cancel route returned"
+    )
+    assert status_events[-1]["status"] == "cancelled"
+
+
+def test_cancel_without_any_live_socketio_still_succeeds(tmp_path):
+    """No dashboard to notify is not a run failure.
+
+    A cancel that persisted correctly must not be reported to the operator as a
+    500 because no socket server was listening. Holds the other side of the
+    resolver so a later 'make the emit mandatory' tightening cannot pass.
+    """
+
+    class _DudSocketIO:
+        server = None
+
+        def emit(self, *args, **kwargs):
+            raise AttributeError("'NoneType' object has no attribute 'emit'")
+
+    store = RunArtifactStore(tmp_path / "runs")
+    sid = "cancel-nosocket"
+    state, _ = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    run_id = state["run_id"]
+
+    result = web_events._cancel_simulation_state(
+        _DudSocketIO(), sid, reason="operator_cancelled", run_id=run_id
+    )
+    assert result == {"run_id": run_id, "status": "cancelled", "cancelled": True}
