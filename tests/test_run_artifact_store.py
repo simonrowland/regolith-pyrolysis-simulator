@@ -49,6 +49,11 @@ from web.run_store import (
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Thread-rendezvous guards throughout this module: these bound a HANG, they do
+# not assert a latency. Any test that means to claim "within N seconds" should
+# use its own explicit figure and say so, rather than borrowing this one.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 def _runner_payload(status: str = "partial") -> dict:
     return {
@@ -714,7 +719,7 @@ def test_store_concurrent_first_writers_commit_exactly_one_complete_artifact(
     barrier = run_store_module.threading.Barrier(2)
 
     def save_candidate(index):
-        barrier.wait(timeout=5)
+        barrier.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         return index, store.save("race", artifacts[index])
 
     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -817,7 +822,7 @@ def test_store_meta_update_cannot_succeed_after_retention_deletes_run(
 
     def controlled_retention():
         retention_entered.set()
-        assert release_retention.wait(timeout=5)
+        assert release_retention.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         original_retention()
 
     def star_old():
@@ -827,14 +832,14 @@ def test_store_meta_update_cannot_succeed_after_retention_deletes_run(
     monkeypatch.setattr(store, "_apply_retention_locked", controlled_retention)
     with ThreadPoolExecutor(max_workers=2) as executor:
         save_future = executor.submit(store.save, "new", new)
-        assert retention_entered.wait(timeout=5)
+        assert retention_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         star_future = executor.submit(star_old)
-        assert update_started.wait(timeout=5)
+        assert update_started.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         assert not star_future.done()
         release_retention.set()
-        assert save_future.result(timeout=5) is True
+        assert save_future.result(timeout=_RENDEZVOUS_TIMEOUT_S) is True
         with pytest.raises(FileNotFoundError):
-            star_future.result(timeout=5)
+            star_future.result(timeout=_RENDEZVOUS_TIMEOUT_S)
 
     assert store.load("old") is None
 
@@ -946,7 +951,7 @@ def test_store_quarantine_serializes_with_concurrent_metadata_replace(
 
     def controlled_quarantine(path):
         quarantine_entered.set()
-        assert release_quarantine.wait(timeout=5)
+        assert release_quarantine.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         return original_quarantine(path)
 
     def update_metadata():
@@ -956,13 +961,13 @@ def test_store_quarantine_serializes_with_concurrent_metadata_replace(
     monkeypatch.setattr(store, "_quarantine", controlled_quarantine)
     with ThreadPoolExecutor(max_workers=2) as executor:
         list_future = executor.submit(store.list_runs)
-        assert quarantine_entered.wait(timeout=5)
+        assert quarantine_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         update_future = executor.submit(update_metadata)
-        assert update_started.wait(timeout=5)
+        assert update_started.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         assert not update_future.done()
         release_quarantine.set()
-        assert list_future.result(timeout=5)[0]["run_id"] == "quarantine-race"
-        assert update_future.result(timeout=5) == {"starred": True}
+        assert list_future.result(timeout=_RENDEZVOUS_TIMEOUT_S)[0]["run_id"] == "quarantine-race"
+        assert update_future.result(timeout=_RENDEZVOUS_TIMEOUT_S) == {"starred": True}
 
     assert json.loads(meta_path.read_text(encoding="utf-8")) == {"starred": True}
     assert (meta_path.parent / "quarantine-race.json.corrupt").exists()

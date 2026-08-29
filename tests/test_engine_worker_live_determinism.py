@@ -26,6 +26,10 @@ from simulator.melt_backend.magemin import MAGEMinBackend
 
 pytestmark = [pytest.mark.live_engine, pytest.mark.serial]
 
+# Hang bounds for reaping synthetic load workers after SIGTERM/SIGKILL. Not a
+# latency claim about the engine under test.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 def _enabled() -> bool:
     return os.environ.get('REGOLITH_RUN_ENGINE_DETERMINISM') == '1'
@@ -163,10 +167,10 @@ def _synthetic_contention():
             process.terminate()
         for process in processes:
             try:
-                process.wait(timeout=5.0)
+                process.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
             except subprocess.TimeoutExpired:
                 process.kill()
-                process.wait(timeout=5.0)
+                process.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
 
 
 def _without_formula_sign_noise(value: bytes) -> bytes:

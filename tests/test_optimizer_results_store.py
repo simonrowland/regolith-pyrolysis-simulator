@@ -41,6 +41,11 @@ from simulator.optimize.results_store import (
 )
 from web.routes import _coating_readout
 
+# Thread-rendezvous guards throughout this module: these bound a HANG, they do
+# not assert a latency. Any test that means to claim "within N seconds" should
+# use its own explicit figure and say so, rather than borrowing this one.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 def _base_spec(**overrides: object) -> EvalSpec:
     data = {
@@ -1886,7 +1891,7 @@ def test_concurrent_same_key_writers_serialize_to_one_latest_row(tmp_path) -> No
                 current_data_digests=spec.data_digests,
                 busy_timeout_ms=2000,
             )
-            start.wait(timeout=5)
+            assert start.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
             time.sleep(delay)
             local.store(
                 spec,
@@ -1904,7 +1909,7 @@ def test_concurrent_same_key_writers_serialize_to_one_latest_row(tmp_path) -> No
         thread.start()
     start.set()
     for thread in threads:
-        thread.join(timeout=5)
+        thread.join(timeout=_RENDEZVOUS_TIMEOUT_S)
 
     with sqlite3.connect(path) as conn:
         row_count = conn.execute("SELECT count(*) FROM results").fetchone()[0]

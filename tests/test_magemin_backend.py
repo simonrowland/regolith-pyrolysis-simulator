@@ -36,6 +36,11 @@ from simulator.melt_backend.magemin import (
     MAGEMinBackend,
 )
 
+# Thread-rendezvous guards throughout this module: these bound a HANG, they do
+# not assert a latency. Any test that means to claim "within N seconds" should
+# use its own explicit figure and say so, rather than borrowing this one.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 def _disable_configured_magemin_path(monkeypatch):
     import simulator.engine_local_config as engine_local_config
@@ -1870,7 +1875,7 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
         try:
             if call_number == 1:
                 first_entered.set()
-                assert release_first.wait(timeout=1.0)
+                assert release_first.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
             return FakeCompleted()
         finally:
             with state_lock:
@@ -1903,13 +1908,13 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
     first = threading.Thread(target=solve)
     second = threading.Thread(target=solve)
     first.start()
-    assert first_entered.wait(timeout=1.0)
+    assert first_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
     second.start()
     time.sleep(0.05)
     assert state['calls'] == 1
     release_first.set()
-    first.join(timeout=1.0)
-    second.join(timeout=1.0)
+    first.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+    second.join(timeout=_RENDEZVOUS_TIMEOUT_S)
 
     assert not first.is_alive()
     assert not second.is_alive()

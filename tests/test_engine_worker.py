@@ -23,6 +23,11 @@ from simulator.engine_pool import (
     _pool_ready_wait_s,
 )
 
+# Thread-rendezvous guards throughout this module: these bound a HANG, they do
+# not assert a latency. Any test that means to claim "within N seconds" should
+# use its own explicit figure and say so, rather than borrowing this one.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 def _bootstrap_test_worker():
     return {'calls': 0, 'scratch': []}, 'test-ready'
@@ -155,7 +160,7 @@ def test_submit_racing_close_is_completed_or_rejected_without_orphan():
     def gated_put(item, *args, **kwargs):
         if item is not None:
             submit_entered_put.set()
-            assert release_submit.wait(timeout=2.0)
+            assert release_submit.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         return original_put(item, *args, **kwargs)
 
     pool._queue.put = gated_put
@@ -169,14 +174,14 @@ def test_submit_racing_close_is_completed_or_rejected_without_orphan():
 
     submit_thread = threading.Thread(target=submit)
     submit_thread.start()
-    assert submit_entered_put.wait(timeout=1.0)
+    assert submit_entered_put.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
     close_thread = threading.Thread(target=pool.close)
     close_thread.start()
     time.sleep(0.05)
     assert close_thread.is_alive()
     release_submit.set()
-    submit_thread.join(timeout=2.0)
-    close_thread.join(timeout=2.0)
+    submit_thread.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+    close_thread.join(timeout=_RENDEZVOUS_TIMEOUT_S)
 
     assert not submit_thread.is_alive()
     assert not close_thread.is_alive()

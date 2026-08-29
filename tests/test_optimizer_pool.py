@@ -37,6 +37,10 @@ from simulator.optimize.results_store import ResultStore
 _POOL_TEST_KNOB = "furnace_max_T_C"
 _POOL_TEST_SIGNAL_BASE = 1300.0
 
+# Hang bound for reaping a SIGKILL'd fixture process in test cleanup. Not a
+# latency claim about the pool under test.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 _DATA_DIGESTS = {
     "setpoints": "setpoints-digest",
@@ -1430,7 +1434,7 @@ def test_cleanup_deadline_expiry_reclaims_tracked_straggler_and_worker(
         for process in (worker, straggler):
             if process.poll() is None:
                 process.kill()
-                process.wait(timeout=2.0)
+                process.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
 
 
 def test_hashseed_result_view_rejects_or_normalizes_unordered_fields() -> None:

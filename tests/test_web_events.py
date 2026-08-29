@@ -45,6 +45,11 @@ from web.events import (
 )
 from web.run_store import RunArtifactStore
 
+# Thread-rendezvous guards throughout this module: these bound a HANG, they do
+# not assert a latency. Any test that means to claim "within N seconds" should
+# use its own explicit figure and say so, rather than borrowing this one.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 _DELETE = object()
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -2947,7 +2952,7 @@ def test_restart_waits_for_current_emit_and_payload_identifies_run():
         def emit(self, event, payload, room=None):
             emitted.append((event, payload, room))
             emit_entered.set()
-            assert release_emit.wait(timeout=2.0)
+            assert release_emit.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
 
     try:
         first, _ = _replace_simulation_state(sid, object(), speed=0.0)
@@ -2962,7 +2967,7 @@ def test_restart_waits_for_current_emit_and_payload_identifies_run():
             ),
         )
         emitter.start()
-        assert emit_entered.wait(timeout=2.0)
+        assert emit_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
 
         def replace():
             _replace_simulation_state(sid, object(), speed=0.0)
@@ -2972,8 +2977,8 @@ def test_restart_waits_for_current_emit_and_payload_identifies_run():
         replacer.start()
         assert not replacement_done.wait(timeout=0.05)
         release_emit.set()
-        emitter.join(timeout=2.0)
-        replacer.join(timeout=2.0)
+        emitter.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+        replacer.join(timeout=_RENDEZVOUS_TIMEOUT_S)
 
         assert replacement_done.is_set()
         assert emitted == [

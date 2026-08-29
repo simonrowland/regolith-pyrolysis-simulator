@@ -27,6 +27,11 @@ from _pytest_session_safety import (
     write_watchdog_diagnostic,
 )
 
+# Thread-rendezvous / reap guards throughout this module: these bound a HANG,
+# they do not assert a latency. Any test that means to claim "within N seconds"
+# should use its own explicit figure and say so, rather than borrowing this one.
+_RENDEZVOUS_TIMEOUT_S = 30.0
+
 
 class _Clock:
     def __init__(self) -> None:
@@ -437,7 +442,7 @@ def test_session_finish_suppresses_in_flight_watchdog_trip() -> None:
 
     def _blocked_process_tree_read() -> ProcessTreeSnapshot:
         entered.set()
-        release.wait(timeout=2.0)
+        release.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         return ProcessTreeSnapshot(48 * 1024**3, "ps tree")
 
     watchdog = SessionWatchdog(
@@ -463,10 +468,10 @@ def test_session_finish_suppresses_in_flight_watchdog_trip() -> None:
         daemon=True,
     )
     checker.start()
-    assert entered.wait(timeout=1.0)
+    assert entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
     watchdog.stop()
     release.set()
-    checker.join(timeout=1.0)
+    checker.join(timeout=_RENDEZVOUS_TIMEOUT_S)
 
     assert checker.is_alive() is False
     assert reasons == []
@@ -515,6 +520,11 @@ def test_stop_return_disarms_abort_blocked_in_loud_writer() -> None:
     loud_entered = threading.Event()
     loud_release = threading.Event()
     exits: list[int] = []
+
+    def _blocked_loud_writer(_data):
+        loud_entered.set()
+        loud_release.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+
     watchdog = SessionWatchdog(
         wall_clock=clock.wall_time,
         process_tree_reader=lambda: ProcessTreeSnapshot(1, "ps tree"),
@@ -523,10 +533,7 @@ def test_stop_return_disarms_abort_blocked_in_loud_writer() -> None:
         ),
         process_tree_terminator=session_safety._terminate_process,
         abort=lambda code: exits.append(code),
-        loud_writer=lambda _data: (
-            loud_entered.set(),
-            loud_release.wait(timeout=2.0),
-        ),
+        loud_writer=_blocked_loud_writer,
     )
     process = _NeverExitProcess()
     watchdog.arm_child_handshake(
@@ -539,11 +546,11 @@ def test_stop_return_disarms_abort_blocked_in_loud_writer() -> None:
     clock.wall = 1.1
     checker = threading.Thread(target=watchdog.check_once, daemon=True)
     checker.start()
-    assert loud_entered.wait(timeout=1.0)
+    assert loud_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
 
     watchdog.stop()
     loud_release.set()
-    checker.join(timeout=1.0)
+    checker.join(timeout=_RENDEZVOUS_TIMEOUT_S)
 
     assert checker.is_alive() is False
     assert exits == []
@@ -579,7 +586,7 @@ def test_process_tree_cleanup_escalates_and_reaps_synthetic_gateway_descendant()
     finally:
         if process.poll() is None:
             process.kill()
-            process.wait(timeout=1.0)
+            process.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         try:
             os.kill(child_pid, signal.SIGKILL)
         except ProcessLookupError:
@@ -603,7 +610,7 @@ def test_process_tree_cleanup_reaps_group_after_gateway_leader_exits() -> None:
     assert process._regolith_isolated_pgid == process.pid
     assert process.stdout is not None
     child_pid = int(process.stdout.readline().strip())
-    process.wait(timeout=2.0)
+    process.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
     try:
         _terminate_process_tree(process, 1.0)
         with selectors.DefaultSelector() as selector:
