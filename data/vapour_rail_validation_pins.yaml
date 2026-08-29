@@ -379,9 +379,18 @@ species:
         # melt chemistry is dead. Given a composition-dependent activity
         # model and the REAL bulk analyses, IMCC-SF04 gives an a(Na2O) ratio
         # of 1.21 dex at 1429 K (extrapolated, sub-liquidus) and 1.06 dex at
-        # 1800 K (in domain) -- cutting the residual from 1.417 dex to
-        # ~0.3-0.4 dex, inside the authors' own factor-of-2 plus digitisation
-        # sigma.
+        # 1800 K (in domain). The 1.417 dex residual already subtracts Henry
+        # H=log10(0.36/0.27)=0.124939, so replacing Henry with IMCC is
+        #   r_new = r_old - (A_IMCC - H) = 1.5 - A_IMCC - O
+        # with O=-(1/4)log10(5.54e-9/3.78e-9)=-0.0415045:
+        #   1429 K: 1.5-1.21-(-0.0415045)=0.3315 dex
+        #   1800 K: 1.5-1.06-(-0.0415045)=0.4815 dex
+        # Range 0.33-0.48 dex (one decimal: 0.3-0.5), inside the authors'
+        # own factor-of-2 plus digitisation sigma.
+        # Boundary: do not compute 1.417-A_IMCC; that double-subtracts Henry.
+        # Do not touch the adjacent production pin 2.043550129219774 (exact
+        # at 12065 / 1324.5 K); this range is an explanatory IMCC diagnostic,
+        # not that pin.
         #
         # * The two samples are not resolved the same way, so the comparison
         # was never composition-vs-composition (b-249, verified in-repo):

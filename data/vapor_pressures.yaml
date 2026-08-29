@@ -586,10 +586,13 @@ families:
           - 1673.0
           - 1673.0
           gamma_authority: Fixed gamma_NaO0.5=1e-3 certified only at the 1673 K Sossi
-            anchor in the Lamoreaux & Hildenbrand liquid-NaO0.5 frame. Coefficient residual
-            0.000118 dex is good; gamma temperature extrapolation dominates uncertainty and
-            is UNCERTIFIED outside (1673,1673) K. Certifying callers must treat out-of-domain
-            gamma as authority-limited (DRIFT-HIGH).
+            anchor in the Lamoreaux & Hildenbrand liquid-NaO0.5 frame. Stored residual_dex
+            0.000118 is a rounded evidence snapshot; landed A/B/C give max |res| =
+            1.189126e-4 dex on the 1405-1600 K source grid. Runtime consumes the
+            coefficients, not this snapshot. Gamma temperature extrapolation dominates
+            uncertainty and is UNCERTIFIED outside (1673,1673) K. Certifying callers must
+            treat out-of-domain gamma as authority-limited (DRIFT-HIGH). Do not retune
+            A/B/C to recover 1.18e-4, and do not assert the snapshot equals the live fit.
           coherent_pair:
             standard: lamoreaux_hildenbrand_1984_liquid_nao0_5
             gamma: 0.001
@@ -658,10 +661,18 @@ families:
             # Units: K_r is dimensionless on the 1 atm standard; runtime Pref uses 1 bar
             #   (100000 Pa). Conversion (Deltan_gas = 1.25): log10(P_ref/Pa) = log10 K_r,atm
             #   + log10(1e5) + 1.25·log10(1.01325) = log10 K_r,atm + 5.007145765517163.
-            # Sanity: fit residual 1.18e-4 dex on 1405-1600 K grid; denser 5 K grid same
-            #   max|Delta|; Sossi second-hand linear (DeltaH=255 kJ/mol, DeltaS=0.128 kJ/mol/K) is
+            # Sanity: landed A/B/C give max |log10 P_fit - log10 P_assembly| =
+            #   1.189126e-4 dex on the 1405-1600 K source grid (1405 K:
+            #   11.342243-12140.316409/(1405-163.701)=1.561910937 vs assembly
+            #   1.562029850; res=-0.000118912 dex). Stored residual_dex /
+            #   fit_residual_dex.max_abs remain the rounded 0.000118 snapshot;
+            #   runtime consumes A/B/C, not that snapshot. Denser 5 K grid is a
+            #   provenance claim about the original fit, not a retune. Sossi
+            #   second-hand linear (DeltaH=255 kJ/mol, DeltaS=0.128 kJ/mol/K) is
             #   NOT the landed Pref (cross-check only in kems-012) -- table assembly is
             #   ~0.62 dex lower at 1429 K than that linear form.
+            # Boundary: do not retune coefficients to make 1.18e-4 true, and do
+            #   not assert 1.18e-4 still bounds the live fit.
             fit_form: log10(P_Na_Pa)=A-B/(T_K+C)+log10(a_NaO0.5)-0.25*log10(pO2_bar/1bar)
             pressure_standard_Pa: 100000
             source: Lamoreaux & Hildenbrand 1984 J. Phys. Chem. Ref. Data 13:151-173 Tables 2/4,
@@ -867,7 +878,10 @@ families:
               evaluator_family: antoine
               coefficients:
                 # Minimax |log10 P_fit - log10 P_assembly| on the extracted liquid
-                # grid 1405-1600 K (K precedent). max|res| = 1.18e-4 dex.
+                # grid 1405-1600 K (K precedent). Live max|res| = 1.189126e-4 dex
+                # from landed A/B/C (1405 K residual -0.000118912 dex). Stored
+                # 1.18e-4 / 0.000118 is a rounded evidence snapshot. Runtime
+                # consumes these coefficients. Do not retune A/B/C to recover 1.18e-4.
                 A: 11.342243
                 B: 12140.316409
                 C: -163.701
@@ -1046,11 +1060,16 @@ families:
             - 679.4
             - 1033
           oxide_activity_exponent: 1.0
-          # Premise: P2O5(melt) -> 2 PO2(g) + 0.5 O2(g).
-          # Algebra: K=(p_PO2/Pstd)^2 (fO2/Pstd)^0.5 / a_P2O5; p_PO2/Pstd=K^0.5 a_P2O5^0.5 (fO2/Pstd)^-0.25.
+          # Premise: KO0.5(l) -> K(g) + 0.25 O2(g). Atom balance K 1=1, O 0.5=0.25*2.
+          # Algebra: K=(p_K/Pstd)(fO2/Pstd)^0.25 / a_KO0.5;
+          #   p_K/Pstd = K * a_KO0.5^1 * (fO2/Pstd)^-0.25.
           # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
           # multiplies the solved ratio by Pstd=100000 Pa before HKL.
-          # Sanity: lower fO2 increases PO2, but less strongly than PO.
+          # Sanity: lower fO2 increases K; monatomic ν=-1/4 slope preserved.
+          # Boundary: do not read this as P2O5 -> 2 PO2 + 0.5 O2. That reaction
+          # is also e_O2=-0.25 (the adjacent exponent that covered the paste) but
+          # its activity exponent is 0.5; this row consumes oxide_activity_exponent=1.0
+          # from KO0.5. Catalog compilation derives exponents from the K reaction.
           pO2_exponent: -0.25
           pO2_reference_bar: 1.0
           boiling_point_C: 759
@@ -1212,20 +1231,32 @@ families:
               pressure_Pa: 100000.0
               source: REF-033 CRC.b/Stull magnesium pressure-level table final certified point
             - temperature_K: 1366
-              # b-147 Mg (2026-08-07): upper bridge anchor is Pref_GF at 1366 K
-              # (JANAF gas-metal Ellingham), not TE Pref_GR. Explicit pressure_Pa
-              # so reconstruction does not depend on the now-dormant gas_rail
-              # block. Continuous with Builtin gas_fugacity above 1366 K.
-              # Old TE Pref_GR at 1366 was 1.776479712477316e-13 Pa
-              # (log10=-12.750439747819721).
+              # b-147 Mg (2026-08-07): upper bridge anchor is the stored Pref_GF-era
+              # pin at 1366 K (JANAF gas-metal Ellingham), not TE Pref_GR. Explicit
+              # pressure_Pa so reconstruction does not depend on the now-dormant
+              # gas_rail block.
+              # Premise: this literal is the consumed reconstruction endpoint.
+              # Algebra: live Pref_GF = 10^(15.7554806875-38215.2786789571/1366)
+              #   = 6.017759157899912e-13 Pa; pin/live = 1.000379990719267
+              #   (+0.000164996526 dex; pin log10=-12.220400, live=-12.220565).
+              # Units: Pa. Old TE Pref_GR at 1366 was 1.776479712477316e-13 Pa
+              #   (log10=-12.750439747819721).
+              # Sanity/limit: do not assert equality with live Pref_GF(1366) or
+              #   exact continuity of Builtin gas_fugacity onto this pin. The 5 K
+              #   bridge is a declared reconstruction, not a live closed-form eval.
+              #   The pin remains authoritative for the consumed endpoint; live
+              #   Pref_GF is the closed-form check, not a replacement value.
               pressure_Pa: 6.020045850530698e-13
               source: Pref_GF at gas-domain lower bound 1366 K (b-147; was TE gas_rail)
             provenance: 'DECLARED RECONSTRUCTION, not a fit extrapolation. log10(P/Pa) is linear in 1/T
-              from REF-033 CRC.b/Stull''s certified 1361 K, 100000 Pa endpoint to Pref_GF
-              (JANAF gas-metal Ellingham root) at 1366 K: 6.020045850530698e-13 Pa
-              (log10(P/Pa)~=-12.2204 (pinned literal; live Pref_GF(1366) closed form gives -12.220565)). b-147 Mg 2026-08-07 retargeted the upper anchor from
-              dormant TE Pref_GR (1.776e-13 Pa, log10=-12.750) so the bridge joins continuously
-              onto Builtin gas_fugacity. The 5 K authority gap brackets NIST Chemistry WebBook
+              from REF-033 CRC.b/Stull''s certified 1361 K, 100000 Pa endpoint to the stored
+              Pref_GF-era pin at 1366 K: 6.020045850530698e-13 Pa
+              (log10(P/Pa)~=-12.2204 (pinned literal; live Pref_GF(1366) closed form gives
+              6.017759157899912e-13 Pa, log10=-12.220565; pin/live=1.000380, +0.000165 dex)).
+              b-147 Mg 2026-08-07 retargeted the upper anchor from dormant TE Pref_GR
+              (1.776e-13 Pa, log10=-12.750). The pin is the consumed reconstruction
+              endpoint; do not assert exact continuity of Builtin gas_fugacity onto this
+              literal. The 5 K authority gap brackets NIST Chemistry WebBook
               SRD 69 T_boiling=1363.15 +/- 1.5 K. Across the closed bridge, maximum deviation
               from naive extension is bounded by ~17.25 dex versus the condensed fit and
               ~17.32 dex versus Pref_GF gas path. Condensed sidecar coefficients and certified
@@ -3010,11 +3041,15 @@ families:
           stoichiometry_derivation: Identical TiO2 formulas give M_parent/M_vapor=79.865/79.865=1 and
             zero O2. Unit kg/kg; mass sanity 1=1+0.
           oxide_activity_exponent: 1.0
-          # Premise: 2 P2O5(melt) -> P4O10(g).
-          # Algebra: K=(p_P4O10/Pstd) / a_P2O5^2; p_P4O10/Pstd=K a_P2O5^2, so the derived fO2 exponent is zero.
+          # Premise: TiO2(l) -> TiO2(g). Identical formulas; no O2 on either side.
+          # Algebra: K=(p_TiO2/Pstd) / a_TiO2; p_TiO2/Pstd = K * a_TiO2^1 * (fO2/Pstd)^0.
           # Units: K, activities, and p/Pstd ratios are dimensionless; the evaluator
           # multiplies the solved ratio by Pstd=100000 Pa before HKL.
-          # Sanity: oxygen-balanced polymerization is independent of fO2.
+          # Sanity: oxide-vapour phase transfer; p falls with a_TiO2, not with fO2.
+          # Boundary: do not read this as 2 P2O5 -> P4O10. That reaction is also
+          # e_O2=0 (the adjacent exponent that covered the paste) but its activity
+          # exponent is 2; this row consumes oxide_activity_exponent=1.0 from
+          # liquid TiO2. Catalog compilation derives exponents from the TiO2 reaction.
           pO2_exponent: 0.0
           pO2_reference_bar: 1.0
           notes: Status-bearing analytical carrier. Stolyarova 2013 Table 1 observes TiO2 over CTS melt;
@@ -8082,10 +8117,18 @@ families:
               phase_branch: associated_condensed_vapor_NO2_N2O4_equilibrium
             - source: t-583 catalog-self executable composition
               status: status_bearing_non_authoritative
-            # Premise: landed catalog correlation transfers NO2(condensed) to NO2(g); nu_target=1 and nu_O2=0.
-            # Algebra: e_O2=-nu_O2/nu_target=0; coefficient is derived from the balanced reaction.
-            # Unit check: stoichiometric ratios and pressure/activity ratios are dimensionless; returned pressure is Pa.
-            # Sanity check: catalog-self row remains flux-dormant, non-authoritative, and uses its landed validity domain.
+            # Premise: the Stull/NIST Antoine is a TOTAL associated NO2-N2O4
+            #   mixture vapour pressure (fit_target=total_mixture_pressure,
+            #   species_basis=total_associated_mixture); source_reactions is empty.
+            # Algebra: no balanced one-species transfer is stored, so there is
+            #   no nu_target and no derived e_O2 from mass action. The correlation
+            #   itself has no O2 argument; activity_exponent=0 is the pure-condensed
+            #   unit-activity representation, not a species-transfer power.
+            # Unit check: Antoine log10(P/Pa) is dimensionless; returned pressure is Pa.
+            # Sanity/limit: flux-dormant, non-authoritative. Do NOT assert a
+            #   species-isolated NO2(condensed)->NO2(g) transfer, nu_target=1,
+            #   or that e_O2=0 was derived from a balanced source reaction.
+            #   The adjacent zero O2 dependence does not validate that premise.
             evaluator_family: antoine
             coefficients:
               A: 8.35248
