@@ -34,7 +34,10 @@ from simulator.lab_schedule import (
     pO2_setpoint_mbar_from_schedule,
     schedule_sample_time_h,
 )
-from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+from simulator.furnace_materials import (
+    FURNACE_MAX_T_BOUNDS_C,
+    resolve_furnace_max_T_C,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
@@ -231,11 +234,34 @@ class CampaignManager:
     def __init__(self, setpoints: dict):
         self.setpoints = setpoints
         self.campaigns = setpoints.get('campaigns', {})
+        # CEILING INHERITS FROM THE PIPE MATERIAL. `furnace_material` names the row
+        # in data/furnace_materials.yaml and its max_service_T_C IS the ceiling, so
+        # changing the pipe changes the ceiling in exactly one place. An explicit
+        # furnace_max_T_C still wins, but only DOWNWARD (min against the material):
+        # a setpoint must be able to derate a vessel below its rating, and must not
+        # be able to run it hotter than the material it is made of. The old literal
+        # 1800.0 default was neither a material limit nor a derived figure -- it sat
+        # below dense_alumina_max (1843) and far below zirconia (2200), capping every
+        # run under the worst enabled pipe in the catalog.
         try:
-            self.furnace_max_T_C = self._float(
-                setpoints.get('furnace_max_T_C', 1800.0),
-                1800.0,
+            material = setpoints.get('furnace_material')
+            material_ceiling = (
+                resolve_furnace_max_T_C(str(material))
+                if material else None
             )
+            requested = setpoints.get('furnace_max_T_C')
+            if material_ceiling is not None and requested is None:
+                self.furnace_max_T_C = float(material_ceiling)
+            elif material_ceiling is not None:
+                self.furnace_max_T_C = min(
+                    self._float(requested, material_ceiling),
+                    float(material_ceiling),
+                )
+            else:
+                self.furnace_max_T_C = self._float(
+                    requested if requested is not None else 1800.0,
+                    1800.0,
+                )
         except ValueError as exc:
             raise ValueError('furnace_max_T_C must be numeric') from exc
         if (

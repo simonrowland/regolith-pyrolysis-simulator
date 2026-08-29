@@ -15,8 +15,14 @@
 # with upper range from refractory service temperatures plus 1800-2100 C solar
 # vacuum pyrolysis operating evidence. The canonical lunar recipe overrides
 # this with the catalogued dense-alumina maximum (1843 C).
-furnace_max_T_C: 1800
-
+# FURNACE CEILING IS INHERITED FROM THE PIPE MATERIAL, not set here.
+# `furnace_material` is the single source of truth: the runtime ceiling is that
+# material's max_service_T_C from data/furnace_materials.yaml (zirconia_ysz =
+# 2200 C, continuous AND max per its catalog source note). Setting a number here
+# instead would be a second place to change when the pipe changes, and the two
+# would drift. Override `furnace_max_T_C` explicitly ONLY to run a vessel BELOW
+# its material rating; it is capped by the material either way and never raises it.
+furnace_material: zirconia_ysz
 # ============================================================================
 # 1. CAMPAIGNS
 # ============================================================================

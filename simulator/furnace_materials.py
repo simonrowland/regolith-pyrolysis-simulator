@@ -15,7 +15,52 @@ from simulator.scalar_boundary import is_declared_real_scalar
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_FURNACE_MATERIALS_PATH = DATA_DIR / "furnace_materials.yaml"
-FURNACE_MAX_T_BOUNDS_C = (1200.0, 2000.0)
+# RUNTIME TEMPERATURE ENVELOPE.
+#
+# The ceiling is DERIVED FROM THE CATALOG, not asserted here. It is the highest
+# max_service_T_C among enabled materials, so the envelope always admits the best
+# pipe the catalog actually ships. Previously this was the literal 2000.0, which
+# silently derated zirconia_ysz (rated 2200 C for BOTH continuous and max service)
+# to a 2000 C applied ceiling. That derate had no materials basis: the resolver's
+# own comment justified it only as cross-layer agreement with the CampaignManager
+# guard (BUG-076), and that guard's comment states outright that "a literature
+# derivation is unestablished here" and that its cited research file is not in the
+# repository. An undocumented constant was truncating a documented material rating.
+#
+# Deriving it keeps BUG-076's actual invariant intact -- resolver and CampaignManager
+# still read ONE value, so they cannot disagree on admissibility -- while removing the
+# arbitrary truncation. Adding a better-rated pipe to the catalog now raises the
+# envelope automatically instead of being clipped by a number nobody can source.
+#
+# The FLOOR stays 1200.0 and stays asymmetric (fail loud, never clamp up), per the
+# resolver's rationale: silently raising a sub-floor request would run the furnace
+# HOTTER than asked, which is a rewrite of operator intent.
+def _catalog_max_service_T_C(default: float = 2000.0) -> float:
+    """Highest enabled max_service_T_C in the catalog; `default` if unreadable."""
+    try:
+        catalog = load_furnace_materials()
+    except Exception:
+        return default
+    # The YAML nests entries under a single "furnace_materials" key; tolerate both
+    # that shape and an already-unwrapped mapping so this cannot silently fall back
+    # to `default` (which is how the derate would quietly survive the fix).
+    if (
+        isinstance(catalog, Mapping)
+        and len(catalog) == 1
+        and "furnace_materials" in catalog
+    ):
+        catalog = catalog["furnace_materials"]
+    ratings = [
+        float(entry["max_service_T_C"])
+        for entry in (catalog or {}).values()
+        if isinstance(entry, Mapping)
+        and entry.get("enabled")
+        and isinstance(entry.get("max_service_T_C"), (int, float))
+    ]
+    return max(ratings) if ratings else default
+
+
+FURNACE_MAX_T_BOUNDS_C = (1200.0, 2000.0)  # rebound below once the loader exists
 CERTIFIED_WALL_ANCHORED_FURNACE_MATERIALS = frozenset(
     {
         "dense_alumina_continuous",
@@ -168,3 +213,14 @@ def _finite_float(value: Any, label: str) -> float:
     if not math.isfinite(result):
         raise ValueError(f"{label} must be finite")
     return result
+
+
+# --- envelope rebind (MUST be last) -------------------------------------------
+# Deferred to end-of-module ON PURPOSE. load_furnace_materials() calls
+# validate_furnace_material_grounding(), so evaluating this any earlier raises
+# NameError, which _catalog_max_service_T_C() swallows and answers with its
+# `default` -- silently reinstating the very 2000 C derate this change removes.
+# A failed lru_cache call is not cached, so the same helper then SUCCEEDS when
+# called later, and the constant and the helper disagree with no error anywhere.
+# Keep this the last statement in the file.
+FURNACE_MAX_T_BOUNDS_C = (1200.0, _catalog_max_service_T_C())

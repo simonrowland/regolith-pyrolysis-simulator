@@ -204,11 +204,21 @@ def test_resolver_allows_sintered_regolith_bootstrap_floor():
     assert resolve_furnace_max_T_C("sintered_regolith") == pytest.approx(1200)
 
 
-def test_resolver_clamps_applied_ceiling_to_runtime_envelope_when_uncapped():
-    # BUG-076: an enabled material rated above the runtime envelope (zirconia_ysz at
-    # 2200 C) must not emit a runtime-inadmissible applied ceiling when no cap is
-    # requested. The raw service rating is preserved; the applied ceiling is clamped
-    # to FURNACE_MAX_T_BOUNDS_C[1] so CampaignManager accepts it.
+def test_uncapped_material_applies_its_full_service_rating():
+    # BUG-076's invariant is that the resolver must not emit a ceiling CampaignManager
+    # would reject -- the resolver and the consumer must agree on admissibility. That
+    # still holds, and is asserted below.
+    #
+    # What this test USED to assert additionally was that the applied ceiling is
+    # STRICTLY BELOW the service rating (zirconia 2200 -> applied 2000). That derate
+    # was not a materials fact: FURNACE_MAX_T_BOUNDS_C[1] was the literal 2000.0, a
+    # constant whose own consumer comment records that "a literature derivation is
+    # unestablished here" and whose cited research file is absent from the repo. An
+    # undocumented number was truncating a documented material rating by 200 C.
+    #
+    # The envelope max now DERIVES from the catalog (highest enabled max_service_T_C),
+    # so admissibility is preserved by construction while nothing is derated. Asserting
+    # applied == rating is the stronger claim: it fails if any hidden clamp returns.
     from simulator.furnace_materials import (
         FURNACE_MAX_T_BOUNDS_C,
         resolve_furnace_temperature_caps,
@@ -217,9 +227,11 @@ def test_resolver_clamps_applied_ceiling_to_runtime_envelope_when_uncapped():
     caps = resolve_furnace_temperature_caps("zirconia_ysz")  # no requested cap
 
     assert caps["service_rating_T_C"] == pytest.approx(2200)
-    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(FURNACE_MAX_T_BOUNDS_C[1])
-    assert caps["effective_applied_ceiling_T_C"] < caps["service_rating_T_C"]
-    assert resolve_furnace_max_T_C("zirconia_ysz") == pytest.approx(FURNACE_MAX_T_BOUNDS_C[1])
+    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(2200)
+    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(caps["service_rating_T_C"])
+    # ... and still runtime-admissible, which is BUG-076's actual requirement.
+    assert caps["effective_applied_ceiling_T_C"] <= FURNACE_MAX_T_BOUNDS_C[1]
+    assert resolve_furnace_max_T_C("zirconia_ysz") == pytest.approx(2200)
 
 
 @pytest.mark.parametrize("material_id", _ENABLED_FINITE_FURNACE_MATERIALS)
@@ -264,20 +276,29 @@ def test_resolver_fails_loud_for_sub_floor_requested_cap():
     assert resolve_furnace_max_T_C("zirconia_ysz", ceiling) == pytest.approx(ceiling)
 
 
-def test_resolver_clamps_over_envelope_requested_cap():
-    # A requested cap above the envelope max but below the material rating clamps to the
-    # envelope max (zirconia_ysz rated 2200: cap 2100 -> applied 2000), so the resolver
-    # stays runtime-admissible on the capped path too, not only the uncapped path.
-    from simulator.furnace_materials import (
-        FURNACE_MAX_T_BOUNDS_C,
-        resolve_furnace_temperature_caps,
-    )
+def test_requested_cap_derates_but_can_never_exceed_the_material():
+    # Two directions, and only one of them is a safety property.
+    #
+    # DOWNWARD (this is operator intent and must be honoured): a cap below the material
+    # rating applies as asked. Previously a 2100 cap on zirconia returned 2000, because
+    # the cap was clamped to a 2000 envelope -- the operator asked for 2100, got 2000,
+    # and nothing said so. Silently REDUCING a request is less dangerous than silently
+    # raising one, but it is still a rewrite of intent.
+    #
+    # UPWARD (the safety property, and the one worth guarding): a cap ABOVE the material
+    # rating must clamp DOWN to the rating. Nothing may run a vessel hotter than the
+    # material it is made of. Neither of the two tests this replaced covered that case.
+    from simulator.furnace_materials import resolve_furnace_temperature_caps
 
-    caps = resolve_furnace_temperature_caps("zirconia_ysz", 2100)
+    below = resolve_furnace_temperature_caps("zirconia_ysz", 2100)
+    assert below["requested_ceiling_T_C"] == pytest.approx(2100)
+    assert below["service_rating_T_C"] == pytest.approx(2200)
+    assert below["effective_applied_ceiling_T_C"] == pytest.approx(2100)
 
-    assert caps["requested_ceiling_T_C"] == pytest.approx(2100)
-    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(FURNACE_MAX_T_BOUNDS_C[1])
-    assert caps["service_rating_T_C"] == pytest.approx(2200)
+    above = resolve_furnace_temperature_caps("zirconia_ysz", 2500)
+    assert above["service_rating_T_C"] == pytest.approx(2200)
+    assert above["effective_applied_ceiling_T_C"] == pytest.approx(2200)
+    assert above["effective_applied_ceiling_T_C"] <= above["service_rating_T_C"]
 
 
 def test_resolver_fails_loud_for_unknown_material():
