@@ -8,7 +8,8 @@ Run ONLY these tests, serially, against the already-running dev server:
     .venv/bin/python -m pytest tests/e2e/test_happy_path_journey.py \
         tests/e2e/test_no_feedstock_alert.py \
         tests/e2e/test_run_stall_out_of_domain.py \
-        tests/e2e/test_optimizer_bounded.py -n0 -v
+        tests/e2e/test_optimizer_bounded.py \
+        tests/e2e/test_run_control_journey.py -n0 -v
 
 -n0 overrides the repo-wide `-n auto` (xdist): browser tests against one
 shared dev server must run serially.

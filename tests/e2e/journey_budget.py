@@ -53,6 +53,38 @@ JOURNEY_BUDGET_MS = (
 JOURNEY_MARGIN_MS = 120_000
 JOURNEY_TIMEOUT_S = (JOURNEY_BUDGET_MS + JOURNEY_MARGIN_MS) // 1000
 
+# Pause-hold must be at least one advance window: a shorter hold would pass
+# if the next hour is merely slow (pause never took). Same number as
+# TICK_ADVANCE_MS, named separately so the control-journey sum cannot drop
+# the hold by "reusing" the first-advance term.
+PAUSE_HOLD_MS = TICK_ADVANCE_MS
+
+# Pause / resume / cancel / restart in one browser session. Two starts, two
+# advance waits, one hold. Does NOT wait for Complete — the default recipe
+# refuses at C4 (owner-gated); this journey leaves before that window.
+#
+#   land 30 + feedstock 15 + socket 20 + status 30 + ack 60
+#   + first tick 90 + pause ack 30 + pause hold 90
+#   + resume ack 30 + resume tick 90 + cancel recover 30
+#   + restart ack 60 + restart tick 90
+#   = 665 s declared; + 120 s margin for page load and browser teardown.
+CONTROL_JOURNEY_BUDGET_MS = (
+    PAGE_LOAD_MS
+    + FEEDSTOCK_CARD_MS
+    + SOCKET_CONNECT_MS
+    + STATUS_CHANGE_MS
+    + START_ACK_MS
+    + TICK_ADVANCE_MS
+    + STATUS_CHANGE_MS
+    + PAUSE_HOLD_MS
+    + STATUS_CHANGE_MS
+    + TICK_ADVANCE_MS
+    + STATUS_CHANGE_MS
+    + START_ACK_MS
+    + TICK_ADVANCE_MS
+)
+CONTROL_JOURNEY_TIMEOUT_S = (CONTROL_JOURNEY_BUDGET_MS + JOURNEY_MARGIN_MS) // 1000
+
 # The one journey failure that is excused, quoted from the refusal the product
 # actually emits. BOTH marks must be present: "Knudsen" alone appears in
 # unrelated transport prose, and matching loosely would re-open the hole this

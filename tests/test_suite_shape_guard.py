@@ -86,6 +86,15 @@ HEAVY_ROSTER = frozenset({
     # the journey was killed before it could report, and steps 5-7 had never
     # once rendered a verdict.
     ("tests/e2e/test_happy_path_journey.py", "test_happy_path_journey"),
+    # 2026-08-28: pause/resume/cancel/restart browser journey. MEASURED 159 s
+    # then 194 s on two consecutive live runs (90 s of each is the pause-hold
+    # window). Cap is derived from declared step budgets in
+    # tests/e2e/journey_budget.py (665 s + 120 s margin = 785 s): two
+    # start-ack windows plus three 90 s advance/hold windows exceed the
+    # 300 s default whenever the start-wedge (~41 s yaml parse) hits twice,
+    # and a 300 s cap would kill the test before step 8 can report.
+    ("tests/e2e/test_run_control_journey.py",
+     "test_pause_resume_cancel_restart_journey"),
     # gate-2 amendments (2026-07-23): C6-continue lengthened these past the
     # default ceiling; each carries its measured justification at the mark.
     ("tests/test_make_recipe_db_profile.py",

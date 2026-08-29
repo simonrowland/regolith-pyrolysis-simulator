@@ -1273,6 +1273,20 @@ def test_submillimbar_pressure_survives_socket_emitter_and_dom(
             },
             "error",
         ),
+        (
+            # 2026-08-28, found by the run-control e2e journey: the HTTP cancel
+            # path is a THIRD ending, and it latched the controls exactly as a
+            # refusal used to. Cancel is neither a fault nor a refusal -- the
+            # operator asked for it -- so it must not be reported as either,
+            # but it must hand the controls back like every other ending.
+            {
+                "status": "cancelled",
+                "run_id": "run-1",
+                "reason": "operator_cancelled",
+                "message": "run cancelled",
+            },
+            "operator cancel",
+        ),
     ],
 )
 def test_any_terminal_outcome_hands_the_controls_back(terminal_payload, label):

@@ -20,7 +20,8 @@ never starts or kills a server.
 .venv/bin/python -m pytest tests/e2e/test_happy_path_journey.py \
     tests/e2e/test_no_feedstock_alert.py \
     tests/e2e/test_run_stall_out_of_domain.py \
-    tests/e2e/test_optimizer_bounded.py -n0 -v
+    tests/e2e/test_optimizer_bounded.py \
+    tests/e2e/test_run_control_journey.py -n0 -v
 ```
 
 `-n0` overrides the repo-wide `-n auto` xdist default. These four tests also
@@ -43,6 +44,7 @@ in-process chemistry tests, not browser tests.
 | `test_no_feedstock_alert.py` | Defect (a): Start with no feedstock | Native `alert("Please select a feedstock first.")` is captured (Playwright auto-dismisses dialogs — that is why this looks dead); `#status-text` stays `Ready`; **no** `start_simulation` leaves the browser |
 | `test_run_stall_out_of_domain.py` | Defect (b): run starts then stalls / OUT_OF_DOMAIN | Server must answer within 60s; then no 90s no-progress window across 360s. A true stall dumps the **verbatim socket.io tail**. A terminal `refused`/`error` also fails, with the socket payload as the deliverable |
 | `test_optimizer_bounded.py` | Defect (c): `/optimizer` historically ~7 min | Bounded 120s goto; blows up instead of hanging; then asserts leaderboard rows |
+| `test_run_control_journey.py` | Pause / resume / cancel / restart in one session | Pause ACK + hour frozen one advance window · resume ACK + hour advances · command-plane cancel hands Start back · second Start is a new `run_id` that ticks |
 
 Decision modals are auto-answered with the recommended option (MutationObserver,
 not a sleep). No fixed sleeps anywhere for synchronisation.

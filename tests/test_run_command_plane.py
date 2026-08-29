@@ -2148,3 +2148,61 @@ def test_cancel_unknown_returns_typed_404():
         "error": "run not found",
         "error_type": "run_not_found",
     }
+
+
+def test_cancel_tells_the_dashboard_not_only_the_caller(tmp_path, monkeypatch):
+    """A cancel must EMIT a terminal status, not just return one.
+
+    Found by the run-control e2e journey (2026-08-28) and reproduced twice: the
+    HTTP cancel stopped the worker and persisted lifecycle='cancelled', then
+    returned success to the caller and emitted NOTHING. The browser keys its
+    terminal handling on a socket status, so the dashboard went on showing
+    "Running" with #btn-start disabled and Pause still live, on a dead run. The
+    operator could not start again without reloading.
+
+    Same latch 44183a43 removed for a lawful refusal, on a third ending nobody
+    had walked. Asserting the RETURN VALUE alone cannot catch it -- that was
+    already correct while the dashboard stayed stuck.
+    """
+    emitted: list[tuple] = []
+
+    class _CapturingSocketIO:
+        def emit(self, event, payload=None, **kwargs):
+            emitted.append((event, payload, kwargs))
+
+    app = app_module.create_app()
+    store = RunArtifactStore(tmp_path / "runs")
+    sid = "cancel-emits"
+    state, _ = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    run_id = state["run_id"]
+
+    result = web_events._cancel_simulation_state(
+        _CapturingSocketIO(),
+        sid,
+        reason="operator_cancelled",
+        run_id=run_id,
+    )
+
+    assert result == {"run_id": run_id, "status": "cancelled", "cancelled": True}
+
+    status_events = [
+        (payload, kwargs)
+        for event, payload, kwargs in emitted
+        if event == "simulation_status"
+    ]
+    assert status_events, (
+        "cancel persisted a terminal run and told nobody: no simulation_status "
+        f"was emitted; events seen = {[e for e, _, _ in emitted]}"
+    )
+    payload, kwargs = status_events[-1]
+    assert payload["status"] == "cancelled"
+    assert payload["run_id"] == run_id
+    assert kwargs.get("room") == sid, (
+        "a terminal status delivered to the wrong room reaches no dashboard"
+    )

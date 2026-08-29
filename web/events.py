@@ -1011,6 +1011,28 @@ def _cancel_simulation_state(
             )
             raise RuntimeError('cancelled run artifact could not be persisted')
         _finish_terminal_state(sid, target_run_id)
+        # Tell the DASHBOARD the run ended, not just the caller. This path
+        # stopped the worker and persisted lifecycle='cancelled', then returned
+        # success to whoever issued the HTTP cancel -- and emitted nothing. The
+        # browser keys its terminal handling on a socket status, so it went on
+        # showing "Running" with #btn-start disabled and Pause still live, on a
+        # run that was already dead. The operator could not start again without
+        # reloading the page.
+        #
+        # Exactly the latch 44183a43 removed for a lawful refusal, on a third
+        # ending nobody had walked: found by the run-control e2e journey
+        # (2026-08-28), reproduced twice, and confirmed here by reading this
+        # function and both helpers it calls -- none of them emit.
+        socketio.emit(
+            'simulation_status',
+            {
+                'status': 'cancelled',
+                'run_id': target_run_id,
+                'reason': reason,
+                'message': 'Run cancelled',
+            },
+            room=sid,
+        )
         return {
             'run_id': target_run_id,
             'status': 'cancelled',
