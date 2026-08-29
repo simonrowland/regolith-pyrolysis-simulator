@@ -236,6 +236,69 @@ BASELINE_SIO_EVOLVED_KG = {
     "mars_basalt": 1.03956433809e-05,
 }
 
+
+def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
+    """The same physical quantity is pinned in three files; they must agree.
+
+    2026-08-29. `sio_evolved_kg` for lunar_mare_low_ti C2A is hand-maintained in
+    THREE tracked locations that must move together on any regen:
+
+        tests/test_sio_yield_regression.py        BASELINE_SIO_EVOLVED_KG
+        tests/fixtures/sio_yield/<feedstock>_c2a.json   "sio_evolved_kg"
+        tests/chemistry/test_sio_chain_coherence.py     PHASE3BIS_SIO_EVOLVED_KG
+
+    Nothing checked that they agree. Regenerate the fixture and forget the
+    constant (or the reverse) and two tests assert DIFFERENT values for the same
+    quantity, each passing or failing on its own copy, with no signal that the
+    tree now contradicts itself. That failure mode is live right now: b-302 is a
+    pending regen of exactly these pins, so this guard exists to make that regen
+    safe rather than to catch today's tree, which is consistent.
+
+    Green today. It fires only on a PARTIAL update.
+
+    ★ DELIBERATELY NOT INCLUDED: scripts/emit_studio_pin_values.py's
+    LAPTOP_BASELINES. That copy is a historical snapshot on purpose -- its own
+    comment says "pre-regen pins at tip 0de9c6d" -- and its staged_silica_kg
+    already differs from the live pin in the 13th digit, which is the evidence
+    that it is a frozen comparison baseline and not a mirror. Requiring it to
+    track would make this guard fire on correct work. docs/ci-local-divergence.md
+    carries the value too, as prose in a table; also excluded, same reason.
+    """
+    fixture_dir = Path(__file__).resolve().parent / "fixtures" / "sio_yield"
+
+    mismatches = []
+    for feedstock, pinned in sorted(BASELINE_SIO_EVOLVED_KG.items()):
+        fixture_path = fixture_dir / f"{feedstock}_c2a.json"
+        assert fixture_path.exists(), f"missing CLI golden {fixture_path}"
+        fixture_value = json.loads(fixture_path.read_text(encoding="utf-8"))[
+            "sio_evolved_kg"
+        ]
+        if fixture_value != pinned:
+            mismatches.append(
+                f"{feedstock}: BASELINE_SIO_EVOLVED_KG={pinned!r} but "
+                f"{fixture_path.name} sio_evolved_kg={fixture_value!r}"
+            )
+
+    # The chemistry-side constant covers lunar only, and is documented there as
+    # lunar_mare_low_ti / C2A / 24 h -- the same quantity this file pins.
+    # Imported lazily so a collection error in that module cannot mask this one.
+    from tests.chemistry.test_sio_chain_coherence import PHASE3BIS_SIO_EVOLVED_KG
+
+    lunar = BASELINE_SIO_EVOLVED_KG["lunar_mare_low_ti"]
+    if PHASE3BIS_SIO_EVOLVED_KG != lunar:
+        mismatches.append(
+            f"lunar_mare_low_ti: BASELINE_SIO_EVOLVED_KG={lunar!r} but "
+            f"test_sio_chain_coherence.PHASE3BIS_SIO_EVOLVED_KG="
+            f"{PHASE3BIS_SIO_EVOLVED_KG!r}"
+        )
+
+    assert not mismatches, (
+        "sio_evolved_kg is pinned in several places and they have DIVERGED, so "
+        "the tree now asserts two different values for one quantity. This is "
+        "what a partial regen looks like; update every location together.\n  "
+        + "\n  ".join(mismatches)
+    )
+
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
 # default `StirState(radial=1.0)` (laminar gas-side Sherwood) produced
 # Stage 4 SiO carryover ABOVE Stage 3 SiO zone product — documented
