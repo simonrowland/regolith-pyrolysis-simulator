@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+import os
 from pathlib import Path
 from typing import Mapping, Sequence
 
@@ -61,11 +62,51 @@ class ImccGasTemperatureOutsideDomainError(ImccRefusal):
 # --------------------------------------------------------------------------- #
 
 
-def _default_vaporock_root() -> Path:
-    """Return the sibling VapoRock checkout root.
+# Candidate VapoRock locations, searched in order. The sibling checkout stays the
+# default because that is how a dev workspace is laid out, but it MUST NOT be the
+# only option: a CI job directory sits one level deeper, so ``../VapoRock`` resolves
+# to <jobs-root>/VapoRock and does not exist. That single assumption made 29 tests
+# fail on every runner while passing on every dev box (2026-08-29) -- the worst
+# possible shape, because nobody who could reproduce it could see it and nobody who
+# could see it could reproduce it. The studio workaround was a symlink in the jobs
+# root, which the jobs reaper then deleted in the same run (ls -1dt */ matches a
+# symlink-to-directory on macOS), so the fix un-fixed itself. Resolve it in code.
+_VAPOROCK_ENV_VAR = "RPS_VAPOROCK_ROOT"
 
-    ``simulator/melt_backend/imcc_sf04/gas.py`` -> workspace root -> ``../VapoRock``.
+
+def _vaporock_candidates() -> tuple[Path, ...]:
+    """Ordered candidate roots for the VapoRock checkout."""
+    workspace = Path(__file__).resolve().parents[3]
+    candidates: list[Path] = []
+    override = os.environ.get(_VAPOROCK_ENV_VAR)
+    if override:
+        candidates.append(Path(override).expanduser())
+    candidates.extend(
+        [
+            workspace / ".." / "VapoRock",   # dev workspace sibling (historic default)
+            workspace / "VapoRock",          # vendored inside the checkout
+            Path.home() / "Repos" / "VapoRock",
+            Path.home() / "repos" / "VapoRock",
+        ]
+    )
+    return tuple(candidates)
+
+
+def _default_vaporock_root() -> Path:
+    """Return the VapoRock checkout root.
+
+    Returns the first candidate that actually contains the gas database. Falls back
+    to the historic sibling path when none is present, so a resulting
+    FileNotFoundError still names the conventional location rather than a surprise.
+    Set ``RPS_VAPOROCK_ROOT`` to point at a checkout in a non-standard place.
     """
+    marker = Path("src") / "vaporock" / "data" / "JANAF-vapor-data-full.csv"
+    for candidate in _vaporock_candidates():
+        try:
+            if (candidate / marker).is_file():
+                return candidate.resolve()
+        except OSError:
+            continue
     return Path(__file__).resolve().parents[3] / ".." / "VapoRock"
 
 
