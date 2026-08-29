@@ -16,6 +16,7 @@ from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+from simulator.furnace_materials import setpoints_furnace_ceiling_C
 from simulator.optimize.recipe import (
     C3_ALKALI_DOSING_K_KG_PATH,
     C3_ALKALI_DOSING_NA_KG_PATH,
@@ -79,17 +80,34 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # Pref_GF retarget (moon 1978.564→1892.647 C; asteroid 1840.802→1768.703 C)
     # plus the phase_basis provenance string — the digest tracks the file
     # content by design. Empty patch bytes remain neutral (identity holds).
+    # Recomputed 2026-08-29 (b-329 furnace-ceiling inheritance). The move was
+    # verified by diffing the resolved setpoints structure before/after rather
+    # than accepted on faith; it is EXACTLY two entries, both deliberate:
+    #   -  "max_service_T_C": 1750   (the stale Doloma-REE duct literal, removed:
+    #                                 nothing in simulator/ reads it, and it sat
+    #                                 450 C below the inherited furnace ceiling)
+    #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
+    #                                 null meaning "inherit from furnace_material")
+    # No other key changed. The digest tracks file content by design.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "ba84a1a08ba61af122bb582bb1e02672e0f939e0d0711500bcdb9db573573ca9"
+        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
     )
+    # bounds_digest moved with the knob bounds themselves: the furnace envelope
+    # top (2000 -> catalog max) and the hot-wall ceiling (1750 -> inherited).
+    # This digest IS the cache-invalidation lever for a bounds change -- it fires
+    # automatically, which is why no allowlist_version bump is warranted here:
+    # the set of tunable PATHS did not change, only two paths' bounds.
     assert schema.bounds_digest == (
-        "5a5aba76747df5b17a0dc98ce81eb47bccf045687394656f55474ca60ecd9184"
+        "9d87f2394cc45bc6a4d99a3dfa287ed304aa1a5473182c4b1eda2d04df66cccd"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
+    # Moves with bounds_digest above -- that is the POINT of this test's name
+    # ("identity moves"): the empty patch's own bytes stay neutral while identity
+    # tracks the schema. Recomputed 2026-08-29 (b-329).
     assert empty.recipe_id(schema) == (
-        "3c6729031ecaf686b0e6b6a2e795d7cd8859d0b2b6cb9d3f5f5ade577fd0a53e"
+        "d71962c0eb855b0260adc13d4036800e331b948c48d3f2a8e7fb617dee494b78"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -100,8 +118,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     identity_digest = hashlib.sha256(
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
+    # Fourth and last digest in this test to move with the b-329 bounds change,
+    # for the same reason as the three above. Recomputed 2026-08-29.
     assert identity_digest == (
-        "af510d5baa724a244755b8711cc4f038e200dd1df5ab1ec5785bfe51a4d1ea9f"
+        "f25190100b5ee2a9cbb7b8d877dfa6a65a1926501c0c6b8ad7a43a16c6fa8669"
     )
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
@@ -706,7 +726,13 @@ def test_furnace_max_t_c_knob_bounds_and_top_level_patch() -> None:
     with pytest.raises(RecipeValidationError, match="below lower bound"):
         RecipePatch({FURNACE_MAX_T_C_PATH: FURNACE_MAX_T_BOUNDS_C[0] - 1.0}).validated(schema)
     with pytest.raises(RecipeValidationError, match="above upper bound"):
-        RecipePatch({FURNACE_MAX_T_C_PATH: 2001.0}).validated(schema)
+        # Derived, not the old literal 2001.0: that number was "one above the
+        # envelope" only while the envelope top was 2000, and silently became a
+        # VALID value when the catalog ceiling rose -- the assertion then proved
+        # nothing while still passing its lower-bound twin.
+        RecipePatch(
+            {FURNACE_MAX_T_C_PATH: FURNACE_MAX_T_BOUNDS_C[1] + 1.0}
+        ).validated(schema)
 
     nested = schema.to_setpoints_patch(RecipePatch({FURNACE_MAX_T_C_PATH: 1450.0}))
     assert nested == {"furnace_max_T_C": 1450.0}
@@ -718,17 +744,18 @@ def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
     schema = RecipeSchema()
     spec = schema.spec_for(FURNACE_MAX_T_C_PATH)
 
-    assert (
-        schema.allowlist_version,
-        O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION,
-        (spec.low, spec.high),
-        FURNACE_MAX_T_BOUNDS_C,
-    ) == (
-        "allowlist-v12",
-        "allowlist-v12",
-        (1200.0, 2000.0),
-        (1200.0, 2000.0),
-    )
+    # Split from a single four-tuple compare. Bundling the epoch strings with the
+    # bound values meant a failure named none of them -- the diff said only "at
+    # index 2", and an epoch drift and a bounds drift were indistinguishable.
+    # One assertion per fact, so the failure names the fact.
+    assert schema.allowlist_version == "allowlist-v12"
+    assert O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION == "allowlist-v12"
+    # The knob's bounds ARE the furnace envelope -- that identity is the claim
+    # worth pinning here. The envelope's own VALUE is owned by the catalog and
+    # pinned in tests/test_furnace_materials.py; restating a number here would be
+    # the second copy that went stale last time.
+    assert (spec.low, spec.high) == FURNACE_MAX_T_BOUNDS_C
+    assert FURNACE_MAX_T_BOUNDS_C[0] == 1200.0
 
 
 @pytest.mark.parametrize(("field", "value"), (("low", 1300.0), ("high", 1900.0)))
@@ -842,7 +869,10 @@ def test_furnace_max_t_c_default_and_clamp_chokepoint() -> None:
         0,
         MeltState(campaign=CampaignPhase.C2A, temperature_C=1200.0),
     )
-    assert target == pytest.approx(1800.0)
+    # Was the literal 1800.0. The default ceiling is now inherited from
+    # `furnace_material`, so this asserts the INHERITANCE rather than a number
+    # that has to be re-typed every time the pipe catalog changes.
+    assert target == pytest.approx(setpoints_furnace_ceiling_C(setpoints))
     assert ramp == pytest.approx(15.0)
 
     setpoints["furnace_max_T_C"] = 1400.0
@@ -889,7 +919,21 @@ def test_furnace_max_t_c_default_and_clamp_chokepoint() -> None:
     )[0] is None
 
 
-@pytest.mark.parametrize("value", [1199.0, 2000.1, float("inf"), "nan", "hot"])
+# 2000.1 was "just above the envelope" only while the top was 2000; once the
+# catalog ceiling rose it became a legitimately VALID setpoint and the case
+# stopped testing anything. Derived from the envelope so it cannot go stale.
+# float("inf") is the case that matters most: it is invalid at ANY ceiling, and
+# it regressed to passing when validation ran after a min() clamp (b-329).
+@pytest.mark.parametrize(
+    "value",
+    [
+        FURNACE_MAX_T_BOUNDS_C[0] - 1.0,
+        FURNACE_MAX_T_BOUNDS_C[1] + 0.1,
+        float("inf"),
+        "nan",
+        "hot",
+    ],
+)
 def test_furnace_max_t_c_setpoints_validation_fails_loud(value) -> None:
     setpoints = copy.deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
     setpoints["furnace_max_T_C"] = value
@@ -1585,9 +1629,15 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # 2026-07-21 B1: recomputed again after the hot-wall offset window
     # re-derivation (OVERHEAD_HEADSPACE_OFFSET_MIN_K -200 -> -443 for the
     # 1843 C melt ceiling) moved the schema bounds digest.
+    # 2026-08-29 b-329: recomputed again for the same reason, one layer out --
+    # the hot-wall ceiling stopped being a literal (1750, Doloma-REE) and now
+    # inherits the furnace-material envelope, taking offset_min -443 -> -800 with
+    # it. Note the -443 above was itself a re-derivation of this same pin: a
+    # difference between two moving numbers, written down as a constant, goes
+    # stale every time either moves. It is now evaluated, not pinned.
     assert (
         first.recipe_id()
-                == "a50572d57d8785fd02a8d9e8638d7c997f693c72c8ef1ff22ad4aff7240abf64"
+                == "c9d30fc5ce7426f78c331b7d3a441f293d9fe0512bb255fae315e1cfd214904b"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

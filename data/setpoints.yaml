@@ -9,20 +9,30 @@
 # Source: context-setpoints.yaml v2 + context-core.md + context-thermo.md
 # ============================================================================
 
-# Top-level operator furnace ceiling. Grounding: docs-private/research/
-# 2026-06-18-furnace-max-temp/findings.md recommends default 1800 C and
-# bounds [1200, 2000]: 1200 C from fused-silica max-operating authority,
-# with upper range from refractory service temperatures plus 1800-2100 C solar
-# vacuum pyrolysis operating evidence. The canonical lunar recipe overrides
-# this with the catalogued dense-alumina maximum (1843 C).
 # FURNACE CEILING IS INHERITED FROM THE PIPE MATERIAL, not set here.
 # `furnace_material` is the single source of truth: the runtime ceiling is that
 # material's max_service_T_C from data/furnace_materials.yaml (zirconia_ysz =
 # 2200 C, continuous AND max per its catalog source note). Setting a number here
 # instead would be a second place to change when the pipe changes, and the two
-# would drift. Override `furnace_max_T_C` explicitly ONLY to run a vessel BELOW
-# its material rating; it is capped by the material either way and never raises it.
+# would drift.
+#
+# Envelope: the admissible RANGE is [1200 C, catalog max] from
+# simulator.furnace_materials.FURNACE_MAX_T_BOUNDS_C -- 1200 C from fused-silica
+# max-operating authority, the top tracking the best enabled material in the
+# catalog. Deliberately NOT restated as a number here: an earlier revision of this
+# comment pinned "bounds [1200, 2000]" and went stale the moment the catalog moved,
+# which is the failure this whole inheritance change exists to stop. The grounding
+# note it cited (docs-private/research/2026-06-18-furnace-max-temp/findings.md,
+# default 1800 C) is not in this repository and is superseded by the catalog.
 furnace_material: zirconia_ysz
+# Explicit DERATE hook, and the anchor for the optimizer's furnace_max_T_C lever.
+# Null means "inherit from furnace_material" -- the key is present on purpose so
+# the mandate lever has a real setpoint path to patch rather than one that springs
+# into existence only when tuned. Set a number ONLY to run a vessel BELOW its
+# material rating: an in-envelope request is derated downward against the material
+# and never raises it, and an out-of-envelope or non-finite request is REFUSED
+# (not clamped) by CampaignManager.
+furnace_max_T_C: null
 # ============================================================================
 # 1. CAMPAIGNS
 # ============================================================================
@@ -1078,7 +1088,14 @@ condensation_train:
       label: "Hot Duct with IR Spectroscopy"
       temp_range_C: [1400, 1600]
       material: "Doloma-REE ceramic (Material 3)"
-      max_service_T_C: 1750
+      # Display metadata only -- nothing in simulator/ reads this field; the sole
+      # consumer is the furnace-material catalog row rendered by web/routes.py,
+      # which reads data/furnace_materials.yaml, not this one. It is left absent
+      # rather than restated: the literal 1750 (Doloma-REE) sat 450 C BELOW the
+      # furnace ceiling once that began inheriting from `furnace_material`, i.e.
+      # the first component downstream of the melt documented as rated below the
+      # vapour it receives, with nothing refusing (b-329). The duct is built of the
+      # furnace material, so its rating is that material's max_service_T_C.
       ir_spectroscopy:
         window: "sapphire"
         monitored_lines:

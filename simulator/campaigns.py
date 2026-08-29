@@ -35,8 +35,10 @@ from simulator.lab_schedule import (
     schedule_sample_time_h,
 )
 from simulator.furnace_materials import (
+    FURNACE_CEILING_FALLBACK_C,
     FURNACE_MAX_T_BOUNDS_C,
     resolve_furnace_max_T_C,
+    setpoints_furnace_ceiling_C,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.optimize.recipe import (
@@ -249,35 +251,46 @@ class CampaignManager:
                 resolve_furnace_max_T_C(str(material))
                 if material else None
             )
-            requested = setpoints.get('furnace_max_T_C')
-            if material_ceiling is not None and requested is None:
-                self.furnace_max_T_C = float(material_ceiling)
-            elif material_ceiling is not None:
-                self.furnace_max_T_C = min(
-                    self._float(requested, material_ceiling),
-                    float(material_ceiling),
-                )
-            else:
-                self.furnace_max_T_C = self._float(
-                    requested if requested is not None else 1800.0,
-                    1800.0,
-                )
+            # Shared resolver: explicit request, else the pipe material, else the
+            # historic fallback. Kept in furnace_materials so the optimizer's
+            # thermal-window scheduler answers this question identically (b-329).
+            self.furnace_max_T_C = self._float(
+                setpoints_furnace_ceiling_C(setpoints),
+                FURNACE_CEILING_FALLBACK_C,
+            )
         except ValueError as exc:
             raise ValueError('furnace_max_T_C must be numeric') from exc
+        # VALIDATE THE REQUESTED VALUE BEFORE ANY CLAMPING. Order is load-bearing:
+        # this check used to run on the POST-clamp value, and `min(requested,
+        # material_ceiling)` launders any absurd request into a valid-looking
+        # number -- min(inf, 2200) is 2200, which is finite and in-envelope, so a
+        # setpoint of `furnace_max_T_C: .inf` was silently accepted as 2200 C
+        # instead of refused (b-329). A clamp is not a validator: it maps invalid
+        # input onto valid output, which is precisely a fail-open. Refuse first,
+        # derate second.
         if (
             not math.isfinite(self.furnace_max_T_C)
             or self.furnace_max_T_C < FURNACE_MAX_T_BOUNDS_C[0]
             or self.furnace_max_T_C > FURNACE_MAX_T_BOUNDS_C[1]
         ):
-            # Envelope is the imported FURNACE_MAX_T_BOUNDS_C pair
-            # (1200 C, 2000 C) from simulator.furnace_materials. This
-            # module does not derive those bounds. The previously cited
-            # path docs-private/research/2026-06-18-furnace-max-temp/
-            # findings.md is not in this repository; a literature
-            # derivation is unestablished here.
+            # Envelope is the imported FURNACE_MAX_T_BOUNDS_C pair from
+            # simulator.furnace_materials -- currently (1200 C, catalog max),
+            # NOT a literal restated here: it tracks the best enabled material in
+            # data/furnace_materials.yaml, so quoting a number in this comment is
+            # what let it drift once already. This module does not derive those
+            # bounds. The previously cited path
+            # docs-private/research/2026-06-18-furnace-max-temp/findings.md is not
+            # in this repository; a literature derivation is unestablished here.
             raise ValueError(
                 'furnace_max_T_C must be finite and within '
                 f'[{FURNACE_MAX_T_BOUNDS_C[0]:.0f}, {FURNACE_MAX_T_BOUNDS_C[1]:.0f}]'
+            )
+        # Derate to the named pipe: an in-envelope request may still exceed THIS
+        # vessel's material, and a setpoint must never run a vessel hotter than
+        # what it is made of. Downward only -- a request below the material stands.
+        if material_ceiling is not None:
+            self.furnace_max_T_C = min(
+                self.furnace_max_T_C, float(material_ceiling)
             )
         # User-configurable overrides
         self.c4_max_temp_C = 1670.0  # Max T for C4 Mg pyrolysis (default)

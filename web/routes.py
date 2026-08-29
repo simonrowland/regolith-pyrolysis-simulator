@@ -2175,7 +2175,12 @@ def _c4_operator_preset_payload(
 
 def _furnace_material_catalog_payload() -> list[dict[str, Any]]:
     setpoints = _load_yaml('setpoints.yaml')
-    requested_cap = setpoints.get('furnace_max_T_C', 1800)
+    # Not .get('furnace_max_T_C', 1800): the default fires only on an ABSENT
+    # key, so the explicit null that spells "inherit" would surface as a
+    # requested derate of None anyway -- and the 1800 literal was a third copy
+    # of a ceiling the pipe material owns (b-329). None means no derate, which
+    # is what resolve_furnace_temperature_caps already treats as "full rating".
+    requested_cap = setpoints.get('furnace_max_T_C')
     catalog = load_furnace_materials()
     materials = []
     for material_id, row in catalog.items():

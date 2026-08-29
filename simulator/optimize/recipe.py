@@ -31,36 +31,55 @@ O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
 
-# Hot-wall bounds: mandate invariant keeps ducts upstream of the designated
-# condenser above ~1400 C; Stage 0 setpoints cap the Doloma-REE hot duct at
-# 1750 C. Source sidecar: data/setpoints.yaml condensation_train.metals_train
-# stage_0_hot_duct temp_range_C [1400,1600], max_service_T_C 1750; material
-# support: data/wall_materials.yaml doloma service_temp direct 1700 C
-# (W:S7/W:S8) plus magnesia 1600-1800 C (W:S6).
+# Hot-wall bounds: the mandate invariant keeps ducts upstream of the designated
+# condenser above ~1400 C. The CEILING is not an independent number -- the hot
+# duct is built of the same refractory as the furnace, so its service ceiling IS
+# the furnace envelope ceiling, and it is INHERITED rather than restated here.
+#
+# Premise: FURNACE_MAX_T_BOUNDS_C[1] is the highest max_service_T_C among enabled
+#   rows of data/furnace_materials.yaml (zirconia_ysz, 2200 C at time of writing).
+# Why inherited, not literal: this was the literal 1750.0 (Doloma-REE), correct
+#   only while the furnace itself was capped near dense-alumina. Once the furnace
+#   ceiling began inheriting from `furnace_material` (c5434d19), a fixed 1750 left
+#   the FIRST COMPONENT DOWNSTREAM of the melt rated 450 C below the vapour it
+#   receives, with nothing refusing -- the cross-layer disagreement BUG-076 exists
+#   to prevent, reintroduced one layer out (b-329).
+# Unit check: both sides are absolute temperatures in C.
+# Sanity: ceiling >= floor, so the band is non-empty for any catalog whose best
+#   enabled material is rated above 1400 C.
+# Boundary -- what this does NOT assert: this is an ENVELOPE (what the optimizer
+#   may explore), not a per-run setpoint, and NOT a claim that any real duct holds
+#   2200 C. A run's actual ceiling is capped down from the campaign's named
+#   `furnace_material` in campaigns.py; this bound only says no recipe may ask for
+#   more than the best enabled material in the catalog is rated to hold.
 OVERHEAD_HOT_WALL_MIN_C = 1400.0
-OVERHEAD_HOT_WALL_MAX_C = 1750.0
+OVERHEAD_HOT_WALL_MAX_C = float(FURNACE_MAX_T_BOUNDS_C[1])
 # Offset window derivation: the offset knob is liner-relative-to-melt (K).
-# Requirement: at the C2A melt ceiling the liner must still be able to sit
-# at the hot-wall floor. C2A_continuous.temp_range_C max is 1843 C
-# (dense-alumina ceiling, recipe-family closure 22e604f; was 1600 C), so
-# offset_min = HOT_WALL_MIN - melt_max = 1400 - 1843 = -443 K. Units: a C
-# difference equals a K difference. Sanity: melt 1843 C + offset -443 K ->
-# liner 1400 C (the floor); the old 1600 C ceiling with -200 K gave the
-# same floor. offset_max = 0 (gas never hotter than melt without an
-# explicit wall-heat model).
-OVERHEAD_HEADSPACE_OFFSET_MIN_K = -443.0
+# Premise: at the melt ceiling the liner must still be able to sit at the hot-wall
+#   floor, so offset_min = HOT_WALL_MIN - melt_ceiling.
+# Algebra: 1400 - OVERHEAD_HOT_WALL_MAX_C, evaluated rather than pinned. The old
+#   literal -443.0 was 1400 - 1843 (the dense-alumina ceiling) and went stale the
+#   moment that ceiling moved: a pinned difference between two moving numbers is a
+#   value that can contradict its own derivation.
+# Unit check: a difference in C equals a difference in K.
+# Sanity: melt at the ceiling + offset_min -> liner exactly 1400 C, the floor.
+# Boundary -- what this does NOT assert: offset_max = 0 because the gas is never
+#   hotter than the melt WITHOUT AN EXPLICIT WALL-HEAT MODEL. That is a modelling
+#   limit, not a claim that an actively heated duct is physically impossible.
+OVERHEAD_HEADSPACE_OFFSET_MIN_K = OVERHEAD_HOT_WALL_MIN_C - OVERHEAD_HOT_WALL_MAX_C
 OVERHEAD_HEADSPACE_OFFSET_MAX_K = 0.0
 OVERHEAD_HOT_WALL_BOUNDS_SOURCE = (
-    "hot_wall_invariant: docs/concepts.md Hot walls section; "
+    "hot_wall_invariant: docs/concepts.md Hot walls section; floor 1400 C from "
     "data/setpoints.yaml condensation_train.metals_train.stage_0_hot_duct "
-    "temp_range_C=[1400,1600], max_service_T_C=1750; "
-    "data/wall_materials.yaml doloma W:S7/W:S8 direct service 1700 C"
+    "temp_range_C=[1400,1600]; ceiling INHERITED from the furnace-material "
+    "envelope FURNACE_MAX_T_BOUNDS_C[1] (highest enabled max_service_T_C in "
+    "data/furnace_materials.yaml), not restated here (b-329)"
 )
 OVERHEAD_HEADSPACE_OFFSET_BOUNDS_SOURCE = (
-    "hot_wall_invariant: C2A_continuous melt ceiling 1843 C (dense-alumina "
-    "furnace ceiling, data/wall_materials.yaml) minus Stage 0 hot-wall "
-    "floor 1400 C => offset >= -443 K; gas not hotter than melt without an "
-    "explicit wall-heat model"
+    "hot_wall_invariant: melt ceiling = furnace-material envelope "
+    "(FURNACE_MAX_T_BOUNDS_C[1], data/furnace_materials.yaml) minus Stage 0 "
+    "hot-wall floor 1400 C => offset_min = 1400 - ceiling, derived not pinned; "
+    "gas not hotter than melt without an explicit wall-heat model"
 )
 DOWNSTREAM_CONDENSATION_STAGE_PAIRS: tuple[tuple[str, int, int], ...] = (
     ("stage_4_to_stage_5", 4, 5),

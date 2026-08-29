@@ -21,6 +21,7 @@ from engines.builtin.vapor_pressure import (
     VaporPressureNumericalOverflowError,
     VaporPressureRangeError,
 )
+from simulator.furnace_materials import setpoints_furnace_ceiling_C
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
@@ -3638,7 +3639,12 @@ def _furnace_ceiling_C(
         campaign,
         recipe_patch=recipe_patch,
     )
-    hardware_ceiling_C = float(setpoints.get("furnace_max_T_C", 1800.0))
+    # Was float(setpoints.get("furnace_max_T_C", 1800.0)): a hardcoded ceiling
+    # that never consulted the pipe material, so an unpatched evaluation
+    # scheduled against 1800 C on a vessel the catalog rates to 2200 C. The
+    # .get() default also fired only on an ABSENT key, so the explicit
+    # `furnace_max_T_C: null` that spells "inherit" reached float(None) (b-329).
+    hardware_ceiling_C = setpoints_furnace_ceiling_C(setpoints)
     if constraints is None:
         if local_ceiling is not None:
             return local_ceiling[0], "recipe_local_furnace_max_T_C"

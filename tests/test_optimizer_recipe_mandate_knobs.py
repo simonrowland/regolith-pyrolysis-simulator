@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
 from simulator.optimize.recipe import (
@@ -110,11 +111,32 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     c2a_continuous = setpoints["campaigns"]["C2A_continuous"]
 
     assert hot_duct["temp_range_C"][0] == OVERHEAD_HOT_WALL_MIN_C
-    assert hot_duct["max_service_T_C"] == OVERHEAD_HOT_WALL_MAX_C
+    # SINGLE SOURCE OF TRUTH: the duct is built of the furnace material, so its
+    # service ceiling is that material's rating and the YAML row must NOT restate
+    # it. The row used to carry `max_service_T_C: 1750` (Doloma-REE) and this test
+    # asserted the code constant equalled it -- which held right up until the
+    # furnace ceiling began inheriting from `furnace_material`, at which point the
+    # duct was documented 450 C below the vapour it receives and the two numbers
+    # disagreed with nothing to catch it (b-329). Asserting ABSENCE is what keeps
+    # the second copy from coming back.
+    assert "max_service_T_C" not in hot_duct
+    assert OVERHEAD_HOT_WALL_MAX_C == FURNACE_MAX_T_BOUNDS_C[1]
+    # Offset floor is derived against the FURNACE ceiling, not C2A_continuous's
+    # own declared range. A knob bound must admit the worst case the optimizer can
+    # command, and campaigns.py caps every run at the furnace ceiling -- so the
+    # liner must be able to reach its 1400 C floor even from the hottest melt the
+    # hardware allows. Widening the floor cannot breach a safety limit: the liner
+    # minimum is enforced on the absolute liner knob (asserted below), and a
+    # COOLER-than-reachable gas was already permissible at every melt temperature.
     assert (
         OVERHEAD_HEADSPACE_OFFSET_MIN_K
-        == OVERHEAD_HOT_WALL_MIN_C - c2a_continuous["temp_range_C"][1]
+        == OVERHEAD_HOT_WALL_MIN_C - OVERHEAD_HOT_WALL_MAX_C
     )
+    # C2A_continuous still declares a literal 1843 C max (dense alumina). That is
+    # the remaining leg of "remove the 1843 max and import it from the pipe" -- a
+    # golden-affecting change, deliberately not bundled here. Asserted as an
+    # inequality so this test does not re-pin the stale number.
+    assert c2a_continuous["temp_range_C"][1] <= OVERHEAD_HOT_WALL_MAX_C
     assert OVERHEAD_HEADSPACE_OFFSET_MAX_K == 0.0
 
     hot_wall_paths = [
@@ -136,7 +158,12 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     )
     assert offset_spec.low == OVERHEAD_HEADSPACE_OFFSET_MIN_K
     assert offset_spec.high == OVERHEAD_HEADSPACE_OFFSET_MAX_K
-    assert "C2A_continuous melt ceiling 1843 C" in offset_spec.bounds_source
+    # Was "C2A_continuous melt ceiling 1843 C". The provenance no longer names a
+    # number, because the ceiling it describes is inherited rather than fixed --
+    # a provenance string that quotes a value is one more copy to go stale, and
+    # this one had (b-329).
+    assert "furnace-material envelope" in offset_spec.bounds_source
+    assert "hot_wall_invariant" in offset_spec.bounds_source
 
     default_train = CondensationTrain.create_default()
     stage_ranges = {

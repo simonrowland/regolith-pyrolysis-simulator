@@ -196,6 +196,51 @@ def resolve_furnace_temperature_caps(
     }
 
 
+# Fallback used ONLY when a setpoints mapping names no pipe material and requests
+# no explicit ceiling. It is not a material limit and not a derived figure -- it is
+# the historic literal, kept so an incomplete setpoints file still runs. Any real
+# vessel should reach here via `furnace_material`.
+FURNACE_CEILING_FALLBACK_C = 1800.0
+
+
+def setpoints_furnace_ceiling_C(
+    setpoints: Mapping[str, Any],
+    *,
+    fallback_C: float = FURNACE_CEILING_FALLBACK_C,
+) -> float:
+    """Ceiling a setpoints mapping implies: explicit request, else pipe material.
+
+    SINGLE SOURCE OF TRUTH for "how hot may this furnace run", so the campaign
+    runner and the optimizer's thermal-window scheduler cannot disagree. They did:
+    CampaignManager inherited the ceiling from `furnace_material` while
+    evaluate._furnace_ceiling_C still read `setpoints.get("furnace_max_T_C", 1800.0)`,
+    so an unpatched evaluation scheduled against 1800 C on a vessel the catalog rates
+    to 2200 C (b-329).
+
+    Resolution order, highest priority first:
+      1. an explicit `furnace_max_T_C` (the operator's derate hook), returned AS
+         GIVEN -- coercion, envelope validation and derating against the material
+         belong to the caller, which is why this returns a bare float and raises
+         nothing but the float() TypeError on junk;
+      2. `furnace_material`'s max_service_T_C from data/furnace_materials.yaml;
+      3. `fallback_C`.
+
+    Note `.get(key, default)` is NOT equivalent to step 1: it supplies the default
+    only when the key is ABSENT, so an explicit `furnace_max_T_C: null` -- which is
+    how setpoints.yaml spells "inherit" -- reaches float(None) and raises. That
+    exact call is what this function replaces.
+    """
+    requested = setpoints.get("furnace_max_T_C")
+    if requested is not None:
+        return float(requested)
+    material = setpoints.get("furnace_material")
+    if material:
+        material_ceiling = resolve_furnace_max_T_C(str(material))
+        if material_ceiling is not None:
+            return float(material_ceiling)
+    return float(fallback_C)
+
+
 def _catalog_items(catalog: Mapping[str, Any]) -> Mapping[str, Any]:
     nested = catalog.get("furnace_materials")
     if isinstance(nested, Mapping):
