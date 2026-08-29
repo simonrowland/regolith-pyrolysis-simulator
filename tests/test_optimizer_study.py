@@ -2124,6 +2124,43 @@ def _write_prior_warm_start_run(
     return scored
 
 
+# One-candidate-times-out timing budget. THIRD setting of these numbers, and the
+# first derived from a measurement rather than multiplied.
+#
+# History: 20 s sleep / 2.0 s wall -> both candidates timed out under load
+# (t-419, 2026-07-25). Raised 5x to 30 s / 10.0 s. STILL FAILING the same way in
+# both of the last two full-suite runs, as `AttributeError: 'NoneType' object
+# has no attribute 'candidate_id'` -- which is this failure wearing a different
+# hat, because when BOTH candidates time out the study correctly returns
+# winner=None with COMPLETED_NO_FEASIBLE_WINNER_STATUS and the test derefs it.
+# Production is right; the bounds are wrong. A fourth blind multiply is not the
+# fix.
+#
+# Derived instead, from measured numbers:
+#   the OK candidate's real eval           ~1-2 s idle (measured, this file's
+#                                          own prior comment)
+#   measured CI inflation on this suite    1.6-3.4x under 24-way xdist
+#                                          self-contention (2026-08-29 sweep)
+#   => worst-case contended OK eval        ~7 s
+#   EVAL_WALL = 30 s                       >4x that, so the OK candidate has
+#                                          room it can no longer plausibly lose
+#   SLOW_SLEEP = 120 s                     4x EVAL_WALL, so candidate 0 is still
+#                                          sleeping when its wall fires -- the
+#                                          constraint is bounded on this side
+#                                          too, and a sleep BELOW the wall would
+#                                          silently stop testing the timeout
+#   test wall = 150 s                      idle duration is EVAL_WALL (waiting
+#                                          candidate 0 out) + ~7 + ~10 pool
+#                                          spawn ~= 47 s; 150 is >3x, and stays
+#                                          under the 300 s global default so no
+#                                          suite-shape roster entry is needed
+#
+# Cost: the test goes from ~22 s to ~47 s idle. It is currently red in every
+# run, so it contributes nothing today; 25 s buys a test that actually reports.
+_SLOW_FIRST_EVAL_WALL_S = 30.0
+_SLOW_FIRST_SLEEP_S = 120.0
+
+
 def _slow_first_then_ok_evaluator(
     patch: RecipePatch,
     feedstock: str,
@@ -2134,12 +2171,9 @@ def _slow_first_then_ok_evaluator(
     **kwargs: Any,
 ) -> ScoredResult:
     if _sequence(candidate_id) == 0:
-        # 30 s against the caller's 10 s eval wall: the margin is deliberately
-        # huge in BOTH directions so exactly one candidate times out even on a
-        # heavily loaded box (2026-07-25 t-419: the old 20 s/2.0 s pairing let
-        # the OK candidate's ~1-2 s real eval also cross the 2.0 s wall under
-        # load, making BOTH time out and the winner assertions deref None).
-        time.sleep(30.0)
+        # Must OUTLAST the caller's eval wall, so exactly one candidate times
+        # out. See the derivation above _SLOW_FIRST_EVAL_WALL_S.
+        time.sleep(_SLOW_FIRST_SLEEP_S)
     return _evaluator()(patch, feedstock, fidelity, profile=profile, candidate_id=candidate_id, **kwargs)
 
 
@@ -4658,7 +4692,7 @@ def test_feasible_earned_rump_ood_cache_rejection_warns_and_study_continues(
     assert "out_of_domain_provenance" in caplog.text
 
 
-@pytest.mark.timeout(25)
+@pytest.mark.timeout(150)
 def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
     result = study.run(
         PROFILE,
@@ -4670,9 +4704,9 @@ def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
         tmp_path,
         seed=7,
         evaluator=_slow_first_then_ok_evaluator,
-        # 10 s wall vs the ok-candidate's ~1-2 s real eval: load-robust
-        # margin in both directions (see _slow_first_then_ok_evaluator).
-        per_eval_timeout_seconds=10.0,
+        # Derived from measured cost, not multiplied; see the budget above
+        # _slow_first_then_ok_evaluator for why 2.0 and then 10.0 both failed.
+        per_eval_timeout_seconds=_SLOW_FIRST_EVAL_WALL_S,
     )
 
     provenance = _read_provenance(tmp_path)
