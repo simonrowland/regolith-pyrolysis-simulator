@@ -47,6 +47,24 @@ class EllinghamPressureRefusal(ValueError):
     """
 
 
+def _physical_pO2_bar(pO2_bar: float) -> float:
+    """Mass-action pO2 (bar): refuse a negative fugacity, then floor tiny positives.
+
+    The 1e-30 floor is a division guard for a physically valid (zero or
+    tiny) pO2, not a validator. ``max(negative, 1e-30)`` maps an invalid
+    fugacity onto a valid-looking one and kills the ``numerator <= 0``
+    guard in ``_metal_activity_factor_from_segment``. Refuse first, floor
+    second.
+    """
+    pO2 = float(pO2_bar)
+    if pO2 < 0.0:
+        raise EllinghamPressureRefusal(
+            f"pO2_bar must be non-negative; got {pO2_bar!r} "
+            "(negative fugacity is not a physical pO2)"
+        )
+    return max(pO2, 1e-30)
+
+
 @dataclass(frozen=True)
 class EvolutionRankEntry:
     species: str
@@ -133,7 +151,7 @@ def _metal_activity_factor_from_segment(
     # Same operation order as dissociation_equilibrium_constant; hoisting the
     # already-selected segment removes lookup/validation only.
     K = math.exp(dG_kJ * 1000.0 / (GAS_CONSTANT_J_PER_MOL_K * T_K))
-    pO2 = max(float(pO2_bar), 1e-30)
+    pO2 = _physical_pO2_bar(pO2_bar)
     numerator = K * (max(float(a_oxide), 0.0) ** n_ox) / pO2
     if numerator <= 0.0:
         return 0.0
@@ -265,7 +283,7 @@ def effective_equilibrium_pressure_Pa(
 
     data = _resolve_vapor_pressure_data(vapor_pressure_data)
     T_K = float(temperature_K)
-    pO2 = max(float(pO2_bar), 1e-30)
+    pO2 = _physical_pO2_bar(pO2_bar)
     a_ox = max(float(a_oxide), 0.0)
 
     metals = data.get("metals", {}) or {}

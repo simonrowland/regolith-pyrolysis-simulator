@@ -1727,7 +1727,13 @@ def _knudsen_summary_from_eval_inputs(
         run_config=run_config,
     )
     if gas_temperature_C is None:
-        gas_temperature_C = 1500.0
+        # Do not fabricate a measured temperature. Defaulting to 1500 C
+        # buckets "could not measure T" with "measured 1500 C", produces
+        # a status=ok viscous summary, and the missing-summary refusal
+        # can never fire because a summary is now present. Pressure-only
+        # fallback remains; T must be a real candidate or this path
+        # declines so the Knudsen gate can see the gap.
+        return None
     pipe_diameter_m = _knudsen_pipe_diameter_m()
     summary = knudsen_regime_diagnostic(
         overhead_pressure_mbar=pressure_mbar,
@@ -3722,9 +3728,40 @@ def _positive_finite_recipe_local_furnace_ceiling_C(
     return value
 
 
+def _refuse_present_nonfinite_interval_member(
+    value: Any,
+    *,
+    label: str,
+) -> None:
+    """Refuse a present-but-non-finite bound; leave genuine absence alone.
+
+    ``_finite_float_or_none`` answers None for BOTH "absent" and "was a
+    number, but non-finite". Dropping a missing bound is a feature (a
+    one-sided interval collapses to isothermal). Dropping ``inf`` is
+    not: ``[1600, inf]`` becomes ``(1600, 1600)`` and the ceiling guard
+    then compares ``1600 > 2200`` (false) where raw ``inf > 2200`` is
+    true. Distinguish those two facts; refuse only the present non-finite.
+    """
+    if value is None or isinstance(value, bool):
+        return
+    if isinstance(value, (list, tuple)):
+        for item in value:
+            _refuse_present_nonfinite_interval_member(item, label=label)
+        return
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return
+    if not math.isfinite(numeric):
+        raise EvaluationInputError(
+            f"{label} bound must be finite; got {value!r}"
+        )
+
+
 def _numeric_interval(value: Any) -> tuple[float, float] | None:
     if value is None:
         return None
+    _refuse_present_nonfinite_interval_member(value, label="numeric interval")
     if isinstance(value, (str, bytes)) or not isinstance(value, Iterable):
         numeric = _numeric_setting(value, sequence_policy="max")
         if numeric is None:
@@ -5148,12 +5185,16 @@ def _crash_point_composition_mol_by_account(
     raw_by_account = crash_point.get("composition_mol_by_account")
     if isinstance(raw_by_account, MappingABC):
         by_account = _finite_nested_float_mapping(raw_by_account)
+        if by_account is None:
+            return None
         if by_account:
             return by_account
 
     raw_mol = crash_point.get("composition_mol")
     if isinstance(raw_mol, MappingABC):
         mol = _finite_float_mapping(raw_mol)
+        if mol is None:
+            return None
         if mol:
             return {"process.cleaned_melt": mol}
 
@@ -5168,12 +5209,17 @@ def _crash_point_composition_mol_by_account(
 
 def _finite_nested_float_mapping(
     values: Mapping[Any, Any],
-) -> dict[str, dict[str, float]]:
+) -> dict[str, dict[str, float]] | None:
     result: dict[str, dict[str, float]] = {}
     for account, species_mol in values.items():
         if not isinstance(species_mol, MappingABC):
             continue
         cleaned = _finite_float_mapping(species_mol)
+        if cleaned is None:
+            # Present-but-non-finite in any account poisons the whole
+            # nested mapping. Skipping the bad account and keeping the
+            # rest is the same mixed-case launder one layer up.
+            return None
         if cleaned:
             result[str(account)] = cleaned
     return result
@@ -5187,6 +5233,8 @@ def _composition_wt_pct_to_mol(
     registry = dict(getattr(sim, "species_formula_registry", {}) or {})
     result: dict[str, float] = {}
     for species, raw_mass in values.items():
+        if _present_nonfinite_number(raw_mass):
+            return {}
         mass_basis = _finite_optional_float(raw_mass)
         if mass_basis is None or mass_basis <= 0.0:
             continue
@@ -5267,12 +5315,14 @@ def _terminal_rump_by_species_kg(run_execution: Any) -> dict[str, float]:
     trace = getattr(run_execution, "trace", None)
     raw = _carrier_value(trace, "terminal_rump_by_species_kg")
     if isinstance(raw, MappingABC):
-        return _finite_float_mapping(raw)
+        cleaned = _finite_float_mapping(raw)
+        return {} if cleaned is None else cleaned
     sim = getattr(run_execution, "simulator", None)
     getter = getattr(sim, "_terminal_rump_by_species", None)
     if callable(getter):
         try:
-            return _finite_float_mapping(getter() or {})
+            cleaned = _finite_float_mapping(getter() or {})
+            return {} if cleaned is None else cleaned
         except (TypeError, ValueError):
             return {}
     return {}
@@ -5286,9 +5336,32 @@ def _carrier_value(carrier: Any, key: str) -> Any:
     return getattr(carrier, key, None)
 
 
-def _finite_float_mapping(values: Mapping[Any, Any]) -> dict[str, float]:
+def _present_nonfinite_number(value: Any) -> bool:
+    """True when a value was supplied as a number but is inf/nan.
+
+    Distinct from absence: None/unparseable is not a number. This is the
+    mixed-composition fact ``_finite_float_mapping`` used to erase.
+    """
+    if value is None or isinstance(value, bool):
+        return False
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return False
+    return not math.isfinite(numeric)
+
+
+def _finite_float_mapping(values: Mapping[Any, Any]) -> dict[str, float] | None:
     result: dict[str, float] = {}
     for key, raw in values.items():
+        # VALIDATE PRESENT MEMBERS BEFORE DROPPING NON-FINITE. Dropping
+        # inf/nan species and keeping the rest maps {SiO2: 10, FeO: inf}
+        # onto {SiO2: 10}, which is truthy, so _assess_rump_terminal
+        # treats an incomplete composition as complete evidence.
+        # All-non-finite already yielded {} / None; the mixed case is
+        # the launder. None here means "present but unusable".
+        if _present_nonfinite_number(raw):
+            return None
         value = _finite_optional_float(raw)
         if value is not None and value > 0.0:
             result[str(key)] = value

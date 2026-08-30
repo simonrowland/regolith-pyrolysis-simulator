@@ -1482,6 +1482,72 @@ def test_nonfinite_flow_scalar_missing_knudsen_summary_fails_closed(
     assert "not-applicable-zero-overhead-flow" not in margin.detail
 
 
+def test_knudsen_eval_input_fallback_does_not_fabricate_temperature() -> None:
+    """SC-170 F: missing gas T must not become a measured 1500 C summary.
+
+    When pressure is present but temperature is absent, defaulting T to
+    1500 C produces status=ok, regime=viscous, provenance
+    fallback:eval-inputs. The missing-summary refusal then cannot fire
+    because a summary is present. Preserve the fallback when T is a
+    real candidate; decline when it is not.
+    """
+    spec_missing_t = SimpleNamespace(
+        campaign="NOPE",
+        runtime_campaign_overrides={"NOPE": {"p_total_mbar_default": 10.0}},
+    )
+    assert evaluate_module._knudsen_summary_from_eval_inputs(
+        spec=spec_missing_t,
+        profile=None,
+        run_config=None,
+    ) is None
+
+    spec_measured_t = SimpleNamespace(
+        campaign="NOPE",
+        runtime_campaign_overrides={
+            "NOPE": {
+                "p_total_mbar_default": 10.0,
+                "gas_temperature_C": 1600.0,
+            }
+        },
+    )
+    summary = evaluate_module._knudsen_summary_from_eval_inputs(
+        spec=spec_measured_t,
+        profile=None,
+        run_config=None,
+    )
+    assert summary is not None
+    assert summary["provenance"] == evaluate_module.KNUDSEN_FALLBACK_EVAL_INPUTS
+    assert summary["gas_temperature_C"] == pytest.approx(1600.0)
+
+
+def test_finite_float_mapping_refuses_mixed_nonfinite_composition() -> None:
+    """SC-170 G: a present inf species must not drop out of a composition.
+
+    {SiO2: 10, FeO: inf} became {SiO2: 10}, which is truthy, so
+    _assess_rump_terminal skipped missing_crash_point_composition.
+    All-non-finite already yielded empty; only the mixed case launders.
+    """
+    assert evaluate_module._finite_float_mapping({"SiO2": 10.0, "FeO": 2.0}) == {
+        "SiO2": 10.0,
+        "FeO": 2.0,
+    }
+    assert evaluate_module._finite_float_mapping(
+        {"SiO2": float("inf"), "FeO": float("nan")}
+    ) is None
+    assert evaluate_module._finite_float_mapping(
+        {"SiO2": 10.0, "FeO": float("inf")}
+    ) is None
+    crash = {
+        "temperature_C": 1600.0,
+        "pressure_bar": 1e-6,
+        "fO2_log": -9.0,
+        "composition_mol": {"SiO2": 10.0, "FeO": float("inf")},
+    }
+    assert evaluate_module._crash_point_composition_mol_by_account(
+        crash, None
+    ) is None
+
+
 def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) -> None:
     green_profile = {
         **PROFILE,

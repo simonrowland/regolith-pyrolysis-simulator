@@ -133,8 +133,23 @@ def physical_melt_dissociation_pO2_bar(fO2_log: float) -> tuple[float, bool]:
     # physical envelope is applied (fO2_log=-400 → 0.0 in float64 otherwise).
     log_min = math.log10(MELT_DISSOCIATION_PO2_MIN_BAR)
     log_max = math.log10(MELT_DISSOCIATION_PO2_MAX_BAR)
+    # nan is missing input, not an envelope outlier. Mapping it onto either
+    # edge invents a melt pO2; Fe-free melts never reach the Kress91
+    # finite-controls guard, so the provider must refuse here.
+    if math.isnan(fO2):
+        raise VaporPressureComputationError(
+            f"melt dissociation fO2_log must be finite; got {fO2_log!r}"
+        )
     if not math.isfinite(fO2):
-        return MELT_DISSOCIATION_PO2_MAX_BAR, True
+        # Lifted from the "unreachable after log clamp" branch below. The
+        # previous sign-blind `return MAX_BAR, True` preempted that
+        # sign-aware form and mapped -inf (infinitely reducing) onto the
+        # most oxidizing edge. ±inf are envelope outliers; the sign of
+        # the log chooses the edge.
+        return (
+            MELT_DISSOCIATION_PO2_MIN_BAR if fO2 < 0.0 else MELT_DISSOCIATION_PO2_MAX_BAR,
+            True,
+        )
     if fO2 < log_min:
         return MELT_DISSOCIATION_PO2_MIN_BAR, True
     if fO2 > log_max:

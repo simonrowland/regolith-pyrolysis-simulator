@@ -1302,9 +1302,38 @@ def _setpoint_campaign_key(campaign: str) -> str:
     return _SETPOINT_CAMPAIGN_ALIASES.get(campaign, campaign)
 
 
+def _refuse_present_nonfinite_interval_member(
+    value: Any,
+    *,
+    label: str,
+) -> None:
+    """Refuse a present-but-non-finite bound; leave genuine absence alone.
+
+    Same drop as ``evaluate._numeric_interval``: ``_finite_float_or_none``
+    collapses "absent" and "non-finite" onto one sentinel, so
+    ``[1600, inf]`` survives profile load as ``(1600, 1600)``. Dropping
+    a missing bound is a feature; a present inf/nan must refuse.
+    """
+    if value is None or isinstance(value, bool):
+        return
+    if isinstance(value, (list, tuple)):
+        for item in value:
+            _refuse_present_nonfinite_interval_member(item, label=label)
+        return
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return
+    if not math.isfinite(numeric):
+        raise ProfileValidationError(
+            f"{label} bound must be finite; got {value!r}"
+        )
+
+
 def _numeric_interval_optional(value: Any) -> tuple[float, float] | None:
     if value is None:
         return None
+    _refuse_present_nonfinite_interval_member(value, label="numeric interval")
     if isinstance(value, (str, bytes)) or not isinstance(value, (list, tuple)):
         numeric = _numeric_setting(value, sequence_policy="max")
         if numeric is None:

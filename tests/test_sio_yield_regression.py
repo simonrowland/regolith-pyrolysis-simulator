@@ -92,6 +92,41 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
     assert configured["wall_temperature_C"] == pytest.approx(900.0)
     assert configured["pipe_segment_temperatures_C"] == {"hot_duct": 900.0}
 
+
+def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
+    """SC-170 E: a negative pO2 must refuse, not floor to 0.0 mbar.
+
+    max(0.0, -1.0) is 0.0, which was written to melt.pO2_mbar and the
+    C2A override and switched atmosphere to CONTROLLED_O2. The web path
+    already refuses pO2 < 0; this CLI/runner path must agree. inf is not
+    laundered by max(0, inf).
+    """
+    from simulator.state import Atmosphere
+
+    sim = SimpleNamespace(
+        campaign_mgr=SimpleNamespace(overrides={}),
+        melt=SimpleNamespace(
+            temperature_C=1450.0,
+            pO2_mbar=1.0,
+            p_total_mbar=10.0,
+            atmosphere="PN2_SWEEP",
+        ),
+        overhead=SimpleNamespace(composition={}),
+        _condensation_model=None,
+        _configure_overhead_headspace=lambda _campaign: None,
+        _current_melt_redox_fO2_log=lambda: -8.0,
+        _refresh_oxygen_reservoir_without_exchange=lambda **_kwargs: None,
+    )
+    with pytest.raises(ValueError, match="non-negative"):
+        _apply_sio_wall_sweep_controls(sim, pO2_mbar=-1.0)
+    assert sim.melt.pO2_mbar == pytest.approx(1.0)
+    assert sim.melt.atmosphere == "PN2_SWEEP"
+    assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
+
+    _apply_sio_wall_sweep_controls(sim, pO2_mbar=1.0)
+    assert sim.melt.pO2_mbar == pytest.approx(1.0)
+    assert sim.melt.atmosphere is Atmosphere.CONTROLLED_O2
+
 # Post 2026-05-20 Antoine P_sat refit: builtin SiO fallback fitted to VapoRock,
 # so evolved SiO dropped ~4700x to the activity-corrected magnitude.
 # Was {lunar: 3.7303230676, mars: 3.82533227031} pre-refit.

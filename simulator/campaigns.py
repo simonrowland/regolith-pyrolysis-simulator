@@ -1666,7 +1666,19 @@ class CampaignManager:
     def _clamp_to_furnace_max(self, target_T: Optional[float]) -> Optional[float]:
         if target_T is None:
             return None
-        return min(target_T, self.furnace_max_T_C)
+        # VALIDATE THE RAW TARGET BEFORE ANY DERATE. Order is load-bearing:
+        # min(+inf, furnace_max) is the finite ceiling, so core.py's later
+        # isfinite check and c6_at_hold_target both accept a laundered
+        # number and C6 reports hold acquired at the material limit.
+        # NaN is not laundered by min() (it stays NaN); +inf is. Refuse
+        # first, derate a finite request second. Same class as the
+        # furnace_max_T_C refuse-then-derate at construction (b-329).
+        requested = float(target_T)
+        if not math.isfinite(requested):
+            raise ValueError(
+                f'campaign temperature target must be finite; got {target_T!r}'
+            )
+        return min(requested, self.furnace_max_T_C)
 
     def _get_base_temp_target(self, campaign: CampaignPhase,
                                campaign_hour: int,

@@ -61,6 +61,36 @@ def test_dissociation_pO2_threshold_matches_formation_equilibrium(
     ) == pytest.approx(expected, rel=0.0, abs=1e-12)
 
 
+def test_negative_pO2_refuses_before_division_floor(vapor_pressure_data) -> None:
+    """SC-170 C2: a negative fugacity must refuse, not floor to 1e-30.
+
+    ``max(-1.0, 1e-30)`` is 1e-30, which kills the ``numerator <= 0``
+    guard and returns a physical-looking P_sat. The 1e-30 floor stays
+    as a division guard for zero / tiny-positive pO2; only a negative
+    input is invalid.
+    """
+    with pytest.raises(ellingham_graph.EllinghamPressureRefusal, match="non-negative"):
+        ellingham_graph.metal_activity_factor("Na", 1700.0, -1.0)
+    with pytest.raises(ellingham_graph.EllinghamPressureRefusal, match="non-negative"):
+        ellingham_graph.effective_equilibrium_pressure_Pa(
+            "Na",
+            1700.0,
+            -1.0,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+    with pytest.raises(ellingham_graph.EllinghamPressureRefusal, match="non-negative"):
+        ellingham_graph.evolves(
+            "Na",
+            1700.0,
+            -1.0,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+    # Zero still takes the vacuum floor; that is not this class.
+    assert ellingham_graph.metal_activity_factor("Na", 1700.0, 0.0) == pytest.approx(
+        ellingham_graph.metal_activity_factor("Na", 1700.0, 1e-30)
+    )
+
+
 def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:
     T_K = 1600.0
     pO2_bar = 1e-9

@@ -919,6 +919,43 @@ def test_furnace_max_t_c_default_and_clamp_chokepoint() -> None:
     )[0] is None
 
 
+def test_clamp_to_furnace_max_refuses_nonfinite_target_before_derate() -> None:
+    """SC-170 instance 1: +inf hold target must refuse, not become the ceiling.
+
+    min(+inf, furnace_max) is the finite ceiling, so core.py's isfinite
+    check and c6_at_hold_target both accept a laundered number and C6
+    reports hold acquired. A finite request above the ceiling still
+    derates — that is the clamp's job. Only a non-finite request is
+    invalid input.
+    """
+    setpoints = copy.deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    manager = CampaignManager(setpoints)
+    ceiling = manager.furnace_max_T_C
+    melt = MeltState(campaign=CampaignPhase.C4, temperature_C=1200.0)
+
+    manager.overrides["C4"] = {"hold_temp_C": float("inf")}
+    with pytest.raises(ValueError, match="campaign temperature target must be finite"):
+        manager.get_temp_target(CampaignPhase.C4, 0, melt)
+
+    # Finite-but-too-hot still derates; that is not this class.
+    manager.overrides["C4"] = {"hold_temp_C": 1e9}
+    target, ramp = manager.get_temp_target(CampaignPhase.C4, 0, melt)
+    assert target == pytest.approx(ceiling)
+    assert ramp == pytest.approx(10.0)
+
+    # C6 with an explicit finite ramp is the hold-acquired corruption path.
+    manager.overrides["C6"] = {
+        "hold_temp_C": float("inf"),
+        "ramp_rate_C_per_hr": 10.0,
+    }
+    with pytest.raises(ValueError, match="campaign temperature target must be finite"):
+        manager.get_temp_target(
+            CampaignPhase.C6,
+            0,
+            MeltState(campaign=CampaignPhase.C6, temperature_C=1200.0),
+        )
+
+
 # 2000.1 was "just above the envelope" only while the top was 2000; once the
 # catalog ceiling rose it became a legitimately VALID setpoint and the case
 # stopped testing anything. Derived from the envelope so it cannot go stale.

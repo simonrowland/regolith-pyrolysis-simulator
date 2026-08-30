@@ -2563,6 +2563,40 @@ def test_recipe_without_local_max_hold_does_not_borrow_other_seed_cap() -> None:
         )
 
 
+def test_numeric_interval_refuses_present_nonfinite_bound() -> None:
+    """SC-170 instance 2: a present inf bound must refuse, not collapse.
+
+    ``_finite_float_or_none`` answers None for both "absent" and
+    "present but non-finite". Dropping a genuinely missing bound is a
+    feature (one-sided interval → isothermal). Dropping inf is not:
+    ``[1600, inf]`` becomes ``(1600, 1600)`` and the ceiling guard
+    compares ``1600 > 2200`` where raw ``inf > 2200`` would refuse.
+    """
+    assert evaluate_module._numeric_interval([1600.0, 1800.0]) == (1600.0, 1800.0)
+    assert evaluate_module._numeric_interval([1600.0, None]) == (1600.0, 1600.0)
+    with pytest.raises(EvaluationInputError, match="finite"):
+        evaluate_module._numeric_interval([1600.0, float("inf")])
+    with pytest.raises(EvaluationInputError, match="finite"):
+        evaluate_module._numeric_interval([float("inf"), 1800.0])
+
+    assert profiles_module._numeric_interval_optional([1600.0, None]) == (
+        1600.0,
+        1600.0,
+    )
+    with pytest.raises(ProfileValidationError, match="finite"):
+        profiles_module._numeric_interval_optional([1600.0, float("inf")])
+
+    # Product path: optimizer must not emit an isothermal window at 1600.
+    profile = _c2a_window_profile(1600.0, float("inf"), 24)
+    with pytest.raises(EvaluationInputError, match="finite"):
+        evaluate_module._profile_thermal_window_schedule(
+            profile["run"],
+            profile=profile,
+            constraints=None,
+            setpoints=load_config_bundle(evaluate_module.DEFAULT_DATA_DIR).setpoints,
+        )
+
+
 def test_evaluate_names_recipe_local_bound_when_it_refuses_window() -> None:
     profile = _c2a_window_profile(1050.0, 1600.0, 29)
     profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
@@ -2849,17 +2883,49 @@ def test_lab_schedule_uses_setpoints_furnace_ceiling_when_constraint_unset(
 
 
 def test_default_profile_without_local_furnace_field_refuses_1843_c() -> None:
+    """The knob bound now fires BEFORE the profile-default furnace ceiling.
+
+    This asserted that a 1843 C window is refused against a
+    profile_default_furnace_max_T_C of 1800 C. Both halves of that moved (b-329):
+    the profile default is no longer 1800 -- it inherits the pipe material, so it
+    is the catalog ceiling -- and 1843 C is now legitimately ADMISSIBLE against
+    it, which is the change the owner asked for.
+
+    What refuses 1843 C today is a different, LOWER guard: the recipe-schema knob
+    bound on campaigns.C2A_continuous.temp_range_C, still pinned at the literal
+    1843 (tracked as b-330). That bound sits strictly BELOW the inherited furnace
+    ceiling, so for this campaign the profile-default ceiling refusal is
+    currently UNREACHABLE -- the knob guard always fires first.
+
+    Pinning the real ordering rather than deleting the test, because the ordering
+    is the fact worth knowing: it is why raising the furnace ceiling alone did not
+    raise what the optimizer can actually request. When b-330 lifts the knob bound
+    above the furnace ceiling, this test should go red and be restored to a
+    profile-default assertion.
+
+    The furnace-ceiling refusal itself is NOT left uncovered: the local-field
+    variant reaches it, because a recipe-local cap below 1843 sits under the knob
+    bound -- see test_recipe_local_1820_c_furnace_field_refuses_1843_c_ramp.
+    """
+    # 1843 C itself is ADMITTED -- the knob bound is inclusive and equal to it.
+    _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        _c2a_window_profile(1050.0, 1843.0, 18),
+        RecipeSchema(),
+    )
+    # One degree above it is refused, and by the KNOB BOUND, not the furnace
+    # ceiling -- which is the ordering this test now pins.
     with pytest.raises(
-        EvaluationInputError,
-        match=(
-            r"1843 C exceeds profile_default_furnace_max_T_C 1800 C"
-        ),
+        ProfileValidationError,
+        match=r"temp_range_C value 1844\.0 above upper bound 1843",
     ):
         _build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
             "internal-analytical",
-            _c2a_window_profile(1050.0, 1843.0, 18),
+            _c2a_window_profile(1050.0, 1844.0, 18),
             RecipeSchema(),
         )
 
@@ -2941,24 +3007,52 @@ def test_explicit_furnace_constraint_stays_stricter_than_active_recipe_field() -
 
 
 def test_recipe_without_local_furnace_field_does_not_borrow_other_seed() -> None:
-    profile = _c2a_window_profile(1050.0, 1843.0, 18)
-    profile["seed_recipes"].append({
-        "id": "other-seed",
-        "source_campaign": "C2A_continuous",
-        "patch": {"furnace_max_T_C": 1843.0},
-    })
+    """A non-active seed's furnace cap must not be borrowed -- proved by control.
 
-    with pytest.raises(
-        EvaluationInputError,
-        match=r"1843 C exceeds profile_default_furnace_max_T_C 1800 C",
-    ):
+    This used to assert a refusal against profile_default_furnace_max_T_C 1800 C.
+    That default now inherits the pipe material (b-329), so the old window is
+    admitted whether or not the borrow happens, and the assertion could no longer
+    tell the two apart -- it would have passed on a tree where borrowing WAS
+    reintroduced.
+
+    Rewritten so the two cases give OPPOSITE outcomes. The cap under test sits
+    below the window, so:
+      borrowed      -> the window exceeds it and evaluation refuses
+      not borrowed  -> the profile default governs and the window is admitted
+    The refusing case is included as the CONTROL: without it, the admitted case
+    is indistinguishable from a guard that stopped working.
+    """
+    borrowable_cap_C = 1500.0
+    window_high_C = 1600.0  # above the cap, below the C2A knob bound (b-330)
+
+    # CONTROL: as the ACTIVE seed the cap really does refuse this window, so the
+    # mechanism is live and the negative result below means something.
+    active = _c2a_window_profile(1050.0, window_high_C, 18)
+    active["seed_recipes"][0]["patch"]["furnace_max_T_C"] = borrowable_cap_C
+    with pytest.raises(EvaluationInputError, match=r"exceeds recipe_local_furnace_max_T_C"):
         _build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
             "internal-analytical",
-            profile,
+            active,
             RecipeSchema(),
         )
+
+    # THE ASSERTION: the same cap on a NON-active seed is not borrowed, so the
+    # window is admitted.
+    profile = _c2a_window_profile(1050.0, window_high_C, 18)
+    profile["seed_recipes"].append({
+        "id": "other-seed",
+        "source_campaign": "C2A_continuous",
+        "patch": {"furnace_max_T_C": borrowable_cap_C},
+    })
+    _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        RecipeSchema(),
+    )
 
 
 def test_recipe_local_1820_c_furnace_field_refuses_1843_c_ramp() -> None:

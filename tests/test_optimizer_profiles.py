@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import composition_target_eval_metadata
@@ -312,7 +313,15 @@ def test_shipped_profiles_do_not_select_stub_smoke() -> None:
     assert offenders == []
 
 
-@pytest.mark.parametrize("cap_C", [1199.0, 2001.0])
+# Derived, not literal. 2001.0 was "one above the envelope" only while the top
+# was 2000; once the ceiling began inheriting from the pipe material (b-329) it
+# became an IN-envelope value and this case silently stopped testing anything
+# while its 1199 twin went on passing. Same defect this file's subject exists to
+# catch, in the test itself.
+@pytest.mark.parametrize(
+    "cap_C",
+    [FURNACE_MAX_T_BOUNDS_C[0] - 1.0, FURNACE_MAX_T_BOUNDS_C[1] + 1.0],
+)
 def test_furnace_temperature_cap_must_be_inside_hardware_envelope(cap_C: float) -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["constraints"]["furnace_T_max_C"] = cap_C

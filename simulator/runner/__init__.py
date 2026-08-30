@@ -3604,7 +3604,15 @@ def _apply_sio_wall_sweep_controls(
     if pO2_mbar is not None:
         if not is_declared_real_scalar(pO2_mbar, allow_numeric_str=True):
             raise TypeError("pO2_mbar must be numeric")
-        pO2_value = max(0.0, float(pO2_mbar))
+        # VALIDATE THE RAW VALUE BEFORE ANY FLOOR. Order is load-bearing:
+        # max(0.0, -1.0) is 0.0, which is then written to melt.pO2_mbar
+        # and the C2A override and switches atmosphere to CONTROLLED_O2.
+        # The web path (_coerce_runtime_campaign_overrides) and session
+        # adjust already refuse pO2 < 0; this CLI/runner path did not.
+        # inf is not laundered by max(0, inf). A negative fugacity is.
+        pO2_value = float(pO2_mbar)
+        if pO2_value < 0.0:
+            raise ValueError("pO2_mbar must be non-negative")
         runtime_override["pO2_mbar"] = pO2_value
         sim.melt.pO2_mbar = pO2_value
         sim.melt.p_total_mbar = max(float(sim.melt.p_total_mbar), pO2_value)

@@ -1475,6 +1475,68 @@ def test_physical_melt_dissociation_pO2_bar_clamps_sentinel() -> None:
     assert p == MELT_DISSOCIATION_PO2_MIN_BAR
 
 
+def test_physical_melt_dissociation_pO2_bar_inf_uses_sign_aware_envelope() -> None:
+    """SC-170 C1(a): ±inf are envelope outliers; the log's sign chooses the edge.
+
+    The sign-blind `return MAX_BAR` at the isfinite gate preempted the
+    sign-aware form ten lines below, mapping -inf (infinitely reducing)
+    onto the most oxidizing edge. The file already wrote the correct
+    expression; this test pins that it is reachable.
+    """
+    from engines.builtin.vapor_pressure import physical_melt_dissociation_pO2_bar
+    from simulator.physical_constants import (
+        MELT_DISSOCIATION_PO2_MAX_BAR,
+        MELT_DISSOCIATION_PO2_MIN_BAR,
+    )
+
+    p, clamped = physical_melt_dissociation_pO2_bar(float("-inf"))
+    assert clamped is True
+    assert p == MELT_DISSOCIATION_PO2_MIN_BAR
+
+    p, clamped = physical_melt_dissociation_pO2_bar(float("inf"))
+    assert clamped is True
+    assert p == MELT_DISSOCIATION_PO2_MAX_BAR
+
+
+def test_physical_melt_dissociation_pO2_bar_refuses_nan_before_envelope() -> None:
+    """SC-170 C1(b): nan is missing input and must refuse, not pick an edge.
+
+    nan < 0 is False, so the sign-aware inf mapping would still send nan
+    to MAX_BAR. That is a doctrine call: missing input is not an envelope
+    outlier. Fe-free melts never reach the Kress91 raw-controls guard.
+    """
+    from engines.builtin.vapor_pressure import (
+        VaporPressureComputationError,
+        physical_melt_dissociation_pO2_bar,
+    )
+
+    with pytest.raises(VaporPressureComputationError, match="finite"):
+        physical_melt_dissociation_pO2_bar(float("nan"))
+
+    provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {
+                    "SiO2": 1.0,
+                    "Na2O": 0.05,
+                    "MgO": 0.1,
+                }
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1700.0,
+        pressure_bar=1e-9,
+        control_inputs={
+            "pO2_bar": 1e-9,
+            "intrinsic_fO2_log": float("nan"),
+        },
+    )
+    with pytest.raises(VaporPressureComputationError, match="finite"):
+        provider.dispatch(request)
+
+
 def test_na_composites_base_matches_lh_monatomic_and_pins() -> None:
     """b-151: Na2/Na2O_gas must track monatomic L&H Pref (not retired pseudo).
 
