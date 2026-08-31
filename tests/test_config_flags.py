@@ -241,3 +241,49 @@ def test_admitted_flags_are_exactly_the_audited_four():
             "import_flag_enabled",
         }
     )
+
+
+# --- quoted-false regression (peer-reported after 92769d93) ------------------
+
+@pytest.mark.parametrize("spelling", ["false", "False", "FALSE ", " no", "off", "0"])
+def test_a_quoted_false_does_not_read_as_true(spelling):
+    """The null bug's mirror image, and in the more dangerous direction.
+
+    ``bool("false")`` is True, and so are "no", "off" and "0" -- four spellings
+    that invert the operator's intent with no exception. Where a present null
+    gave the CONSERVATIVE default, this gave the PERMISSIVE opposite of what was
+    asked: Arrhenius temperature dependence ON for an operator who wrote it off.
+
+    Unquoted ``false`` parses as a real YAML boolean and never reaches this
+    path, so the bug only bites the quoted or numeric-as-string spelling --
+    which is exactly the spelling nobody writes a test for.
+    """
+    key = "temperature_dependence_enabled"
+    assert bool_feature_flag({key: spelling}, key, True) is False
+
+
+@pytest.mark.parametrize("spelling", ["true", "yes", "on", "1", "anything"])
+def test_a_non_false_string_still_reads_as_true(spelling):
+    key = "temperature_dependence_enabled"
+    assert bool_feature_flag({key: spelling}, key, True) is True
+
+
+def test_the_three_way_distinction_survives_the_string_handling():
+    """absent -> default, null -> default, explicit false -> FALSE.
+
+    Re-pinned here because the string branch is new: a later "simplification"
+    that folded strings back into bool() would restore the inversion while
+    leaving the original three-way test green.
+    """
+    key = "temperature_dependence_enabled"
+    assert bool_feature_flag({}, key, True) is True
+    assert bool_feature_flag({key: None}, key, True) is True
+    assert bool_feature_flag({key: False}, key, True) is False
+
+
+def test_an_uninterpretable_value_refuses_rather_than_guessing():
+    """bool() on a container answers by emptiness, which is not an opinion."""
+    key = "temperature_dependence_enabled"
+    for value in ([], ["x"], {}, {"a": 1}, object()):
+        with pytest.raises(ValueError, match="must be a boolean"):
+            bool_feature_flag({key: value}, key, True)

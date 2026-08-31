@@ -101,7 +101,31 @@ def bool_feature_flag(
     value = mapping[key]
     if value is None:
         return bool(default)
-    return bool(value)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        # A QUOTED FALSE MUST NOT READ AS TRUE. bool("false") is True, and so
+        # are "no", "off" and "0" -- four spellings that invert the operator's
+        # intent with no exception, which is the null bug's mirror image and
+        # in the MORE dangerous direction: null gave the conservative default,
+        # this gives the permissive opposite of what was asked.
+        #
+        # Not a new policy. simulator/cost_ledger.py already carries exactly
+        # this set for exactly this key class; the helper simply failed to use
+        # its own project's convention. Unquoted false/no parse as real YAML
+        # booleans and take the branch above, so this only bites a quoted or
+        # numeric-as-string spelling -- which is precisely the spelling nobody
+        # tests.
+        return value.strip().lower() not in {"", "0", "false", "no", "off"}
+    if isinstance(value, (int, float)):
+        return bool(value)
+    # Neither a boolean, a string, nor a number. bool() on a container answers
+    # by emptiness, which is not an opinion about the flag; refuse instead of
+    # inventing one.
+    raise ValueError(
+        f"{key} must be a boolean, a boolean-ish string, a number, or null "
+        f"(meaning inherit the default); got {type(value).__name__}"
+    )
 
 
 __all__ = (
