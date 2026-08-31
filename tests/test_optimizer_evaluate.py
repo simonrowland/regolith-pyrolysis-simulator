@@ -5249,3 +5249,32 @@ def test_direct_genuine_overdraw_is_still_an_invalid_recipe() -> None:
     assert result.feasible is False
     assert result.failure_category is FailureCategory.INVALID_RECIPE
     assert result.failing_gates == ("inventory_overdraw",)
+
+
+# --- authority verdict off a JSON carrier (bool-coercion sweep, 2026-08-31) ---
+
+def test_a_trace_saying_not_authoritative_does_not_read_as_authoritative():
+    """bool("false") is True, on the flag that decides whether a result is trusted.
+
+    The named field already refuses this: _translate_backend_authoritative
+    raises for a non-bool. The trace fallback ran ahead of that check and
+    coerced first, so the guard was reading a value already made valid-looking.
+    Fail-open, on an authority flag, from stored JSON.
+    """
+    from simulator.optimize.evaluate import _backend_authoritative_from_carrier as f
+    for spelling in ("false", "no", "off", "0", "maybe", "true", 1, 0, []):
+        assert f({"backend_authoritative": spelling}) is False, spelling
+
+
+def test_absent_authority_stays_None_and_a_real_bool_survives():
+    """The three-way distinction, and the middle case is the load-bearing one.
+
+    A schema-invalid verdict must NOT read as missing: returning None for it
+    would let it fall through to the next carrier as though the field had never
+    been written. Absent is None; present-but-invalid is False.
+    """
+    from simulator.optimize.evaluate import _backend_authoritative_from_carrier as f
+    assert f({}) is None
+    assert f({"backend_authoritative": None}) is None
+    assert f({"backend_authoritative": True}) is True
+    assert f({"backend_authoritative": False}) is False

@@ -5987,12 +5987,47 @@ def _has_out_of_domain_backend_signal(
     return _crash_point_from_diagnostics(diagnostics) is not None
 
 
+def _carrier_authoritative_verdict(raw: Any) -> bool | None:
+    """Read an authority verdict off a JSON carrier without laundering it.
+
+    This was ``bool(raw) if raw is not None else None``, and ``bool("false")``
+    is True -- so a trace recording NOT-authoritative read as AUTHORITATIVE, in
+    the fail-open direction, on the flag that decides whether a result is
+    trusted at all.
+
+    The project already refuses that value: ``_translate_backend_authoritative``
+    raises FidelityVocabularyTranslationError for a non-bool on the NAMED field.
+    The trace fallback simply ran ahead of it -- the guard is correct and was
+    reading a value a transform had already made valid-looking. So this is not a
+    new policy; it is the fallback declining to be more permissive than the
+    validator it stands in for.
+
+    Three inputs, three answers, and the middle one is the point:
+      absent (None)      -> None, meaning "no opinion, ask the next carrier"
+      a real bool        -> itself
+      present but not a  -> False. NOT None. A schema-invalid verdict is not a
+      bool                  missing one, and returning None here would let it
+                            fall through to another carrier as though the field
+                            had never been written.
+
+    False is the refusal, not a measurement: an unparseable flag is not a
+    reading, so the three-state doctrine for measurements does not apply to it.
+    Declining authority is the closed direction, which is the only safe one for
+    this flag.
+    """
+    if raw is None:
+        return None
+    if isinstance(raw, bool):
+        return raw
+    return False
+
+
 def _backend_authoritative_from_carrier(carrier: Any) -> bool | None:
     if carrier is None:
         return None
     if isinstance(carrier, MappingABC):
         raw = carrier.get("backend_authoritative")
-        return bool(raw) if raw is not None else None
+        return _carrier_authoritative_verdict(raw)
     raw = getattr(carrier, "backend_authoritative", None)
     return bool(raw) if raw is not None else None
 
