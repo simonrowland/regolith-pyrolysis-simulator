@@ -26,7 +26,9 @@ from simulator.optimize.study import (
 )
 from simulator.optimize.result_trust import (
     carrier_backend_status as _carrier_backend_status,
+    carrier_worst_backend_status as _carrier_worst_backend_status,
 )
+from simulator.optimize.backend_status import backend_statuses_from_carrier
 
 from simulator.chemistry.kernel.dto import (
     DEGRADING_INTENT_RESULT_STATUSES,
@@ -603,3 +605,123 @@ def test_every_sequence_reducer_agrees_with_the_owner(degrading: str) -> None:
     control = [{"backend_status": "ok"}, {"backend_status": degrading}]
     assert _pool_latest_backend_status(control) == degrading
     assert _study_latest_backend_status(control) == degrading
+
+
+# Branch pairs where the FLATTERING token sits in the branch the old body read
+# first, so a return-on-first-branch reducer answers ok and never consults the
+# worse sibling. Each tuple is (name, carrier-builder taking the degrading token).
+_SIBLING_BRANCH_PAIRS = (
+    ("top_level_vs_backend_diagnostics",
+     lambda bad: {"backend_status": "ok", "backend_diagnostics": {"backend_status": bad}}),
+    ("top_level_vs_per_hour",
+     lambda bad: {"backend_status": "ok", "per_hour": [{"backend_status": bad}]}),
+    ("per_hour_vs_backend_diagnostics",
+     lambda bad: {"per_hour": [{"backend_status": "ok"}], "backend_diagnostics": {"backend_status": bad}}),
+    ("per_hour_vs_trace",
+     lambda bad: {"per_hour": [{"backend_status": "ok"}], "trace": {"backend_status": bad}}),
+    ("trace_vs_diagnostics",
+     lambda bad: {"trace": {"backend_status": "ok"}, "diagnostics": {"backend_status": bad}}),
+)
+
+
+@pytest.mark.parametrize("degrading", sorted(DEGRADING_INTENT_RESULT_STATUSES))
+@pytest.mark.parametrize("pair_name,build", _SIBLING_BRANCH_PAIRS, ids=[p[0] for p in _SIBLING_BRANCH_PAIRS])
+def test_carrier_reducer_ranks_across_branches_not_just_within_one(
+    pair_name: str, build, degrading: str
+) -> None:
+    """The position defect above, one level UP: across branches, not within one.
+
+    ★ THE SEQUENCE TEST ABOVE CANNOT CATCH THIS, and that is the whole point of
+    a separate test rather than another case. That one hands the reducer ONE
+    branch and checks it ranks inside it. This hands it TWO branches, each
+    internally consistent, and checks it ranks across them. A reducer that
+    returns from the first branch holding any status passes every sequence case
+    and fails every case here.
+
+    The old body returned from the first branch that produced anything:
+
+        top-level backend_status -> return   (siblings never read)
+        per_hour / hours         -> return   (trace/diagnostics never read)
+        trace / backend_diagnostics / diagnostics
+
+    so ``{per_hour: [ok], backend_diagnostics: unavailable}`` answered ok while
+    the canonical collector answered unavailable. Measured 2026-08-31 against
+    the canonical pair: FIVE branch pairs leaked, not the one the subsystem
+    audit reported -- which is why this parametrises the pairs instead of
+    pinning the reported one.
+
+    Flattering direction, in the module that decides what counts as evidence:
+    the failure the run actually had is the one that must survive the
+    reduction, exactly as for the hour that failed.
+    """
+    carrier = build(degrading)
+
+    # The owner's answer, built the canonical way: collect every branch, rank once.
+    expected = select_backend_status(list(backend_statuses_from_carrier(carrier)))
+    assert expected == degrading, (
+        f"owner itself regressed on {pair_name}/{degrading!r}: got {expected!r}"
+    )
+
+    assert _carrier_worst_backend_status(carrier) == expected, (
+        f"result_trust answered by BRANCH POSITION on {pair_name}: "
+        f"got {_carrier_worst_backend_status(carrier)!r}, owner says {expected!r}"
+    )
+
+
+@pytest.mark.parametrize("pair_name,build", _SIBLING_BRANCH_PAIRS, ids=[p[0] for p in _SIBLING_BRANCH_PAIRS])
+def test_carrier_reducer_does_not_become_pessimistic_across_branches(
+    pair_name: str, build
+) -> None:
+    """Negative control for the test above -- it must not simply answer "worst".
+
+    A reducer hard-wired to return the worst token in the vocabulary would pass
+    every case above while being just as wrong. Feeding ok into BOTH branches
+    must still answer ok, and an empty carrier must still answer None.
+
+    This is the specificity half: the test above proves the probe can SEE a
+    worse sibling, this proves it can still REJECT one that is not there.
+    """
+    healthy = build("ok")
+    assert _carrier_worst_backend_status(healthy) == "ok", (
+        f"{pair_name}: became pessimistic -- ok in both branches must stay ok"
+    )
+    assert _carrier_worst_backend_status({}) is None
+    assert _carrier_worst_backend_status(None) is None
+
+
+@pytest.mark.parametrize("degrading", sorted(DEGRADING_INTENT_RESULT_STATUSES))
+def test_own_claim_and_worst_accessors_must_stay_distinct(degrading: str) -> None:
+    """The two accessors answer DIFFERENT questions and must not be merged.
+
+    ★ THIS TEST EXISTS BECAUSE MERGING THEM LOOKS LIKE A CLEAN FIX AND IS NOT.
+    The m47 subsystem audit reported that `carrier_backend_status` ignores a
+    worse sibling diagnostic, which is true. Making it rank across branches --
+    the obvious fix -- silently disables the result store's carrier-disagreement
+    gate, because that gate asks each carrier what IT claims and rejects when a
+    reference and its own trace disagree. If the reference absorbs its trace's
+    status they agree, and the contradiction becomes invisible.
+
+    Confirmed by executing it: the merged version turned
+    test_store_rejects_authority_and_status_carrier_disagreement_without_masking
+    from passing to failing.
+
+        carrier_backend_status       -> what does THIS carrier claim
+        carrier_worst_backend_status -> worst anywhere in the SUBTREE
+
+    A future reader who "simplifies" these into one function must fail here, not
+    in a store test three modules away whose name mentions neither accessor.
+    """
+    # top-level claims ok; its own trace claims something worse
+    carrier = {"backend_status": "ok", "trace": {"backend_status": degrading}}
+
+    assert _carrier_backend_status(carrier) == "ok", (
+        "own-claim accessor must report what the carrier itself claims -- the "
+        "store's disagreement gate depends on it NOT absorbing the trace"
+    )
+    assert _carrier_worst_backend_status(carrier) == degrading, (
+        "subtree accessor must surface the worse nested status"
+    )
+    assert _carrier_backend_status(carrier) != _carrier_worst_backend_status(carrier), (
+        "the two accessors collapsed into one answer; the disagreement gate and "
+        "the trust reduction can no longer both be served"
+    )

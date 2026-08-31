@@ -163,6 +163,68 @@ def carrier_backend_status(carrier: Any) -> str | None:
     return None
 
 
+def carrier_worst_backend_status(carrier: Any) -> str | None:
+    """The worst status anywhere in this carrier's subtree, ranked not positional.
+
+    ★ THIS IS A DIFFERENT QUESTION FROM `carrier_backend_status`, and conflating
+    them is a live trap -- I merged them and broke a real gate before catching it
+    (2026-08-31).
+
+        carrier_backend_status      -> "what does THIS carrier claim?"
+        carrier_worst_backend_status-> "what is the worst thing in this SUBTREE?"
+
+    `carrier_backend_status` answers by first branch that holds anything, and
+    the result store DEPENDS on that: it asks each carrier what it individually
+    claims and rejects when a reference and its own trace disagree
+    (`backend_status_carrier_disagreement:'ok'|'unavailable'`). Making that
+    accessor absorb its children's statuses makes the reference and its trace
+    agree, and the internal contradiction the gate exists to catch becomes
+    invisible. Verified: doing so turns
+    tests/test_optimizer_results_store.py::
+    test_store_rejects_authority_and_status_carrier_disagreement_without_masking
+    from passing to failing.
+
+    But a TRUST decision genuinely needs the other question. A carrier with
+    `{per_hour: [ok], backend_diagnostics: unavailable}` answers ok to the
+    own-claim accessor while the canonical collector
+    (`backend_statuses_from_carrier` + `select_backend_status`) answers
+    unavailable -- measured 2026-08-31, FIVE distinct branch pairs leak a
+    flattering status that way. Reported as finding 2 of the m47 subsystem audit.
+
+    So: two questions, two functions, and each caller picks. This one collects
+    from every branch and ranks the union exactly once, delegating the ordering
+    to `select_backend_status` so no second precedence is ever encoded here.
+
+    Ranking, not position, in the flattering-vs-degrading direction: the failure
+    the run actually had is the one that must survive the reduction.
+    """
+    if carrier is None:
+        return None
+    statuses: list[str] = []
+
+    raw = carrier_value(carrier, "backend_status")
+    if raw is not None:
+        statuses.append(str(raw))
+
+    for key in ("per_hour", "hours"):
+        nested = carrier_value(carrier, key)
+        if isinstance(nested, Sequence) and not isinstance(nested, (str, bytes)) and nested:
+            statuses.extend(
+                value
+                for value in (carrier_worst_backend_status(entry) for entry in nested)
+                if value is not None
+            )
+
+    for key in ("trace", "backend_diagnostics", "diagnostics"):
+        status = carrier_worst_backend_status(carrier_value(carrier, key))
+        if status is not None:
+            statuses.append(status)
+
+    if not statuses:
+        return None
+    return select_backend_status(statuses)
+
+
 def strict_bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
