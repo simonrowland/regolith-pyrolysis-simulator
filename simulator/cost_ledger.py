@@ -268,21 +268,19 @@ class CostImportContext:
     def from_config(cls, config: Mapping[str, Any] | None) -> "CostImportContext":
         cfg = dict(config or {})
         mode = str(cfg.get("mode") or "mature")
-        raw_flag = cfg.get("import_flag_enabled")
-        if isinstance(raw_flag, str):
-            import_flag_enabled = raw_flag.strip().lower() not in {
-                "",
-                "0",
-                "false",
-                "no",
-                "off",
-            }
-        else:
-            import_flag_enabled = bool_feature_flag(
-                cfg,
-                "import_flag_enabled",
-                mode == "bootstrap_narrative",
-            )
+        # The string branch that used to sit here carried its own copy of
+        # {"", "0", "false", "no", "off"}. bool_feature_flag now owns that set
+        # (e0b1ed2a), so keeping a second one would be a copy free to drift --
+        # and it was the ORIGINAL of the two: this key is a member of
+        # CONSERVATIVE_BOOL_FEATURE_FLAGS, so before e0b1ed2a two of the four
+        # admitted flags were governed by two different rules in one codebase.
+        # Behaviour is unchanged: a string resolves against the same set either
+        # way, and neither path consults the default for a string.
+        import_flag_enabled = bool_feature_flag(
+            cfg,
+            "import_flag_enabled",
+            mode == "bootstrap_narrative",
+        )
         suppliers = cfg.get("available_supplier_species") or ()
         return cls(
             mode=mode,
