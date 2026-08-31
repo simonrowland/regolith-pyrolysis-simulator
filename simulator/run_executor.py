@@ -475,8 +475,20 @@ class RunExecutor:
                 latest_backend_status,
                 exception_status=_backend_status_from_honest_exception(failure_exc),
             )
+            # Default CLOSED, matching the sibling site below. The attribute is
+            # always set -- build_simulator assigns it at backends.py:226
+            # immediately before returning, and `sim` is dereferenced several
+            # times just above here, so it is neither None nor unbuilt. The
+            # default is therefore dead today.
+            #
+            # It is unified anyway because the two sites disagreed: this one
+            # defaulted True while its sibling defaulted False, for the same
+            # attribute, in the same file. A dead default that says AUTHORITATIVE
+            # on the honest-exception path is the wrong thing to leave lying
+            # around -- if the lifecycle ever changes, the failure it waits for
+            # is a failed run being trusted.
             backend_authoritative = bool(
-                getattr(sim, "_backend_authoritative", True)
+                getattr(sim, "_backend_authoritative", False)
             )
             return RunExecution(
                 session=session,
