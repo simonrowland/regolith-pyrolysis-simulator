@@ -5262,8 +5262,14 @@ def test_a_trace_saying_not_authoritative_does_not_read_as_authoritative():
     Fail-open, on an authority flag, from stored JSON.
     """
     from simulator.optimize.evaluate import _backend_authoritative_from_carrier as f
+    from types import SimpleNamespace
+
+    # BOTH carrier shapes. The function has two branches -- a mapping form and a
+    # getattr form four lines apart -- and the first version of this test drove
+    # only the mapping. It passed while the object branch still coerced.
     for spelling in ("false", "no", "off", "0", "maybe", "true", 1, 0, []):
-        assert f({"backend_authoritative": spelling}) is False, spelling
+        assert f({"backend_authoritative": spelling}) is False, f"mapping {spelling!r}"
+        assert f(SimpleNamespace(backend_authoritative=spelling)) is False, f"object {spelling!r}"
 
 
 def test_absent_authority_stays_None_and_a_real_bool_survives():
@@ -5274,7 +5280,33 @@ def test_absent_authority_stays_None_and_a_real_bool_survives():
     been written. Absent is None; present-but-invalid is False.
     """
     from simulator.optimize.evaluate import _backend_authoritative_from_carrier as f
+    from types import SimpleNamespace
     assert f({}) is None
     assert f({"backend_authoritative": None}) is None
     assert f({"backend_authoritative": True}) is True
     assert f({"backend_authoritative": False}) is False
+    # and the object branch, which is where the first fix did not reach
+    assert f(SimpleNamespace()) is None
+    assert f(SimpleNamespace(backend_authoritative=None)) is None
+    assert f(SimpleNamespace(backend_authoritative=True)) is True
+    assert f(SimpleNamespace(backend_authoritative=False)) is False
+
+
+def test_the_run_execution_authority_reader_also_refuses_a_string():
+    """Third site of the same fail-open, in a different function.
+
+    _backend_authoritative(run_execution) is the most-used of the three readers
+    (five call sites, including a `is not True` gate) and it carried the same
+    bare bool(). The first fix reached neither this one nor the getattr branch
+    of its neighbour -- the class was three instances wide and the first pass
+    found one.
+    """
+    from types import SimpleNamespace
+    from simulator.optimize.evaluate import _backend_authoritative as f
+
+    for spelling in ("false", "no", "off", "0", "maybe", "true", 1, 0, []):
+        assert f(SimpleNamespace(backend_authoritative=spelling)) is False, spelling
+    assert f(SimpleNamespace()) is None
+    assert f(SimpleNamespace(backend_authoritative=None)) is None
+    assert f(SimpleNamespace(backend_authoritative=True)) is True
+    assert f(SimpleNamespace(backend_authoritative=False)) is False

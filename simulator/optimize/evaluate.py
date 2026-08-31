@@ -5919,8 +5919,12 @@ def _latest_backend_status_reason(run_execution: Any) -> str | None:
 
 
 def _backend_authoritative(run_execution: Any) -> bool | None:
+    # Third site of the same fail-open, in a DIFFERENT function from the two in
+    # _backend_authoritative_from_carrier. Same flag, same coercion, same
+    # direction: bool("false") is True, so a run recording NOT-authoritative
+    # read as authoritative.
     raw = getattr(run_execution, "backend_authoritative", None)
-    return bool(raw) if raw is not None else None
+    return _carrier_authoritative_verdict(raw)
 
 
 def _backend_status_from_carrier(carrier: Any) -> str | None:
@@ -6028,8 +6032,11 @@ def _backend_authoritative_from_carrier(carrier: Any) -> bool | None:
     if isinstance(carrier, MappingABC):
         raw = carrier.get("backend_authoritative")
         return _carrier_authoritative_verdict(raw)
+    # SAME function, SAME fail-open, four lines below the mapping branch. The
+    # first fix here changed only the mapping form and left this one coercing,
+    # while a test that exercised only mappings went green over it.
     raw = getattr(carrier, "backend_authoritative", None)
-    return bool(raw) if raw is not None else None
+    return _carrier_authoritative_verdict(raw)
 
 
 def _backend_status_reasons_from_run_execution(run_execution: Any) -> tuple[str, ...]:
