@@ -4621,14 +4621,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'source': 'none:invalid_liquid_fraction_curve',
                 'reason': str(exc),
             }
-            return 0.0
+            # Unreadable curve is a measurement failure, not evidence of
+            # solidification. Same policy as the fallback branch above.
+            self._melt_redox_liquidus_floor_fallback(
+                source='none:invalid_liquid_fraction_curve',
+                reason=str(exc),
+                liquidus_status='invalid',
+            )
+            temperature_C = float(T_K) - 273.15
+            return (
+                1.0
+                if temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
+                else 0.0
+            )
         if not math.isfinite(liquid_fraction):
             self._last_melt_redox_liquid_fraction_diagnostic = {
                 'status': 'invalid',
                 'source': 'none:nonfinite_liquid_fraction',
                 'liquid_fraction': liquid_fraction,
             }
-            return 0.0
+            # Non-finite interpolation is unusable data, not a solidus.
+            self._melt_redox_liquidus_floor_fallback(
+                source='none:nonfinite_liquid_fraction',
+                reason=f'non-finite liquid_fraction={liquid_fraction!r}',
+                liquidus_status='invalid',
+            )
+            temperature_C = float(T_K) - 273.15
+            return (
+                1.0
+                if temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
+                else 0.0
+            )
         liquid_fraction = max(0.0, min(1.0, liquid_fraction))
         self._last_melt_redox_liquid_fraction_diagnostic = {
             'status': 'ok',

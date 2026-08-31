@@ -1162,6 +1162,117 @@ def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
     assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
 
 
+def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """Interpolation KeyError/TypeError/ValueError must not assert solid.
+
+    FALSIFIABILITY: restore `return 0.0` on the mapping-curve exception
+    path in `_melt_redox_liquid_fraction_factor` and this goes red —
+    capacity at 1500 °C collapses to 0 instead of the Kress91 floor.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    _install_freeze_gate_curve(
+        sim,
+        path=((1000.0, 0.0), (1300.0, 1.0)),
+    )
+
+    def unreadable_curve(*_args, **_kwargs):
+        raise KeyError('freeze-gate path')
+
+    monkeypatch.setattr(sim, '_interpolate_freeze_gate_curve', unreadable_curve)
+    monkeypatch.setattr(
+        sim, '_melt_redox_capacity_mol_per_ln_fO2', lambda **_kwargs: 12.0
+    )
+
+    T_K = 1500.0 + 273.15
+    assert sim._melt_redox_liquid_fraction_factor(T_K) == 1.0
+    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
+    assert diagnostic['status'] == 'invalid'
+    assert diagnostic['source'] == 'none:invalid_liquid_fraction_curve'
+    assert 'freeze-gate path' in diagnostic['reason']
+    assert 'liquidus_status' not in diagnostic
+    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=-9.0,
+        T_K=T_K,
+    ) == 12.0
+    fallback = sim._melt_redox_liquidus_gate_fallback_diagnostics[-1]
+    assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
+    assert fallback['liquidus_status'] == 'invalid'
+    assert fallback['source'] == 'none:invalid_liquid_fraction_curve'
+    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
+    assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
+        'invalid'
+    )
+    assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
+        'none:invalid_liquid_fraction_curve'
+    )
+
+
+def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """A NaN/Inf interpolated fraction is unusable data, not a solidus.
+
+    FALSIFIABILITY: restore `return 0.0` on the mapping-curve non-finite
+    path in `_melt_redox_liquid_fraction_factor` and this goes red —
+    capacity at 1500 °C collapses to 0 instead of the Kress91 floor.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    _install_freeze_gate_curve(
+        sim,
+        path=((1000.0, 0.0), (1300.0, 1.0)),
+    )
+
+    monkeypatch.setattr(
+        sim,
+        '_interpolate_freeze_gate_curve',
+        lambda *_args, **_kwargs: float('nan'),
+    )
+    monkeypatch.setattr(
+        sim, '_melt_redox_capacity_mol_per_ln_fO2', lambda **_kwargs: 12.0
+    )
+
+    T_K = 1500.0 + 273.15
+    assert sim._melt_redox_liquid_fraction_factor(T_K) == 1.0
+    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
+    assert diagnostic['status'] == 'invalid'
+    assert diagnostic['source'] == 'none:nonfinite_liquid_fraction'
+    assert math.isnan(diagnostic['liquid_fraction'])
+    assert 'liquidus_status' not in diagnostic
+    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=-9.0,
+        T_K=T_K,
+    ) == 12.0
+    fallback = sim._melt_redox_liquidus_gate_fallback_diagnostics[-1]
+    assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
+    assert fallback['liquidus_status'] == 'invalid'
+    assert fallback['source'] == 'none:nonfinite_liquid_fraction'
+    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
+    assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
+        'invalid'
+    )
+    assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
+        'none:nonfinite_liquid_fraction'
+    )
+
+
 def test_redox_source_capacity_scales_with_continuous_liquid_fraction(
     monkeypatch,
     vapor_pressure_data,
