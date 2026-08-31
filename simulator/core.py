@@ -304,6 +304,7 @@ from simulator.fe_redox import (
     melt_mol_fractions_for_kress91,
 )
 from simulator.melt_regime import MeltRegime, melt_regime
+from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import LabScheduleValidationError, interpolate_schedule_points
@@ -3700,7 +3701,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'k_ref={k_ref:g} k_min={k_min:g} '
                 f'k_max={k_max:g} T_ref={T_ref:g}'
             )
-        if bool(config.get('temperature_dependence_enabled', True)):
+        if bool_feature_flag(config, 'temperature_dependence_enabled', True):
             raw = k_ref * math.exp((-Ea / GAS_CONSTANT) * (1.0 / T_K - 1.0 / T_ref))
             source = (
                 'findings:baseline_2e-5_arrhenius_Ea_150kJ_'
@@ -7085,8 +7086,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt_resistance_enabled = bool(
             series_config.get('melt_resistance_enabled', False)
         )
-        gas_resistance_enabled = bool(
-            series_config.get('gas_resistance_enabled', True)
+        gas_resistance_enabled = bool_feature_flag(
+            series_config, 'gas_resistance_enabled', True
         )
         melt_surface_renewal_base = float(
             series_config.get(

@@ -68,6 +68,7 @@ from simulator.alpha_kinetics import (
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -992,11 +993,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("melt_resistance_enabled", False),
             )
         )
-        gas_resistance_enabled = bool(
-            series_config.get(
-                "gas_resistance_enabled",
-                controls.get("gas_resistance_enabled", True),
-            )
+        gas_resistance_enabled = bool_feature_flag(
+            series_config,
+            "gas_resistance_enabled",
+            bool_feature_flag(controls, "gas_resistance_enabled", True),
         )
         hkl_upper_bound_transport_species = frozenset(
             str(species)

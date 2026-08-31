@@ -19,6 +19,7 @@ from simulator.cost_energy import (
     project_owner_ratify_money,
 )
 from simulator.pumping_cost import estimate_subambient_pump_cost, pumping_cost_parameters
+from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
 
 VECTOR_TOLERANCE = 1e-12
@@ -267,11 +268,21 @@ class CostImportContext:
     def from_config(cls, config: Mapping[str, Any] | None) -> "CostImportContext":
         cfg = dict(config or {})
         mode = str(cfg.get("mode") or "mature")
-        raw_flag = cfg.get("import_flag_enabled", mode == "bootstrap_narrative")
+        raw_flag = cfg.get("import_flag_enabled")
         if isinstance(raw_flag, str):
-            import_flag_enabled = raw_flag.strip().lower() not in {"", "0", "false", "no", "off"}
+            import_flag_enabled = raw_flag.strip().lower() not in {
+                "",
+                "0",
+                "false",
+                "no",
+                "off",
+            }
         else:
-            import_flag_enabled = bool(raw_flag)
+            import_flag_enabled = bool_feature_flag(
+                cfg,
+                "import_flag_enabled",
+                mode == "bootstrap_narrative",
+            )
         suppliers = cfg.get("available_supplier_species") or ()
         return cls(
             mode=mode,

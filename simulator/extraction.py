@@ -23,6 +23,7 @@ from simulator.condensation_routing import (
     PRODUCT_DESTINATIONS,
     product_stage_number,
 )
+from simulator.config_flags import bool_feature_flag
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -3681,8 +3682,8 @@ class ExtractionMixin:
                     melt_resistance_enabled=bool(
                         series_config.get('melt_resistance_enabled', False)
                     ),
-                    gas_resistance_enabled=bool(
-                        series_config.get('gas_resistance_enabled', True)
+                    gas_resistance_enabled=bool_feature_flag(
+                        series_config, 'gas_resistance_enabled', True
                     ),
                     melt_surface_renewal_base_kg_s_m2_pa=self._c7_float(
                         series_config.get(

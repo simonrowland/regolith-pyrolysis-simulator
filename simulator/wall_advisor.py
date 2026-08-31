@@ -8,6 +8,7 @@ from typing import Any, Iterable
 
 import yaml
 
+from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -489,7 +490,9 @@ def _reactive_verdict(
             net_liner_delta=_optional_str(cell.get("net_liner_delta")),
             regime_raw=regime.raw,
             basis=str(effect.get("basis") or ""),
-            needs_experiment=bool(cell.get("needs_experiment", True)),
+            needs_experiment=bool_feature_flag(
+                cell, "needs_experiment", True
+            ),
             matched=True,
         )
         if worst is None or (
