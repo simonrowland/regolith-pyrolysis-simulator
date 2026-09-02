@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import replace
+from decimal import Decimal
 import math
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
@@ -23,6 +24,10 @@ from typing import Any
 import pytest
 import yaml
 
+from simulator.backend_names import (
+    VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+    VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+)
 from simulator.vapour_rail.activity import (
     ActivityRefusalCode,
     ActivityTier,
@@ -53,15 +58,18 @@ from simulator.vapour_rail.request import (
     REFUSAL_ABSENT_SOURCE_ATOM,
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_MISSING_OUTCOME_STATE,
+    REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
     REFUSAL_NO_ADMITTED_SOURCE,
     REFUSAL_OUTSIDE_DECLARED_DOMAIN,
     ProviderDomainCandidate,
     RequestRule,
     VapourResolveState,
     assert_request_coverage,
+    allocate_selected_source,
     build_request,
     build_solve_bundles,
     emit_request_rules,
+    rank_complete_candidate_sources,
     refusal_closure,
     resolve_vapour_batch,
 )
@@ -128,6 +136,65 @@ def _stub_catalog_species(
         ),
     )
     return {species_id: compiled}
+
+
+def _selector_rule(species_id: str) -> RequestRule:
+    return RequestRule(
+        species_id=species_id,
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"P"}),
+        required_source_atoms=frozenset({"P"}),
+        solve_group_id="selector_bundle",
+        applicability_predicate="applicable",
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id=species_id,
+        validation_status="pending_validation",
+        has_pressure_evaluator=True,
+        has_alpha=True,
+        has_route=True,
+        has_formula=True,
+    )
+
+
+def _selector_catalog_species(*species_ids: str) -> dict[str, Any]:
+    return {
+        species_id: _stub_catalog_species(species_id)[species_id]
+        for species_id in species_ids
+    }
+
+
+def _selector_candidate(
+    provider_id: str,
+    evidence_class: str,
+    pressures_pa: dict[str, float],
+    *,
+    statuses: dict[str, str] | None = None,
+    fixed_reviewed: bool = True,
+    total_pressure_dependent: bool = False,
+    independently_validated: frozenset[str] = frozenset(),
+    residuals_dex: dict[str, float | tuple[float, float]] | None = None,
+    anchors_by_species: dict[str, tuple[str, ...]] | None = None,
+) -> ProviderDomainCandidate:
+    return ProviderDomainCandidate(
+        provider_id=provider_id,
+        covers_state=lambda _state: True,
+        evidence_class=evidence_class,
+        pressures_by_species={
+            species_id: PressureValue(pa)
+            for species_id, pa in pressures_pa.items()
+        },
+        validation_status_by_species=(
+            statuses
+            if statuses is not None
+            else {species_id: "pending_validation" for species_id in pressures_pa}
+        ),
+        evaluation_is_fixed_and_reviewed=fixed_reviewed,
+        calibration_request_total_pressure_dependent=total_pressure_dependent,
+        independently_validated_species=independently_validated,
+        validation_residual_dex_by_species=residuals_dex or {},
+        validation_anchor_refs_by_species=anchors_by_species or {},
+    )
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -1478,6 +1545,960 @@ def test_build_solve_bundles_only_from_flux_active_survivors() -> None:
     assert len(bundles) == 1
     members = next(iter(bundles.values()))
     assert members == frozenset({"A", "B"})
+
+
+# ---------------------------------------------------------------------------
+# Complete candidate ranking + bundle-atomic allocation (§4.2 steps 4–5)
+# ---------------------------------------------------------------------------
+
+
+def test_single_catalog_candidate_selection_is_behavioral_noop() -> None:
+    rule = _selector_rule("K")
+    candidate = _selector_candidate(
+        "catalog",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 99.0},
+    )
+    common = {
+        "rules": (rule,),
+        "ledger_snapshot": {"process.cleaned_melt": {"P": 1.0}},
+        "state": VapourResolveState(temperature_K=1600.0),
+        "catalog_species": _selector_catalog_species("K"),
+        "flux_activation_context": _rg_activation_context(),
+    }
+    baseline = resolve_vapour_batch(**common)
+    with_single_candidate = resolve_vapour_batch(
+        **common,
+        provider_candidates_by_species={"K": (candidate,)},
+    )
+
+    baseline_answer = baseline.channel("K")
+    selected_answer = with_single_candidate.channel("K")
+    assert selected_answer.pressure == baseline_answer.pressure
+    assert selected_answer.flux == baseline_answer.flux
+    assert selected_answer.validation_status == baseline_answer.validation_status
+    assert selected_answer.source_label == baseline_answer.source_label
+    assert selected_answer == baseline_answer
+    assert serialize_vapour_answer(selected_answer) == serialize_vapour_answer(
+        baseline_answer
+    )
+    assert with_single_candidate.solve_bundle_ids == baseline.solve_bundle_ids
+    assert (
+        with_single_candidate.flux_active_species_ids
+        == baseline.flux_active_species_ids
+    )
+
+
+def test_single_complete_candidate_noop_ignores_raw_diagnostic_row() -> None:
+    rule = _selector_rule("K")
+    external = _selector_candidate(
+        "only_external",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 701.0},
+    )
+    raw_diagnostic = _selector_candidate(
+        "vaporock",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"K": 999.0},
+    )
+    common = {
+        "rules": (rule,),
+        "ledger_snapshot": {"process.cleaned_melt": {"P": 1.0}},
+        "state": VapourResolveState(temperature_K=1600.0),
+        "catalog_species": _stub_catalog_species("K", pressure_pa=10.0),
+        "flux_activation_context": _rg_activation_context(),
+    }
+
+    baseline = resolve_vapour_batch(**common)
+    with_candidates = resolve_vapour_batch(
+        **common,
+        provider_candidates_by_species={
+            "K": (external, raw_diagnostic),
+        },
+    )
+
+    baseline_answer = baseline.channel("K")
+    selected_answer = with_candidates.channel("K")
+    assert baseline_answer.pressure == PressureValue(10.0)
+    assert selected_answer == baseline_answer
+    assert serialize_vapour_answer(selected_answer) == serialize_vapour_answer(
+        baseline_answer
+    )
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    (
+        _selector_candidate(
+            "vaporock",
+            VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+            {"K": 50.0},
+        ),
+        _selector_candidate(
+            "unratified_external",
+            "diagnostic:unratified",
+            {"K": 50.0},
+        ),
+        _selector_candidate(
+            "unreviewed_external",
+            VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+            {"K": 50.0},
+            fixed_reviewed=False,
+        ),
+        _selector_candidate(
+            "total_pressure_dependent_calibration",
+            VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+            {"K": 50.0},
+            total_pressure_dependent=True,
+        ),
+        replace(
+            _selector_candidate(
+                "outside_domain",
+                VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+                {"K": 50.0},
+            ),
+            covers_state=lambda _state: False,
+        ),
+    ),
+    ids=(
+        "canonical_raw_vaporock",
+        "non_ratified",
+        "non_reviewed",
+        "total_pressure_dependent",
+        "outside_domain",
+    ),
+)
+def test_public_allocator_refuses_source_that_has_not_passed_all_gates(
+    candidate: ProviderDomainCandidate,
+) -> None:
+    rule = _selector_rule("K")
+    baseline = resolve_vapour_batch(
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    with pytest.raises(
+        VapourRequestConstructionError,
+        match="selected source has not passed all allocation gates",
+    ):
+        allocate_selected_source(
+            answers={"K": baseline.channel("K")},
+            bundle_species_ids=frozenset({"K"}),
+            selected_source=candidate,
+        )
+
+
+def test_two_candidate_ranking_prefers_reviewed_calibrated_source() -> None:
+    state = VapourResolveState(temperature_K=1600.0)
+    external = _selector_candidate(
+        "external_pending",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 100.0, "K": 200.0},
+    )
+    calibrated = _selector_candidate(
+        "vaporock_calibrated",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"Na": 10.0, "K": 20.0},
+        fixed_reviewed=True,
+    )
+    candidates = (external, calibrated)  # provider order must not decide
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"Na", "K"}),
+        candidates=candidates,
+        state=state,
+    ) is calibrated
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"Na", "K"}),
+        candidates=(
+            external,
+            replace(
+                calibrated,
+                calibration_request_total_pressure_dependent=True,
+            ),
+        ),
+        state=state,
+    ) is external
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"Na", "K"}),
+        candidates=(
+            external,
+            replace(calibrated, evaluation_is_fixed_and_reviewed=False),
+        ),
+        state=state,
+    ) is external
+
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("Na"), _selector_rule("K")),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=state,
+        provider_candidates_by_species={
+            "Na": candidates,
+            "K": candidates,
+        },
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    assert {
+        batch.channel(species_id).source_label for species_id in ("Na", "K")
+    } == {"vaporock_calibrated"}
+    assert batch.channel("Na").pressure == PressureValue(10.0)
+    assert batch.channel("K").pressure == PressureValue(20.0)
+    assert all(
+        batch.channel(species_id).validation_status == "pending_validation"
+        for species_id in ("Na", "K")
+    )
+
+
+def test_canonical_provider_label_controls_external_tie_break() -> None:
+    diagnostic_alias = _selector_candidate(
+        "diagnostic_stub",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": Decimal("71")},
+    )
+    canonical_first = _selector_candidate(
+        "g-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": Decimal("72")},
+    )
+
+    selected = rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(diagnostic_alias, canonical_first),
+        state=VapourResolveState(temperature_K=1711.0),
+    )
+
+    assert selected is canonical_first
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1711.0),
+        provider_candidates_by_species={
+            "K": (diagnostic_alias, canonical_first),
+        },
+        catalog_species=_stub_catalog_species("K", pressure_pa=19.375),
+        flux_activation_context=_rg_activation_context(),
+    )
+    assert batch.channel("K").source_label == "g-provider"
+    assert batch.channel("K").pressure == PressureValue(Decimal("72"))
+
+
+@pytest.mark.parametrize("reverse_provider_order", [False, True])
+def test_duplicate_provider_id_refuses_in_both_input_orders(
+    reverse_provider_order: bool,
+) -> None:
+    pressure_10 = _selector_candidate(
+        "same-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 10.0},
+    )
+    pressure_20 = _selector_candidate(
+        "same-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 20.0},
+        fixed_reviewed=False,
+    )
+    candidates = (
+        (pressure_20, pressure_10)
+        if reverse_provider_order
+        else (pressure_10, pressure_20)
+    )
+
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={"K": candidates},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    answer = batch.channel("K")
+    assert answer.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "K" not in batch.flux_active_species_ids
+
+
+def test_public_ranker_refuses_provider_collision_in_validation_rows() -> None:
+    complete = _selector_candidate(
+        "diagnostic_stub",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": Decimal("41.25"), "K": Decimal("42.25")},
+    )
+    collision = _selector_candidate(
+        "internal-analytical",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": Decimal("99.25")},
+    )
+    validation_rows = {
+        "Na": (complete, collision),
+        "K": (complete,),
+    }
+
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"Na", "K"}),
+        candidates=(complete,),
+        state=VapourResolveState(temperature_K=1711.0),
+        validation_candidates_by_species=validation_rows,
+    ) is None
+
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("Na"), _selector_rule("K")),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1711.0),
+        provider_candidates_by_species=validation_rows,
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    assert all(
+        batch.channel(species_id).refusal_code
+        == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+        for species_id in ("Na", "K")
+    )
+
+
+def test_repeated_candidate_object_is_one_provider_not_a_collision() -> None:
+    candidate = _selector_candidate(
+        "one-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 101.0},
+    )
+    common = {
+        "rules": (_selector_rule("K"),),
+        "ledger_snapshot": {"process.cleaned_melt": {"P": 1.0}},
+        "state": VapourResolveState(temperature_K=1600.0),
+        "catalog_species": _stub_catalog_species("K", pressure_pa=7.0),
+        "flux_activation_context": _rg_activation_context(),
+    }
+
+    baseline = resolve_vapour_batch(**common)
+    repeated = resolve_vapour_batch(
+        **common,
+        provider_candidates_by_species={"K": (candidate, candidate)},
+    )
+
+    assert repeated == baseline
+    assert repeated.channel("K").refusal_code is None
+    assert repeated.flux_active_species_ids == frozenset({"K"})
+
+
+def test_public_ranker_identity_deduplicates_repeated_candidate() -> None:
+    candidate = _selector_candidate(
+        "one-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 611.0, "K": 612.0},
+    )
+
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"Na", "K"}),
+        candidates=(candidate, candidate, candidate),
+        state=VapourResolveState(temperature_K=1600.0),
+    ) is candidate
+
+
+@pytest.mark.parametrize("reverse_rule_order", [False, True])
+def test_provider_id_collision_on_one_bundle_member_refuses_whole_bundle(
+    reverse_rule_order: bool,
+) -> None:
+    complete_a = _selector_candidate(
+        "a-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 70.0, "K": 71.0},
+    )
+    complete_z = _selector_candidate(
+        "z-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 80.0, "K": 81.0},
+    )
+    colliding_na_only = _selector_candidate(
+        "a-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 90.0},
+    )
+    rules = (_selector_rule("Na"), _selector_rule("K"))
+    if reverse_rule_order:
+        rules = tuple(reversed(rules))
+
+    batch = resolve_vapour_batch(
+        rules=rules,
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={
+            "Na": (complete_a, complete_z, colliding_na_only),
+            "K": (complete_a, complete_z),
+        },
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    assert all(
+        batch.channel(species_id).refusal_code
+        == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+        for species_id in ("Na", "K")
+    )
+    assert batch.flux_active_species_ids == frozenset()
+
+
+def test_validated_selected_source_cannot_inherit_catalog_anchor() -> None:
+    rule = replace(
+        _selector_rule("K"),
+        validation_status="validated",
+        validation_anchor_refs=("catalog-anchor",),
+    )
+    selected_without_anchors = _selector_candidate(
+        "a-selected",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 71.0},
+        statuses={"K": "validated"},
+    )
+    other = _selector_candidate(
+        "z-other",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 99.0},
+    )
+    common = {
+        "rules": (rule,),
+        "ledger_snapshot": {"process.cleaned_melt": {"P": 1.0}},
+        "state": VapourResolveState(temperature_K=1600.0),
+        "catalog_species": _stub_catalog_species("K", pressure_pa=7.0),
+        "flux_activation_context": _rg_activation_context(),
+    }
+
+    baseline = resolve_vapour_batch(**common)
+    with_candidates = resolve_vapour_batch(
+        **common,
+        provider_candidates_by_species={
+            "K": (selected_without_anchors, other),
+        },
+    )
+
+    assert with_candidates.channel("K") == baseline.channel("K")
+    assert with_candidates.channel("K").pressure == PressureValue(7.0)
+    assert with_candidates.channel("K").validation_anchor_refs == (
+        "catalog-anchor",
+    )
+    with pytest.raises(
+        VapourRequestConstructionError,
+        match="selected source has not passed all allocation gates",
+    ):
+        allocate_selected_source(
+            answers={"K": baseline.channel("K")},
+            bundle_species_ids=frozenset({"K"}),
+            selected_source=selected_without_anchors,
+            state=common["state"],
+        )
+    allocated = allocate_selected_source(
+        answers={"K": baseline.channel("K")},
+        bundle_species_ids=frozenset({"K"}),
+        selected_source=other,
+        state=common["state"],
+    )
+    assert allocated["K"].source_label == "z-other"
+    assert allocated["K"].validation_anchor_refs == ()
+
+
+def test_unadmitted_validation_row_cannot_veto_bundle_species() -> None:
+    calibrated = _selector_candidate(
+        "vaporock_calibrated",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"Na": 11.0, "K": 22.0},
+    )
+    rogue_na_only = _selector_candidate(
+        "rogue-na-only",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 303.0},
+        statuses={"K": "validated"},
+        independently_validated=frozenset({"K"}),
+        anchors_by_species={"K": ("rogue-k-anchor",)},
+    )
+    common = {
+        "rules": (_selector_rule("Na"), _selector_rule("K")),
+        "ledger_snapshot": {"process.cleaned_melt": {"P": 1.0}},
+        "state": VapourResolveState(temperature_K=1600.0),
+        "catalog_species": _selector_catalog_species("Na", "K"),
+        "flux_activation_context": _rg_activation_context(),
+    }
+
+    control = resolve_vapour_batch(
+        **common,
+        provider_candidates_by_species={
+            "Na": (calibrated,),
+            "K": (calibrated,),
+        },
+    )
+    with_rogue = resolve_vapour_batch(
+        **common,
+        provider_candidates_by_species={
+            "Na": (calibrated, rogue_na_only),
+            "K": (calibrated,),
+        },
+    )
+
+    assert with_rogue == control
+    assert with_rogue.flux_active_species_ids == frozenset({"Na", "K"})
+    assert all(
+        with_rogue.channel(species_id).refusal_code is None
+        for species_id in ("Na", "K")
+    )
+
+
+def test_anchorless_validated_row_cannot_veto_calibrated_source() -> None:
+    calibrated = _selector_candidate(
+        "vaporock_calibrated",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"K": 91.0},
+    )
+    anchorless_external = _selector_candidate(
+        "external_anchorless",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 927.0},
+        statuses={"K": "validated"},
+        independently_validated=frozenset({"K"}),
+    )
+
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(calibrated,),
+        state=VapourResolveState(temperature_K=1600.0),
+        validation_candidates_by_species={"K": (anchorless_external,)},
+    ) is calibrated
+
+
+def test_step4_refusal_is_not_counted_as_epoch_dormancy() -> None:
+    incomplete = _selector_candidate(
+        "incomplete-source",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 202.0},
+        fixed_reviewed=False,
+    )
+
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={"K": (incomplete,)},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    assert batch.metadata["n_refused"] == 1
+    assert batch.metadata["n_flux_active"] == 0
+    assert batch.metadata["n_flux_dormant_by_epoch"] == 0
+
+
+@pytest.mark.parametrize("reverse_provider_order", [False, True])
+def test_k_demaria_independent_validation_disqualifies_whole_calibrated_bundle(
+    reverse_provider_order: bool,
+) -> None:
+    state = VapourResolveState(temperature_K=1428.571429)
+    demaria_residual_dex = 1.241
+    vaporock_residual_range_dex = (1.15, 1.28)
+    assert vaporock_residual_range_dex[0] < demaria_residual_dex < (
+        vaporock_residual_range_dex[1]
+    )
+
+    external = _selector_candidate(
+        "k_rail_external_grounded",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 101.0, "K": 202.0},
+        statuses={"Na": "pending_validation", "K": "validated"},
+        independently_validated=frozenset({"K"}),
+        residuals_dex={"K": demaria_residual_dex},
+        anchors_by_species={"K": ("demaria-k-anchor",)},
+    )
+    calibrated = _selector_candidate(
+        "vaporock_calibrated",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"Na": 11.0, "K": 22.0},
+        fixed_reviewed=True,
+        residuals_dex={"K": vaporock_residual_range_dex},
+    )
+    assert calibrated.validation_residual_dex_by_species["K"] == (
+        vaporock_residual_range_dex
+    )
+    candidates = (
+        (calibrated, external)
+        if reverse_provider_order
+        else (external, calibrated)
+    )
+
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("Na"), _selector_rule("K")),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=state,
+        provider_candidates_by_species={
+            "Na": candidates,
+            "K": candidates,
+        },
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    assert {
+        batch.channel(species_id).source_label for species_id in ("Na", "K")
+    } == {"k_rail_external_grounded"}
+    assert batch.channel("Na").pressure == PressureValue(101.0)
+    assert batch.channel("K").pressure == PressureValue(202.0)
+    assert batch.channel("Na").validation_status == "pending_validation"
+    assert batch.channel("K").validation_status == "validated"
+    assert batch.channel("K").extra["validation_residual_dex"] == pytest.approx(
+        demaria_residual_dex
+    )
+
+
+def test_canonical_raw_vaporock_candidate_is_rejected_when_flag_omitted() -> None:
+    external_domain_gate = ProviderDomainCandidate(
+        provider_id="external_domain_gate",
+        covers_state=lambda _state: True,
+    )
+    raw = _selector_candidate(
+        "vaporock",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"K": 50.0},
+    )
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={"K": (external_domain_gate, raw)},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    answer = batch.channel("K")
+    assert answer.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "K" not in batch.flux_active_species_ids
+    assert not batch.solve_bundle_ids
+
+
+def test_vaporock_warm_raw_candidate_is_rejected_with_review_flag() -> None:
+    raw = _selector_candidate(
+        "vaporock_warm",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"K": 50.0},
+        fixed_reviewed=True,
+        total_pressure_dependent=False,
+    )
+
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(raw,),
+        state=VapourResolveState(temperature_K=1600.0),
+    ) is None
+
+
+def test_raw_vaporock_refusal_type_and_detail_ignore_domain_only_candidate() -> None:
+    raw = _selector_candidate(
+        " VAPOROCK_WARM ",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"K": 50.0},
+        fixed_reviewed=True,
+        total_pressure_dependent=False,
+    )
+    domain_only = ProviderDomainCandidate(
+        provider_id="unrelated-domain-only",
+        covers_state=lambda _state: True,
+    )
+    common = {
+        "rules": (_selector_rule("K"),),
+        "ledger_snapshot": {"process.cleaned_melt": {"P": 1.0}},
+        "state": VapourResolveState(temperature_K=1600.0),
+        "catalog_species": _selector_catalog_species("K"),
+        "flux_activation_context": _rg_activation_context(),
+    }
+
+    raw_only = resolve_vapour_batch(
+        **common,
+        provider_candidates_by_species={"K": (raw,)},
+    ).channel("K")
+    with_domain_only = resolve_vapour_batch(
+        **common,
+        provider_candidates_by_species={"K": (raw, domain_only)},
+    ).channel("K")
+
+    assert raw_only.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert with_domain_only.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert raw_only.extra["detail"] == with_domain_only.extra["detail"]
+
+
+@pytest.mark.xfail(
+    reason="review record not yet modelled; t-772",
+    strict=True,
+)
+def test_reviewed_evaluation_requires_an_independent_review_record() -> None:
+    raw = _selector_candidate(
+        "vaporock_warm",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"K": 50.0},
+        fixed_reviewed=True,
+        total_pressure_dependent=False,
+    )
+
+    assert getattr(raw, "evaluation_review_record", None) is not None
+
+
+def test_zero_pressure_candidate_is_not_an_executable_flux_contract() -> None:
+    zero = _selector_candidate(
+        "zero_candidate",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 0.0},
+    )
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={"K": (zero,)},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    answer = batch.channel("K")
+    assert answer.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert not answer.is_flux_active
+
+
+def test_boolean_pressure_is_not_an_executable_scalar() -> None:
+    boolean = _selector_candidate(
+        "aa-bool",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": True},
+    )
+    real = _selector_candidate(
+        "zz-real",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 2.5},
+    )
+
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(boolean, real),
+        state=VapourResolveState(temperature_K=1600.0),
+    ) is real
+
+
+def test_canonicalizable_evidence_class_is_ratified() -> None:
+    external = _selector_candidate(
+        "external",
+        " ANALYTICAL:EXTERNAL_GROUNDED ",
+        {"K": 41.0},
+    )
+
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(external,),
+        state=VapourResolveState(temperature_K=1600.0),
+    ) is external
+
+
+def test_allocated_source_clears_replaced_catalog_evaluator_provenance() -> None:
+    catalog_species = _selector_catalog_species("K")
+    catalog_species["K"].evaluator.evaluate = lambda *args, **kwargs: SimpleNamespace(
+        pressure_pa=17.0,
+        out_of_range=True,
+        acquisition_flag="catalog-continued",
+        status="catalog-outside-domain",
+    )
+    selected = _selector_candidate(
+        "a-external",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 170.0},
+    )
+    other = _selector_candidate(
+        "z-external",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 171.0},
+    )
+
+    answer = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={"K": (selected, other)},
+        catalog_species=catalog_species,
+        flux_activation_context=_rg_activation_context(),
+    ).channel("K")
+    rendered = serialize_vapour_answer(answer)
+
+    assert answer.source_label == "a-external"
+    assert answer.pressure == PressureValue(170.0)
+    assert not ({"out_of_range", "acquisition_flag", "status"} & rendered["extra"].keys())
+    assert rendered["out_of_range"] is False
+    assert rendered["acquisition_flag"] is None
+
+
+def test_allocated_real_catalog_answer_namespaces_replaced_attempt() -> None:
+    state = VapourResolveState(temperature_K=1711.0)
+    catalog_answer = resolve_vapour_batch(
+        rules=(_selector_rule("Cs"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=state,
+        catalog_species=_stub_catalog_species("Cs", pressure_pa=19.375),
+        flux_activation_context=_rg_activation_context(),
+    ).channel("Cs")
+    catalog_writer_keys = {
+        "origin",
+        "silent_zero_notes",
+        "source_activity",
+        "source_activity_origin",
+        "out_of_range",
+        "acquisition_flag",
+        "status",
+    }
+    assert catalog_answer.pressure == PressureValue(19.375)
+    assert set(catalog_answer.extra) == catalog_writer_keys
+
+    selected_source = rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"Cs"}),
+        candidates=(
+            _selector_candidate(
+                "fresh/zz",
+                VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+                {"Cs": Decimal("30.875")},
+            ),
+            _selector_candidate(
+                "fresh/aa",
+                VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+                {"Cs": Decimal("29.625")},
+            ),
+        ),
+        state=state,
+    )
+    assert selected_source is not None
+    answer = allocate_selected_source(
+        answers={"Cs": catalog_answer},
+        bundle_species_ids=frozenset({"Cs"}),
+        selected_source=selected_source,
+        state=state,
+    )["Cs"]
+    rendered = serialize_vapour_answer(answer)
+    selected_source_owned_keys = {
+        "selected_provider_id",
+        "selected_evidence_class",
+        "independently_validated",
+        "validation_residual_dex",
+    }
+    namespace_key = "replaced_catalog_attempt"
+
+    assert answer.source_label == "fresh/aa"
+    assert answer.pressure == PressureValue(Decimal("29.625"))
+    assert set(rendered["extra"]) <= selected_source_owned_keys | {
+        namespace_key
+    }
+    assert rendered["extra"][namespace_key] == dict(catalog_answer.extra)
+    assert set(rendered["extra"][namespace_key]) == catalog_writer_keys
+    assert catalog_writer_keys.isdisjoint(
+        set(rendered["extra"]) - {namespace_key}
+    )
+
+
+def test_bundle_candidate_must_be_admitted_for_every_member() -> None:
+    na_admitted_only = _selector_candidate(
+        "na_admitted_only",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 10.0, "K": 20.0},
+    )
+    k_domain_gate = ProviderDomainCandidate(
+        provider_id="k_domain_gate",
+        covers_state=lambda _state: True,
+    )
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("Na"), _selector_rule("K")),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={
+            "Na": (na_admitted_only,),
+            "K": (k_domain_gate,),
+        },
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    assert all(
+        batch.channel(species_id).refusal_code
+        == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+        for species_id in ("Na", "K")
+    )
+    assert not batch.solve_bundle_ids
+
+
+def test_incomplete_sources_refuse_connected_bundle_without_splicing() -> None:
+    na_only = _selector_candidate(
+        "na_only",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 10.0},
+    )
+    k_only = _selector_candidate(
+        "k_only",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 20.0},
+    )
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("Na"), _selector_rule("K")),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={
+            "Na": (na_only,),
+            "K": (k_only,),
+        },
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    for species_id in ("Na", "K"):
+        answer = batch.channel(species_id)
+        assert answer.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+        assert isinstance(answer.pressure, PressureRefusal)
+        assert isinstance(answer.flux, FluxRefusal)
+        assert answer.source_label == "bundle_source_selector"
+    assert batch.flux_active_species_ids == frozenset()
+    assert not batch.solve_bundle_ids
+
+
+def test_pre_rg_incomplete_source_returns_typed_bundle_refusal() -> None:
+    incomplete = _selector_candidate(
+        "external_grounded",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 50.0},
+        fixed_reviewed=False,
+    )
+
+    common = {
+        "rules": (_selector_rule("K"),),
+        "ledger_snapshot": {"process.cleaned_melt": {"P": 1.0}},
+        "state": VapourResolveState(temperature_K=1600.0),
+        "provider_candidates_by_species": {"K": (incomplete,)},
+        "catalog_species": _selector_catalog_species("K"),
+    }
+    rg_batch = resolve_vapour_batch(
+        **common,
+        flux_activation_context=_rg_activation_context(),
+    )
+    pre_rg_batch = resolve_vapour_batch(
+        **common,
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+
+    assert pre_rg_batch.requested_species_ids == rg_batch.requested_species_ids
+    assert (
+        frozenset(pre_rg_batch.channels_by_species)
+        == frozenset(rg_batch.channels_by_species)
+        == frozenset({"K"})
+    )
+    answer = pre_rg_batch.channel("K")
+    assert serialize_vapour_answer(answer) == serialize_vapour_answer(
+        rg_batch.channel("K")
+    )
+    assert answer.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "K" not in pre_rg_batch.flux_active_species_ids
 
 
 # ---------------------------------------------------------------------------

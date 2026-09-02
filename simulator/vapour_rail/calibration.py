@@ -74,6 +74,11 @@ DEFAULT_P_FLOOR_PA: Final[float] = 1.0e-30
 DEFAULT_EPSILON_J: Final[float] = 0.30  # 30 % relative flux tolerance
 _MELT_MODEL_ID: Final[str] = "MELTS-v1.0"
 
+_RAW_VAPOROCK_WARM_SOURCE_LABEL: Final[str] = "vaporock_warm"
+_RAW_VAPOROCK_SOURCE_LABELS: Final[frozenset[str]] = frozenset(
+    {_RAW_VAPOROCK_WARM_SOURCE_LABEL}
+)
+
 SIDECAR_KIND: Final[str] = "vapour_rail_calibration"
 SIDECAR_SCHEMA_VERSION: Final[int] = 1
 
@@ -743,7 +748,7 @@ def evaluate_boundary_jumps(
     boundary_log10_P: float | None,
     boundary: str,
     error_budget: DownstreamErrorBudget,
-    source_before: str = "vaporock_warm",
+    source_before: str = _RAW_VAPOROCK_WARM_SOURCE_LABEL,
     source_after: str = "analytical_rail",
 ) -> BoundaryStatistic:
     """Signed/absolute Δlog10(P) and admissibility vs error budget."""
@@ -1540,7 +1545,7 @@ def run_calibration_campaign(
                             channel=sid,
                             delta_log10_P=None,
                             abs_delta_log10_P=None,
-                            source_before="vaporock_warm",
+                            source_before=_RAW_VAPOROCK_WARM_SOURCE_LABEL,
                             source_after="analytical_rail",
                             admissible=None,
                             note=(

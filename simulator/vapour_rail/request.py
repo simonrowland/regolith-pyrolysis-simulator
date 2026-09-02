@@ -5,7 +5,8 @@ DESIGN-REV5 §1.2 / §4.2 ordering for one flux step:
 1. Construct the request set from compiler-emitted rules + ledger inventory only.
 2. Monotone refusal closure to a fixed point (pending_validation is NOT refusal).
 3. Build connected solve bundles from survivors.
-4. Rank complete candidate sources per bundle (later VR chunks drive selection).
+4. Rank complete candidate sources per bundle.
+5. Allocate one selected source across every channel in each bundle.
 
 Request keys derive ONLY from the frozen U0 manifest + current eligible source
 inventory. Answerability, preferred source, provider capability, and prior
@@ -27,6 +28,13 @@ from simulator.alpha_kinetics import (
     AlphaSpecError,
     parse_alpha_contract,
 )
+from simulator.backend_names import (
+    RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES,
+    VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+    VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+    canonical_backend_name,
+)
+from simulator.vapour_rail.calibration import _RAW_VAPOROCK_SOURCE_LABELS
 from simulator.chemistry.melt_activity import (
     melt_oxide_activity_coefficient,
     single_cation_mole_fractions,
@@ -74,6 +82,11 @@ if TYPE_CHECKING:
 _VALIDATION_PENDING = "pending_validation"
 _VALIDATION_VALIDATED = "validated"
 
+_RAW_VAPOROCK_SOURCE_LABELS_FROM_CALIBRATION = frozenset(
+    str(canonical_backend_name(label)).strip().lower()
+    for label in _RAW_VAPOROCK_SOURCE_LABELS
+)
+
 
 # Inventory threshold: design uses ``> 0 mol`` (exact).
 _INVENTORY_EPSILON = 0.0
@@ -85,6 +98,7 @@ REFUSAL_MISSING_CHANNEL_CONTRACT = "missing_channel_contract"
 REFUSAL_NO_ADMITTED_SOURCE = "no_admitted_source_in_domain"
 REFUSAL_PROVIDER_INDEPENDENT_INAPPLICABLE = "provider_independent_inapplicable"
 REFUSAL_OMITTED_RULE = "omitted_request_rule"
+REFUSAL_NO_COMPLETE_BUNDLE_SOURCE = "no_complete_bundle_source"
 # Outcome-determining process state missing (HI-8 / DESIGN-REV5 §1.2):
 # never fabricate PressureValue(0.0) + FluxEligible as a stand-in.
 REFUSAL_MISSING_OUTCOME_STATE = "missing_outcome_determining_state"
@@ -166,7 +180,55 @@ class ProviderDomainCandidate:
 
     provider_id: str
     covers_state: Callable[[Mapping[str, Any]], bool]
-    evidence_class: str = "analytical:external_grounded"
+    evidence_class: str = VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED
+    pressures_by_species: Mapping[str, PressureValue] | None = None
+    validation_status_by_species: Mapping[str, str] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    validation_anchor_refs_by_species: Mapping[str, tuple[str, ...]] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    evaluation_is_fixed_and_reviewed: bool = False
+    calibration_request_total_pressure_dependent: bool | None = None
+    independently_validated_species: frozenset[str] = frozenset()
+    validation_residual_dex_by_species: Mapping[
+        str, float | tuple[float, float]
+    ] = field(default_factory=lambda: MappingProxyType({}))
+
+    def __post_init__(self) -> None:
+        if self.pressures_by_species is not None:
+            object.__setattr__(
+                self,
+                "pressures_by_species",
+                MappingProxyType(dict(self.pressures_by_species)),
+            )
+        object.__setattr__(
+            self,
+            "validation_status_by_species",
+            MappingProxyType(dict(self.validation_status_by_species)),
+        )
+        object.__setattr__(
+            self,
+            "validation_anchor_refs_by_species",
+            MappingProxyType(
+                {
+                    str(species_id): tuple(refs)
+                    for species_id, refs in (
+                        self.validation_anchor_refs_by_species.items()
+                    )
+                }
+            ),
+        )
+        object.__setattr__(
+            self,
+            "independently_validated_species",
+            frozenset(self.independently_validated_species),
+        )
+        object.__setattr__(
+            self,
+            "validation_residual_dex_by_species",
+            MappingProxyType(dict(self.validation_residual_dex_by_species)),
+        )
 
 
 @dataclass(frozen=True)
@@ -1032,7 +1094,10 @@ def _candidates_cover_state(
         # (literature evaluators with conservative continuation cover state).
         return True
     state_map = state.as_mapping() if state is not None else {}
-    return any(candidate.covers_state(state_map) for candidate in candidates)
+    return any(
+        candidate.covers_state(state_map)
+        for candidate in candidates
+    )
 
 
 @dataclass(frozen=True)
@@ -1751,6 +1816,343 @@ def build_solve_bundles(
     return bundles
 
 
+def _candidate_channel_is_executable(
+    candidate: ProviderDomainCandidate,
+    species_id: str,
+) -> bool:
+    pressures = candidate.pressures_by_species
+    if pressures is None:
+        return False
+    pressure = pressures.get(species_id)
+    if not isinstance(pressure, PressureValue):
+        return False
+    if not is_declared_real_scalar(pressure.pa):
+        return False
+    try:
+        pressure_pa = float(pressure.pa)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(pressure_pa) and pressure_pa > 0.0
+
+
+def _has_raw_vaporock_provenance(
+    candidate: ProviderDomainCandidate,
+) -> bool:
+    provider_id = str(candidate.provider_id).strip().lower()
+    canonical_provider_id = (
+        str(canonical_backend_name(provider_id)).strip().lower()
+    )
+    return (
+        canonical_provider_id == "vaporock"
+        or canonical_provider_id in _RAW_VAPOROCK_SOURCE_LABELS_FROM_CALIBRATION
+    )
+
+
+def _canonical_evidence_class(
+    candidate: ProviderDomainCandidate,
+) -> str | None:
+    return canonical_backend_name(candidate.evidence_class)
+
+
+def _candidate_has_validated_anchor(
+    candidate: ProviderDomainCandidate,
+    species_id: str,
+) -> bool:
+    if (
+        candidate.validation_status_by_species.get(species_id)
+        != _VALIDATION_VALIDATED
+    ):
+        return False
+    anchors = candidate.validation_anchor_refs_by_species.get(species_id, ())
+    return bool(anchors) and all(
+        isinstance(anchor, str) and bool(anchor.strip()) for anchor in anchors
+    )
+
+
+def _unique_provider_candidates(
+    candidates: Sequence[ProviderDomainCandidate],
+) -> tuple[ProviderDomainCandidate, ...] | None:
+    """Identity-deduplicate candidates, then enforce provider uniqueness."""
+
+    unique: list[ProviderDomainCandidate] = []
+    seen_identities: set[int] = set()
+    seen_provider_ids: set[str | None] = set()
+    for candidate in candidates:
+        identity = id(candidate)
+        if identity in seen_identities:
+            continue
+        seen_identities.add(identity)
+        provider_id = canonical_backend_name(candidate.provider_id)
+        if provider_id in seen_provider_ids:
+            return None
+        seen_provider_ids.add(provider_id)
+        unique.append(candidate)
+    return tuple(unique)
+
+
+def _candidate_is_complete(
+    candidate: ProviderDomainCandidate,
+    bundle_species_ids: frozenset[str],
+    state: VapourResolveState | None,
+) -> bool:
+    if _has_raw_vaporock_provenance(candidate):
+        return False
+    evidence_class = _canonical_evidence_class(candidate)
+    if evidence_class not in RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES:
+        return False
+    if not candidate.evaluation_is_fixed_and_reviewed:
+        return False
+    if (
+        evidence_class == VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED
+        and candidate.calibration_request_total_pressure_dependent is not False
+    ):
+        return False
+    state_map = state.as_mapping() if state is not None else {}
+    if not candidate.covers_state(state_map):
+        return False
+    for species_id in bundle_species_ids:
+        if not _candidate_channel_is_executable(candidate, species_id):
+            return False
+        status = candidate.validation_status_by_species.get(species_id)
+        if status != _VALIDATION_PENDING and not _candidate_has_validated_anchor(
+            candidate, species_id
+        ):
+            return False
+    return True
+
+
+def rank_complete_candidate_sources(
+    *,
+    bundle_species_ids: frozenset[str],
+    candidates: Sequence[ProviderDomainCandidate],
+    state: VapourResolveState | None,
+    validation_candidates_by_species: Mapping[
+        str, Sequence[ProviderDomainCandidate]
+    ]
+    | None = None,
+) -> ProviderDomainCandidate | None:
+    """Select one complete step-4 source for a connected solve bundle.
+
+    ``candidates`` contains sources admitted on every bundle member. Input order
+    is never ranking authority. A validated independently grounded row from
+    ``validation_candidates_by_species`` disqualifies every calibrated VapoRock
+    evaluation for the whole bundle when an admitted species row has better
+    validation, even when that row belongs to an incomplete external candidate.
+    Raw VapoRock and non-ratified evidence classes are diagnostic-only.
+    """
+
+    bundle = frozenset(bundle_species_ids)
+    if not bundle:
+        return None
+
+    validation_rows_by_species = (
+        {
+            species_id: tuple(candidates)
+            for species_id in bundle
+        }
+        if validation_candidates_by_species is None
+        else validation_candidates_by_species
+    )
+    consumed_candidates = tuple(candidates) + tuple(
+        candidate
+        for species_id in bundle
+        for candidate in validation_rows_by_species.get(species_id, ())
+    )
+    unique_consumed_candidates = _unique_provider_candidates(
+        consumed_candidates
+    )
+    if unique_consumed_candidates is None:
+        return None
+    candidate_identities = {id(candidate) for candidate in candidates}
+    unique_candidates = tuple(
+        candidate
+        for candidate in unique_consumed_candidates
+        if id(candidate) in candidate_identities
+    )
+    complete = [
+        candidate
+        for candidate in unique_candidates
+        if _candidate_is_complete(candidate, bundle, state)
+    ]
+    state_map = state.as_mapping() if state is not None else {}
+    has_better_independent_validation = any(
+        _canonical_evidence_class(candidate)
+        == VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED
+        and not _has_raw_vaporock_provenance(candidate)
+        and candidate.evaluation_is_fixed_and_reviewed
+        and candidate.covers_state(state_map)
+        and species_id in candidate.independently_validated_species
+        and _candidate_has_validated_anchor(candidate, species_id)
+        and _candidate_channel_is_executable(candidate, species_id)
+        for species_id in bundle
+        for candidate in validation_rows_by_species.get(species_id, ())
+    )
+
+    if not has_better_independent_validation:
+        calibrated = sorted(
+            (
+                candidate
+                for candidate in complete
+                if _canonical_evidence_class(candidate)
+                == VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED
+            ),
+            key=lambda candidate: canonical_backend_name(
+                candidate.provider_id
+            ),
+        )
+        if calibrated:
+            return calibrated[0]
+
+    external = sorted(
+        (
+            candidate
+            for candidate in complete
+            if _canonical_evidence_class(candidate)
+            == VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED
+        ),
+        key=lambda candidate: canonical_backend_name(candidate.provider_id),
+    )
+    return external[0] if external else None
+
+
+def allocate_selected_source(
+    *,
+    answers: Mapping[str, VapourAnswer],
+    bundle_species_ids: frozenset[str],
+    selected_source: ProviderDomainCandidate,
+    state: VapourResolveState | None = None,
+) -> dict[str, VapourAnswer]:
+    """Allocate one selected evaluation across every channel in the bundle."""
+
+    bundle = frozenset(bundle_species_ids)
+    if not _candidate_is_complete(selected_source, bundle, state):
+        raise VapourRequestConstructionError(
+            "selected source has not passed all allocation gates"
+        )
+
+    allocated = dict(answers)
+    pressures = selected_source.pressures_by_species
+    assert pressures is not None  # proved by the complete-contract check above
+    for species_id in bundle:
+        answer = allocated[species_id]
+        pressure = pressures[species_id]
+        extra: dict[str, Any] = {
+            "selected_provider_id": selected_source.provider_id,
+            "selected_evidence_class": selected_source.evidence_class,
+            "independently_validated": (
+                species_id in selected_source.independently_validated_species
+            ),
+            "replaced_catalog_attempt": dict(answer.extra),
+        }
+        residual = selected_source.validation_residual_dex_by_species.get(
+            species_id
+        )
+        if residual is not None:
+            extra["validation_residual_dex"] = residual
+        allocated[species_id] = VapourAnswer(
+            species_id=answer.species_id,
+            pressure=pressure,
+            selected_runtime_pressure=pressure,
+            flux=answer.flux,
+            source_label=selected_source.provider_id,
+            formula_id=answer.formula_id,
+            source_account=answer.source_account,
+            solve_group_id=answer.solve_group_id,
+            state_fingerprint=answer.state_fingerprint,
+            validation_status=selected_source.validation_status_by_species[
+                species_id
+            ],
+            validation_anchor_refs=(
+                selected_source.validation_anchor_refs_by_species.get(
+                    species_id, ()
+                )
+            ),
+            verdict_status=VERDICT_STATUS_BEARING_NON_AUTHORITATIVE,
+            certification_ceiling=CERTIFICATION_CEILING_NEVER,
+            refusal_code=None,
+            extra=MappingProxyType(extra),
+            source_reaction_activity=None,
+            source_reaction_activity_shadow=None,
+            source_reaction_activity_shadow_evaluation=None,
+        )
+    return allocated
+
+
+def _bundle_evaluation_candidates(
+    bundle_species_ids: frozenset[str],
+    provider_candidates_by_species: Mapping[
+        str, Sequence[ProviderDomainCandidate]
+    ],
+) -> tuple[
+    tuple[ProviderDomainCandidate, ...],
+    tuple[ProviderDomainCandidate, ...],
+]:
+    candidates: list[ProviderDomainCandidate] = []
+    admitted_ids_by_species: list[set[int]] = []
+    for species_id in sorted(bundle_species_ids):
+        admitted_ids: set[int] = set()
+        for candidate in provider_candidates_by_species.get(species_id, ()):
+            if candidate.pressures_by_species is None:
+                continue
+            candidate_id = id(candidate)
+            admitted_ids.add(candidate_id)
+            candidates.append(candidate)
+        admitted_ids_by_species.append(admitted_ids)
+    common_ids = (
+        set.intersection(*admitted_ids_by_species)
+        if admitted_ids_by_species
+        else set()
+    )
+    return (
+        tuple(candidates),
+        tuple(candidate for candidate in candidates if id(candidate) in common_ids),
+    )
+
+
+def _refuse_bundle_without_complete_source(
+    *,
+    answers: Mapping[str, VapourAnswer],
+    bundle_id: str,
+    bundle_species_ids: frozenset[str],
+    candidates: Sequence[ProviderDomainCandidate],
+) -> dict[str, VapourAnswer]:
+    candidate_ids = sorted({candidate.provider_id for candidate in candidates})
+    detail = (
+        "no candidate supplies one complete executable contract for connected "
+        f"bundle {bundle_id!r}; candidates={candidate_ids}"
+    )
+    refused = dict(answers)
+    for species_id in bundle_species_ids:
+        pressure_refusal = PressureRefusal(
+            code=REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
+            detail=detail,
+        )
+        flux_refusal = FluxRefusal(
+            code=REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
+            detail=detail,
+        )
+        answer = refused[species_id]
+        refused[species_id] = replace(
+            answer,
+            pressure=pressure_refusal,
+            selected_runtime_pressure=pressure_refusal,
+            flux=flux_refusal,
+            source_label="bundle_source_selector",
+            verdict_status=VERDICT_STATUS_BEARING_NON_AUTHORITATIVE,
+            certification_ceiling=CERTIFICATION_CEILING_NEVER,
+            refusal_code=REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
+            extra=MappingProxyType(
+                {
+                    **dict(answer.extra),
+                    "detail": detail,
+                    "bundle_id": bundle_id,
+                    "candidate_provider_ids": candidate_ids,
+                }
+            ),
+        )
+    return refused
+
+
 def _state_fingerprint(state: VapourResolveState | None) -> str:
     if state is None:
         return "state:none"
@@ -1816,7 +2218,7 @@ def resolve_vapour_batch(
     caller_species_filter: Sequence[str] | None = None,
     flux_activation_context: FluxActivationContext,
 ) -> VapourBatch:
-    """Full §4.2 channel/refusal/set pipeline (no RG-1 value-source flip)."""
+    """Full §4.2 pipeline; catalog stays default without evaluated candidates."""
 
     requested = build_request(
         rules,
@@ -1919,6 +2321,83 @@ def resolve_vapour_batch(
         )
     bundles = build_solve_bundles(flux_active=flux_active, rules=rules)
 
+    # §4.2 steps 4–5: explicit evaluation-bearing candidates replace the
+    # single catalog source only after connected bundles are known. Domain-only
+    # candidates preserve the historical catalog path byte-for-byte.
+    candidates_map = dict(provider_candidates_by_species or {})
+    selected_bundles: dict[str, frozenset[str]] = {}
+    step4_refused: set[str] = set()
+    for bundle_id, members in bundles.items():
+        candidates, admitted_candidates = _bundle_evaluation_candidates(
+            members, candidates_map
+        )
+        if not candidates:
+            selected_bundles[bundle_id] = members
+            continue
+        unique_candidates = _unique_provider_candidates(candidates)
+        if unique_candidates is None:
+            answers = _refuse_bundle_without_complete_source(
+                answers=answers,
+                bundle_id=bundle_id,
+                bundle_species_ids=members,
+                candidates=candidates,
+            )
+            step4_refused.update(members)
+            continue
+        admitted_candidate_identities = {
+            id(candidate) for candidate in admitted_candidates
+        }
+        unique_admitted_candidates = tuple(
+            candidate
+            for candidate in unique_candidates
+            if id(candidate) in admitted_candidate_identities
+        )
+        selected = rank_complete_candidate_sources(
+            bundle_species_ids=members,
+            candidates=unique_admitted_candidates,
+            state=state,
+            validation_candidates_by_species={
+                species_id: tuple(
+                    candidate
+                    for candidate in candidates_map.get(species_id, ())
+                    if candidate.pressures_by_species is not None
+                )
+                for species_id in members
+            },
+        )
+        if selected is None:
+            answers = _refuse_bundle_without_complete_source(
+                answers=answers,
+                bundle_id=bundle_id,
+                bundle_species_ids=members,
+                candidates=candidates,
+            )
+            step4_refused.update(members)
+            continue
+        complete_candidates = tuple(
+            candidate
+            for candidate in unique_admitted_candidates
+            if _candidate_is_complete(candidate, members, state)
+        )
+        if len(complete_candidates) == 1:
+            selected_bundles[bundle_id] = members
+            continue
+        answers = allocate_selected_source(
+            answers=answers,
+            bundle_species_ids=members,
+            selected_source=selected,
+            state=state,
+        )
+        selected_bundles[bundle_id] = members
+
+    selected_flux_active = frozenset(
+        species_id
+        for species_id in flux_active
+        if answers[species_id].is_flux_active
+    )
+    flux_active = selected_flux_active
+    bundles = selected_bundles
+
     return VapourBatch(
         requested_species_ids=requested,
         channels_by_species=answers,
@@ -1931,7 +2410,9 @@ def resolve_vapour_batch(
                 "n_requested": len(requested),
                 "n_refused": sum(1 for a in answers.values() if a.is_refused),
                 "n_flux_active": len(flux_active),
-                "n_flux_dormant_by_epoch": len(union_eligible - flux_active),
+                "n_flux_dormant_by_epoch": len(
+                    union_eligible - (flux_active | step4_refused)
+                ),
                 "flux_activation_epoch": flux_activation_context.epoch,
                 "n_solve_bundles": len(bundles),
             }
