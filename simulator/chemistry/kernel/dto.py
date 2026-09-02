@@ -17,7 +17,7 @@ import math
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import Any, Optional
+from typing import Any, Literal, Optional, get_args
 
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -413,6 +413,29 @@ BACKEND_STATUS_PRECEDENCE: tuple[str, ...] = (
     "unavailable",
     "out_of_domain",
     "not_converged",
+)
+
+#: The TYPE counterpart of the tuple above. The owner of a vocabulary has to own
+#: BOTH representations, or a caller that needs the type has nowhere to get it
+#: and restates the tokens -- which is exactly what test_backend_status_owner
+#: exists to stop, and exactly what happened in simulator/core.py before this
+#: alias existed. Callers that need "one of the ranked tokens" as a TYPE import
+#: this; callers that need the ORDERING import the tuple.
+#:
+#: ★ This is deliberately NOT a lengthening of BACKEND_STATUS_PRECEDENCE. Adding
+#: members there would weaken the ownership guard (it trips only on a literal
+#: containing EVERY ranked token, so a longer tuple makes that subset test
+#: strictly harder to satisfy) and would corrupt a derived ordering. A parallel
+#: alias adds a representation without touching the ranking.
+BackendStatusRanked = Literal["unavailable", "out_of_domain", "not_converged"]
+
+#: The two representations are pinned to each other at import time. Without this
+#: they are a copied rule in the sense the comment above warns about -- one could
+#: be edited and the other silently left behind, which is the same drift that
+#: produced the transposed-order bug. Fail at import, not at the call site.
+assert get_args(BackendStatusRanked) == BACKEND_STATUS_PRECEDENCE, (
+    "BackendStatusRanked and BACKEND_STATUS_PRECEDENCE have drifted: "
+    f"{get_args(BackendStatusRanked)} != {BACKEND_STATUS_PRECEDENCE}"
 )
 
 #: ★ THE PARTITION THAT STOPS AN UNRANKED TOKEN LOSING TO RECENCY.
