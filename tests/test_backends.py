@@ -58,3 +58,40 @@ def test_backend_honesty_internal_analytical_equilibrate_does_not_claim_liquid_f
     assert result.status == "unavailable"
     assert result.liquid_fraction is None
     assert result.phase_assemblage_available is False
+
+
+def test_bare_import_error_for_missing_native_dylibs_is_absence():
+    """Absence detection must not be narrowed to ModuleNotFoundError.
+
+    engine_local_config raises a BARE ImportError when the ThermoEngine dylibs
+    are absent -- no Python module is missing, so ModuleNotFoundError cannot
+    express it. A reviewer narrowing _TYPED_ABSENCE_EXCEPTION_CLASSES to
+    ModuleNotFoundError (a natural-looking tightening) would turn "install the
+    engine" into "engine bug, aborting" on any fresh box. This pins the reason.
+    """
+    from simulator.optimize.evaluate import _is_backend_unavailable
+
+    dylibs_absent = ImportError(
+        "ThermoEngine dylibs not found: configure [paths].thermoengine_dylib_dir "
+        "or run install-engines.py"
+    )
+    assert not isinstance(dylibs_absent, ModuleNotFoundError)
+    assert _is_backend_unavailable(dylibs_absent) is True
+
+
+def test_absence_is_detected_through_a_cause_chain():
+    """Anti-vacuity: the walk, not just a top-level isinstance, is what is pinned."""
+    from simulator.optimize.evaluate import _is_backend_unavailable
+
+    inner = ImportError("MELTSdynamic loader not found")
+    outer = RuntimeError("stage failed")
+    outer.__cause__ = inner
+    assert _is_backend_unavailable(outer) is True
+
+
+def test_unrelated_failure_is_not_absence():
+    """The breadth stops at ImportError; ordinary failures stay non-absence."""
+    from simulator.optimize.evaluate import _is_backend_unavailable
+
+    assert _is_backend_unavailable(RuntimeError("solver did not converge")) is False
+    assert _is_backend_unavailable(ValueError("bad input")) is False

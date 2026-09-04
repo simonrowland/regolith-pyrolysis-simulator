@@ -45,17 +45,28 @@ ARTIFACTS_ROOT = E2E_DIR / "artifacts"
 # Bounded waits (milliseconds). Baselines measured by the controller:
 # GET / ~1.1 s, GET /api/runs ~1.2 s, GET /thermal-train ~0.002 s,
 # GET /optimizer ~7 MINUTES (known live defect, fix in flight).
-PAGE_LOAD_MS = 30_000
-SOCKET_CONNECT_MS = 20_000
-FEEDSTOCK_CARD_MS = 15_000
-STATUS_CHANGE_MS = 30_000
-START_ACK_MS = 60_000
-TICK_ADVANCE_MS = 90_000
-RUN_COMPLETE_MS = 180_000
-OPTIMIZER_BOUND_MS = 120_000
-THERMAL_TRAIN_MS = 30_000
-STALL_THRESHOLD_MS = 90_000
-WATCHDOG_WINDOW_MS = 360_000
+from .journey_budget import (  # noqa: F401 -- re-exported for existing importers
+    BRANCH_JOURNEY_BUDGET_MS,
+    BRANCH_JOURNEY_TIMEOUT_S,
+    CONTROL_JOURNEY_BUDGET_MS,
+    CONTROL_JOURNEY_TIMEOUT_S,
+    FEEDSTOCK_CARD_MS,
+    JOURNEY_BUDGET_MS,
+    JOURNEY_MARGIN_MS,
+    JOURNEY_TIMEOUT_S,
+    OPTIMIZER_BOUND_MS,
+    PAGE_LOAD_MS,
+    PAUSE_HOLD_MS,
+    RUN_COMPLETE_MS,
+    RUN_COMPLETE_TOTAL_MS,
+    SOCKET_CONNECT_MS,
+    STALL_THRESHOLD_MS,
+    START_ACK_MS,
+    STATUS_CHANGE_MS,
+    THERMAL_TRAIN_MS,
+    TICK_ADVANCE_MS,
+    WATCHDOG_WINDOW_MS,
+)
 
 DEFAULT_FEEDSTOCK = "lunar_mare_low_ti"
 
@@ -187,6 +198,75 @@ DECISION_AUTO_ANSWER_JS = r"""
 })();
 """
 
+# Same observer as DECISION_AUTO_ANSWER_JS, but a named option per decision
+# type can override the recommended `.btn-primary`. Unspecified types still
+# click the recommendation. Placeholder __CHOICES__ is replaced with a JSON
+# object by decision_auto_answer_js().
+DECISION_CHOICE_AUTO_ANSWER_JS_TEMPLATE = r"""
+(() => {
+    if (window.__e2eDecisionHookInstalled) return;
+    window.__e2eDecisionHookInstalled = true;
+    window.__e2eDecisions = [];
+    const CHOICES = __CHOICES__;
+    const handle = () => {
+        const modal = document.getElementById('decision-modal');
+        if (!modal || modal.__e2eHandled) return;
+        modal.__e2eHandled = true;
+        let text = '';
+        try { text = modal.innerText.slice(0, 800); } catch (e) { /* ignore */ }
+        let type = '';
+        try {
+            const h3 = modal.querySelector('h3');
+            const raw = h3 ? (h3.textContent || '') : '';
+            const m = raw.match(/Decision Required:\s*(\S+)/);
+            if (m) type = m[1];
+        } catch (e) { /* ignore */ }
+        const wanted = (type && Object.prototype.hasOwnProperty.call(CHOICES, type))
+            ? String(CHOICES[type]) : '';
+        let clicked = null;
+        if (wanted) {
+            const buttons = Array.from(modal.querySelectorAll('button'));
+            clicked = buttons.find((b) => (b.textContent || '').trim() === wanted) || null;
+        }
+        if (!clicked) {
+            clicked = modal.querySelector('.btn-primary') || modal.querySelector('.btn');
+        }
+        const choice = clicked ? (clicked.textContent || '').trim() : null;
+        window.__e2eDecisions.push({
+            ms: Date.now(),
+            text: text,
+            type: type,
+            wanted: wanted || null,
+            answered: !!(clicked),
+            choice: choice,
+        });
+        if (clicked) clicked.click();
+    };
+    const observer = new MutationObserver(handle);
+    try { observer.observe(document, { childList: true, subtree: true }); } catch (e) { /* ignore */ }
+})();
+"""
+
+
+def decision_auto_answer_js(choices: dict[str, str] | None = None) -> str:
+    """Init script for the decision modal.
+
+    Default (no ``choices``): identical to ``DECISION_AUTO_ANSWER_JS`` —
+    click the recommended ``.btn-primary``. Existing journeys rely on that.
+
+    With a mapping of decision-type name to option label (for example
+    ``{"PATH_AB": "B", "BRANCH_ONE_TWO": "one"}``), those types click the
+    matching button; any type not in the map still takes the recommendation.
+    """
+    if not choices:
+        return DECISION_AUTO_ANSWER_JS
+    payload = json.dumps(
+        {str(key): str(value) for key, value in choices.items()},
+        separators=(",", ":"),
+    )
+    return DECISION_CHOICE_AUTO_ANSWER_JS_TEMPLATE.replace("__CHOICES__", payload)
+
+
 # Predicate used by wait_for_function while a run is live. Returns false while
 # nothing changed; returns a tagged string as soon as the run ADVANCES past
 # `lastHour`, reaches a terminal/refused/error status, or completes. The
@@ -212,11 +292,29 @@ RUN_STATE_PREDICATE_JS = r"""
 SOCKET_EVENT_PREDICATE_JS = r"""
 (spec) => {
     const log = window.__e2eSocketLog || [];
-    for (const e of log) {
+    const start = Number.isFinite(spec.after_count) ? spec.after_count : 0;
+    for (const e of log.slice(start)) {
         if (e.dir !== 'in' || e.event !== spec.event) continue;
         if (!spec.statuses || spec.statuses.length === 0) return JSON.stringify(e.data);
         if (e.data && spec.statuses.includes(e.data.status)) return JSON.stringify(e.data);
     }
+    return false;
+}
+"""
+
+# Pause-hold detector: returns a tagged string if the hour leaks past the
+# snapshot taken AFTER the paused ack, or if the run goes terminal while
+# supposedly paused. Timeout of this predicate IS a successful hold.
+PAUSE_HOLD_PREDICATE_JS = r"""
+(frozenHour) => {
+    const statusEl = document.getElementById('status-text');
+    const status = statusEl ? (statusEl.textContent || '').trim() : '';
+    if (/^Complete\b/.test(status)) return 'TERMINAL::' + status;
+    if (/^refused\b/i.test(status)) return 'TERMINAL::' + status;
+    if (/^error\b/i.test(status)) return 'TERMINAL::' + status;
+    const hourEl = document.getElementById('status-hour');
+    const m = hourEl ? (hourEl.textContent || '').match(/Hour:\s*([0-9]+(?:\.[0-9]+)?)/) : null;
+    if (m && parseFloat(m[1]) > frozenHour) return 'LEAKED::' + m[1] + '::' + status;
     return false;
 }
 """
@@ -461,6 +559,65 @@ def click_start(page: Page) -> None:
     page.locator("#btn-start").click()
 
 
+def click_pause(page: Page) -> None:
+    page.locator("#btn-pause").click()
+
+
+def click_resume(page: Page) -> None:
+    page.locator("#btn-resume").click()
+
+
+def socket_log_count(page: Page) -> int:
+    return int(page.evaluate("((window.__e2eSocketLog || []).length)"))
+
+
+def status_hour(page: Page) -> float:
+    text = page.locator("#status-hour").inner_text()
+    match = re.search(r"Hour:\s*([0-9]+(?:\.[0-9]+)?)", text)
+    if not match:
+        raise AssertionError(f"#status-hour has no hour: {text!r}")
+    return float(match.group(1))
+
+
+def pause_hold_verdict(
+    page: Page, frozen_hour: float, timeout_ms: int
+) -> tuple[str, str]:
+    """Wait one advance window for a pause leak.
+
+    Returns (HELD, detail) if the hour stays put. Returns (LEAKED, ...) or
+    (TERMINAL, ...) if the pause did not hold. Timeout of the predicate is
+    the hold succeeding — the next hour never arrived.
+    """
+    try:
+        handle = page.wait_for_function(
+            PAUSE_HOLD_PREDICATE_JS, arg=frozen_hour, timeout=timeout_ms
+        )
+    except PlaywrightTimeoutError:
+        return "HELD", f"Hour stayed at {frozen_hour:g} for {timeout_ms // 1000}s"
+    value = str(handle.json_value())
+    parts = value.split("::", 1)
+    return parts[0], parts[1] if len(parts) > 1 else ""
+
+
+def cancel_run(page: Page, run_id: str) -> dict[str, Any]:
+    """POST /api/runs/<id>/cancel from the page itself (same-origin cookies).
+
+    There is no dashboard Cancel button; this is the documented command-plane
+    cancel an operator (or a second tab) would issue against the live run.
+    """
+    result = page.evaluate(
+        """async ({url}) => {
+            const response = await fetch(url, {method: 'POST', credentials: 'same-origin'});
+            let body = null;
+            try { body = await response.json(); }
+            catch (e) { body = {_parse_error: String(e)}; }
+            return {http_status: response.status, body};
+        }""",
+        {"url": f"{BASE_URL}/api/runs/{run_id}/cancel"},
+    )
+    return result if isinstance(result, dict) else {"_raw": result}
+
+
 def wait_for_run_state(page: Page, last_hour: float, timeout_ms: int) -> tuple[str, str]:
     """Wait until the run advances past last_hour, or hits a terminal state.
 
@@ -480,14 +637,22 @@ def wait_for_socket_event(
     event: str,
     timeout_ms: int,
     statuses: list[str] | None = None,
+    after_count: int = 0,
 ) -> dict[str, Any]:
     """Wait until an inbound socket event arrives in the tapped log.
+
+    ``after_count`` skips already-seen log entries so a second ``started``
+    (or a later ``paused``) is not matched against the first run's events.
 
     Returns the event's data dict. Raises PlaywrightTimeoutError on timeout —
     that timeout IS the 'server never answered' detector."""
     handle = page.wait_for_function(
         SOCKET_EVENT_PREDICATE_JS,
-        arg={"event": event, "statuses": statuses or []},
+        arg={
+            "event": event,
+            "statuses": statuses or [],
+            "after_count": after_count,
+        },
         timeout=timeout_ms,
     )
     raw = handle.json_value()
@@ -519,12 +684,15 @@ def cancel_run_quietly(page: Page, evidence: EvidenceRecorder) -> None:
 __all__ = [
     "ARTIFACTS_ROOT",
     "BASE_URL",
+    "BRANCH_JOURNEY_TIMEOUT_S",
+    "CONTROL_JOURNEY_TIMEOUT_S",
     "DECISION_AUTO_ANSWER_JS",
     "DEFAULT_FEEDSTOCK",
     "EvidenceRecorder",
     "HEADED",
     "OPTIMIZER_BOUND_MS",
     "PAGE_LOAD_MS",
+    "PAUSE_HOLD_MS",
     "PlaywrightTimeoutError",
     "RUN_COMPLETE_MS",
     "SOCKET_TAP_JS",
@@ -534,11 +702,18 @@ __all__ = [
     "THERMAL_TRAIN_MS",
     "TICK_ADVANCE_MS",
     "WATCHDOG_WINDOW_MS",
+    "cancel_run",
     "cancel_run_quietly",
+    "click_pause",
+    "click_resume",
     "click_start",
+    "decision_auto_answer_js",
     "new_artifacts_dir",
+    "pause_hold_verdict",
     "select_feedstock",
     "set_max_speed",
+    "socket_log_count",
+    "status_hour",
     "wait_for_run_state",
     "wait_for_socket_event",
     "wait_for_start_enabled",

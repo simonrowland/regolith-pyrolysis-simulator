@@ -1057,6 +1057,7 @@ def test_redox_liquid_gate_in_progress_refuses_reentrant_curve_request(
     inner_curves = []
     inner_factors = []
     inner_diagnostics = []
+    inner_liquid_fraction_diagnostics = []
 
     def fake_dispatch(intent, *args, **kwargs):
         nonlocal gate_calls
@@ -1065,6 +1066,9 @@ def test_redox_liquid_gate_in_progress_refuses_reentrant_curve_request(
         assert sim._freeze_gate_liquid_fraction_cache['status'] == 'computing'
         inner_factors.append(
             sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+        )
+        inner_liquid_fraction_diagnostics.append(
+            dict(sim._last_melt_redox_liquid_fraction_diagnostic)
         )
         inner_curves.append(sim._melt_redox_liquidus_gate_curve())
         inner_diagnostics.append(
@@ -1096,6 +1100,49 @@ def test_redox_liquid_gate_in_progress_refuses_reentrant_curve_request(
             'source': 'none:liquidus_gate_in_progress',
         }
     ]
+    assert inner_liquid_fraction_diagnostics == [
+        {
+            'status': 'unavailable',
+            'source': 'none:liquidus_gate_in_progress',
+            'liquid_fraction': 0.0,
+        }
+    ]
+
+
+def test_bootstrap_none_refreshes_stale_liquid_fraction_diagnostic(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """R3-C: a leftover ok diagnostic must not survive the bootstrap None path."""
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    _install_freeze_gate_curve(
+        sim,
+        path=(
+            (1000.0, 0.0),
+            (1300.0, 1.0),
+        ),
+    )
+    assert sim._melt_redox_liquid_fraction_factor(1300.0 + 273.15) == 1.0
+    stale = dict(sim._last_melt_redox_liquid_fraction_diagnostic)
+    assert stale['status'] == 'ok'
+    assert stale['liquid_fraction'] == pytest.approx(1.0)
+
+    factor = sim._melt_redox_liquid_fraction_factor(
+        1300.0 + 273.15,
+        gate_authority=None,
+    )
+    assert factor == 0.0
+    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
+    assert diagnostic != stale
+    assert diagnostic['status'] == 'unavailable'
+    assert diagnostic['source'] == 'none:liquidus_gate_in_progress'
+    assert diagnostic['liquid_fraction'] == 0.0
 
 
 @pytest.mark.parametrize(
@@ -1103,8 +1150,13 @@ def test_redox_liquid_gate_in_progress_refuses_reentrant_curve_request(
     (
         ('unavailable', 'none:liquidus_unavailable'),
         ('not_converged', 'none:liquidus_not_converged'),
+        ('out_of_domain', 'none:liquidus_out_of_domain'),
     ),
-    ids=('provider-unavailable', 'provider-not-converged'),
+    ids=(
+        'provider-unavailable',
+        'provider-not-converged',
+        'provider-out-of-domain',
+    ),
 )
 def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
     monkeypatch,
@@ -1128,8 +1180,8 @@ def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
             if provider_status == 'unavailable':
                 raise ProviderUnavailableError('gate provider unavailable in test')
             return SimpleNamespace(
-                status='not_converged',
-                diagnostic={'backend_status': 'not_converged'},
+                status=provider_status,
+                diagnostic={'backend_status': provider_status},
             )
         if intent is ChemistryIntent.SILICATE_LIQUIDUS:
             raise ProviderUnavailableError('kernel liquidus unavailable in test')
@@ -1271,6 +1323,110 @@ def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
     assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
         'none:nonfinite_liquid_fraction'
     )
+
+
+def test_typed_thermoengine_out_of_domain_is_not_labelled_unavailable(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """R3-D: ThermoEngineRefusalCause maps to out_of_domain, not absence.
+
+    The exception text has no ``status=`` token, so the old
+    ``'status=not_converged' in str(exc)`` classifier labelled this
+    unavailable. Capacity stays the floor fallback; only the label
+    changes.
+    """
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+    from simulator.core import _MeltRedoxLiquidusFloorFallback
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+
+    def raise_out_of_domain():
+        raise ThermoEngineOutOfDomainError(
+            ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET
+        )
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', raise_out_of_domain)
+    curve = sim._melt_redox_liquidus_gate_curve()
+    assert isinstance(curve, _MeltRedoxLiquidusFloorFallback)
+    assert curve.liquidus_status == 'out_of_domain'
+    assert curve.liquidus_status != 'unavailable'
+    assert curve.liquidus_status != 'not_converged'
+    assert curve.source == 'none:liquidus_out_of_domain'
+    assert 'status=not_converged' not in curve.reason
+    assert 'status=out_of_domain' not in curve.reason
+
+
+def test_typed_thermoengine_nonfinite_is_not_converged_without_substring(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """R3-D: typed non-convergence wins even when the prose says unavailable."""
+    from engines.alphamelts.thermoengine import ThermoEngineNonFiniteField
+    from simulator.core import _MeltRedoxLiquidusFloorFallback
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+
+    def raise_nonfinite():
+        raise ThermoEngineNonFiniteField(
+            'ThermoEngine Liquid GibbsFreeEnergy is unavailable: nan'
+        )
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', raise_nonfinite)
+    curve = sim._melt_redox_liquidus_gate_curve()
+    assert isinstance(curve, _MeltRedoxLiquidusFloorFallback)
+    assert curve.liquidus_status == 'not_converged'
+    assert curve.liquidus_status != 'unavailable'
+    assert curve.source == 'none:liquidus_not_converged'
+    assert 'status=not_converged' not in curve.reason
+    assert 'unavailable' in curve.reason
+
+
+def test_not_converged_token_is_not_rewritten_to_out_of_domain(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """parser.py:226 — a lateral not_converged → out_of_domain drop is forbidden."""
+    from simulator.core import _MeltRedoxLiquidusFloorFallback
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+
+    def raise_both_tokens():
+        raise RuntimeError(
+            'gate liquid fraction unavailable: status=not_converged; '
+            'kernel liquidus unavailable: status=out_of_domain'
+        )
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', raise_both_tokens)
+    curve = sim._melt_redox_liquidus_gate_curve()
+    assert isinstance(curve, _MeltRedoxLiquidusFloorFallback)
+    assert curve.liquidus_status == 'not_converged'
+    assert curve.liquidus_status != 'out_of_domain'
+    assert curve.source == 'none:liquidus_not_converged'
 
 
 def test_redox_source_capacity_scales_with_continuous_liquid_fraction(

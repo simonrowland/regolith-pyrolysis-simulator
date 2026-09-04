@@ -29,6 +29,7 @@ OPTIONAL_HEADER_KEYS = {
     "recipe_snapshot",
     "seed",
     "c3_dose",
+    "additives_kg",
     "effective_config",
 }
 TERMINAL_KEYS = {
@@ -528,3 +529,38 @@ def test_cost_totals_omit_when_canonical_usage_is_incomplete() -> None:
 
     assert "cost_block" in artifact["header"]
     assert "cost_totals" not in artifact["terminal"]
+
+
+def test_header_carries_reagent_dosing_as_an_input(monkeypatch) -> None:
+    """additives_kg must appear in the HEADER, not only in terminal.run_metadata.
+
+    Regression, 2026-08-28: dosing was recorded only on the output side, so two
+    runs differing by 119 kg Mg / 55 kg K compared byte-identical across every
+    header input field (effective_config's 645 resolved keys, recipe_snapshot,
+    target_snapshot, charge_mass_kg, campaign_chain). Their headline Fe differed
+    14.6x because the metallothermic shuttle needs reductant. A header that
+    cannot express that difference cannot establish input equality.
+    """
+    payload = _runner_payload()
+    payload["run_metadata"]["additives_kg"] = {"K": 55.3, "Mg": 119.0}
+    artifact = build_run_artifact(payload, run_id="run-dosed")
+    assert artifact["header"]["additives_kg"] == {"K": 55.3, "Mg": 119.0}
+
+
+def test_header_omits_dosing_when_nothing_was_dosed(monkeypatch) -> None:
+    """Absence stays absence: an empty block would assert 'dosed nothing'.
+
+    A run whose dosing was never recorded must not be made to claim it dosed
+    zero of everything -- that is a fabricated input, and it would make an
+    undosed run compare equal to a genuinely zero-dosed one.
+    """
+    payload = _runner_payload()
+    payload["run_metadata"]["additives_kg"] = {}
+    artifact = build_run_artifact(payload, run_id="run-empty-dose")
+    assert "additives_kg" not in artifact["header"]
+
+    payload2 = _runner_payload()
+    payload2["run_metadata"].pop("additives_kg", None)
+    assert "additives_kg" not in build_run_artifact(
+        payload2, run_id="run-no-dose"
+    )["header"]

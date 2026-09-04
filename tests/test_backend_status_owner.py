@@ -725,3 +725,33 @@ def test_own_claim_and_worst_accessors_must_stay_distinct(degrading: str) -> Non
         "the two accessors collapsed into one answer; the disagreement gate and "
         "the trust reduction can no longer both be served"
     )
+
+
+def test_ranked_status_type_and_ordering_cannot_drift_apart() -> None:
+    """The owner exports the ranking AND its type; they must stay identical.
+
+    `dto.py` carries a runtime `assert` pinning these together at import, but
+    `assert` is stripped under `python -O`, so the pin would silently vanish in
+    an optimised interpreter. This test is the durable half.
+
+    Why the pair exists at all: the ownership guard above forbids restating the
+    ranked tokens outside the owner, and a caller needing them as a TYPE had
+    nowhere to import one -- so it restated them, which is precisely what the
+    guard flags. Exporting both representations removes the reason to copy.
+    They are separate objects, so they can drift; drifting them reintroduces the
+    transposed-order class the precedence comment documents.
+    """
+    from typing import get_args
+
+    from simulator.chemistry.kernel.dto import (
+        BACKEND_STATUS_PRECEDENCE,
+        BackendStatusRanked,
+    )
+
+    assert get_args(BackendStatusRanked) == BACKEND_STATUS_PRECEDENCE, (
+        "the ranked-status TYPE and the ranked-status ORDERING have drifted; "
+        "they are two representations of one vocabulary and must be edited "
+        f"together: {get_args(BackendStatusRanked)} vs {BACKEND_STATUS_PRECEDENCE}"
+    )
+    # Order is load-bearing, not just membership: the tuple encodes severity.
+    assert list(get_args(BackendStatusRanked)) == list(BACKEND_STATUS_PRECEDENCE)

@@ -77,6 +77,34 @@ HEAVY_ROSTER = frozenset({
      "test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track"),
     ("tests/test_yield_root_cause.py",
      "test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap"),
+    # 2026-08-28: the happy-path journey drives a REAL browser through a REAL
+    # 35-hour run against the live app, so its cost is the product's, not the
+    # test's -- it cannot be shrunk without stopping testing the thing.
+    # MEASURED: 508 s and 553 s on two consecutive runs. Its cap is derived
+    # from the declared step budgets (tests/e2e/journey_budget.py), so it moves
+    # only when a step budget moves, and it must exceed them: at the old 300 s
+    # the journey was killed before it could report, and steps 5-7 had never
+    # once rendered a verdict.
+    ("tests/e2e/test_happy_path_journey.py", "test_happy_path_journey"),
+    # 2026-08-28: pause/resume/cancel/restart browser journey. MEASURED 159 s
+    # then 194 s on two consecutive live runs (90 s of each is the pause-hold
+    # window). Cap is derived from declared step budgets in
+    # tests/e2e/journey_budget.py (665 s + 120 s margin = 785 s): two
+    # start-ack windows plus three 90 s advance/hold windows exceed the
+    # 300 s default whenever the start-wedge (~41 s yaml parse) hits twice,
+    # and a 300 s cap would kill the test before step 8 can report.
+    ("tests/e2e/test_run_control_journey.py",
+     "test_pause_resume_cancel_restart_journey"),
+    # 2026-08-29: alternate-branch browser journey (BRANCH_ONE_TWO = one).
+    # MEASURED 190.49 s on the committed A_staged+one path (Complete at hour
+    # 34). Cap is derived from declared step budgets in
+    # tests/e2e/journey_budget.py (845 s + 120 s margin = 965 s) so a slower
+    # host, or the longer Path B chain (scouted at 638 s, still inside C3_NA
+    # at hour 81), can still report. A 300 s cap would kill those runs
+    # before the ledger step can report — same class as the happy-path
+    # journey.
+    ("tests/e2e/test_alternate_branch_journey.py",
+     "test_alternate_branch_journey"),
     # gate-2 amendments (2026-07-23): C6-continue lengthened these past the
     # default ceiling; each carries its measured justification at the mark.
     ("tests/test_make_recipe_db_profile.py",

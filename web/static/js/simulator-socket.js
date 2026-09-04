@@ -40,6 +40,11 @@ const SimulatorLifecycleState = Object.freeze({
     TERMINAL_COMPLETE: 'terminal-complete',
     TERMINAL_REFUSED: 'terminal-refused',
     TERMINAL_ERROR: 'terminal-error',
+    // Cancel is a THIRD ending and gets its own phase on purpose. The
+    // operator asked for it, so it is neither a fault (error) nor the
+    // model declining to extrapolate (refused); reporting it as either
+    // would misname what happened.
+    TERMINAL_CANCELLED: 'terminal-cancelled',
     DISCONNECTED: 'disconnected',
 });
 
@@ -60,6 +65,7 @@ const TERMINAL_LIFECYCLE_STATES = new Set([
     SimulatorLifecycleState.TERMINAL_COMPLETE,
     SimulatorLifecycleState.TERMINAL_REFUSED,
     SimulatorLifecycleState.TERMINAL_ERROR,
+    SimulatorLifecycleState.TERMINAL_CANCELLED,
 ]);
 
 let _simulatorLifecycle = {
@@ -436,6 +442,19 @@ function reduceSimulatorLifecycle(current, event) {
         return _terminalLifecycleResult(
             current,
             SimulatorLifecycleState.TERMINAL_REFUSED,
+            text,
+            runId,
+        );
+    }
+    // A cancel latched the controls exactly as a refusal used to before
+    // the 2026-08-27 fix: the run stopped, the dashboard kept saying
+    // Running, and #btn-start stayed grey until the page was reloaded.
+    // Found by the run-control e2e journey, 2026-08-28. Needs no `reason`
+    // guard: unlike 'error', a cancel is unambiguous.
+    if (status === 'cancelled') {
+        return _terminalLifecycleResult(
+            current,
+            SimulatorLifecycleState.TERMINAL_CANCELLED,
             text,
             runId,
         );

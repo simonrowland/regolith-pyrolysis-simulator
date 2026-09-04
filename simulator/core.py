@@ -362,6 +362,10 @@ from simulator.melt_backend.sulfsat import (
     SulfSatGate,
     SulfurSaturationResult,
 )
+from simulator.chemistry.kernel.dto import (
+    BACKEND_STATUS_PRECEDENCE,
+    BackendStatusRanked,
+)
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
@@ -371,6 +375,7 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     ProviderRegistry,
+    ProviderUnavailableError,
     normalize_chemistry_kernel_config,
     normalize_oxygen_sink_channel_mode,
 )
@@ -451,11 +456,86 @@ def _canonicalize_condenser_geometry_stage_keys(
     return resolved
 
 
+# The ranked members come from the vocabulary's owner (dto.py) rather than being
+# restated here; 'invalid' is this module's own addition and is NOT a ranked
+# backend status, so it is unioned on rather than folded into the owner's tuple.
+# Restating the ranked tokens here is what test_backend_status_owner flags, and
+# the reason it could not be avoided before is that dto.py exported the ORDERING
+# but no TYPE -- so a caller needing the type had nowhere to get it.
+_MeltRedoxLiquidusStatus = BackendStatusRanked | Literal['invalid']
+
+
 @dataclass(frozen=True)
 class _MeltRedoxLiquidusFloorFallback:
     source: str
     reason: str
-    liquidus_status: Literal['unavailable', 'not_converged', 'invalid']
+    liquidus_status: _MeltRedoxLiquidusStatus
+
+
+def _liquidus_status_from_freeze_gate_exception(
+    exc: BaseException,
+) -> _MeltRedoxLiquidusStatus:
+    """Classify a freeze-gate curve failure without grepping prose.
+
+    Typed ThermoEngine / liquidus-sample exceptions win. Freeze-gate
+    RuntimeError still concatenates ``status=<token>`` from upstream
+    IntentResult statuses; extract those tokens rather than treating
+    anything other than ``not_converged`` as engine-absence.
+    ``not_converged`` is preserved when present: rewriting it to
+    ``out_of_domain`` drops the non-convergence mark.
+    """
+    if isinstance(exc, ProviderUnavailableError):
+        return 'unavailable'
+
+    from simulator.melt_backend.liquidus import LiquidusSampleError
+
+    if isinstance(exc, LiquidusSampleError):
+        sample_status = str(exc.status)
+        if sample_status in BACKEND_STATUS_PRECEDENCE:
+            return sample_status  # type: ignore[return-value]
+        return 'unavailable'
+
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2OmittedError,
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineIsolationError,
+        ThermoEngineNonFiniteField,
+        ThermoEngineOutOfDomainError,
+        ThermoEngineTimeoutError,
+        thermoengine_failure_disposition_from_exception,
+    )
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    if isinstance(
+        exc,
+        (
+            ThermoEngineOutOfDomainError,
+            ThermoEngineIsolationError,
+            ThermoEngineFO2UndefinedError,
+            ThermoEngineNonFiniteField,
+            ThermoEngineFO2OmittedError,
+            ThermoEngineTimeoutError,
+            EngineWorkerTimeout,
+        ),
+    ):
+        mapped = thermoengine_failure_disposition_from_exception(exc).status
+        if mapped == 'out_of_domain':
+            return 'out_of_domain'
+        if mapped == 'not_converged':
+            return 'not_converged'
+        return 'unavailable'
+
+    text = str(exc)
+    tokens = tuple(
+        token
+        for token in BACKEND_STATUS_PRECEDENCE
+        if f'status={token}' in text
+    )
+    if 'not_converged' in tokens:
+        return 'not_converged'
+    if 'out_of_domain' in tokens:
+        return 'out_of_domain'
+    return 'unavailable'
 
 
 _MeltRedoxGateAuthority = (
@@ -4162,7 +4242,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         source: str,
         reason: str,
-        liquidus_status: Literal['unavailable', 'not_converged', 'invalid'],
+        liquidus_status: _MeltRedoxLiquidusStatus,
     ) -> _MeltRedoxLiquidusFloorFallback:
         fallback = _MeltRedoxLiquidusFloorFallback(
             source=source,
@@ -4505,10 +4585,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 raise
             except Exception as exc:  # noqa: BLE001 - optional liquidus engines
                 reason = str(exc)
-                liquidus_status: Literal['unavailable', 'not_converged'] = (
-                    'not_converged'
-                    if 'status=not_converged' in reason
-                    else 'unavailable'
+                liquidus_status = _liquidus_status_from_freeze_gate_exception(
+                    exc
                 )
                 return self._melt_redox_liquidus_floor_fallback(
                     source=f'none:liquidus_{liquidus_status}',
@@ -4588,6 +4666,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> float:
         curve = self._resolved_melt_redox_gate_authority(gate_authority)
         if curve is None:
+            self._last_melt_redox_liquid_fraction_diagnostic = {
+                'status': 'unavailable',
+                'source': 'none:liquidus_gate_in_progress',
+                'liquid_fraction': 0.0,
+            }
             return 0.0
         if isinstance(curve, _MeltRedoxLiquidusFloorFallback):
             temperature_C = float(T_K) - 273.15
