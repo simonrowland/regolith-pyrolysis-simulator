@@ -21,7 +21,9 @@ import importlib.util
 import inspect
 import json
 import math
+import sqlite3
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -43,6 +45,7 @@ from simulator.vapour_rail.calibration import (
     CalibrationResearchStore,
     CalibrationRunnerError,
     CalibrationSidecarError,
+    BoundaryStatistic,
     HoldoutSplit,
     ObservationKind,
     RowValidationState,
@@ -441,13 +444,214 @@ def test_research_store_roundtrip_and_digest(tmp_path: Path):
             cells[0].temperature_K,
             "MELTS-v1.0",
         )
-        persisted["research_note"] = "diagnostic digest is cache-inert"
+        persisted["research_note"] = "changed diagnostic provenance"
         store._conn.execute(
             "UPDATE cells SET diagnostics_json = ? WHERE cell_id = ?",
             (json.dumps(persisted, sort_keys=True), cells[0].cell_id),
         )
         store._conn.commit()
-        assert store.digest() == digest
+        assert store.digest() != digest
+
+
+def test_research_store_digest_projection_classifies_every_stored_column(
+    tmp_path: Path,
+) -> None:
+    with CalibrationResearchStore(tmp_path / "projection.sqlite") as store:
+        tables = {
+            str(row[0])
+            for row in store._conn.execute(
+                "SELECT name FROM sqlite_schema WHERE type = 'table'"
+            ).fetchall()
+        }
+        stored_columns = {
+            f"{table}.{row[1]}"
+            for table in tables
+            for row in store._conn.execute(
+                f"PRAGMA table_info({table})"
+            ).fetchall()
+        }
+
+    projected_columns = {
+        f"{table}.{column}"
+        for table, columns in calib._RAW_STORE_DIGEST_PROJECTION.items()
+        for column in columns
+    }
+    excluded_columns = set(calib._RAW_STORE_DIGEST_EXCLUDED_COLUMNS)
+
+    assert projected_columns.isdisjoint(excluded_columns)
+    assert stored_columns == projected_columns | excluded_columns
+
+
+@pytest.mark.parametrize(
+    "key",
+    (
+        "calibration_id",
+        "p_floor_Pa",
+        "epsilon_J",
+        "frozen_families_json",
+        "warm_pool_only",
+        "cache_layer",
+    ),
+)
+def test_research_store_digest_changes_with_campaign_metadata(
+    tmp_path: Path,
+    key: str,
+) -> None:
+    with CalibrationResearchStore(tmp_path / f"{key}.sqlite") as store:
+        store.set_meta(key, "before")
+        digest = store.digest()
+        store.set_meta(key, "after")
+        assert store.digest() != digest
+
+
+def test_research_store_digest_changes_with_composition(tmp_path: Path):
+    cell = build_calibration_cells()[0]
+    observations = (censor_pressure(1.0e-6, species="SiO"),)
+
+    with CalibrationResearchStore(tmp_path / "composition.sqlite") as store:
+        store.insert_cell(cell, status="ok", observations=observations)
+        original_digest = store.digest()
+
+        composition = dict(cell.formulation.composition_mol)
+        composition["SiO2"] += 0.01
+        changed_cell = replace(
+            cell,
+            formulation=replace(
+                cell.formulation,
+                composition_mol=composition,
+            ),
+        )
+        store.insert_cell(
+            changed_cell,
+            status="ok",
+            observations=observations,
+        )
+
+        assert store.digest() != original_digest
+
+
+def test_research_store_digest_changes_with_censor_floor(tmp_path: Path):
+    cell = build_calibration_cells()[0]
+
+    with CalibrationResearchStore(tmp_path / "floor.sqlite") as store:
+        store.insert_cell(
+            cell,
+            status="ok",
+            observations=(
+                censor_pressure(0.0, p_floor_Pa=1.0e-30, species="SiO"),
+            ),
+        )
+        original_digest = store.digest()
+
+        store.insert_cell(
+            cell,
+            status="ok",
+            observations=(
+                censor_pressure(0.0, p_floor_Pa=1.0e-20, species="SiO"),
+            ),
+        )
+
+        assert store.digest() != original_digest
+
+
+def test_research_store_upserts_boundary_stats_and_digests_them(tmp_path: Path):
+    store_path = tmp_path / "boundary.sqlite"
+    first = BoundaryStatistic(
+        species="SiO",
+        boundary="T_min",
+        channel="SiO",
+        delta_log10_P=0.1,
+        abs_delta_log10_P=0.1,
+        source_before="vaporock_warm",
+        source_after="analytical_rail",
+        admissible=True,
+        note="first batch",
+    )
+    latest = BoundaryStatistic(
+        species="SiO",
+        boundary="T_min",
+        channel="SiO",
+        delta_log10_P=0.2,
+        abs_delta_log10_P=0.2,
+        source_before="vaporock_warm",
+        source_after="analytical_rail",
+        admissible=False,
+        note="latest batch",
+    )
+
+    with CalibrationResearchStore(store_path) as store:
+        store.insert_boundary_stats([first])
+        digest_before_update = store.digest()
+        store.insert_boundary_stats([latest])
+
+        rows = store._conn.execute(
+            "SELECT delta_log10_P, admissible, note FROM boundary_stats"
+        ).fetchall()
+        assert rows == [(0.2, 0, "latest batch")]
+        assert store.digest() != digest_before_update
+
+        digest_before_foreign_row = store.digest()
+        store._conn.execute(
+            """
+            INSERT INTO boundary_stats(
+                species, boundary, channel, delta_log10_P,
+                abs_delta_log10_P, source_before, source_after,
+                admissible, note
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "Fe",
+                "T_max",
+                "Fe",
+                None,
+                None,
+                "foreign",
+                "foreign",
+                None,
+                "not represented by report_json",
+            ),
+        )
+        store._conn.commit()
+        assert store.digest() != digest_before_foreign_row
+
+
+def test_research_store_dedupes_legacy_boundary_rows_to_latest(tmp_path: Path):
+    store_path = tmp_path / "legacy-boundary.sqlite"
+    with sqlite3.connect(store_path) as conn:
+        conn.execute(
+            """
+            CREATE TABLE boundary_stats (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                species TEXT NOT NULL,
+                boundary TEXT NOT NULL,
+                channel TEXT NOT NULL,
+                delta_log10_P REAL,
+                abs_delta_log10_P REAL,
+                source_before TEXT NOT NULL,
+                source_after TEXT NOT NULL,
+                admissible INTEGER,
+                note TEXT NOT NULL
+            )
+            """
+        )
+        for note in ("old batch", "latest batch"):
+            conn.execute(
+                """
+                INSERT INTO boundary_stats(
+                    species, boundary, channel, delta_log10_P,
+                    abs_delta_log10_P, source_before, source_after,
+                    admissible, note
+                ) VALUES ('SiO', 'T_min', 'SiO', NULL, NULL,
+                          'vaporock_warm', 'analytical_rail', NULL, ?)
+                """,
+                (note,),
+            )
+
+    with CalibrationResearchStore(store_path) as store:
+        rows = store._conn.execute(
+            "SELECT note FROM boundary_stats ORDER BY id"
+        ).fetchall()
+        assert rows == [("latest batch",)]
 
 
 def test_research_store_rejects_partial_h2_diagnostic(tmp_path: Path):
@@ -523,9 +727,72 @@ def test_sidecar_loader_accepts_checked_in_runtime_yaml():
     assert payload["performance"]["execution"] == "vaporock_warm_pool_only"
     assert set(payload["frozen_families"]) == set(DEFAULT_CALIBRATION_SPECIES)
     assert set(payload["parameter_caps"]) == set(DEFAULT_CALIBRATION_SPECIES)
+    selection = payload["source_selection_fractions"]
+    assert (
+        selection["n_ok"]
+        + selection["n_refused"]
+        + selection["n_non_authoritative"]
+        == selection["n_cells"]
+    )
+    breakdown = selection["status_breakdown"]
+    assert sum(status["n_cells"] for status in breakdown.values()) == selection[
+        "n_cells"
+    ]
+    assert sum(status["fraction"] for status in breakdown.values()) == pytest.approx(
+        1.0
+    )
+    assert selection["fraction_vaporock_covered_basis"] == (
+        "species coverage, not usable-cell coverage"
+    )
+    boundary = payload["boundary_statistics_summary"]
+    assert boundary["n_faces_enumerated"] == 5
+    assert boundary["n_statistics_enumerated"] == 35
+    assert boundary["n_statistics_evaluated"] == 0
+    assert boundary["note"] == (
+        "5 faces enumerated, 35 statistics enumerated, 0 evaluated; "
+        "analytical candidate fits and dual-source boundary Δlog10(P) "
+        "remain pending."
+    )
     # All scaffold rows pending — no silent promotion.
     statuses = {r["validation_status"] for r in payload["per_row_state"]}
     assert statuses == {"pending_validation"}
+
+
+def test_sidecar_boundary_note_distinguishes_fully_evaluated_statistics():
+    statistics = tuple(
+        BoundaryStatistic(
+            species=species,
+            boundary=str(face["boundary"]),
+            channel=species,
+            delta_log10_P=0.1,
+            abs_delta_log10_P=0.1,
+            source_before="vaporock_warm",
+            source_after="analytical_rail",
+            admissible=True,
+            note="evaluated",
+        )
+        for face in boundary_faces_for_domain()
+        for species in DEFAULT_CALIBRATION_SPECIES
+    )
+    report = build_progressive_validation_report(
+        calibration_id="fully-evaluated-boundaries",
+        cells=build_calibration_cells(),
+        boundary_statistics=statistics,
+        include_rail_pending=False,
+    )
+
+    boundary = build_sidecar_document(
+        calibration_id="fully-evaluated-boundaries",
+        raw_store_digest=None,
+        raw_store_path=None,
+        report=report,
+    )["boundary_statistics_summary"]
+
+    assert boundary["n_statistics_evaluated"] == 35
+    assert "analytical candidate fits remain pending" in boundary["note"]
+    assert "dual-source boundary Δlog10(P) is fully evaluated" in boundary[
+        "note"
+    ]
 
 
 def test_sidecar_rejects_runtime_readable_sqlite_and_cache_layer(tmp_path: Path):
@@ -574,6 +841,54 @@ def test_write_sidecar_roundtrip(tmp_path: Path):
     assert loaded["calibration_id"] == "vr10-roundtrip"
     assert loaded["raw_store"]["digest"] == "abc"
     assert loaded["raw_store"]["runtime_readable"] is False
+
+
+def test_writer_regeneration_preserves_every_cell_status(tmp_path: Path):
+    report = build_progressive_validation_report(
+        calibration_id="status-accounting",
+        cells=build_calibration_cells()[:2],
+        cell_results=(
+            {"status": "non_authoritative"},
+            {"status": "not_converged"},
+        ),
+        include_rail_pending=False,
+    )
+    doc = build_sidecar_document(
+        calibration_id="status-accounting",
+        raw_store_digest=None,
+        raw_store_path=None,
+        report=report,
+    )
+    path = tmp_path / "status-accounting.yaml"
+    write_sidecar(path, doc)
+
+    selection = load_vapour_rail_calibration_sidecar(path)[
+        "source_selection_fractions"
+    ]
+    assert selection["status_breakdown"] == {
+        "ok": {"n_cells": 0, "fraction": 0.0},
+        "non_authoritative": {"n_cells": 1, "fraction": 0.5},
+        "not_converged": {"n_cells": 1, "fraction": 0.5},
+    }
+    assert selection["n_non_authoritative"] == 1
+    assert selection["n_refused"] == 1
+    assert (
+        selection["n_ok"]
+        + selection["n_refused"]
+        + selection["n_non_authoritative"]
+        == selection["n_cells"]
+        == 2
+    )
+
+
+def test_report_rejects_unaccounted_cell_status() -> None:
+    with pytest.raises(ValueError, match="must conserve n_cells"):
+        build_progressive_validation_report(
+            calibration_id="status-accounting",
+            cells=build_calibration_cells()[:1],
+            cell_results=({"status": "unexpected"},),
+            include_rail_pending=False,
+        )
 
 
 def test_runtime_sidecar_loader_source_does_not_open_sqlite():

@@ -1,0 +1,235 @@
+schema_version: literature_extract.v1
+source_id: sf04-magma-companion-workbook
+source:
+  citation: >-
+    Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high
+    temperature lava vaporization on Io", Icarus 169:216-241; numerical
+    MAGMA grid preserved in the VapoRock Schaefer2004-MAGMA-valid.xlsx
+    companion workbook.
+  doi: 10.1016/j.icarus.2003.08.023
+  year: 2004
+  version: Schaefer2004-MAGMA-valid.xlsx sheet tho
+  source_workbook_sha256: ebe0f4daca57926e9347de09edef2167c94cb8b70f85c13572d3cda26c7f0e0f
+  checked_in_fixture_sha256: e792f4c12a2f29778d3dc13185364022803c2b1f7bf6c469467635bab5791cbe
+extraction:
+  method: >-
+    Reviewed transcription of the checked-in openpyxl data-only workbook
+    fixture. The paper supplies the Table 5 composition and Fig. 10a graphical
+    locator; it does not print these numerical high-temperature species rows.
+  date: '2026-09-01'
+  worker: vr13-b-calibration
+  provenance_path: tests/fixtures/imcc_sf04_magma_workbook.csv
+review_status: reviewed
+coverage:
+  composition: tholeiite
+  calculation_range_stated_in_paper_K: [1700.0, 3000.0]
+  figure_range_K: [1700.0, 2400.0]
+  companion_workbook_grid_range_K: [1500.0, 2500.0]
+  extracted_range_K: [1750.0, 2500.0]
+  limitation: >-
+    SF04 prints no numerical 1700-3000 K species-pressure table. These are
+    model-model companion-workbook anchors, not independent measurements.
+    Values above 2400 K are outside the plotted range, and 2500 K is the last
+    preserved workbook row.
+composition_wt_pct:
+  SiO2: 50.71
+  MgO: 4.68
+  Al2O3: 14.48
+  TiO2: 1.70
+  Fe2O3: 4.89
+  FeO: 9.07
+  CaO: 8.83
+  Na2O: 3.16
+  K2O: 0.77
+  MnO: 0.22
+  H2O: 1.04
+  P2O5: 0.36
+species:
+  O:
+    observations:
+    - observation_id: sf04_workbook_tho_o_pressure_series
+      type: psat_series
+      locator: &sf04_locator
+        published_page: 227
+        pdf_page_index: 12
+        figure: 10a
+        record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
+        note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
+      T_range_K: [1750.0, 2500.0]
+      phase: tholeiite_silicate_melt
+      standard_state: initial equilibrium vapor at zero fractional vaporization
+      regime: magma_model_companion_workbook
+      units: bar
+      values:
+      - {T_K: 1750.0, pressure_bar: 1.133381e-07, log10_pressure_bar: -6.9456240721465434}
+      - {T_K: 1875.0, pressure_bar: 7.849888e-07, log10_pressure_bar: -6.1051365396023867}
+      - {T_K: 1900.0, pressure_bar: 1.121325e-06, log10_pressure_bar: -5.9502684951212528}
+      - {T_K: 2000.0, pressure_bar: 4.270354e-06, log10_pressure_bar: -5.3695361217257709}
+      - {T_K: 2125.0, pressure_bar: 1.902479e-05, log10_pressure_bar: -4.720680128373135}
+      - {T_K: 2250.0, pressure_bar: 7.178274e-05, log10_pressure_bar: -4.1439799683464793}
+      - {T_K: 2375.0, pressure_bar: 2.359199e-04, log10_pressure_bar: -3.6272354245417846}
+      - {T_K: 2500.0, pressure_bar: 6.920946e-04, log10_pressure_bar: -3.1598345392859764}
+  O2:
+    observations:
+    - observation_id: sf04_workbook_tho_o2_pressure_series
+      type: psat_series
+      locator: *sf04_locator
+      T_range_K: [1750.0, 2500.0]
+      phase: tholeiite_silicate_melt
+      standard_state: initial equilibrium vapor at zero fractional vaporization
+      regime: magma_model_companion_workbook
+      units: bar
+      values:
+      - {T_K: 1750.0, pressure_bar: 2.229361e-06, log10_pressure_bar: -5.6518196006029475}
+      - {T_K: 1875.0, pressure_bar: 1.040384e-05, log10_pressure_bar: -4.9828063354122873}
+      - {T_K: 1900.0, pressure_bar: 1.382024e-05, log10_pressure_bar: -4.8594844150102556}
+      - {T_K: 2000.0, pressure_bar: 4.008000e-05, log10_pressure_bar: -4.3970722871408103}
+      - {T_K: 2125.0, pressure_bar: 1.316272e-04, log10_pressure_bar: -3.880654357003984}
+      - {T_K: 2250.0, pressure_bar: 3.786712e-04, log10_pressure_bar: -3.4217377240756495}
+      - {T_K: 2375.0, pressure_bar: 9.780730e-04, log10_pressure_bar: -3.0096287297583806}
+      - {T_K: 2500.0, pressure_bar: 2.322367e-03, log10_pressure_bar: -2.6340691483009637}
+  Mg:
+    observations:
+    - observation_id: sf04_workbook_tho_mg_pressure_series
+      type: psat_series
+      locator: *sf04_locator
+      T_range_K: [1750.0, 2500.0]
+      phase: tholeiite_silicate_melt
+      standard_state: initial equilibrium vapor at zero fractional vaporization
+      regime: magma_model_companion_workbook
+      units: bar
+      values:
+      - {T_K: 1750.0, pressure_bar: 1.575052e-10, log10_pressure_bar: -9.8027051034996102}
+      - {T_K: 1875.0, pressure_bar: 1.755858e-09, log10_pressure_bar: -8.7555106093354098}
+      - {T_K: 1900.0, pressure_bar: 2.733803e-09, log10_pressure_bar: -8.5632327842434997}
+      - {T_K: 2000.0, pressure_bar: 1.432297e-08, log10_pressure_bar: -7.8439669177215725}
+      - {T_K: 2125.0, pressure_bar: 9.047511e-08, log10_pressure_bar: -7.0434708802024772}
+      - {T_K: 2250.0, pressure_bar: 4.621354e-07, log10_pressure_bar: -6.3352307628472069}
+      - {T_K: 2375.0, pressure_bar: 1.972089e-06, log10_pressure_bar: -5.7050734893254909}
+      - {T_K: 2500.0, pressure_bar: 7.202059e-06, log10_pressure_bar: -5.1425433251655832}
+  SiO:
+    observations:
+    - observation_id: sf04_workbook_tho_sio_pressure_series
+      type: psat_series
+      locator: *sf04_locator
+      T_range_K: [1750.0, 2500.0]
+      phase: tholeiite_silicate_melt
+      standard_state: initial equilibrium vapor at zero fractional vaporization
+      regime: magma_model_companion_workbook
+      units: bar
+      values:
+      - {T_K: 1750.0, pressure_bar: 1.266025e-09, log10_pressure_bar: -8.8975577182879793}
+      - {T_K: 1875.0, pressure_bar: 2.039921e-08, log10_pressure_bar: -7.6903866511664587}
+      - {T_K: 1900.0, pressure_bar: 3.411743e-08, log10_pressure_bar: -7.4670236908355712}
+      - {T_K: 2000.0, pressure_bar: 2.363555e-07, log10_pressure_bar: -6.6264342871970792}
+      - {T_K: 2125.0, pressure_bar: 2.083974e-06, log10_pressure_bar: -5.6811077036676032}
+      - {T_K: 2250.0, pressure_bar: 1.460089e-05, log10_pressure_bar: -4.8356206709067688}
+      - {T_K: 2375.0, pressure_bar: 8.400103e-05, log10_pressure_bar: -4.0757153886931912}
+      - {T_K: 2500.0, pressure_bar: 4.066878e-04, log10_pressure_bar: -3.3907388555574243}
+  Fe:
+    observations:
+    - observation_id: sf04_workbook_tho_fe_pressure_series
+      type: psat_series
+      locator: *sf04_locator
+      T_range_K: [1750.0, 2500.0]
+      phase: tholeiite_silicate_melt
+      standard_state: initial equilibrium vapor at zero fractional vaporization
+      regime: magma_model_companion_workbook
+      units: bar
+      values:
+      - {T_K: 1750.0, pressure_bar: 1.323692e-08, log10_pressure_bar: -7.878213055879205}
+      - {T_K: 1875.0, pressure_bar: 1.088142e-07, log10_pressure_bar: -6.9633144265198501}
+      - {T_K: 1900.0, pressure_bar: 1.602551e-07, log10_pressure_bar: -6.7951881404886239}
+      - {T_K: 2000.0, pressure_bar: 6.824990e-07, log10_pressure_bar: -6.1658979806165837}
+      - {T_K: 2125.0, pressure_bar: 3.428764e-06, log10_pressure_bar: -5.4648624061142579}
+      - {T_K: 2250.0, pressure_bar: 1.431997e-05, log10_pressure_bar: -4.8440578918639243}
+      - {T_K: 2375.0, pressure_bar: 5.113043e-05, log10_pressure_bar: -4.291320554900258}
+      - {T_K: 2500.0, pressure_bar: 1.593091e-04, log10_pressure_bar: -3.7977594158692485}
+  Na:
+    observations:
+    - observation_id: sf04_workbook_tho_na_pressure_series
+      type: psat_series
+      locator: *sf04_locator
+      T_range_K: [1750.0, 2500.0]
+      phase: tholeiite_silicate_melt
+      standard_state: initial equilibrium vapor at zero fractional vaporization
+      regime: magma_model_companion_workbook
+      units: bar
+      values:
+      - {T_K: 1750.0, pressure_bar: 8.606028e-06, log10_pressure_bar: -5.0651972452595393}
+      - {T_K: 1875.0, pressure_bar: 4.046110e-05, log10_pressure_bar: -4.3929623144115766}
+      - {T_K: 1900.0, pressure_bar: 5.384318e-05, log10_pressure_bar: -4.2688692984187604}
+      - {T_K: 2000.0, pressure_bar: 1.573534e-04, log10_pressure_bar: -3.8031238686688695}
+      - {T_K: 2125.0, pressure_bar: 5.216904e-04, log10_pressure_bar: -3.2825871549689927}
+      - {T_K: 2250.0, pressure_bar: 1.509766e-03, log10_pressure_bar: -2.821090359186186}
+      - {T_K: 2375.0, pressure_bar: 3.885705e-03, log10_pressure_bar: -2.4105301738173761}
+      - {T_K: 2500.0, pressure_bar: 9.024949e-03, log10_pressure_bar: -2.0445552436141226}
+  K:
+    observations:
+    - observation_id: sf04_workbook_tho_k_pressure_series
+      type: psat_series
+      locator: *sf04_locator
+      T_range_K: [1750.0, 2500.0]
+      phase: tholeiite_silicate_melt
+      standard_state: initial equilibrium vapor at zero fractional vaporization
+      regime: magma_model_companion_workbook
+      units: bar
+      values:
+      - {T_K: 1750.0, pressure_bar: 5.067528e-07, log10_pressure_bar: -6.2952038429878101}
+      - {T_K: 1875.0, pressure_bar: 2.452494e-06, log10_pressure_bar: -5.6103920464434589}
+      - {T_K: 1900.0, pressure_bar: 3.273535e-06, log10_pressure_bar: -5.4849830113249674}
+      - {T_K: 2000.0, pressure_bar: 9.612152e-06, log10_pressure_bar: -5.0171793701778231}
+      - {T_K: 2125.0, pressure_bar: 3.164822e-05, log10_pressure_bar: -4.4996507111100277}
+      - {T_K: 2250.0, pressure_bar: 9.012150e-05, log10_pressure_bar: -4.0451715884051369}
+      - {T_K: 2375.0, pressure_bar: 2.270824e-04, log10_pressure_bar: -3.6438165244287961}
+      - {T_K: 2500.0, pressure_bar: 5.152974e-04, log10_pressure_bar: -3.2879420488226465}
+fidelity_samples:
+- species: O
+  observation_id: sf04_workbook_tho_o_pressure_series
+  observable: psat_series
+  T_K: 2500.0
+  field: log10_pressure_bar
+  value: -3.1598345392859764
+  locator: *sf04_locator
+- species: O2
+  observation_id: sf04_workbook_tho_o2_pressure_series
+  observable: psat_series
+  T_K: 2500.0
+  field: log10_pressure_bar
+  value: -2.6340691483009637
+  locator: *sf04_locator
+- species: Mg
+  observation_id: sf04_workbook_tho_mg_pressure_series
+  observable: psat_series
+  T_K: 2500.0
+  field: log10_pressure_bar
+  value: -5.1425433251655832
+  locator: *sf04_locator
+- species: SiO
+  observation_id: sf04_workbook_tho_sio_pressure_series
+  observable: psat_series
+  T_K: 2500.0
+  field: log10_pressure_bar
+  value: -3.3907388555574243
+  locator: *sf04_locator
+- species: Fe
+  observation_id: sf04_workbook_tho_fe_pressure_series
+  observable: psat_series
+  T_K: 2500.0
+  field: log10_pressure_bar
+  value: -3.7977594158692485
+  locator: *sf04_locator
+- species: Na
+  observation_id: sf04_workbook_tho_na_pressure_series
+  observable: psat_series
+  T_K: 2500.0
+  field: log10_pressure_bar
+  value: -2.0445552436141226
+  locator: *sf04_locator
+- species: K
+  observation_id: sf04_workbook_tho_k_pressure_series
+  observable: psat_series
+  T_K: 2500.0
+  field: log10_pressure_bar
+  value: -3.2879420488226465
+  locator: *sf04_locator

@@ -791,6 +791,11 @@ class RowValidationState(str, Enum):
     VALIDATED = "validated"
 
 
+_REFUSED_CELL_STATUSES: Final[frozenset[str]] = frozenset(
+    {"out_of_domain", "refused", "unavailable", "not_converged"}
+)
+
+
 @dataclass
 class PerRowValidationState:
     species: str
@@ -824,9 +829,13 @@ class SourceSelectionFractions:
     n_cells: int
     n_ok: int
     n_refused: int
+    n_non_authoritative: int
     fraction_selectable: float
     fraction_refused: float
+    fraction_non_authoritative: float
+    status_breakdown: dict[str, dict[str, int | float]]
     fraction_vaporock_covered: float
+    fraction_vaporock_covered_basis: str
     fraction_literature_rail: float
     fraction_pending_validation: float
 
@@ -953,25 +962,86 @@ def compute_source_selection_fractions(
     n_species_total: int,
     n_vaporock_species_covered: int,
     n_literature_species: int,
+    n_non_authoritative: int = 0,
+    status_breakdown: Mapping[str, int] | None = None,
 ) -> SourceSelectionFractions:
     """Aggregate selectable/refused fractions for the progressive report."""
 
-    if n_cells < 0 or n_ok < 0 or n_refused < 0:
+    if any(
+        count < 0
+        for count in (n_cells, n_ok, n_refused, n_non_authoritative)
+    ):
         raise ValueError("cell counts must be non-negative")
+    accounted = n_ok + n_refused + n_non_authoritative
+    if accounted != n_cells:
+        raise ValueError(
+            "cell status accounting must conserve n_cells: "
+            f"{n_ok} ok + {n_refused} refused + "
+            f"{n_non_authoritative} non_authoritative != {n_cells}"
+        )
+
+    breakdown_counts = {
+        str(status): int(count)
+        for status, count in (
+            status_breakdown
+            or {
+                "ok": n_ok,
+                "refused": n_refused,
+                "non_authoritative": n_non_authoritative,
+            }
+        ).items()
+    }
+    if any(count < 0 for count in breakdown_counts.values()):
+        raise ValueError("status breakdown counts must be non-negative")
+    if sum(breakdown_counts.values()) != n_cells:
+        raise ValueError("status breakdown must conserve n_cells")
+    if breakdown_counts.get("ok", 0) != n_ok:
+        raise ValueError("status breakdown ok count does not match n_ok")
+    if (
+        breakdown_counts.get("non_authoritative", 0)
+        != n_non_authoritative
+    ):
+        raise ValueError(
+            "status breakdown non_authoritative count does not match"
+        )
+    if (
+        sum(
+            count
+            for status, count in breakdown_counts.items()
+            if status in _REFUSED_CELL_STATUSES
+        )
+        != n_refused
+    ):
+        raise ValueError("status breakdown refused counts do not match n_refused")
+
     if n_cells == 0:
         frac_sel = 0.0
         frac_ref = 0.0
+        frac_non_authoritative = 0.0
     else:
         frac_sel = n_ok / n_cells
         frac_ref = n_refused / n_cells
+        frac_non_authoritative = n_non_authoritative / n_cells
     n_species_total = max(int(n_species_total), 1)
     return SourceSelectionFractions(
         n_cells=int(n_cells),
         n_ok=int(n_ok),
         n_refused=int(n_refused),
+        n_non_authoritative=int(n_non_authoritative),
         fraction_selectable=frac_sel,
         fraction_refused=frac_ref,
+        fraction_non_authoritative=frac_non_authoritative,
+        status_breakdown={
+            status: {
+                "n_cells": count,
+                "fraction": count / n_cells if n_cells else 0.0,
+            }
+            for status, count in breakdown_counts.items()
+        },
         fraction_vaporock_covered=n_vaporock_species_covered / n_species_total,
+        fraction_vaporock_covered_basis=(
+            "species coverage, not usable-cell coverage"
+        ),
         fraction_literature_rail=n_literature_species / n_species_total,
         fraction_pending_validation=n_species_pending / n_species_total,
     )
@@ -991,14 +1061,19 @@ def build_progressive_validation_report(
     """Assemble the VR-10 progressive-validation report."""
 
     cell_results = list(cell_results or [])
-    n_ok = sum(1 for r in cell_results if r.get("status") == "ok")
+    status_counts: dict[str, int] = {"ok": 0}
+    for result in cell_results:
+        status = str(result.get("status", "missing"))
+        status_counts[status] = status_counts.get(status, 0) + 1
+
+    n_ok = status_counts["ok"]
     n_refused = sum(
-        1
-        for r in cell_results
-        if r.get("status") in {"out_of_domain", "refused", "unavailable", "not_converged"}
+        count
+        for status, count in status_counts.items()
+        if status in _REFUSED_CELL_STATUSES
     )
-    # When no live results yet, counts still describe the planned corpus.
-    n_cells = len(cell_results) if cell_results else len(cells)
+    n_non_authoritative = status_counts.get("non_authoritative", 0)
+    n_cells = len(cell_results)
 
     per_row = build_per_row_states(promoted_validated=promoted_validated)
     remaining_from_calibration = [
@@ -1045,6 +1120,8 @@ def build_progressive_validation_report(
         n_species_total=len(per_row),
         n_vaporock_species_covered=len(DEFAULT_CALIBRATION_SPECIES),
         n_literature_species=len(DEFAULT_CALIBRATION_SPECIES),
+        n_non_authoritative=n_non_authoritative,
+        status_breakdown=status_counts,
     )
 
     frozen = {
@@ -1101,6 +1178,7 @@ def build_progressive_validation_report(
             "evaluated_cells": len(cell_results),
             "ok": n_ok,
             "refused": n_refused if cell_results else 0,
+            "non_authoritative": n_non_authoritative,
             **{f"split_{k}": v for k, v in split_counts.items()},
         },
         notes=notes,
@@ -1160,6 +1238,69 @@ CREATE INDEX IF NOT EXISTS idx_obs_cell ON observations(cell_id);
 CREATE INDEX IF NOT EXISTS idx_obs_species ON observations(species);
 """
 
+# Every stored evidence column is either projected here or named with a reason
+# below.  ``digest()`` builds its SELECTs from this map so the inventory cannot
+# drift away from the bytes that are actually hashed.
+_RAW_STORE_DIGEST_PROJECTION: Final[dict[str, tuple[str, ...]]] = {
+    "meta": ("key", "value"),
+    "cells": (
+        "cell_id",
+        "formulation_id",
+        "formulation_family",
+        "temperature_K",
+        "fo2_label",
+        "fO2_log",
+        "split",
+        "status",
+        "composition_json",
+        "warnings_json",
+        "diagnostics_json",
+    ),
+    "observations": (
+        "cell_id",
+        "species",
+        "kind",
+        "pressure_Pa",
+        "p_floor_Pa",
+        "log10_pressure_Pa",
+        "note",
+    ),
+    "boundary_stats": (
+        "species",
+        "boundary",
+        "channel",
+        "delta_log10_P",
+        "abs_delta_log10_P",
+        "source_before",
+        "source_after",
+        "admissible",
+        "note",
+    ),
+}
+_RAW_STORE_DIGEST_ORDER_BY: Final[dict[str, tuple[str, ...]]] = {
+    "meta": ("key",),
+    "cells": ("cell_id",),
+    "observations": ("cell_id", "species"),
+    "boundary_stats": ("species", "boundary", "channel"),
+}
+
+# Explicit column exclusions.  IDs are insertion mechanics, not evidence;
+# sqlite_sequence is SQLite's AUTOINCREMENT bookkeeping rather than user data.
+_RAW_STORE_DIGEST_EXCLUDED_COLUMNS: Final[dict[str, str]] = {
+    "observations.id": "surrogate insertion identifier",
+    "boundary_stats.id": "surrogate identifier unstable under replacement",
+    "sqlite_sequence.name": "SQLite AUTOINCREMENT bookkeeping",
+    "sqlite_sequence.seq": "SQLite AUTOINCREMENT bookkeeping",
+}
+
+# Explicit meta-row exclusions.  raw_store_digest cannot hash itself.
+# report_json is a derived, write-only snapshot rebuilt from the projected
+# rows/configuration; sidecar regeneration independently checks its output.
+_RAW_STORE_DIGEST_EXCLUDED_META_KEYS: Final[dict[str, str]] = {
+    "raw_store_digest": "self-referential digest value",
+    "report_json": "derived report snapshot with no read consumer",
+}
+
 
 class CalibrationResearchStore:
     """SQLite research store for raw calibration cells (offline only).
@@ -1183,7 +1324,31 @@ class CalibrationResearchStore:
                 "ALTER TABLE cells ADD COLUMN diagnostics_json "
                 "TEXT NOT NULL DEFAULT '{}'"
             )
+        self._dedupe_boundary_stats_to_latest()
         self._conn.commit()
+
+    def _dedupe_boundary_stats_to_latest(self) -> None:
+        """Migrate legacy stores to one latest row per boundary key."""
+
+        self._conn.execute(
+            """
+            DELETE FROM boundary_stats
+            WHERE EXISTS (
+                SELECT 1
+                FROM boundary_stats AS newer
+                WHERE newer.species = boundary_stats.species
+                  AND newer.boundary = boundary_stats.boundary
+                  AND newer.channel = boundary_stats.channel
+                  AND newer.id > boundary_stats.id
+            )
+            """
+        )
+        self._conn.execute(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_boundary_stats_key
+            ON boundary_stats(species, boundary, channel)
+            """
+        )
 
     def close(self) -> None:
         self._conn.close()
@@ -1271,49 +1436,59 @@ class CalibrationResearchStore:
     def insert_boundary_stats(
         self, stats: Sequence[BoundaryStatistic]
     ) -> None:
-        for stat in stats:
-            self._conn.execute(
-                """
-                INSERT INTO boundary_stats(
-                    species, boundary, channel, delta_log10_P,
-                    abs_delta_log10_P, source_before, source_after,
-                    admissible, note
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    stat.species,
-                    stat.boundary,
-                    stat.channel,
-                    stat.delta_log10_P,
-                    stat.abs_delta_log10_P,
-                    stat.source_before,
-                    stat.source_after,
+        """Replace the store's complete boundary-statistics batch."""
+
+        with self._conn:
+            self._conn.execute("DELETE FROM boundary_stats")
+            for stat in stats:
+                self._conn.execute(
+                    """
+                    INSERT INTO boundary_stats(
+                        species, boundary, channel, delta_log10_P,
+                        abs_delta_log10_P, source_before, source_after,
+                        admissible, note
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(species, boundary, channel) DO UPDATE SET
+                        delta_log10_P = excluded.delta_log10_P,
+                        abs_delta_log10_P = excluded.abs_delta_log10_P,
+                        source_before = excluded.source_before,
+                        source_after = excluded.source_after,
+                        admissible = excluded.admissible,
+                        note = excluded.note
+                    """,
                     (
-                        None
-                        if stat.admissible is None
-                        else (1 if stat.admissible else 0)
+                        stat.species,
+                        stat.boundary,
+                        stat.channel,
+                        stat.delta_log10_P,
+                        stat.abs_delta_log10_P,
+                        stat.source_before,
+                        stat.source_after,
+                        (
+                            None
+                            if stat.admissible is None
+                            else (1 if stat.admissible else 0)
+                        ),
+                        stat.note,
                     ),
-                    stat.note,
-                ),
-            )
-        self._conn.commit()
+                )
 
     def digest(self) -> str:
-        """Digest promotion-relevant cell and observation inputs only."""
+        """Digest promotion-relevant metadata and stored evidence."""
 
         h = hashlib.sha256()
-        cur = self._conn.execute(
-            "SELECT cell_id, status, temperature_K, fO2_log, split "
-            "FROM cells ORDER BY cell_id"
-        )
-        for row in cur.fetchall():
-            h.update(repr(row).encode("utf-8"))
-        cur = self._conn.execute(
-            "SELECT cell_id, species, kind, pressure_Pa, log10_pressure_Pa "
-            "FROM observations ORDER BY cell_id, species"
-        )
-        for row in cur.fetchall():
-            h.update(repr(row).encode("utf-8"))
+        for table, columns in _RAW_STORE_DIGEST_PROJECTION.items():
+            query = f"SELECT {', '.join(columns)} FROM {table}"
+            parameters: tuple[str, ...] = ()
+            if table == "meta":
+                parameters = tuple(_RAW_STORE_DIGEST_EXCLUDED_META_KEYS)
+                placeholders = ", ".join("?" for _ in parameters)
+                query += f" WHERE key NOT IN ({placeholders})"
+            query += " ORDER BY " + ", ".join(
+                _RAW_STORE_DIGEST_ORDER_BY[table]
+            )
+            for row in self._conn.execute(query, parameters).fetchall():
+                h.update(repr(row).encode("utf-8"))
         return h.hexdigest()
 
 
@@ -1601,6 +1776,65 @@ def build_sidecar_document(
         cells=build_calibration_cells(),
         include_rail_pending=False,
     )
+    selection = report.source_selection_fractions
+    breakdown = selection.get("status_breakdown")
+    if not isinstance(breakdown, Mapping) or sum(
+        int(status.get("n_cells", 0))
+        for status in breakdown.values()
+        if isinstance(status, Mapping)
+    ) != int(selection.get("n_cells", 0)):
+        raise CalibrationSidecarError(
+            "source-selection status breakdown must conserve n_cells"
+        )
+    if (
+        int(selection.get("n_ok", 0))
+        + int(selection.get("n_refused", 0))
+        + int(selection.get("n_non_authoritative", 0))
+        != int(selection.get("n_cells", 0))
+    ):
+        raise CalibrationSidecarError(
+            "source-selection status accounting must conserve n_cells"
+        )
+    n_faces_enumerated = len(
+        {
+            str(statistic.get("boundary"))
+            for statistic in report.boundary_statistics
+            if statistic.get("boundary") is not None
+        }
+    )
+    n_statistics_enumerated = len(report.boundary_statistics)
+    n_statistics_evaluated = sum(
+        1
+        for statistic in report.boundary_statistics
+        if statistic.get("admissible") is not None
+    )
+    n_statistics_remaining = (
+        n_statistics_enumerated - n_statistics_evaluated
+    )
+    boundary_note_prefix = (
+        f"{n_faces_enumerated} faces enumerated, "
+        f"{n_statistics_enumerated} statistics enumerated, "
+        f"{n_statistics_evaluated} evaluated; "
+    )
+    if n_statistics_evaluated == 0:
+        boundary_note = (
+            boundary_note_prefix
+            + "analytical candidate fits and dual-source boundary "
+            "Δlog10(P) remain pending."
+        )
+    elif n_statistics_remaining:
+        boundary_note = (
+            boundary_note_prefix
+            + "analytical candidate fits remain pending; "
+            f"{n_statistics_remaining} dual-source boundary Δlog10(P) "
+            "statistics remain pending."
+        )
+    else:
+        boundary_note = (
+            boundary_note_prefix
+            + "analytical candidate fits remain pending; dual-source "
+            "boundary Δlog10(P) is fully evaluated."
+        )
     return {
         "schema_version": SIDECAR_SCHEMA_VERSION,
         "kind": SIDECAR_KIND,
@@ -1632,11 +1866,10 @@ def build_sidecar_document(
         ],
         "error_budget": report.error_budget,
         "boundary_statistics_summary": {
-            "n_faces": len(report.boundary_statistics),
-            "note": (
-                "Full dual-source boundary Δlog10(P) lives in the research "
-                "store; sidecar carries reviewed summary only."
-            ),
+            "n_faces_enumerated": n_faces_enumerated,
+            "n_statistics_enumerated": n_statistics_enumerated,
+            "n_statistics_evaluated": n_statistics_evaluated,
+            "note": boundary_note,
         },
         "per_row_state": report.per_row_state,
         "remaining_pending_species": [
