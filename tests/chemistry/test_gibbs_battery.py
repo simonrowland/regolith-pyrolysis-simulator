@@ -176,7 +176,12 @@ def test_partition_splits_own_input_from_independent() -> None:
     # thermochemical rows as kems gibbs coverage; metadata completion added
     # observations). The own-input partition remained pinned while later
     # extracts added seven independently tabulated rows.
-    assert part["observations_total"] == 2310
+    # 2026-09-04 (VR-13/B, 3e324581): the SF04 MAGMA companion-workbook extract
+    # added seven psat_series observations (O, O2, Mg, SiO, Fe, Na, K; regime
+    # magma_model_companion_workbook - a model reproduction, not an empirical
+    # anchor). They are not gibbs tables: every partition count below is
+    # unchanged; only the store-wide observation total moved, 2310 -> 2317.
+    assert part["observations_total"] == 2317
     assert part["gibbs_table_total"] == 1730
     assert part["gibbs_table_kems"] == 33
     assert part["gibbs_table_non_kems"] == 1697
