@@ -1476,7 +1476,10 @@ def _serialize_margins(margins: Mapping[str, GateMargin]) -> dict[str, dict[str,
                 "source_ref": margin.threshold.source_ref,
                 "tolerance": margin.threshold.tolerance,
             },
-            "observed": _json_number(margin.observed, f"{gate}.observed"),
+            "observed": (
+                None if margin.status == "unavailable" and margin.observed is None
+                else _json_number(margin.observed, f"{gate}.observed")
+            ),
             "detail": margin.detail,
         }
         _add_margin_status_fields(payload, margin)
@@ -1516,7 +1519,10 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
             if isinstance(item.get("status_payload", {}), Mapping)
             else {}
         )
-        observed_value = _decode_json_number(item["observed"], f"{gate}.observed")
+        observed_value = (
+            None if status_value == "unavailable" and item["observed"] is None
+            else _decode_json_number(item["observed"], f"{gate}.observed")
+        )
         threshold_value = float(threshold["value"])
         threshold_tolerance = float(threshold.get("tolerance", 0.0))
         feasible_value = bool(item["feasible"])

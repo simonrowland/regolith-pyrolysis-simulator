@@ -1062,7 +1062,10 @@ def _gate_margin_payload(margin: GateMargin) -> dict[str, Any]:
         "gate": margin.gate,
         "feasible": margin.feasible,
         "margin": _json_number(margin.margin),
-        "observed": _json_number(margin.observed),
+        "observed": (
+            None if margin.status == "unavailable" and margin.observed is None
+            else _json_number(margin.observed)
+        ),
         "detail": margin.detail,
         "status": margin.status,
         "status_reason": margin.status_reason,

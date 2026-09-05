@@ -4028,7 +4028,9 @@ def _assert_finite_margins(scored: ScoredResult) -> None:
     for name, margin in scored.feasibility_margins.items():
         prefix = f"feasibility margin {name!r}"
         _finite_or_infinite(getattr(margin, "margin", None), f"{prefix}.margin")
-        _finite_or_infinite(getattr(margin, "observed", None), f"{prefix}.observed")
+        observed = getattr(margin, "observed", None)
+        if getattr(margin, "status", None) != "unavailable" or observed is not None:
+            _finite_or_infinite(observed, f"{prefix}.observed")
 
 
 def _result_backend_status(scored: ScoredResult) -> str | None:
@@ -4269,11 +4271,15 @@ def _margin_mapping(margins: Mapping[str, Any]) -> Mapping[str, Mapping[str, Any
 
 def _margin_payload(margin: Any) -> Mapping[str, Any]:
     threshold = getattr(margin, "threshold", None)
+    observed = getattr(margin, "observed", 0.0)
     payload: dict[str, Any] = {
         "gate": str(getattr(margin, "gate", "")),
         "feasible": bool(getattr(margin, "feasible", False)),
         "margin": _json_number(getattr(margin, "margin", 0.0), "margin"),
-        "observed": _json_number(getattr(margin, "observed", 0.0), "observed"),
+        "observed": (
+            None if getattr(margin, "status", None) == "unavailable" and observed is None
+            else _json_number(observed, "observed")
+        ),
         "detail": str(getattr(margin, "detail", "")),
     }
     if threshold is not None:

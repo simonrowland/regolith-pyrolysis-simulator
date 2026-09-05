@@ -455,6 +455,70 @@ def test_runner_fouling_report_non_authoritative_is_unconstrained_and_surfaced()
     assert "resinter threshold is not grounded" in coating.detail
 
 
+@pytest.mark.parametrize("nominal_load", [0.0, 0.1])
+@pytest.mark.parametrize("output_status", ["status_bearing", "non-authoritative-threshold"])
+def test_null_threshold_unavailable_wall_channel_is_not_an_authoritative_pass(
+    nominal_load: float, output_status: str,
+) -> None:
+    from simulator.optimize.results_store import (
+        _deserialize_grounding_margins, _serialize_margins,
+    )
+    from simulator.optimize.study import _assert_finite_margins, _margin_payload
+    from simulator.optimize.strategy.staged import _margin_view
+    from simulator.optimize.sso2_evidence import _gate_margin_payload
+    from web.routes import (
+        _constraint_margin_readout, _constraint_margin_summary,
+        _result_row_constraint_margins,
+    )
+
+    report = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": nominal_load,
+        "authoritative_for_resinter": False,
+        "output_status": output_status,
+        "status_reason": "wall saturation unavailable: above_source_certified_range",
+        "sticking_alpha_authority": {"authoritative_for_deposit_mass": False},
+    }
+    constraints = PhysicsConstraintSet(active_gates=("coating",))
+    result = constraints.evaluate(_valid_trace_object(wall_fouling_report=report))
+    coating = result.margins["coating"]
+    _assert_finite_margins(SimpleNamespace(feasibility_margins=result.margins))
+    finite_threshold = constraints.coating_from_fouling_report(
+        {**report, "resinter_threshold_kg": 1.0}
+    )
+
+    assert coating.feasible is finite_threshold.feasible  # Unconstrained, not a clean-wall claim.
+    assert coating.status == "unavailable"
+    assert coating.authoritative is False
+    assert coating.observed is None
+    assert coating.status_payload["coating_constraint_authoritative"] is False
+    assert coating.status_reason == report["status_reason"]
+    assert _margin_view(coating)[9] is None
+    exported = _gate_margin_payload(coating)
+    assert exported["status"] == "unavailable"
+    assert exported["observed"] is None
+    assert _margin_payload(coating)["observed"] is None
+    readout = _constraint_margin_readout(coating)
+    assert readout["verdict"] == "unavailable"
+    assert readout["observed"] is None
+    assert readout["observed_label"] != "0.0"
+    assert _constraint_margin_summary([readout]) == [readout]
+    stored = _serialize_margins({"coating": coating})
+    restored = _deserialize_grounding_margins(stored)["coating"]
+    assert restored.status == "unavailable"
+    assert restored.observed is None
+    assert restored.authoritative is False
+    assert restored.status_payload["coating_constraint_authoritative"] is False
+    persisted_readouts = _result_row_constraint_margins({"feasibility_margins": stored})
+    assert len(persisted_readouts) == 1
+    persisted = persisted_readouts[0]
+    for field in ("gate", "verdict", "status", "status_reason", "observed", "observed_label"):
+        assert persisted[field] == readout[field]
+    assert persisted["status_payload"]["coating_constraint_authoritative"] is False
+    assert _constraint_margin_summary(persisted_readouts) == persisted_readouts
+
+
 def test_direct_null_threshold_report_binds_no_unqualified_deposition() -> None:
     trace = _valid_trace_object(
         wall_fouling_report={

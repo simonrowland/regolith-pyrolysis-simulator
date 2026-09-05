@@ -2894,22 +2894,19 @@ def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic(
     assert result.objectives is not None
     assert result.failing_gates == ()
     coating = result.feasibility_margins["coating"]
-    # Fail-closed contract (wave-0 fix): an unqualified/null resinter threshold
-    # no longer reports an infinite lifespan; the gate binds in
-    # no_unqualified_deposition mode and observed is the (zero) unqualified
-    # deposition, not math.inf. The sourcing claim of this test is unchanged:
-    # the gate must consume the runner wall-fouling report, not the removed
-    # delta heuristic.
-    assert coating.observed == 0.0
+    # A non-authoritative runner report cannot turn nominal ledger zero into a pass.
+    assert coating.observed is None
+    assert coating.status == "unavailable"
+    assert coating.authoritative is False
     assert coating.status_payload["coating_constraint_mode"] == (
         "no_unqualified_deposition"
     )
-    assert coating.status_payload["coating_constraint_authoritative"] is True
+    assert coating.status_payload["coating_constraint_authoritative"] is False
     # Sourcing proof: the delta heuristic was deleted from the trace above, so
     # the per-campaign deposition rate in the payload can only have come from
     # the runner wall-fouling report.
     assert coating.status_payload["wall_deposit_kg_per_campaign"] == 0.0
-    assert "deposit_rate=0 kg/campaign" in coating.detail
+    assert "non-authoritative: coating feasibility unconstrained" in coating.detail
 
 
 def test_optimizer_coating_overlay_preserves_proven_zero_authority() -> None:

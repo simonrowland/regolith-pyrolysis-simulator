@@ -3688,7 +3688,7 @@ class CondensationModel:
         melt_temperature_C: float,
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
-    ) -> float:
+    ) -> float | Mapping[str, Any]:
         if (
             antoine_extrapolations is not None
             or antoine_extrapolation_warnings is not None
@@ -4071,7 +4071,7 @@ class CondensationModel:
         surface_area_m2: float,
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
-    ) -> float:
+    ) -> float | Mapping[str, Any]:
         if (
             antoine_extrapolations is not None
             or antoine_extrapolation_warnings is not None

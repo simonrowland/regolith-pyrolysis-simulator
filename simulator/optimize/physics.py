@@ -90,7 +90,7 @@ class GateMargin:
     feasible: bool
     margin: float
     threshold: ThresholdSpec
-    observed: float
+    observed: float | None
     detail: str
     status: str = "available"
     authoritative: bool = True
@@ -668,6 +668,14 @@ class PhysicsConstraintSet:
                     not math.isfinite(threshold) or threshold <= 0.0
                 )
         if constraint_mode == "no_unqualified_deposition" or threshold_is_unqualified:
+            sticking_authority = report.get("sticking_alpha_authority")
+            unavailable = not authoritative and (
+                output_status != "non-authoritative-threshold"
+                or (
+                    isinstance(sticking_authority, Mapping)
+                    and sticking_authority.get("authoritative_for_deposit_mass") is False
+                )
+            )
             if (
                 constraint_mode == "no_unqualified_deposition"
                 and report.get("coating_constraint_authoritative") is not True
@@ -699,24 +707,27 @@ class PhysicsConstraintSet:
             )
             return GateMargin(
                 gate="coating",
-                feasible=rate == 0.0,
-                margin=-rate,
+                feasible=True if unavailable else rate == 0.0,
+                margin=math.inf if unavailable else -rate,
                 threshold=threshold,
-                observed=rate,
+                observed=None if unavailable else rate,
                 detail=(
+                    "non-authoritative: coating feasibility unconstrained; "
+                    f"output_status={output_status}; status_reason={status_reason}"
+                ) if unavailable else (
                     "fail-closed continuous no-unqualified-deposition constraint: "
                     "no finite material damage capacity qualifies a positive "
                     "deposition rate; "
                     f"deposit_rate={rate:.6g} kg/campaign"
                 ),
-                status="available",
-                authoritative=True,
+                status="unavailable" if unavailable else "available",
+                authoritative=not unavailable,
                 output_status=output_status,
                 status_reason=status_reason,
                 status_payload={
                     **report,
                     "coating_constraint_mode": "no_unqualified_deposition",
-                    "coating_constraint_authoritative": True,
+                    "coating_constraint_authoritative": not unavailable,
                     "constraint_mode": "continuous",
                 },
             )

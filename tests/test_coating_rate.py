@@ -312,6 +312,33 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
     assert model.last_wall_deposition_rate_shadow_candidate == {}
 
 
+def test_source_only_antoine_pole_is_terminal_input_refusal(monkeypatch) -> None:
+    from simulator.condensation import DepositionInputRefusal, _species_vapor_data
+
+    source_data = copy.deepcopy(_species_vapor_data("SiO"))
+    source_data["antoine"]["C"] = -2073.15
+    assert source_data["fit_target"] == "standard_reaction_term"
+    assert "pure_component_antoine" not in source_data
+    monkeypatch.setattr(
+        "simulator.condensation._species_vapor_data", lambda *a, **k: source_data
+    )
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0, species_partial_pressures_mbar={"SiO": 1.0},
+        gas_temperature_C=1800.0, campaign_name="C0",
+    )
+
+    with pytest.raises(DepositionInputRefusal, match="T_wall_K \\+ C") as refused:
+        wall_deposit_candidate_for_surface_kg(
+            model, species="SiO", rate_kg_hr=1.0,
+            T_cond_C=model.condensation_temperatures_C["SiO"],
+            melt_temperature_C=1800.0, wall_temperature_C=1800.0,
+            surface_area_m2=1.0,
+        )
+    assert refused.value.terminal_refusal is True
+    assert model.last_wall_deposition_rate_shadow_candidate == {}
+
+
 @pytest.mark.parametrize(("field", "value"), [
     ("rate_kg_hr", float("nan")),
     ("rate_kg_hr", float("inf")),
@@ -559,6 +586,28 @@ def test_opt_in_diagnostics_are_golden_neutral() -> None:
     assert lifespan["authoritative_for_selection"] is False
     assert "campaigns_to_resinter" in lifespan
     assert "verdict" in lifespan
+
+
+@pytest.mark.parametrize("include_diagnostics", [False, True])
+def test_lunar_payload_preserves_unavailable_mg_wall_channel(
+    include_diagnostics: bool,
+) -> None:
+    payload = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C0", hours=24,
+        additives_kg={}, allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        include_wall_deposit_rate_diagnostics=include_diagnostics,
+    ).run()
+
+    assert payload["status"] == "ok"
+    assert len(payload["per_hour_summary"]) == 24
+    pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
+    assert pareto["by_species"]["Mg"] == {
+        "status": "unavailable",
+        "reason": "above_source_certified_range",
+        "current_wall_deposit_flux_kg_hr": None,
+        "cumulative_wall_deposit_kg": None,
+    }
 
 
 def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None:

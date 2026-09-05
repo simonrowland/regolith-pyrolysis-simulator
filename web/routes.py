@@ -1422,7 +1422,9 @@ def _constraint_margin_readout(margin: Any) -> dict[str, Any]:
         or status_payload.get('reason')
         or ''
     )
-    if feasible:
+    if status == 'unavailable':
+        verdict = 'unavailable'
+    elif feasible:
         verdict = 'pass'
     elif status == 'not-attempted' or output_status == 'not_attempted':
         verdict = 'not-attempted'

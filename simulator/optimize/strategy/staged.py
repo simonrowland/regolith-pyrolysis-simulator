@@ -1982,7 +1982,10 @@ def _margin_view(margin: Any) -> tuple[Any, ...]:
         threshold.source,
         threshold.source_ref,
         float(threshold.tolerance),
-        _number_view(margin.observed),
+        (
+            None if margin.status == "unavailable" and margin.observed is None
+            else _number_view(margin.observed)
+        ),
         margin.detail,
     )
 

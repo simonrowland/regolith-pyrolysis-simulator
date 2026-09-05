@@ -1605,7 +1605,7 @@ def pressure_coating_pareto_diagnostic(
     ) * 100.0
 
     by_species: dict[str, Any] = {}
-    for species in target_species:
+    for species in dict.fromkeys((*target_species, *wall_refusals)):
         name = str(species)
         series = dict(series_by_species.get(name) or {})
         molar_mass = _molar_mass_kg_mol(sim, name, MOLAR_MASS)

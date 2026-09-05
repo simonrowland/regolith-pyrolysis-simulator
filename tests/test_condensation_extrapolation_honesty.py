@@ -174,7 +174,13 @@ def test_wall_deposit_query_reports_out_of_domain_antoine_refusal():
         antoine_extrapolation_warnings=warnings,
     )
 
-    assert candidate_kg == pytest.approx(0.0)
+    assert candidate_kg == {
+        "status": "unavailable",
+        "reason": "above_source_certified_range",
+        "terminal_refusal": False,
+        "species": "Mg",
+        "wall_temperature_K": pytest.approx(wall_temperature_K),
+    }
     assert any(
         "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
         in warning

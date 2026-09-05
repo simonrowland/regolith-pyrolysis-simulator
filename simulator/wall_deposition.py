@@ -351,12 +351,13 @@ def wall_deposit_candidate_for_surface_kg(
                     )
                     for key in ("A", "B", "C")
                 }
-                if not source_only_wall_channel and (
-                    coefficients["A"] <= 0.0 or T_wall_K + coefficients["C"] <= 0.0
+                # Reaction-term log fits may have A <= 0; their denominator must still be valid.
+                if (not source_only_wall_channel and coefficients["A"] <= 0.0) or (
+                    T_wall_K + coefficients["C"] <= 0.0
                 ):
                     raise DepositionInputRefusal(
                         coefficient_block, coefficients,
-                        "wall Antoine fit requires A > 0 and T_wall_K + C > 0",
+                        "Antoine fit requires T_wall_K + C > 0 and wall fits require A > 0",
                     )
             # Valid physics outside the wall model's domain marks and skips.
             # A melt standard-reaction term is not a pure-species wall P_sat;
