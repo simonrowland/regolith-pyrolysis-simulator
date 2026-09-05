@@ -196,12 +196,96 @@
   box-shadow: none;
 }
 
+.sec-p14-sankey .sec-p14-origin-flow {
+  margin: 0 12px 12px;
+}
+
+.sec-p14-sankey .sec-p14-origin-source {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-height: 112px;
+  padding: 14px;
+  border: 2px solid var(--ink);
+  background: color-mix(in srgb, var(--green) 7%, var(--panel));
+}
+
+.sec-p14-sankey .sec-p14-origin-source strong {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sec-p14-sankey .sec-p14-origin-source span {
+  font: 750 clamp(16px, 2.2vw, 24px)/1 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p14-sankey .sec-p14-origin-source small {
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.sec-p14-sankey .sec-p14-origin-bins {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sec-p14-sankey .sec-p14-origin-destination {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 5px 8px;
+  border-left: 3px solid var(--rule);
+}
+
+.sec-p14-sankey .sec-p14-origin-destination > a {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.sec-p14-sankey .sec-p14-origin-destination > a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sec-p14-sankey .sec-p14-origin-destination > span {
+  color: var(--ink-3);
+  font: 9px/1.35 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p14-sankey .sec-p14-origin-table,
+.sec-p14-sankey .sec-p14-origin-ledger {
+  margin: 0 12px 12px;
+}
+
+.sec-p14-sankey .sec-p14-origin-bin-detail {
+  margin: 0 0 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+  scroll-margin-top: 20px;
+}
+
+.sec-p14-sankey .sec-p14-origin-bin-detail > summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sec-p14-sankey .sec-p14-origin-note {
+  margin: 0 12px 12px;
+}
+
 @media (max-width: 760px) {
   .sec-p14-sankey .sec-p14-flow {
     grid-template-columns: 1fr;
   }
 
-  .sec-p14-sankey .sec-p14-source {
+  .sec-p14-sankey .sec-p14-source,
+  .sec-p14-sankey .sec-p14-origin-source {
     min-height: 0;
   }
 }

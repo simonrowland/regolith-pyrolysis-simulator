@@ -186,11 +186,39 @@ function makeHeader(artifact, rows, energy) {
   </header>`;
 }
 
+function yieldDispositionBanner(terminal) {
+  const absent = pending(
+    "W-A0 / W-A1",
+    "Atom-basis available mass, fraction, and denominator are not emitted. Exact evolved kg is shown; no yield percentage is invented."
+  );
+  if (!isRecord(terminal) || !Object.prototype.hasOwnProperty.call(terminal, "yield_disposition")) {
+    return absent;
+  }
+  const payload = terminal.yield_disposition;
+  if (payload === null) {
+    return pending(
+      "W-A0 / W-A1",
+      "yield_disposition is a typed producer refusal (OD-3 envelope-null). Feedstock-origin shares are unavailable; exact evolved kg is shown; no 0% shares are invented."
+    );
+  }
+  const chartReady = isRecord(payload)
+    && Array.isArray(payload.nodes)
+    && Array.isArray(payload.links)
+    && payload.links.length > 0;
+  if (!chartReady) {
+    return pending(
+      "W-A0 / W-A1",
+      "yield_disposition is present but is not a chart-ready origin-to-bin payload. Exact evolved kg is shown; no yield percentage is invented."
+    );
+  }
+  return `<div class="note">Feedstock-origin atom fractions render in section 14 as origin-to-bin provenance. Exact evolved kg is shown here; no yield percentage is invented in this section.</div>`;
+}
+
 function yieldsSection(rows, terminal) {
   const evolved = rows.at(-1).metal_yields_kg || {};
   const max = Math.max(maxPresent(Object.values(evolved)) ?? 0, 1);
   const chips = ELLINGHAM_ORDER.map((element) => `<div class="yield-chip"><div class="el">${element}</div><div class="kg">${exactKg(evolved[element])} evolved</div><div class="bar"><i style="width:${Math.sqrt((n(evolved[element]) ?? 0) / max) * 100}%"></i></div></div>`).join("");
-  const gap = terminal.yield_disposition ? "" : pending("W-A0 / W-A1", "Atom-basis available mass, fraction, and denominator are not emitted. Exact evolved kg is shown; no yield percentage is invented.");
+  const gap = yieldDispositionBanner(terminal);
   return section(1, "Extraction yields — Ellingham order", "Exact evolved mass from the final hourly metal_yields_kg row.", `<div class="yield-track">${chips}</div>${gap}`);
 }
 

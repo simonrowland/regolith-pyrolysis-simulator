@@ -158,25 +158,218 @@
     }).join("");
   }
 
+  function destinationLabel(destination) {
+    const value = String(destination).replace(/_/g, " ").trim();
+    return value ? value.replace(/\b\w/g, (character) => character.toUpperCase()) : "Unclassified destination";
+  }
+
+  function stableOriginBinId(destination) {
+    const slug = String(destination).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bin";
+    return `sec-p14-origin-bin-${slug}`;
+  }
+
+  function originUnattributedFlags(payload) {
+    if (!own(payload, "origin_unattributed")) return "";
+    const block = payload.origin_unattributed;
+    if (block === null) {
+      return `<span class="sec-p14-flag"><b>origin unattributed</b> unavailable</span>`;
+    }
+    if (!isObjectMap(block)) {
+      return `<span class="sec-p14-flag"><b>origin unattributed</b> ${esc(authorityValueText(block))}</span>`;
+    }
+    const chips = [`<span class="sec-p14-flag"><b>origin unattributed</b> emitted</span>`];
+    if (own(block, "basis")) {
+      chips.push(`<span class="sec-p14-flag"><b>origin unattributed basis</b> ${esc(authorityValueText(block.basis))}</span>`);
+    }
+    if (own(block, "limit_mol_atoms") && isFiniteNumber(block.limit_mol_atoms)) {
+      chips.push(`<span class="sec-p14-flag"><b>origin unattributed limit</b> ${esc(fmtNum(block.limit_mol_atoms, "mol-atoms"))}</span>`);
+    }
+    const terminalElements = isObjectMap(block.terminal_mol_atoms_by_element)
+      ? Object.keys(block.terminal_mol_atoms_by_element).filter((name) => name)
+      : [];
+    if (terminalElements.length) {
+      chips.push(`<span class="sec-p14-flag"><b>origin unattributed terminal elements</b> ${esc(terminalElements.join(", "))}</span>`);
+    }
+    return chips.join("");
+  }
+
+  function copiedOriginLinks(payload) {
+    if (!Array.isArray(payload.links)) return null;
+    const links = [];
+    for (const raw of payload.links) {
+      if (!isObjectMap(raw)) continue;
+      const element = typeof raw.element === "string" ? raw.element : "";
+      const destination = typeof raw.destination === "string" ? raw.destination : "";
+      if (!element || !destination) continue;
+      if (!isFiniteNumber(raw.mol_atoms) || !isFiniteNumber(raw.fraction_of_feedstock_element)) continue;
+      links.push({
+        element,
+        destination,
+        mol_atoms: raw.mol_atoms,
+        fraction_of_feedstock_element: raw.fraction_of_feedstock_element,
+        attribution_method: typeof raw.attribution_method === "string" ? raw.attribution_method : "",
+        source_accounts: Array.isArray(raw.source_accounts)
+          ? raw.source_accounts.filter((account) => typeof account === "string")
+          : []
+      });
+    }
+    return links;
+  }
+
+  function originBinOrder(payload, links) {
+    const ordered = [];
+    const seen = new Set();
+    const push = (name) => {
+      if (typeof name !== "string" || !name || seen.has(name)) return;
+      seen.add(name);
+      ordered.push(name);
+    };
+    if (Array.isArray(payload.destination_bins)) {
+      payload.destination_bins.forEach(push);
+    }
+    links.forEach((link) => push(link.destination));
+    return ordered.filter((name) => links.some((link) => link.destination === name));
+  }
+
+  function originPending(message) {
+    return `<div class="pending sec-p14-provenance-pending"><strong>Pending origin-resolved shares</strong>`
+      + `<p>${esc(message)}</p></div>`;
+  }
+
+  function originLinkTable(links) {
+    const rows = links.map((link) => {
+      const accounts = link.source_accounts.length
+        ? esc(link.source_accounts.join("; "))
+        : "not emitted";
+      const method = link.attribution_method ? esc(link.attribution_method) : "not emitted";
+      return `<tr data-p14-origin-link="${esc(link.element)}:${esc(link.destination)}"`
+        + ` data-p14-emitted-mol-atoms="${esc(String(link.mol_atoms))}"`
+        + ` data-p14-emitted-fraction="${esc(String(link.fraction_of_feedstock_element))}">`
+        + `<td>${esc(prettySpecies(link.element))}</td>`
+        + `<td>${esc(destinationLabel(link.destination))}<br><code>${esc(link.destination)}</code></td>`
+        + `<td class="num">${esc(fmtNum(link.mol_atoms, "mol-atoms"))}</td>`
+        + `<td class="num">${esc(fmtNum(link.fraction_of_feedstock_element))}</td>`
+        + `<td>${method}</td>`
+        + `<td>${accounts}</td></tr>`;
+    }).join("");
+    return `<div class="sec-p14-table-wrap sec-p14-origin-table"><table>`
+      + `<thead><tr><th>Element</th><th>Destination bin</th><th class="num">Emitted mol-atoms</th>`
+      + `<th class="num">Emitted fraction of feedstock element</th><th>Attribution</th>`
+      + `<th>Contributing accounts (not a share split)</th></tr></thead>`
+      + `<tbody>${rows}</tbody></table></div>`;
+  }
+
+  function originBinRow(destination, links, largestVisible) {
+    const detailId = stableOriginBinId(destination);
+    const entries = links.map((link) => ({ name: link.element, value: link.mol_atoms }));
+    const visibleTotal = entries.reduce((sum, entry) => sum + entry.value, 0);
+    const methods = [...new Set(links.map((link) => link.attribution_method).filter(Boolean))];
+    const fractionText = links.map((link) => (
+      `${prettySpecies(link.element)} ${fmtNum(link.fraction_of_feedstock_element)} of feedstock element`
+    )).join("; ");
+    const hover = `${destinationLabel(destination)} — emitted mol-atoms: ${
+      links.map((link) => `${prettySpecies(link.element)} ${fmtNum(link.mol_atoms, "mol-atoms")}`).join("; ")
+    }; emitted fractions: ${fractionText}`;
+    let ribbon = "";
+    if (visibleTotal > 0 && largestVisible > 0) {
+      const width = visibleTotal / largestVisible * 100;
+      const background = ribbonBackground(entries, visibleTotal);
+      ribbon = `<a class="sec-p14-ribbon" href="#${esc(detailId)}" data-p14-origin-bin="${esc(destination)}"`
+        + ` style="--sec-p14-width:${width.toFixed(5)}%;--sec-p14-ribbon:linear-gradient(90deg,${esc(background)})"`
+        + ` title="${esc(hover)}" aria-label="${esc(`${destinationLabel(destination)}, ${links.length} origin links, atom basis`)}"></a>`;
+    }
+    const methodFlags = methods.map((method) => (
+      `<span class="sec-p14-flag"><b>attribution method</b> ${esc(method)}</span>`
+    )).join("");
+    return `<div class="sec-p14-row sec-p14-origin-row"><div class="sec-p14-track">${ribbon}</div>`
+      + `<div class="sec-p14-origin-destination"><a href="#${esc(detailId)}" data-p14-origin-bin="${esc(destination)}">${esc(destinationLabel(destination))}</a>`
+      + `<span>${esc(String(links.length))} origin link${links.length === 1 ? "" : "s"} · atom basis</span>`
+      + `${methodFlags}</div></div>`;
+  }
+
+  function originBinDetail(destination, links) {
+    const detailId = stableOriginBinId(destination);
+    const rows = links.map((link) => `<tr>`
+      + `<td>${esc(prettySpecies(link.element))}</td>`
+      + `<td class="num" data-p14-emitted-mol-atoms="${esc(String(link.mol_atoms))}">${esc(fmtNum(link.mol_atoms, "mol-atoms"))}</td>`
+      + `<td class="num" data-p14-emitted-fraction="${esc(String(link.fraction_of_feedstock_element))}">${esc(fmtNum(link.fraction_of_feedstock_element))}</td>`
+      + `<td>${link.attribution_method ? esc(link.attribution_method) : "not emitted"}</td>`
+      + `</tr>`).join("");
+    return `<details class="sec-p14-origin-bin-detail" id="${esc(detailId)}">`
+      + `<summary>${esc(destinationLabel(destination))} · emitted origin links</summary>`
+      + `<p class="sec-p14-account-key"><code>${esc(destination)}</code> · copied producer mol-atoms and fraction_of_feedstock_element · not re-based onto terminal accounts</p>`
+      + `<div class="sec-p14-table-wrap"><table><thead><tr><th>Element</th><th class="num">Emitted mol-atoms</th>`
+      + `<th class="num">Emitted fraction of feedstock element</th><th>Attribution</th></tr></thead>`
+      + `<tbody>${rows}</tbody></table></div></details>`;
+  }
+
+  function originToBinChart(payload) {
+    const links = copiedOriginLinks(payload);
+    if (links === null) {
+      return originPending(
+        "This payload does not expose producer-defined chart-ready origin-to-bin links. "
+        + "No feedstock percentages are inferred from target fractions, terminal mol inventories, or source_accounts."
+      );
+    }
+    if (!links.length) {
+      return originPending(
+        "yield_disposition.links is present but has no chart-ready origin-to-bin rows. "
+        + "No 0% feedstock shares are invented."
+      );
+    }
+    const bins = originBinOrder(payload, links);
+    const grouped = bins.map((destination) => ({
+      destination,
+      links: links.filter((link) => link.destination === destination)
+    }));
+    const visibleTotals = grouped.map((bin) => bin.links.reduce((sum, link) => sum + link.mol_atoms, 0))
+      .filter((value) => value > 0);
+    const largestVisible = visibleTotals.length ? Math.max(...visibleTotals) : 1;
+    const rows = grouped.map((bin) => originBinRow(bin.destination, bin.links, largestVisible)).join("");
+    const details = grouped.map((bin) => originBinDetail(bin.destination, bin.links)).join("");
+    const nodeCount = Array.isArray(payload.nodes) ? payload.nodes.length : 0;
+    const nodeNote = nodeCount
+      ? `${nodeCount} emitted nodes`
+      : "nodes array not emitted";
+    return `<div class="sec-p14-badges"><span class="sec-p14-badge">atom basis</span>`
+      + `<span class="sec-p14-badge">origin-to-bin</span>`
+      + `<span class="sec-p14-badge">copied producer fractions</span></div>`
+      + `<div class="sec-p14-flow sec-p14-origin-flow"><div class="sec-p14-origin-source">`
+      + `<strong>feedstock origin (atom basis)</strong>`
+      + `<span>${esc(String(links.length))} origin links</span>`
+      + `<small>${esc(nodeNote)}. Ribbons copy emitted mol_atoms and fraction_of_feedstock_element; they are not re-based onto final_state or source_accounts. Destinations are producer bins, not terminal accounts.</small></div>`
+      + `<div class="sec-p14-origin-bins">${rows}</div></div>`
+      + `<div class="note sec-p14-note sec-p14-origin-note">Origin-to-bin provenance is an atom-basis snapshot of feedstock-element → destination-bin links. It is not process movement, kg, charge, or molecule-mol conservation. Contributing source_accounts are listed as metadata, not as a per-account share split.</div>`
+      + originLinkTable(links)
+      + `<div class="sec-p14-origin-ledger">${details}</div>`;
+  }
+
   function provenanceTier(terminal) {
     if (!own(terminal, "yield_disposition")) {
       return `<div class="pending sec-p14-provenance"><strong>Pending provenance</strong>`
         + `<p>feedstock-provenance tier pending (origin data not emitted for this run).</p></div>`;
     }
     const payload = terminal.yield_disposition;
+    if (payload === null) {
+      return `<div class="pending sec-p14-provenance"><strong>Pending provenance</strong>`
+        + `<p>yield_disposition is a typed producer refusal (OD-3 envelope-null). `
+        + `Feedstock-origin shares are unavailable; no 0% shares are shown.</p></div>`;
+    }
     if (!isObjectMap(payload)) {
       return `<div class="pending sec-p14-provenance"><strong>Malformed provenance payload</strong>`
-        + `<p>yield_disposition was emitted, but it is not an origin-resolved account map. No feedstock shares are shown.</p></div>`;
+        + `<p>yield_disposition was emitted, but it is not an origin-resolved map. No feedstock shares are shown.</p></div>`;
     }
     const basis = own(payload, "basis")
       ? `<span class="sec-p14-flag"><b>basis</b> ${esc(authorityValueText(payload.basis))}</span>`
       : "";
-    const flags = authorityChips(payload);
-    return `<details class="sec-p14-provenance"><summary>yield_disposition emitted · provenance schema check</summary>`
+    const flags = `${authorityChips(payload)}${originUnattributedFlags(payload)}`;
+    const chartReady = Array.isArray(payload.nodes) && Array.isArray(payload.links);
+    const summary = chartReady
+      ? "yield_disposition emitted · origin-to-bin provenance (atom basis)"
+      : "yield_disposition emitted · provenance schema check";
+    return `<details class="sec-p14-provenance"><summary>${summary}</summary>`
       + `<div class="sec-p14-flags">${basis}${flags}</div>`
-      + `<div class="pending sec-p14-provenance-pending"><strong>Pending origin-resolved shares</strong>`
-      + `<p>This payload does not expose a producer-defined chart-ready origin-to-account link schema. `
-      + `No feedstock percentages are inferred from target fractions or terminal mol inventories.</p></div></details>`;
+      + `${originToBinChart(payload)}</details>`;
   }
 
   function availabilityNote(finalState) {
@@ -362,12 +555,21 @@
     if (typeof document === "undefined" || !document.addEventListener || root.__ReportPanelP14Links) return;
     root.__ReportPanelP14Links = true;
     document.addEventListener("click", (event) => {
-      const trigger = event.target?.closest?.("[data-p14-account], [data-p14-trace]");
+      const trigger = event.target?.closest?.("[data-p14-account], [data-p14-trace], [data-p14-origin-bin]");
       if (!trigger) return;
       const account = trigger.getAttribute("data-p14-account");
+      const originBin = trigger.getAttribute("data-p14-origin-bin");
       const href = trigger.getAttribute("href") || "";
       const targetId = href.startsWith("#") ? href.slice(1) : "";
       const localDetail = targetId ? document.getElementById(targetId) : null;
+      if (originBin) {
+        if (!localDetail) return;
+        const provenanceDisclosure = localDetail.closest?.("details.sec-p14-provenance");
+        if (provenanceDisclosure) provenanceDisclosure.open = true;
+        localDetail.open = true;
+        localDetail.scrollIntoView?.({ block: "center" });
+        return;
+      }
       const sharedRows = [...document.querySelectorAll(".disposition-group tbody tr")];
       const sharedRow = sharedRows.find((row) => [...row.querySelectorAll("span[title]")]
         .some((span) => span.getAttribute("title") === account));

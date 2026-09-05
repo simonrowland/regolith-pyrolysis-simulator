@@ -641,41 +641,127 @@ def test_p14_structured_authority_values_preserve_emitted_content() -> None:
     assert "structured value" not in provenance
 
 
-def test_p14_provenance_partial_path_does_not_derive_shares() -> None:
-    html = _render_panel(
-        _artifact(
-            {
-                "final_state": {"terminal.offgas": {"Na": 5.0}},
-                "yield_disposition": {
-                    "basis": "target_atom_equivalent",
-                    "targets": {
-                        "Fe": {
-                            "denominator_target_equiv_mol": 2.0,
-                            "yield_fraction": 0.3141592653,
-                        }
-                    },
-                },
-            }
-        )
-    )["html"]
-    provenance = _provenance_region(html)
+ORIGIN_FRACTION = 0.3141592653
+ORIGIN_MOL_ATOMS = 2.718281828
+# Deliberately not equal to ORIGIN_MOL_ATOMS / node total (10), / sibling (4),
+# / final_state Fe (100), or half the fraction across two source_accounts.
+YIELD_FRACTION_DECOY = 0.1111111111
+ACCOUNT_SPLIT_DECOY = ORIGIN_FRACTION / 2
+NODE_RATIO_DECOY = ORIGIN_MOL_ATOMS / 10.0
+FINAL_STATE_RATIO_DECOY = ORIGIN_MOL_ATOMS / 100.0
 
-    assert "Pending origin-resolved shares" in provenance
-    assert "No feedstock percentages are inferred" in provenance
-    assert "0.3141592653" not in provenance
-    assert "31.4159" not in provenance
-    assert "0.3142" not in provenance
-    assert "31.42" not in provenance
-    assert provenance == (
-        '<details class="sec-p14-provenance"><summary>yield_disposition emitted · '
-        'provenance schema check</summary><div class="sec-p14-flags"><span '
-        'class="sec-p14-flag"><b>basis</b> target_atom_equivalent</span></div>'
-        '<div class="pending sec-p14-provenance-pending"><strong>Pending '
-        'origin-resolved shares</strong><p>This payload does not expose a '
-        'producer-defined chart-ready origin-to-account link schema. No feedstock '
-        'percentages are inferred from target fractions or terminal mol inventories.'
-        '</p></div></details>'
-    )
+REV5_BINS = (
+    "product_condensed",
+    "product_tapped",
+    "product_oxygen",
+    "cleanup_volatile_product",
+    "melt_retained",
+    "metal_phase_retained",
+    "wall_deposit",
+    "charge_unprocessed",
+    "redox_buffer_retained",
+    "cleanup_sequestered",
+    "offgas_vented",
+    "overhead_terminal_inventory",
+)
+
+
+def _origin_payload() -> dict:
+    return {
+        "schema_version": "5.0",
+        "basis": "feedstock_element_atom_fraction",
+        "destination_bins": list(REV5_BINS),
+        "nodes": [
+            {
+                "id": "feedstock_element:Fe",
+                "kind": "feedstock_element",
+                "element": "Fe",
+                "mol_atoms": 10.0,
+            },
+            {
+                "id": "feedstock_element:Na",
+                "kind": "feedstock_element",
+                "element": "Na",
+                "mol_atoms": 4.0,
+            },
+            *[
+                {
+                    "id": f"destination:{name}",
+                    "kind": "destination",
+                    "destination": name,
+                }
+                for name in REV5_BINS
+            ],
+        ],
+        "links": [
+            {
+                "source": "feedstock_element:Fe",
+                "target": "destination:product_tapped",
+                "element": "Fe",
+                "destination": "product_tapped",
+                "mol_atoms": ORIGIN_MOL_ATOMS,
+                "fraction_of_feedstock_element": ORIGIN_FRACTION,
+                "source_accounts": ["terminal.offgas", "process.cleaned_melt"],
+                "attribution_method": "tracked",
+            },
+            {
+                "source": "feedstock_element:Na",
+                "target": "destination:offgas_vented",
+                "element": "Na",
+                "destination": "offgas_vented",
+                "mol_atoms": 4.0,
+                "fraction_of_feedstock_element": 0.6858407347,
+                "source_accounts": ["terminal.offgas"],
+                "attribution_method": "pool_ratio",
+            },
+        ],
+        "origin_unattributed": {
+            "basis": "element_mol_atoms",
+            "limit_mol_atoms": 1.25e-5,
+            "terminal_mol_atoms_by_element": {"Na": 1e-19},
+        },
+        "targets": {
+            "Fe": {
+                "denominator_target_equiv_mol": 2.0,
+                "yield_fraction": YIELD_FRACTION_DECOY,
+            }
+        },
+    }
+
+
+def _origin_terminal() -> dict:
+    return {
+        "final_state": {
+            "terminal.offgas": {"Fe": 100.0, "Na": 5.0},
+            "process.cleaned_melt": {"SiO2": 20.0},
+        },
+        "yield_disposition": _origin_payload(),
+    }
+
+
+def test_p14_provenance_partial_path_does_not_derive_shares() -> None:
+    html = _render_panel(_artifact(_origin_terminal()))["html"]
+    provenance = _html_region(html, '<details class="sec-p14-provenance">', "</details>")
+    fractions = re.findall(r'data-p14-emitted-fraction="([^"]+)"', html)
+    mols = re.findall(r'data-p14-emitted-mol-atoms="([^"]+)"', html)
+
+    assert "origin-to-bin provenance (atom basis)" in provenance
+    assert "Pending origin-resolved shares" not in provenance
+    assert "Malformed provenance payload" not in provenance
+    assert str(ORIGIN_FRACTION) in fractions
+    assert str(ORIGIN_MOL_ATOMS) in mols
+    assert str(YIELD_FRACTION_DECOY) not in html
+    assert str(ACCOUNT_SPLIT_DECOY) not in html
+    assert str(NODE_RATIO_DECOY) not in html
+    assert str(FINAL_STATE_RATIO_DECOY) not in html
+    assert "terminal.offgas" in html
+    assert "process.cleaned_melt" in html
+    assert "not a share split" in html
+    assert "not re-based onto terminal accounts" in html
+    assert 'data-p14-origin-bin="product_tapped"' in html
+    assert 'data-p14-account="product_tapped"' not in html
+    assert "terminal inventory total (Σ accounts, mol — display total, not charge)" in html
+    assert NUMERIC_KG.search(html) is None
 
 
 def test_p14_artifact_text_is_escaped_exactly_once() -> None:
@@ -937,3 +1023,325 @@ def test_p14_deep_link_ids_unique_for_slug_colliding_accounts() -> None:
     # Hash suffixes must differ even though slugs normalize identically.
     suffixes = {detail_id.rsplit("-", 1)[-1] for detail_id in detail_ids}
     assert len(suffixes) == 2
+
+
+def _render_report_html(artifact: dict) -> str:
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const artifact = JSON.parse(process.argv[4]);
+const nodes = new Map();
+function el(id) {
+  if (!nodes.has(id)) {
+    nodes.set(id, {
+      id, textContent: "", value: "", events: {}, markup: "",
+      set innerHTML(value) {
+        this.markup = value;
+        for (const match of value.matchAll(/\bid="([^"]+)"/g)) el(match[1]);
+      },
+      get innerHTML() { return this.markup; },
+      addEventListener(type, callback) { this.events[type] = callback; }
+    });
+  }
+  return nodes.get(id);
+}
+const report = el("report");
+const context = {
+  window: { location: { search: "" } },
+  document: {
+    title: "",
+    querySelector(selector) {
+      if (selector === "#report") return report;
+      if (selector.startsWith("#")) return nodes.get(selector.slice(1)) || null;
+      if (selector === ".status-pill" && nodes.has("stepper")) return el("status-pill");
+      if (selector === ".stepper" && nodes.has("stepper")) return el("stepper-root");
+      return null;
+    },
+    getElementById(id) { return nodes.get(id) || null; },
+    querySelectorAll() { return []; },
+    addEventListener() {}
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  setTimeout,
+  console,
+  fetch: async () => ({ ok: true, json: async () => artifact })
+};
+context.globalThis = context;
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(report.innerHTML));
+"""
+    completed = subprocess.run(
+        [
+            "node",
+            "-",
+            str(VIEWER / "labels.js"),
+            str(VIEWER / "report-viewer.js"),
+            json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return completed.stdout
+
+
+def _report_artifact(terminal: dict) -> dict:
+    return {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {
+            "run_id": "t-366",
+            "name": "origin banner",
+            "feedstock_id": "lunar_mare_low_ti",
+            "charge_mass_kg": 1.0,
+        },
+        "timesteps": [
+            {
+                "hour": 0,
+                "summary": {
+                    "campaign": "C0",
+                    "metal_yields_kg": {"Fe": 1.25},
+                    "T_C": 1200,
+                },
+            }
+        ],
+        "terminal": terminal,
+    }
+
+
+def _section01(html: str) -> str:
+    start = html.index("<section>")
+    return html[start : html.index("</section>", start) + len("</section>")]
+
+
+def test_p14_origin_tier_copies_emitted_mol_and_fraction() -> None:
+    html = _render_panel(_artifact(_origin_terminal()))["html"]
+    fe_link = _html_region_containing(
+        html,
+        'data-p14-origin-link="Fe:product_tapped"',
+        "<tr ",
+        "</tr>",
+    )
+
+    assert 'data-p14-emitted-fraction="' + str(ORIGIN_FRACTION) + '"' in fe_link
+    assert 'data-p14-emitted-mol-atoms="' + str(ORIGIN_MOL_ATOMS) + '"' in fe_link
+    assert "copied producer fractions" in html
+    assert "feedstock origin (atom basis)" in html
+    assert str(YIELD_FRACTION_DECOY) not in html
+    assert str(NODE_RATIO_DECOY) not in html
+    assert str(FINAL_STATE_RATIO_DECOY) not in html
+    assert str(ACCOUNT_SPLIT_DECOY) not in html
+    assert NUMERIC_KG.search(html) is None
+
+
+def test_p14_origin_tier_does_not_map_bins_onto_accounts() -> None:
+    html = _render_panel(_artifact(_origin_terminal()))["html"]
+    origin_bins = set(re.findall(r'data-p14-origin-bin="([^"]+)"', html))
+
+    assert origin_bins == {"product_tapped", "offgas_vented"}
+    assert "glass" not in origin_bins
+    assert "rump" not in origin_bins
+    assert "ceramic" not in origin_bins
+    for empty in set(REV5_BINS) - origin_bins:
+        assert f'data-p14-origin-bin="{empty}"' not in html
+        assert f"{empty}</code> · 0" not in html
+    assert "0% shares" not in html
+    assert 'data-p14-account="product_tapped"' not in html
+    assert "contributing accounts (not a share split)" in html.lower()
+
+
+def test_p14_origin_flags_attribution_and_unattributed() -> None:
+    html = _render_panel(_artifact(_origin_terminal()))["html"]
+
+    assert "attribution method</b> tracked" in html
+    assert "attribution method</b> pool_ratio" in html
+    assert "origin unattributed</b> emitted" in html
+    assert "origin unattributed basis</b> element_mol_atoms" in html
+    assert "origin unattributed terminal elements</b> Na" in html
+    assert "low confidence" not in html.lower()
+
+
+def test_p14_yield_disposition_absent_null_present_agree() -> None:
+    absent = _render_panel(_artifact({"final_state": {"terminal.offgas": {"Na": 5.0}}}))["html"]
+    null = _render_panel(
+        _artifact({"final_state": {"terminal.offgas": {"Na": 5.0}}, "yield_disposition": None})
+    )["html"]
+    present = _render_panel(_artifact(_origin_terminal()))["html"]
+    malformed = _render_panel(
+        _artifact({"final_state": {"terminal.offgas": {"Na": 5.0}}, "yield_disposition": []})
+    )["html"]
+
+    assert "feedstock-provenance tier pending (origin data not emitted for this run)." in absent
+    assert "Malformed provenance payload" not in absent
+    assert "OD-3" not in absent
+    assert "sec-p14-origin-flow" not in absent
+
+    assert "typed producer refusal (OD-3 envelope-null)" in null
+    assert "no 0% shares are shown" in null
+    assert "Malformed provenance payload" not in null
+    assert "origin data not emitted for this run" not in null
+    assert "sec-p14-origin-flow" not in null
+    assert re.search(r"\b0%\b", null) is None
+
+    assert "origin-to-bin provenance (atom basis)" in present
+    assert "sec-p14-origin-flow" in present
+    assert "Pending origin-resolved shares" not in present
+    assert "Malformed provenance payload" not in present
+    assert str(ORIGIN_FRACTION) in present
+
+    assert "Malformed provenance payload" in malformed
+    assert "typed producer refusal" not in malformed
+    assert "sec-p14-origin-flow" not in malformed
+
+
+def test_p14_origin_tier_renders_without_final_state() -> None:
+    html = _render_panel(_artifact({"yield_disposition": _origin_payload()}))["html"]
+
+    assert "Pending terminal inventory" in html
+    assert "origin-to-bin provenance (atom basis)" in html
+    assert str(ORIGIN_FRACTION) in html
+    assert "sec-p14-origin-flow" in html
+
+
+def test_p14_dead_yield_fraction_schema_does_not_lock_non_consume() -> None:
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": {"terminal.offgas": {"Na": 5.0}},
+                "yield_disposition": {
+                    "basis": "target_atom_equivalent",
+                    "targets": {
+                        "Fe": {
+                            "denominator_target_equiv_mol": 2.0,
+                            "yield_fraction": ORIGIN_FRACTION,
+                        }
+                    },
+                },
+            }
+        )
+    )["html"]
+    provenance = _provenance_region(html)
+
+    assert "Pending origin-resolved shares" in provenance
+    assert "origin-to-bin links" in provenance
+    assert "source_accounts" in provenance
+    assert str(ORIGIN_FRACTION) not in provenance
+    assert "31.4159" not in provenance
+    assert "0.3142" not in provenance
+    assert "sec-p14-origin-flow" not in html
+
+
+def test_p14_lunar_fixture_origin_tier_copies_all_emitted_links() -> None:
+    runner = json.loads(
+        (ROOT / "tests/fixtures/runner/lunar_mare_low_ti_C0_24h.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    payload = runner["yield_disposition"]
+    html = _render_panel(
+        _artifact(
+            {
+                "final_state": runner["final_state"],
+                "yield_disposition": payload,
+            }
+        )
+    )["html"]
+    table_fractions = re.findall(
+        r'data-p14-origin-link="[^"]+" data-p14-emitted-mol-atoms="[^"]+" '
+        r'data-p14-emitted-fraction="([^"]+)"',
+        html,
+    )
+    table_mols = re.findall(
+        r'data-p14-origin-link="[^"]+" data-p14-emitted-mol-atoms="([^"]+)" '
+        r'data-p14-emitted-fraction="[^"]+"',
+        html,
+    )
+    emitted_fractions = [link["fraction_of_feedstock_element"] for link in payload["links"]]
+    emitted_mols = [link["mol_atoms"] for link in payload["links"]]
+
+    assert len(payload["nodes"]) == 79
+    assert len(payload["links"]) == 89
+    assert "Pending origin-resolved shares" not in html
+    assert "Malformed provenance payload" not in html
+    assert [float(value) for value in table_fractions] == emitted_fractions
+    assert [float(value) for value in table_mols] == emitted_mols
+    assert html.count("data-p14-origin-link=") == 89
+    assert NUMERIC_KG.search(
+        _html_region(html, '<div class="sec-p14-flow sec-p14-origin-flow">', "</small></div>")
+    ) is None
+
+
+def test_p14_sample_artifact_stays_pending_without_inventing_shares() -> None:
+    sample = json.loads((VIEWER / "sample-run-artifact.json").read_text(encoding="utf-8"))
+    terminal = sample["terminal"]
+    html = _render_panel(
+        _artifact({"final_state": terminal.get("final_state", {})})
+    )["html"]
+
+    assert "yield_disposition" not in terminal
+    assert "feedstock-provenance tier pending (origin data not emitted for this run)." in html
+    assert "sec-p14-origin-flow" not in html
+    assert "Malformed provenance payload" not in html
+    assert "0% shares" not in html
+    assert re.search(r"\b0%\b", html) is None
+    assert NUMERIC_KG.search(html) is None
+
+
+def test_section01_yield_disposition_absent_null_present() -> None:
+    absent = _section01(_render_report_html(_report_artifact({"final_state": {}})))
+    null = _section01(
+        _render_report_html(_report_artifact({"final_state": {}, "yield_disposition": None}))
+    )
+    present = _section01(_render_report_html(_report_artifact(_origin_terminal())))
+    partial = _section01(
+        _render_report_html(
+            _report_artifact({"final_state": {}, "yield_disposition": {"basis": "x"}})
+        )
+    )
+
+    def banner(html: str) -> str:
+        if '<div class="pending">' in html:
+            return _html_region(html, '<div class="pending">', "</div>")
+        return _html_region(html, '<div class="note">', "</div>")
+
+    absent_banner = banner(absent)
+    null_banner = banner(null)
+    present_banner = banner(present)
+    partial_banner = banner(partial)
+
+    assert "Pending W-A0 / W-A1" in absent_banner
+    assert "Atom-basis available mass, fraction, and denominator are not emitted" in absent_banner
+    assert "OD-3" not in absent_banner
+    assert "no yield percentage is invented" in absent_banner
+
+    assert "Pending W-A0 / W-A1" in null_banner
+    assert "typed producer refusal (OD-3 envelope-null)" in null_banner
+    assert "no 0% shares are invented" in null_banner
+    assert "Atom-basis available mass, fraction, and denominator are not emitted" not in null_banner
+    assert "Malformed" not in null_banner
+
+    assert "Pending W-A0 / W-A1" not in present
+    assert "section 14" in present_banner
+    assert "origin-to-bin provenance" in present_banner
+    assert "no yield percentage is invented in this section" in present_banner
+    assert str(ORIGIN_FRACTION) not in present
+
+    assert "Pending W-A0 / W-A1" in partial_banner
+    assert "not a chart-ready origin-to-bin payload" in partial_banner
+    assert str(ORIGIN_FRACTION) not in partial
+
+
+def test_p14_panel_parses_under_node_check() -> None:
+    completed = subprocess.run(
+        ["node", "--check", str(VIEWER / "panels" / "p14-sankey.js")],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
