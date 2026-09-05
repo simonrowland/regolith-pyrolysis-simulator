@@ -265,20 +265,47 @@ def test_happy_path_journey(page, evidence, artifacts_dir):
     try:
         page.goto(f"{BASE_URL}/optimizer", wait_until="domcontentloaded", timeout=OPTIMIZER_BOUND_MS)
         expect(page.locator("h2", has_text="Optimizer Results")).to_be_visible(timeout=10_000)
+        # An EMPTY board is not a journey failure. The leaderboard reads
+        # Path.cwd()/'runs' on the SERVER (web/routes.py:279), so it reflects the
+        # ambient optimizer corpus of whatever tree the server was started in --
+        # measured 2026-09-04 as 326 cache.sqlite in the project root versus 0 in a
+        # fresh worktree. Nothing this journey does can populate it either: winners
+        # come from optimizer STUDIES, not from the single simulation run in steps
+        # 3-5. Recording empty as a failed step made step 6 assert the operator's
+        # disk, and would fire on every clean checkout and every CI tree.
+        # What still fails: an incoherent board. partials/optimizer_table.html
+        # renders EITHER the table (`{% if entries %}`) OR the winners hint
+        # (`{% else %}`), so both-or-neither is a real defect, as is table chrome
+        # with an empty tbody.
+        table = page.locator("#optimizer-table table.composition-table")
         rows = page.locator("#optimizer-table table.composition-table tbody tr")
-        row_count = rows.count()
-        if row_count >= 1:
-            first_cells = rows.first.locator("td").all_inner_texts()
-            record("6-optimizer", True, f"leaderboard rendered with {row_count} rows; winner row: {first_cells[:3]}")
-        elif page.locator("#optimizer-table .empty-hint").count() > 0:
+        # Text-scoped: a bare .empty-hint also matches the excluded-rows footnote,
+        # which coexists with a populated board (rows=11, unscoped hint=1 measured).
+        winners_hint = page.locator(
+            "#optimizer-table .empty-hint", has_text="No stored optimizer winners"
+        )
+        table_n, row_count, hint_n = table.count(), rows.count(), winners_hint.count()
+        if (table_n >= 1) == (hint_n >= 1):
             record(
                 "6-optimizer",
                 False,
-                "leaderboard rendered EMPTY: "
-                + page.locator("#optimizer-table .empty-hint").inner_text().strip()[:200],
+                f"incoherent board (table={table_n}, winners_hint={hint_n}): the "
+                "template renders either the table or its empty-hint, never both "
+                "and never neither",
             )
+        elif table_n >= 1 and row_count < 1:
+            record("6-optimizer", False, "winners table rendered its chrome with an EMPTY tbody")
+        elif row_count >= 1:
+            first_cells = rows.first.locator("td").all_inner_texts()
+            record("6-optimizer", True, f"leaderboard rendered with {row_count} rows; winner row: {first_cells[:3]}")
         else:
-            record("6-optimizer", False, "no leaderboard rows and no empty-hint — unrecognised shell")
+            record(
+                "6-optimizer",
+                True,
+                "leaderboard empty and correctly declared so (no optimizer corpus "
+                "in this server's runs/ dir; population is not something this "
+                "journey can produce)",
+            )
     except PlaywrightTimeoutError:
         record(
             "6-optimizer",
