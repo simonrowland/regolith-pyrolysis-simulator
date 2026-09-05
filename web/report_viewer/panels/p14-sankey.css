@@ -1,0 +1,235 @@
+.sec-p14-sankey {
+  --sec-p14-track-height: 18px;
+}
+
+.sec-p14-sankey .sec-p14-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.sec-p14-sankey .sec-p14-badge,
+.sec-p14-sankey .sec-p14-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink-2);
+  font: 10px/1.2 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p14-sankey .sec-p14-scale {
+  border-color: color-mix(in srgb, var(--orange) 50%, var(--rule));
+  color: var(--accent-ink);
+}
+
+.sec-p14-sankey .sec-p14-flow {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.sec-p14-sankey .sec-p14-source {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-height: 112px;
+  padding: 14px;
+  border: 2px solid var(--ink);
+  background: color-mix(in srgb, var(--blue) 7%, var(--panel));
+}
+
+.sec-p14-sankey .sec-p14-source strong {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sec-p14-sankey .sec-p14-source span {
+  font: 750 clamp(18px, 2.5vw, 27px)/1 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p14-sankey .sec-p14-source small {
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.sec-p14-sankey .sec-p14-accounts {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sec-p14-sankey .sec-p14-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) minmax(190px, .8fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sec-p14-sankey .sec-p14-track {
+  min-width: 0;
+  height: var(--sec-p14-track-height);
+  border-left: 2px solid var(--ink);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--rule) 65%, transparent), transparent);
+}
+
+.sec-p14-sankey .sec-p14-ribbon {
+  display: block;
+  width: var(--sec-p14-width);
+  height: 100%;
+  border-radius: 0 2px 2px 0;
+  background: var(--sec-p14-ribbon);
+  opacity: .82;
+  transition: opacity 120ms ease, filter 120ms ease;
+}
+
+.sec-p14-sankey .sec-p14-ribbon:hover,
+.sec-p14-sankey .sec-p14-ribbon:focus-visible {
+  opacity: 1;
+  filter: saturate(1.18);
+}
+
+.sec-p14-sankey .sec-p14-destination {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 5px 8px;
+  border-left: 3px solid var(--rule);
+}
+
+.sec-p14-sankey .sec-p14-destination > a {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.sec-p14-sankey .sec-p14-destination > a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sec-p14-sankey .sec-p14-destination > span {
+  color: var(--ink-3);
+  font: 9px/1.35 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p14-sankey .sec-p14-destination .sec-p14-signed,
+.sec-p14-sankey .sec-p14-destination .sec-p14-non-ribbon {
+  color: var(--warning-ink);
+}
+
+.sec-p14-sankey .sec-p14-note {
+  margin-top: 10px;
+}
+
+.sec-p14-sankey .sec-p14-ledger,
+.sec-p14-sankey .sec-p14-provenance {
+  margin-top: 12px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+.sec-p14-sankey .sec-p14-ledger > summary,
+.sec-p14-sankey details.sec-p14-provenance > summary {
+  padding: 11px 13px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.sec-p14-sankey .sec-p14-account-detail {
+  margin: 0 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+  scroll-margin-top: 20px;
+}
+
+.sec-p14-sankey .sec-p14-account-detail > summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sec-p14-sankey .sec-p14-trace {
+  margin-left: 6px;
+  color: var(--ink-3);
+  font: 9px/1.2 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p14-sankey .sec-p14-account-key {
+  margin: 8px 0;
+  color: var(--ink-3);
+  font-size: 10px;
+}
+
+.sec-p14-sankey .sec-p14-table-wrap {
+  overflow-x: auto;
+}
+
+.sec-p14-sankey .sec-p14-table-wrap table {
+  min-width: 300px;
+}
+
+.sec-p14-sankey .sec-p14-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 12px 12px;
+}
+
+.sec-p14-sankey .sec-p14-provenance-pending {
+  margin: 0 12px 12px;
+  box-shadow: none;
+}
+
+@media (max-width: 760px) {
+  .sec-p14-sankey .sec-p14-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .sec-p14-sankey .sec-p14-source {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .sec-p14-sankey .sec-p14-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .sec-p14-sankey .sec-p14-destination {
+    border-left-width: 2px;
+  }
+
+  .sec-p14-sankey .sec-p14-flow {
+    padding: 10px;
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sec-p14-sankey .sec-p14-ribbon {
+    transition: none;
+  }
+}
+
+@media print {
+  .sec-p14-sankey .sec-p14-flow {
+    box-shadow: none;
+  }
+}
