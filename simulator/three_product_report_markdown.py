@@ -32,7 +32,7 @@ _CLASS_DISPLAY_ORDER: tuple[tuple[str, str], ...] = (
     ('industrial_mixed_glass',
      '3. Industrial mixed glass (early-tap residual melt option)'),
     ('refractory_ceramic_rump',
-     '4. Refractory ceramic rump (Ca / REE / refractory oxides — by physics)'),
+     '4. Refractory ceramic rump (refractory-oxide floor only)'),
 )
 
 
@@ -171,7 +171,7 @@ def format_three_product_markdown(
             )
             other_kg = float(bucket.get('rump_other_kg', 0.0))
             lines.append(
-                f"- Rump total: "
+                f"- Residual inventory total (not a product total): "
                 f"{_format_kg(float(bucket.get('rump_total_kg', 0.0)))} kg"
             )
             lines.append(
@@ -179,7 +179,7 @@ def format_three_product_markdown(
                 f"{_format_kg(refractory_oxides_kg)} kg"
             )
             lines.append(
-                "- Silicate residual: "
+                "- Silicate residual (non-product inventory): "
                 f"{_format_kg(silicate_residual_kg)} kg"
             )
             lines.append(
@@ -191,7 +191,7 @@ def format_three_product_markdown(
                 f"{_format_kg(other_kg)} kg"
             )
             lines.append("")
-            lines.append("Per-species:")
+            lines.append("Residual inventory per species (not all product):")
             lines.append(_kg_by_species_block(rump_species))
         lines.append("")
 

@@ -364,7 +364,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             ),
             'rump_other_kg': rump_by_class_kg['other'],
             'ree_enrichment_extent': ree_enrichment_extent,
-            'class_total_kg': rump_total_kg,
+            'class_total_kg': rump_by_class_kg['refractory_oxides'],
         },
         'unclassified': {
             'kg_by_species': unclassified,

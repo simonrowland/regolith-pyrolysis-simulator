@@ -365,6 +365,7 @@ def test_rump_surfaces_nonzero_other_bucket_and_mass_closes():
     bucket = result['refractory_ceramic_rump']
 
     assert bucket['rump_total_kg'] == pytest.approx(5.75)
+    assert bucket['class_total_kg'] == pytest.approx(4.0)
     assert bucket['rump_refractory_oxides_kg'] == pytest.approx(4.0)
     assert bucket['rump_silicate_residual_kg'] == pytest.approx(1.0)
     assert bucket['rump_unextracted_metals_kg'] == pytest.approx(0.5)

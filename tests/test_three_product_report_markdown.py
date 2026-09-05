@@ -135,11 +135,31 @@ def test_rump_class_shows_per_species_breakdown():
     report = format_three_product_markdown(classification)
     assert "**CaO**" in report
     assert "**REE_oxides**" in report
-    assert "Rump total" in report
+    assert "Residual inventory total (not a product total)" in report
     assert "Refractory oxides floor (by physics)" in report
     assert "Silicate residual" in report
     assert "Unextracted metals residue (failure-mode 1)" in report
     assert "Other / unclassified rump" in report
+
+
+def test_rump_snapshot_excludes_unprocessed_residual_inventory():
+    classification = _empty_classification()
+    classification['refractory_ceramic_rump'].update({
+        'rump_kg_by_species': {'CaO': 4.0, 'SiO2': 1.0, 'Fe': 0.5},
+        'rump_total_kg': 5.5,
+        'rump_refractory_oxides_kg': 4.0,
+        'rump_silicate_residual_kg': 1.0,
+        'rump_unextracted_metals_kg': 0.5,
+        'class_total_kg': 4.0,
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Rump: 4.000 kg' in report
+    assert 'Rump: 5.500 kg' not in report
+    assert 'refractory-oxide floor only' in report
+    assert 'Silicate residual (non-product inventory): 1.000 kg' in report
+    assert 'Residual inventory total (not a product total): 5.500 kg' in report
 
 
 # ---------------------------------------------------------------------------
