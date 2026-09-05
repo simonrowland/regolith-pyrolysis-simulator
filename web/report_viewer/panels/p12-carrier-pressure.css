@@ -1,0 +1,93 @@
+.sec-p12-carrier-pressure {
+  display: grid;
+  gap: 14px;
+}
+
+.sec-p12-carrier-pressure > .sub {
+  margin-bottom: 0;
+}
+
+.sec-p12-carrier-pressure .sec-p12-headline {
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--blue) 45%, var(--rule));
+  background: color-mix(in srgb, var(--blue) 7%, var(--panel));
+}
+
+.sec-p12-carrier-pressure .sec-p12-headline-value {
+  margin-top: 7px;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 780;
+  letter-spacing: -.04em;
+}
+
+.sec-p12-carrier-pressure .sec-p12-context {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sec-p12-carrier-pressure .sec-p12-metric {
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+.sec-p12-carrier-pressure .sec-p12-label {
+  color: var(--ink-3);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p12-carrier-pressure .sec-p12-value {
+  margin-top: 7px;
+  font: 750 19px/1.2 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p12-carrier-pressure .sec-p12-detail {
+  margin-top: 8px;
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.sec-p12-carrier-pressure .sec-p12-authority {
+  display: inline-block;
+  padding: 3px 6px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-2);
+  background: var(--panel);
+  font: 700 9px/1.2 "SFMono-Regular", Consolas, monospace;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: help;
+}
+
+.sec-p12-carrier-pressure .sec-p12-pending {
+  padding: 14px 15px;
+  border: 1px dashed var(--orange);
+  background: var(--amber-soft);
+  color: var(--ink);
+}
+
+.sec-p12-carrier-pressure .sec-p12-pending strong {
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p12-carrier-pressure .sec-p12-pending p {
+  margin: 5px 0 0;
+  color: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .sec-p12-carrier-pressure .sec-p12-context {
+    grid-template-columns: 1fr;
+  }
+}
