@@ -138,15 +138,15 @@
         : "";
 
     return `<article class="sec-p4-stage-card"><div class="sec-p4-stage-head">` +
-      `<div><div class="sec-p4-stage-number">${stageNumber}</div><h3>${label}</h3></div>` +
+      `<div><div class="sec-p4-stage-number">Product destination · ${stageNumber}</div><h3>${label}</h3></div>` +
       `<div class="sec-p4-verdict-line">${verdict(stage)}${massQualifier}</div></div>` +
-      `<div class="sec-p4-headline"><div><span>Total stage mass</span>` +
+      `<div class="sec-p4-headline"><div><span>Total classified product mass</span>` +
       `<b>${stageNumberValue(stage, "total_kg", "kg")}</b></div>` +
       `<div><span>Purity fraction</span><b>${stageNumberValue(stage, "purity_fraction", "")}</b></div></div>` +
       `<details class="sec-p4-details"><summary>Accepted species, activity &amp; mass detail</summary>` +
       `<div class="sec-p4-detail-grid"><div class="sec-p4-breakdown"><h4>Accepted species</h4>${acceptedSpecies(stage)}</div>` +
       `<div class="sec-p4-breakdown"><h4>Activity</h4>${activityDetail(stage)}</div>` +
-      `<div class="sec-p4-breakdown"><h4>Collected-stage totals <small>kg basis</small></h4>` +
+      `<div class="sec-p4-breakdown"><h4>Product-destination totals <small>kg basis</small></h4>` +
       `<dl><div><dt>Designated + coproduct</dt><dd>${stageNumberValue(stage, "designated_kg", "kg")}</dd></div>` +
       `<div><dt>Impurity</dt><dd>${stageNumberValue(stage, "impurity_kg", "kg")}</dd></div></dl></div>` +
       `${speciesMap(stage, "designated_species_kg", "Designated species")}` +
@@ -170,8 +170,8 @@
           : `<div class="sec-p4-stage-grid">${stages.map(stageCard).join("")}</div>`;
 
     return `<section id="sec-p4-stage-purity" class="sec-p4-stage-purity" aria-labelledby="sec-p4-stage-purity-title">` +
-      `<h2 id="sec-p4-stage-purity-title"><span class="sect">P4</span>Condensation-train stage purity</h2>` +
-      `<p class="sub">Backend-emitted stage mass, grade, activity, and verdict. Purity and totals are not recomputed in the viewer.</p>` +
+      `<h2 id="sec-p4-stage-purity-title"><span class="sect">P4</span>Terminal product-destination classification</h2>` +
+      `<p class="sub">Backend-emitted product-destination mass, grade, activity, and verdict. Stage masses include stage-routed tap metal; not physical condenser inventory. Purity and totals are not recomputed in the viewer.</p>` +
       `${body}</section>`;
   }
 

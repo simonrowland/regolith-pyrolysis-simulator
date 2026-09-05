@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+from html import unescape
 from pathlib import Path
+import re
 import subprocess
 
 import pytest
@@ -66,8 +68,8 @@ def _species_map_region(html: str, title: str) -> str:
     return _between(html, start, "</div>")
 
 
-def _collected_totals_region(html: str) -> str:
-    return _between(html, "<h4>Collected-stage totals <small>kg basis</small></h4>", "</dl>")
+def _destination_totals_region(html: str) -> str:
+    return _between(html, "<h4>Product-destination totals <small>kg basis</small></h4>", "</dl>")
 
 
 def _headline_value(html: str, label: str) -> str:
@@ -98,6 +100,35 @@ def _complete_stage(**overrides) -> dict:
     return stage
 
 
+def test_stage_mass_is_product_destination_classification_not_condenser_inventory() -> None:
+    stage = _complete_stage(
+        label="Fe Condenser", designated_species_kg={"Fe": 85.22329294683593},
+        coproduct_species_kg={}, designated_kg=85.22329294683593,
+        impurity_species_kg={"Al": 0.00176855144165}, impurity_kg=0.00176855144165,
+        total_kg=85.22506149827758, purity_fraction=0.9999792473594084,
+    )
+    artifact = {
+        "terminal": {
+            "stage_purity": {"stage_1_fe_condenser": stage},
+            "final_state": {"process.metal_phase_bottom_pool": {"Fe": 1525.994711609524}},
+        },
+        "timesteps": [{"summary": {"condensation_train_kg": {"Fe": 0.02739867051993343}}}],
+    }
+    html = _render_panel(artifact)
+    visible = " ".join(unescape(re.sub(r"<[^>]+>", " ", html)).split())
+    assert "Terminal product-destination classification" in visible
+    assert "Stage masses include stage-routed tap metal; not physical condenser inventory" in visible
+    assert "Product destination · Stage 1" in visible
+    assert "Fe Condenser" in visible
+    assert "Total classified product mass 85.23 kg" in visible
+    assert "Product-destination totals kg basis Designated + coproduct 85.22 kg" in visible
+    for misleading in ("Condensation-train stage purity", "Total stage mass", "Collected-stage totals"):
+        assert misleading not in visible
+    assert "0.0274 kg" not in visible
+    assert "1526" not in visible
+    assert _headline_value(html, "Purity fraction") == "1"
+
+
 def _render_stage(stage: dict[str, object], **kwargs: object) -> str:
     return _render_panel(
         {"terminal": {"stage_purity": {"stage_1": stage}}},
@@ -109,18 +140,18 @@ def test_stage_purity_panel_renders_emitted_grade_breakdowns_and_activity() -> N
     html = _render_panel({"terminal": {"stage_purity": {"stage_1": _complete_stage()}}})
 
     assert 'id="sec-p4-stage-purity"' in html
-    assert "Condensation-train stage purity" in html
+    assert "Terminal product-destination classification" in html
     assert "Condenser stage purity" not in html
     assert "Stage 1" in html
     assert "Iron condenser" in html
-    assert _headline_value(html, "Total stage mass") == "1.271 kg"
+    assert _headline_value(html, "Total classified product mass") == "1.271 kg"
     assert _headline_value(html, "Purity fraction") == "0.9992"
     assert "MIXED" in html
     assert "trace · &lt;0.01 kg total" not in _verdict_line(html)
     assert "empty · 0 kg total" not in _verdict_line(html)
-    collected_totals = _collected_totals_region(html)
-    assert "Designated + coproduct" in collected_totals
-    assert "1.27 kg" in collected_totals
+    destination_totals = _destination_totals_region(html)
+    assert "Designated + coproduct" in destination_totals
+    assert "1.27 kg" in destination_totals
     assert "Designated species" in html
     assert "1.25 kg" in html
     assert "Coproduct species" in html
@@ -257,7 +288,7 @@ def test_exact_zero_is_empty_not_trace() -> None:
     verdict_line = _verdict_line(html)
     assert "empty · 0 kg total" in verdict_line
     assert "trace · &lt;0.01 kg total" not in verdict_line
-    assert _headline_value(html, "Total stage mass") == "0 kg"
+    assert _headline_value(html, "Total classified product mass") == "0 kg"
 
 
 def test_sparse_activity_stays_per_species_without_stagewide_idle() -> None:
@@ -298,7 +329,7 @@ def test_partial_total_stays_pending_when_species_maps_exist() -> None:
     stage.pop("total_kg")
     html = _render_panel({"terminal": {"stage_purity": {"stage_1": stage}}})
 
-    total = _headline_value(html, "Total stage mass")
+    total = _headline_value(html, "Total classified product mass")
     assert "Pending · total_kg not emitted" in total
     assert "1.271 kg" not in total
 
@@ -455,7 +486,8 @@ def test_subtitle_binds_backend_emission_and_no_recompute_claims() -> None:
 
     subtitle = _between(html, '<p class="sub">', "</p>")
     assert subtitle == (
-        "Backend-emitted stage mass, grade, activity, and verdict. "
+        "Backend-emitted product-destination mass, grade, activity, and verdict. "
+        "Stage masses include stage-routed tap metal; not physical condenser inventory. "
         "Purity and totals are not recomputed in the viewer."
     )
 
@@ -465,7 +497,7 @@ def test_partial_total_stays_pending_with_component_ingredients() -> None:
     stage.pop("total_kg")
     html = _render_stage(stage)
 
-    total = _headline_value(html, "Total stage mass")
+    total = _headline_value(html, "Total classified product mass")
     assert "Pending · total_kg not emitted" in total
     assert "1.271 kg" not in total
 
@@ -485,7 +517,7 @@ def test_partial_designated_total_stays_pending_with_species_ingredients() -> No
     stage.pop("designated_kg")
     html = _render_stage(stage)
 
-    totals = _collected_totals_region(html)
+    totals = _destination_totals_region(html)
     assert "Pending · designated_kg not emitted" in totals
     assert "1.27 kg" not in totals
 
@@ -495,7 +527,7 @@ def test_partial_impurity_total_stays_pending_with_species_ingredients() -> None
     stage.pop("impurity_kg")
     html = _render_stage(stage)
 
-    totals = _collected_totals_region(html)
+    totals = _destination_totals_region(html)
     assert "Pending · impurity_kg not emitted" in totals
     assert "0.001 kg" not in totals
 
