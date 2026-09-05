@@ -137,3 +137,71 @@ def test_real_backend_out_of_domain_is_not_typed_backend_unavailable():
     assert_real_backend_feedstock_supported(
         "alphamelts", "lunar_mare_low_ti", feedstocks
     )
+
+
+def test_cached_real_config_errors_are_input_not_backend_unavailable():
+    """A misconfigured cache is not a missing engine.
+
+    normalize_cached_real_config raises the injected unavailable_error_cls for
+    config mistakes (no db_path, bad miss_policy, malformed quantization). That
+    class is correct -- callers catch it -- but resolve_backend first runs
+    _unavailable_error_cls_with_reason, which stamps 'backend_unavailable' in
+    __init__ regardless of what failed. So "you did not pass a cache path" was
+    reported as a dead backend.
+
+    The wrapped arm is the one that matters: it is the class resolve_backend
+    actually hands the validators, and the one that was forcing the label.
+    """
+    from simulator.backends import (
+        BackendUnavailableError,
+        _unavailable_error_cls_with_reason,
+        normalize_cached_real_config,
+    )
+
+    # ARMS MUST DIFFER. _unavailable_error_cls_with_reason SHORT-CIRCUITS when the
+    # class already carries reason_code == 'backend_unavailable', which
+    # BackendUnavailableError does -- so wrapping it returns the SAME class and a
+    # (raw, wrapped) pair built from it is one arm run twice. An earlier version of
+    # this test did exactly that and proved nothing about the wrapped path. Use a
+    # class with no reason_code, as session_cli's RunnerError and
+    # mre_reproduction's MREReproductionError are, to get a real wrap.
+    class _InjectedError(RuntimeError):
+        pass
+
+    wrapped = _unavailable_error_cls_with_reason(_InjectedError)
+    assert wrapped is not _InjectedError, (
+        "wrapper short-circuited; this arm would not exercise the __init__ stamp"
+    )
+    assert getattr(wrapped("probe"), "reason_code", None) == "backend_unavailable", (
+        "the wrapped class must stamp backend_unavailable in __init__, or there is "
+        "nothing for the fix to override and the test below is vacuous"
+    )
+
+    for error_cls, arm in ((BackendUnavailableError, "raw"), (wrapped, "wrapped")):
+        with pytest.raises(Exception) as excinfo:
+            normalize_cached_real_config(None, unavailable_error_cls=error_cls)
+        assert getattr(excinfo.value, "reason_code", None) == "invalid_run_input", (
+            f"{arm} arm: a missing cache config is bad input, not an outage; got "
+            f"{getattr(excinfo.value, 'reason_code', None)!r}"
+        )
+
+    # Negative control 1: a genuine availability error keeps its label, or the
+    # assertions above would pass by having broken the stamp for everything.
+    outage = wrapped("AlphaMELTS unavailable; run install-dependencies.py")
+    assert getattr(outage, "reason_code", None) == "backend_unavailable"
+
+    # Negative control 2: a well-formed config must not raise at all.
+    import pathlib as _pathlib
+    import tempfile
+
+    db_path = _pathlib.Path(tempfile.mkdtemp()) / "cache.sqlite"
+    db_path.write_text("")
+    normalize_cached_real_config(
+        {
+            "db_path": str(db_path),
+            "miss_policy": "fail-loud",
+            "authorized_backend_name": "alphamelts",
+            "authorized_backend_version": "1",
+        },
+        unavailable_error_cls=wrapped,
+    )

@@ -2020,6 +2020,52 @@ def test_start_payload_echoes_status_strip_lifecycle_generation():
     assert payload["lifecycle_generation"] == 7
 
 
+def test_cached_real_misconfig_over_socket_is_input_not_backend_unavailable(
+    monkeypatch,
+):
+    """The reachable path for the cached-real config typing.
+
+    _get_backend -> resolve_backend runs the cached-real config validators, so a
+    socket start naming backend='cached-real' with no reduced_real_cache reaches
+    the _get_backend catch as a CONFIG error. That catch used to hardcode
+    'backend_unavailable', so a missing db_path paged as an engine outage.
+
+    The sibling test test_socket_start_rejection_echoes_status_strip_lifecycle_generation
+    covers the other side: a genuine outage there still reports backend_unavailable.
+    """
+    app = app_module.create_app()
+    emitted = []
+
+    monkeypatch.setattr(
+        app_module.socketio,
+        "emit",
+        lambda event, payload, **kwargs: emitted.append(
+            (event, payload, kwargs)
+        ),
+    )
+
+    with app.app_context():
+        result = web_events._registered_start_handler(
+            {
+                "backend": "cached-real",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+            },
+            sid="cached-real-misconfig-test",
+            ledger_client_id="cached-real-misconfig-owner",
+        )
+
+    assert result is None
+    assert emitted, "handler emitted nothing"
+    payload = emitted[-1][1]
+    assert payload["status"] == "error"
+    assert "cached-real" in payload["message"], payload["message"]
+    assert payload["error_type"] == "invalid_run_input", (
+        "a missing cached-real cache config is bad input, not an engine outage; got "
+        f"{payload.get('error_type')!r}"
+    )
+
+
 def test_missing_stage0_reductant_is_input_error_not_backend_unavailable(
     monkeypatch,
 ):

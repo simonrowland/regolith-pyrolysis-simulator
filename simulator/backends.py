@@ -122,6 +122,30 @@ def stamp_unavailable_reason(exc: BaseException) -> BaseException:
     return exc
 
 
+def stamp_config_reason(exc: BaseException, reason_code: str) -> BaseException:
+    """Say WHICH input was wrong, on an exception that must keep its class.
+
+    Counterpart to stamp_unavailable_reason. The cached-real config validators
+    raise the caller's injected unavailable_error_cls (RunnerError,
+    MREReproductionError, ...) because callers catch that type -- but a missing
+    reduced_real_cache.db_path is a CONFIG mistake, not a dead engine, and
+    resolve_backend runs _unavailable_error_cls_with_reason, which stamps
+    'backend_unavailable' in __init__ regardless of what actually failed.
+    Stamping after construction overrides that, so the label matches the failure
+    while the class stays put and existing catches keep working.
+
+    This is the rule the session/web input errors already follow, reaching the
+    backend config validators.
+    """
+    try:
+        exc.reason_code = reason_code
+    except (AttributeError, TypeError):
+        # Mirrors stamp_unavailable_reason: __slots__ or a read-only attribute
+        # must not turn a clean config rejection into an AttributeError.
+        pass
+    return exc
+
+
 def _unavailable_error_cls_with_reason(cls: type[_E]) -> type[_E]:
     if getattr(cls, "reason_code", None) == BackendUnavailableError.reason_code:
         return cls
@@ -307,9 +331,12 @@ def normalize_cached_real_config(
     """Validate and normalize the cached-real cache config."""
 
     if value is None:
-        raise unavailable_error_cls(
+        raise stamp_config_reason(
+            unavailable_error_cls(
             "cached-real requires reduced_real_cache.db_path and "
             "reduced_real_cache.miss_policy"
+            ),
+            "invalid_run_input",
         )
     if isinstance(value, CachedRealConfig):
         value = {
@@ -326,10 +353,16 @@ def normalize_cached_real_config(
             "control_quantization": value.control_quantization,
         }
     if not isinstance(value, Mapping):
-        raise unavailable_error_cls("cached-real cache config must be a mapping")
+        raise stamp_config_reason(
+            unavailable_error_cls("cached-real cache config must be a mapping"),
+            "invalid_run_input",
+        )
     raw_db_path = value.get("db_path")
     if raw_db_path in (None, ""):
-        raise unavailable_error_cls("cached-real requires reduced_real_cache.db_path")
+        raise stamp_config_reason(
+            unavailable_error_cls("cached-real requires reduced_real_cache.db_path"),
+            "invalid_run_input",
+        )
     db_path = Path(str(raw_db_path)).expanduser()
     if not db_path.is_absolute():
         db_path = (_REPO_ROOT / db_path).resolve()
@@ -337,8 +370,11 @@ def normalize_cached_real_config(
         value.get("authorized_backend_name", "")
     ).strip()
     if not authorized_backend_name:
-        raise unavailable_error_cls(
+        raise stamp_config_reason(
+            unavailable_error_cls(
             "cached-real requires reduced_real_cache.authorized_backend_name"
+            ),
+            "invalid_run_input",
         )
     raw_authorized_family = value.get("authorized_backend_family")
     if raw_authorized_family is None:
@@ -351,8 +387,11 @@ def normalize_cached_real_config(
     elif isinstance(raw_authorized_family, RealBackendFamily):
         authorized_backend_family = raw_authorized_family
     else:
-        raise unavailable_error_cls(
+        raise stamp_config_reason(
+            unavailable_error_cls(
             "cached-real authorized_backend_family must be a RealBackendFamily"
+            ),
+            "invalid_run_input",
         )
     authorized_backend_version = str(
         value.get("authorized_backend_version", "")
@@ -368,17 +407,23 @@ def normalize_cached_real_config(
     miss_policy = str(value.get("miss_policy", "fail-loud")).strip().lower()
     miss_policy = miss_policy.replace("_", "-")
     if miss_policy not in CACHED_REAL_MISS_POLICIES:
-        raise unavailable_error_cls(
+        raise stamp_config_reason(
+            unavailable_error_cls(
             "cached-real reduced_real_cache.miss_policy must be one of "
             f"{', '.join(CACHED_REAL_MISS_POLICIES)}"
+            ),
+            "invalid_run_input",
         )
     cache_tier_ceiling = str(
         value.get("cache_tier_ceiling", DEFAULT_CACHE_TIER_CEILING)
     ).strip()
     if cache_tier_ceiling not in CACHE_TIER_CEILINGS:
-        raise unavailable_error_cls(
+        raise stamp_config_reason(
+            unavailable_error_cls(
             "cached-real reduced_real_cache.cache_tier_ceiling must be one of "
             f"{', '.join(CACHE_TIER_CEILINGS)}"
+            ),
+            "invalid_run_input",
         )
     read_only_base_db_path = None
     raw_read_only_base = value.get("read_only_base_db_path")
@@ -388,8 +433,11 @@ def normalize_cached_real_config(
             read_only_base_db_path = (_REPO_ROOT / read_only_base_db_path).resolve()
     strict_vapor_gate = value.get("strict_vapor_gate", False)
     if not isinstance(strict_vapor_gate, bool):
-        raise unavailable_error_cls(
+        raise stamp_config_reason(
+            unavailable_error_cls(
             "cached-real reduced_real_cache.strict_vapor_gate must be a bool"
+            ),
+            "invalid_run_input",
         )
     control_quantization = _parse_control_quantization_config(
         value.get("control_quantization"),
@@ -429,15 +477,21 @@ def _parse_control_quantization_config(
             try:
                 value = json.loads(stripped)
             except json.JSONDecodeError as exc:
-                raise unavailable_error_cls(
+                raise stamp_config_reason(
+                    unavailable_error_cls(
                     "cached-real reduced_real_cache.control_quantization "
                     "JSON dict is invalid"
+                    ),
+                    "invalid_run_input",
                 ) from exc
         else:
             try:
                 return ControlQuantization.from_name(stripped)
             except ValueError as exc:
-                raise unavailable_error_cls(str(exc)) from exc
+                raise stamp_config_reason(
+                    unavailable_error_cls(str(exc)),
+                    "invalid_run_input",
+                ) from exc
     if isinstance(value, Mapping):
         expected = {
             "t_k_quantum",
@@ -449,10 +503,13 @@ def _parse_control_quantization_config(
         if keys != expected:
             missing = ", ".join(sorted(expected - keys)) or "none"
             extra = ", ".join(sorted(str(key) for key in keys - expected)) or "none"
-            raise unavailable_error_cls(
+            raise stamp_config_reason(
+                unavailable_error_cls(
                 "cached-real reduced_real_cache.control_quantization "
                 f"must contain exactly {', '.join(sorted(expected))}; "
                 f"missing={missing}; extra={extra}"
+                ),
+                "invalid_run_input",
             )
         try:
             for field_name in expected:
@@ -468,13 +525,19 @@ def _parse_control_quantization_config(
                 composition_sig_figs=int(value["composition_sig_figs"]),
             )
         except (TypeError, ValueError) as exc:
-            raise unavailable_error_cls(
+            raise stamp_config_reason(
+                unavailable_error_cls(
                 "cached-real reduced_real_cache.control_quantization "
                 "values are invalid"
+                ),
+                "invalid_run_input",
             ) from exc
-    raise unavailable_error_cls(
+    raise stamp_config_reason(
+        unavailable_error_cls(
         "cached-real reduced_real_cache.control_quantization must be a "
         "tier name string or JSON dict"
+        ),
+        "invalid_run_input",
     )
 
 

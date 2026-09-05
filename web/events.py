@@ -3777,12 +3777,21 @@ def register_events(socketio):
         try:
             backend = _get_backend(backend_name)
         except BackendUnavailableError as exc:
+            # Classify by reason_code here too. When I first typed the session
+            # input errors I left this catch hardcoded, reasoning that a
+            # _get_backend failure genuinely IS unavailability. That stopped being
+            # true: _get_backend -> resolve_backend runs the cached-real config
+            # validators, so a socket start with backend='cached-real' and a
+            # missing reduced_real_cache.db_path arrives here as a CONFIG error and
+            # was still paging as an engine outage. Absent reason_code keeps the
+            # old label, so a real outage is unchanged.
+            reason = getattr(exc, 'reason_code', None) or 'backend_unavailable'
             return reject({
                 'status': 'error',
                 'message': str(exc),
                 'backend_status': 'unavailable',
                 'backend_authoritative': False,
-            }, 'backend_unavailable')
+            }, reason)
         if socket_bound:
             with _run_command_lock:
                 if _socket_client_ids.get(sid) != resolved_ledger_client_id:
