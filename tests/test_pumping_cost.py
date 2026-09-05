@@ -257,9 +257,8 @@ def test_finite_near_vacuum_target_fails_soft_without_overflow():
 
 
 def test_perfect_vacuum_target_is_fail_soft_infeasible():
-    # b-288 renamed this regime and NOTHING ELSE about this case. Every
-    # behavioural assertion below is unchanged and still passes: fail-soft,
-    # zero energy, infinite pump speed, infinite compression ratio.
+    # b-288 renamed this regime. Fail-soft, unavailable energy (not a priced
+    # zero), infinite pump speed, infinite compression ratio.
     #
     # Those two infinities are the argument for the rename. The code was ALREADY
     # computing this as a physical divergence -- log(ambient/target) -> inf as
@@ -280,7 +279,7 @@ def test_perfect_vacuum_target_is_fail_soft_infeasible():
     )
 
     assert r.regime == "unreachable-absolute-vacuum-target"
-    assert r.energy_kWh == 0.0
+    assert r.energy_kWh is None
     assert r.feasible is False
     assert math.isinf(r.required_pump_speed_m3_s)
     assert math.isinf(r.compression_ratio)
@@ -341,7 +340,7 @@ def test_degenerate_pressure_inputs_fail_soft_infeasible():
             ambient_pressure_pa=MARS_OLYMPUS_SUMMIT_AMBIENT_PA,
         )
         assert r.regime == "invalid-target-pressure"
-        assert r.energy_kWh == 0.0
+        assert r.energy_kWh is None
         assert r.feasible is False
 
 
@@ -378,6 +377,7 @@ def test_invalid_compressor_model_parameters_refuse(kwargs, expected_status):
 
     assert result.status == expected_status
     assert result.feasible is False
+    assert result.energy_kWh is None
 
 
 def test_pumping_context_accepts_explicit_ambient_without_body_metadata():
@@ -497,6 +497,7 @@ def test_pumping_context_refuses_a_snapshot_missing_the_vented_flow_field():
 
     assert context["status"] == "refused"
     assert context["reason"] == "missing-o2-vented-flow"
+    assert context["ambient_pressure_pa"] == pytest.approx(610.0)
 
 
 def test_pumping_context_only_costs_o2_not_already_compressed_by_turbine():
@@ -597,6 +598,7 @@ def test_missing_offgas_or_duration_refuses_instead_of_venting_free(offgas, dura
     )
     assert result.status == token
     assert result.feasible is False
+    assert result.energy_kWh is None
     # Pin the regime too. A NOT-FIXED review observed that without this, a
     # reintroduction returning regime="vent-free" alongside the refusing status
     # would still pass -- the assertion would be blind to a result that still
@@ -645,6 +647,7 @@ def test_negative_inputs_refuse_rather_than_venting_free(offgas, duration, token
     assert result.status == token
     assert result.regime == token
     assert result.feasible is False
+    assert result.energy_kWh is None
 
 
 def test_missing_input_is_distinguishable_from_a_proven_zero():
@@ -656,6 +659,8 @@ def test_missing_input_is_distinguishable_from_a_proven_zero():
         target_pressure_pa=100.0, offgas_mol_per_s=0.0, duration_s=3600.0, **_B259_BASE
     )
     assert (missing.status, missing.feasible) != (proven_zero.status, proven_zero.feasible)
+    assert missing.energy_kWh is None
+    assert proven_zero.energy_kWh == 0.0
 
 
 def test_a_real_pumping_load_is_still_costed():
@@ -743,6 +748,7 @@ def test_absolute_vacuum_target_against_a_real_atmosphere_names_why_it_is_imposs
     )
     assert cost.feasible is False
     assert cost.regime == "unreachable-absolute-vacuum-target"
+    assert cost.energy_kWh is None
 
 
 def test_pumping_still_refuses_genuinely_unknown_and_impossible_pressures():
@@ -774,6 +780,7 @@ def test_pumping_still_refuses_genuinely_unknown_and_impossible_pressures():
         cost = estimate_subambient_pump_cost(**call)
         assert cost.feasible is False
         assert cost.regime == expected
+        assert cost.energy_kWh is None
 
 
 def test_mars_pumping_is_unchanged_by_the_vacuum_relaxation():
@@ -789,3 +796,84 @@ def test_mars_pumping_is_unchanged_by_the_vacuum_relaxation():
     )
     assert cost.regime == "pump"
     assert cost.energy_kWh > 0.0
+
+
+def _assert_unavailable_energy(value, reason: str) -> None:
+    from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
+
+    assert is_unavailable_quantity(value)
+    assert value["value"] is None
+    assert unavailable_reason_of(value) == reason
+    assert value["units"] == "kWh"
+
+
+def test_missing_offgas_serializes_unavailable_energy_not_zero() -> None:
+    result = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=math.nan,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    payload = result.to_json()
+    assert result.energy_kWh is None
+    _assert_unavailable_energy(payload["energy_kWh"], "invalid-offgas-rate")
+
+
+def test_measured_zero_offgas_stays_numeric_zero_and_is_not_unavailable() -> None:
+    from simulator.cost_energy import is_unavailable_quantity
+
+    result = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=0.0,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    payload = result.to_json()
+    assert result.regime == "vent-free"
+    assert result.energy_kWh == 0.0
+    assert payload["energy_kWh"] == 0.0
+    assert not is_unavailable_quantity(payload["energy_kWh"])
+
+
+def test_finite_rh84_subambient_point_still_costs_energy() -> None:
+    result = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    assert result.status == "ok"
+    assert result.energy_kWh == pytest.approx(0.008100986135507747)
+    assert result.required_pump_speed_m3_s == pytest.approx(0.04988677570800004)
+
+
+def test_missing_offgas_unavailable_mutation_fails_then_restores(monkeypatch) -> None:
+    from simulator import pumping_cost as pumping_mod
+    from simulator.pumping_cost import SubambientPumpCost
+
+    original = pumping_mod._infeasible_degenerate
+
+    def mutated(status: str) -> SubambientPumpCost:
+        return SubambientPumpCost(status, 0.0, 0.0, math.inf, math.inf, False, status=status)
+
+    kwargs = dict(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=math.nan,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    monkeypatch.setattr(pumping_mod, "_infeasible_degenerate", mutated)
+    with pytest.raises(AssertionError):
+        assert pumping_mod.estimate_subambient_pump_cost(**kwargs).energy_kWh is None
+    monkeypatch.setattr(pumping_mod, "_infeasible_degenerate", original)
+    restored = pumping_mod.estimate_subambient_pump_cost(**kwargs)
+    assert restored.energy_kWh is None
+    _assert_unavailable_energy(restored.to_json()["energy_kWh"], "invalid-offgas-rate")

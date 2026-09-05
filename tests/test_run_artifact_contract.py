@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
 from simulator.cost_parameters import (
     PAYLOAD_ABSENT_COST_PROVENANCE,
     default_cost_parameters_block,
@@ -474,7 +475,6 @@ def test_cost_totals_disclose_absent_pumping_basis() -> None:
 @pytest.mark.parametrize(
     "status,pumping_kWh",
     [
-        ("refused", 0.0),
         ("partial", 2.0),
         ("pumping_feasibility_unresolved", 4.0),
     ],
@@ -511,6 +511,38 @@ def test_cost_totals_exclude_nonresolved_pumping_and_name_status(
     assert totals["basis_note"] == (
         f"pumping electrical energy excluded; diagnostic status={status}"
     )
+
+
+def test_cost_totals_mark_refused_pumping_unavailable_instead_of_omitting() -> None:
+    payload = _runner_payload(
+        per_hour_summary=[
+            {
+                "hour": 1,
+                "campaign": "C0",
+                "mass_balance_pct": 0.0,
+                "energy_electrical_kWh": 2.0,
+                "energy_evaporation_thermal_kWh": 3.0,
+            }
+        ]
+    )
+    payload["run_metadata"]["cost_rollup_diagnostic"] = {
+        "pumping_diagnostic": {
+            "status": "refused",
+            "reason": "missing-o2-vented-flow",
+            "pumping_electrical_kWh": 0.0,
+        }
+    }
+
+    artifact = build_run_artifact(payload, run_id="run-cost-refused-pumping")
+    totals = artifact["terminal"]["cost_totals"]
+    assert is_unavailable_quantity(totals["pumping_electrical_energy_kWh"])
+    assert unavailable_reason_of(totals["pumping_electrical_energy_kWh"]) == (
+        "missing-o2-vented-flow"
+    )
+    assert is_unavailable_quantity(totals["electrical_energy_kWh"])
+    assert is_unavailable_quantity(totals["total_cost_usd"])
+    assert totals["completeness"] == "incomplete"
+    assert totals["process_electrical_energy_kWh"] == pytest.approx(2.0)
 
 
 def test_cost_totals_omit_when_canonical_usage_is_incomplete() -> None:

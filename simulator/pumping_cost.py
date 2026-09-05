@@ -28,6 +28,7 @@ from dataclasses import dataclass
 import math
 from typing import Any
 
+from simulator.cost_energy import unavailable_quantity
 from simulator.environment import (
     ASTEROID_VACUUM_FLOOR_BAR,
     MARS_DATUM_PRESSURE_BAR,
@@ -227,8 +228,8 @@ class SubambientPumpCost:
     """Rough sub-ambient pumping cost + feasibility for one stage."""
 
     regime: str  # "vent-free" (target >= ambient) | "pump" (target < ambient)
-    energy_kWh: float  # electrical energy over the stage duration
-    mean_power_W: float  # electrical input power
+    energy_kWh: float | None  # None = unavailable; 0.0 is a measured vent-free hour
+    mean_power_W: float | None  # None tracks unavailable energy; 0.0 is measured idle
     required_pump_speed_m3_s: float  # volumetric speed the pump must provide at P_target
     compression_ratio: float  # P_ambient / P_target
     feasible: bool | None  # None until line conductance is supplied
@@ -240,10 +241,16 @@ class SubambientPumpCost:
     effective_speed_ceiling_m3_s: float = math.nan
 
     def to_json(self) -> dict[str, Any]:
+        if self.energy_kWh is None:
+            energy: Any = unavailable_quantity(reason=self.status, units="kWh")
+            power: Any = unavailable_quantity(reason=self.status, units="W")
+        else:
+            energy = float(self.energy_kWh)
+            power = float(self.mean_power_W if self.mean_power_W is not None else 0.0)
         return {
             "regime": self.regime,
-            "energy_kWh": float(self.energy_kWh),
-            "mean_power_W": float(self.mean_power_W),
+            "energy_kWh": energy,
+            "mean_power_W": power,
             "required_pump_speed_m3_s": float(self.required_pump_speed_m3_s),
             "compression_ratio": float(self.compression_ratio),
             "feasible": self.feasible,
@@ -564,6 +571,8 @@ def pumping_context_from_sim(
                 "missing-o2-vented-flow",
                 body=body,
                 feedstock_id=feedstock_id,
+                ambient_pressure_pa=ambient_pressure_pa,
+                ambient_pressure_source=ambient_pressure_source,
             )
         uncompressed_o2_mol_hr = _float_or_nan(raw_uncompressed_o2)
         if (
@@ -575,6 +584,8 @@ def pumping_context_from_sim(
                 body=body,
                 feedstock_id=feedstock_id,
                 hour=int(getattr(snapshot, "hour", len(rows))),
+                ambient_pressure_pa=ambient_pressure_pa,
+                ambient_pressure_source=ambient_pressure_source,
             )
         if uncompressed_o2_mol_hr == 0.0:
             continue
@@ -585,6 +596,8 @@ def pumping_context_from_sim(
                 body=body,
                 feedstock_id=feedstock_id,
                 hour=int(getattr(snapshot, "hour", len(rows))),
+                ambient_pressure_pa=ambient_pressure_pa,
+                ambient_pressure_source=ambient_pressure_source,
             )
         target_pressure_pa = pressure_mbar * _PA_PER_MBAR
         gas_temperature_K = _float_or_nan(
@@ -646,26 +659,35 @@ def _pumping_context_refusal(
     body: str = "",
     feedstock_id: str = "",
     hour: int | None = None,
+    ambient_pressure_pa: float | None = None,
+    ambient_pressure_source: str = "",
 ) -> dict[str, Any]:
+    known_ambient = _float_or_nan(ambient_pressure_pa)
     refusal: dict[str, Any] = {
         "schema_version": "pumping-context-v1",
         "status": "refused",
         "reason": reason,
         "feedstock_id": feedstock_id,
         "body": body,
-        "ambient_pressure_pa": math.nan,
+        "ambient_pressure_pa": (
+            known_ambient if math.isfinite(known_ambient) else math.nan
+        ),
         "rows": (),
     }
+    if ambient_pressure_source:
+        refusal["ambient_pressure_source"] = ambient_pressure_source
     if hour is not None:
         refusal["hour"] = int(hour)
     return refusal
 
 
 def _infeasible_degenerate(status: str) -> SubambientPumpCost:
+    # Missing/invalid inputs are not a measured zero load. Energy and power
+    # stay None so a later sum cannot bill 0 kWh / 0 USD for "we do not know".
     return SubambientPumpCost(
         status,
-        0.0,
-        0.0,
+        None,
+        None,
         math.inf,
         math.inf,
         False,

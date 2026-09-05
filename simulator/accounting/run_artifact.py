@@ -9,6 +9,11 @@ from numbers import Real
 from typing import Any
 
 from simulator.backend_names import canonical_backend_name
+from simulator.cost_energy import (
+    is_unavailable_quantity,
+    unavailable_quantity,
+    unavailable_reason_of,
+)
 from simulator.cost_parameters import canonical_energy_cost_block
 from simulator.engine_local_config import cache_version_for
 
@@ -101,13 +106,21 @@ def _canonical_energy_cost_totals(
 
     pumping_electrical_kWh = None
     pumping_status = None
+    pumping_unavailable_reason = None
     if isinstance(pumping_diagnostic, Mapping):
         raw_status = pumping_diagnostic.get("status")
         pumping_status = (
             str(raw_status).strip() if raw_status is not None else "missing"
         ) or "missing"
-        if pumping_status in {"ok", "resolved"}:
-            candidate = pumping_diagnostic.get("pumping_electrical_kWh")
+        candidate = pumping_diagnostic.get("pumping_electrical_kWh")
+        if is_unavailable_quantity(candidate) or pumping_status == "refused":
+            pumping_unavailable_reason = unavailable_reason_of(
+                candidate,
+                default=str(
+                    pumping_diagnostic.get("reason") or pumping_status
+                ),
+            )
+        elif pumping_status in {"ok", "resolved"}:
             if (
                 isinstance(candidate, bool)
                 or not isinstance(candidate, Real)
@@ -125,6 +138,30 @@ def _canonical_energy_cost_totals(
             "energy_evaporation_thermal_kWh"
         ],
     }
+    solar_heat = (
+        totals["energy_evaporation_thermal_kWh"]
+        * float(cost_block["solar_heat_cost_per_kWh"])
+    )
+    result["solar_heat_cost_usd"] = solar_heat
+    if pumping_unavailable_reason is not None:
+        energy_unavailable = unavailable_quantity(
+            reason=pumping_unavailable_reason, units="kWh"
+        )
+        money_unavailable = unavailable_quantity(
+            reason=pumping_unavailable_reason, units="USD"
+        )
+        result.update(
+            {
+                "pumping_electrical_energy_kWh": energy_unavailable,
+                "pumping_electrical_cost_usd": money_unavailable,
+                "electrical_energy_kWh": energy_unavailable,
+                "electrical_cost_usd": money_unavailable,
+                "total_cost_usd": money_unavailable,
+                "completeness": "incomplete",
+                "unavailable_reason": pumping_unavailable_reason,
+            }
+        )
+        return result
     if pumping_electrical_kWh is None:
         if pumping_status is None:
             result["basis_note"] = (
@@ -146,14 +183,9 @@ def _canonical_energy_cost_totals(
             }
         )
     electrical = total_electrical_kWh * electrical_price
-    solar_heat = (
-        totals["energy_evaporation_thermal_kWh"]
-        * float(cost_block["solar_heat_cost_per_kWh"])
-    )
     result.update({
         "electrical_energy_kWh": total_electrical_kWh,
         "electrical_cost_usd": electrical,
-        "solar_heat_cost_usd": solar_heat,
         "total_cost_usd": electrical + solar_heat,
     })
     return result

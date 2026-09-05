@@ -96,6 +96,9 @@ def test_report_and_optimizer_share_yaml_electricity_price_and_citation() -> Non
         == 0.15
     )
     assert project_owner_ratify_money(CostVector(electrical_kWh=2.0)) == pytest.approx(0.30)
+    from simulator.cost_energy import unavailable_quantity
+    with pytest.raises(TypeError, match="unavailable quantity"):
+        project_owner_ratify_money(unavailable_quantity(reason="missing-o2-vented-flow", units="USD"))
     assert ELECTRICAL_USD_PER_KWH.source_tag == declared["source_tag"] == (
         "U.S. EIA, Electric Power Monthly, Table 5.6.A, Average Price of Electricity "
         "to Ultimate Customers by End-Use Sector, accessed 2026-07-12, "

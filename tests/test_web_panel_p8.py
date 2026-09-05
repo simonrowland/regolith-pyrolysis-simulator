@@ -417,6 +417,66 @@ def test_no_rows_pumping_zero_is_preserved_without_viewer_inclusion_claim() -> N
     assert "pending · terminal.cost_totals.pumping_electrical_cost_usd not emitted" in totals_region
 
 
+def test_unavailable_pumping_energy_is_shown_with_reason_not_zero() -> None:
+    artifact = _full_artifact()
+    pumping = artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["pumping_diagnostic"]
+    pumping["status"] = "refused"
+    pumping["reason"] = "missing-o2-vented-flow"
+    pumping["pumping_electrical_kWh"] = {
+        "status": "unavailable",
+        "reason": "missing-o2-vented-flow",
+        "value": None,
+        "units": "kWh",
+    }
+    pumping["rows"] = []
+    product = artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["product_costs"][
+        "process.cleaned_melt:SiO2"
+    ]
+    product["owner_ratify_money_projection"] = {
+        "status": "unavailable",
+        "reason": "missing-o2-vented-flow",
+        "value": None,
+        "units": "USD",
+    }
+    totals = artifact["terminal"]["cost_totals"]
+    totals["pumping_electrical_energy_kWh"] = {
+        "status": "unavailable",
+        "reason": "missing-o2-vented-flow",
+        "value": None,
+        "units": "kWh",
+    }
+    totals["pumping_electrical_cost_usd"] = {
+        "status": "unavailable",
+        "reason": "missing-o2-vented-flow",
+        "value": None,
+        "units": "USD",
+    }
+    totals["electrical_energy_kWh"] = {
+        "status": "unavailable",
+        "reason": "missing-o2-vented-flow",
+        "value": None,
+        "units": "kWh",
+    }
+    totals["total_cost_usd"] = {
+        "status": "unavailable",
+        "reason": "missing-o2-vented-flow",
+        "value": None,
+        "units": "USD",
+    }
+
+    html = _render_panel(artifact)["html"]
+    pumping_region = _between(html, "<summary>Pumping diagnostic</summary>", "<summary>Warnings</summary>")
+    products = _between(html, "<summary>Product allocations</summary>", "<summary>Active inventory allocations</summary>")
+    totals_region = html.split('<div class="card sec-p8-price-card">', 1)[0]
+
+    assert "unavailable · missing-o2-vented-flow" in _field_value(
+        pumping_region, "Emitted pumping diagnostic energy"
+    )
+    assert "0 kWh" not in _field_value(pumping_region, "Emitted pumping diagnostic energy")
+    assert "unavailable · missing-o2-vented-flow" in products
+    assert "unavailable · missing-o2-vented-flow" in totals_region
+
+
 def test_missing_cost_block_price_does_not_adopt_diagnostic_placeholder() -> None:
     artifact = _full_artifact()
     artifact["header"]["cost_block"].pop("electrical_cost_per_kWh")

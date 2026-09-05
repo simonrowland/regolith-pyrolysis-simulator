@@ -15,6 +15,12 @@ const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (c) => ({
 }[c]));
 const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 const isFiniteNumber = (value) => typeof value === "number" && Number.isFinite(value);
+const isUnavailableQuantity = (value) => isRecord(value) && value.status === "unavailable";
+const unavailableText = (value) => {
+  if (!isUnavailableQuantity(value)) return null;
+  const reason = typeof value.reason === "string" && value.reason.trim() ? value.reason.trim() : "unspecified";
+  return `unavailable · ${reason}`;
+};
 const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
 const n = (value) => hasNumber(value) ? Number(value) : null;
 const sum = (values) => values.reduce((total, value) => total + (n(value) ?? 0), 0);
@@ -346,7 +352,10 @@ function wallAndOxygenSection(artifact, rows) {
   const o2 = last.O2_source_side_potential_kg_cumulative ?? null;
   const o2Label = last.O2_metric_label || "O₂ metric label not emitted";
   const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b class="mono">${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
-  const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric field</span><b>O2_source_side_potential_kg_cumulative</b></div><div class="kv"><span>Pumping energy</span><b>${pumping && hasNumber(pumping.pumping_electrical_kWh) ? `${Number(pumping.pumping_electrical_kWh).toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
+  const pumpingEnergy = pumping && hasNumber(pumping.pumping_electrical_kWh)
+    ? `${Number(pumping.pumping_electrical_kWh).toFixed(6)} kWh`
+    : (unavailableText(pumping?.pumping_electrical_kWh) || "not emitted");
+  const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric field</span><b>O2_source_side_potential_kg_cumulative</b></div><div class="kv"><span>Pumping energy</span><b>${esc(pumpingEnergy)}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
   return section(6, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
 }
 
@@ -581,17 +590,25 @@ function costSection(artifact, energy) {
   const provenance = typeof prices.provenance === "string" && prices.provenance.trim()
     ? `<div class="note"><b>Cost provenance:</b> ${esc(prices.provenance.trim())}</div>`
     : "";
+  const pumpingDisplay = hasNumber(energy.pumpingElectrical)
+    ? `${energy.pumpingElectrical.toFixed(6)} kWh · ${money(energy.pumpingElectricalCost)}`
+    : (energy.pumpingUnavailable || "excluded / not emitted");
   const pumpingRows = energy.canonicalCostTotals
-    ? `<div class="kv"><span>Process electrical</span><b>${hasNumber(energy.processElectrical) ? `${energy.processElectrical.toFixed(6)} kWh · ${money(energy.processElectricalCost)}` : "not emitted"}</b></div><div class="kv"><span>Pumping</span><b>${hasNumber(energy.pumpingElectrical) ? `${energy.pumpingElectrical.toFixed(6)} kWh · ${money(energy.pumpingElectricalCost)}` : "excluded / not emitted"}</b></div>`
+    ? `<div class="kv"><span>Process electrical</span><b>${hasNumber(energy.processElectrical) ? `${energy.processElectrical.toFixed(6)} kWh · ${money(energy.processElectricalCost)}` : "not emitted"}</b></div><div class="kv"><span>Pumping</span><b>${esc(pumpingDisplay)}</b></div>`
     : "";
   const basisNote = typeof energy.basisNote === "string" && energy.basisNote.trim()
     ? `<div class="note"><b>Cost basis:</b> ${esc(energy.basisNote.trim())}</div>`
     : "";
+  const electricalHeadline = hasNumber(energy.electrical)
+    ? `${energy.electrical.toFixed(6)} <small>kWh</small>`
+    : esc(energy.electricalUnavailable || "not emitted");
+  const totalLabel = hasNumber(energy.totalCost) ? money(energy.totalCost) : esc(energy.electricalUnavailable || "not emitted");
+  const electricalTotalText = hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : (energy.electricalUnavailable || "not emitted");
   const totalFormula = energy.canonicalCostTotals
-    ? `<div class="note"><b>Total ${money(energy.totalCost)}</b> binds terminal.cost_totals: ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh total electrical plus ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`
+    ? `<div class="note"><b>Total ${totalLabel}</b> binds terminal.cost_totals: ${esc(electricalTotalText)} kWh total electrical plus ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`
     : `<div class="note"><b>Total ${money(energy.totalCost)}</b> = ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh × ${money(prices.electrical_cost_per_kWh)} + ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`;
   return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
-    provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${hasNumber(energy.electrical) ? `${energy.electrical.toFixed(6)} <small>kWh</small>` : "not emitted"}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
+    provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${electricalHeadline}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${hasNumber(energy.electricalCost) ? money(energy.electricalCost) : esc(energy.electricalUnavailable || "not emitted")}</b></div></div>` +
     `<div class="card"><div class="ct">Solar heat · evaporation thermal total</div><div class="cbig">${hasNumber(energy.thermal) ? `${energy.thermal.toFixed(6)} <small>kWh</small>` : "not emitted"}</div><div class="kv"><span>Latent breakdown</span><b>${hasNumber(energy.latent) ? `${energy.latent.toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Dissociation breakdown</span><b>${hasNumber(energy.dissociation) ? `${energy.dissociation.toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Price</span><b>${money(prices.solar_heat_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.thermalCost)}</b></div></div></div>` +
     `${hasCostShare ? `<div class="cost-stack" aria-label="Cost share"><span style="width:${electricalShare}%"></span><span style="width:${100 - electricalShare}%"></span></div><div class="legend"><span><i class="swatch" style="background:var(--blue)"></i>electrical cost</span><span><i class="swatch" style="background:var(--green)"></i>solar-heat cost</span></div>` : pending("energy values", "Cost share is unavailable because one or more energy or price values were not emitted.")}` +
     totalFormula);
@@ -719,6 +736,8 @@ function render(artifact) {
     energy.canonicalCostTotals = true;
     energy.processElectrical = n(canonicalCostTotals.process_electrical_energy_kWh);
     energy.pumpingElectrical = n(canonicalCostTotals.pumping_electrical_energy_kWh);
+    energy.pumpingUnavailable = unavailableText(canonicalCostTotals.pumping_electrical_energy_kWh)
+      || unavailableText(canonicalCostTotals.pumping_electrical_cost_usd);
     energy.electrical = n(canonicalCostTotals.electrical_energy_kWh);
     energy.thermal = n(canonicalCostTotals.evaporation_thermal_energy_kWh);
     energy.processElectricalCost = n(canonicalCostTotals.process_electrical_cost_usd);
@@ -726,6 +745,8 @@ function render(artifact) {
     energy.electricalCost = n(canonicalCostTotals.electrical_cost_usd);
     energy.thermalCost = n(canonicalCostTotals.solar_heat_cost_usd);
     energy.totalCost = n(canonicalCostTotals.total_cost_usd);
+    energy.electricalUnavailable = unavailableText(canonicalCostTotals.electrical_energy_kWh)
+      || unavailableText(canonicalCostTotals.total_cost_usd);
     energy.basisNote = canonicalCostTotals.basis_note;
   } else {
     energy.canonicalCostTotals = false;

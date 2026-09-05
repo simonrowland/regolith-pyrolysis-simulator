@@ -755,6 +755,12 @@ def test_pumping_gate_rejects_diagnostic_from_different_feedstock_body() -> None
         "pumping_cost_evidence"
     ]
     assert evidence["reason"] == "pumping-diagnostic-environment-mismatch"
+    from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
+    pumping_energy = evidence["pumping_electrical_kWh"]
+    assert is_unavailable_quantity(pumping_energy)
+    assert unavailable_reason_of(pumping_energy) == (
+        "pumping-diagnostic-environment-mismatch"
+    )
     mismatch = evidence["identity_mismatch"]
     assert mismatch["expected_feedstock_id"] == "mars_global_mgs1"
     assert mismatch["observed_feedstock_id"] == "lunar_mare_low_ti"

@@ -460,6 +460,35 @@ def test_certified_pumping_diagnostic_without_energy_fails_closed() -> None:
         )
 
 
+def test_unavailable_pumping_energy_is_not_ranked_as_zero() -> None:
+    from simulator.cost_energy import unavailable_quantity
+
+    sim = SimpleNamespace(
+        energy_electrical_plus_evaporation_cumulative_kWh=18.0,
+    )
+    execution = SimpleNamespace(
+        certified_pumping_diagnostic={
+            "status": "refused",
+            "pumping_electrical_kWh": unavailable_quantity(
+                reason="missing-o2-vented-flow", units="kWh"
+            ),
+        },
+    )
+
+    with pytest.raises(
+        ObjectiveComputationError,
+        match="pumping_diagnostic.pumping_electrical_kWh is unavailable: "
+        "missing-o2-vented-flow",
+    ):
+        _metric_value(
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+            sim,
+            {},
+            {},
+            run_execution=execution,
+        )
+
+
 def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch) -> None:
     monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 2.0)
     cost_parameters = CostParameters(

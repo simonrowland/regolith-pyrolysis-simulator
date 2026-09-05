@@ -29,6 +29,7 @@ from simulator.optimize.physics import (
     target_species_yield_report,
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
+from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
 from simulator.diagnostics import (
@@ -4927,8 +4928,14 @@ def _pumping_energy_penalty_kWh(
         pumping = cost_rollup.get("pumping_diagnostic")
         if not isinstance(pumping, Mapping):
             return 0.0
+    energy = pumping.get("pumping_electrical_kWh", _MISSING)
+    if is_unavailable_quantity(energy):
+        raise ObjectiveComputationError(
+            "pumping_diagnostic.pumping_electrical_kWh is unavailable: "
+            f"{unavailable_reason_of(energy)}"
+        )
     penalty = _finite_float(
-        pumping.get("pumping_electrical_kWh", _MISSING),
+        energy,
         "pumping_diagnostic.pumping_electrical_kWh",
     )
     if penalty < 0.0:

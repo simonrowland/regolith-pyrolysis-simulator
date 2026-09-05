@@ -16,10 +16,12 @@ from simulator.cost_energy import (
     FURNACE_USD_PER_H,
     THERMAL_USD_PER_FLUX_H,
     furnace_thermal_flux_hours,
+    is_unavailable_quantity,
     owner_ratify_cost_placeholders,
+    unavailable_reason_of,
 )
 from simulator.cost_ledger import CostImportContext, CostLedger, CostVector
-from simulator.cost_ledger import build_cost_rollup_diagnostic
+from simulator.cost_ledger import build_cost_rollup_diagnostic, run_pumping_input_cost
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import PyrolysisRun
@@ -428,7 +430,13 @@ def test_cost_rollup_preserves_typed_pumping_context_refusal():
     assert pumping["status"] == "refused"
     assert pumping["reason"] == "missing-ambient-pressure"
     assert pumping["feasible"] is False
-    assert pumping["pumping_electrical_kWh"] == 0.0
+    assert is_unavailable_quantity(pumping["pumping_electrical_kWh"])
+    assert unavailable_reason_of(pumping["pumping_electrical_kWh"]) == "missing-ambient-pressure"
+    assert diagnostic["run_input_cost"]["allocation_status"] == "incomplete_unavailable_pumping"
+    o2_money = diagnostic["product_costs"]["terminal.product:O2"]["owner_ratify_money_projection"]
+    assert is_unavailable_quantity(o2_money)
+    assert unavailable_reason_of(o2_money) == "missing-ambient-pressure"
+    assert diagnostic["product_costs"]["terminal.product:O2"]["completeness"] == "incomplete"
 
 
 def test_cost_rollup_allocates_non_mre_electrical_to_real_products():
@@ -713,3 +721,228 @@ def test_cost_seed_exception_does_not_abort_additive_atom_load(
         "injected seed failure" in warning
         for warning in summary["warnings"]
     )
+
+
+def _assert_unavailable(value, reason: str, units: str) -> None:
+    assert is_unavailable_quantity(value)
+    assert value["value"] is None
+    assert unavailable_reason_of(value) == reason
+    assert value["units"] == units
+
+
+def _rh84_subambient_context(offgas_mol_per_s):
+    row = {
+        "hour": 12,
+        "target_pressure_pa": 500.0,
+        "duration_s": 3600.0,
+        "gas_temperature_K": 300.0,
+        "validated_line_conductance_m3_s": 1.0,
+    }
+    if offgas_mol_per_s != "ABSENT":
+        row["offgas_mol_per_s"] = offgas_mol_per_s
+    return {
+        "status": "ok",
+        "feedstock_id": "mars_basalt",
+        "body": "mars",
+        "ambient_pressure_pa": 610.0,
+        "rows": [row],
+    }
+
+
+def test_missing_offgas_row_is_unavailable_energy_and_money() -> None:
+    cost, diagnostic = run_pumping_input_cost(_rh84_subambient_context("ABSENT"))
+    assert cost is None
+    assert diagnostic["status"] == "refused"
+    _assert_unavailable(
+        diagnostic["pumping_electrical_kWh"], "invalid-offgas-rate", "kWh"
+    )
+    rollup = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"O2": 1.0},
+        pumping_context=_rh84_subambient_context("ABSENT"),
+    )
+    assert rollup["run_input_cost"]["allocation_status"] == (
+        "incomplete_unavailable_pumping"
+    )
+    product = rollup["product_costs"]["terminal.product:O2"]
+    _assert_unavailable(
+        product["owner_ratify_money_projection"], "invalid-offgas-rate", "USD"
+    )
+    _assert_unavailable(
+        product["accumulated_cost"]["electrical_kWh"], "invalid-offgas-rate", "kWh"
+    )
+    assert product["completeness"] == "incomplete"
+    _assert_unavailable(
+        rollup["auxiliary_electrical_diagnostic"]["auxiliary_electrical_kWh"],
+        "invalid-offgas-rate",
+        "kWh",
+    )
+
+
+def test_invalid_negative_offgas_is_typed_refusal_not_zero() -> None:
+    cost, diagnostic = run_pumping_input_cost(_rh84_subambient_context(-0.01))
+    assert cost is None
+    assert diagnostic["reason"] == "invalid-offgas-rate"
+    _assert_unavailable(
+        diagnostic["pumping_electrical_kWh"], "invalid-offgas-rate", "kWh"
+    )
+
+
+def test_measured_zero_offgas_row_stays_numeric_zero() -> None:
+    cost, diagnostic = run_pumping_input_cost(_rh84_subambient_context(0.0))
+    assert cost is not None
+    assert cost.electrical_kWh == 0.0
+    assert diagnostic["status"] == "ok"
+    assert diagnostic["pumping_electrical_kWh"] == 0.0
+    assert not is_unavailable_quantity(diagnostic["pumping_electrical_kWh"])
+    rollup = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"O2": 1.0},
+        pumping_context=_rh84_subambient_context(0.0),
+    )
+    assert rollup["run_input_cost"]["allocation_status"] == "allocated_by_product_mass"
+    money = rollup["product_costs"]["terminal.product:O2"][
+        "owner_ratify_money_projection"
+    ]
+    assert isinstance(money, float)
+    assert not is_unavailable_quantity(money)
+
+
+def test_refused_context_money_is_unavailable_not_silently_short() -> None:
+    rollup = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"O2": 1.0},
+        pumping_context={
+            "schema_version": "pumping-context-v1",
+            "status": "refused",
+            "reason": "missing-o2-vented-flow",
+            "feedstock_id": "mars_basalt",
+            "body": "mars",
+            "ambient_pressure_pa": 610.0,
+            "rows": (),
+        },
+    )
+    money = rollup["product_costs"]["terminal.product:O2"][
+        "owner_ratify_money_projection"
+    ]
+    _assert_unavailable(money, "missing-o2-vented-flow", "USD")
+    with pytest.raises(TypeError):
+        sum(
+            entry["owner_ratify_money_projection"]
+            for entry in rollup["product_costs"].values()
+        )
+
+
+def test_cost_rollup_unavailable_money_mutation_fails_then_restores(monkeypatch) -> None:
+    from simulator import cost_ledger as ledger_mod
+    from simulator.cost_energy import unavailable_quantity
+
+    original = ledger_mod.run_pumping_input_cost
+
+    def mutated(context):
+        cost, diagnostic = original(context)
+        diagnostic = dict(diagnostic)
+        diagnostic["pumping_electrical_kWh"] = 0.0
+        return CostVector(), diagnostic
+
+    context = {
+        "schema_version": "pumping-context-v1",
+        "status": "refused",
+        "reason": "missing-o2-vented-flow",
+        "body": "mars",
+        "rows": (),
+    }
+    kwargs = dict(
+        cost_ledger=CostLedger(),
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"O2": 1.0},
+        pumping_context=context,
+    )
+    monkeypatch.setattr(ledger_mod, "run_pumping_input_cost", mutated)
+    with pytest.raises(AssertionError):
+        money = ledger_mod.build_cost_rollup_diagnostic(**kwargs)["product_costs"][
+            "terminal.product:O2"
+        ]["owner_ratify_money_projection"]
+        assert is_unavailable_quantity(money)
+    monkeypatch.setattr(ledger_mod, "run_pumping_input_cost", original)
+    restored = ledger_mod.build_cost_rollup_diagnostic(**kwargs)
+    _assert_unavailable(
+        restored["product_costs"]["terminal.product:O2"][
+            "owner_ratify_money_projection"
+        ],
+        "missing-o2-vented-flow",
+        "USD",
+    )
+    assert restored["run_input_cost"]["allocation_status"] == (
+        "incomplete_unavailable_pumping"
+    )
+    assert isinstance(unavailable_quantity(reason="x", units="USD"), dict)
+
+
+def test_energy_and_money_consumers_do_not_default_unavailable_to_zero() -> None:
+    import ast
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent
+    consumer_files = (
+        root / "simulator/cost_ledger.py",
+        root / "simulator/cost_energy.py",
+        root / "simulator/pumping_cost.py",
+        root / "simulator/optimize/evaluate.py",
+        root / "simulator/optimize/objective.py",
+        root / "simulator/accounting/run_artifact.py",
+        root / "scripts/sso2_owner_recipe_report.py",
+    )
+    energy_names = {
+        "pumping_electrical_kWh",
+        "pumping_electrical_energy_kWh",
+        "owner_ratify_money_projection",
+    }
+
+    def _name(node):
+        if isinstance(node, ast.Name):
+            return node.id
+        if isinstance(node, ast.Attribute):
+            return node.attr
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        return None
+
+    violations = []
+    for path in consumer_files:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            func_name = _name(func)
+            if func_name != "_finite":
+                continue
+            if len(node.args) < 1:
+                continue
+            target = _name(node.args[0])
+            if target not in energy_names:
+                continue
+            default = None
+            if len(node.args) >= 2 and isinstance(node.args[1], ast.Constant):
+                default = node.args[1].value
+            for keyword in node.keywords:
+                if keyword.arg == "default" and isinstance(keyword.value, ast.Constant):
+                    default = keyword.value.value
+            if default == 0.0:
+                violations.append(f"{path.name}:{node.lineno} _finite({target}, 0.0)")
+    js_files = (
+        root / "web/report_viewer/panels/p8-cost-rollup.js",
+        root / "web/report_viewer/report-viewer.js",
+    )
+    for path in js_files:
+        text = path.read_text(encoding="utf-8")
+        assert "isUnavailableQuantity" in text, path.name
+        assert "unavailable" in text
+    owner_report = (root / "scripts/sso2_owner_recipe_report.py").read_text(encoding="utf-8")
+    assert "pumping_electrical_kWh" not in owner_report
+    assert "owner_ratify_money_projection" not in owner_report
+    assert violations == []

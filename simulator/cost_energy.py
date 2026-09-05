@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -11,6 +12,8 @@ from simulator.cost_parameters import (
     DEFAULT_ELECTRICAL_COST_PER_KWH,
     load_cost_parameters,
 )
+
+UNAVAILABLE_STATUS = "unavailable"
 
 
 @dataclass(frozen=True)
@@ -95,9 +98,45 @@ def furnace_thermal_flux_hours(temperature_C: float, duration_h: float) -> float
     return temperature_K * duration
 
 
+def unavailable_quantity(*, reason: str, units: str) -> dict[str, Any]:
+    """Typed unavailable energy or money. Never a priced 0.0."""
+
+    return {
+        "status": UNAVAILABLE_STATUS,
+        "reason": str(reason or "unspecified"),
+        "value": None,
+        "units": str(units),
+    }
+
+
+def is_unavailable_quantity(value: Any) -> bool:
+    return isinstance(value, Mapping) and str(value.get("status", "")) == UNAVAILABLE_STATUS
+
+
+def unavailable_reason_of(value: Any, default: str = "unspecified") -> str:
+    if is_unavailable_quantity(value):
+        reason = value.get("reason")
+        if reason is not None and str(reason).strip():
+            return str(reason)
+    if default is not None and str(default).strip():
+        return str(default)
+    return "unspecified"
+
+
 def project_owner_ratify_money(cost: Any) -> float:
+    if is_unavailable_quantity(cost):
+        raise TypeError(
+            "cannot project money from an unavailable quantity: "
+            f"{unavailable_reason_of(cost)}"
+        )
+    electrical = getattr(cost, "electrical_kWh", 0.0)
+    if is_unavailable_quantity(electrical):
+        raise TypeError(
+            "cannot project money from unavailable electrical_kWh: "
+            f"{unavailable_reason_of(electrical)}"
+        )
     return (
-        float(getattr(cost, "electrical_kWh", 0.0)) * ELECTRICAL_USD_PER_KWH.value
+        float(electrical) * ELECTRICAL_USD_PER_KWH.value
         + float(getattr(cost, "thermal_flux_h", 0.0)) * THERMAL_USD_PER_FLUX_H.value
         + float(getattr(cost, "furnace_h", 0.0)) * FURNACE_USD_PER_H.value
         + float(getattr(cost, "launch_penalty_kg", 0.0)) * LAUNCH_USD_PER_KG.value

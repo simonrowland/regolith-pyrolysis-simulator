@@ -89,6 +89,17 @@
     return typeof value === "number" && Number.isFinite(value);
   }
 
+  function isUnavailableQuantity(value) {
+    return isRecord(value) && value.status === "unavailable";
+  }
+
+  function formatUnavailable(value) {
+    const reason = typeof value.reason === "string" && value.reason.trim()
+      ? value.reason.trim()
+      : "unspecified";
+    return `<span class="sec-p8-inline-pending">unavailable · ${esc(reason)}</span>`;
+  }
+
   function hasCanonicalTotals(totals) {
     return isRecord(totals) && CANONICAL_TOTAL_CORE.every(key => finiteNumber(totals[key]));
   }
@@ -142,6 +153,7 @@
   function formatLeaf(value, key, path) {
     if (value === undefined) return pendingInline(path);
     if (value === null) return emptyInline(path, "null");
+    if (isUnavailableQuantity(value)) return formatUnavailable(value);
     if (typeof value === "number") {
       if (!Number.isFinite(value)) return malformedInline(path, "a finite number");
       return `<span class="mono">${esc(fmtNum(value, leafUnit(key, path)))}</span>`;
@@ -178,6 +190,7 @@
   function numericValue(record, key, unit, path) {
     const valuePath = `${path}.${key}`;
     if (!hasOwn(record, key)) return pendingInline(valuePath);
+    if (isUnavailableQuantity(record[key])) return formatUnavailable(record[key]);
     return typeof record[key] === "number" && Number.isFinite(record[key])
       ? `<span class="mono">${esc(fmtNum(record[key], unit))}</span>`
       : malformedInline(valuePath, "a finite number");
@@ -288,6 +301,9 @@
   }
 
   function costVector(vector, path) {
+    if (isUnavailableQuantity(vector)) {
+      return `<div class="sec-p8-field"><span>Physical cost vector</span><b>${formatUnavailable(vector)}</b></div>`;
+    }
     if (!isRecord(vector)) return structuredProblem(vector, path, "an object");
     if (!Object.keys(vector).length) return pending(path, `${path} was emitted empty; zero is not inferred.`);
     return `<div class="sec-p8-vector">${COST_VECTOR_FIELDS.map(([key, label, unit]) =>

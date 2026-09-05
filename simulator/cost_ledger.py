@@ -15,8 +15,11 @@ from simulator.accounting.ledger import LedgerTransition
 from simulator.accounting.queries import is_reagent_bookkeeping_product
 from simulator.cost_energy import (
     furnace_thermal_flux_hours,
+    is_unavailable_quantity,
     owner_ratify_cost_placeholders,
     project_owner_ratify_money,
+    unavailable_quantity,
+    unavailable_reason_of,
 )
 from simulator.pumping_cost import estimate_subambient_pump_cost, pumping_cost_parameters
 from simulator.config_flags import bool_feature_flag
@@ -861,11 +864,16 @@ def build_cost_rollup_diagnostic(
             exc,
         )
         summary = cost_ledger._summary_fallback()
+        error_reason = "unavailable_after_cost_observation_error"
         summary["run_input_cost"] = {
             "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",
-            "physical_cost": ZERO_COST.to_json(),
-            "allocation_status": "unavailable_after_cost_observation_error",
-            "owner_ratify_money_projection": project_owner_ratify_money(ZERO_COST),
+            "physical_cost": unavailable_quantity(
+                reason=error_reason, units="cost-vector"
+            ),
+            "allocation_status": error_reason,
+            "owner_ratify_money_projection": unavailable_quantity(
+                reason=error_reason, units="USD"
+            ),
         }
         return summary
 
@@ -889,6 +897,9 @@ def _build_cost_rollup_diagnostic(
     auxiliary_electrical_input, auxiliary_electrical_components = (
         _run_auxiliary_electrical_input_cost(per_hour)
     )
+    pumping_reason = _pumping_unavailable_reason(
+        pumping_input, pumping_diagnostic
+    ) if pumping_enabled else None
     if pumping_enabled:
         # pumping_context is authoritative when present; the per-hour breakdown
         # remains the fallback only when that typed context is absent.
@@ -901,9 +912,14 @@ def _build_cost_rollup_diagnostic(
         )
     # Provenance: owner-approved wave-5 cost-ledger behavior, present in v0.5.10;
     # pumping/turbine/condenser electrical is allocated per component to products.
-    product_allocation_input = (
-        furnace_input + pumping_input + auxiliary_electrical_input
-    )
+    # Unavailable pumping is not a measured zero: omit it from the numeric
+    # allocation and mark every total that would have contained it incomplete.
+    if pumping_reason is None and pumping_input is not None:
+        product_allocation_input = (
+            furnace_input + pumping_input + auxiliary_electrical_input
+        )
+    else:
+        product_allocation_input = furnace_input + auxiliary_electrical_input
     product_inputs = _cost_allocation_product_inputs(products_kg)
     product_alloc = (
         _allocate_by_mass(product_inputs, product_allocation_input)
@@ -950,35 +966,58 @@ def _build_cost_rollup_diagnostic(
                 "accumulated_cost": total.to_json(),
                 "owner_ratify_money_projection": project_owner_ratify_money(total),
             }
+    if pumping_reason is not None:
+        product_costs = _mark_product_costs_incomplete(product_costs, pumping_reason)
+    allocation_status = (
+        "allocated_by_product_mass"
+        if product_inputs else "unallocated_no_product_mass"
+    )
+    if pumping_reason is not None:
+        allocation_status = "incomplete_unavailable_pumping"
     run_input_cost = {
         "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",
         "physical_cost": furnace_input.to_json(),
-        "allocation_status": (
-            "allocated_by_product_mass"
-            if product_inputs else "unallocated_no_product_mass"
-        ),
+        "allocation_status": allocation_status,
         "owner_ratify_money_projection": project_owner_ratify_money(furnace_input),
     }
     if pumping_enabled:
         summary["pumping_diagnostic"] = {
             **pumping_diagnostic,
-            "pumping_electrical_kWh": pumping_input.electrical_kWh,
             "status": pumping_diagnostic.get("status", "unknown"),
         }
-    electrical_components = {
-        **auxiliary_electrical_components,
-        "pumping": auxiliary_electrical_components.get("pumping", 0.0)
-        + pumping_input.electrical_kWh,
-    }
-    summary["auxiliary_electrical_diagnostic"] = {
-        "schema_version": "auxiliary-electrical-rollup-v1",
-        "components_kWh": {
+    if pumping_reason is not None:
+        pumping_component: Any = unavailable_quantity(
+            reason=pumping_reason, units="kWh"
+        )
+        auxiliary_total: Any = unavailable_quantity(
+            reason=pumping_reason, units="kWh"
+        )
+        electrical_components = {
+            **auxiliary_electrical_components,
+            "pumping": pumping_component,
+        }
+        components_kWh = {
+            component: electrical_components.get(component, 0.0)
+            for component in sorted(_AUXILIARY_ELECTRICAL_COMPONENT_ALIASES)
+        }
+    else:
+        pumping_kwh = (
+            0.0 if pumping_input is None else pumping_input.electrical_kWh
+        )
+        electrical_components = {
+            **auxiliary_electrical_components,
+            "pumping": auxiliary_electrical_components.get("pumping", 0.0)
+            + pumping_kwh,
+        }
+        components_kWh = {
             component: float(electrical_components.get(component, 0.0))
             for component in sorted(_AUXILIARY_ELECTRICAL_COMPONENT_ALIASES)
-        },
-        "auxiliary_electrical_kWh": float(
-            sum(electrical_components.values())
-        ),
+        }
+        auxiliary_total = float(sum(electrical_components.values()))
+    summary["auxiliary_electrical_diagnostic"] = {
+        "schema_version": "auxiliary-electrical-rollup-v1",
+        "components_kWh": components_kWh,
+        "auxiliary_electrical_kWh": auxiliary_total,
     }
     summary["run_input_cost"] = run_input_cost
     if not product_inputs and not product_allocation_input.is_zero():
@@ -1124,23 +1163,69 @@ def _canonical_auxiliary_electrical_components(
     return components
 
 
+def _pumping_unavailable_reason(
+    pumping_input: CostVector | None,
+    pumping_diagnostic: Mapping[str, Any],
+) -> str | None:
+    energy = pumping_diagnostic.get("pumping_electrical_kWh")
+    if is_unavailable_quantity(energy):
+        return unavailable_reason_of(
+            energy,
+            default=str(pumping_diagnostic.get("reason") or "unavailable-pumping-energy"),
+        )
+    if pumping_input is None:
+        return str(
+            pumping_diagnostic.get("reason")
+            or pumping_diagnostic.get("status")
+            or "unavailable-pumping-energy"
+        )
+    return None
+
+
+def _mark_product_costs_incomplete(
+    product_costs: dict[str, Any],
+    reason: str,
+) -> dict[str, Any]:
+    marked: dict[str, Any] = {}
+    for key, entry in product_costs.items():
+        if not isinstance(entry, Mapping):
+            marked[key] = entry
+            continue
+        cost_json = dict(entry.get("accumulated_cost") or {})
+        cost_json["electrical_kWh"] = unavailable_quantity(reason=reason, units="kWh")
+        updated = dict(entry)
+        updated["accumulated_cost"] = cost_json
+        updated["owner_ratify_money_projection"] = unavailable_quantity(
+            reason=reason, units="USD"
+        )
+        updated["completeness"] = "incomplete"
+        updated["unavailable_reason"] = reason
+        marked[key] = updated
+    return marked
+
+
 def run_pumping_input_cost(
     pumping_context: Mapping[str, Any] | None,
-) -> tuple[CostVector, dict[str, Any]]:
+) -> tuple[CostVector | None, dict[str, Any]]:
     parameter_metadata = [p.to_json() for p in pumping_cost_parameters()]
     if not isinstance(pumping_context, Mapping):
-        return ZERO_COST, {
+        reason = "not_evaluated_no_pumping_context"
+        return None, {
             "schema_version": "pumping-cost-rollup-v1",
-            "status": "not_evaluated_no_pumping_context",
-            "pumping_electrical_kWh": 0.0,
+            "status": reason,
+            "reason": reason,
+            "pumping_electrical_kWh": unavailable_quantity(
+                reason=reason, units="kWh"
+            ),
             "parameter_metadata": parameter_metadata,
             "rows": [],
         }
     if str(pumping_context.get("status", "")) == "refused":
-        return ZERO_COST, {
+        reason = str(pumping_context.get("reason", "unspecified") or "unspecified")
+        return None, {
             "schema_version": "pumping-cost-rollup-v1",
             "status": "refused",
-            "reason": str(pumping_context.get("reason", "unspecified")),
+            "reason": reason,
             "feedstock_id": str(pumping_context.get("feedstock_id", "")),
             "body": str(pumping_context.get("body", "")),
             "ambient_pressure_pa": _finite(
@@ -1150,7 +1235,9 @@ def run_pumping_input_cost(
             "ambient_pressure_source": str(
                 pumping_context.get("ambient_pressure_source", "")
             ),
-            "pumping_electrical_kWh": 0.0,
+            "pumping_electrical_kWh": unavailable_quantity(
+                reason=reason, units="kWh"
+            ),
             "feasible": False,
             "parameter_metadata": parameter_metadata,
             "rows": [],
@@ -1163,6 +1250,7 @@ def run_pumping_input_cost(
     total_energy_kWh = 0.0
     any_infeasible = False
     any_unresolved = False
+    unavailable_reason: str | None = None
     for raw_row in pumping_context.get("rows", ()) or ():
         if not isinstance(raw_row, Mapping):
             continue
@@ -1179,7 +1267,11 @@ def run_pumping_input_cost(
                 else _finite(line_conductance, math.nan)
             ),
         )
-        total_energy_kWh += max(0.0, _finite(result.energy_kWh))
+        if result.energy_kWh is None:
+            if unavailable_reason is None:
+                unavailable_reason = str(result.status or "unavailable-pumping-energy")
+        else:
+            total_energy_kWh += max(0.0, float(result.energy_kWh))
         if result.feasible is None:
             any_unresolved = True
         elif not result.feasible:
@@ -1196,17 +1288,26 @@ def run_pumping_input_cost(
             ),
             **result.to_json(),
         })
-    cost = CostVector(electrical_kWh=total_energy_kWh)
-    status = "ok"
-    if not rows:
-        status = "no_rows"
-    elif any_infeasible:
-        status = "infeasible_pumping_point"
-    elif any_unresolved:
-        status = "pumping_feasibility_unresolved"
-    feasible: bool | None = not any_infeasible
-    if any_unresolved and not any_infeasible:
-        feasible = None
+    if unavailable_reason is not None:
+        cost = None
+        energy_field: Any = unavailable_quantity(
+            reason=unavailable_reason, units="kWh"
+        )
+        status = "refused"
+        feasible: bool | None = False
+    else:
+        cost = CostVector(electrical_kWh=total_energy_kWh)
+        energy_field = cost.electrical_kWh
+        status = "ok"
+        if not rows:
+            status = "no_rows"
+        elif any_infeasible:
+            status = "infeasible_pumping_point"
+        elif any_unresolved:
+            status = "pumping_feasibility_unresolved"
+        feasible = not any_infeasible
+        if any_unresolved and not any_infeasible:
+            feasible = None
     diagnostic = {
         "schema_version": "pumping-cost-rollup-v1",
         "status": status,
@@ -1216,11 +1317,13 @@ def run_pumping_input_cost(
         "ambient_pressure_source": str(
             pumping_context.get("ambient_pressure_source", "")
         ),
-        "pumping_electrical_kWh": cost.electrical_kWh,
+        "pumping_electrical_kWh": energy_field,
         "feasible": feasible,
         "parameter_metadata": parameter_metadata,
         "rows": rows,
     }
+    if unavailable_reason is not None:
+        diagnostic["reason"] = unavailable_reason
     return cost, diagnostic
 
 

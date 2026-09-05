@@ -44,6 +44,7 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.cost_energy import unavailable_quantity
 from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.corpus_version import current_corpus_version
@@ -4236,7 +4237,10 @@ def _pumping_diagnostic_for_gate(
                     "feedstock_id": feedstock_id,
                     "body": str(mismatch["expected_body"]),
                     "ambient_pressure_pa": mismatch["expected_ambient_pressure_pa"],
-                    "pumping_electrical_kWh": 0.0,
+                    "pumping_electrical_kWh": unavailable_quantity(
+                        reason="pumping-diagnostic-environment-mismatch",
+                        units="kWh",
+                    ),
                     "feasible": False,
                     "rows": [],
                     "identity_mismatch": mismatch,
