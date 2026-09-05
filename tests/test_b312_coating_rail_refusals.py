@@ -15,9 +15,11 @@ import pytest
 
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.queries import (
-    _wall_geometry_conductance_weight,
     wall_deposit_candidate_for_surface_kg,
     wall_deposit_candidates_by_segment_kg,
+)
+from simulator.wall_deposition import (
+    _wall_geometry_conductance_weight,
 )
 from simulator.condensation import (
     CondensationModel,

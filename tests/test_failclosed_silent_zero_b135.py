@@ -18,6 +18,8 @@ import pytest
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.queries import (
     _stage0_foulant_partition_rows,
+)
+from simulator.wall_deposition import (
     _wall_geometry_conductance_weight,
 )
 from simulator.chemistry import ellingham_graph
