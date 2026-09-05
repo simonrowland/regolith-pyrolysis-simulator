@@ -305,26 +305,26 @@
         "Na": {
           "status": "unavailable",
           "reason": "species_absent_from_latest_evaporation_series_diagnostic",
-          "current_wall_deposit_flux_kg_hr": 0.0,
-          "cumulative_wall_deposit_kg": 0.0
+          "current_wall_deposit_flux_kg_hr": null,
+          "cumulative_wall_deposit_kg": null
         },
         "K": {
           "status": "unavailable",
           "reason": "species_absent_from_latest_evaporation_series_diagnostic",
-          "current_wall_deposit_flux_kg_hr": 0.0,
-          "cumulative_wall_deposit_kg": 0.0
+          "current_wall_deposit_flux_kg_hr": null,
+          "cumulative_wall_deposit_kg": null
         },
         "SiO": {
           "status": "unavailable",
           "reason": "species_absent_from_latest_evaporation_series_diagnostic",
-          "current_wall_deposit_flux_kg_hr": 0.0,
-          "cumulative_wall_deposit_kg": 0.0
+          "current_wall_deposit_flux_kg_hr": null,
+          "cumulative_wall_deposit_kg": null
         },
         "Fe": {
           "status": "unavailable",
           "reason": "species_absent_from_latest_evaporation_series_diagnostic",
-          "current_wall_deposit_flux_kg_hr": 0.0,
-          "cumulative_wall_deposit_kg": 0.0
+          "current_wall_deposit_flux_kg_hr": null,
+          "cumulative_wall_deposit_kg": null
         }
       }
     },
@@ -2366,7 +2366,7 @@
           "ree_enrichment_factor": null,
           "derivation": "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
         },
-        "class_total_kg": 759.2312041414734
+        "class_total_kg": 229.8441294934647
       },
       "unclassified": {
         "kg_by_species": {
@@ -2377,7 +2377,7 @@
         "total_kg": 39.907780615075126
       }
     },
-    "markdown": "# Three-Product-Class Report\n**Feedstock**: `ci_carbonaceous_chondrite` \u2022 **Campaign**: `C2B`\n\n**Class totals**: Metals + O\u2082 potential: \u2014 kg | Silica glass: \u2014 kg | Mixed glass: \u2014 kg | Rump: 759.231 kg\n\n## 1. Metals + source-side O\u2082 potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O\u2082 potential)\n**Class total**: \u2014 kg\n\n- Metals subtotal: \u2014 kg\n- Source-side O\u2082 potential subtotal (emitted; not recovered/captured): \u2014 kg\n\nPer-species:\n  (no species in this class)\n\n## 2. Pure silica glass (Stage 3 fused-silica baffle capture)\n**Class total**: \u2014 kg\n\n- Stage 3 capture: \u2014 kg\n\nPer-species on Stage 3 baffles:\n  (no species in this class)\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: \u2014 kg\n\n- Mixed melt residual: \u2014 kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default \u2014 mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (Ca / REE / refractory oxides \u2014 by physics)\n**Class total**: 759.231 kg\n\n- Rump total: 759.231 kg\n- Refractory oxides floor (by physics): 229.844 kg\n- Silicate residual: 277.446 kg\n- Unextracted metals residue (failure-mode 1): \u2014 kg\n- Other / unclassified rump: 251.941 kg\n\nPer-species:\n  - **Al2O3**: 19.267 kg\n  - **CaO**: 22.152 kg\n  - **FeO**: 231.205 kg\n  - **MgO**: 188.425 kg\n  - **Na2O**: 5.323 kg\n  - **NiO**: 15.414 kg\n  - **SiO2**: 277.446 kg\n\n## \u26a0\ufe0f Unclassified species (mapping gap)\n**Total**: 39.908 kg \u2014 these species were in `product_ledger()` but did not map to any of the four north-star product classes. The mapping in `simulator/three_product_report.py` may need to be extended.\n\n  - **CaCO3**: 7.531e-03 kg\n  - **Na2CO3**: \u2014 kg\n  - **S**: 39.900 kg\n"
+    "markdown": "# Three-Product-Class Report\n**Feedstock**: `ci_carbonaceous_chondrite` \u2022 **Campaign**: `C2B`\n\n**Class totals**: Metals + O\u2082 potential: \u2014 kg | Silica glass: \u2014 kg | Mixed glass: \u2014 kg | Rump: 229.844 kg\n\n## 1. Metals + source-side O\u2082 potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O\u2082 potential)\n**Class total**: \u2014 kg\n\n- Metals subtotal: \u2014 kg\n- Source-side O\u2082 potential subtotal (emitted; not recovered/captured): \u2014 kg\n\nPer-species:\n  (no species in this class)\n\n## 2. Stage 3 silica capture (not a product)\n**Class total**: \u2014 kg\n\nPure silica glass is not established. Qualification requires positive capture following a recorded pO\u2082 hold \u2192 pN\u2082 SiO-release switch, with authoritative SiO evidence for every capture.\n\n- Stage 3 capture: \u2014 kg\n\nPer-species on Stage 3 baffles:\n  (no species in this class)\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: \u2014 kg\n\n- Mixed melt residual: \u2014 kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default \u2014 mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (refractory-oxide floor only)\n**Class total**: 229.844 kg\n\n- Residual inventory total (not a product total): 759.231 kg\n- Refractory oxides floor (by physics): 229.844 kg\n- Silicate residual (non-product inventory): 277.446 kg\n- Unextracted metals residue (failure-mode 1): \u2014 kg\n- Other / unclassified rump: 251.941 kg\n\nResidual inventory per species (not all product):\n  - **Al2O3**: 19.267 kg\n  - **CaO**: 22.152 kg\n  - **FeO**: 231.205 kg\n  - **MgO**: 188.425 kg\n  - **Na2O**: 5.323 kg\n  - **NiO**: 15.414 kg\n  - **SiO2**: 277.446 kg\n\n## \u26a0\ufe0f Unclassified species (non-product inventory / mapping gap)\n**Total**: 39.908 kg \u2014 these amounts are not assigned to a north-star product class. They may include Stage 0 native-metal cleanup inventory and material without a product classification.\n\n  - **CaCO3**: 7.531e-03 kg\n  - **Na2CO3**: \u2014 kg\n  - **S**: 39.900 kg\n"
   },
   "terminal_product_taxonomy": {
     "grade": {
@@ -2523,8 +2523,8 @@
       "basis": "hardware_rating_minimum",
       "capture_shortfall_kg": 0.0,
       "capture_status": {
-        "reason": null,
-        "status": "captured"
+        "reason": "no_oxygen_captured",
+        "status": "not_captured"
       },
       "captured_batch_kg": 0.0,
       "cavern_capacity_kg": 2850000.0,
