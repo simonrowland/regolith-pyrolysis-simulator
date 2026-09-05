@@ -1286,6 +1286,37 @@ def test_run_artifact_routes_return_index_full_artifact_and_404(tmp_path) -> Non
     assert corrupt_response.get_json()["error_type"] == "run_store_corruption"
 
 
+def _assert_read_plane_transport_error(response, expected_status: int) -> None:
+    """Read-plane GET errors: HTTP 4xx + JSON object with a non-empty string ``error``.
+
+    Independent of the command-plane ``{error, error_type}`` shape: extra keys
+    are additive, and a body that is only ``{"error": ...}`` remains valid.
+    """
+    assert response.status_code == expected_status, response.get_json()
+    body = response.get_json()
+    assert isinstance(body, dict)
+    error = body.get("error")
+    assert isinstance(error, str) and error.strip() != ""
+
+
+def test_get_run_artifact_transport_errors_return_json_error_body(tmp_path) -> None:
+    app = Flask(__name__)
+    app.config.update(
+        TESTING=True,
+        SECRET_KEY="run-artifact-error-body-test",
+        RUN_ARTIFACT_DIR=str(tmp_path / "runs"),
+    )
+    app.register_blueprint(web_routes.bp)
+    client = app.test_client()
+
+    missing = client.get("/api/runs/missing")
+    _assert_read_plane_transport_error(missing, 404)
+    assert missing.get_json()["error"] == "run artifact not found"
+
+    invalid = client.get("/api/runs/not.ok")
+    _assert_read_plane_transport_error(invalid, 400)
+
+
 def test_run_meta_route_round_trip_validation_and_404(tmp_path) -> None:
     app = Flask(__name__)
     app.config.update(

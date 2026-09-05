@@ -200,3 +200,50 @@ def test_every_http_ledger_get_is_typed_and_byte_identical_read_only():
 def _assert_http_ok(client, url: str) -> None:
     response = client.get(url)
     assert response.status_code == 200, response.get_json()
+
+
+def _assert_read_plane_transport_error(response, expected_status: int) -> None:
+    """Read-plane GET errors: HTTP 4xx + JSON object with a non-empty string ``error``.
+
+    Independent of the command-plane ``{error, error_type}`` shape: extra keys
+    are additive, and a body that is only ``{"error": ...}`` remains valid.
+    """
+    assert response.status_code == expected_status, response.get_json()
+    body = response.get_json()
+    assert isinstance(body, dict)
+    error = body.get("error")
+    assert isinstance(error, str) and error.strip() != ""
+
+
+def test_http_ledger_transport_errors_return_json_error_body():
+    import app as app_module
+    from web.events import _simulations, _sim_locks
+
+    api = _api()
+    sid = "ledger-error-body-test"
+    client_id = "ledger-error-body-browser"
+    _simulations[sid] = {
+        "session": SimpleNamespace(simulator=api.sim),
+        "run_id": "ledger-error-body-run",
+        "ledger_client_id": client_id,
+    }
+    _sim_locks[sid] = threading.RLock()
+    client = app_module.create_app().test_client()
+    with client.session_transaction() as browser_session:
+        browser_session["ledger_client_id"] = client_id
+    try:
+        _assert_read_plane_transport_error(
+            client.get("/api/ledger/account/not.real"),
+            404,
+        )
+        _assert_read_plane_transport_error(
+            client.get("/api/ledger/views/not_real"),
+            404,
+        )
+        _assert_read_plane_transport_error(
+            client.get("/api/ledger/account/process.cleaned_melt?units=grams"),
+            400,
+        )
+    finally:
+        _simulations.pop(sid, None)
+        _sim_locks.pop(sid, None)
