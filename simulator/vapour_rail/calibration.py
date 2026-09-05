@@ -26,7 +26,6 @@ import hashlib
 import json
 import math
 import sqlite3
-import unicodedata
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from enum import Enum
@@ -1955,78 +1954,27 @@ def load_vapour_rail_calibration_sidecar(
     return dict(payload)
 
 
-def _ascii_fold_c1_utf8_continuation_bytes(text: str) -> str:
-    """Replace characters whose UTF-8 encoding contains a C1-range byte.
-
-    ``test_data_yaml_survives_latin1_misdecode`` rejects data YAML whose
-    UTF-8 bytes fall in 0x80-0x9F (continuation bytes that become C1
-    controls under latin1). NFKD-to-ASCII when that yields a replacement;
-    otherwise ``?``. Characters whose encoding stays outside C1 (e.g. §
-    U+00A7 = C2 A7) are kept.
-    """
-
-    folded: list[str] = []
-    for char in text:
-        encoded = char.encode("utf-8")
-        if any(0x80 <= byte <= 0x9F for byte in encoded):
-            spelled = _C1_GLYPH_ASCII.get(char)
-            if spelled is None:
-                spelled = (
-                    unicodedata.normalize("NFKD", char)
-                    .encode("ascii", "ignore")
-                    .decode("ascii")
-                )
-            # A glyph with no spelling and no NFKD form is a loss of meaning;
-            # keep it visible as '?' rather than silently dropping it.
-            folded.append(spelled if spelled else "?")
-        else:
-            folded.append(char)
-    return "".join(folded)
-
-
-# Meaning-preserving spellings for the maths glyphs this module's prose uses.
-# NFKD cannot spell these (it strips them to nothing), so without the map a
-# fold would turn "Δlog10(P)" into "?log10(P)" (review). Keep in sync with the
-# sidecar notes, which use the same spellings.
-_C1_GLYPH_ASCII = {
-    "⇌": "<=>",   # ⇌ equilibrium
-    "→": "->",    # → maps to
-    "⇒": "=>",    # ⇒ implies
-    "≈": "~=",    # ≈ approximately
-    "∝": "~",     # ∝ proportional
-    "Δ": "d",     # Δ delta (dlog10, as the sidecar spells it)
-    "−": "-",     # − minus
-    "–": "-",     # – en dash
-    "—": "-",     # — em dash
-    "≤": "<=",    # ≤
-    "≥": ">=",    # ≥
-    "≠": "!=",    # ≠
-    "±": "+/-",   # ± (C2 B1: not C1, listed for completeness)
-}
-
-
 def write_sidecar(
     path: Path,
     document: Mapping[str, Any],
 ) -> None:
     """Write a reviewed sidecar YAML document.
 
-    Arbitrary writer prose is sanitised at this boundary: characters whose
-    UTF-8 encoding contains a C1-range continuation byte (0x80-0x9F) are
-    ASCII-folded so a later latin1 misdecode cannot re-break
-    ``test_data_yaml_survives_latin1_misdecode``.
+    Dump with ``allow_unicode=False`` so non-ASCII identifiers, paths, and
+    notes become YAML ``\\uXXXX`` escapes. That keeps the file free of
+    C1-range UTF-8 continuation bytes (0x80-0x9F) that
+    ``test_data_yaml_survives_latin1_misdecode`` rejects, without rewriting
+    the loaded values or changing YAML scalar types.
     """
 
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     # Validate by round-trip through the loader contract after write.
-    text = _ascii_fold_c1_utf8_continuation_bytes(
-        yaml.safe_dump(
-            dict(document),
-            sort_keys=False,
-            default_flow_style=False,
-            allow_unicode=True,
-        )
+    text = yaml.safe_dump(
+        dict(document),
+        sort_keys=False,
+        default_flow_style=False,
+        allow_unicode=False,
     )
     path.write_text(text)
     load_vapour_rail_calibration_sidecar(path)

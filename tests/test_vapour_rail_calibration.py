@@ -843,14 +843,14 @@ def test_write_sidecar_roundtrip(tmp_path: Path):
     assert loaded["raw_store"]["runtime_readable"] is False
 
 
-def test_write_sidecar_folds_c1_range_utf8_continuation_bytes(tmp_path: Path):
-    """Arbitrary writer prose cannot reintroduce latin1-guard C1 bytes."""
+def test_write_sidecar_emits_ascii_yaml_and_roundtrips_identity(tmp_path: Path):
+    """Sidecar dumps stay C1-free without rewriting IDs, paths, or scalar types."""
 
     doc = build_sidecar_document(
-        calibration_id="vr10-c1-fold",
+        calibration_id="calibration-Δ",
         raw_store_digest=None,
-        raw_store_path=None,
-        notes=["diagnostic ⇌ result Δlog10"],
+        raw_store_path="/data/Δ/run.sqlite",
+        notes=["−1", "diagnostic ⇌ result Δlog10"],
     )
     path = tmp_path / "vapour_rail_calibration.yaml"
     write_sidecar(path, doc)
@@ -858,12 +858,23 @@ def test_write_sidecar_folds_c1_range_utf8_continuation_bytes(tmp_path: Path):
     offenders = [f"0x{byte:02X}" for byte in raw if 0x80 <= byte <= 0x9F]
     assert not offenders, f"C1-range UTF-8 bytes in sidecar dump: {offenders}"
     text = path.read_text(encoding="utf-8")
-    assert "⇌" not in text
-    assert "Δ" not in text
+    assert text.isascii()
     loaded = load_vapour_rail_calibration_sidecar(path)
-    # Meaning-preserving spellings (the sidecar's own): a fold that turned
-    # "Δlog10" into "?log10" would pass the byte guard while losing the maths.
-    assert loaded["notes"] == ["diagnostic <=> result dlog10"]
+    assert loaded["calibration_id"] == "calibration-Δ"
+    assert loaded["raw_store"]["path"] == "/data/Δ/run.sqlite"
+    assert loaded["notes"] == ["−1", "diagnostic ⇌ result Δlog10"]
+    assert isinstance(loaded["notes"][0], str)
+
+    minus_one = build_sidecar_document(
+        calibration_id="−1",
+        raw_store_digest=None,
+        raw_store_path=None,
+    )
+    path2 = tmp_path / "minus-one.yaml"
+    write_sidecar(path2, minus_one)
+    loaded2 = load_vapour_rail_calibration_sidecar(path2)
+    assert loaded2["calibration_id"] == "−1"
+    assert isinstance(loaded2["calibration_id"], str)
 
 
 def test_writer_regeneration_preserves_every_cell_status(tmp_path: Path):
