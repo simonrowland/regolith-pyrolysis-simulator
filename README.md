@@ -116,7 +116,7 @@ batch runner; nothing in the runner is feedstock-specific.
 
 **"Can I trade recipe knobs against product grade?"**
 Every run emits `stage_purity_report`, the per-stage designated / coproduct / impurity split with a
-PURE / MIXED / CONTAMINATED verdict, so a selectivity claim is checkable per condenser stage. The
+PURE / MIXED / CONTAMINATED / INDETERMINATE verdict, so a selectivity claim is checkable per condenser stage. Empty stages are INDETERMINATE, not PURE. The
 grading policies live in `data/glass_types.yaml` and `data/ceramics_taxonomy.yaml`. The §5
 early-tap option — stop before the SiO release window and tap a mixed industrial glass — is
 `--early-tap` on the three-product runner.

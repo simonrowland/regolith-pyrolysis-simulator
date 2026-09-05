@@ -61,6 +61,11 @@ from simulator.runner import (
     _status_with_mass_balance_invariant,
     _vapor_pressure_source_report,
 )
+from simulator.condensation import (
+    STAGE_PURITY_NO_CAPTURED_MASS,
+    STAGE_PURITY_VERDICT_INDETERMINATE,
+    STAGE_PURITY_VERDICTS,
+)
 from simulator.three_product_report import classify_products
 from simulator.three_product_report_markdown import (
     format_three_product_markdown,
@@ -1083,7 +1088,13 @@ def _assert_schema_shape(payload: dict) -> None:
             "purity_fraction",
             "verdict",
         })
-        assert stage["verdict"] in {"PURE", "MIXED", "CONTAMINATED"}
+        assert stage["verdict"] in STAGE_PURITY_VERDICTS
+        if stage["verdict"] == STAGE_PURITY_VERDICT_INDETERMINATE:
+            assert stage["purity_fraction"] is None
+            assert stage["reason"] == STAGE_PURITY_NO_CAPTURED_MASS
+        else:
+            assert isinstance(stage["purity_fraction"], (int, float))
+            assert "reason" not in stage
 
     source_report = payload["vapor_pressure_source_report"]
     assert isinstance(source_report, dict)

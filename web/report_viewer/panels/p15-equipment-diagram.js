@@ -131,7 +131,7 @@
     return `<div class="sec-p15-stage-group"><span>${esc(label)}</span>${speciesList(value, "kg", "None emitted")}</div>`;
   }
 
-  function stageCard(stageDefinition, stagePurity, campaign) {
+  function stageCard(stageDefinition, stagePurity, campaign, productClassification) {
     const stage = asMap(stagePurity?.[stageDefinition.key]);
     const label = stage && typeof stage.label === "string" && stage.label.trim()
       ? stage.label.trim()
@@ -139,19 +139,39 @@
     const active = stageDefinition.campaigns.includes(campaign);
     const activeClass = active ? " sec-p15-stage--active" : "";
     const designated = asMap(stage?.designated_species_kg);
-    const emittedProductSpecies = stageDefinition.productSpecies?.find((species) => (
+    const designatedProductSpecies = stageDefinition.productSpecies?.find((species) => (
       designated && hasNumber(designated[species]) && designated[species] > 0
     ));
+    const isSilicaStage = stageDefinition.key === "stage_3_sio_zone";
+    const silica = isSilicaStage ? asMap(asMap(productClassification)?.pure_silica_glass) : null;
+    const silicaClassTotal = silica && hasNumber(silica.class_total_kg) ? silica.class_total_kg : null;
+    const silicaCapture = silica && hasNumber(silica.stage_3_capture_kg) ? silica.stage_3_capture_kg : null;
+    const silicaQualified = silicaClassTotal !== null && silicaClassTotal > 0;
+    const silicaUnqualifiedCapture = isSilicaStage
+      && silicaCapture !== null
+      && silicaCapture > 0
+      && !silicaQualified;
+    const emittedProductSpecies = !stage
+      ? null
+      : isSilicaStage
+        ? (silicaQualified ? (designatedProductSpecies || stageDefinition.productSpecies[0]) : null)
+        : designatedProductSpecies;
     const emittedProduct = Boolean(emittedProductSpecies);
     const productClass = emittedProduct ? " sec-p15-stage--product" : "";
     const productStyle = emittedProduct
       ? ` style="--sec-p15-product:${esc(speciesColor(emittedProductSpecies))}"`
       : "";
+    let routeStatus = "collection not implied";
+    if (stage && isSilicaStage && silicaQualified) {
+      routeStatus = "qualified silica product";
+    } else if (stage && silicaUnqualifiedCapture) {
+      routeStatus = "flagged capture · not a product";
+    } else if (emittedProduct) {
+      routeStatus = "terminal designated mass emitted";
+    }
     const routeNote = stageDefinition.productSpecies
       ? `<span class="sec-p15-stage-route">${esc(
-        `Designed product route · ${stageDefinition.productSpecies.map(prettySpecies).join(" / ")} · ${
-          emittedProduct ? "terminal designated mass emitted" : "collection not implied"
-        }`
+        `Designed product route · ${stageDefinition.productSpecies.map(prettySpecies).join(" / ")} · ${routeStatus}`
       )}</span>`
       : "";
     const activeText = active ? " · designed campaign-route focus; activity not emitted" : "";
@@ -163,12 +183,19 @@
     }
 
     const hasVerdict = typeof stage.verdict === "string" && stage.verdict.trim();
-    const verdict = hasVerdict ? stage.verdict.trim() : "PENDING";
-    const verdictClass = ["PURE", "MIXED", "CONTAMINATED"].includes(verdict)
-      ? ` sec-p15-verdict--${verdict.toLowerCase()}`
-      : " sec-p15-verdict--pending";
+    const verdictToken = hasVerdict ? stage.verdict.trim() : "PENDING";
+    const isIndeterminate = verdictToken === "INDETERMINATE";
+    const verdict = isIndeterminate ? "no material" : verdictToken;
+    const verdictClass = ["PURE", "MIXED", "CONTAMINATED"].includes(verdictToken)
+      ? ` sec-p15-verdict--${verdictToken.toLowerCase()}`
+      : isIndeterminate
+        ? " sec-p15-verdict--indeterminate"
+        : " sec-p15-verdict--pending";
     const warning = typeof stage.warning === "string" && stage.warning.trim()
       ? `<p class="sec-p15-stage-warning">${esc(stage.warning.trim())}</p>`
+      : "";
+    const flaggedCapture = silicaUnqualifiedCapture
+      ? `<p class="sec-p15-stage-flag">${esc("flagged capture · not a product")}</p>`
       : "";
     // Empty-stage classification sentence only when the backend emitted a
     // verdict; inventing "backend's empty-stage classification" for a missing
@@ -179,13 +206,16 @@
         ? `<p class="sec-p15-stage-empty">${esc("No classified product mass emitted; verdict is the backend's empty-stage classification")}</p>`
         : `<p class="sec-p15-stage-empty">${esc("No classified product mass emitted; verdict pending — not emitted")}</p>`;
     }
+    const purityMetric = isIndeterminate || stage.purity_fraction === null
+      ? `<div class="sec-p15-metric"><span>Emitted purity fraction</span><strong>no material</strong></div>`
+      : metric("Emitted purity fraction", stage.purity_fraction, "", { min: 0, max: 1 });
     return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; includes stage-routed tap metal; not condenser inventory${activeText}`)}">` +
       `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
       `<h4>${esc(label)}</h4>${routeNote}` +
-      `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${warning}` +
+      `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${flaggedCapture}${warning}` +
       metric("Designated + coproduct mass", stage.designated_kg, "kg", { min: 0 }) +
       metric("Impurity mass", stage.impurity_kg, "kg", { min: 0 }) +
-      metric("Emitted purity fraction", stage.purity_fraction, "", { min: 0, max: 1 }) +
+      purityMetric +
       `<details class="sec-p15-stage-detail"><summary>Terminal species split</summary>` +
       stageSpeciesGroup("Designated", stage.designated_species_kg) +
       stageSpeciesGroup("Coproduct", stage.coproduct_species_kg) +
@@ -220,9 +250,10 @@
 
   function stageTrain(artifact, summary, campaign) {
     const stagePurity = asMap(artifact.terminal)?.stage_purity;
+    const productClassification = asMap(asMap(artifact.terminal)?.product_classification);
     const items = [];
     STAGES.forEach((stage, index) => {
-      items.push(stageCard(stage, stagePurity, campaign));
+      items.push(stageCard(stage, stagePurity, campaign, productClassification));
       if (index < STAGES.length - 1) items.push(pipeSegment(summary, index));
     });
     return `<div class="sec-p15-train-head"><div><span class="sec-p15-kicker">Metal condensation train</span>` +

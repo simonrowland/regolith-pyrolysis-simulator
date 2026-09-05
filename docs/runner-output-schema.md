@@ -466,7 +466,8 @@ and the aggregate liner load:
     "impurity_kg": 0.123,
     "total_kg": 12.468,
     "purity_fraction": 0.9901,
-    "verdict": "PURE" | "MIXED" | "CONTAMINATED",
+    "verdict": "PURE" | "MIXED" | "CONTAMINATED" | "INDETERMINATE",
+    "reason": "no_captured_mass",
     "warning": ""
   }
 }
@@ -476,6 +477,11 @@ and the aggregate liner load:
 * Accepted species come from `simulator/condensation_routing.py`.
 * Verdict thresholds: `PURE` when purity is above 95%, `MIXED`
   from 80-95%, and `CONTAMINATED` below 80%.
+* Empty captured mass (`total_kg` at or below the classification
+  floor) is `INDETERMINATE` with `purity_fraction: null` and
+  `reason: "no_captured_mass"`. A 0/0 ratio is not 1.0. `reason`
+  is omitted on non-empty stages. Invalid inventory still refuses
+  the report rather than minting a purity number.
 
 ## Vapor pressure source report
 

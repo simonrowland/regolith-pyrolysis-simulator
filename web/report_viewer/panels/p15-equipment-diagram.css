@@ -520,7 +520,8 @@
   color: var(--red);
 }
 
-.sec-p15-equipment .sec-p15-verdict--pending {
+.sec-p15-equipment .sec-p15-verdict--pending,
+.sec-p15-equipment .sec-p15-verdict--indeterminate {
   background: var(--rule);
   color: var(--ink-2);
 }
@@ -532,7 +533,8 @@
   line-height: 1.3;
 }
 
-.sec-p15-equipment .sec-p15-stage-empty {
+.sec-p15-equipment .sec-p15-stage-empty,
+.sec-p15-equipment .sec-p15-stage-flag {
   margin: 5px 0;
   color: var(--ink-3);
   font-size: 11px;

@@ -1,6 +1,14 @@
+import math
+
 import pytest
 
-from simulator.condensation import CondensationModel, stage_purity_report
+from simulator.condensation import (
+    CondensationModel,
+    STAGE_PURITY_NO_CAPTURED_MASS,
+    STAGE_PURITY_VERDICT_INDETERMINATE,
+    STAGE_PURITY_VERDICT_PURE,
+    stage_purity_report,
+)
 from simulator.condensation_routing import (
     PRODUCT_DESTINATIONS,
     STAGE_KEY_BY_NUMBER,
@@ -36,6 +44,31 @@ def test_default_train_targets_use_canonical_registry(stage_number):
 def test_recipe_product_destinations_are_canonical(recipe, species, stage_number):
     assert recipe in PRODUCT_DESTINATIONS
     assert product_stage_number(recipe, species) == stage_number
+
+
+def test_stage_purity_report_empty_is_indeterminate_not_pure():
+    train = CondensationTrain.create_default()
+    empty = stage_purity_report(train)[STAGE_KEY_BY_NUMBER[1]]
+
+    assert empty["total_kg"] == 0
+    assert empty["purity_fraction"] is None
+    assert empty["verdict"] == STAGE_PURITY_VERDICT_INDETERMINATE
+    assert empty["reason"] == STAGE_PURITY_NO_CAPTURED_MASS
+
+    train.stages[1].collected_kg["Fe"] = 1e-9
+    tiny = stage_purity_report(train)[STAGE_KEY_BY_NUMBER[1]]
+
+    assert tiny["total_kg"] == pytest.approx(1e-9)
+    assert tiny["purity_fraction"] == pytest.approx(1.0)
+    assert tiny["verdict"] == STAGE_PURITY_VERDICT_PURE
+    assert "reason" not in tiny
+
+    train.stages[1].collected_kg["Fe"] = math.nan
+    with pytest.raises(
+        ValueError,
+        match="stage 1 inventory for Fe must be finite and non-negative",
+    ):
+        stage_purity_report(train)
 
 
 def test_stage_purity_report_flags_non_designated_stage_landings():

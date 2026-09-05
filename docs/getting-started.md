@@ -73,7 +73,7 @@ Things to look for during the run:
   C2A boiloff to the alumina ceiling. C5/MRE is absent.
 - **SiO flux peak in the 1400–1600 °C window**: under the default Path A pN₂ sweep (C2A_continuous), SiO co-evolves with Fe. The `condensation_train_kg` column shows SiO glass accumulating in Stage 3. Under pO₂ control (C2B), SiO flux is suppressed >300× at 1 mbar pO₂.
 - **Mass balance closure**: the `mass_balance_pct` field should remain below `5e-12 %` at every tick. A nonzero drift indicates a regression; see `tests/test_mass_balance.py`.
-- **Stage purity** (in the runner JSON output's `stage_purity_report`): each stage carries a `verdict` (`PURE` / `MIXED` / `CONTAMINATED`) and a per-species kg breakdown of designated vs impurity material. Stage 3 should be `PURE` SiO under default Path A.
+- **Stage purity** (in the runner JSON output's `stage_purity_report`): each stage carries a `verdict` (`PURE` / `MIXED` / `CONTAMINATED` / `INDETERMINATE`) and a per-species kg breakdown of designated vs impurity material. Empty stages are `INDETERMINATE`, not `PURE`. Stage 3 should be `PURE` SiO under default Path A when it actually captured.
 - **Shuttle refusals** (in `shuttle_refusal_history`): empty list means every C3 step the engine accepted; entries name the campaign, hour, melt T, and thermodynamic margin. Under V1c-JANAF a stray `--additive=K=…` will be quietly ignored by the gate (this is the surviving design, not a bug); see [`docs/recipe-playbook.md`](recipe-playbook.md) for the policy.
 
 

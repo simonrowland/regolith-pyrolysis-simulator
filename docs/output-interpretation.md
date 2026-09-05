@@ -39,6 +39,7 @@ The `summary` map gives per-source counts and species-count percentages for the 
 - **PURE** — designated species strictly **greater than** 95 % of stage total kg. Expected for Stage 3 SiO under default Path A. Exactly 95.0 % reads as MIXED, not PURE.
 - **MIXED** — 80 % ≤ purity ≤ 95 %. Mild routing drift; usually a sign that a cold spot upstream of the designated condenser caught some flux. Cross-reference `wall_deposit_kg` and the segment cold-spot ledger.
 - **CONTAMINATED** — <80 %. Real failure mode. The recipe's selectivity claim does not hold for this stage; check the F1 routing registry and the per-segment wall T.
+- **INDETERMINATE** — no captured mass (`total_kg` is empty). `purity_fraction` is null and `reason` is `no_captured_mass`. A 0/0 ratio is not 1.0 and is not PURE.
 
 The registry's accepted species per stage are: Stage 1 Fe condenser `Fe`; Stage 2 Cr oxide harvester `Cr`/`Cr2O3`/`CrO2`/`Mn`; Stage 3 SiO zone `Si`/`SiO`/`SiO2`; Stage 4 alkali/Mg cyclone `Na`/`K`/`Mg`. Stages 0, 5, 6 and 7 (hot duct, vortex dust filter, turbine-compressor, turbine outlet monitor) designate nothing, so anything landing there is by definition off-route.
 

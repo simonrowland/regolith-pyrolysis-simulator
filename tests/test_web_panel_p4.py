@@ -279,16 +279,25 @@ def test_exact_zero_is_empty_not_trace() -> None:
         designated_kg=0,
         impurity_kg=0,
         total_kg=0,
-        purity_fraction=1.0,
-        verdict="PURE",
+        purity_fraction=None,
+        verdict="INDETERMINATE",
+        reason="no_captured_mass",
         activity={},
     )
     html = _render_panel({"terminal": {"stage_purity": {"stage_0": stage}}})
 
     verdict_line = _verdict_line(html)
+    assert "no material" in verdict_line
+    assert "PURE" not in verdict_line
+    assert "MIXED" not in verdict_line
+    assert "CONTAMINATED" not in verdict_line
+    assert "INDETERMINATE" not in verdict_line
     assert "empty · 0 kg total" in verdict_line
     assert "trace · &lt;0.01 kg total" not in verdict_line
     assert _headline_value(html, "Total classified product mass") == "0 kg"
+    assert "no material" in _headline_value(html, "Purity fraction")
+    assert "1" not in _headline_value(html, "Purity fraction")
+    assert "0%" not in html
 
 
 def test_sparse_activity_stays_per_species_without_stagewide_idle() -> None:
@@ -542,3 +551,5 @@ def test_partial_verdict_stays_pending_with_purity_ingredient() -> None:
     assert "PURE" not in verdict
     assert "MIXED" not in verdict
     assert "CONTAMINATED" not in verdict
+    assert "INDETERMINATE" not in verdict
+    assert "no material" not in verdict

@@ -45,7 +45,8 @@
 .sec-p4-stage-purity .sec-p4-verdict-mixed,
 .sec-p4-stage-purity .sec-p4-qualifier { background: var(--amber-soft); color: var(--warning-ink); }
 .sec-p4-stage-purity .sec-p4-verdict-contaminated { background: var(--red-soft); color: var(--red); }
-.sec-p4-stage-purity .sec-p4-verdict-unknown { background: var(--rule); color: var(--ink-2); }
+.sec-p4-stage-purity .sec-p4-verdict-unknown,
+.sec-p4-stage-purity .sec-p4-verdict-indeterminate { background: var(--rule); color: var(--ink-2); }
 
 .sec-p4-stage-purity .sec-p4-headline {
   display: grid;

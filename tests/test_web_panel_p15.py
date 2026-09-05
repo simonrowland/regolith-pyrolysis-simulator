@@ -170,8 +170,9 @@ def _stage_purity() -> dict:
             "designated_kg": 0.0,
             "impurity_kg": 0.0,
             "total_kg": 0.0,
-            "purity_fraction": 1.0,
-            "verdict": "PURE",
+            "purity_fraction": None,
+            "verdict": "INDETERMINATE",
+            "reason": "no_captured_mass",
             "warning": "",
         },
         "stage_1_fe_condenser": {
@@ -293,6 +294,8 @@ def test_present_artifact_renders_route_specific_values_and_authority() -> None:
     assert "carrier separation / recycle target · recovery not emitted" in html
     assert "CONTAMINATED" in html
     assert "non-designated condensate present" in html
+    assert "no material" in _stage_card(html, "stage_0")
+    assert "PURE" not in _stage_card(html, "stage_0")
     assert "No classified product mass emitted; verdict is the backend&#39;s empty-stage classification" in html
     assert "No condensate emitted" not in html
     assert "Terminal product-destination classification" in html
@@ -805,8 +808,6 @@ def test_product_stripe_requires_positive_matching_emitted_species() -> None:
 
     accepted_cases = [
         ("stage_1_fe_condenser", "Fe", "Designed product route · Fe"),
-        ("stage_3_sio_zone", "SiO", "Designed product route · SiO / SiO₂"),
-        ("stage_3_sio_zone", "SiO2", "Designed product route · SiO / SiO₂"),
         ("stage_4_alkali_mg_cyclone", "Na", "Designed product route · Na / K / Mg"),
         ("stage_4_alkali_mg_cyclone", "K", "Designed product route · Na / K / Mg"),
         ("stage_4_alkali_mg_cyclone", "Mg", "Designed product route · Na / K / Mg"),
@@ -824,6 +825,30 @@ def test_product_stripe_requires_positive_matching_emitted_species() -> None:
         assert route_label in stage
         assert "terminal designated mass emitted" in stage
         assert "collection not implied" not in stage
+
+    for species in ("SiO", "SiO2"):
+        stages = _stage_purity()
+        stages["stage_3_sio_zone"] = stage_snapshot(species)
+        artifact = {
+            "timesteps": [{"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}],
+            "terminal": {
+                "stage_purity": stages,
+                "product_classification": {
+                    "pure_silica_glass": {
+                        "stage_3_capture_kg": 1.0,
+                        "stage_3_kg_by_species": {species: 1.0},
+                        "class_total_kg": 1.0,
+                    }
+                },
+            },
+        }
+        stage = _stage_card(_run_panel(artifact)["html"], "stage_3_sio_zone")
+
+        assert "sec-p15-stage--product" in stage
+        assert "Designed product route · SiO / SiO₂" in stage
+        assert "qualified silica product" in stage
+        assert "collection not implied" not in stage
+        assert "flagged capture" not in stage
 
     foreign_stages = _stage_purity()
     foreign_stages["stage_3_sio_zone"] = stage_snapshot("Fe")
@@ -873,6 +898,68 @@ def test_product_stripe_requires_positive_matching_emitted_species() -> None:
         assert "terminal designated mass emitted" not in zero_stage
         assert "collection not implied" in zero_stage
         assert "--sec-p15-product" not in zero_stage
+
+
+def test_p15_unqualified_silica_capture_is_flagged_not_product_glow() -> None:
+    stages = _stage_purity()
+    stages["stage_3_sio_zone"] = {
+        "label": "SiO Zone",
+        "designated_species_kg": {"SiO": 4.0},
+        "coproduct_species_kg": {},
+        "impurity_species_kg": {},
+        "designated_kg": 4.0,
+        "impurity_kg": 0.0,
+        "total_kg": 4.0,
+        "purity_fraction": 1.0,
+        "verdict": "PURE",
+    }
+    artifact = {
+        "timesteps": [{"hour": 1, "summary": {"campaign": "C2A"}, "ledger": {}}],
+        "terminal": {
+            "stage_purity": stages,
+            "product_classification": {
+                "pure_silica_glass": {
+                    "stage_3_capture_kg": 4.0,
+                    "stage_3_kg_by_species": {"SiO": 4.0},
+                    "class_total_kg": 0.0,
+                }
+            },
+        },
+    }
+    stage = _stage_card(_run_panel(artifact)["html"], "stage_3_sio_zone")
+
+    assert "sec-p15-stage--product" not in stage
+    assert "--sec-p15-product" not in stage
+    assert "qualified silica product" not in stage
+    assert "terminal designated mass emitted" not in stage
+    assert "flagged capture · not a product" in stage
+
+    ungated = _stage_card(
+        _run_panel({
+            "timesteps": [{"hour": 1, "summary": {"campaign": "C2A"}, "ledger": {}}],
+            "terminal": {"stage_purity": stages},
+        })["html"],
+        "stage_3_sio_zone",
+    )
+    assert "sec-p15-stage--product" not in ungated
+    assert "qualified silica product" not in ungated
+    assert "flagged capture" not in ungated
+
+
+def test_empty_stage_indeterminate_renders_as_no_material() -> None:
+    stage = _stage_card(
+        _run_panel({
+            "timesteps": [{"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}],
+            "terminal": {"stage_purity": _stage_purity()},
+        })["html"],
+        "stage_0",
+    )
+
+    assert "no material" in stage
+    assert "PURE" not in stage
+    assert "0%" not in stage
+    assert ">1<" not in stage
+    assert "Emitted purity fraction</span><strong>no material</strong>" in stage
 
 
 def test_species_presence_visuals_distinguish_absent_empty_zero_and_malformed() -> None:

@@ -177,6 +177,59 @@ setImmediate(() => process.stdout.write(report.innerHTML));
         assert "Pending W-A10" in completed.stdout
 
 
+def test_report_viewer_empty_stage_carries_indeterminate_token() -> None:
+    script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/report-viewer.js"
+    artifact = {
+        "artifact_schema_version": "0.1.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "empty-purity"},
+        "timesteps": [],
+        "terminal": {
+            "stage_purity": {
+                "stage_0": {
+                    "label": "Hot Duct",
+                    "accepted_species": [],
+                    "total_kg": 0.0,
+                    "designated_kg": 0.0,
+                    "impurity_kg": 0.0,
+                    "purity_fraction": None,
+                    "verdict": "INDETERMINATE",
+                    "reason": "no_captured_mass",
+                }
+            }
+        },
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const source = fs.readFileSync(process.argv[2], "utf8");
+const report = { innerHTML: "" };
+const context = {
+  window: { location: { search: "" } },
+  document: { querySelector: (selector) => selector === "#report" ? report : null },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[3]) })
+};
+vm.runInNewContext(source, context);
+setImmediate(() => process.stdout.write(report.innerHTML));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(script_path), json.dumps(artifact)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    html = completed.stdout
+    assert "INDETERMINATE" in html
+    assert "PURE" not in html
+    assert "no material" in html
+    assert "100.0000%" not in html
+    assert "0.0000%" not in html
+
+
 @pytest.mark.parametrize("has_recipe_snapshot", [True, False])
 def test_settings_script_executes_live_run_resolution_and_manifest_gate(
     has_recipe_snapshot: bool,

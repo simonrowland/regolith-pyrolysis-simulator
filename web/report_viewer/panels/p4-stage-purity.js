@@ -109,11 +109,25 @@
 
   function verdict(stage) {
     if (!own(stage, "verdict")) return pending("backend verdict not emitted");
-    if (typeof stage.verdict !== "string" || !["PURE", "MIXED", "CONTAMINATED"].includes(stage.verdict)) {
+    if (typeof stage.verdict !== "string") {
+      return pending("backend verdict is malformed");
+    }
+    if (stage.verdict === "INDETERMINATE") {
+      return `<span class="sec-p4-verdict sec-p4-verdict-indeterminate">${esc("no material")}</span>`;
+    }
+    if (!["PURE", "MIXED", "CONTAMINATED"].includes(stage.verdict)) {
       return pending("backend verdict is malformed");
     }
     const verdictClass = stage.verdict.toLowerCase();
     return `<span class="sec-p4-verdict sec-p4-verdict-${verdictClass}">${esc(stage.verdict)}</span>`;
+  }
+
+  function purityValue(stage) {
+    if (!own(stage, "purity_fraction")) return pending("purity_fraction not emitted");
+    if (stage.purity_fraction === null || stage.verdict === "INDETERMINATE") {
+      return `<span class="sec-p4-empty-value">no material</span>`;
+    }
+    return stageNumberValue(stage, "purity_fraction", "");
   }
 
   function stageCard(stage) {
@@ -142,7 +156,7 @@
       `<div class="sec-p4-verdict-line">${verdict(stage)}${massQualifier}</div></div>` +
       `<div class="sec-p4-headline"><div><span>Total classified product mass</span>` +
       `<b>${stageNumberValue(stage, "total_kg", "kg")}</b></div>` +
-      `<div><span>Purity fraction</span><b>${stageNumberValue(stage, "purity_fraction", "")}</b></div></div>` +
+      `<div><span>Purity fraction</span><b>${purityValue(stage)}</b></div></div>` +
       `<details class="sec-p4-details"><summary>Accepted species, activity &amp; mass detail</summary>` +
       `<div class="sec-p4-detail-grid"><div class="sec-p4-breakdown"><h4>Accepted species</h4>${acceptedSpecies(stage)}</div>` +
       `<div class="sec-p4-breakdown"><h4>Activity</h4>${activityDetail(stage)}</div>` +

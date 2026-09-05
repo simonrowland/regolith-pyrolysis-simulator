@@ -7241,6 +7241,19 @@ def cold_spot_diagnostic(
     }
 
 
+STAGE_PURITY_VERDICT_PURE = 'PURE'
+STAGE_PURITY_VERDICT_MIXED = 'MIXED'
+STAGE_PURITY_VERDICT_CONTAMINATED = 'CONTAMINATED'
+STAGE_PURITY_VERDICT_INDETERMINATE = 'INDETERMINATE'
+STAGE_PURITY_VERDICTS = frozenset((
+    STAGE_PURITY_VERDICT_PURE,
+    STAGE_PURITY_VERDICT_MIXED,
+    STAGE_PURITY_VERDICT_CONTAMINATED,
+    STAGE_PURITY_VERDICT_INDETERMINATE,
+))
+STAGE_PURITY_NO_CAPTURED_MASS = 'no_captured_mass'
+
+
 def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
     """Classify each stage's accumulated product as designated or impurity."""
 
@@ -7282,13 +7295,17 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         )
         impurity_kg = sum(impurity_species_kg.values())
         total_kg = designated_kg + impurity_kg
-        purity_fraction = 1.0 if total_kg <= 1e-12 else designated_kg / total_kg
-        if purity_fraction > 0.95:
-            verdict = 'PURE'
-        elif purity_fraction >= 0.80:
-            verdict = 'MIXED'
+        if total_kg <= 1e-12:
+            purity_fraction = None
+            verdict = STAGE_PURITY_VERDICT_INDETERMINATE
         else:
-            verdict = 'CONTAMINATED'
+            purity_fraction = designated_kg / total_kg
+            if purity_fraction > 0.95:
+                verdict = STAGE_PURITY_VERDICT_PURE
+            elif purity_fraction >= 0.80:
+                verdict = STAGE_PURITY_VERDICT_MIXED
+            else:
+                verdict = STAGE_PURITY_VERDICT_CONTAMINATED
 
         stage_report = {
             'stage_number': stage_number,
@@ -7307,6 +7324,8 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
                 if impurity_kg > 1e-12 else ''
             ),
         }
+        if verdict == STAGE_PURITY_VERDICT_INDETERMINATE:
+            stage_report['reason'] = STAGE_PURITY_NO_CAPTURED_MASS
         if activity:
             stage_report['activity'] = activity
         report[stage_key] = stage_report
