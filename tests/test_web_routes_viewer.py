@@ -442,7 +442,7 @@ def _render_report_html_with_panels(artifact: dict, panels_js: str) -> str:
     return _render_report_state_with_panels(artifact, panels_js)["html"]
 
 
-_PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p6-mre"]
+_PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p6-mre", "p7-energy"]
 
 
 @pytest.mark.parametrize("sample", ["populated", "zero", "partial"])

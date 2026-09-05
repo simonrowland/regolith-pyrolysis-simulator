@@ -1,0 +1,171 @@
+.sec-p7-energy .sec-p7-energy-grid,
+.sec-p7-energy .sec-p7-energy-breakdowns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sec-p7-energy .sec-p7-energy-breakdowns {
+  margin-top: 10px;
+}
+
+.sec-p7-energy .sec-p7-energy-card,
+.sec-p7-energy .sec-p7-energy-breakdown {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.sec-p7-energy .sec-p7-energy-card {
+  border-top-width: 3px;
+}
+
+.sec-p7-energy .sec-p7-energy-electrical {
+  border-top-color: var(--blue);
+}
+
+.sec-p7-energy .sec-p7-energy-thermal {
+  border-top-color: var(--orange);
+}
+
+.sec-p7-energy .sec-p7-energy-combined {
+  border-top-color: var(--green);
+}
+
+.sec-p7-energy h3 {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.sec-p7-energy .sec-p7-energy-value {
+  margin-top: 10px;
+  overflow-wrap: anywhere;
+  font: 780 clamp(21px, 3vw, 30px)/1.1 "SFMono-Regular", Consolas, monospace;
+  letter-spacing: -.03em;
+}
+
+.sec-p7-energy .sec-p7-energy-basis {
+  margin: 7px 0 0;
+  color: var(--ink-3);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.sec-p7-energy .sec-p7-energy-caveats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.sec-p7-energy .sec-p7-energy-chip {
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--orange) 45%, var(--rule));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--orange) 7%, var(--panel));
+  color: var(--ink-2);
+  font: 10px/1.3 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p7-energy .sec-p7-energy-missing {
+  color: var(--warning-ink);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.sec-p7-energy .sec-p7-energy-pending {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px dashed var(--orange);
+  background: var(--amber-soft);
+  color: var(--warning-ink);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sec-p7-energy .sec-p7-energy-pending b {
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p7-energy .sec-p7-energy-table-wrap {
+  margin-top: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+}
+
+.sec-p7-energy table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.sec-p7-energy th,
+.sec-p7-energy td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.sec-p7-energy thead th {
+  color: var(--ink-3);
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p7-energy tbody th {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.sec-p7-energy td:last-child,
+.sec-p7-energy thead th:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.sec-p7-energy .sec-p7-energy-row-authority {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-3);
+  font: 9px/1.35 "SFMono-Regular", Consolas, monospace;
+  white-space: normal;
+}
+
+.sec-p7-energy tr:last-child th,
+.sec-p7-energy tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  .sec-p7-energy .sec-p7-energy-grid,
+  .sec-p7-energy .sec-p7-energy-breakdowns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .sec-p7-energy .sec-p7-energy-pending {
+    color: #ffe0a5;
+  }
+}
+
+@media print {
+  .sec-p7-energy .sec-p7-energy-card,
+  .sec-p7-energy .sec-p7-energy-breakdown {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}
