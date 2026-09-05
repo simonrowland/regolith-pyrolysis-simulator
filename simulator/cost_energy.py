@@ -9,7 +9,7 @@ from typing import Any
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.cost_parameters import (
     DEFAULT_ELECTRICAL_COST_PER_KWH,
-    ENERGY_COST_DEFAULT_SOURCE,
+    load_cost_parameters,
 )
 
 
@@ -32,11 +32,14 @@ class OwnerRatifyCostParameter:
         }
 
 
+# Owner D35 (2026-09-05): one electricity quantity, using the YAML's EIA citation
+# verbatim. Supersedes 10.0 USD/kWh, tagged owner-ratify-placeholder /
+# owner-t7-two-price-energy-v1, with the cited 0.15 USD/kWh bootstrap rate.
 ELECTRICAL_USD_PER_KWH = OwnerRatifyCostParameter(
     name="electrical_usd_per_kWh",
     value=DEFAULT_ELECTRICAL_COST_PER_KWH,
     units="USD/kWh",
-    source_tag=ENERGY_COST_DEFAULT_SOURCE,
+    source_tag=load_cost_parameters()["parameters"]["electricity_cost_per_kWh"]["source_tag"],
     ticket="COST-PARAM-ELECTRICAL-KWH",
 )
 THERMAL_USD_PER_FLUX_H = OwnerRatifyCostParameter(

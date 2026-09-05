@@ -9,6 +9,8 @@ import yaml
 
 from simulator.cost_parameters import (
     CostParameters,
+    DEFAULT_COST_PARAMETERS_PATH,
+    DEFAULT_ELECTRICAL_COST_PER_KWH,
     RECIPE_COST_PARAMETERS_KEY,
     SHUTTLE_REAGENT_SPECIES,
     cost_parameter_values,
@@ -64,7 +66,7 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
     block = default_cost_parameters_block()
     values = cost_parameter_values(block)["parameters"]
 
-    assert values["electricity_cost_per_kWh"] == pytest.approx(10.0)
+    assert values["electricity_cost_per_kWh"] == pytest.approx(0.15)
     assert values["solar_heat_cost_per_kWh"] == pytest.approx(0.05)
     assert values["furnace_resinter_cost_usd"] > 0.0
     assert values["depreciation_expense_per_run"] > 0.0
@@ -76,6 +78,30 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
     assert defaulted["provenance"]["defaults_applied"] is True
     assert "legacy.recipe.yaml" in defaulted["provenance"]["recipe_source"]
     assert cost_parameter_values(defaulted) == cost_parameter_values(block)
+
+
+def test_report_and_optimizer_share_yaml_electricity_price_and_citation() -> None:
+    from simulator.cost_ledger import CostVector
+    from simulator.cost_energy import ELECTRICAL_USD_PER_KWH, project_owner_ratify_money
+    from simulator.optimize.objective import cost_parameters_from_mapping as optimizer_costs
+
+    raw = yaml.safe_load(DEFAULT_COST_PARAMETERS_PATH.read_text(encoding="utf-8"))
+    declared = raw["parameters"]["electricity_cost_per_kWh"]
+    assert (
+        ELECTRICAL_USD_PER_KWH.value
+        == DEFAULT_ELECTRICAL_COST_PER_KWH
+        == optimizer_costs(raw).electricity_cost_per_kWh
+        == optimizer_costs().electricity_cost_per_kWh
+        == declared["value"]
+        == 0.15
+    )
+    assert project_owner_ratify_money(CostVector(electrical_kWh=2.0)) == pytest.approx(0.30)
+    assert ELECTRICAL_USD_PER_KWH.source_tag == declared["source_tag"] == (
+        "U.S. EIA, Electric Power Monthly, Table 5.6.A, Average Price of Electricity "
+        "to Ultimate Customers by End-Use Sector, accessed 2026-07-12, "
+        "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_06_a; "
+        "owner bootstrap margin"
+    )
 
 
 @pytest.mark.parametrize("floor", (0.0, -1.0))
@@ -216,8 +242,10 @@ def test_cost_parameter_sources_are_reproducible() -> None:
     parameters = default_cost_parameters_block()["parameters"]
 
     electricity_source = parameters["electricity_cost_per_kWh"]["source_tag"]
-    assert electricity_source == "owner-t7-two-price-energy-v1"
-    assert parameters["solar_heat_cost_per_kWh"]["source_tag"] == electricity_source
+    raw = yaml.safe_load(DEFAULT_COST_PARAMETERS_PATH.read_text(encoding="utf-8"))
+    assert parameters["electricity_cost_per_kWh"] == raw["parameters"]["electricity_cost_per_kWh"]
+    assert "U.S. EIA, Electric Power Monthly, Table 5.6.A" in electricity_source
+    assert parameters["solar_heat_cost_per_kWh"]["source_tag"] == "owner-t7-two-price-energy-v1"
     for name in ("furnace_resinter_cost_usd", "depreciation_expense_per_run"):
         assert "owner ratified 2026-07-12" in parameters[name]["source_tag"]
     assert "owner final ratification 2026-07-19" in parameters[

@@ -20,7 +20,6 @@ from simulator.config import DEFAULT_DATA_DIR
 OPTIMIZE_COSTS_SCHEMA_VERSION = "optimize-costs-v1"
 RECIPE_COST_PARAMETERS_KEY = "cost_parameters"
 DEFAULT_COST_PARAMETERS_PATH = DEFAULT_DATA_DIR / "optimize_costs.yaml"
-DEFAULT_ELECTRICAL_COST_PER_KWH = 10.0
 DEFAULT_SOLAR_HEAT_COST_PER_KWH = 0.05
 DEFAULT_FURNACE_LIFETIME_COST_MULTIPLIER = 500.0
 DEFAULT_MIN_FOULING_PENALTY = 1.0
@@ -276,11 +275,6 @@ def _with_default_energy_costs(payload: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(parameters, Mapping):
         return result
     parameters = copy.deepcopy(dict(parameters))
-    parameters["electricity_cost_per_kWh"] = {
-        "value": DEFAULT_ELECTRICAL_COST_PER_KWH,
-        "units": "USD/kWh",
-        "source_tag": ENERGY_COST_DEFAULT_SOURCE,
-    }
     parameters["solar_heat_cost_per_kWh"] = {
         "value": DEFAULT_SOLAR_HEAT_COST_PER_KWH,
         "units": "USD/kWh",
@@ -357,3 +351,7 @@ def _canonical_json_ready(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(key): _canonical_json_ready(value[key]) for key in sorted(value)}
     raise TypeError(f"unsupported cost parameter digest value: {type(value).__name__}")
+
+
+# Read the cited YAML after the loader is defined; electricity has no Python override.
+DEFAULT_ELECTRICAL_COST_PER_KWH = cost_parameters_from_mapping().electricity_cost_per_kWh

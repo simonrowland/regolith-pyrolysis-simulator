@@ -296,7 +296,7 @@ def test_available_optional_header_fields_keep_verified_shapes(monkeypatch) -> N
     # the already-built header (stored bytes are authoritative/immutable).
     payload["effective_config"]["mass_kg"]["value"] = -1.0
     assert artifact["header"]["effective_config"]["mass_kg"]["value"] == 1000.0
-    assert artifact["header"]["cost_block"]["electrical_cost_per_kWh"] == 10.0
+    assert artifact["header"]["cost_block"]["electrical_cost_per_kWh"] == 0.15
     assert artifact["header"]["engine_identity"]["cache_version"] == "internal-analytical-cache-v1"
 
 
@@ -422,18 +422,18 @@ def test_cost_block_times_canonical_usage_equals_terminal_cost_totals() -> None:
     cost_block = artifact["header"]["cost_block"]
     totals = artifact["terminal"]["cost_totals"]
     assert cost_block == {
-        "electrical_cost_per_kWh": 10.0,
+        "electrical_cost_per_kWh": 0.15,
         "solar_heat_cost_per_kWh": 0.05,
         "provenance": PAYLOAD_ABSENT_COST_PROVENANCE,
     }
     assert totals["process_electrical_energy_kWh"] == pytest.approx(7.0)
     assert totals["pumping_electrical_energy_kWh"] == pytest.approx(4.0)
     assert totals["electrical_energy_kWh"] == pytest.approx(11.0)
-    assert totals["process_electrical_cost_usd"] == pytest.approx(70.0)
-    assert totals["pumping_electrical_cost_usd"] == pytest.approx(40.0)
-    assert totals["electrical_cost_usd"] == pytest.approx(110.0)
+    assert totals["process_electrical_cost_usd"] == pytest.approx(7.0 * 0.15)
+    assert totals["pumping_electrical_cost_usd"] == pytest.approx(4.0 * 0.15)
+    assert totals["electrical_cost_usd"] == pytest.approx(11.0 * 0.15)
     assert totals["solar_heat_cost_usd"] == pytest.approx(10.0 * 0.05)
-    assert totals["total_cost_usd"] == pytest.approx(110.5)
+    assert totals["total_cost_usd"] == pytest.approx(11.0 * 0.15 + 10.0 * 0.05)
 
 
 def test_payload_cost_parameters_override_artifact_cost_identity() -> None:
@@ -507,7 +507,7 @@ def test_cost_totals_exclude_nonresolved_pumping_and_name_status(
     assert "pumping_electrical_energy_kWh" not in totals
     assert "pumping_electrical_cost_usd" not in totals
     assert totals["electrical_energy_kWh"] == pytest.approx(2.0)
-    assert totals["electrical_cost_usd"] == pytest.approx(20.0)
+    assert totals["electrical_cost_usd"] == pytest.approx(2.0 * 0.15)
     assert totals["basis_note"] == (
         f"pumping electrical energy excluded; diagnostic status={status}"
     )

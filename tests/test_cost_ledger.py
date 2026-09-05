@@ -164,7 +164,8 @@ def test_furnace_flux_tracks_absolute_temperature_times_time():
 
     assert cool == pytest.approx((1000.0 + 273.15) * 2.0)
     assert hot > cool
-    assert ELECTRICAL_USD_PER_KWH.value > THERMAL_USD_PER_FLUX_H.value
+    assert ELECTRICAL_USD_PER_KWH.value == 0.15
+    assert THERMAL_USD_PER_FLUX_H.value == 1.0
     assert len(owner_ratify_cost_placeholders()) == 5
 
 
