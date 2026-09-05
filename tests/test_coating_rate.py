@@ -267,6 +267,74 @@ def test_missing_wall_antoine_data_raises_typed_refusal(monkeypatch) -> None:
         )
 
 
+@pytest.mark.parametrize(("alpha", "pressure", "reason"), [
+    (-0.1, 1.0, "alpha_s"),
+    ({"value": -0.1}, 1.0, "alpha_s"),
+    (0.0, 1.0, "declared_zero_sticking_coefficient"),
+    (0.0, None, "declared_zero_sticking_coefficient"),
+    (0.7, 0.0, "computed_zero_species_partial_pressure"),
+    (0.7, None, "P_local_pa"),
+])
+@pytest.mark.parametrize("unused_inputs_absent", [False, True])
+def test_wall_zero_requires_declared_input_and_reports_its_source(
+    alpha, pressure, reason, unused_inputs_absent,
+):
+    from simulator.condensation import DepositionInputRefusal
+
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        materials={"wall_surfaces": {"interstage_duct": {
+            "alpha_s_by_species": {"Fe": alpha},
+        }}},
+        wall_temperature_C=2926.85,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={} if pressure is None else {"Fe": pressure},
+        gas_temperature_C=2926.85,
+        campaign_name="C0",
+    )
+    if unused_inputs_absent:
+        model.gas_temperature_C = None
+        if alpha == 0.0:
+            model.species_partial_pressures_mbar = {"Fe": -1.0}
+    kwargs = dict(
+        species="Fe", rate_kg_hr=1.0, T_cond_C=1200.0,
+        melt_temperature_C=2926.85, wall_temperature_C=2926.85,
+        surface_area_m2=1.0,
+    )
+    if reason in {"alpha_s", "P_local_pa"}:
+        with pytest.raises(DepositionInputRefusal, match=reason):
+            wall_deposit_candidate_for_surface_kg(model, **kwargs)
+        assert model.last_wall_deposition_rate_shadow_candidate == {}
+    else:
+        assert wall_deposit_candidate_for_surface_kg(model, **kwargs) == 0.0
+        rate = model.last_wall_deposition_rate_shadow_candidate["default_pipe"]["Fe"]
+        assert rate["status"] == "computed"
+        assert rate["zero_reason"] == reason
+        assert rate["zero_source"]
+        if pressure == 0.0:
+            assert rate["zero_source"] == "species_partial_pressures_mbar"
+        assert rate["mol_s"] == 0.0
+        assert rate.get("wall_saturation_pressure_pa") is None
+        assert rate["supersaturated"] is None
+        assert rate["transport"] == {}
+
+
+def test_missing_wall_alpha_record_refuses_before_zero(monkeypatch):
+    from simulator.condensation import DepositionInputRefusal
+
+    monkeypatch.setattr("simulator.condensation._wall_alpha_record", lambda *a, **k: {})
+    model = CondensationModel(CondensationTrain.create_default())
+    with pytest.raises(DepositionInputRefusal, match="no sticking coefficient recorded"):
+        wall_deposit_candidate_for_surface_kg(
+            model, species="Fe", rate_kg_hr=1.0, T_cond_C=1200.0,
+            melt_temperature_C=2926.85, wall_temperature_C=2926.85,
+            surface_area_m2=1.0,
+        )
+    assert model.last_wall_deposition_rate_shadow_candidate == {}
+
+
 def test_unusable_wall_antoine_coefficients_raise_typed_refusal(
     monkeypatch,
 ) -> None:
