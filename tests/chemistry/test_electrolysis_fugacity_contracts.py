@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 
 import pytest
 
@@ -21,8 +22,10 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.electrolysis import (
     ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
+    MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
     mre_selectivity_weight,
 )
+from simulator.mre_ladder import mre_decomposition_voltage_reference
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -42,6 +45,53 @@ def _single_oxide_view(sim, oxide: str, *, oxide_mol: float = 10.0):
         },
         species_formula_registry=sim.species_formula_registry,
     )
+
+
+def test_product_phase_refusal_omits_uncomputed_quantities(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    def missing_product_phase(*args, **kwargs):
+        return replace(
+            mre_decomposition_voltage_reference(*args, **kwargs),
+            metal_product_phase=None,
+        )
+
+    monkeypatch.setattr(
+        "engines.builtin.electrolysis_step.mre_decomposition_voltage_reference",
+        missing_product_phase,
+    )
+    monkeypatch.setattr(
+        "simulator.electrolysis.mre_decomposition_voltage_reference",
+        missing_product_phase,
+    )
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=_single_oxide_view(sim, "FeO"),
+            temperature_C=1600.0,
+            pressure_bar=1.0,
+            control_inputs={"voltage_V": 5.0, "current_A": 100.0, "pO2_bar": 1.0},
+        )
+    )
+    assert result.status == "refused"
+    assert result.transition is None
+    melt = MeltState(composition_kg={"FeO": 1.0})
+    legacy = ElectrolysisModel().step_hour(
+        melt, voltage_V=5.0, current_A=100.0, T_C=1600.0, pO2_bar=1.0,
+    )
+    assert melt.composition_kg == {"FeO": 1.0}
+    for diagnostic in (result.diagnostic, legacy):
+        assert diagnostic["reason_refused"] == MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
+        assert not {
+            "energy_kWh", "oxides_reduced_kg", "oxides_reduced_mol",
+            "metals_produced_kg", "metals_produced_mol",
+            "gas_products_produced_kg", "gas_products_produced_mol",
+            "oxides_produced_kg", "oxides_produced_mol",
+            "O2_produced_kg", "O2_produced_mol",
+        }.intersection(diagnostic)
 
 
 def test_parent_oxide_nernst_quotient_exponents_single_cation_activity():
@@ -305,7 +355,7 @@ def test_invalid_authoritative_controls_refuse_before_energy_or_transition(
     assert result.transition is None
     assert result.diagnostic["reason_refused"] == MRE_INVALID_CONTROL_REFUSAL
     assert invalid_name in result.diagnostic["invalid_controls"]
-    assert result.diagnostic["energy_kWh"] == 0.0
+    assert "energy_kWh" not in result.diagnostic
 
 
 @pytest.mark.parametrize("zero_control", ["voltage_V", "current_A", "dt_hr"])
@@ -410,7 +460,7 @@ def test_invalid_allowed_oxide_filters_refuse_atomically(
     assert result.status == "refused"
     assert result.transition is None
     assert result.diagnostic["reason_refused"] == MRE_INVALID_TARGET_REFUSAL
-    assert result.diagnostic["energy_kWh"] == 0.0
+    assert "energy_kWh" not in result.diagnostic
 
 
 @pytest.mark.parametrize("fugacity", [0.0, -1.0, math.nan, math.inf, True])

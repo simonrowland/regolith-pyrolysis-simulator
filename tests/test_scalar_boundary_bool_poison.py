@@ -1683,7 +1683,7 @@ def test_electrolysis_step_deferred_controls_refuse_poison_before_energy_or_tran
 ) -> None:
     # DTO defers these four names on ELECTROLYSIS_STEP; the provider must
     # still refuse every input the DTO used to TypeError, plus nan/inf,
-    # with the typed invalid-control result (zero energy, no transition).
+    # with the typed invalid-control result (no quantities or transition).
     controls = {
         "voltage_V": 5.0,
         "current_A": 100.0,
@@ -1704,7 +1704,10 @@ def test_electrolysis_step_deferred_controls_refuse_poison_before_energy_or_tran
     assert result.transition is None
     assert result.diagnostic["reason_refused"] == MRE_INVALID_CONTROL_REFUSAL
     assert field_name in result.diagnostic["invalid_controls"]
-    assert result.diagnostic["energy_kWh"] == 0.0
+    assert not {
+        "energy_kWh", "O2_produced_mol", "oxides_reduced_mol",
+        "metals_produced_mol", "gas_products_produced_mol",
+    }.intersection(result.diagnostic)
 
 
 @pytest.mark.parametrize(

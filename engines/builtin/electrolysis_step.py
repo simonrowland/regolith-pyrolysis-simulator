@@ -303,6 +303,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             MRE_NORTH_STAR_POSTURE,
             MRE_OPTIONAL_BANNER,
             CURRENT_EFFICIENCY_MODEL_ID,
+            _without_mre_quantities,
             coerce_gas_product_fugacity_bar,
             current_efficiency_diagnostic,
             mre_selectivity_weight,
@@ -697,8 +698,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 ))
 
         if not reducible:
-            if voltage_V > 0.0 and current_A > 0.0:
-                diagnostic["energy_kWh"] = voltage_V * current_A * dt_hr / 1000.0
             status = "ok"
             if diagnostic["mre_raw_margin_refused_targets"]:
                 status = "refused"
@@ -706,6 +705,10 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             if diagnostic["mre_phase_refused_targets"]:
                 status = "refused"
                 diagnostic["reason_refused"] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
+            if status == "refused":
+                diagnostic = _without_mre_quantities(diagnostic)
+            elif voltage_V > 0.0 and current_A > 0.0:
+                diagnostic["energy_kWh"] = voltage_V * current_A * dt_hr / 1000.0
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status=status,
@@ -716,7 +719,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
 
         refused_targets = uncertified_multi_oxide_partition_targets(reducible)
         if refused_targets:
-            diagnostic["energy_kWh"] = voltage_V * current_A * dt_hr / 1000.0
             diagnostic["reason_refused"] = MRE_MULTI_OXIDE_PARTITION_REFUSAL
             diagnostic["reducible_oxide_targets"] = refused_targets
             return IntentResult(
@@ -724,7 +726,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 status="refused",
                 transition=None,
                 control_audit=control_audit,
-                diagnostic=diagnostic,
+                diagnostic=_without_mre_quantities(diagnostic),
             )
 
         # Partition current among reducible species (selectivity:
@@ -1147,11 +1149,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             diagnostic={
                 "reason_refused": reason,
                 "invalid_controls": dict(invalid),
-                "energy_kWh": 0.0,
-                "oxides_reduced_mol": {},
-                "metals_produced_mol": {},
-                "gas_products_produced_mol": {},
-                "O2_produced_mol": 0.0,
             },
         )
 

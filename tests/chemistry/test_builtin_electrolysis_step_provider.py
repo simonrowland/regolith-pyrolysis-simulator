@@ -854,9 +854,9 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
 
     assert result.status == "refused"
     assert result.transition is None
-    assert diagnostic["oxides_reduced_mol"] == {}
-    assert diagnostic["metals_produced_mol"] == {}
-    assert diagnostic["O2_produced_mol"] == pytest.approx(0.0)
+    assert not {
+        "oxides_reduced_mol", "metals_produced_mol", "O2_produced_mol", "energy_kWh",
+    }.intersection(diagnostic)
     assert diagnostic["mre_north_star_posture"] == MRE_NORTH_STAR_POSTURE
     assert diagnostic["mre_optional_banner"] == MRE_OPTIONAL_BANNER
     assert diagnostic["certification_evidence_class"] == MRE_CERTIFICATION_EVIDENCE_CLASS
@@ -895,8 +895,9 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
         T_C=1600.0,
         pO2_bar=1e-6,
     )
-    assert legacy["oxides_reduced_mol"] == {}
-    assert legacy["metals_produced_mol"] == {}
+    assert not {
+        "oxides_reduced_mol", "metals_produced_mol", "O2_produced_mol", "energy_kWh",
+    }.intersection(legacy)
     assert legacy["mre_north_star_posture"] == MRE_NORTH_STAR_POSTURE
     assert legacy["certification_allowed"] is False
     assert legacy["certification_denylist_reason"] == MRE_CERTIFICATION_DENYLIST_REASON
@@ -950,9 +951,9 @@ def test_non_authoritative_feo_fallback_cannot_erase_negative_raw_margin(
     assert refusal["fallback_margin_V"] > 0.0
     assert refusal["raw_margin_V"] <= 0.0
     assert refusal["raw_requirement_V"] > held_voltage_V
-    assert diagnostic["oxides_reduced_mol"] == {}
-    assert diagnostic["metals_produced_mol"] == {}
-    assert diagnostic["O2_produced_mol"] == pytest.approx(0.0)
+    assert not {
+        "oxides_reduced_mol", "metals_produced_mol", "O2_produced_mol", "energy_kWh",
+    }.intersection(diagnostic)
 
     boundary_result = BuiltinElectrolysisStepProvider().dispatch(
         IntentRequest(
@@ -993,8 +994,9 @@ def test_non_authoritative_feo_fallback_cannot_erase_negative_raw_margin(
     )
     assert legacy["reason_refused"] == MRE_RAW_MARGIN_REFUSAL
     assert legacy["mre_raw_margin_refused_targets"]["FeO"]["raw_margin_V"] <= 0.0
-    assert legacy["oxides_reduced_mol"] == {}
-    assert legacy["metals_produced_mol"] == {}
+    assert not {
+        "oxides_reduced_mol", "metals_produced_mol", "O2_produced_mol", "energy_kWh",
+    }.intersection(legacy)
 
 
 def test_allowed_sio2_target_still_converts_ferric_inventory_to_ferrous(

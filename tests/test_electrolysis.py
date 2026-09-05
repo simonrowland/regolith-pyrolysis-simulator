@@ -104,8 +104,12 @@ def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(
     assert diagnostic["mre_effective_voltage_margin_V_by_oxide"]["SiO2"] > 0.0
 
 
+@pytest.mark.parametrize(
+    "refusal_reason", [MRE_RAW_MARGIN_REFUSAL, "invalid_electrolysis_control"]
+)
 def test_sc109_mre_non_partition_refusal_propagates_typed_through_executor(
     monkeypatch: pytest.MonkeyPatch,
+    refusal_reason: str,
 ):
     """SC-109 shape C: non-partition provider refusals must stay typed.
 
@@ -130,7 +134,7 @@ def test_sc109_mre_non_partition_refusal_propagates_typed_through_executor(
             status="refused",
             transition=None,
             diagnostic={
-                "reason_refused": MRE_RAW_MARGIN_REFUSAL,
+                "reason_refused": refusal_reason,
                 "current_partition_certified": False,
             },
         )
@@ -163,9 +167,9 @@ def test_sc109_mre_non_partition_refusal_propagates_typed_through_executor(
     execution = RunExecutor().execute(config)
 
     assert execution.status == "refused"
-    assert execution.reason == MRE_RAW_MARGIN_REFUSAL
+    assert execution.reason == refusal_reason
     assert execution.refusal_diagnostic["diagnostic"]["reason_refused"] == (
-        MRE_RAW_MARGIN_REFUSAL
+        refusal_reason
     )
     assert execution.simulator._poisoned_hour is None
     assert execution.simulator.melt.hour == 0
@@ -386,5 +390,5 @@ def test_multi_oxide_step_still_refuses_while_sequence_ranks():
         pO2_bar=1.0,
     )
     assert result["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
-    assert result["oxides_reduced_kg"] == {}
-    assert result["energy_kWh"] == pytest.approx(0.3)
+    assert "oxides_reduced_kg" not in result
+    assert "energy_kWh" not in result

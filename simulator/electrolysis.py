@@ -117,6 +117,7 @@ MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
 MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
+    "invalid_electrolysis_control",
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
     MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
@@ -131,6 +132,19 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
     oxide for oxide in DECOMP_VOLTAGES
     if oxide != 'Fe2O3'
 )
+
+
+def _without_mre_quantities(diagnostic: Mapping[str, object]) -> dict[str, object]:
+    """A refused calculation has no computed product or energy quantities."""
+    quantity_keys = {
+        "oxides_reduced_kg", "oxides_reduced_mol",
+        "metals_produced_kg", "metals_produced_mol",
+        "gas_products_produced_kg", "gas_products_produced_mol",
+        "oxides_produced_kg", "oxides_produced_mol",
+        "oxide_charge_electrons", "O2_produced_kg", "O2_produced_mol",
+        "energy_kWh",
+    }
+    return {key: value for key, value in diagnostic.items() if key not in quantity_keys}
 
 
 class MREElectrolysisRefusal(RuntimeError):
@@ -600,8 +614,8 @@ class ElectrolysisModel:
         the applied voltage is collected as a reducible row. If more
         than one oxide_to_metal target is in that set, the method
         returns reason_refused=uncertified_multi_oxide_current_partition,
-        bills V×I/1000 kWh, and applies no Faraday reduction. A single
-        oxide_to_metal target (optionally plus a ferric_to_ferrous row,
+        omits product and energy quantities, and applies no Faraday reduction.
+        A single oxide_to_metal target (optionally plus a ferric_to_ferrous row,
         which the detector does not count) is weighted by SEL-1 and
         reduced by Faraday's law.
 
@@ -612,7 +626,7 @@ class ElectrolysisModel:
             T_C:        Cell temperature (°C), finite, above absolute zero
 
         Returns:
-            Dict with keys:
+            Accepted results include keys (refusals omit these quantities):
                 oxides_reduced_kg:  {oxide: kg_removed}
                 metals_produced_kg: {metal: kg_produced}
                 O2_produced_kg:     float
@@ -807,20 +821,21 @@ class ElectrolysisModel:
                 ))
 
         if not reducible:
-            if voltage_V > 0.0 and current_A > 0.0:
-                result['energy_kWh'] = voltage_V * current_A / 1000.0
             if result['mre_raw_margin_refused_targets']:
                 result['reason_refused'] = MRE_RAW_MARGIN_REFUSAL
             if result['mre_phase_refused_targets']:
                 result['reason_refused'] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
+            if 'reason_refused' in result:
+                return _without_mre_quantities(result)
+            if voltage_V > 0.0 and current_A > 0.0:
+                result['energy_kWh'] = voltage_V * current_A / 1000.0
             return result
 
         refused_targets = uncertified_multi_oxide_partition_targets(reducible)
         if refused_targets:
-            result['energy_kWh'] = voltage_V * current_A / 1000.0
             result['reason_refused'] = MRE_MULTI_OXIDE_PARTITION_REFUSAL
             result['reducible_oxide_targets'] = refused_targets
-            return result
+            return _without_mre_quantities(result)
 
         # Partition current among reducible species            [SEL-1]
         # Weight = activity × exp(positive overvoltage / (RT/F)),

@@ -672,7 +672,7 @@ def test_mre_refused_partition_fails_loud_without_energy_or_products():
     assert refusal["diagnostic"]["reason_refused"] == (
         MRE_MULTI_OXIDE_PARTITION_REFUSAL
     )
-    assert refusal["diagnostic"]["energy_kWh"] > 0.0
+    assert "energy_kWh" not in refusal["diagnostic"]
     assert sim._mre_refusal_history == [refusal]
 
 
