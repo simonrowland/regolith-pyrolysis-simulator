@@ -54,73 +54,73 @@
         <p class="feedstock-source"><strong>basis:</strong> {{ sw.basis }}</p>
         {% endif %}
 
-        {% if sw.species_ppm %}
+        {% if sw.species_ppm %}{% set sp = namespace(interval=false, source=false, confidence=false, basis=false, any_row=false) %}{% for assay in sw.species_ppm.values() %}{% if assay is mapping and (assay.value is defined or assay.interval is defined or assay.source is defined or assay.confidence is defined or assay.basis is defined) %}{% set sp.any_row = true %}{% if assay.interval is defined %}{% set sp.interval = true %}{% endif %}{% if assay.source is defined %}{% set sp.source = true %}{% endif %}{% if assay.confidence is defined %}{% set sp.confidence = true %}{% endif %}{% if assay.basis is defined %}{% set sp.basis = true %}{% endif %}{% endif %}{% endfor %}{% if sp.any_row %}
         <table class="composition-table">
             <thead>
                 <tr>
                     <th>species_ppm</th>
                     <th>ppm</th>
-                    <th>interval</th>
-                    <th>source</th>
-                    <th>confidence</th>
-                    <th>basis</th>
+                    {% if sp.interval %}<th>interval</th>{% endif %}
+                    {% if sp.source %}<th>source</th>{% endif %}
+                    {% if sp.confidence %}<th>confidence</th>{% endif %}
+                    {% if sp.basis %}<th>basis</th>{% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for species, assay in sw.species_ppm.items() %}
-                <tr>
+                {% if assay is mapping and (assay.value is defined or assay.interval is defined or assay.source is defined or assay.confidence is defined or assay.basis is defined) %}<tr>
                     <td>{{ species }}</td>
                     <td>{% if assay is mapping and assay.value is defined %}{{ assay.value }}{% endif %}</td>
-                    <td class="range">{% if assay is mapping and assay.interval is defined %}[{{ assay.interval[0] }}, {{ assay.interval[1] }}]{% endif %}</td>
-                    <td>{% if assay is mapping and assay.source is defined %}{{ assay.source }}{% endif %}</td>
-                    <td>{% if assay is mapping and assay.confidence is defined %}{{ assay.confidence }}{% endif %}</td>
-                    <td>{% if assay is mapping and assay.basis is defined %}{{ assay.basis }}{% endif %}</td>
+                    {% if sp.interval %}<td class="range">{% if assay is mapping and assay.interval is defined %}[{{ assay.interval[0] }}, {{ assay.interval[1] }}]{% endif %}</td>{% endif %}
+                    {% if sp.source %}<td>{% if assay is mapping and assay.source is defined %}{{ assay.source }}{% endif %}</td>{% endif %}
+                    {% if sp.confidence %}<td>{% if assay is mapping and assay.confidence is defined %}{{ assay.confidence }}{% endif %}</td>{% endif %}
+                    {% if sp.basis %}<td>{% if assay is mapping and assay.basis is defined %}{{ assay.basis }}{% endif %}</td>{% endif %}
                 </tr>
-                {% endfor %}
+                {% endif %}{% endfor %}
             </tbody>
         </table>
-        {% endif %}
+        {% endif %}{% endif %}
 
         {% if sw.He3_ppb %}
-        {% set he3 = sw.He3_ppb %}
+        {% set he3 = sw.He3_ppb %}{% set he3_has = namespace(interval=he3 is mapping and he3.interval is defined, source=he3 is mapping and he3.source is defined, confidence=he3 is mapping and he3.confidence is defined, basis=he3 is mapping and he3.basis is defined, value=he3 is mapping and he3.value is defined) %}{% if he3_has.value or he3_has.interval or he3_has.source or he3_has.confidence or he3_has.basis %}
         <table class="composition-table">
             <thead>
                 <tr>
                     <th>He3_ppb</th>
                     <th>ppb</th>
-                    <th>interval</th>
-                    <th>source</th>
-                    <th>confidence</th>
-                    <th>basis</th>
+                    {% if he3_has.interval %}<th>interval</th>{% endif %}
+                    {% if he3_has.source %}<th>source</th>{% endif %}
+                    {% if he3_has.confidence %}<th>confidence</th>{% endif %}
+                    {% if he3_has.basis %}<th>basis</th>{% endif %}
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>He3_ppb</td>
                     <td>{% if he3 is mapping and he3.value is defined %}{{ he3.value }}{% endif %}</td>
-                    <td class="range">{% if he3 is mapping and he3.interval is defined %}[{{ he3.interval[0] }}, {{ he3.interval[1] }}]{% endif %}</td>
-                    <td>{% if he3 is mapping and he3.source is defined %}{{ he3.source }}{% endif %}</td>
-                    <td>{% if he3 is mapping and he3.confidence is defined %}{{ he3.confidence }}{% endif %}</td>
-                    <td>{% if he3 is mapping and he3.basis is defined %}{{ he3.basis }}{% endif %}</td>
+                    {% if he3_has.interval %}<td class="range">{% if he3 is mapping and he3.interval is defined %}[{{ he3.interval[0] }}, {{ he3.interval[1] }}]{% endif %}</td>{% endif %}
+                    {% if he3_has.source %}<td>{% if he3 is mapping and he3.source is defined %}{{ he3.source }}{% endif %}</td>{% endif %}
+                    {% if he3_has.confidence %}<td>{% if he3 is mapping and he3.confidence is defined %}{{ he3.confidence }}{% endif %}</td>{% endif %}
+                    {% if he3_has.basis %}<td>{% if he3 is mapping and he3.basis is defined %}{{ he3.basis }}{% endif %}</td>{% endif %}
                 </tr>
             </tbody>
         </table>
-        {% endif %}
+        {% endif %}{% endif %}
 
         {% if sw.isotope_ratio_He3_He4 %}
-        {% set iso = sw.isotope_ratio_He3_He4 %}
+        {% set iso = sw.isotope_ratio_He3_He4 %}{% if iso is mapping and (iso.value is defined or iso.confidence is defined or iso.owner_ratify is defined) %}
         <p class="feedstock-source">
             <strong>isotope_ratio_He3_He4:</strong>
             {% if iso is mapping and iso.value is defined %}{{ iso.value }}{% endif %}
             {% if iso is mapping and iso.confidence is defined %} confidence: {{ iso.confidence }}{% endif %}
             {% if iso is mapping and iso.owner_ratify is defined %} owner_ratify: {{ iso.owner_ratify }}{% endif %}
         </p>
-        {% if iso is mapping and iso.basis is defined %}
+        {% endif %}{% if iso is mapping and iso.basis is defined %}
         <p class="feedstock-source">{{ iso.basis }}</p>
         {% endif %}
         {% endif %}
 
-        {% if sw.release_windows_C %}
+        {% if sw.release_windows_C %}{% set rw = namespace(rows=false) %}{% for window, span in sw.release_windows_C.items() %}{% if window != 'source' and span is sequence and span is not string %}{% set rw.rows = true %}{% endif %}{% endfor %}{% if rw.rows %}
         <table class="composition-table">
             <thead>
                 <tr><th>release_windows_C</th><th>interval</th></tr>
@@ -136,7 +136,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% if sw.release_windows_C.source is defined %}
+        {% endif %}{% if sw.release_windows_C.source is defined %}
         <p class="feedstock-source"><strong>source:</strong> {{ sw.release_windows_C.source }}</p>
         {% endif %}
         {% endif %}
