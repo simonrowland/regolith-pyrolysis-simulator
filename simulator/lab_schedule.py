@@ -14,7 +14,7 @@ import math
 from types import MappingProxyType
 from typing import Any
 
-from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
+from simulator.canonical import canonical_json_dumps, normalize_canonical_value
 
 
 LAB_SCHEDULE_OVERRIDE_KEY = "lab_schedule"

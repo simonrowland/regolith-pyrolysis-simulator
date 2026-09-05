@@ -13,7 +13,7 @@ from simulator.cost_parameters import (
     RECIPE_COST_PARAMETERS_KEY,
     recipe_cost_parameters_from_payload,
 )
-from simulator.optimize.recipe import (
+from simulator.recipe import (
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,

@@ -118,7 +118,7 @@ from simulator.lab_schedule import (
     LabScheduleValidationError,
     normalize_lab_schedule,
 )
-from simulator.optimize.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
+from simulator.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, load_recipe_patch
 from simulator.scalar_boundary import is_declared_real_scalar

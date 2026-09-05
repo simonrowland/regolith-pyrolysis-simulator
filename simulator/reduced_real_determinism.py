@@ -111,7 +111,7 @@ _SOURCE_MODULE_SET_ID = "equilibrium-vapor-melt-backend-v3"
 _SOURCE_MODULE_PATTERNS = (
     "simulator/core.py",
     "simulator/evaporation.py",
-    "simulator/optimize/recipe.py",
+    "simulator/recipe.py",
     "simulator/reduced_real_determinism.py",
     "simulator/chemistry/kernel/*.py",
     "simulator/melt_backend/*.py",

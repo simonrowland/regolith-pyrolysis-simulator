@@ -1745,7 +1745,7 @@ def test_pt0_quantized_pO2_bar_fails_loudly_on_non_finite(bad_pO2: float) -> Non
 
 
 FOULANT_DISPOSITION_MODULE = "engines/builtin/foulant_disposition.py"
-RECIPE_SCHEMA_MODULE = "simulator/optimize/recipe.py"
+RECIPE_SCHEMA_MODULE = "simulator/recipe.py"
 
 
 def test_foulant_disposition_helper_source_module_digest_coverage(
@@ -1803,7 +1803,7 @@ def test_recipe_schema_source_module_digest_coverage() -> None:
         "engines/builtin/vapor_pressure.py",
         "engines/builtin/stage0_pretreatment.py",
         "engines/builtin/foulant_disposition.py",
-        "simulator/optimize/recipe.py",
+        "simulator/recipe.py",
     ],
 )
 def test_pt2_source_module_digest_changes_with_payload_source(

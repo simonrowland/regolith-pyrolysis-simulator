@@ -41,7 +41,7 @@ from simulator.furnace_materials import (
     setpoints_furnace_ceiling_C,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.optimize.recipe import (
+from simulator.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
     C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
     c2a_staged_stage_order,
