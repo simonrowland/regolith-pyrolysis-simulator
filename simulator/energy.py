@@ -25,8 +25,11 @@ from __future__ import annotations
 
 import math
 
-from simulator.core import (
-    EnergyRecord, EvaporationFlux, MeltState, OverheadGas,
+from simulator.state import (
+    EnergyRecord,
+    EvaporationFlux,
+    MeltState,
+    OverheadGas,
 )
 from simulator.thermal_budget import evaporation_enthalpy_budget
 

@@ -48,10 +48,18 @@ from simulator.optimize.recipe import (
     validate_c2a_staged_stage_order,
 )
 from simulator.condensation import _canonical_carrier_gas_key
-from simulator.state import StirState, clamp_stir_factor, clamp_stir_state
-from simulator.core import (
-    Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
-    DecisionPoint, DecisionType, EvaporationFlux, MeltState,
+from simulator.state import (
+    Atmosphere,
+    BatchRecord,
+    CampaignPhase,
+    CondensationTrain,
+    DecisionPoint,
+    DecisionType,
+    EvaporationFlux,
+    MeltState,
+    StirState,
+    clamp_stir_factor,
+    clamp_stir_state,
 )
 
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01

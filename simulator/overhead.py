@@ -53,8 +53,13 @@ import math
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional
 
-from simulator.core import (
-    EvaporationFlux, MeltState, OverheadGas, CondensationTrain,
+from simulator.state import (
+    GAS_CONSTANT,  # R: J/(mol·K)
+    MOLAR_MASS,  # g/mol
+    CondensationTrain,
+    EvaporationFlux,
+    MeltState,
+    OverheadGas,
 )
 # Single-source the pipe-temperature default from condensation (canonical
 # pipe-defaults home; cycle-safe — condensation doesn't import overhead) [BUG-052].
@@ -65,7 +70,6 @@ from engines.builtin.overhead_bleed import (
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.state import GAS_CONSTANT, MOLAR_MASS  # R: J/(mol·K); molar masses: g/mol
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> kg/mol
 
