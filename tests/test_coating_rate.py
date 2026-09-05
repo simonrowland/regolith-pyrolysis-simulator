@@ -215,6 +215,32 @@ def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
         == "above_source_certified_range"
     )
 
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        vapor_pressure_data=vapor_pressure_data,
+        wall_temperature_C=2926.85,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        gas_temperature_C=2926.85,
+        campaign_name="C0",
+    )
+    with pytest.raises(WallSaturationPressureRefusal) as refused:
+        wall_deposit_candidate_for_surface_kg(
+            model,
+            species="Fe",
+            rate_kg_hr=1.0,
+            T_cond_C=model.condensation_temperatures_C["Fe"],
+            melt_temperature_C=2926.85,
+            wall_temperature_C=2926.85,
+            surface_area_m2=1.0,
+        )
+    assert refused.value.reason == "above_source_certified_range"
+    assert refused.value.species == "Fe"
+    assert refused.value.temperature_K == pytest.approx(3200.0)
+    assert model.last_wall_deposition_rate_shadow_candidate == {}
+
 
 def test_missing_wall_antoine_data_raises_typed_refusal(monkeypatch) -> None:
     monkeypatch.setattr(

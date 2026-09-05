@@ -595,7 +595,17 @@ def test_pressure_coating_pareto_refuses_missing_knudsen_provenance():
     assert diagnostic["current"] == {"status": "unavailable"}
 
 
-def test_pressure_coating_current_kn_and_regime_share_controlling_segment():
+@pytest.mark.parametrize(
+    ("per_hour", "current_flux", "cumulative_mass"),
+    [
+        ([], None, None),
+        ([{"wall_deposit_delta_kg": {"wall": {"Fe": 2.5}}}], 2.5, 2.5),
+        ([{"wall_deposit_delta_kg": {"wall": {"Fe": 2.5}}}, {}], None, 2.5),
+    ],
+)
+def test_pressure_coating_current_kn_and_regime_share_controlling_segment(
+    per_hour, current_flux, cumulative_mass,
+):
     knudsen = {
         "gas_temperature_C": 1000.0,
         "carrier_gas": "N2",
@@ -626,9 +636,15 @@ def test_pressure_coating_current_kn_and_regime_share_controlling_segment():
         )
     )
 
-    diagnostic = pressure_coating_pareto_diagnostic(sim, target_species=())
+    diagnostic = pressure_coating_pareto_diagnostic(
+        sim, per_hour=per_hour, target_species=("Fe",)
+    )
 
     assert diagnostic["gate"]["controlling_segment"] == "narrow"
     assert diagnostic["current"]["segment"] == "narrow"
     assert diagnostic["current"]["knudsen_number"] == pytest.approx(0.12)
     assert diagnostic["current"]["regime"] == "free_molecular"
+    row = diagnostic["by_species"]["Fe"]
+    assert row["status"] == "unavailable"
+    assert row["current_wall_deposit_flux_kg_hr"] == current_flux
+    assert row["cumulative_wall_deposit_kg"] == cumulative_mass

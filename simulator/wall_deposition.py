@@ -136,6 +136,7 @@ def wall_deposit_candidate_for_surface_kg(
 
     from simulator.condensation import (
         DepositionInputRefusal,
+        WallSaturationPressureRefusal,
         _flowing_species_partial_pressures_pa,
         _knudsen_number,
         _series_resistance_deposition_flux_mol_m2_s,
@@ -250,6 +251,12 @@ def wall_deposit_candidate_for_surface_kg(
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         diagnostic_out=rate_diagnostic,
     )
+    if rate_diagnostic.get("wall_saturation_pressure_refused"):
+        raise WallSaturationPressureRefusal(
+            species,
+            T_wall_K,
+            rate_diagnostic["wall_saturation_pressure_refusal_reason"],
+        )
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa
     rate_diagnostic["total_pressure_pa"] = overhead_pressure_pa
     wall_saturation_pressure_pa = rate_diagnostic.get(

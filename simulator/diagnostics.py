@@ -1610,8 +1610,8 @@ def pressure_coating_pareto_diagnostic(
             by_species[name] = {
                 "status": "unavailable",
                 "reason": "species_absent_from_latest_evaporation_series_diagnostic",
-                "current_wall_deposit_flux_kg_hr": latest_wall_flux.get(name, 0.0),
-                "cumulative_wall_deposit_kg": cumulative_wall.get(name, 0.0),
+                "current_wall_deposit_flux_kg_hr": latest_wall_flux.get(name),
+                "cumulative_wall_deposit_kg": cumulative_wall.get(name),
             }
             continue
         flux_kwargs = {
