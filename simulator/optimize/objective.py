@@ -1466,6 +1466,11 @@ def compute_objectives(
                 run_execution=run_execution,
                 cost_parameters=active_cost_parameters,
             )
+            if definition.metric == "pure_silica_glass_kg":
+                evidence[definition.metric] = _silica_objective_evidence(
+                    product_classes,
+                    value,
+                )
             if definition.metric in PRODUCT_CLASS_MASS_METRIC_PATHS:
                 source_path = PRODUCT_CLASS_MASS_METRIC_PATHS[definition.metric]
                 evidence[definition.metric] = {
@@ -4314,6 +4319,75 @@ def product_classes_summary(sim: Any, profile: Mapping[str, Any]) -> Mapping[str
     )
 
 
+_SILICA_CAPTURE_PATH = ("pure_silica_glass", "stage_3_capture_kg")
+_SILICA_PRODUCT_PATH = ("pure_silica_glass", "class_total_kg")
+_SILICA_UNQUALIFIED_FLAG = "unqualified_silica_capture"
+_SILICA_UNQUALIFIED_REASON = (
+    "missing release path / non-authoritative evidence"
+)
+
+
+def _silica_capture_objective_value(
+    product_classes: Mapping[str, Any],
+) -> float | None:
+    """Return Stage-3 capture mass; None if the report omitted or refused it."""
+
+    bucket = (
+        product_classes.get("pure_silica_glass")
+        if isinstance(product_classes, Mapping)
+        else None
+    )
+    if not isinstance(bucket, Mapping) or "stage_3_capture_kg" not in bucket:
+        return None
+    raw = bucket["stage_3_capture_kg"]
+    if raw is None:
+        return None
+    label = ".".join(_SILICA_CAPTURE_PATH)
+    value = _finite_float(raw, label)
+    if value < 0.0:
+        raise ObjectiveComputationError(f"{label} is negative")
+    return value
+
+
+def _silica_objective_evidence(
+    product_classes: Mapping[str, Any],
+    capture_kg: float | None,
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "metric": "pure_silica_glass_kg",
+        "source": "classify_products",
+        "source_class_path": ".".join(_SILICA_CAPTURE_PATH),
+    }
+    if capture_kg is None:
+        payload["value_status"] = "unavailable"
+        payload["notes"] = ("Stage-3 silica capture is unavailable",)
+        return payload
+    bucket = (
+        product_classes.get("pure_silica_glass")
+        if isinstance(product_classes, Mapping)
+        else None
+    )
+    qualified_kg = 0.0
+    if isinstance(bucket, Mapping) and bucket.get("class_total_kg") is not None:
+        product_label = ".".join(_SILICA_PRODUCT_PATH)
+        qualified_kg = _finite_float(bucket["class_total_kg"], product_label)
+        if qualified_kg < 0.0:
+            raise ObjectiveComputationError(f"{product_label} is negative")
+    unqualified_kg = capture_kg - qualified_kg
+    if unqualified_kg < 0.0:
+        unqualified_kg = 0.0
+    payload["stage_3_capture_kg"] = capture_kg
+    payload["qualified_product_kg"] = qualified_kg
+    payload["unqualified_capture_kg"] = unqualified_kg
+    if unqualified_kg > 0.0:
+        payload["flag"] = _SILICA_UNQUALIFIED_FLAG
+        payload["notes"] = (
+            f"{unqualified_kg:g} kg Stage-3 silica capture is unqualified "
+            f"(not certified product): {_SILICA_UNQUALIFIED_REASON}",
+        )
+    return payload
+
+
 def _metric_value(
     metric: str,
     sim: Any,
@@ -4324,7 +4398,7 @@ def _metric_value(
     cost_parameters: CostParameters | None = None,
 ) -> float | None:
     if metric == "pure_silica_glass_kg":
-        return _nested_float(product_classes, ("pure_silica_glass", "class_total_kg"))
+        return _silica_capture_objective_value(product_classes)
     if metric in PRODUCT_CLASS_MASS_METRIC_PATHS:
         return _product_class_mass_value(metric, product_classes)
     if metric == "metals_plus_o2_kg":

@@ -15,6 +15,7 @@ from engines.builtin.vapor_pressure import (
     _pow10_pressure_or_raise,
 )
 import simulator.optimize.evaluate as evaluate_module
+import simulator.optimize.objective as objective_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
@@ -2418,6 +2419,14 @@ def test_objectives_populated_only_for_feasible_runs() -> None:
     assert feasible.objectives is not None
     assert feasible.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
     assert feasible.objectives.as_mapping()["oxygen_kg"] == pytest.approx(3.0)
+    silica_evidence = feasible.objectives.evidence["pure_silica_glass_kg"]
+    assert silica_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
+    assert silica_evidence["unqualified_capture_kg"] == pytest.approx(12.5)
+    assert silica_evidence["qualified_product_kg"] == pytest.approx(0.0)
+    notes = " ".join(silica_evidence["notes"])
+    assert "unqualified" in notes
+    assert "missing release path" in notes
+    assert "non-authoritative evidence" in notes
 
     infeasible = evaluate(
         _valid_patch(),
@@ -2432,6 +2441,117 @@ def test_objectives_populated_only_for_feasible_runs() -> None:
     assert infeasible.objectives is None
     assert infeasible.failing_gates == ("delivered_stream_purity",)
     assert infeasible.feasibility_margins["delivered_stream_purity"].margin < 0.0
+
+
+def _authoritative_sio_carrier() -> dict[str, object]:
+    return {
+        "species_id": "SiO",
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "authoritative",
+        "certification_ceiling": "validated_point",
+        "validation_status": "validated",
+        "is_flux_active": True,
+    }
+
+
+def _qualified_silica_snapshots(capture_kg: float = 12.5) -> tuple[SimpleNamespace, ...]:
+    authority = _authoritative_sio_carrier()
+    return (
+        SimpleNamespace(
+            c2a_staged_gas={
+                "stage_name": "alkali_early_fe",
+                "gas_cover_mode": "po2_hold",
+            },
+            condensed_by_stage_species_delta={},
+            evap_flux=SimpleNamespace(carrier_authority_by_species={"SiO": authority}),
+        ),
+        SimpleNamespace(
+            c2a_staged_gas={
+                "stage_name": "sio_window",
+                "gas_cover_mode": "pn2_sweep",
+            },
+            condensed_by_stage_species_delta={(3, "SiO"): capture_kg},
+            evap_flux=SimpleNamespace(carrier_authority_by_species={"SiO": authority}),
+        ),
+    )
+
+
+def test_silica_objective_values_qualified_and_unqualified_and_refuses_unavailable(
+    monkeypatch,
+) -> None:
+    unqualified = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_execution()),
+    )
+    assert unqualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
+    unqualified_evidence = unqualified.objectives.evidence["pure_silica_glass_kg"]
+    assert unqualified_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
+    assert unqualified_evidence["unqualified_capture_kg"] == pytest.approx(12.5)
+    assert unqualified_evidence["qualified_product_kg"] == pytest.approx(0.0)
+
+    qualified_execution = _execution()
+    qualified_execution.simulator.record.snapshots = _qualified_silica_snapshots()
+    qualified = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(qualified_execution),
+    )
+    assert qualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
+    qualified_evidence = qualified.objectives.evidence["pure_silica_glass_kg"]
+    assert "flag" not in qualified_evidence
+    assert qualified_evidence["qualified_product_kg"] == pytest.approx(12.5)
+    assert qualified_evidence["unqualified_capture_kg"] == pytest.approx(0.0)
+
+    real_classify = objective_module.classify_products
+
+    def _refused_capture(sim, *, early_tap_mode: bool = False):
+        result = dict(real_classify(sim, early_tap_mode=early_tap_mode))
+        silica = dict(result.get("pure_silica_glass") or {})
+        silica["stage_3_capture_kg"] = None
+        result["pure_silica_glass"] = silica
+        return result
+
+    monkeypatch.setattr(objective_module, "classify_products", _refused_capture)
+    refused = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_execution()),
+    )
+    assert refused.objectives.as_mapping()["pure_silica_glass_kg"] is None
+    refused_evidence = refused.objectives.evidence["pure_silica_glass_kg"]
+    assert refused_evidence["value_status"] == "unavailable"
+    assert "flag" not in refused_evidence
+
+
+def test_silica_objective_reverts_to_zero_when_consumer_reads_class_total(
+    monkeypatch,
+) -> None:
+    def _reverted_class_total(product_classes):
+        return objective_module._nested_float(
+            product_classes, ("pure_silica_glass", "class_total_kg")
+        )
+
+    monkeypatch.setattr(
+        objective_module,
+        "_silica_capture_objective_value",
+        _reverted_class_total,
+    )
+    reverted = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_execution()),
+    )
+    assert reverted.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
 
 
 def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:
