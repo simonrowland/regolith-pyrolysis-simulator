@@ -365,6 +365,30 @@ def test_antoine_dew_column_reports_local_partial_pressure_and_provenance() -> N
     assert diagnostic["routing_authority"] is False
 
 
+@pytest.mark.parametrize(
+    ("oxygen_mol_hr", "sticking_fraction", "expected_status"),
+    [(0.0, 1.0, "not_captured"), (100.0, 0.0, "not_captured"),
+     (100.0, 1.0, "captured")],
+)
+def test_capture_status_requires_captured_oxygen(
+    oxygen_mol_hr, sticking_fraction, expected_status
+) -> None:
+    params = replace(
+        thermal_train_parameters_from_mapping(),
+        frost_sticking_fraction=sticking_fraction,
+    )
+    report = report_from_recorded_series(
+        [{}], [oxygen_mol_hr], [1000.0], setpoints=_setpoints(), parameters=params
+    )
+    capacity = report["capacity"]
+    assert capacity["deposition_gate"]["frost_forms"] is True
+    assert capacity["capture_status"] == {
+        "status": expected_status,
+        "reason": None if expected_status == "captured" else "no_oxygen_captured",
+    }
+    assert (capacity["captured_batch_kg"] > 0.0) == (expected_status == "captured")
+
+
 def test_false_deposition_gate_captures_no_frost() -> None:
     base = thermal_train_parameters_from_mapping()
     params = replace(base, P_suction_Pa=1.0, P_discharge_Pa=100.0)

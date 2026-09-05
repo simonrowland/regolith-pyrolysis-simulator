@@ -1733,7 +1733,11 @@ def report_from_recorded_series(
             cavern_thermal_mass_J_per_K=params.cavern_thermal_mass_J_per_K,
             segment_K=params.dT_segment_K,
         )
-        capture_status = {"status": "captured", "reason": None}
+        capture_status = (
+            {"status": "captured", "reason": None}
+            if captured_batch_mol > 0.0
+            else {"status": "not_captured", "reason": "no_oxygen_captured"}
+        )
     else:
         captured_batch_mol = 0.0
         cavern = {
