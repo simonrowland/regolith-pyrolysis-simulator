@@ -39,4 +39,111 @@
     {% if feedstock.process_notes is defined %}
     <p class="feedstock-notes"><strong>Process notes:</strong> {{ feedstock.process_notes }}</p>
     {% endif %}
+
+    {% if feedstock.solar_wind_volatiles %}
+    {% set sw = feedstock.solar_wind_volatiles %}
+    <div class="feedstock-volatiles">
+        <p class="feedstock-notes"><strong>Solar-wind volatiles</strong></p>
+        {% if sw.status is defined %}
+        <p class="feedstock-source"><strong>status:</strong> {{ sw.status }}</p>
+        {% endif %}
+        {% if sw.adopted is defined %}
+        <p class="feedstock-source"><strong>adopted:</strong> {{ sw.adopted }}</p>
+        {% endif %}
+        {% if sw.basis is defined %}
+        <p class="feedstock-source"><strong>basis:</strong> {{ sw.basis }}</p>
+        {% endif %}
+
+        {% if sw.species_ppm %}
+        <table class="composition-table">
+            <thead>
+                <tr>
+                    <th>species_ppm</th>
+                    <th>ppm</th>
+                    <th>interval</th>
+                    <th>source</th>
+                    <th>confidence</th>
+                    <th>basis</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for species, assay in sw.species_ppm.items() %}
+                <tr>
+                    <td>{{ species }}</td>
+                    <td>{% if assay is mapping and assay.value is defined %}{{ assay.value }}{% endif %}</td>
+                    <td class="range">{% if assay is mapping and assay.interval is defined %}[{{ assay.interval[0] }}, {{ assay.interval[1] }}]{% endif %}</td>
+                    <td>{% if assay is mapping and assay.source is defined %}{{ assay.source }}{% endif %}</td>
+                    <td>{% if assay is mapping and assay.confidence is defined %}{{ assay.confidence }}{% endif %}</td>
+                    <td>{% if assay is mapping and assay.basis is defined %}{{ assay.basis }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if sw.He3_ppb %}
+        {% set he3 = sw.He3_ppb %}
+        <table class="composition-table">
+            <thead>
+                <tr>
+                    <th>He3_ppb</th>
+                    <th>ppb</th>
+                    <th>interval</th>
+                    <th>source</th>
+                    <th>confidence</th>
+                    <th>basis</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>He3_ppb</td>
+                    <td>{% if he3 is mapping and he3.value is defined %}{{ he3.value }}{% endif %}</td>
+                    <td class="range">{% if he3 is mapping and he3.interval is defined %}[{{ he3.interval[0] }}, {{ he3.interval[1] }}]{% endif %}</td>
+                    <td>{% if he3 is mapping and he3.source is defined %}{{ he3.source }}{% endif %}</td>
+                    <td>{% if he3 is mapping and he3.confidence is defined %}{{ he3.confidence }}{% endif %}</td>
+                    <td>{% if he3 is mapping and he3.basis is defined %}{{ he3.basis }}{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if sw.isotope_ratio_He3_He4 %}
+        {% set iso = sw.isotope_ratio_He3_He4 %}
+        <p class="feedstock-source">
+            <strong>isotope_ratio_He3_He4:</strong>
+            {% if iso is mapping and iso.value is defined %}{{ iso.value }}{% endif %}
+            {% if iso is mapping and iso.confidence is defined %} confidence: {{ iso.confidence }}{% endif %}
+            {% if iso is mapping and iso.owner_ratify is defined %} owner_ratify: {{ iso.owner_ratify }}{% endif %}
+        </p>
+        {% if iso is mapping and iso.basis is defined %}
+        <p class="feedstock-source">{{ iso.basis }}</p>
+        {% endif %}
+        {% endif %}
+
+        {% if sw.release_windows_C %}
+        <table class="composition-table">
+            <thead>
+                <tr><th>release_windows_C</th><th>interval</th></tr>
+            </thead>
+            <tbody>
+                {% for window, span in sw.release_windows_C.items() %}
+                {% if window != 'source' and span is sequence and span is not string %}
+                <tr>
+                    <td>{{ window }}</td>
+                    <td class="range">[{{ span[0] }}, {{ span[1] }}]</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if sw.release_windows_C.source is defined %}
+        <p class="feedstock-source"><strong>source:</strong> {{ sw.release_windows_C.source }}</p>
+        {% endif %}
+        {% endif %}
+
+        {% if sw.capture_note %}
+        <p class="feedstock-notes"><strong>capture_note:</strong> {{ sw.capture_note }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
