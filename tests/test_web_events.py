@@ -2094,7 +2094,11 @@ def test_missing_stage0_reductant_is_input_error_not_backend_unavailable(
 
     with app.app_context():
         result = web_events._registered_start_handler(
-            {"feedstock": "mars_basalt", "mass_kg": 1000},
+            {
+                "backend": "internal-analytical",
+                "feedstock": "mars_basalt",
+                "mass_kg": 1000,
+            },
             sid="mars-reductant-test",
             ledger_client_id="mars-reductant-owner",
         )
@@ -2108,6 +2112,8 @@ def test_missing_stage0_reductant_is_input_error_not_backend_unavailable(
         "a missing required additive is bad input, not a backend outage; got "
         f"{payload.get('error_type')!r}"
     )
+    assert "backend_status" not in payload
+    assert "backend_authoritative" not in payload
 
 
 def test_unknown_feedstock_is_typed_unknown_feedstock_not_backend_unavailable(
@@ -2140,6 +2146,7 @@ def test_unknown_feedstock_is_typed_unknown_feedstock_not_backend_unavailable(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "backend": "internal-analytical",
                 "feedstock": "__no_such_feedstock_for_typing_test__",
                 "mass_kg": 1000,
             },
@@ -2157,18 +2164,24 @@ def test_unknown_feedstock_is_typed_unknown_feedstock_not_backend_unavailable(
         "a mistyped feedstock id must not be typed as a backend outage; got "
         f"{payload.get('error_type')!r}"
     )
+    assert "backend_status" not in payload
+    assert "backend_authoritative" not in payload
 
 
+@pytest.mark.parametrize("failure_at", ["backend_selection", "session_start"])
 def test_socket_start_rejection_echoes_status_strip_lifecycle_generation(
-    monkeypatch,
+    monkeypatch, failure_at,
 ):
     app = app_module.create_app()
     emitted = []
 
-    def unavailable(_name):
+    def unavailable(*_args):
         raise BackendUnavailableError("backend unavailable for test")
 
-    monkeypatch.setattr(web_events, "_get_backend", unavailable)
+    if failure_at == "backend_selection":
+        monkeypatch.setattr(web_events, "_get_backend", unavailable)
+    else:
+        monkeypatch.setattr(web_events.SimSession, "start", unavailable)
     monkeypatch.setattr(
         app_module.socketio,
         "emit",
@@ -2180,7 +2193,7 @@ def test_socket_start_rejection_echoes_status_strip_lifecycle_generation(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
-                "backend": "unavailable",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "lifecycle_generation": 9,
