@@ -27,7 +27,7 @@ def wall_deposit_candidate_kg(
     T_cond_C: float,
     melt_temperature_C: float,
     antoine_extrapolation_warnings: list[str] | None = None,
-) -> float:
+) -> float | dict[str, Any]:
     return wall_deposit_candidate_for_surface_kg(
         model,
         species=species,
@@ -50,6 +50,9 @@ def wall_deposit_candidates_by_segment_kg(
     supply_by_segment_kg: Mapping[str, float],
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> dict[str, float]:
+    from simulator.condensation import _deposition_finite_scalar
+
+    rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
     if rate_kg_hr <= 0.0 or not model.pipe_segments:
         return {}
     reachable_segments = model._mixed_temperature_wall_candidate_segments(species)
@@ -58,8 +61,10 @@ def wall_deposit_candidates_by_segment_kg(
     candidates: dict[str, float] = {}
     for segment in reachable_segments:
         supply_kg = min(
-            max(0.0, float(supply_by_segment_kg.get(
-                segment.name, rate_kg_hr))),
+            max(0.0, _deposition_finite_scalar(
+                "segment_supply_kg_hr",
+                supply_by_segment_kg.get(segment.name, rate_kg_hr),
+            )),
             rate_kg_hr,
         )
         candidate = wall_deposit_candidate_for_surface_kg(
@@ -77,6 +82,9 @@ def wall_deposit_candidates_by_segment_kg(
             segment=segment,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
+        if isinstance(candidate, Mapping) and candidate.get("status") == "unavailable":
+            # No wall quantity: leave this supply on the existing gas-train route.
+            continue
         if candidate > 0.0:
             candidates[segment.name] = min(candidate, supply_kg)
     total = sum(candidates.values())
@@ -130,10 +138,7 @@ def wall_deposit_candidate_for_surface_kg(
     regime_factor: float | None = None,
     segment: Any | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
-) -> float:
-    if rate_kg_hr <= 0.0 or surface_area_m2 <= 0.0:
-        return 0.0
-
+) -> float | dict[str, Any]:
     from simulator.condensation import (
         DepositionInputRefusal,
         WallSaturationPressureRefusal,
@@ -144,11 +149,17 @@ def wall_deposit_candidate_for_surface_kg(
         _liner_material_config,
         _required_record_alpha_s,
         _series_resistance_deposition_flux_mol_m2_s,
+        _species_vapor_data,
         _transport_parameter_notice,
         _wall_alpha_record,
         _wall_material_config,
         classify_knudsen_regime,
     )
+
+    rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
+    surface_area_m2 = _deposition_finite_scalar("surface_area_m2", surface_area_m2)
+    if rate_kg_hr <= 0.0 or surface_area_m2 <= 0.0:
+        return 0.0
 
     materials = getattr(model, "materials", None)
     wall_config = _wall_material_config(materials)
@@ -271,6 +282,9 @@ def wall_deposit_candidate_for_surface_kg(
             if regime_factor is not None
             else model.regime_factor
         )
+        applied_regime_factor = _deposition_finite_scalar(
+            "regime_factor", applied_regime_factor
+        )
         flux = _series_resistance_deposition_flux_mol_m2_s(
             species, P_local_pa, T_wall_K, alpha_s,
             pipe_diameter_m=applied_pipe_diameter_m,
@@ -295,20 +309,69 @@ def wall_deposit_candidate_for_surface_kg(
             diagnostic_out=rate_diagnostic,
         )
     if rate_diagnostic.get("wall_saturation_pressure_refused"):
+        refusal_reason = rate_diagnostic["wall_saturation_pressure_refusal_reason"]
         notice = model.last_sticking_alpha_provenance_notice
         notice.setdefault("wall_saturation_pressure_refusals_by_species", {}).setdefault(
             species, {}
         )[str(getattr(segment, "name", "default_pipe"))] = {
             "status": "refused",
-            "reason": rate_diagnostic["wall_saturation_pressure_refusal_reason"],
+            "reason": refusal_reason,
             "output_status": "status_bearing",
             "wall_temperature_K": T_wall_K,
             "wall_saturation_pressure_pa": None,
         }
+        source_data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
+        source_only_wall_channel = (
+            source_data.get("fit_target") == "standard_reaction_term"
+            and "pure_component_antoine" not in source_data
+        )
+        if refusal_reason == "above_source_certified_range" or (
+            refusal_reason == "source_certified_range_refused" and source_only_wall_channel
+        ):
+            from engines.builtin.vapor_pressure import (
+                _coefficient_mapping,
+                wall_condensation_antoine_coefficients,
+            )
+
+            if source_only_wall_channel:
+                coefficient_block = "antoine"
+            else:
+                _, coefficient_block = wall_condensation_antoine_coefficients(
+                    source_data, temperature_K=T_wall_K
+                )
+            if coefficient_block in source_data:
+                # A range label can also mask an incomplete or invalid fit.
+                # Validate the declared fit before treating it as domain-only.
+                coefficients = _coefficient_mapping(
+                    source_data, coefficient_block, temperature_K=T_wall_K
+                )
+                coefficients = {
+                    key: _deposition_finite_scalar(
+                        f"{coefficient_block}.{key}", coefficients.get(key)
+                    )
+                    for key in ("A", "B", "C")
+                }
+                if not source_only_wall_channel and (
+                    coefficients["A"] <= 0.0 or T_wall_K + coefficients["C"] <= 0.0
+                ):
+                    raise DepositionInputRefusal(
+                        coefficient_block, coefficients,
+                        "wall Antoine fit requires A > 0 and T_wall_K + C > 0",
+                    )
+            # Valid physics outside the wall model's domain marks and skips.
+            # A melt standard-reaction term is not a pure-species wall P_sat;
+            # without a wall sidecar it cannot supply a wall quantity either.
+            return {
+                "status": "unavailable",
+                "reason": refusal_reason,
+                "terminal_refusal": False,
+                "species": species,
+                "wall_temperature_K": T_wall_K,
+            }
         raise WallSaturationPressureRefusal(
             species,
             T_wall_K,
-            rate_diagnostic["wall_saturation_pressure_refusal_reason"],
+            refusal_reason,
         )
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa
     rate_diagnostic["total_pressure_pa"] = overhead_pressure_pa

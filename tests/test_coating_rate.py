@@ -226,26 +226,127 @@ def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
         gas_temperature_C=2926.85,
         campaign_name="C0",
     )
-    with pytest.raises(WallSaturationPressureRefusal) as refused:
-        wall_deposit_candidate_for_surface_kg(
-            model,
-            species="Fe",
-            rate_kg_hr=1.0,
-            T_cond_C=model.condensation_temperatures_C["Fe"],
-            melt_temperature_C=2926.85,
-            wall_temperature_C=2926.85,
-            surface_area_m2=1.0,
-        )
-    assert refused.value.reason == "above_source_certified_range"
-    assert refused.value.species == "Fe"
-    assert refused.value.temperature_K == pytest.approx(3200.0)
+    unavailable = wall_deposit_candidate_for_surface_kg(
+        model,
+        species="Fe",
+        rate_kg_hr=1.0,
+        T_cond_C=model.condensation_temperatures_C["Fe"],
+        melt_temperature_C=2926.85,
+        wall_temperature_C=2926.85,
+        surface_area_m2=1.0,
+    )
+    assert unavailable == {
+        "status": "unavailable",
+        "reason": "above_source_certified_range",
+        "terminal_refusal": False,
+        "species": "Fe",
+        "wall_temperature_K": pytest.approx(3200.0),
+    }
     assert model.last_wall_deposition_rate_shadow_candidate == {}
     refusal_notice = model.last_sticking_alpha_provenance_notice[
         "wall_saturation_pressure_refusals_by_species"
     ]["Fe"]["default_pipe"]
     assert refusal_notice["status"] == "refused"
-    assert refusal_notice["reason"] == refused.value.reason
+    assert refusal_notice["reason"] == unavailable["reason"]
     assert refusal_notice["wall_saturation_pressure_pa"] is None
+    model.pipe_segments = [
+        PipeSegment("hot", "melt", "stage_1", 2926.85, 1.0, 0.12)
+    ]
+    assert model._wall_deposit_candidates_by_segment_kg(
+        species="Fe", rate_kg_hr=1.0,
+        T_cond_C=model.condensation_temperatures_C["Fe"],
+        melt_temperature_C=2926.85, supply_by_segment_kg={"hot": 1.0},
+    ) == {}
+    assert model.last_wall_deposition_rate_shadow_candidate == {}
+
+
+@pytest.mark.parametrize("invalid_data", [
+    None, "pure_component_antoine", "antoine", "above_range_antoine",
+])
+def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
+    monkeypatch, invalid_data,
+) -> None:
+    from simulator.condensation import DepositionInputRefusal, _species_vapor_data
+
+    species = "SiO"
+    source_data = copy.deepcopy(_species_vapor_data(species))
+    assert source_data["fit_target"] == "standard_reaction_term"
+    assert "pure_component_antoine" not in source_data
+    if invalid_data == "pure_component_antoine":
+        source_data["pure_component_antoine"] = {"A": 1.0, "B": "invalid", "C": 0.0}
+    elif invalid_data in {"antoine", "above_range_antoine"}:
+        source_data["antoine"]["B"] = "invalid"
+        if invalid_data == "above_range_antoine":
+            source_data["source_certified_range_K"] = [1000.0, 2000.0]
+    monkeypatch.setattr(
+        "simulator.condensation._species_vapor_data", lambda *a, **k: source_data
+    )
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={species: 1.0},
+        gas_temperature_C=1800.0, campaign_name="C0",
+    )
+    kwargs = dict(
+        species=species, rate_kg_hr=1.0,
+        T_cond_C=model.condensation_temperatures_C[species],
+        melt_temperature_C=1800.0, wall_temperature_C=1800.0,
+        surface_area_m2=1.0,
+    )
+    if invalid_data:
+        expected = (
+            WallSaturationPressureRefusal
+            if invalid_data == "pure_component_antoine" else DepositionInputRefusal
+        )
+        with pytest.raises(expected) as refused:
+            wall_deposit_candidate_for_surface_kg(model, **kwargs)
+        assert refused.value.terminal_refusal is True
+    else:
+        assert wall_deposit_candidate_for_surface_kg(model, **kwargs) == {
+            "status": "unavailable",
+            "reason": "source_certified_range_refused",
+            "terminal_refusal": False,
+            "species": species,
+            "wall_temperature_K": pytest.approx(2073.15),
+        }
+    assert model.last_wall_deposition_rate_shadow_candidate == {}
+
+
+@pytest.mark.parametrize(("field", "value"), [
+    ("rate_kg_hr", float("nan")),
+    ("rate_kg_hr", float("inf")),
+    ("surface_area_m2", float("nan")),
+    ("regime_factor", float("nan")),
+    ("pure_component_antoine.B", None),
+    ("pure_component_antoine", 0.0),
+])
+def test_unavailable_wall_saturation_does_not_hide_invalid_input(field, value) -> None:
+    from simulator.condensation import DepositionInputRefusal
+
+    data = copy.deepcopy(VAPOR_PRESSURE_DATA)
+    data["metals"]["Fe"]["pure_component_antoine"].update(
+        source_certified_range_K=[1800.0, 3100.0], extrapolation_policy="refuse"
+    )
+    if field == "pure_component_antoine.B":
+        del data["metals"]["Fe"]["pure_component_antoine"]["B"]
+    elif field == "pure_component_antoine":
+        data["metals"]["Fe"]["pure_component_antoine"]["A"] = value
+    model = CondensationModel(CondensationTrain.create_default(), vapor_pressure_data=data)
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0, species_partial_pressures_mbar={"Fe": 1.0},
+        gas_temperature_C=2926.85, campaign_name="C0",
+    )
+    kwargs = dict(
+        species="Fe", rate_kg_hr=1.0, T_cond_C=1200.0,
+        melt_temperature_C=2926.85, wall_temperature_C=2926.85,
+        surface_area_m2=1.0,
+    )
+    if not field.startswith("pure_component_antoine"):
+        kwargs[field] = value
+    with pytest.raises(DepositionInputRefusal, match=field) as refused:
+        wall_deposit_candidate_for_surface_kg(model, **kwargs)
+    assert refused.value.terminal_refusal is True
+    assert model.last_wall_deposition_rate_shadow_candidate == {}
 
 
 def test_missing_wall_antoine_data_raises_typed_refusal(monkeypatch) -> None:
