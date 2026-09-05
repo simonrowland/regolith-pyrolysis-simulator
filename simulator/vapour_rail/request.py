@@ -16,6 +16,8 @@ success are forbidden inputs to the request projection.
 from __future__ import annotations
 
 import math
+import unicodedata
+import weakref
 from collections import deque
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
@@ -46,6 +48,9 @@ from simulator.vapour_rail.activity import (
     CondensedPhaseActivityProvider,
     SourceReactionActivity,
     StandardStateIdentity,
+    _fingerprint_float,
+    _is_nonfinite_number,
+    composition_fingerprint,
 )
 from simulator.vapour_rail.batch import (
     CERTIFICATION_CEILING_NEVER,
@@ -176,6 +181,8 @@ class ProviderDomainCandidate:
 
     A single candidate's domain miss does **not** create a step-2 refusal when
     another admitted candidate covers the requested state.
+    Evaluation, solve-group, and state identity are captured at admission so
+    later live-attribute tampering cannot change allocation identity.
     """
 
     provider_id: str
@@ -194,6 +201,15 @@ class ProviderDomainCandidate:
     validation_residual_dex_by_species: Mapping[
         str, float | tuple[float, float]
     ] = field(default_factory=lambda: MappingProxyType({}))
+    evaluation_id: str = ""
+    solve_group_id: str = ""
+    state_fingerprint: str = ""
+    evaluation_review_record: str | None = None
+    _admitted_identity: tuple[str, str, str] = field(
+        init=False,
+        repr=False,
+        compare=False,
+    )
 
     def __post_init__(self) -> None:
         if self.pressures_by_species is not None:
@@ -229,6 +245,21 @@ class ProviderDomainCandidate:
             "validation_residual_dex_by_species",
             MappingProxyType(dict(self.validation_residual_dex_by_species)),
         )
+        object.__setattr__(
+            self,
+            "_admitted_identity",
+            (self.evaluation_id, self.solve_group_id, self.state_fingerprint),
+        )
+
+
+@dataclass(frozen=True)
+class SelectedBundleIdentity:
+    """One selected evaluation identity for a connected solve bundle."""
+
+    bundle_id: str
+    evaluation_id: str
+    solve_group_id: str
+    state_fingerprint: str
 
 
 @dataclass(frozen=True)
@@ -1144,6 +1175,12 @@ def refusal_closure(
     candidates_map = dict(provider_candidates_by_species or {})
     catalog_species = catalog_species or {}
     activity_provider = activity_provider or CondensedPhaseActivityProvider()
+    state_identity_error: str | None = None
+    try:
+        state_identity = _state_fingerprint(state)
+    except VapourRequestConstructionError as exc:
+        state_identity = "state:refused"
+        state_identity_error = str(exc)
 
     # Seed answers as non-refused placeholders; iterate to fixed point.
     answers: dict[str, VapourAnswer] = {}
@@ -1165,7 +1202,7 @@ def refusal_closure(
             formula_id=rule.formula_id,
             source_account=rule.source_account,
             solve_group_id=rule.solve_group_id,
-            state_fingerprint=_state_fingerprint(state),
+            state_fingerprint=state_identity,
             validation_status=rule.validation_status,
             validation_anchor_refs=rule.validation_anchor_refs,
             verdict_status=VERDICT_STATUS_BEARING_NON_AUTHORITATIVE,
@@ -1184,6 +1221,8 @@ def refusal_closure(
         remains in the exact-key batch and never joins a solve bundle.
         """
 
+        if state_identity_error is not None:
+            return state_identity_error
         if state is None or state.temperature_K is None:
             return (
                 "outcome-determining temperature_K absent from resolve state "
@@ -1292,7 +1331,7 @@ def refusal_closure(
                         thermoengine=None,
                         activity_exponent=evaluator_activity_exponent,
                         solve_group_id=rule.solve_group_id,
-                        state_fingerprint=_state_fingerprint(state),
+                        state_fingerprint=state_identity,
                         mole_fraction=reported_mole_fraction,
                         reported_activity=reported_activity,
                         reported_activity_provider=(
@@ -1628,7 +1667,7 @@ def refusal_closure(
             formula_id=rule.formula_id,
             source_account=rule.source_account,
             solve_group_id=rule.solve_group_id,
-            state_fingerprint=_state_fingerprint(state),
+            state_fingerprint=state_identity,
             validation_status=rule.validation_status,
             validation_anchor_refs=rule.validation_anchor_refs,
             verdict_status=verdict,
@@ -1869,19 +1908,157 @@ def _candidate_has_validated_anchor(
     )
 
 
+_admitted_candidate_identities: dict[
+    int, tuple[weakref.ReferenceType[ProviderDomainCandidate], tuple[str, str, str]]
+] = {}
+
+
+def _admitted_candidate_identity(
+    candidate: ProviderDomainCandidate,
+) -> tuple[str, str, str]:
+    key = id(candidate)
+    record = _admitted_candidate_identities.get(key)
+    if record is None:
+        identity = candidate._admitted_identity
+        # Release per-step records with their candidates; never reuse a dead id.
+        _admitted_candidate_identities[key] = (
+            weakref.ref(candidate, lambda _: _admitted_candidate_identities.pop(key, None)),
+            identity,
+        )
+        return identity
+    return record[1]
+
+
+def _candidate_solve_identity(
+    candidate: ProviderDomainCandidate,
+    state: VapourResolveState | None,
+) -> tuple[str, str] | None:
+    _, solve_group_id, state_fingerprint = _admitted_candidate_identity(candidate)
+    if not isinstance(solve_group_id, str) or not solve_group_id.strip():
+        return None
+    if not isinstance(state_fingerprint, str) or not state_fingerprint.strip():
+        return None
+    if state_fingerprint != _state_fingerprint(state):
+        return None
+    return solve_group_id, state_fingerprint
+
+
+def _shared_candidate_solve_identity(
+    candidates: Sequence[ProviderDomainCandidate],
+    state: VapourResolveState | None,
+) -> tuple[str, str] | None:
+    identities: set[tuple[str, str]] = set()
+    for candidate in candidates:
+        if candidate.pressures_by_species is None:
+            continue
+        identity = _candidate_solve_identity(candidate, state)
+        if identity is None:
+            return None
+        identities.add(identity)
+    if len(identities) != 1:
+        return None
+    return next(iter(identities))
+
+
+def _normalize_evaluation_reference(reference: str) -> str:
+    normalized = reference.strip().rstrip("/").casefold()
+    if any(
+        char.isspace() or unicodedata.category(char) in {"Cc", "Cf"}
+        for char in normalized
+    ):
+        return ""
+    return normalized
+
+
+def _candidate_has_independent_review_record(
+    candidate: ProviderDomainCandidate,
+) -> bool:
+    evaluation_id, _, _ = _admitted_candidate_identity(candidate)
+    review_record = candidate.evaluation_review_record
+    if not isinstance(evaluation_id, str) or not evaluation_id.strip():
+        return False
+    if not isinstance(review_record, str) or not review_record.strip():
+        return False
+    normalized_review = _normalize_evaluation_reference(review_record)
+    normalized_evaluation = _normalize_evaluation_reference(evaluation_id)
+    return bool(
+        normalized_review
+        and normalized_evaluation
+        and normalized_review != normalized_evaluation
+    )
+
+
+def _selected_bundle_identity(
+    *,
+    bundle_id: str,
+    selected_source: ProviderDomainCandidate,
+    state: VapourResolveState | None,
+) -> SelectedBundleIdentity | None:
+    if not isinstance(bundle_id, str) or not bundle_id.strip():
+        return None
+    solve_identity = _candidate_solve_identity(selected_source, state)
+    if solve_identity is None:
+        return None
+    evaluation_id, _, _ = _admitted_candidate_identity(selected_source)
+    if not isinstance(evaluation_id, str) or not evaluation_id.strip():
+        return None
+    solve_group_id, state_fingerprint = solve_identity
+    return SelectedBundleIdentity(
+        bundle_id=bundle_id,
+        evaluation_id=evaluation_id,
+        solve_group_id=solve_group_id,
+        state_fingerprint=state_fingerprint,
+    )
+
+
+def _answer_has_selected_bundle_identity(
+    *,
+    answer: VapourAnswer,
+    selected_source: ProviderDomainCandidate,
+    bundle_identity: SelectedBundleIdentity,
+) -> bool:
+    if (
+        answer.solve_group_id != bundle_identity.solve_group_id
+        or answer.state_fingerprint != bundle_identity.state_fingerprint
+        or canonical_backend_name(answer.source_label)
+        != canonical_backend_name(selected_source.provider_id)
+    ):
+        return False
+    selected_evaluation_id = _normalize_evaluation_reference(
+        bundle_identity.evaluation_id
+    )
+    answer_evaluation_id = answer.extra.get("selected_evaluation_id")
+    if "selected_evaluation_id" in answer.extra:
+        if not isinstance(answer_evaluation_id, str):
+            return False
+        return (
+            _normalize_evaluation_reference(answer_evaluation_id)
+            == selected_evaluation_id
+            and answer.extra.get("bundle_id") == bundle_identity.bundle_id
+        )
+    return (
+        canonical_backend_name(selected_source.provider_id) == "catalog"
+        and selected_evaluation_id == "evaluation:catalog"
+    )
+
+
 def _unique_provider_candidates(
     candidates: Sequence[ProviderDomainCandidate],
 ) -> tuple[ProviderDomainCandidate, ...] | None:
-    """Identity-deduplicate candidates, then enforce provider uniqueness."""
+    """Value-deduplicate candidates, then enforce provider uniqueness."""
 
     unique: list[ProviderDomainCandidate] = []
-    seen_identities: set[int] = set()
     seen_provider_ids: set[str | None] = set()
     for candidate in candidates:
-        identity = id(candidate)
-        if identity in seen_identities:
+        if candidate in unique:
+            index = unique.index(candidate)
+            # Equal clones share the representative's captured admission.
+            if (
+                id(unique[index]) not in _admitted_candidate_identities
+                and id(candidate) in _admitted_candidate_identities
+            ):
+                unique[index] = candidate
             continue
-        seen_identities.add(identity)
         provider_id = canonical_backend_name(candidate.provider_id)
         if provider_id in seen_provider_ids:
             return None
@@ -1901,6 +2078,10 @@ def _candidate_is_complete(
     if evidence_class not in RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES:
         return False
     if not candidate.evaluation_is_fixed_and_reviewed:
+        return False
+    if not _candidate_has_independent_review_record(candidate):
+        return False
+    if _candidate_solve_identity(candidate, state) is None:
         return False
     if (
         evidence_class == VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED
@@ -1963,12 +2144,24 @@ def rank_complete_candidate_sources(
     )
     if unique_consumed_candidates is None:
         return None
-    candidate_identities = {id(candidate) for candidate in candidates}
+    if (
+        _shared_candidate_solve_identity(unique_consumed_candidates, state)
+        is None
+    ):
+        return None
     unique_candidates = tuple(
         candidate
         for candidate in unique_consumed_candidates
-        if id(candidate) in candidate_identities
+        if candidate in candidates
     )
+    validation_rows_by_species = {
+        species_id: tuple(
+            candidate
+            for candidate in unique_consumed_candidates
+            if candidate in validation_rows_by_species.get(species_id, ())
+        )
+        for species_id in bundle
+    }
     complete = [
         candidate
         for candidate in unique_candidates
@@ -1980,6 +2173,7 @@ def rank_complete_candidate_sources(
         == VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED
         and not _has_raw_vaporock_provenance(candidate)
         and candidate.evaluation_is_fixed_and_reviewed
+        and _candidate_has_independent_review_record(candidate)
         and candidate.covers_state(state_map)
         and species_id in candidate.independently_validated_species
         and _candidate_has_validated_anchor(candidate, species_id)
@@ -2020,6 +2214,7 @@ def allocate_selected_source(
     answers: Mapping[str, VapourAnswer],
     bundle_species_ids: frozenset[str],
     selected_source: ProviderDomainCandidate,
+    bundle_identity: SelectedBundleIdentity,
     state: VapourResolveState | None = None,
 ) -> dict[str, VapourAnswer]:
     """Allocate one selected evaluation across every channel in the bundle."""
@@ -2029,6 +2224,17 @@ def allocate_selected_source(
         raise VapourRequestConstructionError(
             "selected source has not passed all allocation gates"
         )
+    if (
+        _selected_bundle_identity(
+            bundle_id=bundle_identity.bundle_id,
+            selected_source=selected_source,
+            state=state,
+        )
+        != bundle_identity
+    ):
+        raise VapourRequestConstructionError(
+            "selected source identity does not match bundle identity"
+        )
 
     allocated = dict(answers)
     pressures = selected_source.pressures_by_species
@@ -2037,8 +2243,13 @@ def allocate_selected_source(
         answer = allocated[species_id]
         pressure = pressures[species_id]
         extra: dict[str, Any] = {
+            "bundle_id": bundle_identity.bundle_id,
+            "selected_evaluation_id": bundle_identity.evaluation_id,
             "selected_provider_id": selected_source.provider_id,
             "selected_evidence_class": selected_source.evidence_class,
+            "evaluation_review_record": (
+                selected_source.evaluation_review_record
+            ),
             "independently_validated": (
                 species_id in selected_source.independently_validated_species
             ),
@@ -2057,8 +2268,8 @@ def allocate_selected_source(
             source_label=selected_source.provider_id,
             formula_id=answer.formula_id,
             source_account=answer.source_account,
-            solve_group_id=answer.solve_group_id,
-            state_fingerprint=answer.state_fingerprint,
+            solve_group_id=bundle_identity.solve_group_id,
+            state_fingerprint=bundle_identity.state_fingerprint,
             validation_status=selected_source.validation_status_by_species[
                 species_id
             ],
@@ -2087,25 +2298,21 @@ def _bundle_evaluation_candidates(
     tuple[ProviderDomainCandidate, ...],
     tuple[ProviderDomainCandidate, ...],
 ]:
-    candidates: list[ProviderDomainCandidate] = []
-    admitted_ids_by_species: list[set[int]] = []
-    for species_id in sorted(bundle_species_ids):
-        admitted_ids: set[int] = set()
-        for candidate in provider_candidates_by_species.get(species_id, ()):
-            if candidate.pressures_by_species is None:
-                continue
-            candidate_id = id(candidate)
-            admitted_ids.add(candidate_id)
-            candidates.append(candidate)
-        admitted_ids_by_species.append(admitted_ids)
-    common_ids = (
-        set.intersection(*admitted_ids_by_species)
-        if admitted_ids_by_species
-        else set()
+    candidates = tuple(
+        candidate
+        for species_id in sorted(bundle_species_ids)
+        for candidate in provider_candidates_by_species.get(species_id, ())
+        if candidate.pressures_by_species is not None
     )
     return (
-        tuple(candidates),
-        tuple(candidate for candidate in candidates if id(candidate) in common_ids),
+        candidates,
+        tuple(
+            candidate for candidate in candidates
+            if all(
+                candidate in provider_candidates_by_species.get(species_id, ())
+                for species_id in bundle_species_ids
+            )
+        ),
     )
 
 
@@ -2157,13 +2364,18 @@ def _state_fingerprint(state: VapourResolveState | None) -> str:
     if state is None:
         return "state:none"
 
-    def _number_part(raw: Any) -> str:
+    def _number_part(
+        raw: Any, precision: int = 6, label: str = "request state",
+    ) -> str:
         if raw is None:
             return "na"
+        if _is_nonfinite_number(raw):
+            raise VapourRequestConstructionError(f"non-finite {label}")
         try:
-            return f"{float(raw):.6g}"
+            value = _fingerprint_float(raw)
         except (TypeError, ValueError):
             return repr(raw)
+        return f"{value if value != 0.0 else 0.0:.{precision}g}"
 
     t = state.temperature_K
     t_part = _number_part(t)
@@ -2172,7 +2384,15 @@ def _state_fingerprint(state: VapourResolveState | None) -> str:
     p_tot = state.total_pressure_Pa
     p_part = _number_part(p_tot)
     source_fo2 = state.source_reaction_fO2_bar
-    source_fo2_part = _number_part(source_fo2)
+    source_fo2_part = _number_part(
+        source_fo2, label="intrinsic_melt oxygen fugacity",
+    )
+    source_fo2_log10_part = _number_part(
+        state.source_reaction_fO2_log10
+    )
+    activity_pressure_part = _number_part(
+        state.source_reaction_activity_pressure_bar
+    )
     extras = state.extras or {}
     extra_part = ""
     if extras:
@@ -2186,21 +2406,48 @@ def _state_fingerprint(state: VapourResolveState | None) -> str:
         formatted_activities: list[str] = []
         for key in sorted(state.source_reaction_activities):
             raw_value = state.source_reaction_activities[key]
-            try:
-                value_text = f"{float(raw_value):.12g}"
-            except (TypeError, ValueError):
-                value_text = repr(raw_value)
+            value_text = (
+                repr(raw_value) if raw_value is None
+                else _number_part(raw_value, precision=12)
+            )
             formatted_activities.append(f"{key}={value_text}")
         activity_items = ",".join(formatted_activities)
         activity_part = (
             f"|activity_provider={state.source_reaction_activity_provider or 'na'}"
             f"|activities={activity_items}"
         )
+    composition_part = ""
+    if state.source_reaction_composition_wt_pct:
+        try:
+            composition_identity = composition_fingerprint(
+                state.source_reaction_composition_wt_pct
+            )
+        except ValueError as exc:
+            raise VapourRequestConstructionError(str(exc)) from exc
+        composition_part = (
+            f"|composition={composition_identity}"
+        )
+    activity_basis_part = ""
+    if state.source_reaction_activity_standard_states:
+        try:
+            basis_items = ",".join(
+                f"{component_id}={standard_state.fingerprint()}"
+                for component_id, standard_state in sorted(
+                    state.source_reaction_activity_standard_states.items()
+                )
+            )
+        except ValueError as exc:
+            raise VapourRequestConstructionError(str(exc)) from exc
+        activity_basis_part = f"|activity_basis={basis_items}"
     return (
         f"state:T={t_part}|phase={state.process_phase or 'na'}|"
         f"stage={state.stage or 'na'}|fO2={fo2_part}|"
-        f"source_fO2={source_fo2_part}|P={p_part}"
-        f"{activity_part}{extra_part}"
+        f"source_fO2={source_fo2_part}|"
+        f"source_fO2_log10={source_fo2_log10_part}|P={p_part}|"
+        f"activity_P_bar={activity_pressure_part}|"
+        f"redox_model={state.source_reaction_redox_model_id or 'na'}"
+        f"{composition_part}{activity_basis_part}{activity_part}"
+        f"{extra_part}"
     )
 
 
@@ -2344,14 +2591,17 @@ def resolve_vapour_batch(
             )
             step4_refused.update(members)
             continue
-        admitted_candidate_identities = {
-            id(candidate) for candidate in admitted_candidates
-        }
         unique_admitted_candidates = tuple(
             candidate
             for candidate in unique_candidates
-            if id(candidate) in admitted_candidate_identities
+            if candidate in admitted_candidates
         )
+        admitted_bundle_identities = {
+            id(candidate): _selected_bundle_identity(
+                bundle_id=bundle_id, selected_source=candidate, state=state,
+            )
+            for candidate in unique_admitted_candidates
+        }
         selected = rank_complete_candidate_sources(
             bundle_species_ids=members,
             candidates=unique_admitted_candidates,
@@ -2374,18 +2624,36 @@ def resolve_vapour_batch(
             )
             step4_refused.update(members)
             continue
+        bundle_identity = admitted_bundle_identities.get(id(selected))
+        if bundle_identity is None:
+            answers = _refuse_bundle_without_complete_source(
+                answers=answers,
+                bundle_id=bundle_id,
+                bundle_species_ids=members,
+                candidates=candidates,
+            )
+            step4_refused.update(members)
+            continue
         complete_candidates = tuple(
             candidate
             for candidate in unique_admitted_candidates
             if _candidate_is_complete(candidate, members, state)
         )
-        if len(complete_candidates) == 1:
+        if len(complete_candidates) == 1 and all(
+            _answer_has_selected_bundle_identity(
+                answer=answers[species_id],
+                selected_source=selected,
+                bundle_identity=bundle_identity,
+            )
+            for species_id in members
+        ):
             selected_bundles[bundle_id] = members
             continue
         answers = allocate_selected_source(
             answers=answers,
             bundle_species_ids=members,
             selected_source=selected,
+            bundle_identity=bundle_identity,
             state=state,
         )
         selected_bundles[bundle_id] = members

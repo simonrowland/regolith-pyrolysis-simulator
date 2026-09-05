@@ -14,13 +14,14 @@ Acceptance (DECOMPOSITION VR-6 / DESIGN-REV5 §1.2 / §4.2):
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import replace
+from dataclasses import FrozenInstanceError, replace
 from decimal import Decimal
 import math
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 from typing import Any
 
+import numpy as np
 import pytest
 import yaml
 
@@ -63,7 +64,9 @@ from simulator.vapour_rail.request import (
     REFUSAL_OUTSIDE_DECLARED_DOMAIN,
     ProviderDomainCandidate,
     RequestRule,
+    SelectedBundleIdentity,
     VapourResolveState,
+    _state_fingerprint,
     assert_request_coverage,
     allocate_selected_source,
     build_request,
@@ -78,6 +81,7 @@ from simulator.vapour_rail.instrumentation import (
     flux_pressures_from_batch,
     serialize_melt_activity_shadow,
     serialize_vapour_answer,
+    serialize_vapour_batch,
 )
 from simulator.vapour_rail.u0_manifest import load_u0_manifest
 
@@ -175,7 +179,17 @@ def _selector_candidate(
     independently_validated: frozenset[str] = frozenset(),
     residuals_dex: dict[str, float | tuple[float, float]] | None = None,
     anchors_by_species: dict[str, tuple[str, ...]] | None = None,
+    evaluation_id: str | None = None,
+    solve_group_id: str = "selector_bundle",
+    evaluation_state: VapourResolveState | None = None,
+    state_fingerprint: str | None = None,
+    evaluation_review_record: str | None = "review:independent",
 ) -> ProviderDomainCandidate:
+    if state_fingerprint is None:
+        state_fingerprint = _state_fingerprint(
+            evaluation_state
+            or VapourResolveState(temperature_K=1600.0)
+        )
     return ProviderDomainCandidate(
         provider_id=provider_id,
         covers_state=lambda _state: True,
@@ -194,6 +208,23 @@ def _selector_candidate(
         independently_validated_species=independently_validated,
         validation_residual_dex_by_species=residuals_dex or {},
         validation_anchor_refs_by_species=anchors_by_species or {},
+        evaluation_id=evaluation_id or f"evaluation:{provider_id.strip()}",
+        solve_group_id=solve_group_id,
+        state_fingerprint=state_fingerprint,
+        evaluation_review_record=evaluation_review_record,
+    )
+
+
+def _selector_bundle_identity(
+    candidate: ProviderDomainCandidate,
+    *,
+    bundle_id: str = "selector_bundle",
+) -> SelectedBundleIdentity:
+    return SelectedBundleIdentity(
+        bundle_id=bundle_id,
+        evaluation_id=candidate.evaluation_id,
+        solve_group_id=candidate.solve_group_id,
+        state_fingerprint=candidate.state_fingerprint,
     )
 
 
@@ -319,6 +350,25 @@ _TEST_ACTIVITY_STANDARD_STATE = StandardStateIdentity(
     phase="liquid",
     reference_pressure_bar=1.0,
     component_basis="raoultian_pure_endmember",
+)
+
+_NONFINITE_FINGERPRINT_VALUES = (
+    pytest.param(float("nan"), id="float-nan"),
+    pytest.param(float("inf"), id="float-inf"),
+    pytest.param(float("-inf"), id="float-negative-inf"),
+    pytest.param(Decimal("NaN"), id="decimal-nan"),
+    pytest.param(Decimal("sNaN"), id="decimal-snan"),
+    pytest.param(Decimal("Infinity"), id="decimal-inf"),
+    pytest.param(np.nan, id="numpy-nan"),
+    pytest.param(np.inf, id="numpy-inf"),
+    pytest.param(np.float32("nan"), id="numpy32-nan"),
+    pytest.param(np.float32("inf"), id="numpy32-inf"),
+    pytest.param(np.float64("nan"), id="numpy64-nan"),
+    pytest.param(np.float64("inf"), id="numpy64-inf"),
+    pytest.param(np.str_("nan"), id="numpy-str-nan"),
+    pytest.param(np.str_("inf"), id="numpy-str-inf"),
+    pytest.param(np.bytes_(b"nan"), id="numpy-bytes-nan"),
+    pytest.param(np.bytes_(b"inf"), id="numpy-bytes-inf"),
 )
 
 
@@ -1589,7 +1639,7 @@ def test_single_catalog_candidate_selection_is_behavioral_noop() -> None:
     )
 
 
-def test_single_complete_candidate_noop_ignores_raw_diagnostic_row() -> None:
+def test_single_complete_candidate_allocates_despite_raw_diagnostic_row() -> None:
     rule = _selector_rule("K")
     external = _selector_candidate(
         "only_external",
@@ -1617,12 +1667,13 @@ def test_single_complete_candidate_noop_ignores_raw_diagnostic_row() -> None:
         },
     )
 
-    baseline_answer = baseline.channel("K")
     selected_answer = with_candidates.channel("K")
-    assert baseline_answer.pressure == PressureValue(10.0)
-    assert selected_answer == baseline_answer
-    assert serialize_vapour_answer(selected_answer) == serialize_vapour_answer(
-        baseline_answer
+    assert baseline.channel("K").pressure == PressureValue(10.0)
+    assert selected_answer.pressure == PressureValue(701.0)
+    assert selected_answer.source_label == "only_external"
+    assert (
+        selected_answer.extra["selected_evaluation_id"]
+        == "evaluation:only_external"
     )
 
 
@@ -1687,6 +1738,7 @@ def test_public_allocator_refuses_source_that_has_not_passed_all_gates(
             answers={"K": baseline.channel("K")},
             bundle_species_ids=frozenset({"K"}),
             selected_source=candidate,
+            bundle_identity=_selector_bundle_identity(candidate),
         )
 
 
@@ -1752,29 +1804,699 @@ def test_two_candidate_ranking_prefers_reviewed_calibrated_source() -> None:
     )
 
 
+def test_selected_connected_bundle_stamps_one_solve_group_identity() -> None:
+    rules = (
+        replace(_selector_rule("Na"), solve_group_id="g-na"),
+        replace(_selector_rule("K"), solve_group_id="g-k"),
+    )
+    candidates = (
+        _selector_candidate(
+            "a-provider",
+            VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+            {"Na": 101.0, "K": 202.0},
+        ),
+        _selector_candidate(
+            "z-provider",
+            VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+            {"Na": 303.0, "K": 404.0},
+        ),
+    )
+
+    batch = resolve_vapour_batch(
+        rules=rules,
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={
+            "Na": candidates,
+            "K": candidates,
+        },
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    rendered = serialize_vapour_batch(batch)
+    assert rendered is not None
+    assert rendered["solve_bundle_ids"] == {
+        "bundle:0:K+Na": ["K", "Na"]
+    }
+    channels = rendered["channels_by_species"]
+    assert {
+        channels[species_id]["solve_group_id"]
+        for species_id in ("Na", "K")
+    } == {"selector_bundle"}
+    assert {
+        channels[species_id]["state_fingerprint"]
+        for species_id in ("Na", "K")
+    } == {_state_fingerprint(VapourResolveState(temperature_K=1600.0))}
+    assert {
+        channels[species_id]["extra"]["bundle_id"]
+        for species_id in ("Na", "K")
+    } == {"bundle:0:K+Na"}
+    assert {
+        channels[species_id]["extra"]["selected_evaluation_id"]
+        for species_id in ("Na", "K")
+    } == {"evaluation:a-provider"}
+
+
+def test_single_complete_candidate_stamps_transitive_bundle_identity() -> None:
+    rules = (
+        replace(
+            _selector_rule("Na"),
+            parent_species_ids=frozenset({"P"}),
+            required_source_atoms=frozenset({"P"}),
+            solve_group_id="rule-na",
+        ),
+        replace(
+            _selector_rule("K"),
+            parent_species_ids=frozenset({"P", "Q"}),
+            required_source_atoms=frozenset({"P", "Q"}),
+            solve_group_id="rule-k",
+        ),
+        replace(
+            _selector_rule("Cs"),
+            parent_species_ids=frozenset({"Q"}),
+            required_source_atoms=frozenset({"Q"}),
+            solve_group_id="rule-cs",
+        ),
+    )
+    selected = _selector_candidate(
+        "catalog",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 101.0, "K": 202.0, "Cs": 303.0},
+        evaluation_id="evaluation:catalog",
+        solve_group_id="catalog-bundle",
+    )
+
+    batch = resolve_vapour_batch(
+        rules=rules,
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0, "Q": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={
+            species_id: (selected,) for species_id in ("Na", "K", "Cs")
+        },
+        catalog_species=_selector_catalog_species("Na", "K", "Cs"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    rendered = serialize_vapour_batch(batch)
+    assert rendered is not None
+    assert rendered["solve_bundle_ids"] == {
+        "bundle:0:Cs+K+Na": ["Cs", "K", "Na"]
+    }
+    channels = rendered["channels_by_species"]
+    assert {
+        channels[species_id]["solve_group_id"]
+        for species_id in ("Na", "K", "Cs")
+    } == {"catalog-bundle"}
+    assert {
+        channels[species_id]["extra"]["selected_evaluation_id"]
+        for species_id in ("Na", "K", "Cs")
+    } == {"evaluation:catalog"}
+
+
+def test_allocator_stamps_selected_state_identity_on_every_answer() -> None:
+    state = VapourResolveState(temperature_K=1600.0)
+    rules = (_selector_rule("Na"), _selector_rule("K"))
+    baseline = resolve_vapour_batch(
+        rules=rules,
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=state,
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    selected = _selector_candidate(
+        "selected",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 101.0, "K": 202.0},
+    )
+    bundle_identity = _selector_bundle_identity(selected)
+
+    allocated = allocate_selected_source(
+        answers={
+            "Na": replace(
+                baseline.channel("Na"),
+                solve_group_id="stale-na",
+                state_fingerprint="state:stale-na",
+            ),
+            "K": replace(
+                baseline.channel("K"),
+                solve_group_id="stale-k",
+                state_fingerprint="state:stale-k",
+            ),
+        },
+        bundle_species_ids=frozenset({"Na", "K"}),
+        selected_source=selected,
+        bundle_identity=bundle_identity,
+        state=state,
+    )
+
+    assert {answer.solve_group_id for answer in allocated.values()} == {
+        bundle_identity.solve_group_id
+    }
+    assert {answer.state_fingerprint for answer in allocated.values()} == {
+        bundle_identity.state_fingerprint
+    }
+    assert {answer.extra["bundle_id"] for answer in allocated.values()} == {
+        bundle_identity.bundle_id
+    }
+
+
+@pytest.mark.parametrize(
+    "identity_change",
+    (
+        {"bundle_id": ""},
+        {"evaluation_id": "evaluation:other"},
+        {"solve_group_id": "other-solve-group"},
+        {"state_fingerprint": "state:other"},
+    ),
+    ids=("empty-bundle", "evaluation", "solve-group", "state"),
+)
+def test_allocator_refuses_mismatched_bundle_identity(
+    identity_change: dict[str, str],
+) -> None:
+    state = VapourResolveState(temperature_K=1600.0)
+    baseline = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=state,
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    selected = _selector_candidate(
+        "selected",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 202.0},
+    )
+    mismatched_identity = replace(
+        _selector_bundle_identity(selected),
+        **identity_change,
+    )
+
+    with pytest.raises(
+        VapourRequestConstructionError,
+        match="selected source identity does not match bundle identity",
+    ):
+        allocate_selected_source(
+            answers={"K": baseline.channel("K")},
+            bundle_species_ids=frozenset({"K"}),
+            selected_source=selected,
+            bundle_identity=mismatched_identity,
+            state=state,
+        )
+
+
+@pytest.mark.parametrize(
+    "identity_change",
+    (
+        {"solve_group_id": "other-solve-group"},
+        {
+            "state_fingerprint": _state_fingerprint(
+                VapourResolveState(temperature_K=1700.0)
+            )
+        },
+    ),
+    ids=("mixed-solve-group", "mixed-state"),
+)
+def test_mixed_candidate_identity_refuses_connected_bundle(
+    identity_change: dict[str, str],
+) -> None:
+    first = _selector_candidate(
+        "first-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 101.0, "K": 202.0},
+    )
+    second = replace(
+        _selector_candidate(
+            "second-provider",
+            VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+            {"Na": 303.0, "K": 404.0},
+        ),
+        **identity_change,
+    )
+    candidates = (first, second)
+
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("Na"), _selector_rule("K")),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        provider_candidates_by_species={
+            "Na": candidates,
+            "K": candidates,
+        },
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    assert all(
+        batch.channel(species_id).refusal_code
+        == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+        for species_id in ("Na", "K")
+    )
+    assert all(
+        isinstance(batch.channel(species_id).pressure, PressureRefusal)
+        and isinstance(batch.channel(species_id).flux, FluxRefusal)
+        for species_id in ("Na", "K")
+    )
+    assert batch.flux_active_species_ids == frozenset()
+    assert not batch.solve_bundle_ids
+
+
+@pytest.mark.parametrize(
+    "evaluation_state",
+    (
+        VapourResolveState(
+            temperature_K=1600.0,
+            source_reaction_composition_wt_pct={"SiO2": 60.0},
+            source_reaction_activity_standard_states={
+                "K": _TEST_ACTIVITY_STANDARD_STATE
+            },
+        ),
+        VapourResolveState(
+            temperature_K=1600.0,
+            source_reaction_composition_wt_pct={"SiO2": 50.0},
+            source_reaction_activity_standard_states={
+                "K": replace(
+                    _TEST_ACTIVITY_STANDARD_STATE,
+                    component_basis="henrian_infinite_dilution",
+                )
+            },
+        ),
+    ),
+    ids=("composition", "activity-basis"),
+)
+def test_candidate_state_identity_refuses_state_basis_mismatch(
+    evaluation_state: VapourResolveState,
+) -> None:
+    request_state = VapourResolveState(
+        temperature_K=1600.0,
+        source_reaction_composition_wt_pct={"SiO2": 50.0},
+        source_reaction_activity_standard_states={
+            "K": _TEST_ACTIVITY_STANDARD_STATE
+        },
+    )
+    candidates = tuple(
+        _selector_candidate(
+            provider_id,
+            VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+            {"K": pressure},
+            evaluation_state=evaluation_state,
+        )
+        for provider_id, pressure in (("first", 101.0), ("second", 202.0))
+    )
+
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=request_state,
+        provider_candidates_by_species={"K": candidates},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    answer = batch.channel("K")
+    assert answer.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+
+
+def test_numeric_equivalent_standard_state_identity_remains_admissible() -> None:
+    request_standard_state = replace(
+        _TEST_ACTIVITY_STANDARD_STATE,
+        reference_pressure_bar=1.0,
+        reference_temperature_K=1600.0,
+    )
+    evaluation_standard_state = replace(
+        request_standard_state,
+        reference_pressure_bar=1,
+        reference_temperature_K=1600,
+    )
+    assert evaluation_standard_state == request_standard_state
+    request_state = VapourResolveState(
+        temperature_K=1600.0,
+        source_reaction_activity_standard_states={"K": request_standard_state},
+    )
+    evaluation_state = VapourResolveState(
+        temperature_K=1600.0,
+        source_reaction_activity_standard_states={
+            "K": evaluation_standard_state
+        },
+    )
+    candidate = _selector_candidate(
+        "numeric-equivalent",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 101.0},
+        evaluation_state=evaluation_state,
+    )
+
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(candidate,),
+        state=request_state,
+    ) is candidate
+
+
+@pytest.mark.parametrize("field_name", (
+    "reference_pressure_bar", "reference_temperature_K",
+))
+@pytest.mark.parametrize("number", (float, Decimal), ids=("float", "decimal"))
+def test_standard_state_fingerprint_canonicalizes_signed_zero(
+    field_name: str, number,
+) -> None:
+    positive = replace(_TEST_ACTIVITY_STANDARD_STATE, **{field_name: number("0")})
+    negative = replace(positive, **{field_name: number("-0")})
+    assert positive == negative
+    assert positive.fingerprint() == negative.fingerprint()
+
+
+@pytest.mark.parametrize("field_name", (
+    "reference_pressure_bar", "reference_temperature_K",
+))
+@pytest.mark.parametrize("value", _NONFINITE_FINGERPRINT_VALUES)
+def test_standard_state_fingerprint_refuses_nonfinite(
+    field_name: str, value: float,
+) -> None:
+    standard_state = replace(_TEST_ACTIVITY_STANDARD_STATE, **{field_name: value})
+    with pytest.raises(ValueError, match="non-finite"):
+        standard_state.fingerprint()
+
+
+@pytest.mark.parametrize("field_name", (
+    "temperature_K", "fO2_bar", "total_pressure_Pa",
+    "source_reaction_fO2_bar", "source_reaction_fO2_log10",
+    "source_reaction_activity_pressure_bar", "source_reaction_activities",
+    "source_reaction_composition_wt_pct", "reference_pressure_bar",
+    "reference_temperature_K",
+))
+@pytest.mark.parametrize("number", (float, Decimal), ids=("float", "decimal"))
+def test_candidate_signed_zero_state_remains_admissible(
+    field_name: str, number,
+) -> None:
+    states = []
+    for zero in (number("0"), number("-0")):
+        if field_name.startswith("reference_"):
+            fields = {"source_reaction_activity_standard_states": {
+                "K": replace(_TEST_ACTIVITY_STANDARD_STATE, **{field_name: zero}),
+            }}
+        elif field_name in (
+            "source_reaction_activities", "source_reaction_composition_wt_pct",
+        ):
+            fields = {field_name: {"K": zero}}
+        else:
+            fields = {field_name: zero}
+        states.append(replace(VapourResolveState(temperature_K=1600.0), **fields))
+    request_state, evaluation_state = states
+    assert request_state == evaluation_state
+    candidate = _selector_candidate(
+        "signed-zero", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED, {"K": 137.0},
+        evaluation_state=evaluation_state,
+    )
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}), candidates=(candidate,),
+        state=request_state,
+    ) is candidate
+    if field_name == "source_reaction_fO2_log10":
+        batch = resolve_vapour_batch(
+            rules=(_selector_rule("K"),),
+            ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+            state=request_state, provider_candidates_by_species={"K": (candidate,)},
+            catalog_species=_selector_catalog_species("K"),
+            flux_activation_context=_rg_activation_context(),
+        )
+        assert batch.channel("K").pressure == PressureValue(137.0)
+
+
+@pytest.mark.parametrize("field_name", (
+    "temperature_K", "fO2_bar", "total_pressure_Pa",
+    "source_reaction_fO2_bar", "source_reaction_fO2_log10",
+    "source_reaction_activity_pressure_bar", "source_reaction_activities",
+    "source_reaction_composition_wt_pct", "reference_pressure_bar",
+    "reference_temperature_K",
+))
+@pytest.mark.parametrize("value", _NONFINITE_FINGERPRINT_VALUES)
+@pytest.mark.parametrize("boundary", ("fingerprint", "resolver"))
+def test_request_fingerprint_refuses_nonfinite(
+    field_name: str, value: float, boundary: str,
+) -> None:
+    if field_name.startswith("reference_"):
+        fields = {"source_reaction_activity_standard_states": {
+            "K": replace(_TEST_ACTIVITY_STANDARD_STATE, **{field_name: value}),
+        }}
+    elif field_name in (
+        "source_reaction_activities", "source_reaction_composition_wt_pct",
+    ):
+        fields = {field_name: {"K": value}}
+    else:
+        fields = {field_name: value}
+    state = replace(VapourResolveState(temperature_K=1600.0), **fields)
+    if boundary == "fingerprint":
+        with pytest.raises(VapourRequestConstructionError, match="non-finite"):
+            _state_fingerprint(state)
+        return
+    # On the broken gate this recreates an evaluation bearing the invalid state.
+    try:
+        fingerprint = _state_fingerprint(state)
+    except VapourRequestConstructionError:
+        fingerprint = "invalid-state"
+    candidate = _selector_candidate(
+        "nonfinite-evaluation", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 139.0}, state_fingerprint=fingerprint,
+    )
+    answer = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}}, state=state,
+        provider_candidates_by_species={"K": (candidate,)},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    ).channel("K")
+    assert answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+    assert answer.flux.code == REFUSAL_MISSING_OUTCOME_STATE
+    assert "non-finite" in answer.extra["detail"]
+
+
+@pytest.mark.parametrize("field_name", (
+    "temperature_K", "fO2_bar", "total_pressure_Pa",
+    "source_reaction_fO2_bar", "source_reaction_fO2_log10",
+    "source_reaction_activity_pressure_bar", "source_reaction_activities",
+    "source_reaction_composition_wt_pct", "reference_pressure_bar",
+    "reference_temperature_K",
+))
+@pytest.mark.parametrize("base_type, actual, override", (
+    pytest.param(Decimal, "-sNaN", "false", id="decimal-hidden-snan"),
+    pytest.param(Decimal, "Infinity", "false", id="decimal-hidden-inf"),
+    pytest.param(Decimal, "-sNaN", "raise", id="decimal-raising-snan"),
+    pytest.param(Decimal, "0.125", "true", id="decimal-finite-lying"),
+    pytest.param(Decimal, "0.125", "raise", id="decimal-finite-raising"),
+    pytest.param(float, "nan", "finite", id="float-hidden-nan"),
+    pytest.param(float, "inf", "finite", id="float-hidden-inf"),
+    pytest.param(float, "nan", "value-error", id="float-raising-nan"),
+    pytest.param(float, "nan", "overflow", id="float-overflow-nan"),
+    pytest.param(float, "0.125", "finite", id="float-finite-lying"),
+))
+def test_numeric_subclass_fingerprint_uses_underlying_value(
+    field_name: str, base_type, actual: str, override: str,
+) -> None:
+    class OverrideNumber(base_type):
+        def is_nan(self):
+            if override == "raise":
+                raise RuntimeError("classification override must not run")
+            return override == "true"
+
+        is_snan = is_nan
+        is_infinite = is_nan
+
+        def __float__(self):
+            if override == "value-error":
+                raise ValueError("conversion override must not run")
+            if override == "overflow":
+                raise OverflowError("conversion override must not run")
+            return 0.25
+
+    value = OverrideNumber(actual)
+    finite = actual == "0.125"
+    states = []
+    for number in (value, 0.125):
+        if field_name.startswith("reference_"):
+            fields = {"source_reaction_activity_standard_states": {
+                "K": replace(_TEST_ACTIVITY_STANDARD_STATE, **{field_name: number}),
+            }}
+        elif field_name in (
+            "source_reaction_activities", "source_reaction_composition_wt_pct",
+        ):
+            fields = {field_name: {"K": number}}
+        else:
+            fields = {field_name: number}
+        states.append(replace(VapourResolveState(temperature_K=1600.0), **fields))
+    state, ordinary_state = states
+    if finite:
+        assert _state_fingerprint(state) == _state_fingerprint(ordinary_state)
+    else:
+        with pytest.raises(VapourRequestConstructionError, match="non-finite"):
+            _state_fingerprint(state)
+    candidate = _selector_candidate(
+        "numeric-subclass", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED, {"K": 149.0},
+        evaluation_state=ordinary_state,
+    )
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}}, state=state,
+        provider_candidates_by_species={"K": (candidate,)},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("K")
+    if finite:
+        assert answer.refusal_code is None
+        assert answer.pressure == PressureValue(149.0)
+        assert batch.flux_active_species_ids == frozenset({"K"})
+        assert answer.state_fingerprint == _state_fingerprint(ordinary_state)
+    else:
+        assert answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
+        assert isinstance(answer.pressure, PressureRefusal)
+        assert isinstance(answer.flux, FluxRefusal)
+        assert answer.pressure.code == REFUSAL_MISSING_OUTCOME_STATE
+        assert answer.flux.code == REFUSAL_MISSING_OUTCOME_STATE
+        assert "non-finite" in answer.extra["detail"]
+        assert batch.flux_active_species_ids == frozenset()
+
+
+@pytest.mark.parametrize("tampering", ("replacement", "unreadable"))
+def test_resolver_preserves_public_admission_identity(monkeypatch, tampering: str) -> None:
+    state = VapourResolveState(temperature_K=1633.0)
+    parents = {"Li": {"P"}, "Na": {"P", "Q"}, "K": {"Q", "R"}, "Rb": {"R"}}
+    candidate = _selector_candidate(
+        "public-admission", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {species_id: 139.0 for species_id in parents},
+        evaluation_state=state, solve_group_id="solve:original",
+    )
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset(parents), candidates=(candidate,), state=state,
+    ) is candidate
+    evaluation_id, _, fingerprint = candidate._admitted_identity
+    if tampering == "replacement":
+        object.__setattr__(candidate, "_admitted_identity", (
+            evaluation_id, "solve:forged-after-public-admission", fingerprint,
+        ))
+    else:
+        def forbidden_read(self):
+            raise AssertionError("resolver read live identity after public admission")
+
+        monkeypatch.setattr(
+            ProviderDomainCandidate, "_admitted_identity", property(forbidden_read),
+            raising=False,
+        )
+    try:
+        batch = resolve_vapour_batch(
+            rules=tuple(
+                replace(
+                    _selector_rule(species_id), parent_species_ids=frozenset(atoms),
+                    solve_group_id=f"rule:{species_id}",
+                )
+                for species_id, atoms in parents.items()
+            ),
+            ledger_snapshot={"process.cleaned_melt": {"P": 1.0, "Q": 1.0, "R": 1.0}},
+            state=state,
+            provider_candidates_by_species={species_id: (candidate,) for species_id in parents},
+            catalog_species=_selector_catalog_species(*parents),
+            flux_activation_context=_rg_activation_context(),
+        )
+    except VapourRequestConstructionError:
+        return
+    assert len(batch.solve_bundle_ids) == 1
+    for species_id in parents:
+        answer = batch.channel(species_id)
+        if answer.is_refused:
+            assert isinstance(answer.pressure, PressureRefusal)
+            assert isinstance(answer.flux, FluxRefusal)
+        else:
+            assert answer.solve_group_id == "solve:original"
+            assert answer.state_fingerprint == fingerprint
+            assert answer.extra["selected_evaluation_id"] == evaluation_id
+
+
+def test_candidate_identity_fields_reject_ordinary_assignment() -> None:
+    candidate = _selector_candidate(
+        "immutable-provider",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 101.0},
+    )
+
+    for field_name in ("evaluation_id", "solve_group_id", "state_fingerprint"):
+        with pytest.raises(FrozenInstanceError):
+            setattr(candidate, field_name, "mutated")
+
+
+def test_allocator_uses_identity_captured_when_candidate_was_admitted() -> None:
+    state = VapourResolveState(temperature_K=1600.0)
+    candidate = _selector_candidate(
+        "captured-identity",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 101.0},
+        evaluation_id="evaluation:captured",
+        solve_group_id="solve-group:captured",
+    )
+    admitted = rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(candidate,),
+        state=state,
+    )
+    assert admitted is candidate
+    captured_identity = _selector_bundle_identity(admitted)
+    baseline = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=state,
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+
+    object.__setattr__(candidate, "evaluation_id", "evaluation:mutated")
+    object.__setattr__(candidate, "solve_group_id", "solve-group:mutated")
+    object.__setattr__(candidate, "state_fingerprint", "state:mutated")
+    allocated = allocate_selected_source(
+        answers={"K": baseline.channel("K")},
+        bundle_species_ids=frozenset({"K"}),
+        selected_source=candidate,
+        bundle_identity=captured_identity,
+        state=state,
+    )
+
+    answer = allocated["K"]
+    assert answer.solve_group_id == captured_identity.solve_group_id
+    assert answer.state_fingerprint == captured_identity.state_fingerprint
+    assert (
+        answer.extra["selected_evaluation_id"]
+        == captured_identity.evaluation_id
+    )
+
+
 def test_canonical_provider_label_controls_external_tie_break() -> None:
+    state = VapourResolveState(temperature_K=1711.0)
     diagnostic_alias = _selector_candidate(
         "diagnostic_stub",
         VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
         {"K": Decimal("71")},
+        evaluation_state=state,
     )
     canonical_first = _selector_candidate(
         "g-provider",
         VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
         {"K": Decimal("72")},
+        evaluation_state=state,
     )
 
     selected = rank_complete_candidate_sources(
         bundle_species_ids=frozenset({"K"}),
         candidates=(diagnostic_alias, canonical_first),
-        state=VapourResolveState(temperature_K=1711.0),
+        state=state,
     )
 
     assert selected is canonical_first
     batch = resolve_vapour_batch(
         rules=(_selector_rule("K"),),
         ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
-        state=VapourResolveState(temperature_K=1711.0),
+        state=state,
         provider_candidates_by_species={
             "K": (diagnostic_alias, canonical_first),
         },
@@ -1874,14 +2596,16 @@ def test_repeated_candidate_object_is_one_provider_not_a_collision() -> None:
         "flux_activation_context": _rg_activation_context(),
     }
 
-    baseline = resolve_vapour_batch(**common)
     repeated = resolve_vapour_batch(
         **common,
         provider_candidates_by_species={"K": (candidate, candidate)},
     )
 
-    assert repeated == baseline
-    assert repeated.channel("K").refusal_code is None
+    answer = repeated.channel("K")
+    assert answer.pressure == PressureValue(101.0)
+    assert answer.source_label == "one-provider"
+    assert answer.extra["selected_evaluation_id"] == "evaluation:one-provider"
+    assert answer.refusal_code is None
     assert repeated.flux_active_species_ids == frozenset({"K"})
 
 
@@ -1897,6 +2621,142 @@ def test_public_ranker_identity_deduplicates_repeated_candidate() -> None:
         candidates=(candidate, candidate, candidate),
         state=VapourResolveState(temperature_K=1600.0),
     ) is candidate
+
+
+@pytest.mark.parametrize("split_rows", (False, True))
+@pytest.mark.parametrize("reverse_order", (False, True))
+def test_equal_candidate_clones_share_selection_and_allocation(
+    split_rows: bool, reverse_order: bool,
+) -> None:
+    state = VapourResolveState(temperature_K=1600.0)
+    candidate = _selector_candidate(
+        "one-provider", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"Na": 611.0, "K": 612.0},
+    )
+    clone = replace(candidate)
+    assert clone == candidate and clone is not candidate
+    candidates = (clone, candidate) if reverse_order else (candidate, clone)
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"Na", "K"}),
+        candidates=candidates, state=state,
+    ) is candidates[0]
+    rows = (
+        {"Na": (candidates[0],), "K": (candidates[1],)}
+        if split_rows else {species_id: candidates for species_id in ("Na", "K")}
+    )
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("Na"), _selector_rule("K")),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}}, state=state,
+        provider_candidates_by_species=rows,
+        catalog_species=_selector_catalog_species("Na", "K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    assert batch.flux_active_species_ids == frozenset({"Na", "K"})
+    for species_id, pressure in (("Na", 611.0), ("K", 612.0)):
+        answer = batch.channel(species_id)
+        assert answer.refusal_code is None
+        assert answer.pressure == PressureValue(pressure)
+        assert answer.source_label == candidate.provider_id
+        assert answer.extra["selected_evaluation_id"] == candidate.evaluation_id
+        assert answer.solve_group_id == candidate.solve_group_id
+        assert answer.state_fingerprint == _state_fingerprint(state)
+
+
+def test_admitted_candidate_clone_swap_preserves_allocation(monkeypatch) -> None:
+    import simulator.vapour_rail.request as request_module
+
+    state = VapourResolveState(temperature_K=1633.0)
+    parents = {"Li": {"P"}, "Na": {"P", "Q"}, "K": {"Q", "R"}, "Rb": {"R"}}
+    candidate = _selector_candidate(
+        "identity-own-probe", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {species_id: 139.0 for species_id in parents},
+        evaluation_state=state, evaluation_id="evaluation:original",
+        solve_group_id="solve:original",
+    )
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset(parents), candidates=(candidate,), state=state,
+    ) is candidate
+    clone = replace(candidate)
+    object.__setattr__(clone, "_admitted_identity", None)
+    assert clone == candidate and clone is not candidate
+    caller_rows = {species_id: [candidate] for species_id in parents}
+    gather = request_module._bundle_evaluation_candidates
+
+    def gather_then_replace(*args):
+        gathered = gather(*args)
+        for row in caller_rows.values():
+            row[:] = [clone]
+        return gathered
+
+    monkeypatch.setattr(request_module, "_bundle_evaluation_candidates", gather_then_replace)
+    batch = resolve_vapour_batch(
+        rules=tuple(
+            replace(
+                _selector_rule(species_id), parent_species_ids=frozenset(atoms),
+                solve_group_id=f"rule:{species_id}",
+            )
+            for species_id, atoms in parents.items()
+        ),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0, "Q": 1.0, "R": 1.0}},
+        state=state, provider_candidates_by_species=caller_rows,
+        catalog_species=_selector_catalog_species(*parents),
+        flux_activation_context=_rg_activation_context(),
+    )
+    assert len(batch.solve_bundle_ids) == 1
+    assert batch.flux_active_species_ids == frozenset(parents)
+    assert id(clone) not in request_module._admitted_candidate_identities
+    for species_id in parents:
+        answer = batch.channel(species_id)
+        assert answer.refusal_code is None
+        assert answer.pressure == PressureValue(139.0)
+        assert answer.extra["selected_evaluation_id"] == "evaluation:original"
+        assert answer.solve_group_id == "solve:original"
+        assert answer.state_fingerprint == _state_fingerprint(state)
+
+
+def test_clone_first_uses_admitted_value_representative() -> None:
+    import simulator.vapour_rail.request as request_module
+
+    state = VapourResolveState(temperature_K=1600.0)
+    candidate = _selector_candidate(
+        "admitted-provider", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED, {"K": 137.0},
+    )
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}), candidates=(candidate,), state=state,
+    ) is candidate
+    clone = replace(candidate)
+    object.__setattr__(clone, "_admitted_identity", None)
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}), candidates=(clone,), state=state,
+        validation_candidates_by_species={"K": (clone, candidate)},
+    ) is candidate
+    assert id(clone) not in request_module._admitted_candidate_identities
+
+
+@pytest.mark.parametrize("reverse_order", (False, True))
+def test_value_different_clone_is_still_provider_collision(reverse_order: bool) -> None:
+    candidate = _selector_candidate(
+        "same-provider", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED, {"K": 10.0},
+    )
+    different = replace(candidate, pressures_by_species={"K": PressureValue(20.0)})
+    assert different != candidate
+    candidates = (different, candidate) if reverse_order else (candidate, different)
+    state = VapourResolveState(temperature_K=1600.0)
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}), candidates=candidates, state=state,
+    ) is None
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}}, state=state,
+        provider_candidates_by_species={"K": candidates},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("K")
+    assert answer.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert batch.flux_active_species_ids == frozenset()
 
 
 @pytest.mark.parametrize("reverse_rule_order", [False, True])
@@ -1975,11 +2835,10 @@ def test_validated_selected_source_cannot_inherit_catalog_anchor() -> None:
         },
     )
 
-    assert with_candidates.channel("K") == baseline.channel("K")
-    assert with_candidates.channel("K").pressure == PressureValue(7.0)
-    assert with_candidates.channel("K").validation_anchor_refs == (
-        "catalog-anchor",
-    )
+    answer = with_candidates.channel("K")
+    assert answer.pressure == PressureValue(99.0)
+    assert answer.source_label == "z-other"
+    assert answer.validation_anchor_refs == ()
     with pytest.raises(
         VapourRequestConstructionError,
         match="selected source has not passed all allocation gates",
@@ -1988,12 +2847,16 @@ def test_validated_selected_source_cannot_inherit_catalog_anchor() -> None:
             answers={"K": baseline.channel("K")},
             bundle_species_ids=frozenset({"K"}),
             selected_source=selected_without_anchors,
+            bundle_identity=_selector_bundle_identity(
+                selected_without_anchors
+            ),
             state=common["state"],
         )
     allocated = allocate_selected_source(
         answers={"K": baseline.channel("K")},
         bundle_species_ids=frozenset({"K"}),
         selected_source=other,
+        bundle_identity=_selector_bundle_identity(other),
         state=common["state"],
     )
     assert allocated["K"].source_label == "z-other"
@@ -2108,6 +2971,7 @@ def test_k_demaria_independent_validation_disqualifies_whole_calibrated_bundle(
         independently_validated=frozenset({"K"}),
         residuals_dex={"K": demaria_residual_dex},
         anchors_by_species={"K": ("demaria-k-anchor",)},
+        evaluation_state=state,
     )
     calibrated = _selector_candidate(
         "vaporock_calibrated",
@@ -2115,6 +2979,7 @@ def test_k_demaria_independent_validation_disqualifies_whole_calibrated_bundle(
         {"Na": 11.0, "K": 22.0},
         fixed_reviewed=True,
         residuals_dex={"K": vaporock_residual_range_dex},
+        evaluation_state=state,
     )
     assert calibrated.validation_residual_dex_by_species["K"] == (
         vaporock_residual_range_dex
@@ -2226,20 +3091,185 @@ def test_raw_vaporock_refusal_type_and_detail_ignore_domain_only_candidate() -> 
     assert raw_only.extra["detail"] == with_domain_only.extra["detail"]
 
 
-@pytest.mark.xfail(
-    reason="review record not yet modelled; t-772",
-    strict=True,
+@pytest.mark.parametrize(
+    "canonical_self_reference",
+    ("EVALUATION:reviewed", "evaluation:reviewed/"),
+    ids=("case", "trailing-separator"),
 )
-def test_reviewed_evaluation_requires_an_independent_review_record() -> None:
-    raw = _selector_candidate(
-        "vaporock_warm",
-        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+def test_canonical_self_review_reference_is_not_independent(
+    canonical_self_reference: str,
+) -> None:
+    state = VapourResolveState(temperature_K=1600.0)
+    candidate = _selector_candidate(
+        "reviewed",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
         {"K": 50.0},
-        fixed_reviewed=True,
-        total_pressure_dependent=False,
+        evaluation_id="evaluation:reviewed",
+        evaluation_review_record=canonical_self_reference,
     )
 
-    assert getattr(raw, "evaluation_review_record", None) is not None
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(candidate,),
+        state=state,
+    ) is None
+
+
+@pytest.mark.parametrize("separator", ("\t", "\n", "\r", "\u00a0", "\u200b", " "),
+                         ids=("tab", "newline", "cr", "nbsp", "zero-width", "space"))
+@pytest.mark.parametrize("malformed_field", ("evaluation_id", "evaluation_review_record"))
+def test_embedded_whitespace_review_reference_is_refused(
+    separator: str, malformed_field: str,
+) -> None:
+    references = {
+        "evaluation_id": "https://example.test/evaluations/run-17",
+        "evaluation_review_record": "https://example.test/evaluations/run-17",
+    }
+    references[malformed_field] = f"https://example.test/evaluations/run-{separator}17"
+    state = VapourResolveState(temperature_K=1600.0)
+    candidate = _selector_candidate(
+        "embedded-reference", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 50.0}, **references,
+    )
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}), candidates=(candidate,), state=state,
+    ) is None
+    answer = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=state, provider_candidates_by_species={"K": (candidate,)},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    ).channel("K")
+    assert answer.refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+
+
+@pytest.mark.parametrize("replacement_kind", ("evaluation", "none", "short-tuple"))
+def test_resolver_refuses_replacement_admitted_identity(
+    monkeypatch, replacement_kind: str,
+) -> None:
+    import simulator.vapour_rail.request as request_module
+
+    state = VapourResolveState(temperature_K=1600.0)
+    species_ids = ("Na", "K", "Rb")
+    candidate = _selector_candidate(
+        "captured-at-boundary", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {species_id: 137.0 for species_id in species_ids},
+        evaluation_id="evaluation:admitted",
+    )
+    rank = request_module.rank_complete_candidate_sources
+
+    def rank_then_replace_snapshot(**kwargs):
+        selected = rank(**kwargs)
+        assert selected is candidate
+        replacement = {
+            "evaluation": (
+                "evaluation:replacement", *selected._admitted_identity[1:],
+            ),
+            "none": None,
+            "short-tuple": ("evaluation:replacement",),
+        }[replacement_kind]
+        object.__setattr__(selected, "_admitted_identity", replacement)
+        return selected
+
+    monkeypatch.setattr(request_module, "rank_complete_candidate_sources", rank_then_replace_snapshot)
+    try:
+        batch = resolve_vapour_batch(
+            rules=tuple(_selector_rule(species_id) for species_id in species_ids),
+            ledger_snapshot={"process.cleaned_melt": {"P": 1.0}}, state=state,
+            provider_candidates_by_species={
+                species_id: (candidate,) for species_id in species_ids
+            },
+            catalog_species=_selector_catalog_species(*species_ids),
+            flux_activation_context=_rg_activation_context(),
+        )
+    except VapourRequestConstructionError:
+        return
+    for species_id in species_ids:
+        answer = batch.channel(species_id)
+        if answer.is_refused:
+            assert isinstance(answer.pressure, PressureRefusal)
+            assert isinstance(answer.flux, FluxRefusal)
+        else:
+            assert answer.extra["selected_evaluation_id"] == "evaluation:admitted"
+            assert answer.solve_group_id == candidate.solve_group_id
+            assert answer.state_fingerprint == _state_fingerprint(state)
+
+
+def test_reviewed_evaluation_requires_an_independent_review_record() -> None:
+    state = VapourResolveState(temperature_K=1600.0)
+    reviewed = _selector_candidate(
+        "reviewed-external",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 50.0},
+        fixed_reviewed=True,
+        evaluation_id="evaluation:reviewed-external",
+        evaluation_review_record="reviews/reviewed-external.md",
+    )
+
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(reviewed,),
+        state=state,
+    ) is reviewed
+
+    for invalid_record in (
+        None,
+        "",
+        "   ",
+        reviewed.evaluation_id,
+        f" {reviewed.evaluation_id} ",
+    ):
+        invalid = replace(
+            reviewed,
+            evaluation_review_record=invalid_record,
+        )
+        assert rank_complete_candidate_sources(
+            bundle_species_ids=frozenset({"K"}),
+            candidates=(invalid,),
+            state=state,
+        ) is None
+
+    self_referential = replace(
+        reviewed,
+        evaluation_review_record=reviewed.evaluation_id,
+    )
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=state,
+        provider_candidates_by_species={"K": (self_referential,)},
+        catalog_species=_selector_catalog_species("K"),
+        flux_activation_context=_rg_activation_context(),
+    )
+    assert batch.channel("K").refusal_code == REFUSAL_NO_COMPLETE_BUNDLE_SOURCE
+    assert isinstance(batch.channel("K").pressure, PressureRefusal)
+    assert isinstance(batch.channel("K").flux, FluxRefusal)
+
+    calibrated = _selector_candidate(
+        "calibrated",
+        VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
+        {"K": 25.0},
+        evaluation_state=state,
+    )
+    invalid_validation_row = _selector_candidate(
+        "invalid-validation-row",
+        VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"K": 50.0},
+        statuses={"K": "validated"},
+        independently_validated=frozenset({"K"}),
+        anchors_by_species={"K": ("held-out:k",)},
+        evaluation_state=state,
+        evaluation_review_record=None,
+    )
+    assert rank_complete_candidate_sources(
+        bundle_species_ids=frozenset({"K"}),
+        candidates=(calibrated,),
+        state=state,
+        validation_candidates_by_species={"K": (invalid_validation_row,)},
+    ) is calibrated
 
 
 def test_zero_pressure_candidate_is_not_an_executable_flux_contract() -> None:
@@ -2361,11 +3391,13 @@ def test_allocated_real_catalog_answer_namespaces_replaced_attempt() -> None:
                 "fresh/zz",
                 VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
                 {"Cs": Decimal("30.875")},
+                evaluation_state=state,
             ),
             _selector_candidate(
                 "fresh/aa",
                 VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
                 {"Cs": Decimal("29.625")},
+                evaluation_state=state,
             ),
         ),
         state=state,
@@ -2375,12 +3407,16 @@ def test_allocated_real_catalog_answer_namespaces_replaced_attempt() -> None:
         answers={"Cs": catalog_answer},
         bundle_species_ids=frozenset({"Cs"}),
         selected_source=selected_source,
+        bundle_identity=_selector_bundle_identity(selected_source),
         state=state,
     )["Cs"]
     rendered = serialize_vapour_answer(answer)
     selected_source_owned_keys = {
+        "bundle_id",
+        "selected_evaluation_id",
         "selected_provider_id",
         "selected_evidence_class",
+        "evaluation_review_record",
         "independently_validated",
         "validation_residual_dex",
     }

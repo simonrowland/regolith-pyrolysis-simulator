@@ -17,8 +17,11 @@ import math
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from decimal import Decimal
 from enum import Enum
 from typing import Any, Final
+
+import numpy as np
 
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_TIER,
@@ -133,6 +136,29 @@ class ActivityAttempt:
         )
 
 
+def _fingerprint_float(value: Any) -> float:
+    if isinstance(value, Decimal):
+        return Decimal.__float__(value)
+    if isinstance(value, float):
+        return float.__float__(value)
+    return float(value)
+
+
+def _is_nonfinite_number(value: Any) -> bool:
+    if isinstance(value, Decimal):
+        if Decimal.is_nan(value) or Decimal.is_snan(value) or Decimal.is_infinite(value):
+            return True
+    try:
+        if isinstance(value, np.generic) and not np.isfinite(value):
+            return True
+    except TypeError:
+        pass
+    try:
+        return not math.isfinite(_fingerprint_float(value))
+    except (TypeError, ValueError):
+        return False
+
+
 @dataclass(frozen=True)
 class StandardStateIdentity:
     """Exact standard-state identity; substring matching is forbidden."""
@@ -149,10 +175,17 @@ class StandardStateIdentity:
         payload = {
             "convention": self.convention,
             "phase": self.phase,
-            "P_bar": float(self.reference_pressure_bar),
+            "P_bar": self.reference_pressure_bar,
             "T_K": self.reference_temperature_K,
             "basis": self.component_basis,
         }
+        for key in ("P_bar", "T_K"):
+            value = payload[key]
+            if value is not None or key == "P_bar":
+                if _is_nonfinite_number(value):
+                    raise ValueError(f"non-finite standard-state {key}")
+                value = _fingerprint_float(value)
+                payload[key] = value if value != 0.0 else 0.0
         # Preserve legacy fingerprints when the ABI-safe identity tail is not
         # supplied; component-qualified t-568 states cannot collide.
         if self.identity_id is not None:
@@ -646,10 +679,12 @@ class SourceReactionActivity:
 def composition_fingerprint(composition: Mapping[str, float]) -> str:
     """Stable fingerprint for oxide/component mole maps."""
 
+    if any(_is_nonfinite_number(value) for value in composition.values()):
+        raise ValueError("non-finite composition")
     cleaned = {
-        str(key): float(value)
+        str(key): _fingerprint_float(value)
         for key, value in sorted(composition.items())
-        if float(value) != 0.0
+        if _fingerprint_float(value) != 0.0
     }
     return _stable_hash(cleaned)
 
