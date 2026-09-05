@@ -1,0 +1,151 @@
+.sec-p5-alkali-shuttle .sec-p5-block {
+  margin-top: 12px;
+  padding: 15px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.sec-p5-alkali-shuttle .sec-p5-block-head h3,
+.sec-p5-alkali-shuttle .sec-p5-disclosure summary {
+  margin: 0;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-block-head p,
+.sec-p5-alkali-shuttle .sec-p5-note {
+  margin: 5px 0 0;
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-species-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-species-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.sec-p5-alkali-shuttle .sec-p5-species {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 700 14px/1.2 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-species i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--species-color);
+}
+
+.sec-p5-alkali-shuttle .sec-p5-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 11px;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-kv span:first-child {
+  color: var(--ink-3);
+}
+
+.sec-p5-alkali-shuttle .sec-p5-kv b {
+  text-align: right;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-not-emitted {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-pending {
+  margin-top: 10px;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-disclosure {
+  margin-top: 14px;
+  padding: 12px 15px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+.sec-p5-alkali-shuttle .sec-p5-disclosure summary {
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-disclosure summary:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-hourly table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 11px/1.4 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-hourly th,
+.sec-p5-alkali-shuttle .sec-p5-hourly td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-hourly th {
+  color: var(--ink-3);
+  font-size: 9px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-refusal {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sec-p5-alkali-shuttle .sec-p5-refusal li {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+@media (max-width: 768px) {
+  .sec-p5-alkali-shuttle .sec-p5-species-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .sec-p5-alkali-shuttle .sec-p5-kv {
+    display: block;
+  }
+
+  .sec-p5-alkali-shuttle .sec-p5-kv b {
+    display: block;
+    margin-top: 4px;
+    text-align: left;
+  }
+}
