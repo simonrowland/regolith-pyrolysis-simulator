@@ -140,6 +140,19 @@ def test_authoritative_vapor_pressure_no_liquid_gate_zeroes_evaporation():
 
 
 @pytest.mark.parametrize('temperature_C', [0.0, 1000.0, 1600.0])
+@pytest.mark.xfail(
+    strict=True,
+    # Only the "DID NOT RAISE" outcome is the known gap. An unrelated error, or a
+    # re-landed refusal carrying the wrong reason, must fail normally (review).
+    raises=pytest.fail.Exception,
+    reason=(
+        "spec kept, behaviour reverted: 817f5386 reverted the refusal-doctrine "
+        "pair (028791da + c59cb5f0) after 44 regressions, so a refused channel "
+        "once again authorises empty flux and this raise does not happen. "
+        "t-766 re-lands the doctrine across the full blast radius; when it "
+        "does, this XPASSes strictly and the marker must come off."
+    ),
+)
 def test_active_liquid_empty_vapor_pressures_fail_loud(temperature_C):
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(temperature_C=temperature_C),

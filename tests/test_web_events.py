@@ -1729,30 +1729,48 @@ def test_furnace_material_catalog_endpoint_returns_enabled_only():
         else:
             assert set(material) == base_material_keys
 
+    # The catalog endpoint carries no operator request (setpoints.yaml has
+    # furnace_max_T_C: null = inherit), so each row's requested ceiling is the
+    # material's own service limit and the applied ceiling is that limit clamped
+    # to the runtime envelope. Pinned as catalog NUMBERS read from the data file,
+    # not via the resolver (review: a resolver round-trip cannot catch a wrong
+    # number inside the resolver). The 1800 C this used to assert was the
+    # pre-inheritance default.
+    from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+
+    catalog = web_routes._load_yaml("furnace_materials.yaml")["furnace_materials"]
+    envelope_max_C = float(FURNACE_MAX_T_BOUNDS_C[1])
+
     zirconia = next(
         material
         for material in materials
         if material["id"] == "zirconia_ysz"
     )
+    zirconia_limit_C = float(catalog["zirconia_ysz"]["max_service_T_C"])
+    assert zirconia_limit_C == pytest.approx(2200)
     assert zirconia["service_rating_T_C"] == pytest.approx(2200)
-    assert zirconia["requested_ceiling_T_C"] == pytest.approx(1800)
-    assert zirconia["effective_applied_ceiling_T_C"] == pytest.approx(1800)
+    assert zirconia["requested_ceiling_T_C"] == pytest.approx(2200)
+    assert zirconia["effective_applied_ceiling_T_C"] == pytest.approx(
+        min(2200.0, envelope_max_C)
+    )
     fused_silica = next(
         material
         for material in materials
         if material["id"] == "fused_silica"
     )
+    assert float(catalog["fused_silica"]["max_service_T_C"]) == pytest.approx(1200)
     assert fused_silica["service_rating_T_C"] == pytest.approx(1200)
-    assert fused_silica["requested_ceiling_T_C"] == pytest.approx(1800)
+    assert fused_silica["requested_ceiling_T_C"] == pytest.approx(1200)
     assert fused_silica["effective_applied_ceiling_T_C"] == pytest.approx(1200)
     sintered_regolith = next(
         material
         for material in materials
         if material["id"] == "sintered_regolith"
     )
+    assert float(catalog["sintered_regolith"]["max_service_T_C"]) == pytest.approx(1200)
     assert sintered_regolith["max_service_T_C"] == pytest.approx(1200)
     assert sintered_regolith["service_rating_T_C"] == pytest.approx(1200)
-    assert sintered_regolith["requested_ceiling_T_C"] == pytest.approx(1800)
+    assert sintered_regolith["requested_ceiling_T_C"] == pytest.approx(1200)
     assert sintered_regolith["effective_applied_ceiling_T_C"] == pytest.approx(1200)
     assert sintered_regolith["grounding"]["tier"] == "proxy-sintering"
     assert sintered_regolith["grounding"]["source"] == "Warren et al. 2022 (arXiv:2205.06855)"
@@ -2138,22 +2156,58 @@ def test_c4_start_payload_uses_rendered_setpoint_not_literal_1670():
     assert "|| 1670" not in controls
 
 
+def _expected_start_ceiling_C(furnace_material_id: str | None) -> float:
+    """The ceiling the start path must apply, read from the same data it reads.
+
+    Since the ceiling began inheriting from the pipe material (c5434d19,
+    36da8e17), a start request that names no explicit ``furnace_max_T_C``
+    resolves to the named material's own service limit, and a request that
+    names no material resolves through ``setpoints.yaml``'s ``furnace_material``
+    (``furnace_max_T_C: null`` there means "inherit"). The earlier 1800 C
+    literal was the pre-inheritance default; asserting it again here would pin
+    the retired invariant, so the expectation is derived, not written down.
+    """
+    # Independent of the production resolvers on purpose (review: a helper
+    # that calls resolve_furnace_temperature_caps / setpoints_furnace_ceiling_C
+    # is same-function parity and passes when the resolver itself is wrong, or
+    # when the null-request branch quietly falls back to the retired 1800 C).
+    # Read the two data files directly and apply the one documented clamp.
+    from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+
+    setpoints = web_routes._load_yaml("setpoints.yaml")
+    if not furnace_material_id:
+        furnace_material_id = setpoints.get("furnace_material")
+        assert furnace_material_id, (
+            "setpoints.yaml names no furnace_material: the start path would "
+            "take the historic 1800 C fallback and this test would be pinning "
+            "the retired default again"
+        )
+        assert setpoints.get("furnace_max_T_C") is None, (
+            "setpoints.yaml carries an explicit furnace_max_T_C; the no-material "
+            "cases assume inheritance from furnace_material"
+        )
+    catalog = web_routes._load_yaml("furnace_materials.yaml")["furnace_materials"]
+    service_limit_C = float(catalog[furnace_material_id]["max_service_T_C"])
+    return min(service_limit_C, float(FURNACE_MAX_T_BOUNDS_C[1]))
+
+
 @pytest.mark.parametrize(
-    ("payload_extra", "expected_cap"),
+    "payload_extra",
     [
-        ({"furnace_material_id": "dense_alumina_continuous"}, 1700.0),
-        # Cap-preserving: a material whose max (2200) exceeds the 1800 default
-        # must resolve to min(1800, 2200) = 1800, never raising the ceiling.
-        ({"furnace_material_id": "zirconia_ysz"}, 1800.0),
-        ({}, 1800.0),
-        ({"furnace_material_id": ""}, 1800.0),
+        {"furnace_material_id": "dense_alumina_continuous"},
+        {"furnace_material_id": "zirconia_ysz"},
+        {},
+        {"furnace_material_id": ""},
     ],
+    ids=["alumina", "zirconia", "no-key", "empty-id"],
 )
 def test_web_start_event_resolves_furnace_material_cap(
     monkeypatch,
     payload_extra,
-    expected_cap,
 ):
+    expected_cap = _expected_start_ceiling_C(
+        payload_extra.get("furnace_material_id")
+    )
     captured_tasks = []
 
     def force_internal_analytical_backend(_backend_name):
