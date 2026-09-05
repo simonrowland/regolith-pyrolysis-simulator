@@ -565,7 +565,7 @@ class NasaCeaPolynomial:
 
         Derivation
         ----------
-        Premise: for equilibrium ``M(cond) ⇌ M(g)`` at standard pressure P°,
+        Premise: for equilibrium ``M(cond) <=> M(g)`` at standard pressure P°,
         ΔG°_vap = G°_gas − G°_cond and K = P_sat/P° = exp(−ΔG°_vap / (R T)).
         Algebra: ΔG°/(R T) = G_gas/(R T) − G_cond/(R T) from the ratio forms.
         Units: dimensionless pressure ratio; multiply by a standard pressure
@@ -645,7 +645,7 @@ def reaction_equilibrium_constant(
     standard-state convention the supplied terms already used. Absolute
     ``G°`` is not needed — only the dimensionless ratio form.
 
-    Sanity: for vaporization ``M(cond) ⇌ M(g)`` with ν_gas = +1,
+    Sanity: for vaporization ``M(cond) <=> M(g)`` with ν_gas = +1,
     ν_cond = −1 and both records the same component, ``K`` matches
     :meth:`NasaCeaPolynomial.pure_psat_over_Pstd`. A synthetic constant-Cp
     NASA-7 whose ``G°/(R T)`` is built from a JANAF ΔfG° recovers that same

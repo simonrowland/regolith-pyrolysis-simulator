@@ -4153,12 +4153,30 @@ def test_compile_cache_detects_in_place_payload_mutation() -> None:
 
 
 def test_default_compile_production_warm_hit_budget() -> None:
-    """P1: default production warm hits stay out of the ~151 ms/50 class.
+    """CPU-time upper bound on 50 production warm compile hits.
 
-    Null hypothesis: omitting the opt-in content_key serializes and hashes the
-    full payload plus default manifest on every hit.
-    Refutation: mutation-checked default identity reuse makes 50 ordinary API
-    calls fast without weakening the content-keyed cache contract.
+    85c67736 reverted 15cd6a9b, which skipped the only applicability check
+    on warm catalog hits. Do not restore that unsound skip.
+    Correctness gate:
+    tests/test_b189_condensation_admission.py::test_legacy_antoine_rows_still_consult_applicability
+
+    This assertion is a process-CPU upper bound (time.process_time) on 50
+    warm compile_vapour_rail_catalog calls after one cold compile. It does
+    not identify which serialization work ran: marshal.dumps of the owner
+    payload still runs per hit. Object identity (warm is cold) is asserted
+    inside the timed loop.
+
+    Measured at HEAD (f48eb879), N=7:
+      cpu ms/50 = 159.388, 163.734, 159.716, 157.086, 153.216, 137.672, 127.582
+      median = 157.086 ms/50
+      pstdev = 12.399 ms
+    Budget 0.220 s/50 = 1.40 x median. The round margin was chosen first;
+    on this sample it equals median + 5.07*pstdev, i.e. it sits far above
+    any 3-4 sigma ceiling (194-207 ms) and a further 2x slowdown of the
+    correct path (314 ms) still trips it. This is a CPU upper bound on the
+    correct path, not evidence about which serialization work runs per hit.
+    Ratchet: b-317 (any sound keyed warm path) must re-measure and TIGHTEN
+    this budget.
     """
 
     import time
@@ -4171,12 +4189,12 @@ def test_default_compile_production_warm_hit_budget() -> None:
     production = _yaml("vapor_pressures.yaml")
     clear_vapour_rail_compile_cache()
     cold = compile_vapour_rail_catalog(production)
-    t0 = time.perf_counter()
+    t0 = time.process_time()
     for _ in range(50):
         warm = compile_vapour_rail_catalog(production)
         assert warm is cold
-    warm50_s = time.perf_counter() - t0
-    assert warm50_s < 0.075, (
+    warm50_s = time.process_time() - t0
+    assert warm50_s < 0.220, (
         "default production warm hits too slow: "
         f"{warm50_s * 1000:.3f} ms/50"
     )

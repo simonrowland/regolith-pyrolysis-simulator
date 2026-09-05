@@ -26,6 +26,7 @@ import hashlib
 import json
 import math
 import sqlite3
+import unicodedata
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from enum import Enum
@@ -186,7 +187,7 @@ FROZEN_ANALYTICAL_FAMILIES: Final[dict[str, AnalyticalFamilySpec]] = {
         max_parameters=3,
         parent_oxide=None,
         activity_exponent=0.0,
-        notes="1/2 O2(g) ⇌ O(g); d log10 P / d log10 fO2 = +1/2",
+        notes="1/2 O2(g) <=> O(g); d log10 P / d log10 fO2 = +1/2",
     ),
     "O2": AnalyticalFamilySpec(
         family_id=AnalyticalFamilyId.MOLECULAR_OXYGEN,
@@ -281,7 +282,7 @@ DEFAULT_INDEPENDENT_ANCHORS: Final[tuple[IndependentAnchor, ...]] = (
         anchor_id="o_janaf_half_o2",
         species="O",
         kind="janaf_nist",
-        citation="JANAF / NASA CEA 1/2 O2 ⇌ O equilibrium constant",
+        citation="JANAF / NASA CEA 1/2 O2 <=> O equilibrium constant",
         temperature_K=None,
         notes="Thermodynamic K(T); not a VapoRock fit",
     ),
@@ -679,12 +680,13 @@ def derive_error_budget(epsilon_J: float = DEFAULT_EPSILON_J) -> DownstreamError
         epsilon_J=eps,
         log10_pressure_threshold_dex=threshold,
         algebra=(
-            "HKL at fixed alpha,T: J ∝ P ⇒ |Δlog10 J| = |Δlog10 P|; "
-            "pointwise threshold = log10(1 + ε_J)"
+            "HKL at fixed alpha,T: J ~ P => |dlog10 J| = |dlog10 P|; "
+            "pointwise threshold = log10(1 + epsilon_J)"
         ),
-        units="ε_J dimensionless relative flux; threshold in log10 dex",
+        units="epsilon_J dimensionless relative flux; threshold in log10 dex",
         limiting_check=(
-            "ε_J→0 ⇒ threshold→0; ε_J=1 ⇒ threshold=log10(2)≈0.3010 dex"
+            "epsilon_J->0 => threshold->0; epsilon_J=1 => "
+            "threshold=log10(2)~=0.3010 dex"
         ),
     )
 
@@ -1820,20 +1822,20 @@ def build_sidecar_document(
         boundary_note = (
             boundary_note_prefix
             + "analytical candidate fits and dual-source boundary "
-            "Δlog10(P) remain pending."
+            "dlog10(P) remain pending."
         )
     elif n_statistics_remaining:
         boundary_note = (
             boundary_note_prefix
             + "analytical candidate fits remain pending; "
-            f"{n_statistics_remaining} dual-source boundary Δlog10(P) "
+            f"{n_statistics_remaining} dual-source boundary dlog10(P) "
             "statistics remain pending."
         )
     else:
         boundary_note = (
             boundary_note_prefix
             + "analytical candidate fits remain pending; dual-source "
-            "boundary Δlog10(P) is fully evaluated."
+            "boundary dlog10(P) is fully evaluated."
         )
     return {
         "schema_version": SIDECAR_SCHEMA_VERSION,
@@ -1953,20 +1955,78 @@ def load_vapour_rail_calibration_sidecar(
     return dict(payload)
 
 
+def _ascii_fold_c1_utf8_continuation_bytes(text: str) -> str:
+    """Replace characters whose UTF-8 encoding contains a C1-range byte.
+
+    ``test_data_yaml_survives_latin1_misdecode`` rejects data YAML whose
+    UTF-8 bytes fall in 0x80-0x9F (continuation bytes that become C1
+    controls under latin1). NFKD-to-ASCII when that yields a replacement;
+    otherwise ``?``. Characters whose encoding stays outside C1 (e.g. §
+    U+00A7 = C2 A7) are kept.
+    """
+
+    folded: list[str] = []
+    for char in text:
+        encoded = char.encode("utf-8")
+        if any(0x80 <= byte <= 0x9F for byte in encoded):
+            spelled = _C1_GLYPH_ASCII.get(char)
+            if spelled is None:
+                spelled = (
+                    unicodedata.normalize("NFKD", char)
+                    .encode("ascii", "ignore")
+                    .decode("ascii")
+                )
+            # A glyph with no spelling and no NFKD form is a loss of meaning;
+            # keep it visible as '?' rather than silently dropping it.
+            folded.append(spelled if spelled else "?")
+        else:
+            folded.append(char)
+    return "".join(folded)
+
+
+# Meaning-preserving spellings for the maths glyphs this module's prose uses.
+# NFKD cannot spell these (it strips them to nothing), so without the map a
+# fold would turn "Δlog10(P)" into "?log10(P)" (review). Keep in sync with the
+# sidecar notes, which use the same spellings.
+_C1_GLYPH_ASCII = {
+    "⇌": "<=>",   # ⇌ equilibrium
+    "→": "->",    # → maps to
+    "⇒": "=>",    # ⇒ implies
+    "≈": "~=",    # ≈ approximately
+    "∝": "~",     # ∝ proportional
+    "Δ": "d",     # Δ delta (dlog10, as the sidecar spells it)
+    "−": "-",     # − minus
+    "–": "-",     # – en dash
+    "—": "-",     # — em dash
+    "≤": "<=",    # ≤
+    "≥": ">=",    # ≥
+    "≠": "!=",    # ≠
+    "±": "+/-",   # ± (C2 B1: not C1, listed for completeness)
+}
+
+
 def write_sidecar(
     path: Path,
     document: Mapping[str, Any],
 ) -> None:
-    """Write a reviewed sidecar YAML document."""
+    """Write a reviewed sidecar YAML document.
+
+    Arbitrary writer prose is sanitised at this boundary: characters whose
+    UTF-8 encoding contains a C1-range continuation byte (0x80-0x9F) are
+    ASCII-folded so a later latin1 misdecode cannot re-break
+    ``test_data_yaml_survives_latin1_misdecode``.
+    """
 
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     # Validate by round-trip through the loader contract after write.
-    text = yaml.safe_dump(
-        dict(document),
-        sort_keys=False,
-        default_flow_style=False,
-        allow_unicode=True,
+    text = _ascii_fold_c1_utf8_continuation_bytes(
+        yaml.safe_dump(
+            dict(document),
+            sort_keys=False,
+            default_flow_style=False,
+            allow_unicode=True,
+        )
     )
     path.write_text(text)
     load_vapour_rail_calibration_sidecar(path)

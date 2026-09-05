@@ -2,7 +2,10 @@
 """Re-run and compactly summarize the t-605 oxidative sweep for t-622.
 
 The catalog payload is the t-622 landing revision, not HEAD, so later lawful
-species additions cannot change the historic MnO/CoO window subject.
+species additions cannot change the historic MnO/CoO window subject. The
+payload is the committed fixture under tests/fixtures/catalog-pins/ (byte
+snapshot of 3a36e9bb:data/vapor_pressures.yaml). Runtime does not call
+``git show``, so a .git-less CI copy can still reproduce the envelope.
 """
 
 from __future__ import annotations
@@ -14,7 +17,6 @@ import io
 import math
 from pathlib import Path
 import re
-import subprocess
 import sys
 
 import yaml
@@ -37,6 +39,13 @@ from simulator.vapour_rail.domain_policy import (  # noqa: E402
 
 
 CANDIDATE_REVISION = "3a36e9bb6ff79a6a3f51ca969d3a2d41c4e800a9"
+DEFAULT_CATALOG_FIXTURE = (
+    ROOT
+    / "tests"
+    / "fixtures"
+    / "catalog-pins"
+    / "vapor_pressures.3a36e9bb.yaml"
+)
 DEFAULT_OUTPUT = (
     ROOT
     / "docs-private"
@@ -156,24 +165,17 @@ def _maximum(values):
     return max(present) if present else None
 
 
-def _historic_catalog_payload(root: Path, revision: str) -> dict:
-    completed = subprocess.run(
-        ["git", "show", f"{revision}:data/vapor_pressures.yaml"],
-        cwd=root,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    if completed.returncode != 0:
+def _historic_catalog_payload(catalog_fixture: Path) -> dict:
+    if not catalog_fixture.is_file():
         raise SystemExit(
-            f"t-622 catalog revision {revision} is not recoverable in {root}: "
-            f"{(completed.stderr or completed.stdout).strip()}"
+            f"t-622 catalog fixture is absent: {catalog_fixture}; "
+            f"expected pinned snapshot of {CANDIDATE_REVISION}:data/vapor_pressures.yaml"
         )
-    return yaml.safe_load(completed.stdout)
+    return yaml.safe_load(catalog_fixture.read_text(encoding="utf-8"))
 
 
-def _render() -> str:
-    payload = _historic_catalog_payload(ROOT, CANDIDATE_REVISION)
+def _render(*, catalog_fixture: Path) -> str:
+    payload = _historic_catalog_payload(catalog_fixture)
     feedstocks = yaml.safe_load((ROOT / "data" / "feedstocks.yaml").read_text())
     composition = feedstocks["lunar_mare_low_ti"]["composition_wt_pct"]
     account_mol = {
@@ -467,9 +469,18 @@ def _render() -> str:
 def _main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--catalog-fixture",
+        type=Path,
+        default=DEFAULT_CATALOG_FIXTURE,
+        help=(
+            "pinned t-622 catalog snapshot (default: in-tree fixture of "
+            f"{CANDIDATE_REVISION}:data/vapor_pressures.yaml; no git required)"
+        ),
+    )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    rendered = _render()
+    rendered = _render(catalog_fixture=args.catalog_fixture)
     if args.check:
         if not args.output.is_file():
             raise SystemExit(

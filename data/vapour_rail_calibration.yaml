@@ -82,7 +82,7 @@ frozen_families:
     - C
     parent_oxide: null
     activity_exponent: 0.0
-    notes: 1/2 O2(g) ⇌ O(g); d log10 P / d log10 fO2 = +1/2
+    notes: 1/2 O2(g) <=> O(g); d log10 P / d log10 fO2 = +1/2
   O2:
     family_id: molecular_oxygen_unit
     pO2_exponent: 1.0
@@ -183,7 +183,7 @@ independent_anchors:
 - anchor_id: o_janaf_half_o2
   species: O
   kind: janaf_nist
-  citation: JANAF / NASA CEA 1/2 O2 ⇌ O equilibrium constant
+  citation: JANAF / NASA CEA 1/2 O2 <=> O equilibrium constant
   temperature_K: null
   notes: Thermodynamic K(T); not a VapoRock fit
   may_certify: false
@@ -197,16 +197,17 @@ independent_anchors:
 error_budget:
   epsilon_J: 0.3
   log10_pressure_threshold_dex: 0.11394335230683679
-  algebra: 'HKL at fixed alpha,T: J ∝ P ⇒ |Δlog10 J| = |Δlog10 P|; pointwise threshold
-    = log10(1 + ε_J)'
-  units: ε_J dimensionless relative flux; threshold in log10 dex
-  limiting_check: ε_J→0 ⇒ threshold→0; ε_J=1 ⇒ threshold=log10(2)≈0.3010 dex
+  algebra: 'HKL at fixed alpha,T: J ~ P => |dlog10 J| = |dlog10 P|; pointwise threshold
+    = log10(1 + epsilon_J)'
+  units: epsilon_J dimensionless relative flux; threshold in log10 dex
+  limiting_check: epsilon_J->0 => threshold->0; epsilon_J=1 => threshold=log10(2)~=0.3010
+    dex
 boundary_statistics_summary:
   n_faces_enumerated: 5
   n_statistics_enumerated: 35
   n_statistics_evaluated: 0
   note: 5 faces enumerated, 35 statistics enumerated, 0 evaluated; analytical candidate
-    fits and dual-source boundary Δlog10(P) remain pending.
+    fits and dual-source boundary dlog10(P) remain pending.
 per_row_state:
 - species: SiO
   family_id: oxide_reduction_half_o2

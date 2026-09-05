@@ -750,7 +750,7 @@ def test_sidecar_loader_accepts_checked_in_runtime_yaml():
     assert boundary["n_statistics_evaluated"] == 0
     assert boundary["note"] == (
         "5 faces enumerated, 35 statistics enumerated, 0 evaluated; "
-        "analytical candidate fits and dual-source boundary Δlog10(P) "
+        "analytical candidate fits and dual-source boundary dlog10(P) "
         "remain pending."
     )
     # All scaffold rows pending — no silent promotion.
@@ -790,7 +790,7 @@ def test_sidecar_boundary_note_distinguishes_fully_evaluated_statistics():
 
     assert boundary["n_statistics_evaluated"] == 35
     assert "analytical candidate fits remain pending" in boundary["note"]
-    assert "dual-source boundary Δlog10(P) is fully evaluated" in boundary[
+    assert "dual-source boundary dlog10(P) is fully evaluated" in boundary[
         "note"
     ]
 
@@ -841,6 +841,29 @@ def test_write_sidecar_roundtrip(tmp_path: Path):
     assert loaded["calibration_id"] == "vr10-roundtrip"
     assert loaded["raw_store"]["digest"] == "abc"
     assert loaded["raw_store"]["runtime_readable"] is False
+
+
+def test_write_sidecar_folds_c1_range_utf8_continuation_bytes(tmp_path: Path):
+    """Arbitrary writer prose cannot reintroduce latin1-guard C1 bytes."""
+
+    doc = build_sidecar_document(
+        calibration_id="vr10-c1-fold",
+        raw_store_digest=None,
+        raw_store_path=None,
+        notes=["diagnostic ⇌ result Δlog10"],
+    )
+    path = tmp_path / "vapour_rail_calibration.yaml"
+    write_sidecar(path, doc)
+    raw = path.read_bytes()
+    offenders = [f"0x{byte:02X}" for byte in raw if 0x80 <= byte <= 0x9F]
+    assert not offenders, f"C1-range UTF-8 bytes in sidecar dump: {offenders}"
+    text = path.read_text(encoding="utf-8")
+    assert "⇌" not in text
+    assert "Δ" not in text
+    loaded = load_vapour_rail_calibration_sidecar(path)
+    # Meaning-preserving spellings (the sidecar's own): a fold that turned
+    # "Δlog10" into "?log10" would pass the byte guard while losing the maths.
+    assert loaded["notes"] == ["diagnostic <=> result dlog10"]
 
 
 def test_writer_regeneration_preserves_every_cell_status(tmp_path: Path):

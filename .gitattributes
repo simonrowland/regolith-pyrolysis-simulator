@@ -1,0 +1,6 @@
+# Catalog pin fixtures are byte-identical snapshots of historic
+# data/vapor_pressures.yaml revisions, verified by SHA-256 in
+# tests/test_vapour_rail_catalog.py. A line-ending rewrite on checkout
+# (core.autocrlf on Windows) would false-red that gate; pin them to LF.
+tests/fixtures/catalog-pins/*.yaml text eol=lf
+tests/fixtures/catalog-pins/SHA256SUMS text eol=lf

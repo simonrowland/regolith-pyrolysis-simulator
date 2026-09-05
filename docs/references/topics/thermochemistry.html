@@ -43,8 +43,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/foulant_thermo.yaml:270</code> - Na2CO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.3 C0-corrected (-84 kJ/mol @900 degC)&quot;</li>
 <li><code>data/species_catalog.yaml:122</code> - id.source: REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:179</code> - id.source: gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
-<li><code>data/vapor_pressures.yaml:1487</code> - families.metals_fe_family.physical_properties.species.Fe.pure_component_antoine.source: source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron</li>
-<li><code>simulator/core.py:10657</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
+<li><code>data/vapor_pressures.yaml:1518</code> - families.metals_fe_family.physical_properties.species.Fe.pure_component_antoine.source: source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron</li>
+<li><code>simulator/core.py:10764</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-020">
@@ -83,16 +83,16 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/extracts/ref-032-mg.yaml:5</code> - source.citation: Chase 1998 (REF-020) free-energy path as secondary.</li>
 <li><code>data/literature/extracts/ref-032-mg.yaml:19</code> - species.Mg.observation_id.locator.note: Chase 1998 (REF-020) free-energy path as secondary.</li>
 <li><code>data/literature/extracts/ref-032-mg.yaml:43</code> - path.locator.note: 1998 (REF-020) free-energy path as secondary.</li>
-<li><code>data/vapor_pressures.yaml:2490</code> - families.metals_mn_family.physical_properties.species.Mn.source: source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid,</li>
-<li><code>data/vapor_pressures.yaml:2495</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032</li>
-<li><code>data/vapor_pressures.yaml:2500</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: # was a mixed-source artifact, so runtime uses REF-020 NIST/JANAF solid</li>
-<li><code>data/vapor_pressures.yaml:2510</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation;</li>
-<li><code>data/vapor_pressures.yaml:2621</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation;</li>
+<li><code>data/vapor_pressures.yaml:2521</code> - families.metals_mn_family.physical_properties.species.Mn.source: source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid,</li>
+<li><code>data/vapor_pressures.yaml:2526</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032</li>
+<li><code>data/vapor_pressures.yaml:2531</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: # was a mixed-source artifact, so runtime uses REF-020 NIST/JANAF solid</li>
+<li><code>data/vapor_pressures.yaml:2541</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation;</li>
+<li><code>data/vapor_pressures.yaml:2652</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation;</li>
 <li><code>engines/builtin/stage0_pretreatment.py:1620</code> - def _dispatch_char_feo_reduction(: (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous</li>
-<li><code>simulator/core.py:621</code> - class _MeltRedoxLiquidusFloorFallback: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
-<li><code>simulator/runner/__init__.py:2861</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
-<li><code>simulator/runner/__init__.py:2976</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
-<li><code>simulator/runner/__init__.py:3001</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
+<li><code>simulator/core.py:702</code> - def _liquidus_status_from_freeze_gate_exception(: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
+<li><code>simulator/runner/__init__.py:2883</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
+<li><code>simulator/runner/__init__.py:2998</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
+<li><code>simulator/runner/__init__.py:3023</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-045">
@@ -105,8 +105,9 @@ ul { padding-left: 1.4rem; }</style>
 </section>
 <section class="entry" id="REF-046">
 <h2>REF-046</h2>
-<p class="citation">O&#x27;Neill, H.St.C. (1988). FeO electromotive-force thermodynamic data used for decomposition voltage grounding.</p>
+<p class="citation">O&#x27;Neill, H.St.C. (1988). Systems Fe-O and Cu-O: Thermodynamic data for the equilibria Fe-&quot;FeO,&quot; Fe-Fe3O4, &quot;FeO&quot;-Fe3O4, Fe3O4-Fe2O3, Cu-Cu2O, and Cu2O-CuO from emf measurements. <em>American Mineralogist</em> <strong>73</strong>: 470-486.</p>
 <p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="thermochemistry.html">thermochemistry</a></p>
+<p><a href="http://www.minsocam.org/ammin/AM73/AM73_470.pdf">source URL</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong> none</p>
 </section>
@@ -119,7 +120,7 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>1728 K, melting point of Ni; DeltaH = 4.10 kcal/mole.</p><footer>p. 28; Pins the solid-Ni/liquid-Ni segment boundary used by the NiO Ellingham row.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/setpoints.yaml:1457</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
+<li><code>data/setpoints.yaml:1480</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
 <li><code>engines/builtin/electrolysis_step.py:126</code> - &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668 NiO(s) &quot;</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:68</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # and REF-058 USBM Bulletin 668 for Ni/NiO.</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:308</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # Ni premise: REF-058, Mah &amp; Pankratz, U.S. Bureau of Mines Bulletin 668</li>

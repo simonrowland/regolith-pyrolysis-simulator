@@ -3165,7 +3165,7 @@ def _compile_thermo_reference_model(
             def _log10_from_composite(temperature_K: float) -> float:
                 # Physical composite in pure log space (b-145 regrind).
                 #
-                # Premise: exchange m B + n O2 ⇌ ν V gives
+                # Premise: exchange m B + n O2 <=> ν V gives
                 #   (p_V/P°) = (K_ex · (p_B/P°)^m · (p_O2/P°)^n)^{1/ν}
                 # Algebra (log10 form, identical when every intermediate is
                 # representable):

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import csv
+import hashlib
 import importlib.util
 import math
 from pathlib import Path
@@ -35,6 +36,34 @@ from simulator.vapour_rail.channels import CHANNEL_O2
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+CATALOG_PIN_DIR = (
+    Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "catalog-pins"
+)
+T609_BASE_CATALOG_FIXTURE = CATALOG_PIN_DIR / "vapor_pressures.cf4a499d.yaml"
+T609_LANDING_CATALOG_FIXTURE = CATALOG_PIN_DIR / "vapor_pressures.c4a22134.yaml"
+T622_LANDING_CATALOG_FIXTURE = CATALOG_PIN_DIR / "vapor_pressures.3a36e9bb.yaml"
+PINNED_CATALOG_FIXTURES = (
+    ("cf4a499dff2beee6741f1b4da6fa43b61b6ecaa2", T609_BASE_CATALOG_FIXTURE),
+    ("c4a2213422eb30b6f2f38b68281d9662fc35926d", T609_LANDING_CATALOG_FIXTURE),
+    ("3a36e9bb6ff79a6a3f51ca969d3a2d41c4e800a9", T622_LANDING_CATALOG_FIXTURE),
+)
+CATALOG_PIN_SHA256SUMS = CATALOG_PIN_DIR / "SHA256SUMS"
+# The pin identities live HERE, in test code, not only in SHA256SUMS. A
+# manifest file next to the fixtures is a self-checksum: an edit that touches a
+# fixture and rewrites its manifest line together would pass a manifest-only
+# gate (review-proved). Baking the digests here makes that coupled edit a
+# test-file change, which is what a reviewer sees.
+PINNED_CATALOG_FIXTURE_SHA256 = {
+    "vapor_pressures.cf4a499d.yaml": (
+        "9d066f72eb7194be9dd226907ba24715f2d1bf270c591b7954243a3edd7e7c9d"
+    ),
+    "vapor_pressures.c4a22134.yaml": (
+        "020eb16f67d9850692dd0f1d753123ca24ce9658c0c448603a861479b4221ca3"
+    ),
+    "vapor_pressures.3a36e9bb.yaml": (
+        "fefcd5fa2f3f1ba60c3255504dc33c7e710dbb1f0a60fedff433ef14c7826f5d"
+    ),
+}
 COLLISION_GASES = {
     "Al2O3_gas",
     "CaO_gas",
@@ -109,12 +138,57 @@ def _family_species_ids(text: str) -> set[str]:
     return ids
 
 
-def _git_show(root: Path, revision: str, path: str) -> str:
-    return subprocess.check_output(
-        ["git", "show", f"{revision}:{path}"],
-        cwd=root,
-        text=True,
-    )
+def _load_catalog_pin_sha256sums(
+    path: Path = CATALOG_PIN_SHA256SUMS,
+) -> dict[str, str]:
+    mapping: dict[str, str] = {}
+    for raw_line in path.read_text(encoding="ascii").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        digest, name = line.split(None, 1)
+        if name.startswith("*"):
+            name = name[1:]
+        mapping[name] = digest.lower()
+    return mapping
+
+
+def _git_show_catalog_at_revision(root: Path, revision: str) -> bytes | None:
+    """Return ``git show <rev>:data/vapor_pressures.yaml``, or None if unresolvable.
+
+    Missing git executable (FileNotFoundError) and a checkout that cannot
+    resolve the pin are the same typed skip: this per-pin provenance check
+    does not run. Fixture existence/digest is a separate always-on test.
+    """
+
+    try:
+        probe = subprocess.run(
+            ["git", "rev-parse", "--verify", f"{revision}^{{commit}}"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError:
+        return None
+    if probe.returncode != 0:
+        return None
+    try:
+        shown = subprocess.run(
+            ["git", "show", f"{revision}:data/vapor_pressures.yaml"],
+            cwd=root,
+            capture_output=True,
+        )
+    except FileNotFoundError:
+        return None
+    if shown.returncode != 0:
+        # The commit resolved but its catalog blob cannot be shown: that is a
+        # broken checkout or a wrong path, not an unresolvable pin. Fail loud
+        # rather than fold it into the typed skip (review).
+        raise AssertionError(
+            f"git resolved {revision} but could not show its catalog: "
+            f"{shown.stderr.decode('utf-8', 'replace').strip()}"
+        )
+    return shown.stdout
 
 
 def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
@@ -171,24 +245,30 @@ def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
 
 
 def test_t609_additivity_pin_is_the_t609_landing_not_the_live_catalog() -> None:
-    """t-622 already added MnO/CoO. Widening EXPECTED_ADDITIONS would hide that."""
+    """t-622 already added MnO/CoO. Widening EXPECTED_ADDITIONS would hide that.
+
+    Choice: commit the historic ``data/vapor_pressures.yaml`` snapshots as
+    fixtures under ``tests/fixtures/catalog-pins/`` and read those files
+    here. Studio CI rsync copies have no ``.git``, and ``git show`` of
+    cf4a499d / c4a22134 is also fragile on shallow clones. The pin is then
+    self-contained. A missing fixture is a failure of the always-on SHA-256
+    digest test (git-independent). ``git show`` is developer-only provenance
+    and is skipped per pin when that revision does not resolve.
+    """
 
     root = Path(__file__).resolve().parents[1]
     proof = _load_t609_proof()
     assert proof.EXPECTED_ADDITIONS == ("FeO_association_gas", "NiO_gas")
-    assert proof.CANDIDATE_REVISION == (
-        "c4a2213422eb30b6f2f38b68281d9662fc35926d"
-    )
-    head = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=root, text=True
-    ).strip()
-    assert proof.CANDIDATE_REVISION != head
+    assert proof.BASE_REVISION == PINNED_CATALOG_FIXTURES[0][0]
+    assert proof.CANDIDATE_REVISION == PINNED_CATALOG_FIXTURES[1][0]
+    assert T609_BASE_CATALOG_FIXTURE.is_file()
+    assert T609_LANDING_CATALOG_FIXTURE.is_file()
 
     base_ids = _family_species_ids(
-        _git_show(root, proof.BASE_REVISION, "data/vapor_pressures.yaml")
+        T609_BASE_CATALOG_FIXTURE.read_text(encoding="utf-8")
     )
     t609_ids = _family_species_ids(
-        _git_show(root, proof.CANDIDATE_REVISION, "data/vapor_pressures.yaml")
+        T609_LANDING_CATALOG_FIXTURE.read_text(encoding="utf-8")
     )
     live_ids = _family_species_ids(
         (root / "data" / "vapor_pressures.yaml").read_text(encoding="utf-8")
@@ -196,6 +276,69 @@ def test_t609_additivity_pin_is_the_t609_landing_not_the_live_catalog() -> None:
     assert sorted(t609_ids - base_ids) == list(proof.EXPECTED_ADDITIONS)
     later = live_ids - t609_ids
     assert {"CoO_gas", "MnO_gas"} <= later
+
+
+def test_pinned_catalog_fixtures_match_sha256_manifest() -> None:
+    """Always-on pin identity: fixtures exist and match SHA256SUMS.
+
+    Studio CI rsync copies have no ``.git`` and may lack a git executable.
+    This test does not call git. A missing fixture or a digest mismatch is
+    a failure. ``git show`` comparison is a separate, developer-only
+    per-pin provenance check.
+    """
+
+    assert CATALOG_PIN_SHA256SUMS.is_file(), (
+        f"missing catalog pin digest manifest {CATALOG_PIN_SHA256SUMS}"
+    )
+    manifest = _load_catalog_pin_sha256sums()
+    names = {fixture.name for _, fixture in PINNED_CATALOG_FIXTURES}
+    assert set(PINNED_CATALOG_FIXTURE_SHA256) == names, (
+        "PINNED_CATALOG_FIXTURE_SHA256 must name exactly the three pins"
+    )
+    # The manifest is convenience for `shasum -c`; the test constants are the
+    # authority. A manifest rewritten alongside a fixture edit fails here.
+    assert manifest == PINNED_CATALOG_FIXTURE_SHA256, (
+        "SHA256SUMS disagrees with the digests pinned in this test: "
+        f"{manifest} vs {PINNED_CATALOG_FIXTURE_SHA256}"
+    )
+    for _, fixture in PINNED_CATALOG_FIXTURES:
+        assert fixture.is_file(), f"missing catalog pin fixture {fixture}"
+        digest = hashlib.sha256(fixture.read_bytes()).hexdigest()
+        assert digest == PINNED_CATALOG_FIXTURE_SHA256[fixture.name], (
+            f"catalog pin fixture digest mismatch: {fixture.name} "
+            f"got {digest} expected {PINNED_CATALOG_FIXTURE_SHA256[fixture.name]}"
+        )
+
+
+@pytest.mark.parametrize(
+    ("revision", "fixture"),
+    PINNED_CATALOG_FIXTURES,
+    ids=("cf4a499d", "c4a22134", "3a36e9bb"),
+)
+def test_pinned_catalog_fixtures_match_git_when_revision_resolves(
+    revision: str,
+    fixture: Path,
+) -> None:
+    """Developer-only provenance: fixture bytes == ``git show`` when resolvable.
+
+    An unresolved pin (missing git executable, no ``.git``, or a shallow
+    clone that does not contain the revision) is a typed skip of *this*
+    per-pin check. It is never folded into a pass because another pin
+    resolved. A missing fixture is a failure of the always-on digest test,
+    not a skip of identity.
+    """
+
+    root = Path(__file__).resolve().parents[1]
+    shown = _git_show_catalog_at_revision(root, revision)
+    if shown is None:
+        pytest.skip(
+            "pinned catalog revision not resolvable in this checkout "
+            f"(no git executable, no .git, or shallow clone): {revision}"
+        )
+    assert fixture.is_file(), f"missing catalog pin fixture {fixture}"
+    assert fixture.read_bytes() == shown, (
+        f"catalog pin fixture drifted from git {revision}: {fixture}"
+    )
 
 
 def test_t609_additivity_proof_ignores_a_further_catalog_addition(

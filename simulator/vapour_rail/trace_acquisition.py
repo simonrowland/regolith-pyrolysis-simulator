@@ -36,7 +36,7 @@ GROUP_B_IDS: frozenset[str] = frozenset(GROUP_B_GAS_IDS) | frozenset(
     GROUP_B_ELEMENT_IDS
 )
 MONATOMIC_OXYGEN_ID = "O"
-PO2_EXPONENT_ATOMIC_O = 0.5  # +1/2 from ½ O2 ⇌ O
+PO2_EXPONENT_ATOMIC_O = 0.5  # +1/2 from 1/2 O2 <=> O
 _GROUP_A_TYPED_OUTCOMES = frozenset({"evolve"})
 
 
