@@ -72,9 +72,28 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         }
         for item in batch
     ]
+    # Pin of sample_recipe_candidates(RecipeSchema(), n=8, seed=19, scipy-sobol).
+    # Regenerated at work-v064-green HEAD. All 17 changed vocabulary leaves vs
+    # 082c2809 (8 numeric bounds, 7 bounds_source strings, 2 digests):
+    #   1. furnace_max_T_C.high 2000 -> 2200 (c5434d19; FURNACE_MAX_T_BOUNDS_C[1]
+    #      inherited from zirconia_ysz max_service_T_C)
+    #   2-7. six overhead_headspace *.default_C.high 1750 -> 2200 (36da8e17/b-329;
+    #      liner, pipe default, stage_0..3_to_next; inherited from
+    #      FURNACE_MAX_T_BOUNDS_C[1], not an independent lever)
+    #   8. overhead_headspace.temperature_offset_K.low -443 -> -800
+    #      (1400 - 2200; 36da8e17)
+    #   9-14. those six overhead *.default_C.bounds_source: literal 1750 / Doloma
+    #      service text -> inherited-from-envelope text (36da8e17)
+    #   15. overhead_headspace.temperature_offset_K.bounds_source: 1843-dense-alumina
+    #      derivation -> envelope-minus-1400 derivation (36da8e17)
+    #   16. bounds_digest 5a5aba76...ecd9184 -> 9d87f239...df66cccd (derived)
+    #   17. payload_digest 77ff7776...d4ab6a0 -> 511c72ec...1dc56c12 (derived)
+    # Restoring the eight numeric bounds recovers the previous digest
+    # 85eb0ad69e593c8b1f6089ad0cc27ad403e81d5e68500109c12daf028a9b3757; no other
+    # patch path, mask, subspace digest, or effective pin differs.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "85eb0ad69e593c8b1f6089ad0cc27ad403e81d5e68500109c12daf028a9b3757"
+    ).hexdigest() == "7be3cd4d55c564e60193939571bd7b46e5fd943dc16cd57d4ab113cd32852e18"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -96,9 +115,15 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
         }
         for item in batch
     ]
+    # Pin of sample_recipe_candidates(RecipeSchema(), n=8, seed=19, LHC).
+    # Same 17-leaf envelope rebind as the Sobol pin above (8 numeric bounds +
+    # 7 bounds_source strings + 2 derived digests; c5434d19 furnace high and
+    # 36da8e17/b-329 overhead inheritance). Restoring those eight numeric
+    # bounds recovers
+    # 1983fce535aade41fcf064c3d7ca6fa1552ded02de6bacefac124478d7051cd7.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "1983fce535aade41fcf064c3d7ca6fa1552ded02de6bacefac124478d7051cd7"
+    ).hexdigest() == "b3f1d135216179da94c8e480dc90ba75e764f1fbbedf7c9ecc444976e6ddc3fa"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():

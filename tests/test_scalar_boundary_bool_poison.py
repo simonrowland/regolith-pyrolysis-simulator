@@ -26,6 +26,10 @@ from engines.builtin.evaporation_flux import (
     _validated_stir_factor,
 )
 from engines.builtin.ca_aluminothermic_step import _finite_float as ca_finite_float
+from engines.builtin.electrolysis_step import (
+    MRE_INVALID_CONTROL_REFUSAL,
+    BuiltinElectrolysisStepProvider,
+)
 from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from engines.builtin.oxygen_bubbler import _finite_nonnegative_control
 from simulator.accounting.queries import (
@@ -211,6 +215,23 @@ from simulator.vapour_rail.request import (
 
 
 BOOL_POISON = (True, False, np.bool_(True), np.bool_(False))
+# Inputs the DTO used to TypeError (bool / np.bool_ / arrays) plus the
+# non-finite values the provider already refused. All four deferred
+# ELECTROLYSIS_STEP controls must typed-refuse these; none may reach Faraday.
+ELECTROLYSIS_STEP_CONTROL_POISON = (
+    *BOOL_POISON,
+    np.array([True]),
+    np.array([1.0]),
+    float("nan"),
+    float("inf"),
+    float("-inf"),
+)
+ELECTROLYSIS_STEP_DEFERRED_CONTROLS = (
+    "voltage_V",
+    "current_A",
+    "dt_hr",
+    "pO2_bar",
+)
 
 EXPECTED_NUMERIC_CONTROL_INPUTS = frozenset(
     {
@@ -1638,6 +1659,52 @@ def test_kernel_control_numeric_fields_keep_honest_scalars(
 ) -> None:
     request = _intent_request(control_inputs={field_name: raw})
     assert request.control_inputs[field_name] == raw
+
+
+@pytest.mark.parametrize("field_name", ELECTROLYSIS_STEP_DEFERRED_CONTROLS)
+@pytest.mark.parametrize(
+    "raw",
+    ELECTROLYSIS_STEP_CONTROL_POISON,
+    ids=(
+        "bool_true",
+        "bool_false",
+        "np_bool_true",
+        "np_bool_false",
+        "bool_array",
+        "numeric_array",
+        "nan",
+        "pos_inf",
+        "neg_inf",
+    ),
+)
+def test_electrolysis_step_deferred_controls_refuse_poison_before_energy_or_transition(
+    field_name: str,
+    raw: Any,
+) -> None:
+    # DTO defers these four names on ELECTROLYSIS_STEP; the provider must
+    # still refuse every input the DTO used to TypeError, plus nan/inf,
+    # with the typed invalid-control result (zero energy, no transition).
+    controls = {
+        "voltage_V": 5.0,
+        "current_A": 100.0,
+        "dt_hr": 1.0,
+        "pO2_bar": 1.0,
+        "allowed_oxides": ["SiO2"],
+        field_name: raw,
+    }
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        _intent_request(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            temperature_C=1575.0,
+            pressure_bar=1.0,
+            control_inputs=controls,
+        )
+    )
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == MRE_INVALID_CONTROL_REFUSAL
+    assert field_name in result.diagnostic["invalid_controls"]
+    assert result.diagnostic["energy_kWh"] == 0.0
 
 
 @pytest.mark.parametrize(

@@ -1071,8 +1071,23 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         values: dict[str, float] = {}
         invalid: dict[str, str] = {}
         for name, raw in raw_values.items():
-            if isinstance(raw, bool):
-                invalid[name] = "boolean_not_allowed"
+            # Same admission predicate the DTO uses
+            # (`is_declared_real_scalar(..., allow_numeric_str=True)`),
+            # applied here BEFORE float(). The DTO defers these four
+            # electrolysis controls so a typed MRE_INVALID_CONTROL_REFUSAL
+            # can replace a bare TypeError (028791da / RC-05). Skipping that
+            # check without re-applying it admitted np.bool_ and size-1
+            # arrays, which float() coerces (True -> 1.0). None still passes
+            # (absence is not a type error); nan/inf/negative stay below.
+            if raw is not None and not is_declared_real_scalar(
+                raw,
+                allow_numeric_str=True,
+            ):
+                invalid[name] = (
+                    "boolean_not_allowed"
+                    if isinstance(raw, bool)
+                    else "not_declared_real_scalar"
+                )
                 continue
             try:
                 value = float(raw)
