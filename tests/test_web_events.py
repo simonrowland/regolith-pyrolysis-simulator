@@ -2002,6 +2002,97 @@ def test_start_payload_echoes_status_strip_lifecycle_generation():
     assert payload["lifecycle_generation"] == 7
 
 
+def test_missing_stage0_reductant_is_input_error_not_backend_unavailable(
+    monkeypatch,
+):
+    """The reachable instance of the same class, not a synthetic typo.
+
+    Mars feedstocks require a Stage-0 C reductant (mandate section 3). Submitted
+    without it, load_batch raises and simulator/session.py re-raises as the
+    injected unavailable_error_cls. The message already tells the operator exactly
+    what to do -- supply additives_kg={'C': ...} -- while the machine-readable
+    error_type said 'backend_unavailable', so anything keyed on the type (an
+    alerting rule, a retry policy) would treat an input mistake as an engine
+    outage and retry it forever.
+    """
+    app = app_module.create_app()
+    emitted = []
+
+    monkeypatch.setattr(
+        app_module.socketio,
+        "emit",
+        lambda event, payload, **kwargs: emitted.append(
+            (event, payload, kwargs)
+        ),
+    )
+
+    with app.app_context():
+        result = web_events._registered_start_handler(
+            {"feedstock": "mars_basalt", "mass_kg": 1000},
+            sid="mars-reductant-test",
+            ledger_client_id="mars-reductant-owner",
+        )
+
+    assert result is None
+    assert emitted, "handler emitted nothing"
+    payload = emitted[-1][1]
+    assert payload["status"] == "error"
+    assert "C reductant" in payload["message"], payload["message"]
+    assert payload["error_type"] == "invalid_run_input", (
+        "a missing required additive is bad input, not a backend outage; got "
+        f"{payload.get('error_type')!r}"
+    )
+
+
+def test_unknown_feedstock_is_typed_unknown_feedstock_not_backend_unavailable(
+    monkeypatch,
+):
+    """A mistyped feedstock id must not accuse the compute backend.
+
+    simulator/session.py raises the injected unavailable_error_cls for an unknown
+    feedstock -- it has to, because callers (session_cli's RunnerError,
+    mre_reproduction's MREReproductionError) catch that type -- so the class alone
+    cannot distinguish bad input from a dead backend. It stamps
+    reason_code='unknown_feedstock' and the handler classifies on that.
+
+    Before this, a typo in a feedstock id reported error_type 'backend_unavailable',
+    sending an operator (or an alerting rule) to diagnose an engine that was fine and
+    had never been consulted. The same rule is already pinned on the optimizer path by
+    test_unknown_feedstock_is_input_error_not_backend_unavailable.
+    """
+    app = app_module.create_app()
+    emitted = []
+
+    monkeypatch.setattr(
+        app_module.socketio,
+        "emit",
+        lambda event, payload, **kwargs: emitted.append(
+            (event, payload, kwargs)
+        ),
+    )
+
+    with app.app_context():
+        result = web_events._registered_start_handler(
+            {
+                "feedstock": "__no_such_feedstock_for_typing_test__",
+                "mass_kg": 1000,
+            },
+            sid="unknown-feedstock-test",
+            ledger_client_id="unknown-feedstock-owner",
+        )
+
+    assert result is None
+    assert emitted, "handler emitted nothing"
+    payload = emitted[-1][1]
+    assert emitted[-1][0] == "simulation_status"
+    assert payload["status"] == "error"
+    assert "unknown feedstock" in payload["message"]
+    assert payload["error_type"] == "unknown_feedstock", (
+        "a mistyped feedstock id must not be typed as a backend outage; got "
+        f"{payload.get('error_type')!r}"
+    )
+
+
 def test_socket_start_rejection_echoes_status_strip_lifecycle_generation(
     monkeypatch,
 ):

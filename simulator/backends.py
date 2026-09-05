@@ -663,11 +663,30 @@ def assert_real_backend_feedstock_supported(
     )
     if reason is None:
         return
-    raise unavailable_error_cls(
+    # OUT OF DOMAIN, not unavailable. The backend is installed and answering;
+    # this feedstock simply has no MELTS oxide basis for it to solve. Reporting
+    # it as backend_unavailable sends the operator to reinstall an engine that
+    # is fine, when the actual remedies are to pick a different backend or a
+    # different feedstock. Measured web-visible and unblocked at this commit:
+    # m_type_metallic_phase (non_silicate_feedstock) and targeted_super_kreep_ore
+    # (unsupported_melts_species) both hit this on a real melt backend.
+    #
+    # The optimizer already draws this distinction -- evaluate.py treats the
+    # same condition as out-of-domain rather than BackendUnavailableAbort -- so
+    # this is that settled rule reaching the session/web path, exactly as the
+    # six input-typing sites in session.py were.
+    error = unavailable_error_cls(
         "real_backend_out_of_domain: "
         f"{reason}: feedstock {feedstock_id!r} has no MELTS oxide-basis "
         "composition; backend cannot solve this composition"
     )
+    try:
+        error.reason_code = "real_backend_out_of_domain"
+    except (AttributeError, TypeError):
+        # Mirrors stamp_unavailable_reason: __slots__ or a read-only attribute
+        # must not turn a clean domain refusal into an AttributeError.
+        pass
+    raise error
 
 
 def _melts_major_oxide_sum(composition: Mapping[str, Any]) -> float:

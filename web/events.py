@@ -3827,12 +3827,21 @@ def register_events(socketio):
                 )
             )
         except BackendUnavailableError as e:
+            # Classify by the exception's own reason_code, not by the class it
+            # happens to be raised as. simulator/session.py raises the injected
+            # unavailable_error_cls for an unknown feedstock id too -- it has to,
+            # because callers catch that type -- and stamps reason_code
+            # 'unknown_feedstock' to say the backend is not what failed. Reading
+            # the literal here reported a mistyped feedstock id as
+            # 'backend_unavailable', sending the operator to diagnose the engine.
+            # Absent reason_code keeps the previous label, so genuine backend
+            # outages are unchanged.
             return reject({
                 'status': 'error',
                 'message': str(e),
                 'backend_status': resolution_status.backend_status,
                 'backend_authoritative': resolution_status.authoritative,
-            }, 'backend_unavailable')
+            }, getattr(e, 'reason_code', 'backend_unavailable') or 'backend_unavailable')
         except (TypeError, ValueError) as exc:
             return reject({
                 'status': 'error',

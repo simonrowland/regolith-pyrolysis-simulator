@@ -95,3 +95,45 @@ def test_unrelated_failure_is_not_absence():
 
     assert _is_backend_unavailable(RuntimeError("solver did not converge")) is False
     assert _is_backend_unavailable(ValueError("bad input")) is False
+
+
+def test_real_backend_out_of_domain_is_not_typed_backend_unavailable():
+    """A present backend that cannot solve THIS composition is not an outage.
+
+    assert_real_backend_feedstock_supported fires when the melt backend is
+    installed and answering but the feedstock has no MELTS oxide basis. Reported
+    as 'backend_unavailable' it sends the operator to reinstall a working engine;
+    the real remedies are a different backend or a different feedstock.
+
+    Both ids below are web-visible and unblocked, so this is reachable from the UI.
+    The optimizer already treats the same condition as out-of-domain rather than a
+    backend abort; this pins the session/web path to the same rule.
+    """
+    import pathlib as _pathlib
+
+    import yaml
+
+    from simulator.backends import assert_real_backend_feedstock_supported
+
+    feedstocks = yaml.safe_load(
+        (_pathlib.Path(__file__).resolve().parents[1] / "data" / "feedstocks.yaml").read_text()
+    )
+    feedstocks = feedstocks.get("feedstocks", feedstocks)
+
+    for feedstock_id in ("m_type_metallic_phase", "targeted_super_kreep_ore"):
+        with pytest.raises(Exception) as excinfo:
+            assert_real_backend_feedstock_supported(
+                "alphamelts", feedstock_id, feedstocks
+            )
+        assert getattr(excinfo.value, "reason_code", None) == (
+            "real_backend_out_of_domain"
+        ), (
+            f"{feedstock_id} is out of domain for a PRESENT backend; got "
+            f"reason_code={getattr(excinfo.value, 'reason_code', None)!r}"
+        )
+
+    # Negative control: an in-domain feedstock must not refuse at all, or the
+    # assertion above would pass for the wrong reason.
+    assert_real_backend_feedstock_supported(
+        "alphamelts", "lunar_mare_low_ti", feedstocks
+    )

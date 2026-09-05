@@ -110,6 +110,44 @@ def normalize_mre_policy(
     return True, target, voltage
 
 
+
+def _typed_input_error(
+    error_cls: type[Exception], reason_code: str, message: str
+) -> Exception:
+    """Build an input error that says WHICH input was wrong.
+
+    The class must stay whatever the caller injected as `unavailable_error_cls`
+    (RunnerError from session_cli, MREReproductionError from mre_reproduction,
+    RuntimeError by default): callers catch that type, so raising anything else
+    turns a clean rejection into an unhandled exception several layers up.
+
+    What was wrong is the LABEL. Every one of these conditions is BAD INPUT, and
+    they were all reaching web/events.py as error_type 'backend_unavailable' --
+    a claim about the compute backend, which in each case resolved fine and is
+    not what failed. (An earlier draft of this docstring said the backend "has
+    not been consulted"; that is FALSE and was corrected in review -- resolve_backend
+    runs BEFORE these checks. The backend was consulted and succeeded, which makes
+    the mislabel worse, not better.) The realistic case is not a typo: a Mars feedstock submitted
+    without its Stage-0 C reductant produced "supply additives_kg={'C': ...}" in
+    the message and 'backend_unavailable' in the machine-readable type, so an
+    alerting rule keyed on the type would page about an engine outage.
+
+    reason_code is the mechanism backends.py already uses for this
+    (BackendUnavailableError.reason_code / stamp_unavailable_reason); consumers
+    classify on it instead of on prose. The project settled the same rule on the
+    optimizer path in
+    tests/test_optimizer_evaluate.py::test_unknown_feedstock_is_input_error_not_backend_unavailable.
+    """
+    error = error_cls(message)
+    try:
+        error.reason_code = reason_code
+    except (AttributeError, TypeError):
+        # Mirrors stamp_unavailable_reason: __slots__ or a read-only attribute
+        # must not turn a clean input rejection into an AttributeError.
+        pass
+    return error
+
+
 class InvalidDecisionChoiceError(ValueError):
     """Raised when a session refuses a choice outside the pending options."""
 
@@ -251,8 +289,10 @@ class SimSession:
                 unavailable_error_cls=config.unavailable_error_cls,
             )
         elif config.reduced_real_cache is not None:
-            raise config.unavailable_error_cls(
-                "reduced_real_cache is only valid with backend_name='cached-real'"
+            raise _typed_input_error(
+                config.unavailable_error_cls,
+                "invalid_run_input",
+                "reduced_real_cache is only valid with backend_name='cached-real'",
             )
         stage0_subprocess_required = requires_stage0_subprocess(
             config.feedstock_id,
@@ -265,8 +305,13 @@ class SimSession:
                     config.feedstocks[config.feedstock_id],
                 )
             except BlockedFeedstockError as exc:
-                raise config.unavailable_error_cls(
-                    f"BlockedFeedstockError: {exc}"
+                # Distinct from unknown_feedstock: the id is real but the
+                # catalog deliberately withholds it (missing citable composition),
+                # so the remedy is provenance work, not fixing a typo.
+                raise _typed_input_error(
+                    config.unavailable_error_cls,
+                    "blocked_feedstock",
+                    f"BlockedFeedstockError: {exc}",
                 ) from exc
             assert_real_backend_feedstock_supported(
                 config.backend_name,
@@ -293,9 +338,31 @@ class SimSession:
             )
         if config.feedstock_id not in config.feedstocks:
             expected = sorted(config.feedstocks)[:5]
-            raise config.unavailable_error_cls(
+            # An unknown feedstock id is BAD INPUT, not an unavailable backend.
+            # The class raised has to stay config.unavailable_error_cls: callers
+            # inject their own (RunnerError from session_cli, MREReproductionError
+            # from mre_reproduction, RuntimeError by default) and catch that type,
+            # so changing it here would turn a clean error into an unhandled one
+            # several layers up. What was wrong is the LABEL, not the class.
+            #
+            # Stamping reason_code is the mechanism backends.py already uses for
+            # exactly this (BackendUnavailableError.reason_code /
+            # stamp_unavailable_reason), so consumers can classify by type rather
+            # than by prose. Without it, web/events.py reported error_type
+            # 'backend_unavailable' with backend_status 'unavailable' for a
+            # mistyped feedstock id -- three fields all asserting the compute
+            # backend was broken when it was fine and never consulted.
+            #
+            # The project already settled this on the optimizer path:
+            # tests/test_optimizer_evaluate.py::
+            #   test_unknown_feedstock_is_input_error_not_backend_unavailable
+            # pins unknown-feedstock as an input error there. This is the same
+            # rule reaching the session/web path.
+            raise _typed_input_error(
+                config.unavailable_error_cls,
+                "unknown_feedstock",
                 f"unknown feedstock {config.feedstock_id!r}; expected one of "
-                f"{expected}..."
+                f"{expected}...",
             )
 
         sim = build_simulator(
@@ -324,8 +391,13 @@ class SimSession:
                 additives_kg=dict(config.additives_kg),
             )
         except ValueError as exc:
-            raise config.unavailable_error_cls(
-                f"load_batch failed: {exc}"
+            # The reachable one: a Mars feedstock without its Stage-0 C
+            # reductant lands here, message already telling the operator to
+            # supply additives_kg={'C': ...}.
+            raise _typed_input_error(
+                config.unavailable_error_cls,
+                "invalid_run_input",
+                f"load_batch failed: {exc}",
             ) from exc
 
         if config.force_builtin_vapor_pressure is not None:
@@ -350,8 +422,17 @@ class SimSession:
 
         for campaign, overrides in config.runtime_campaign_overrides.items():
             if not isinstance(overrides, Mapping):
-                raise config.unavailable_error_cls(
-                    f"runtime_campaign_overrides[{campaign!r}] must be a mapping"
+                # UNREACHABLE by construction; kept as belt-and-braces and typed
+                # for consistency, not because it fires. __post_init__ runs
+                # _canonical_runtime_campaign_overrides, which rebuilds this as
+                # {str(campaign): dict(fields)}, so every value is already a dict
+                # by the time we get here -- and a non-mapping value raises
+                # TypeError inside that dict() call long before this line. Do not
+                # cite this site as evidence the guard is exercised.
+                raise _typed_input_error(
+                    config.unavailable_error_cls,
+                    "invalid_run_input",
+                    f"runtime_campaign_overrides[{campaign!r}] must be a mapping",
                 )
             target = sim.campaign_mgr.overrides.setdefault(str(campaign), {})
             for field_name, value in overrides.items():
@@ -634,8 +715,10 @@ class SimSession:
             return CampaignPhase[campaign_name]
         except KeyError as exc:
             valid = ", ".join(member.name for member in CampaignPhase)
-            raise config.unavailable_error_cls(
-                f"unknown campaign {campaign_name!r}; valid options: {valid}"
+            raise _typed_input_error(
+                config.unavailable_error_cls,
+                "unknown_campaign",
+                f"unknown campaign {campaign_name!r}; valid options: {valid}",
             ) from exc
 
     @staticmethod
