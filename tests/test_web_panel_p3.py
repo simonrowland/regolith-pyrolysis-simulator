@@ -6,6 +6,8 @@ from pathlib import Path
 import re
 import subprocess
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
 
@@ -448,6 +450,38 @@ def test_p3_surfaces_diagnostic_authority_uncertainty_and_escapes_values() -> No
     assert 'title="geometry &quot;not certified&quot;"' in geometry_region
     assert "<script>" not in species_row and 'geometry "not certified"' not in geometry_region
     assert "baffled <throat>" not in geometry_region
+
+
+@pytest.mark.parametrize("status, leaf", [
+    ("unavailable", 0), ("UNAVAILABLE", 12.5), ("unavailable", None),
+    ("unavailable", "absent"), (None, None),
+])
+def test_p3_unavailable_diagnostics_never_claim_quantities(status, leaf) -> None:
+    entry = {"reason": "species_absent_from_latest_evaporation_series_diagnostic"}
+    if status is not None:
+        entry["status"] = status
+    if leaf != "absent":
+        entry.update(current_wall_deposit_flux_kg_hr=leaf, cumulative_wall_deposit_kg=leaf)
+    artifact = {"terminal": {
+        "final": {"wall_deposit_by_species_kg": {"Fe": 2.5}},
+        "run_metadata": {"pressure_coating_pareto_diagnostic": {
+            "current": {
+                "wall_deposit_flux_kg_hr_by_species": {"Fe": 19, "SiO2": 0.125},
+                "wall_deposit_cumulative_kg_by_species": {"Fe": 23, "SiO2": 3.5},
+            },
+            "by_species": {
+                "Fe": entry,
+                "Si": {"status": "ok", "current_wall_deposit_flux_kg_hr": 0,
+                       "cumulative_wall_deposit_kg": 4.5},
+            },
+        }},
+    }}
+    html = _render_panel(artifact)["html"]
+    cells = _cell_texts(_row_with(html, 'title="Fe"'))
+    assert cells[1:4] == ["2.5 kg", "unavailable", "unavailable"]
+    assert "Reason species absent from latest evaporation series diagnostic" in cells[4]
+    assert _cell_texts(_row_with(html, 'title="Si"'))[2:4] == ["0 kg/hr", "4.5 kg"]
+    assert _cell_texts(_row_with(html, 'title="SiO2"'))[2:4] == ["0.125 kg/hr", "3.5 kg"]
 
 
 def test_p3_partial_maps_never_backfill_terminal_or_flux_values() -> None:

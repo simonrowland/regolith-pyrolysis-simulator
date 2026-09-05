@@ -60,6 +60,7 @@
   }
 
   function claimText(claim) {
+    if (claim.state === "unavailable") return "unavailable";
     if (claim.state === "absent") return "not emitted";
     if (claim.state === "empty") return "empty";
     if (claim.state === "malformed") return `malformed (${malformedType(claim.value)})`;
@@ -120,8 +121,14 @@
   }
 
   function diagnosticClaim(entry, key, fallbackMap, species) {
+    if (isRecord(entry) && typeof entry.status === "string"
+      && entry.status.toLowerCase() === "unavailable") {
+      return { state: "unavailable", value: null };
+    }
     const direct = numberClaim(entry, key);
-    return direct.state === "absent" ? numberClaim(fallbackMap, species) : direct;
+    const claim = direct.state === "absent" ? numberClaim(fallbackMap, species) : direct;
+    return claim.state === "malformed" && claim.value === null
+      ? { state: "unavailable", value: null } : claim;
   }
 
   function speciesNames(aggregate, bySpecies, currentFlux, currentCumulative) {
