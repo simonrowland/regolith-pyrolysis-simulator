@@ -1747,31 +1747,31 @@ def test_furnace_material_catalog_endpoint_returns_enabled_only():
         if material["id"] == "zirconia_ysz"
     )
     zirconia_limit_C = float(catalog["zirconia_ysz"]["max_service_T_C"])
-    assert zirconia_limit_C == pytest.approx(2200)
-    assert zirconia["service_rating_T_C"] == pytest.approx(2200)
-    assert zirconia["requested_ceiling_T_C"] == pytest.approx(2200)
-    assert zirconia["effective_applied_ceiling_T_C"] == pytest.approx(
-        min(2200.0, envelope_max_C)
+    assert zirconia_limit_C == 2200
+    assert zirconia["service_rating_T_C"] == 2200
+    assert zirconia["requested_ceiling_T_C"] == 2200
+    assert zirconia["effective_applied_ceiling_T_C"] == min(
+        2200.0, envelope_max_C
     )
     fused_silica = next(
         material
         for material in materials
         if material["id"] == "fused_silica"
     )
-    assert float(catalog["fused_silica"]["max_service_T_C"]) == pytest.approx(1200)
-    assert fused_silica["service_rating_T_C"] == pytest.approx(1200)
-    assert fused_silica["requested_ceiling_T_C"] == pytest.approx(1200)
-    assert fused_silica["effective_applied_ceiling_T_C"] == pytest.approx(1200)
+    assert float(catalog["fused_silica"]["max_service_T_C"]) == 1200
+    assert fused_silica["service_rating_T_C"] == 1200
+    assert fused_silica["requested_ceiling_T_C"] == 1200
+    assert fused_silica["effective_applied_ceiling_T_C"] == 1200
     sintered_regolith = next(
         material
         for material in materials
         if material["id"] == "sintered_regolith"
     )
-    assert float(catalog["sintered_regolith"]["max_service_T_C"]) == pytest.approx(1200)
-    assert sintered_regolith["max_service_T_C"] == pytest.approx(1200)
-    assert sintered_regolith["service_rating_T_C"] == pytest.approx(1200)
-    assert sintered_regolith["requested_ceiling_T_C"] == pytest.approx(1200)
-    assert sintered_regolith["effective_applied_ceiling_T_C"] == pytest.approx(1200)
+    assert float(catalog["sintered_regolith"]["max_service_T_C"]) == 1200
+    assert sintered_regolith["max_service_T_C"] == 1200
+    assert sintered_regolith["service_rating_T_C"] == 1200
+    assert sintered_regolith["requested_ceiling_T_C"] == 1200
+    assert sintered_regolith["effective_applied_ceiling_T_C"] == 1200
     assert sintered_regolith["grounding"]["tier"] == "proxy-sintering"
     assert sintered_regolith["grounding"]["source"] == "Warren et al. 2022 (arXiv:2205.06855)"
     assert sintered_regolith["service_rating_qualifier"] == {
@@ -2306,7 +2306,7 @@ def test_web_start_event_resolves_furnace_material_cap(
         assert state is not None
         assert (
             state["session"].simulator.campaign_mgr.furnace_max_T_C
-            == pytest.approx(expected_cap)
+            == expected_cap
         )
     finally:
         client.disconnect()
