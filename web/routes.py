@@ -63,7 +63,7 @@ from simulator.mre_ladder import (
     preset_catalog as build_mre_preset_catalog,
 )
 from simulator.optimize import job_runner as optimizer_job_runner
-from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
+from simulator.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
 from simulator.optimize.honesty import optimizer_tier_label
 from simulator.optimize.import_bundle import (

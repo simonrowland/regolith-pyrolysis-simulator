@@ -73,7 +73,7 @@ from simulator.evaporation import EvaporationFluxRefusal
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-from simulator.optimize.recipe import recipe_schema_version
+from simulator.recipe import recipe_schema_version
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
 from simulator.run_executor import RunExecutor

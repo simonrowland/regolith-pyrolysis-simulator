@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.accounting.run_artifact import build_run_artifact
-from simulator.optimize.recipe import recipe_schema_version
+from simulator.recipe import recipe_schema_version
 from simulator.recipe_io import load_recipe_patch
 
 def main():
