@@ -25,6 +25,9 @@ import traceback
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 AUTHORITIES = ("certified", "bridge", "extrapolated", "refused")
+# Production adapters never query engine intent-and-condition certification.
+# envelope() can still emit the token when a caller passes it explicitly.
+CERTIFIED_DERIVABLE = False
 CLOSURES = {
     "vapour": ("Independent pressure, composition/phase, per-point pO2 and standard state; verified source transcription", "t-769, t-623; ADR-001"),
     "SiO evolution": ("Matched silicate melt T/composition/fO2, exposed area and measured SiO pressure/flux or Si loss", "t-099, t-204, t-104, t-205"),
@@ -120,6 +123,27 @@ def envelope(*, dataset_id, observation_id, species, observable, units,
             metric = "dex"
         else:
             metric = "absolute"
+    if status == "self-agreement-excluded":
+        score_reason = "self-agreement excluded from validation"
+    elif eligible:
+        score_reason = "unweighted same-quantity pair"
+    elif not selected:
+        score_reason = "source-inadmissible diagnostic"
+    else:
+        score_reason = "no admissible numeric comparison"
+    raw_clean = clean(raw)
+    engine = raw_clean.get("engine") if isinstance(raw_clean, dict) else None
+    engine_fallback = bool(isinstance(raw_clean, dict) and raw_clean.get("vaporock_error")
+                           and engine == "builtin-antoine")
+    score_eligible = eligible and selected
+    if not selected:
+        terminal = "outside-selected"
+    elif authority == "refused":
+        terminal = "refused"
+    elif score_eligible:
+        terminal = "scored"
+    else:
+        terminal = "excluded"
     row = {
         "schema_version": 1, "dataset_id": dataset_id, "source_id": dataset_id, "observation_id": observation_id,
         "run_id": run_id or dataset_id, "correlation_group": run_id or dataset_id,
@@ -130,10 +154,12 @@ def envelope(*, dataset_id, observation_id, species, observable, units,
         "signed_residual": residual, "residual_metric": metric, "authority": authority,
         "comparator_status": status, "notices": list(dict.fromkeys(str(f) for f in flags if f)),
         "categorical_outcome": status if qualitative else None,
-        "selected": selected, "score_eligible": eligible and selected,
-        "score_reason": "unweighted same-quantity pair" if eligible else (
-            "source-inadmissible diagnostic" if not selected else "no admissible numeric comparison"),
-        "raw": clean(raw), "execution": execution,
+        "selected": selected, "score_eligible": score_eligible,
+        "score_reason": score_reason,
+        "terminal_bucket": terminal,
+        "exclusion_reason": (status if status == "self-agreement-excluded" else score_reason) if terminal == "excluded" else None,
+        "engine": engine, "engine_fallback": engine_fallback,
+        "raw": raw_clean, "execution": execution,
         "closure": {"data_required": CLOSURES[rail][0], "projects": CLOSURES[rail][1],
                     "design": "../BATTERY-DESIGN.md#rails-and-closure-projects", "status": "open"},
     }
@@ -504,7 +530,108 @@ def bench_rows(out, receipts):
     return rows
 
 
+def engine_label(row):
+    if row.get("engine_fallback"):
+        return "builtin-antoine (fallback; VapoRock unavailable)"
+    if row.get("engine"):
+        return row["engine"]
+    if row.get("dataset_id") == "vp30":
+        return "builtin-antoine"
+    if row.get("rail") == "integrated bench":
+        return "simulator.runner"
+    return "extract/KEMS"
+
+
+def assign_terminal(row):
+    if not row["selected"]:
+        terminal = "outside-selected"
+    elif row["authority"] == "refused":
+        terminal = "refused"
+    elif row["score_eligible"]:
+        terminal = "scored"
+    else:
+        terminal = "excluded"
+    row["terminal_bucket"] = terminal
+    if terminal == "excluded":
+        row["exclusion_reason"] = (
+            row["comparator_status"] if row["comparator_status"] == "self-agreement-excluded"
+            else row.get("exclusion_reason") or row["score_reason"]
+        )
+    else:
+        row["exclusion_reason"] = None
+    return row
+
+
+def mark_alpha_rate_twins(rows):
+    """Hashimoto Table 3 alpha re-filed as evaporation_rate is the same point, not a flux."""
+    alphas = {}
+    for row in rows:
+        if row.get("observable") == "evaporation_alpha" and row.get("units") == "alpha" and row.get("selected"):
+            key = (row["dataset_id"], row["species"],
+                   (row.get("conditions") or {}).get("temperature_K"),
+                   row["measured"], row["predicted"])
+            alphas[key] = row
+    for row in rows:
+        if not (row.get("observable") == "evaporation_rate" and row.get("units") == "alpha" and row.get("selected")):
+            continue
+        key = (row["dataset_id"], row["species"],
+               (row.get("conditions") or {}).get("temperature_K"),
+               row["measured"], row["predicted"])
+        original = alphas.get(key)
+        if original is None:
+            continue
+        row["duplicate_of"] = original["observation_id"]
+        row["selected"] = False
+        row["score_eligible"] = False
+        row["score_reason"] = "duplicate alpha transcription labeled as rate"
+        row["notices"] = list(dict.fromkeys(
+            list(row.get("notices") or []) + [
+                "duplicate Hashimoto Table 3 alpha scored as evaporation_rate; alpha is not a flux; retained outside selected denominator"
+            ]))
+        assign_terminal(row)
+    return rows
+
+
+def finalize_rows(rows):
+    mark_alpha_rate_twins(rows)
+    for row in rows:
+        raw = row.get("raw")
+        if not row.get("engine") and isinstance(raw, dict) and raw.get("engine"):
+            row["engine"] = raw["engine"]
+        if isinstance(raw, dict) and raw.get("vaporock_error") and row.get("engine") == "builtin-antoine":
+            row["engine_fallback"] = True
+        assign_terminal(row)
+    return rows
+
+
+def species_coverage(rows, rail):
+    coverage = []
+    species = sorted({r["species"] for r in rows if r["rail"] == rail and r["selected"] and r["species"]})
+    for name in species:
+        cohort = [r for r in rows if r["rail"] == rail and r["species"] == name and r["selected"]]
+        counts = Counter(r["authority"] for r in cohort)
+        n = len(cohort)
+        n_scored = sum(r["score_eligible"] for r in cohort)
+        n_refused = counts["refused"]
+        n_excluded = sum(r["terminal_bucket"] == "excluded" for r in cohort)
+        if n != n_scored + n_refused + n_excluded:
+            raise ValueError(
+                f"{rail}/{name}: selected {n} != scored {n_scored} + refused {n_refused} + excluded {n_excluded}")
+        scored = [r for r in cohort if r["score_eligible"]]
+        coverage.append({
+            "species": name, "N": n, "N_scored": n_scored, "N_refused": n_refused, "N_excluded": n_excluded,
+            "authorities": {a: counts[a] for a in AUTHORITIES},
+            "authorities_scored": {a: sum(r["authority"] == a for r in scored) for a in AUTHORITIES},
+            "authorities_population": "scored",
+            "refused_fraction": counts["refused"] / n if n else None,
+            "extrapolated_fraction": counts["extrapolated"] / n if n else None,
+            "exclusion_reasons": dict(Counter(r["exclusion_reason"] for r in cohort if r["terminal_bucket"] == "excluded")),
+        })
+    return coverage
+
+
 def summarize(rows):
+    finalize_rows(rows)
     groups = defaultdict(list)
     for row in rows:
         key = (row["rail"], row["species"] or "unspecified", row["observable"], row["units"],
@@ -531,50 +658,90 @@ def summarize(rows):
                     "bias": sum(values)/len(values) if values else None,
                     "source_balanced_finite_RMSE": math.sqrt(sum(sum(v)/len(v) for v in source_mse.values())/len(source_mse)) if source_mse else None,
                     "run_balanced_finite_RMSE": math.sqrt(sum(sum(v)/len(v) for v in run_mse.values())/len(run_mse)) if run_mse else None}
+            engines = sorted({engine_label(r) for r in bucket} or {engine_label(r) for r in eligible})
             scores.append(dict(zip(("rail", "species", "observable", "units", "measurement_kind", "split"), key),
                 authority=authority, N_selected=len(bucket), N_scored=len(eligible), metrics=metrics,
+                engines=engines,
                 sources=sorted({r["source_doi"] or r["source_id"] for r in bucket})))
     coverage = []
     for rail in CLOSURES:
         candidates = [r for r in rows if r["rail"] == rail]
         selected = [r for r in candidates if r["selected"]]
+        scored = [r for r in selected if r["score_eligible"]]
         counts = Counter(r["authority"] for r in selected)
+        scored_counts = Counter(r["authority"] for r in scored)
         n = len(selected)
-        coverage.append({"rail": rail, "N": n, "N_scored": sum(r["score_eligible"] for r in selected),
+        n_scored = len(scored)
+        n_refused = counts["refused"]
+        n_excluded = sum(r["terminal_bucket"] == "excluded" for r in selected)
+        if n != n_scored + n_refused + n_excluded:
+            raise ValueError(
+                f"{rail}: selected {n} != scored {n_scored} + refused {n_refused} + excluded {n_excluded}")
+        fallback_all = [r for r in candidates if r.get("engine_fallback")]
+        fallback_selected = [r for r in selected if r.get("engine_fallback")]
+        fallback_scored = [r for r in scored if r.get("engine_fallback")]
+        coverage.append({
+            "rail": rail, "N": n, "N_scored": n_scored, "N_refused": n_refused, "N_excluded": n_excluded,
             "authorities": {a: counts[a] for a in AUTHORITIES},
-            "refused_fraction": counts["refused"]/n if n else None,
-            "extrapolated_fraction": counts["extrapolated"]/n if n else None,
-            "outside_selected_N": len(candidates)-n,
+            "authorities_scored": {a: scored_counts[a] for a in AUTHORITIES},
+            "authorities_population": "scored",
+            "certified_derivable": CERTIFIED_DERIVABLE,
+            "refused_fraction": n_refused / n if n else None,
+            "extrapolated_fraction": counts["extrapolated"] / n if n else None,
+            "outside_selected_N": len(candidates) - n,
             "categorical_outcomes": dict(Counter(r["categorical_outcome"] for r in candidates if r["categorical_outcome"])),
             "status": "observations available" if n else "no direct comparator; proxies: " + PROXIES.get(rail, "none selected"),
             "refusal_subtypes": dict(Counter(r["comparator_status"] for r in selected if r["authority"] == "refused")),
+            "exclusion_reasons": dict(Counter(r["exclusion_reason"] for r in selected if r["terminal_bucket"] == "excluded")),
+            "engines_scored": dict(Counter(engine_label(r) for r in scored)),
+            "engine_fallback_N": len(fallback_all),
+            "engine_fallback_N_selected": len(fallback_selected),
+            "engine_fallback_N_scored": len(fallback_scored),
+            "marker": "builtin-antoine fallback" if fallback_all else "",
             "closure_projects": CLOSURES[rail][1], "closure_data": CLOSURES[rail][0]})
-    species_coverage = []
-    for species in sorted({r["species"] for r in rows if r["rail"] in {"vapour", "SiO evolution"} and r["species"]}):
-        cohort = [r for r in rows if r["rail"] in {"vapour", "SiO evolution"} and r["species"] == species and r["selected"]]
-        counts = Counter(r["authority"] for r in cohort)
-        n = len(cohort)
-        species_coverage.append({"species": species, "N": n, "N_scored": sum(r["score_eligible"] for r in cohort),
-            "authorities": {a: counts[a] for a in AUTHORITIES},
-            "refused_fraction": counts["refused"]/n if n else None,
-            "extrapolated_fraction": counts["extrapolated"]/n if n else None})
-    return {"coverage": coverage, "vapour_by_species": species_coverage, "scores": scores,
+    return {"coverage": coverage, "vapour_by_species": species_coverage(rows, "vapour"),
+            "sio_evolution_by_species": species_coverage(rows, "SiO evolution"), "scores": scores,
+            "certified_derivable": CERTIFIED_DERIVABLE,
             "accounting": {"N_catalogued_targets": len(rows), "N_selected": sum(r["selected"] for r in rows),
                 "N_predicted": sum(r["selected"] and r["authority"] != "refused" for r in rows),
                 "N_no_prediction": sum(r["selected"] and r["authority"] == "refused" for r in rows),
+                "N_excluded": sum(r["selected"] and r["terminal_bucket"] == "excluded" for r in rows),
                 "N_execution_errors": sum(r["comparator_status"] == "failed-to-run" for r in rows),
                 "N_qualitative": sum(r["measurement_kind"] == "qualitative" for r in rows),
                 "N_missing_uncertainty": sum(r["uncertainty"]["status"] == "missing" for r in rows)}}
 
 
 def headline(report):
-    lines = ["| Rail | N selected | N scored | Certified | Bridge | Extrapolated | Refused fraction | Extrapolated fraction |",
-             "|---|---:|---:|---:|---:|---:|---:|---:|"]
+    lines = [
+        "| Rail | N selected | N scored | N refused | N excluded | Certified (scored; not yet derivable) | Bridge (scored) | Extrapolated (scored) | Refused fraction | Extrapolated fraction | Marker |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
     fmt = lambda x: "no data" if x is None else f"{x:.3f}"
     for r in report["coverage"]:
-        a = r["authorities"]
-        lines.append(f"| {r['rail']} | {r['N']} | {r['N_scored']} | {a['certified']} | {a['bridge']} | {a['extrapolated']} | {fmt(r['refused_fraction'])} | {fmt(r['extrapolated_fraction'])} |")
+        a = r["authorities_scored"]
+        reasons = ",".join(f"{k}:{v}" for k, v in sorted((r.get("exclusion_reasons") or {}).items())) or "—"
+        excluded = f"{r['N_excluded']}" + (f" ({reasons})" if r["N_excluded"] else "")
+        marker = r.get("marker") or "—"
+        lines.append(
+            f"| {r['rail']} | {r['N']} | {r['N_scored']} | {r['N_refused']} | {excluded} | {a['certified']} | {a['bridge']} | {a['extrapolated']} | {fmt(r['refused_fraction'])} | {fmt(r['extrapolated_fraction'])} | {marker} |")
     return "\n".join(lines)
+
+
+def headline_notes(report):
+    lines = [
+        "N counts selected atomic comparator targets (including no-prediction records), not independent experiments. Source-inadmissible diagnostics are outside N. Selected = scored + refused + excluded. Authority columns count the **scored** population (header: scored), not all selected rows.",
+        "Certified (scored) is **not yet derivable**: this battery does not query the engine's certification for that intent and those conditions. A good residual, CITED tag, or validated verdict does not promote a row. The column is therefore structurally zero, not a measured finding that nothing is certified.",
+    ]
+    fallback_all = sum(r.get("engine_fallback_N") or 0 for r in report["coverage"])
+    fallback_selected = sum(r.get("engine_fallback_N_selected") or 0 for r in report["coverage"])
+    fallback_scored = sum(r.get("engine_fallback_N_scored") or 0 for r in report["coverage"])
+    if fallback_all:
+        lines.append(
+            f"Host missing provider: VapoRock/ThermoEngine (LiquidMelts) is unavailable on this host. {fallback_all} VP anchors ran on the **builtin-antoine fallback** ({fallback_selected} selected, {fallback_scored} scored). These are not VapoRock numbers.")
+    vapour = next((r for r in report["coverage"] if r["rail"] == "vapour"), None)
+    if vapour and vapour.get("engines_scored"):
+        mix = ", ".join(f"{engine} {n}" for engine, n in sorted(vapour["engines_scored"].items()))
+        lines.append(f"Vapour N scored {vapour['N_scored']} mixes engines: {mix}.")
+    return lines
 
 
 def score_table(report):
@@ -583,10 +750,12 @@ def score_table(report):
         key = tuple(s[k] for k in ("rail", "species", "observable", "units", "measurement_kind", "split"))
         if s["N_selected"]:
             groups[key][s["authority"]] = s
-    lines = ["| Rail/species | Quantity / units | Evidence / split | Certified N / RMSE | Bridge N / RMSE | Extrapolated N / RMSE |",
-             "|---|---|---|---:|---:|---:|"]
+    lines = ["| Rail/species | Quantity / units | Evidence / split | Engine | Certified N / RMSE | Bridge N / RMSE | Extrapolated N / RMSE |",
+             "|---|---|---|---|---:|---:|---:|"]
     for (rail, species, observable, units, evidence, split), buckets in sorted(groups.items()):
         cells = []
+        engines = sorted({e for s in buckets.values() for e in (s.get("engines") or ())})
+        engine_text = ", ".join(engines) if engines else "unspecified"
         for authority in AUTHORITIES[:-1]:
             s = buckets.get(authority)
             metric = "absolute" if units == "K" else "dex"
@@ -600,7 +769,7 @@ def score_table(report):
                 absolute = s["metrics"]["absolute"]
                 cell += f"; absolute {absolute['N']} / {absolute['RMSE']:.5g} {units}"
             cells.append(cell)
-        lines.append(f"| {rail}/{species} | {observable} / {units} | {evidence} / {split} | " + " | ".join(cells) + " |")
+        lines.append(f"| {rail}/{species} | {observable} / {units} | {evidence} / {split} | {engine_text} | " + " | ".join(cells) + " |")
     return "\n".join(lines)
 
 
@@ -664,11 +833,18 @@ def write_report(out, rows, receipts, manifest):
                for r in rows if r["notices"] or r["authority"] != "certified"]
     (out / "certification-backlog.jsonl").write_text("".join(json.dumps(clean(r), default=str)+"\n" for r in backlog))
     lines = ["# Calibration battery — stage 2", "", "Report only; no fitting, certification grant, runtime change or gate.", "",
-        f"Engine revision: `{manifest['engine_head']}`. Command: `{manifest['command']}`.", "", headline(report), "",
-        "N counts selected atomic comparator targets (including no-prediction records), not independent experiments. Source-inadmissible diagnostics are outside N. Metadata-only records remain unscored coverage entries. No certified result is inferred from pass/exit 0.", "",
-        "## Separated scores", "", "Each row fixes species, observable, units, evidence and split before authority. RMSE is dex except Kelvin temperatures (absolute K). No cross-authority or cross-observable RMSE exists. JSON also reports signed bias, absolute/relative metrics, source/run-balanced errors and refusal subtypes. Sources/series are correlated; no confidence intervals or weighted scores are claimed.", "", score_table(report),
-        "", "## Vapour coverage by species", "", "| Species | N selected | N scored | Refused fraction | Extrapolated fraction |", "|---|---:|---:|---:|---:|"]
+        f"Engine revision: `{manifest['engine_head']}`. Command: `{manifest['command']}`.", "", headline(report), ""]
+    for note in headline_notes(report):
+        lines.extend([note, ""])
+    lines.extend([
+        "## Separated scores", "", "Each row fixes species, observable, units, evidence, split and engine before authority. RMSE is dex except Kelvin temperatures (absolute K). No cross-authority or cross-observable RMSE exists. JSON also reports signed bias, absolute/relative metrics, source/run-balanced errors and refusal subtypes. Sources/series are correlated; no confidence intervals or weighted scores are claimed.", "", score_table(report),
+        "", "## Vapour coverage by species", "", "| Species | N selected | N scored | Refused fraction | Extrapolated fraction |", "|---|---:|---:|---:|---:|"])
     for s in report["vapour_by_species"]:
+        lines.append(f"| {s['species']} | {s['N']} | {s['N_scored']} | {s['refused_fraction']} | {s['extrapolated_fraction']} |")
+    lines.extend(["", "## SiO evolution coverage by species", "",
+                  "| Species | N selected | N scored | Refused fraction | Extrapolated fraction |",
+                  "|---|---:|---:|---:|---:|"])
+    for s in report["sio_evolution_by_species"]:
         lines.append(f"| {s['species']} | {s['N']} | {s['N_scored']} | {s['refused_fraction']} | {s['extrapolated_fraction']} |")
     lines.extend(["", "## Candidate diagnostics outside empirical selection", "", "| Dataset / observation | Authority | Signed dex | Notice |", "|---|---|---:|---|"])
     for r in rows:
@@ -676,7 +852,13 @@ def write_report(out, rows, receipts, manifest):
             lines.append(f"| {r['dataset_id']} / {r['observation_id']} | {r['authority']} | {r['signed_residual']['dex']:.6g} | source admission unresolved; no empirical score |")
     lines.extend(["", "## Coverage and closure projects", ""])
     for r in report["coverage"]:
-        lines.append(f"- **{r['rail']}**: {r['status']}. {r['closure_data']}. Projects: {r['closure_projects']}.")
+        extra = ""
+        if r["N_excluded"]:
+            reasons = ", ".join(f"{k} {v}" for k, v in sorted(r["exclusion_reasons"].items()))
+            extra = f" Excluded {r['N_excluded']} ({reasons})."
+        if r.get("marker"):
+            extra += f" Engine marker: {r['marker']}."
+        lines.append(f"- **{r['rail']}**: {r['status']}. {r['closure_data']}. Projects: {r['closure_projects']}.{extra}")
     lines.extend(["", "[Row-level backlog](certification-backlog.jsonl) · [Raw observations](observations.jsonl) · [Full JSON report](report.json) · [Score CSV](rail-summary.csv)",
                   "", "Residual plots: " + (", ".join(f"[{p}]({p})" for p in manifest.get("plots", [])) or "pending/no finite scored pairs"),
                   "", "Plot facets fix species, quantity, source role and split. Sparse/empty temperature or pO2 panels expose unavailable conditions; source composition remains in each observation. No measured wall-deposition points exist to plot.", "", "## Executions", "",
