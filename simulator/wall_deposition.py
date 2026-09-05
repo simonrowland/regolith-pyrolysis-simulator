@@ -252,6 +252,16 @@ def wall_deposit_candidate_for_surface_kg(
         diagnostic_out=rate_diagnostic,
     )
     if rate_diagnostic.get("wall_saturation_pressure_refused"):
+        notice = model.last_sticking_alpha_provenance_notice
+        notice.setdefault("wall_saturation_pressure_refusals_by_species", {}).setdefault(
+            species, {}
+        )[str(getattr(segment, "name", "default_pipe"))] = {
+            "status": "refused",
+            "reason": rate_diagnostic["wall_saturation_pressure_refusal_reason"],
+            "output_status": "status_bearing",
+            "wall_temperature_K": T_wall_K,
+            "wall_saturation_pressure_pa": None,
+        }
         raise WallSaturationPressureRefusal(
             species,
             T_wall_K,

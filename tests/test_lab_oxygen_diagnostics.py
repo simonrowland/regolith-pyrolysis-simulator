@@ -599,12 +599,15 @@ def test_pressure_coating_pareto_refuses_missing_knudsen_provenance():
     ("per_hour", "current_flux", "cumulative_mass"),
     [
         ([], None, None),
+        ([{"wall_deposit_delta_kg": {"wall": {"Fe": 0.0}}}], 0.0, 0.0),
         ([{"wall_deposit_delta_kg": {"wall": {"Fe": 2.5}}}], 2.5, 2.5),
         ([{"wall_deposit_delta_kg": {"wall": {"Fe": 2.5}}}, {}], None, 2.5),
     ],
 )
+@pytest.mark.parametrize("series_present", [False, True])
+@pytest.mark.parametrize("wall_refused", [False, True])
 def test_pressure_coating_current_kn_and_regime_share_controlling_segment(
-    per_hour, current_flux, cumulative_mass,
+    per_hour, current_flux, cumulative_mass, series_present, wall_refused,
 ):
     knudsen = {
         "gas_temperature_C": 1000.0,
@@ -633,8 +636,24 @@ def test_pressure_coating_current_kn_and_regime_share_controlling_segment(
             last_knudsen_regime_diagnostic=knudsen,
             gas_temperature_C=1000.0,
             carrier_gas="N2",
+            last_sticking_alpha_provenance_notice={
+                "wall_saturation_pressure_refusals_by_species": {
+                    "Fe": {"wall": {
+                        "status": "refused",
+                        "output_status": "status_bearing",
+                        "reason": "above_source_certified_range",
+                    }}
+                }
+            } if wall_refused else {},
         )
     )
+    if series_present:
+        sim._last_evaporation_flux_diagnostic = {
+            "evaporation_series_resistance": {"Fe": {
+                "P_eq_Pa": 200.0, "P_bulk_Pa": 100.0,
+                "alpha_intrinsic": 0.7, "transport_length_m": 0.12,
+            }}
+        }
 
     diagnostic = pressure_coating_pareto_diagnostic(
         sim, per_hour=per_hour, target_species=("Fe",)
@@ -645,6 +664,16 @@ def test_pressure_coating_current_kn_and_regime_share_controlling_segment(
     assert diagnostic["current"]["knudsen_number"] == pytest.approx(0.12)
     assert diagnostic["current"]["regime"] == "free_molecular"
     row = diagnostic["by_species"]["Fe"]
-    assert row["status"] == "unavailable"
-    assert row["current_wall_deposit_flux_kg_hr"] == current_flux
-    assert row["cumulative_wall_deposit_kg"] == cumulative_mass
+    if wall_refused:
+        assert row["status"] == "unavailable"
+        assert row["reason"] == "above_source_certified_range"
+        assert row["current_wall_deposit_flux_kg_hr"] is None
+        assert row["cumulative_wall_deposit_kg"] is None
+    else:
+        assert row["status"] == (
+            "ok" if series_present and current_flux is not None else "unavailable"
+        )
+        if series_present and current_flux is None:
+            assert row["reason"] == "current_wall_deposition_quantity_unavailable"
+        assert row["current_wall_deposit_flux_kg_hr"] == current_flux
+        assert row["cumulative_wall_deposit_kg"] == cumulative_mass

@@ -240,6 +240,12 @@ def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
     assert refused.value.species == "Fe"
     assert refused.value.temperature_K == pytest.approx(3200.0)
     assert model.last_wall_deposition_rate_shadow_candidate == {}
+    refusal_notice = model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_refusals_by_species"
+    ]["Fe"]["default_pipe"]
+    assert refusal_notice["status"] == "refused"
+    assert refusal_notice["reason"] == refused.value.reason
+    assert refusal_notice["wall_saturation_pressure_pa"] is None
 
 
 def test_missing_wall_antoine_data_raises_typed_refusal(monkeypatch) -> None:

@@ -12865,12 +12865,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(type(exc), 'terminal_refusal', False)
             )
             if terminal_refusal:
+                wall_refusals = self.condensation_model.last_sticking_alpha_provenance_notice.get(
+                    'wall_saturation_pressure_refusals_by_species'
+                )
                 _materialize_refusal_snapshot_history(terminal_refusal_state)
                 self._restore_terminal_refusal_hour_state(
                     terminal_refusal_state,
                     terminal_refusal_ledger,
                     terminal_refusal_cost_state,
                 )
+                # Roll back quantities, but retain the reason the wall channel refused.
+                if wall_refusals:
+                    self.condensation_model.last_sticking_alpha_provenance_notice[
+                        'wall_saturation_pressure_refusals_by_species'
+                    ] = wall_refusals
             elif committed_transition_count:
                 # AtomLedger is append-only. Whole-hour rollback would require
                 # compensating transitions and is a separate design change.

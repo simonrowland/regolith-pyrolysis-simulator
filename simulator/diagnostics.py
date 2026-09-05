@@ -1596,6 +1596,9 @@ def pressure_coating_pareto_diagnostic(
         * 100.0,
     )
     latest_wall_flux, cumulative_wall = _wall_deposit_fluxes_from_per_hour(per_hour)
+    wall_refusals = _wall_saturation_pressure_refusals_by_species(
+        getattr(condensation_model, "last_sticking_alpha_provenance_notice", {}) or {}
+    )
     current_pressure_pa = _first_finite(
         knudsen_diagnostic.get("overhead_pressure_mbar"),
         getattr(getattr(sim, "overhead", None), "pressure_mbar", 0.0),
@@ -1606,6 +1609,14 @@ def pressure_coating_pareto_diagnostic(
         name = str(species)
         series = dict(series_by_species.get(name) or {})
         molar_mass = _molar_mass_kg_mol(sim, name, MOLAR_MASS)
+        if name in wall_refusals:
+            by_species[name] = {
+                "status": "unavailable",
+                "reason": next(iter(wall_refusals[name].values()))["reason"],
+                "current_wall_deposit_flux_kg_hr": None,
+                "cumulative_wall_deposit_kg": None,
+            }
+            continue
         if not series or molar_mass is None:
             by_species[name] = {
                 "status": "unavailable",
@@ -1662,7 +1673,9 @@ def pressure_coating_pareto_diagnostic(
         flux_15mbar = flux_at(_CURRENT_SETPOINT_HIGH_PA)
         alpha_authority_status = alpha_authority_status_by_species.get(name)
         by_species[name] = {
-            "status": "ok",
+            "status": "ok" if name in latest_wall_flux else "unavailable",
+            **({"reason": "current_wall_deposition_quantity_unavailable"}
+               if name not in latest_wall_flux else {}),
             # HKL upper-bound (matrix policy i): R_m disabled / missing melt inputs.
             "authority_class": "upper-bound",
             "authority_reason": (
@@ -1696,8 +1709,8 @@ def pressure_coating_pareto_diagnostic(
                 gate_flux.flux_kg_s_m2,
                 flux_15mbar.flux_kg_s_m2,
             ),
-            "current_wall_deposit_flux_kg_hr": latest_wall_flux.get(name, 0.0),
-            "cumulative_wall_deposit_kg": cumulative_wall.get(name, 0.0),
+            "current_wall_deposit_flux_kg_hr": latest_wall_flux.get(name),
+            "cumulative_wall_deposit_kg": cumulative_wall.get(name),
             "sweep": [
                 {
                     "pressure_pa": pressure_pa,
@@ -1925,7 +1938,7 @@ def _flatten_wall_deposit_species_kg(value: Any) -> dict[str, float]:
             continue
         for species, kg in species_map.items():
             amount = _finite_float(kg)
-            if amount is None or abs(amount) <= _EPS:
+            if amount is None:
                 continue
             name = str(species)
             totals[name] = totals.get(name, 0.0) + amount
