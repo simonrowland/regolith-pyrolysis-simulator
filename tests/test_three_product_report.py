@@ -189,6 +189,66 @@ def test_silica_glass_zero_when_stage_3_missing():
     assert result['pure_silica_glass']['stage_3_kg_by_species'] == {}
 
 
+@pytest.mark.parametrize(
+    ('events', 'verdict', 'is_product'),
+    [
+        ([], 'authoritative', False),
+        (['release'], 'authoritative', False),
+        (['hold', 'release'], 'authoritative', True),
+        (['hold', 'release'], 'status_bearing_non_authoritative', False),
+        (['hold', 'release'], 'missing', False),
+        (['hold', 'incidental'], 'authoritative', False),
+        (['incidental', 'hold', 'release'], 'authoritative', False),
+        (['hold', 'release', 'incidental'], 'authoritative', False),
+    ],
+)
+def test_silica_product_requires_executed_switch_and_authority_for_every_capture(
+    events, verdict, is_product
+):
+    authority = {
+        'species_id': 'SiO',
+        'pressure': {'kind': 'value', 'pa': 1.0},
+        'flux': {'kind': 'eligible'},
+        'verdict_status': verdict,
+        'certification_ceiling': 'validated_point',
+        'validation_status': 'validated',
+        'is_flux_active': True,
+    }
+    snapshots = [
+        SimpleNamespace(
+            c2a_staged_gas={
+                'stage_name': 'sio_window' if event == 'release' else 'alkali_early_fe',
+                'gas_cover_mode': 'po2_hold' if event == 'hold' else 'pn2_sweep',
+            },
+            condensed_by_stage_species_delta=(
+                {} if event == 'hold' else {(3, 'SiO2'): 1.0}
+            ),
+            evap_flux=SimpleNamespace(
+                carrier_authority_by_species=(
+                    {} if verdict == 'missing' else {'SiO': authority}
+                ),
+            ),
+        )
+        for event in events
+    ]
+    captured_kg = float(max(1, sum(event != 'hold' for event in events)))
+    sim = SimpleNamespace(
+        train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
+            collected_kg={'SiO2': captured_kg},
+        )]),
+        record=SimpleNamespace(snapshots=snapshots),
+    )
+
+    result = classify_products(sim)
+
+    assert result['pure_silica_glass']['stage_3_capture_kg'] == captured_kg
+    assert result['pure_silica_glass']['stage_3_kg_by_species'] == {'SiO2': captured_kg}
+    expected_product_kg = captured_kg if is_product else 0.0
+    assert result['pure_silica_glass']['class_total_kg'] == expected_product_kg
+    assert result['glass']['class_total_kg'] == expected_product_kg
+    assert result['glass']['species_kg'] == ({'SiO2': captured_kg} if is_product else {})
+
+
 def test_captured_volatiles_include_condensation_train_account():
     sim = SimpleNamespace(
         product_ledger=lambda: {},

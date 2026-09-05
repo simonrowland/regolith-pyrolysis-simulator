@@ -46,6 +46,10 @@ from simulator.accounting.queries import (
     TERMINAL_RUMP_SILICATE_RESIDUAL,
     TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
+from simulator.vapour_rail.instrumentation import (
+    VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+    vapour_carrier_authority_status,
+)
 
 # Per CLAUDE.md § 4 + § 5: the species that map cleanly to each
 # product class. Some species can land in MORE THAN ONE class
@@ -238,6 +242,31 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             if kg > 0.0:
                 stage_3_kg_by_species[species] = kg
     stage_3_capture_kg = float(sum(stage_3_kg_by_species.values()))
+    saw_oxygen_hold = False
+    silica_is_product = False
+    for snapshot in getattr(getattr(sim, 'record', None), 'snapshots', ()) or ():
+        gas = getattr(snapshot, 'c2a_staged_gas', {}) or {}
+        if gas.get('gas_cover_mode') == 'po2_hold':
+            saw_oxygen_hold = True
+        capture = getattr(snapshot, 'condensed_by_stage_species_delta', {}) or {}
+        if not any(capture.get((3, species), 0.0) > 0.0
+                   for species in PURE_SILICA_GLASS_SPECIES):
+            continue
+        authority = getattr(
+            getattr(snapshot, 'evap_flux', None), 'carrier_authority_by_species', {}
+        ) or {}
+        if not (
+            saw_oxygen_hold
+            and gas.get('stage_name') == 'sio_window'
+            and gas.get('gas_cover_mode') == 'pn2_sweep'
+            and vapour_carrier_authority_status(
+                authority.get('SiO'), expected_species_id='SiO'
+            ) == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
+        ):
+            silica_is_product = False
+            break
+        silica_is_product = True
+    silica_product_kg = stage_3_capture_kg if silica_is_product else 0.0
 
     # ----- Captured volatiles -----
     captured_volatiles_kg_by_species = _ledger_species_kg(
@@ -334,12 +363,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         'pure_silica_glass': {
             'stage_3_capture_kg': stage_3_capture_kg,
             'stage_3_kg_by_species': stage_3_kg_by_species,
-            'class_total_kg': stage_3_capture_kg,
+            'class_total_kg': silica_product_kg,
         },
         'glass': {
-            'species_kg': stage_3_kg_by_species,
-            'class_total_kg': stage_3_capture_kg + mixed_melt_residual_kg,
-            'pure_silica_glass_kg': stage_3_capture_kg,
+            'species_kg': stage_3_kg_by_species if silica_is_product else {},
+            'class_total_kg': silica_product_kg + mixed_melt_residual_kg,
+            'pure_silica_glass_kg': silica_product_kg,
             'industrial_mixed_glass_kg': mixed_melt_residual_kg,
         },
         'industrial_mixed_glass': {

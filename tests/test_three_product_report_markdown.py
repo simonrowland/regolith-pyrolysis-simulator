@@ -57,13 +57,11 @@ def _empty_classification() -> dict:
 # 1. Empty classification produces a complete report shape
 # ---------------------------------------------------------------------------
 
-def test_empty_classification_renders_all_four_class_headers():
-    """The 4 north-star product class headers MUST appear in every
-    report, even when all values are zero (so the operator sees the
-    class is empty, not missing)."""
+def test_empty_classification_marks_silica_capture_as_not_a_product():
     report = format_three_product_markdown(_empty_classification())
     assert "Metals + O₂" in report
-    assert "Pure silica glass" in report
+    assert "## 2. Pure silica glass" not in report
+    assert "Stage 3 silica capture (not a product)" in report
     assert "Industrial mixed glass" in report
     assert "Refractory ceramic rump" in report
 
@@ -119,6 +117,19 @@ def test_silica_glass_class_shows_stage_3_capture():
     assert "Stage 3 capture" in report
     assert "**SiO**" in report
     assert "**SiO2**" in report
+
+
+def test_unqualified_silica_preserves_measured_capture_without_product_claim():
+    classification = _empty_classification()
+    classification['pure_silica_glass'].update({
+        'stage_3_capture_kg': 1.4420316327429284e-08,
+        'stage_3_kg_by_species': {'SiO2': 1.4420316327429284e-08},
+    })
+    report = format_three_product_markdown(classification)
+    assert 'Silica glass: — kg' in report
+    assert '## 2. Pure silica glass' not in report
+    assert 'Stage 3 capture: 1.442e-08 kg' in report
+    assert 'authoritative SiO evidence for every capture' in report
 
 
 def test_rump_class_shows_per_species_breakdown():

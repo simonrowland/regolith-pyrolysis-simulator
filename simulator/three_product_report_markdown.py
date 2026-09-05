@@ -123,6 +123,8 @@ def format_three_product_markdown(
     for bucket_key, header in _CLASS_DISPLAY_ORDER:
         bucket = dict(classification.get(bucket_key, {}) or {})
         class_total_kg = float(bucket.get('class_total_kg', 0.0))
+        if bucket_key == 'pure_silica_glass' and class_total_kg <= 0.0:
+            header = '2. Stage 3 silica capture (not a product)'
         lines.append(f"## {header}")
         lines.append(f"**Class total**: {_format_kg(class_total_kg)} kg")
         lines.append("")
@@ -143,6 +145,13 @@ def format_three_product_markdown(
             lines.append(_kg_by_species_block(metals_kg))
         elif bucket_key == 'pure_silica_glass':
             stage_3 = bucket.get('stage_3_kg_by_species', {}) or {}
+            if class_total_kg <= 0.0:
+                lines.append(
+                    'Pure silica glass is not established. Qualification requires '
+                    'positive capture following a recorded pO₂ hold → pN₂ SiO-release '
+                    'switch, with authoritative SiO evidence for every capture.'
+                )
+                lines.append('')
             lines.append(
                 f"- Stage 3 capture: "
                 f"{_format_kg(float(bucket.get('stage_3_capture_kg', 0.0)))} kg"
