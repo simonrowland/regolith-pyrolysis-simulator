@@ -1,0 +1,183 @@
+.sec-p2-taps .sec-p2-flags,
+.sec-p2-taps .sec-p2-grade,
+.sec-p2-taps .sec-p2-contaminants,
+.sec-p2-taps .sec-p2-species-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.sec-p2-taps .sec-p2-flags { margin: 0 0 12px; }
+
+.sec-p2-taps .sec-p2-chip {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  white-space: normal;
+}
+
+.sec-p2-taps .sec-p2-warning {
+  border-color: var(--orange);
+  background: var(--amber-soft);
+  color: var(--warning-ink);
+}
+
+.sec-p2-taps .sec-p2-state {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.sec-p2-taps .sec-p2-state > div {
+  padding: 11px 13px;
+  border-left: 2px solid var(--blue);
+  background: var(--blue-soft);
+}
+
+.sec-p2-taps .sec-p2-state span {
+  display: block;
+  color: var(--ink-3);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p2-taps .sec-p2-state b {
+  display: block;
+  margin-top: 5px;
+  font: 700 14px/1.3 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p2-taps .sec-p2-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sec-p2-taps .sec-p2-card { min-width: 0; }
+
+.sec-p2-taps .sec-p2-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sec-p2-taps .sec-p2-card-head > div { min-width: 0; }
+
+.sec-p2-taps .sec-p2-card-head .sec-p2-chip {
+  flex: 0 1 230px;
+  font-size: 9px;
+}
+
+.sec-p2-taps .sec-p2-intent {
+  margin: 5px 0 12px;
+  color: var(--ink-3);
+  font-size: 11px;
+}
+
+.sec-p2-taps .sec-p2-species,
+.sec-p2-taps .sec-p2-contaminant {
+  display: inline-flex;
+  gap: 5px;
+  align-items: baseline;
+  padding: 6px 8px;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--species-color);
+  background: color-mix(in srgb, var(--species-color) 7%, var(--panel));
+  font: 11px/1.25 "SFMono-Regular", Consolas, monospace;
+}
+
+.sec-p2-taps .sec-p2-contaminants {
+  min-height: 29px;
+  margin: 10px 0 12px;
+  align-items: center;
+}
+
+.sec-p2-taps .sec-p2-contaminant {
+  border-color: color-mix(in srgb, var(--species-color) 55%, var(--rule));
+  font-weight: 700;
+}
+
+.sec-p2-taps .sec-p2-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--rule);
+  font-size: 12px;
+}
+
+.sec-p2-taps .sec-p2-kv span:first-child { color: var(--ink-3); }
+.sec-p2-taps .sec-p2-kv b { text-align: right; overflow-wrap: anywhere; }
+
+.sec-p2-taps .sec-p2-details,
+.sec-p2-taps .sec-p2-interface { margin-top: 14px; }
+
+.sec-p2-taps .sec-p2-details summary,
+.sec-p2-taps .sec-p2-interface summary {
+  cursor: pointer;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.sec-p2-taps .sec-p2-details h3 {
+  margin: 16px 0 7px;
+  color: var(--ink-3);
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sec-p2-taps .sec-p2-provenance {
+  display: grid;
+  gap: 4px;
+  margin-top: 7px;
+  padding: 9px;
+  border-left: 3px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.sec-p2-taps .sec-p2-provenance b {
+  border-left: 4px solid var(--species-color);
+  padding-left: 6px;
+  color: var(--ink);
+}
+
+.sec-p2-taps .sec-p2-inline-pending {
+  width: 100%;
+  padding: 10px 12px;
+  box-shadow: none;
+}
+
+.sec-p2-taps .sec-p2-panel-pending { margin-bottom: 12px; }
+
+.sec-p2-taps .sec-p2-interface {
+  padding: 14px 15px;
+}
+
+.sec-p2-taps .sec-p2-interface-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+@media (max-width: 768px) {
+  .sec-p2-taps .sec-p2-grid,
+  .sec-p2-taps .sec-p2-state,
+  .sec-p2-taps .sec-p2-interface-grid { grid-template-columns: 1fr; }
+
+  .sec-p2-taps .sec-p2-card-head { flex-direction: column; }
+  .sec-p2-taps .sec-p2-card-head .sec-p2-chip { flex-basis: auto; }
+}
+
+@media print {
+  .sec-p2-taps .sec-p2-card,
+  .sec-p2-taps .sec-p2-interface { break-inside: avoid; }
+}
