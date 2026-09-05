@@ -596,6 +596,40 @@ function provenanceSection(artifact) {
   return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
 }
 
+function panelRegistry() {
+  return Array.isArray(globalThis.ReportPanels) ? globalThis.ReportPanels : [];
+}
+
+function panelSectionsHtml(artifact, rows, spans, energy) {
+  return panelRegistry().map((panel, index) => {
+    // Read the id BEFORE the try: a null entry made the catch block itself
+    // throw on `panel.id`, which escaped containment and replaced the whole
+    // report with the fatal panel. One bad entry costs its own section, never
+    // the report.
+    const id = panel && typeof panel === "object" && typeof panel.id === "string" && panel.id.trim()
+      ? panel.id.trim()
+      : `panel-${index}`;
+    const failed = (message) => `<section class="card" id="${esc(id)}"><h2>${esc(id)}</h2>` +
+      `<div class="pending"><strong>Panel failed to render</strong><p class="mono">${esc(message)}</p></div></section>`;
+    if (!panel || typeof panel !== "object" || typeof panel.render !== "function") {
+      return failed("panel did not provide a render() function");
+    }
+    let html;
+    try {
+      html = panel.render(artifact, rows, spans, energy);
+    } catch (error) {
+      return failed(error && error.message ? error.message : String(error));
+    }
+    // A non-string return is coerced by join(): an object splices
+    // "[object Object]" between sections. Absent output is a panel opting out.
+    if (html === undefined || html === null) return "";
+    if (typeof html !== "string") {
+      return failed(`panel render() returned ${Array.isArray(html) ? "an array" : typeof html}, not HTML`);
+    }
+    return html;
+  }).join("");
+}
+
 function renderCurrent(artifact, index) {
   const timestep = artifact.timesteps[index];
   const row = timestep.summary;
@@ -611,6 +645,17 @@ function renderCurrent(artifact, index) {
   ].map(([key, value]) => `<div class="current"><div class="k">${esc(key)}</div><div class="v">${esc(value)}</div></div>`).join("");
   $("#timestep-ledger").innerHTML = renderTimestepLedger(timestep);
   updateMarkers(index, artifact.timesteps.length);
+  panelRegistry().forEach((panel, panelIndex) => {
+    // Guard the entry itself: a null registry entry threw here, outside the
+    // try, and took the whole render down on every scrub.
+    if (!panel || typeof panel !== "object" || typeof panel.onTimestep !== "function") return;
+    try {
+      panel.onTimestep(artifact, index);
+    } catch (error) {
+      const id = typeof panel.id === "string" && panel.id.trim() ? panel.id.trim() : `panel-${panelIndex}`;
+      console.error(`panel ${id} onTimestep failed:`, error);
+    }
+  });
 }
 
 function render(artifact) {
@@ -658,6 +703,7 @@ function render(artifact) {
     ledgerSection(artifact.terminal.final_state) +
     tapsAndPuritySection(artifact.terminal) + wallAndOxygenSection(artifact, rows) +
     vapourRailSection(artifact.terminal) + ceramicSection(artifact.terminal) +
+    panelSectionsHtml(artifact, rows, spans, energy) +
     costSection(artifact, energy) + provenanceSection(artifact) +
     `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><a href="./settings.html${RUN_QUERY}">Captured settings</a><span class="mono">${esc(artifact.header.run_id)}</span></footer>`;
   if (rows.length) {

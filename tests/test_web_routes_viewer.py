@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 import subprocess
 
@@ -321,3 +322,229 @@ def test_run_manifest_without_recipe_snapshot_returns_typed_error(tmp_path: Path
         "error": "artifact carries no recipe snapshot; export unavailable",
         "error_type": "run_manifest_unavailable",
     }
+
+
+def _render_report_state_with_panels(artifact: dict | Path, panels_js: str = "") -> dict:
+    """Render the report with panel modules registered on globalThis.ReportPanels."""
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const artifactArg = process.argv[4];
+const artifact = JSON.parse(artifactArg.startsWith("{") ? artifactArg : fs.readFileSync(artifactArg, "utf8"));
+const calls = { render: [], scrub: [], errors: [] };
+const nodes = new Map();
+function el(id) {
+  if (!nodes.has(id)) {
+    nodes.set(id, {
+      id, textContent: "", value: "", disabled: false, events: {}, markup: "",
+      set innerHTML(value) {
+        this.markup = value;
+        for (const match of value.matchAll(/\bid="([^"]+)"/g)) el(match[1]);
+      },
+      get innerHTML() { return this.markup; },
+      attributes: {},
+      setAttribute(name, value) { this.attributes[name] = String(value); },
+      getAttribute(name) { return this.attributes[name] ?? null; },
+      addEventListener(type, callback) { this.events[type] = callback; }, focus() {},
+      insertBefore(element, reference) {
+        element.parentElement = this;
+        element.nextElementSibling = reference;
+        reference.previousElementSibling = element;
+      },
+      classList: { add() {}, remove() {}, toggle() {} }
+    });
+  }
+  return nodes.get(id);
+}
+const report = el("report");
+const context = {
+  window: { location: { search: "" } },
+  document: {
+    title: "",
+    querySelector(selector) {
+      if (selector === "#report") return report;
+      if (selector.startsWith("#")) return nodes.get(selector.slice(1)) || null;
+      if (selector === ".stepper" && nodes.has("stepper")) {
+        const stepper = el("stepper-root");
+        el("current-grid").parentElement = stepper;
+        return stepper;
+      }
+      if (selector === ".status-pill" && nodes.has("stepper")) return el("status-pill");
+      return null;
+    },
+    getElementById(id) { return nodes.get(id) || null; },
+    querySelectorAll() { return []; }
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  setTimeout,
+  console: { error(...args) { calls.errors.push(args.map(String).join(" ")); }, warn() {}, log() {} },
+  fetch: async () => ({ ok: true, json: async () => artifact })
+};
+context.globalThis = context;
+vm.runInNewContext(labelsSource, context);
+const root = require("path").dirname(process.argv[2]);
+const index = fs.readFileSync(require("path").join(root, "index.html"), "utf8");
+const scripts = [...index.matchAll(/<script src="\.\/([^"]+)" defer><\/script>/g)].map((match) => match[1]);
+for (const script of scripts.filter((name) => name.startsWith("panels/"))) {
+  vm.runInNewContext(fs.readFileSync(require("path").join(root, script), "utf8"), context);
+}
+vm.runInNewContext(process.argv[5], context);
+for (const panel of context.ReportPanels || []) {
+  if (!panel || typeof panel !== "object") continue;
+  if (typeof panel.render === "function") {
+    const original = panel.render;
+    panel.render = (...args) => {
+      calls.render.push({ id: panel.id, summaries: args[1].every((row, i) => row === artifact.timesteps[i].summary) });
+      return original(...args);
+    };
+  }
+  if (typeof panel.onTimestep === "function") {
+    const original = panel.onTimestep;
+    panel.onTimestep = (...args) => { calls.scrub.push([panel.id, args[1]]); return original(...args); };
+  }
+}
+vm.runInNewContext(reportSource, context);
+setImmediate(() => {
+  const snapshots = [];
+  const snapshot = () => snapshots.push(Object.fromEntries([...nodes].map(([id, node]) => [id, node.innerHTML || node.textContent])));
+  snapshot();
+  if (nodes.has("stepper")) {
+    for (const index of [artifact.timesteps.length - 1, 0]) {
+      const slider = el("stepper");
+      slider.value = String(index);
+      slider.events.input();
+      snapshot();
+    }
+  }
+  const p13 = nodes.get("sec-p13-status-strip");
+  process.stdout.write(JSON.stringify({
+    html: report.innerHTML, calls, scripts, snapshots,
+    pinned: !!p13 && p13.parentElement === nodes.get("stepper-root") && p13.nextElementSibling === nodes.get("current-grid")
+  }));
+});
+"""
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / "report-viewer.js"),
+         str(artifact) if isinstance(artifact, Path) else json.dumps(artifact), panels_js],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return json.loads(completed.stdout)
+
+
+def _render_report_html_with_panels(artifact: dict, panels_js: str) -> str:
+    return _render_report_state_with_panels(artifact, panels_js)["html"]
+
+
+_PORTED_PANELS: list[str] = []
+
+
+@pytest.mark.parametrize("sample", ["populated", "zero", "partial"])
+def test_registered_modules_render_and_scrub_in_target_shell(sample: str) -> None:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    artifact = root / "sample-run-artifact.json" if sample == "populated" else _panel_artifact()
+    if sample == "partial":
+        artifact["timesteps"] = [
+            {"hour": 0, "summary": {"campaign": "<script>hostile</script>"}},
+            {"hour": 7, "summary": {"campaign": "C5", "T_C": 1500}},
+        ]
+    state = _render_report_state_with_panels(artifact)
+    ids = [f"sec-{name}" for name in _PORTED_PANELS]
+    assert state["scripts"] == ["labels.js", *[f"panels/{name}.js" for name in _PORTED_PANELS], "report-viewer.js"]
+    styles = re.findall(r'<link rel="stylesheet" href="\./([^"]+)">', (root / "index.html").read_text())
+    assert styles == ["report-viewer.css", *[f"panels/{name}.css" for name in _PORTED_PANELS]]
+    assert [call["id"] for call in state["calls"]["render"]] == ids
+    assert all(call["summaries"] for call in state["calls"]["render"])
+    assert not state["calls"]["errors"]
+    assert "Could not read the frozen artifact" not in state["html"]
+    assert "Panel failed to render" not in state["html"]
+    for panel_id in ids:
+        assert state["html"].count(f'id="{panel_id}"') == 1
+    scrub_targets = {
+        "p1-fe-redox": "sec-p1-selected-timestep-body",
+        "p3-wall-coating": "sec-p3-wall-coating-hourly",
+        "p13-status-strip": "p13-status-strip-live",
+        "p15-equipment-diagram": "p15-equipment-state",
+    }
+    if sample == "zero":
+        assert state["calls"]["scrub"] == []
+        assert "stepper" not in state["snapshots"][0]
+        for panel_id in ids:
+            section = state["html"].split(f'id="{panel_id}"', 1)[1].split("</section>", 1)[0]
+            assert re.search(r"pending|not emitted|unavailable|no timestep", section, re.I)
+    else:
+        source = json.loads(artifact.read_text()) if isinstance(artifact, Path) else artifact
+        last = len(source["timesteps"]) - 1
+        consumers = [name for name in _PORTED_PANELS if name in scrub_targets]
+        assert state["calls"]["scrub"] == [[f"sec-{name}", index] for index in [0, last, 0] for name in consumers]
+        assert state["snapshots"][1]["step-output"].startswith(f'Hour {source["timesteps"][last]["hour"]} ·')
+        for name in consumers:
+            target = scrub_targets[name]
+            assert state["snapshots"][0][target]
+            assert state["snapshots"][0][target] != state["snapshots"][1][target]
+            assert state["snapshots"][0][target] == state["snapshots"][2][target]
+        if "p13-status-strip" in _PORTED_PANELS:
+            assert state["pinned"]
+    assert "<script>hostile</script>" not in state["html"]
+
+
+def test_registry_dispatch_contains_throwing_render_and_scrub() -> None:
+    artifact = _panel_artifact()
+    artifact["timesteps"] = [{"hour": 0, "summary": {}}, {"hour": 8, "summary": {}}]
+    state = _render_report_state_with_panels(artifact, """
+globalThis.ReportPanels = [null,
+  {id: '<bad>', render() { throw new Error('<failure>'); }, onTimestep() { throw new Error('scrub failed'); }},
+  {id: 'good', render() { return '<section id="good">still rendered</section>'; },
+    onTimestep(artifact, index) { document.getElementById('good').innerHTML = String(index); }}];
+""")
+    assert 'id="good"' in state["html"]
+    assert "&lt;failure&gt;" in state["html"]
+    assert "<bad>" not in state["html"]
+    assert [snapshot["good"] for snapshot in state["snapshots"]] == ["0", "1", "0"]
+    assert len(state["calls"]["errors"]) == 3
+
+
+def _panel_artifact() -> dict:
+    return {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "panel-registry"},
+        "timesteps": [],
+        "terminal": {"final_state": {}},
+    }
+
+
+@pytest.mark.parametrize(
+    "panels_js,expect_notice",
+    [
+        ("globalThis.ReportPanels = [null];", True),
+        ("globalThis.ReportPanels = [{ id: 'p', render() { return { html: 'x' }; } }];", True),
+        ("globalThis.ReportPanels = [{ id: 'p', render() { return 42; } }];", True),
+        ("globalThis.ReportPanels = [{ id: 'p' }];", True),
+        ("globalThis.ReportPanels = [{ id: 'p', render() { return undefined; } }];", False),
+    ],
+)
+def test_panel_registry_contains_bad_panels(panels_js: str, expect_notice: bool) -> None:
+    """A misbehaving panel costs its own section, never the whole report.
+
+    A null entry previously made the catch block itself throw on `panel.id`,
+    which escaped containment and replaced the entire report with the fatal
+    panel; a non-string return was coerced by join() into "[object Object]".
+    """
+    html = _render_report_html_with_panels(_panel_artifact(), panels_js)
+
+    assert "[object Object]" not in html
+    # The report itself still rendered.
+    assert "Evolved metal mass" in html or "Full terminal ledger" in html
+    assert "Could not read the frozen artifact" not in html
+    if expect_notice:
+        assert "Panel failed to render" in html
+    else:
+        assert "Panel failed to render" not in html
