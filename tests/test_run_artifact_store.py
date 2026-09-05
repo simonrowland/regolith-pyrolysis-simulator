@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -1315,6 +1316,35 @@ def test_get_run_artifact_transport_errors_return_json_error_body(tmp_path) -> N
 
     invalid = client.get("/api/runs/not.ok")
     _assert_read_plane_transport_error(invalid, 400)
+
+
+def test_get_run_artifact_is_byte_identical_read_only(tmp_path) -> None:
+    runs_dir = tmp_path / "runs"
+    app = Flask(__name__)
+    app.config.update(
+        TESTING=True,
+        SECRET_KEY="run-artifact-read-only-test",
+        RUN_ARTIFACT_DIR=str(runs_dir),
+    )
+    app.register_blueprint(web_routes.bp)
+    with app.app_context():
+        persist_run_artifact(_runner_payload(), "run-1", name="Lunar run")
+    stored_path = runs_dir / "run-1.json"
+    before = stored_path.read_bytes()
+    before_digest = hashlib.sha256(before).digest()
+    client = app.test_client()
+
+    response = client.get("/api/runs/run-1")
+    assert response.status_code == 200
+    after_get = stored_path.read_bytes()
+    assert after_get == before
+    assert hashlib.sha256(after_get).digest() == before_digest
+
+    for method in ("post", "put", "patch", "delete"):
+        assert getattr(client, method)("/api/runs/run-1").status_code == 405
+    after_disallowed = stored_path.read_bytes()
+    assert after_disallowed == before
+    assert hashlib.sha256(after_disallowed).digest() == before_digest
 
 
 def test_run_meta_route_round_trip_validation_and_404(tmp_path) -> None:
