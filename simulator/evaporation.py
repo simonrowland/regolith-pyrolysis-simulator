@@ -1129,7 +1129,8 @@ class EvaporationMixin:
         # flux_kg_hr={} — silent zero evaporation, not a load-bearing refuse.
         if str(kernel_result.status) != 'ok':
             reason = str(diagnostic.get('reason') or '').strip()
-            if 'missing_alpha' in diagnostic:
+            # A primary refusal wins; secondary records remain diagnostic context.
+            if 'missing_alpha' in diagnostic and not reason:
                 missing = ', '.join(sorted(diagnostic['missing_alpha']))
                 reason = (
                     "missing evaporation_alpha for sampled species: "

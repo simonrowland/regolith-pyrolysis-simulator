@@ -17,6 +17,7 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.core import PoisonedHourError
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fe_redox import kress91_ln_fO2_temperature_delta
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.state import CampaignPhase, EvaporationFlux
@@ -460,11 +461,38 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
     assert flux.species_kg_hr['Na'] == pytest.approx(7.5)
 
 
-def test_evaporation_missing_transport_data_raises_typed_refusal(
+@pytest.mark.parametrize(
+    ('diagnostic', 'expected_reason'),
+    [
+        pytest.param(
+            {'missing_transport_parameters': {'SiO': {}}},
+            'missing Chapman-Enskog transport parameters for sampled species: SiO',
+            id='missing-transport-alone',
+        ),
+        pytest.param(
+            {'missing_alpha': {'CrO2': {}, 'CrO': {}}},
+            'missing evaporation_alpha for sampled species: CrO, CrO2; set '
+            'chemistry_kernel.allow_unmeasured_alpha_fallback '
+            'for alpha=1.0 prototype fallback',
+            id='missing-alpha-alone',
+        ),
+        pytest.param(
+            {
+                'reason': 'viscous_p_bulk_transport_out_of_domain',
+                'missing_transport_parameters': {'SiO': {}},
+            },
+            'viscous_p_bulk_transport_out_of_domain',
+            id='primary-reason-with-missing-transport',
+        ),
+    ],
+)
+def test_evaporation_missing_data_raises_typed_refusal(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    diagnostic,
+    expected_reason,
 ):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data, feedstocks_data, setpoints_data, enabled=False,
@@ -477,7 +505,7 @@ def test_evaporation_missing_transport_data_raises_typed_refusal(
                 status='unavailable',
                 diagnostic={
                     'evaporation_flux_kg_hr': {},
-                    'missing_transport_parameters': {'SiO': {}},
+                    **diagnostic,
                 },
             )
         if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
@@ -486,11 +514,14 @@ def test_evaporation_missing_transport_data_raises_typed_refusal(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
-    with pytest.raises(
-        ProviderUnavailableError,
-        match='missing Chapman-Enskog transport parameters.*SiO',
-    ):
+    with pytest.raises(EvaporationFluxRefusal) as exc:
         sim._calculate_evaporation(_equilibrium())
+
+    assert exc.value.reason == expected_reason
+    assert str(exc.value) == expected_reason
+    for key, value in diagnostic.items():
+        assert exc.value.diagnostic[key] == value
+        assert sim._last_evaporation_flux_diagnostic[key] == value
 
 
 def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(

@@ -1488,6 +1488,62 @@ def test_prepass_records_missing_alpha_on_transitional_domain_refusal():
     )
 
 
+@pytest.mark.xdist_group("serial")
+def test_evaporation_caller_preserves_domain_reason_with_missing_alpha(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    result = _w3_result_with_controls(
+        1.0,
+        alpha={},
+        vapour_batch_flux_pressures_Pa={"CrO": 100.0, "CrO2": 100.0},
+        molar_mass_kg_mol={"CrO": 0.068, "CrO2": 0.084},
+        stoich_by_species={
+            species: {"parent_oxide": "Cr2O3", "oxide_per_product_kg": ratio}
+            for species, ratio in (("CrO", 76.0 / 68.0), ("CrO2", 76.0 / 84.0))
+        },
+        available_oxide_kg={"CrO": 1.0, "CrO2": 1.0},
+        overhead_pressure_pa=3.632,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=2023.15,
+    )
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert result.diagnostic["evaporation_flux_status"] == "not_evaluated"
+    assert set(result.diagnostic["missing_alpha"]) == {"CrO", "CrO2"}
+    assert any("CrO, CrO2" in warning for warning in result.warnings)
+
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    sim.melt.temperature_C = 1500.0
+    original_dispatch = sim._dispatch_only
+
+    def dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return result
+        return original_dispatch(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, "_dispatch_only", dispatch)
+    equilibrium = SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 1.0},
+        vapor_pressures_source={},
+        activity_coefficients={},
+        diagnostics={},
+        liquid_fraction=1.0,
+    )
+    with pytest.raises(EvaporationFluxRefusal) as exc:
+        sim._calculate_evaporation(equilibrium)
+
+    assert exc.value.reason == "viscous_p_bulk_transport_out_of_domain"
+    assert str(exc.value) == exc.value.reason
+    for key in ("missing_alpha", "species_refusals"):
+        assert exc.value.diagnostic[key] == result.diagnostic[key]
+        assert sim._last_evaporation_flux_diagnostic[key] == result.diagnostic[key]
+
+
 @pytest.mark.parametrize(
     ("control_overrides", "expected_flux_species"),
     (
