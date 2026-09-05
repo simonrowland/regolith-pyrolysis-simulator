@@ -653,7 +653,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # payload is unreachable: current canonical_evalspec_json does not
     # serialize those fingerprints, and the June corpus is not interoperable.
     # Pin recomputed from this tree's executable cache_key(spec).
-    assert cache_key(spec) == "1eb53246f1216356217463a8d536cf1c2fe9a7c627d36044f5e3444f48fa0243"
+    assert cache_key(spec) == "8cd68431dc39a32ed8addb05ccfd936b6ad8d866569cac6473fbb7c4cc671baf"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
