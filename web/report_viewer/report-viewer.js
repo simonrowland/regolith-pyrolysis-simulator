@@ -573,18 +573,25 @@ function provenanceSection(artifact) {
   const meta = artifact.terminal.run_metadata || {};
   const closure = artifact.terminal.mass_balance_closure || {};
   const confidence = artifact.terminal.confidence;
-  const confidenceGrade = typeof confidence?.grade === "string" && confidence.grade.trim()
+  const confidenceGrade = confidence && typeof confidence === "object" && !Array.isArray(confidence)
+    && typeof confidence.grade === "string" && confidence.grade.trim()
     ? confidence.grade.trim()
     : null;
-  const confidenceClass = ({ high: "pure", medium: "mixed", low: "contaminated" })[confidenceGrade?.toLowerCase()] || "unavailable";
-  const confidenceReasons = Array.isArray(confidence?.reasons) ? confidence.reasons : [];
-  const confidenceContent = confidence && typeof confidence === "object"
-    ? `<div class="note"><b>Confidence:</b> <span class="verdict ${confidenceClass}">${esc(confidenceGrade || "grade not emitted")}</span>` +
+  const confidenceReasons = confidence && typeof confidence === "object" && !Array.isArray(confidence)
+    && Array.isArray(confidence.reasons)
+    ? confidence.reasons.filter((reason) => typeof reason === "string" && reason.trim())
+    : [];
+  // Copy terminal.confidence as emitted text. Do not min()-fold other keys,
+  // do not map grade onto stage-purity CSS (pure/mixed/contaminated), and
+  // omit the banner when the key is absent.
+  const confidenceContent = confidenceGrade || confidenceReasons.length
+    ? `<div class="note" data-run-level-confidence="emitted"><b>Emitted run-level grade:</b>` +
+      (confidenceGrade ? ` <span class="mono">${esc(confidenceGrade)}</span>` : "") +
       (confidenceReasons.length
         ? `<ul>${confidenceReasons.map((reason) => `<li>${esc(reason)}</li>`).join("")}</ul>`
-        : `<p>Confidence reasons not emitted.</p>`) +
+        : "") +
       `</div>`
-    : pending("confidence", "Confidence not emitted (requires mass-balance evidence).");
+    : "";
   const hoursRequested = meta.hours_requested === undefined || meta.hours_requested === null ? "not emitted" : meta.hours_requested;
   const hoursCompleted = meta.hours_completed === undefined || meta.hours_completed === null ? "not emitted" : meta.hours_completed;
   const facts = [
@@ -595,7 +602,7 @@ function provenanceSection(artifact) {
     ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha ?? "not emitted"],
     ["Engine cache version", artifact.header.engine_identity?.cache_version ?? "not emitted"]
   ];
-  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
+  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact. Copied from the emitted key when present; no tier is computed here.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
 }
 
 function panelRegistry() {

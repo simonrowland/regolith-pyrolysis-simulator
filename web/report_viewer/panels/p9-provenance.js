@@ -410,7 +410,7 @@
 
     return `<section id="sec-p9-provenance" class="sec-p9-provenance" aria-labelledby="sec-p9-provenance-title">` +
       `<h2 id="sec-p9-provenance-title"><span class="sect">P9</span>Run &amp; engine provenance</h2>` +
-      `<p class="sub">Emitted run identity, backend state, evidence class, and configured engines. No confidence tier is computed in the viewer.</p>` +
+      `<p class="sub">Emitted run identity, backend state, evidence class, and configured engines. No confidence tier is computed in the viewer. Run-level grade rendering is deferred to the report provenance section.</p>` +
       `${artifactNotice}${metadataNotice}${identityNotice}<div class="sec-p9-badges">${badges}</div>` +
       degradationStateContext +
       `<details class="sec-p9-details"><summary>Full run, engine, and label provenance</summary>` +
