@@ -211,9 +211,16 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     )
 
     # ----- Class 1: metals + O2 -----
+    initial_inventory = getattr(getattr(sim, 'record', None), 'initial_inventory', None)
+    native_metals = getattr(initial_inventory, 'metal_alloy_kg', {}) or {}
+    cleanup_native_kg: dict[str, float] = {}
     metals_kg: dict[str, float] = {}
     for species in METAL_PRODUCT_SPECIES:
         kg = float(products.get(species, 0.0))
+        native_kg = min(max(kg, 0.0), max(float(native_metals.get(species, 0.0)), 0.0))
+        if native_kg > 0.0:
+            cleanup_native_kg[species] = native_kg
+        kg -= native_kg
         if kg > 0.0:
             metals_kg[species] = kg
     metals_total_kg = float(sum(metals_kg.values()))
@@ -288,13 +295,14 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     # ----- Unclassified bin -----
     classified_species: set[str] = (
         set(metals_kg.keys())
+        | set(cleanup_native_kg.keys())
         | {'O2'}
         | set(stage_3_kg_by_species.keys())
         | set(captured_volatiles_kg_by_species.keys())
         | set(spent_reductant_kg_by_species.keys())
         | set(rump_kg_by_species.keys())
     )
-    unclassified: dict[str, float] = {}
+    unclassified: dict[str, float] = dict(cleanup_native_kg)
     for species, kg in products.items():
         if species in classified_species:
             continue

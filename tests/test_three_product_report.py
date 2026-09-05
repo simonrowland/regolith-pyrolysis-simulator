@@ -132,6 +132,34 @@ def test_metals_total_excludes_o2():
 # 3. Pure silica glass: Stage 3 capture
 # ---------------------------------------------------------------------------
 
+def test_native_cleanup_is_inventory_but_extracted_same_species_remains_product():
+    native_metals = {'Fe': 2.0, 'Ni': 3.0}
+    sim = SimpleNamespace(
+        product_ledger=lambda: {'Fe': 5.0, 'Ni': 3.0, 'Co': 0.5},
+        record=SimpleNamespace(
+            initial_inventory=SimpleNamespace(metal_alloy_kg=native_metals),
+        ),
+    )
+
+    result = classify_products(sim)
+
+    assert result['metals_plus_O2']['metals_kg'] == {'Fe': 3.0, 'Co': 0.5}
+    assert result['ingots_metals']['class_total_kg'] == 3.5
+    assert result['unclassified']['kg_by_species'] == native_metals
+    assert result['unclassified']['total_kg'] == 5.0
+    assert result['ingots_metals']['class_total_kg'] + result['unclassified']['total_kg'] == 8.5
+
+
+def test_c0_native_cleanup_does_not_produce_ingots_before_any_step():
+    sim = SimSession().start(_config(campaign='C0')).simulator
+    result = classify_products(sim)
+
+    assert sim.record.initial_inventory.metal_alloy_kg['Ni'] > 0.0
+    assert sim.record.initial_inventory.metal_alloy_kg['Co'] > 0.0
+    assert result['ingots_metals']['class_total_kg'] == 0.0
+    for species, kg in sim.record.initial_inventory.metal_alloy_kg.items():
+        assert result['unclassified']['kg_by_species'][species] == pytest.approx(kg)
+
 def test_silica_glass_reads_stage_3_collected_kg():
     """The Stage 3 fused-silica baffles surface is
     ``train.stages[3].collected_kg``. The classifier sums SiO + SiO2

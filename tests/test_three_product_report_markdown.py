@@ -178,6 +178,7 @@ def test_unclassified_section_appears_when_present():
     report = format_three_product_markdown(classification)
     assert "Unclassified species" in report
     assert "mapping gap" in report.lower()
+    assert "Stage 0 native-metal cleanup inventory" in report
     assert "**NewExoticHalide**" in report
 
 

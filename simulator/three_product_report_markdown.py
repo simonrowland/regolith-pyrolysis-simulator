@@ -199,13 +199,12 @@ def format_three_product_markdown(
     unclassified = classification.get('unclassified', {}) or {}
     unclassified_total = float(unclassified.get('total_kg', 0.0))
     if unclassified_total > 0.0:
-        lines.append("## ⚠️ Unclassified species (mapping gap)")
+        lines.append("## ⚠️ Unclassified species (non-product inventory / mapping gap)")
         lines.append(
             f"**Total**: {_format_kg(unclassified_total)} kg — "
-            "these species were in `product_ledger()` but did not "
-            "map to any of the four north-star product classes. "
-            "The mapping in `simulator/three_product_report.py` "
-            "may need to be extended."
+            "these amounts are not assigned to a north-star product class. "
+            "They may include Stage 0 native-metal cleanup inventory and "
+            "material without a product classification."
         )
         lines.append("")
         lines.append(_kg_by_species_block(
