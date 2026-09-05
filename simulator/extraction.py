@@ -1983,6 +1983,9 @@ class ExtractionMixin:
                 else MREElectrolysisRefusal
             )
             raise refusal_type(reason, refusal_record)
+        energy_kWh = result.get('energy_kWh')
+        if energy_kWh is None:
+            raise RuntimeError('ELECTROLYSIS_STEP missing computed energy_kWh')
         transition = None
         if proposal is not None:
             transition = self._commit_proposal(
@@ -2097,7 +2100,7 @@ class ExtractionMixin:
         self._sync_oxygen_kg_counters()
 
         # Store energy for EnergyTracker (don't add to cumulative).    [Step 6]
-        self._mre_energy_this_hr = result.get('energy_kWh', 0.0)
+        self._mre_energy_this_hr = energy_kWh
 
         # Store voltage/current for snapshot                            [Step 7]
         self._mre_voltage_V = voltage_V

@@ -10,6 +10,7 @@ from simulator.chemistry.kernel import (
     IntentResult,
     LedgerTransitionProposal,
 )
+from simulator.accounting.ledger import LedgerTransition
 from simulator.cost_energy import (
     ELECTRICAL_USD_PER_KWH,
     FURNACE_USD_PER_H,
@@ -30,6 +31,58 @@ MASS_BALANCE_HARD_GATE_PCT = 5.0e-12
 
 def _cost(summary: dict, key: str) -> CostVector:
     return CostVector(**summary["product_costs"][key]["accumulated_cost"])
+
+
+@pytest.mark.parametrize("diagnostic", [
+    {"reason_refused": "uncertified_multi_oxide_current_partition"},
+    {"reason_refused": "uncertified_multi_oxide_current_partition", "energy_kWh": 0.0},
+    {},
+    {"energy_kWh": None},
+])
+def test_unavailable_electrolysis_energy_skips_cost_allocation(diagnostic):
+    ledger = CostLedger()
+    ledger.seed_external_material(
+        account="process.metal_phase", species="Fe", quantity_kg=1.0,
+        cost=CostVector(electrical_kWh=3.0),
+    )
+    before = ledger.summary()
+    result = ledger.observe_transition(
+        intent=ChemistryIntent.ELECTROLYSIS_STEP,
+        transition=LedgerTransition.move(
+            "mre", "process.metal_phase", "terminal.product", {"Fe": 1.0}
+        ),
+        diagnostic=diagnostic,
+    )
+    after = ledger.summary()
+    assert result is None
+    assert after["transition_count"] == before["transition_count"]
+    assert after["active_inventory_costs"] == before["active_inventory_costs"]
+    assert after["product_costs"] == before["product_costs"]
+    reason = diagnostic.get("reason_refused") or "missing_energy_kWh"
+    assert any(reason in warning for warning in after["warnings"])
+
+
+@pytest.mark.parametrize(("intent", "diagnostic", "energy"), [
+    (ChemistryIntent.ELECTROLYSIS_STEP, {"energy_kWh": 0.0}, 0.0),
+    (ChemistryIntent.ELECTROLYSIS_STEP, {"energy_kWh": 1.25}, 1.25),
+    (ChemistryIntent.CA_ALUMINOTHERMIC_STEP, {}, 0.0),
+])
+def test_computed_energy_and_non_electrical_cost_controls(intent, diagnostic, energy):
+    ledger = CostLedger()
+    ledger.seed_external_material(
+        account="process.metal_phase", species="Fe", quantity_kg=1.0,
+        cost=CostVector(electrical_kWh=3.0),
+    )
+    result = ledger.observe_transition(
+        intent=intent,
+        transition=LedgerTransition.move(
+            "mre", "process.metal_phase", "terminal.product", {"Fe": 1.0}
+        ),
+        diagnostic=diagnostic,
+    )
+    assert result is not None
+    assert result.processing_cost_added.electrical_kWh == pytest.approx(energy)
+    assert ledger.summary()["warnings"] == []
 
 
 def test_cost_ledger_mass_allocates_normal_coproducts_by_product_mass():

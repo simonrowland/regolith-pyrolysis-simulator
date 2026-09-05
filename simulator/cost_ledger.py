@@ -519,7 +519,23 @@ class CostLedger:
         diagnostic = dict(diagnostic or {})
         controls = dict(control_inputs or {})
         process_step = _process_step(intent, controls)
-        processing_cost = CostVector(electrical_kWh=max(0.0, _finite(diagnostic.get("energy_kWh"))))
+        energy_kWh = diagnostic.get("energy_kWh")
+        reason = diagnostic.get("reason_refused")
+        is_electrolysis = _process_step(intent, {}) == "ELECTROLYSIS_STEP"
+        if reason or (
+            energy_kWh is None
+            and (is_electrolysis or "energy_kWh" in diagnostic)
+        ):
+            self._warnings.append(
+                f"cost_observation_unavailable: {process_step}: "
+                f"{reason or 'missing_energy_kWh'}"
+            )
+            return None
+        # Non-electrical intents have no energy channel; only they use policy zero.
+        processing_cost = (
+            ZERO_COST if energy_kWh is None else
+            CostVector(electrical_kWh=max(0.0, _finite(energy_kWh)))
+        )
         input_lots: list[CostLot] = []
         saw_cost_bearing_debit = False
         for lot in transition.debits:

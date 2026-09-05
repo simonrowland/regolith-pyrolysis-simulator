@@ -1677,15 +1677,17 @@ def test_provider_matches_legacy_step_hour_pure_feo(
     diagnostic = dict(result.diagnostic)
 
     # Mol parity: provider matches legacy step_hour exactly.
-    legacy_ox = dict(legacy.get("oxides_reduced_mol", {}) or {})
-    provider_ox = dict(diagnostic.get("oxides_reduced_mol", {}) or {})
+    assert result.status == "ok", diagnostic
+    assert not legacy.get("reason_refused"), legacy
+    legacy_ox = dict(legacy["oxides_reduced_mol"])
+    provider_ox = dict(diagnostic["oxides_reduced_mol"])
     assert set(legacy_ox) == set(provider_ox)
     for species in legacy_ox:
         assert provider_ox[species] == pytest.approx(
             legacy_ox[species], abs=1e-12, rel=1e-12
         )
-    legacy_O2 = float(legacy.get("O2_produced_mol", 0.0))
-    provider_O2 = float(diagnostic.get("O2_produced_mol", 0.0))
+    legacy_O2 = float(legacy["O2_produced_mol"])
+    provider_O2 = float(diagnostic["O2_produced_mol"])
     assert provider_O2 == pytest.approx(legacy_O2, abs=1e-12, rel=1e-12)
 
     # Proposal shape: cleaned_melt debit + metal_phase credit + anode
@@ -1886,22 +1888,24 @@ def test_provider_matches_legacy_feo_partition_with_ferric_present(
     diagnostic = dict(result.diagnostic)
 
     assert "Fe2O3" not in MRE_FIXED_REDUCIBLE_OXIDES
+    assert result.status == "ok", diagnostic
+    assert not legacy.get("reason_refused"), legacy
     assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is True
-    assert "Fe2O3" in dict(diagnostic.get("oxides_reduced_mol", {}) or {})
-    assert "Fe2O3" in dict(legacy.get("oxides_reduced_mol", {}) or {})
+    assert "Fe2O3" in diagnostic["oxides_reduced_mol"]
+    assert "Fe2O3" in legacy["oxides_reduced_mol"]
     assert diagnostic["fe_redox_split"]["consumed_by_behavior"] is True
 
     for key in ("oxides_reduced_mol", "oxides_produced_mol", "metals_produced_mol"):
-        leg = dict(legacy.get(key, {}) or {})
-        prv = dict(diagnostic.get(key, {}) or {})
+        leg = dict(legacy[key])
+        prv = dict(diagnostic[key])
         assert set(leg) == set(prv), f"keyset mismatch for {key}"
         for sp_name in leg:
             assert prv[sp_name] == pytest.approx(
                 leg[sp_name], abs=1e-12, rel=1e-12
             ), f"species {sp_name!r} mol mismatch in {key}"
 
-    legacy_O2 = float(legacy.get("O2_produced_mol", 0.0))
-    provider_O2 = float(diagnostic.get("O2_produced_mol", 0.0))
+    legacy_O2 = float(legacy["O2_produced_mol"])
+    provider_O2 = float(diagnostic["O2_produced_mol"])
     assert provider_O2 == pytest.approx(legacy_O2, abs=1e-12, rel=1e-12)
 
 
