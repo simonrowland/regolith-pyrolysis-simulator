@@ -2064,6 +2064,8 @@ def test_cached_real_misconfig_over_socket_is_input_not_backend_unavailable(
         "a missing cached-real cache config is bad input, not an engine outage; got "
         f"{payload.get('error_type')!r}"
     )
+    assert "backend_status" not in payload
+    assert "backend_authoritative" not in payload
 
 
 def test_missing_stage0_reductant_is_input_error_not_backend_unavailable(
@@ -2190,6 +2192,8 @@ def test_socket_start_rejection_echoes_status_strip_lifecycle_generation(
     assert result is None
     assert emitted[-1][0] == "simulation_status"
     assert emitted[-1][1]["error_type"] == "backend_unavailable"
+    assert emitted[-1][1]["backend_status"] == "unavailable"
+    assert emitted[-1][1]["backend_authoritative"] is False
     assert emitted[-1][1]["lifecycle_generation"] == 9
 
 
