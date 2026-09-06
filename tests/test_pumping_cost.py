@@ -271,6 +271,13 @@ def test_perfect_vacuum_target_is_fail_soft_infeasible():
     # negative), which still return "invalid-target-pressure" and are pinned by
     # test_degenerate_pressure_inputs_fail_soft_infeasible. One label for both
     # meant the two could not be told apart downstream.
+    #
+    # b-449 r2: this is out-of-domain physics, not missing telemetry. The
+    # staged-adiabatic model has no finite continuation at P_target = 0, so
+    # energy stays unavailable with "no extrapolation available" and the
+    # characterised envelope attached -- not the missing-input helper.
+    from simulator.pumping_cost import NO_EXTRAPOLATION_AVAILABLE
+
     r = estimate_subambient_pump_cost(
         target_pressure_pa=0.0,
         offgas_mol_per_s=0.1,
@@ -279,10 +286,23 @@ def test_perfect_vacuum_target_is_fail_soft_infeasible():
     )
 
     assert r.regime == "unreachable-absolute-vacuum-target"
+    assert r.status == NO_EXTRAPOLATION_AVAILABLE
     assert r.energy_kWh is None
     assert r.feasible is False
     assert math.isinf(r.required_pump_speed_m3_s)
     assert math.isinf(r.compression_ratio)
+    assert r.notice is not None
+    assert r.notice["reason"] == NO_EXTRAPOLATION_AVAILABLE
+    assert r.notice["authority"] == "none"
+    envelope = r.notice["characterised_envelope"]
+    assert envelope["target_pressure_pa"] == 0.0
+    assert envelope["ambient_pressure_pa"] == pytest.approx(MARS_DATUM_AMBIENT_PA)
+    payload = r.to_json()
+    from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
+
+    assert is_unavailable_quantity(payload["energy_kWh"])
+    assert unavailable_reason_of(payload["energy_kWh"]) == NO_EXTRAPOLATION_AVAILABLE
+    assert payload["notice"]["characterised_envelope"]["max_pump_speed_m3_s"] > 0.0
 
 
 def test_zero_flow_with_zero_target_pressure_is_vent_free():
@@ -749,6 +769,10 @@ def test_absolute_vacuum_target_against_a_real_atmosphere_names_why_it_is_imposs
     assert cost.feasible is False
     assert cost.regime == "unreachable-absolute-vacuum-target"
     assert cost.energy_kWh is None
+    from simulator.pumping_cost import NO_EXTRAPOLATION_AVAILABLE
+
+    assert cost.status == NO_EXTRAPOLATION_AVAILABLE
+    assert cost.notice["reason"] == NO_EXTRAPOLATION_AVAILABLE
 
 
 def test_pumping_still_refuses_genuinely_unknown_and_impossible_pressures():
@@ -877,3 +901,113 @@ def test_missing_offgas_unavailable_mutation_fails_then_restores(monkeypatch) ->
     restored = pumping_mod.estimate_subambient_pump_cost(**kwargs)
     assert restored.energy_kWh is None
     _assert_unavailable_energy(restored.to_json()["energy_kWh"], "invalid-offgas-rate")
+
+
+def test_vacuum_target_is_out_of_domain_not_missing_telemetry() -> None:
+    from simulator.pumping_cost import NO_EXTRAPOLATION_AVAILABLE
+
+    missing = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=math.nan,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    vacuum = estimate_subambient_pump_cost(
+        target_pressure_pa=0.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    assert missing.status == "invalid-offgas-rate"
+    assert missing.notice is None
+    _assert_unavailable_energy(missing.to_json()["energy_kWh"], "invalid-offgas-rate")
+    assert vacuum.regime == "unreachable-absolute-vacuum-target"
+    assert vacuum.status == NO_EXTRAPOLATION_AVAILABLE
+    assert vacuum.energy_kWh is None
+    assert vacuum.energy_kWh != 0.0
+    assert vacuum.notice is not None
+    envelope = vacuum.notice["characterised_envelope"]
+    assert envelope["target_pressure_pa"] == 0.0
+    assert envelope["ambient_pressure_pa"] == pytest.approx(610.0)
+    assert envelope["max_pump_speed_m3_s"] == pytest.approx(50.0)
+    _assert_unavailable_energy(
+        vacuum.to_json()["energy_kWh"], NO_EXTRAPOLATION_AVAILABLE
+    )
+    _, diagnostic = run_pumping_input_cost(
+        {
+            "status": "ok",
+            "feedstock_id": "mars_basalt",
+            "body": "mars",
+            "ambient_pressure_pa": 610.0,
+            "rows": [
+                {
+                    "hour": 1,
+                    "target_pressure_pa": 0.0,
+                    "offgas_mol_per_s": 0.01,
+                    "duration_s": 3600.0,
+                    "gas_temperature_K": 300.0,
+                    "validated_line_conductance_m3_s": 1.0,
+                }
+            ],
+        }
+    )
+    assert diagnostic["status"] == "refused"
+    assert diagnostic["reason"] == NO_EXTRAPOLATION_AVAILABLE
+    _assert_unavailable_energy(
+        diagnostic["pumping_electrical_kWh"], NO_EXTRAPOLATION_AVAILABLE
+    )
+    assert diagnostic["rows"][0]["notice"]["reason"] == NO_EXTRAPOLATION_AVAILABLE
+
+
+def test_vacuum_out_of_domain_mutation_fails_then_restores(monkeypatch) -> None:
+    from simulator import pumping_cost as pumping_mod
+    from simulator.pumping_cost import NO_EXTRAPOLATION_AVAILABLE
+
+    original = pumping_mod._out_of_domain_vacuum_target
+
+    def mutated(**_kwargs):
+        return pumping_mod._infeasible_degenerate("unreachable-absolute-vacuum-target")
+
+    kwargs = dict(
+        target_pressure_pa=0.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+    )
+    monkeypatch.setattr(pumping_mod, "_out_of_domain_vacuum_target", mutated)
+    with pytest.raises(AssertionError):
+        result = pumping_mod.estimate_subambient_pump_cost(**kwargs)
+        assert result.status == NO_EXTRAPOLATION_AVAILABLE
+        assert result.notice is not None
+    monkeypatch.setattr(pumping_mod, "_out_of_domain_vacuum_target", original)
+    restored = pumping_mod.estimate_subambient_pump_cost(**kwargs)
+    assert restored.status == NO_EXTRAPOLATION_AVAILABLE
+    assert restored.energy_kWh is None
+    assert restored.notice["reason"] == NO_EXTRAPOLATION_AVAILABLE
+
+
+def test_vacuum_path_ignores_missing_input_helper_zeroing(monkeypatch) -> None:
+    from simulator import pumping_cost as pumping_mod
+    from simulator.pumping_cost import NO_EXTRAPOLATION_AVAILABLE, SubambientPumpCost
+
+    original = pumping_mod._infeasible_degenerate
+
+    def mutated(status: str) -> SubambientPumpCost:
+        return SubambientPumpCost(status, 0.0, 0.0, math.inf, math.inf, False, status=status)
+
+    monkeypatch.setattr(pumping_mod, "_infeasible_degenerate", mutated)
+    vacuum = pumping_mod.estimate_subambient_pump_cost(
+        target_pressure_pa=0.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+    )
+    monkeypatch.setattr(pumping_mod, "_infeasible_degenerate", original)
+    assert vacuum.energy_kWh is None
+    assert vacuum.status == NO_EXTRAPOLATION_AVAILABLE

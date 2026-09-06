@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import json
+import math
+from pathlib import Path
+
 import pytest
 
 from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
+from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import (
     PAYLOAD_ABSENT_COST_PROVENANCE,
     default_cost_parameters_block,
@@ -543,6 +548,111 @@ def test_cost_totals_mark_refused_pumping_unavailable_instead_of_omitting() -> N
     assert is_unavailable_quantity(totals["total_cost_usd"])
     assert totals["completeness"] == "incomplete"
     assert totals["process_electrical_energy_kWh"] == pytest.approx(2.0)
+
+
+_REFUSED_PUMPING_HOUR_FIXTURE = (
+    Path(__file__).resolve().parent
+    / "fixtures/cost/refused_pumping_hour_canonical_totals.json"
+)
+_CANONICAL_UNAVAILABLE_LEAVES = (
+    "pumping_electrical_energy_kWh",
+    "pumping_electrical_cost_usd",
+    "electrical_energy_kWh",
+    "electrical_cost_usd",
+    "total_cost_usd",
+)
+
+
+def _refused_offgas_pumping_context() -> dict:
+    return {
+        "status": "ok",
+        "feedstock_id": "mars_basalt",
+        "body": "mars",
+        "ambient_pressure_pa": 610.0,
+        "rows": [
+            {
+                "hour": 1,
+                "target_pressure_pa": 500.0,
+                "offgas_mol_per_s": math.nan,
+                "duration_s": 3600.0,
+                "gas_temperature_K": 300.0,
+                "validated_line_conductance_m3_s": 1.0,
+            }
+        ],
+    }
+
+
+def _artifact_from_pumping_context(context: dict, run_id: str) -> dict:
+    _cost, diagnostic = run_pumping_input_cost(context)
+    payload = _runner_payload(
+        per_hour_summary=[
+            {
+                "hour": 1,
+                "campaign": "C0",
+                "mass_balance_pct": 0.0,
+                "energy_electrical_kWh": 2.0,
+                "energy_evaporation_thermal_kWh": 3.0,
+            }
+        ]
+    )
+    payload["run_metadata"]["cost_rollup_diagnostic"] = {
+        "pumping_diagnostic": diagnostic,
+    }
+    return build_run_artifact(payload, run_id=run_id)
+
+
+def _jsonable(value):
+    return json.loads(json.dumps(value))
+
+
+def test_refused_pumping_hour_pins_canonical_unavailable_object() -> None:
+    artifact = _artifact_from_pumping_context(
+        _refused_offgas_pumping_context(),
+        "run-refused-pumping-hour-fixture",
+    )
+    totals = artifact["terminal"]["cost_totals"]
+    expected = json.loads(_REFUSED_PUMPING_HOUR_FIXTURE.read_text(encoding="utf-8"))
+    pinned = expected["terminal.cost_totals"]
+    observed = {key: _jsonable(totals[key]) for key in pinned}
+    assert observed == pinned
+    assert totals["completeness"] == "incomplete"
+    assert totals["process_electrical_energy_kWh"] == pytest.approx(2.0)
+    for leaf in _CANONICAL_UNAVAILABLE_LEAVES:
+        assert is_unavailable_quantity(totals[leaf])
+        assert totals[leaf]["value"] is None
+        assert unavailable_reason_of(totals[leaf]) == "invalid-offgas-rate"
+
+
+def test_refused_pumping_hour_fixture_mutation_fails_then_restores(monkeypatch) -> None:
+    from simulator import pumping_cost as pumping_mod
+    from simulator.pumping_cost import SubambientPumpCost
+
+    original = pumping_mod._infeasible_degenerate
+    expected = json.loads(_REFUSED_PUMPING_HOUR_FIXTURE.read_text(encoding="utf-8"))
+    pinned = expected["terminal.cost_totals"]
+
+    def mutated(status: str) -> SubambientPumpCost:
+        return SubambientPumpCost(
+            status, 0.0, 0.0, math.inf, math.inf, False, status=status
+        )
+
+    monkeypatch.setattr(pumping_mod, "_infeasible_degenerate", mutated)
+    with pytest.raises(AssertionError):
+        billed_zero = _artifact_from_pumping_context(
+            _refused_offgas_pumping_context(),
+            "run-refused-pumping-hour-mutated",
+        )["terminal"]["cost_totals"]
+        observed = {key: _jsonable(billed_zero.get(key)) for key in pinned}
+        assert observed == pinned
+        assert is_unavailable_quantity(billed_zero.get("total_cost_usd"))
+    monkeypatch.setattr(pumping_mod, "_infeasible_degenerate", original)
+    restored = _artifact_from_pumping_context(
+        _refused_offgas_pumping_context(),
+        "run-refused-pumping-hour-restored",
+    )["terminal"]["cost_totals"]
+    observed = {key: _jsonable(restored[key]) for key in pinned}
+    assert observed == pinned
+    assert restored["completeness"] == "incomplete"
 
 
 def test_cost_totals_omit_when_canonical_usage_is_incomplete() -> None:

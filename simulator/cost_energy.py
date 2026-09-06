@@ -98,15 +98,31 @@ def furnace_thermal_flux_hours(temperature_C: float, duration_h: float) -> float
     return temperature_K * duration
 
 
-def unavailable_quantity(*, reason: str, units: str) -> dict[str, Any]:
+class UnavailableQuantity(dict):
+    """Typed unavailable energy or money. Never a priced 0.0.
+
+    Falsy so a presence test that does not inspect ``status`` cannot treat a
+    refusal as a present value. Distinct dict subclass so the in-process
+    object is unmistakable; JSON-loaded copies are plain dicts and are
+    recognized via ``status``. ``json.dumps`` keeps the four keys (CPython
+    3.12 C encoder uses size, not truthiness).
+    """
+
+    def __bool__(self) -> bool:
+        return False
+
+
+def unavailable_quantity(*, reason: str, units: str) -> UnavailableQuantity:
     """Typed unavailable energy or money. Never a priced 0.0."""
 
-    return {
-        "status": UNAVAILABLE_STATUS,
-        "reason": str(reason or "unspecified"),
-        "value": None,
-        "units": str(units),
-    }
+    return UnavailableQuantity(
+        {
+            "status": UNAVAILABLE_STATUS,
+            "reason": str(reason or "unspecified"),
+            "value": None,
+            "units": str(units),
+        }
+    )
 
 
 def is_unavailable_quantity(value: Any) -> bool:

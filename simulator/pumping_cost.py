@@ -24,7 +24,7 @@ condenser-exit gas temperature) are noted inline as follow-ups.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import math
 from typing import Any
 
@@ -239,6 +239,7 @@ class SubambientPumpCost:
     status: str = "ok"
     line_conductance_m3_s: float = math.nan
     effective_speed_ceiling_m3_s: float = math.nan
+    notice: dict[str, Any] | None = field(default=None, hash=False)
 
     def to_json(self) -> dict[str, Any]:
         if self.energy_kWh is None:
@@ -247,7 +248,7 @@ class SubambientPumpCost:
         else:
             energy = float(self.energy_kWh)
             power = float(self.mean_power_W if self.mean_power_W is not None else 0.0)
-        return {
+        payload: dict[str, Any] = {
             "regime": self.regime,
             "energy_kWh": energy,
             "mean_power_W": power,
@@ -263,6 +264,9 @@ class SubambientPumpCost:
                 self.effective_speed_ceiling_m3_s
             ),
         }
+        if self.notice:
+            payload["notice"] = dict(self.notice)
+        return payload
 
 
 def estimate_subambient_pump_cost(
@@ -375,13 +379,17 @@ def estimate_subambient_pump_cost(
         return SubambientPumpCost("vent-free", 0.0, 0.0, 0.0, 1.0, True)
 
     if target_pressure_pa == 0.0:
-        # Reached only when ambient > 0 (ambient == 0 vented free above). Holding
-        # an absolute zero against a real atmosphere is not a missing input and
-        # not a bad number -- it is infinite compression work, because
-        # log(ambient/target) diverges as target -> 0. Name that reason rather
-        # than laundering it into "invalid", so an operator asking for a perfect
-        # vacuum on Mars is told what is actually impossible about it.
-        return _infeasible_degenerate("unreachable-absolute-vacuum-target")
+        # Reached only when ambient > 0 (ambient == 0 vented free above). This is
+        # out-of-domain physics, not missing telemetry: ln(P_amb/P_target)
+        # diverges as P_target -> 0, so the characterised staged-adiabatic
+        # model has no finite continuation to attach as a priced number.
+        return _out_of_domain_vacuum_target(
+            ambient_pressure_pa=ambient_pressure_pa,
+            offgas_mol_per_s=offgas_mol_per_s,
+            gas_temperature_K=gas_temperature_K,
+            max_pump_speed_m3_s=max_pump_speed_m3_s,
+            max_stage_pressure_ratio=max_stage_pressure_ratio,
+        )
     log_ratio = math.log(ambient_pressure_pa) - math.log(target_pressure_pa)
     # (1) Intercooled, equal-pressure-ratio adiabatic stages.
     #
@@ -681,9 +689,73 @@ def _pumping_context_refusal(
     return refusal
 
 
+NO_EXTRAPOLATION_AVAILABLE = "no extrapolation available"
+_UNREACHABLE_ABSOLUTE_VACUUM = "unreachable-absolute-vacuum-target"
+
+
+def _out_of_domain_vacuum_target(
+    *,
+    ambient_pressure_pa: float,
+    offgas_mol_per_s: float,
+    gas_temperature_K: float,
+    max_pump_speed_m3_s: float,
+    max_stage_pressure_ratio: float,
+) -> SubambientPumpCost:
+    """Absolute vacuum against a real atmosphere is out-of-domain physics.
+
+    The staged-adiabatic / isothermal work scales as ln(P_amb/P_target) and
+    has no finite value at P_target = 0. Substituting the speed-envelope floor
+    would price a different (higher) pressure and understate the load. Energy
+    stays unavailable with an explicit no-extrapolation reason rather than
+    sharing the missing-telemetry helper.
+    """
+    speed_ceiling = _positive_or_default(
+        max_pump_speed_m3_s,
+        DEFAULT_MAX_PUMP_SPEED_M3_S.value,
+    )
+    stage_ratio_ceiling = _float_or_nan(max_stage_pressure_ratio)
+    if not math.isfinite(stage_ratio_ceiling) or stage_ratio_ceiling <= 1.0:
+        stage_ratio_ceiling = DEFAULT_MAX_STAGE_PRESSURE_RATIO.value
+    if speed_ceiling > 0.0 and math.isfinite(offgas_mol_per_s) and math.isfinite(
+        gas_temperature_K
+    ):
+        envelope_floor_pa = (
+            offgas_mol_per_s * _R_J_PER_MOL_K * gas_temperature_K / speed_ceiling
+        )
+    else:
+        envelope_floor_pa = math.nan
+    notice = {
+        "kind": "out-of-domain-physics",
+        "authority": "none",
+        "reason": NO_EXTRAPOLATION_AVAILABLE,
+        "original_status": _UNREACHABLE_ABSOLUTE_VACUUM,
+        "characterised_envelope": {
+            "compression_model": "intercooled-staged-adiabatic",
+            "target_pressure_pa": 0.0,
+            "ambient_pressure_pa": float(ambient_pressure_pa),
+            "max_pump_speed_m3_s": float(speed_ceiling),
+            "max_stage_pressure_ratio": float(stage_ratio_ceiling),
+            "envelope_floor_pa": float(envelope_floor_pa),
+            "divergence": "ln(P_ambient/P_target) as P_target -> 0",
+        },
+    }
+    return SubambientPumpCost(
+        _UNREACHABLE_ABSOLUTE_VACUUM,
+        None,
+        None,
+        math.inf,
+        math.inf,
+        False,
+        status=NO_EXTRAPOLATION_AVAILABLE,
+        notice=notice,
+    )
+
+
 def _infeasible_degenerate(status: str) -> SubambientPumpCost:
-    # Missing/invalid inputs are not a measured zero load. Energy and power
-    # stay None so a later sum cannot bill 0 kWh / 0 USD for "we do not know".
+    # Missing/invalid inputs only. Out-of-domain vacuum is
+    # _out_of_domain_vacuum_target; do not fold it in here.
+    # Energy and power stay None so a later sum cannot bill 0 kWh for
+    # "we do not know".
     return SubambientPumpCost(
         status,
         None,

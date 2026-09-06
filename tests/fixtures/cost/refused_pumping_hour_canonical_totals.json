@@ -1,0 +1,42 @@
+{
+  "producer": "run_pumping_input_cost + build_run_artifact",
+  "refused_hour": {
+    "target_pressure_pa": 500.0,
+    "offgas_mol_per_s": null,
+    "note": "NaN offgas is a refused hour, not a measured 0.0 mol/s"
+  },
+  "terminal.cost_totals": {
+    "pumping_electrical_energy_kWh": {
+      "status": "unavailable",
+      "reason": "invalid-offgas-rate",
+      "value": null,
+      "units": "kWh"
+    },
+    "pumping_electrical_cost_usd": {
+      "status": "unavailable",
+      "reason": "invalid-offgas-rate",
+      "value": null,
+      "units": "USD"
+    },
+    "electrical_energy_kWh": {
+      "status": "unavailable",
+      "reason": "invalid-offgas-rate",
+      "value": null,
+      "units": "kWh"
+    },
+    "electrical_cost_usd": {
+      "status": "unavailable",
+      "reason": "invalid-offgas-rate",
+      "value": null,
+      "units": "USD"
+    },
+    "total_cost_usd": {
+      "status": "unavailable",
+      "reason": "invalid-offgas-rate",
+      "value": null,
+      "units": "USD"
+    },
+    "completeness": "incomplete",
+    "unavailable_reason": "invalid-offgas-rate"
+  }
+}
