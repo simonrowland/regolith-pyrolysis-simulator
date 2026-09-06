@@ -1,0 +1,131 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0326",
+  "census_id": "high-temperature-printed-page-352",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "GEHLENITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "274.206",
+    "value": 274.206,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      358
+    ],
+    "printed_pages": [
+      352
+    ],
+    "pdftotext_layout_page_file": "page-358.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 28, 30, 32, 33, 36, 43, 46"
+  ],
+  "title_line_as_published": "GEHLENITE                                                                       FOI!IIULA   WEIGHT        274.206",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                  crystals 298. 15 to aelting point 1863 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                  FORIIlTION FRO II THE OIIDES",
+    "                                                                                         GIBBS",
+    "        ( H~-H~               so",
+    "                  98 )/T              -(G~-H~ 98 )/T",
+    "                                                           0",
+    "TEMP.                                                     Cp     ENTHALPY             FREE ENERGY          Log Kf",
+    "                               T",
+    "            J/IIOl•K       J/mol•K      Jjaol• K       Jjaol•K      kJ/•ol              kJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J/IIOl•K",
+    "entropy": "J/mol•K",
+    "negative_gibbs_function": "Jjaol• K",
+    "heat_capacity": "Jjaol•K",
+    "formation_enthalpy": "kJ/•ol",
+    "formation_gibbs_energy": "kJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 17,
+  "uncertainty_line_as_published": "UNCERTAINTY                   1. 64            1.64                     3.090               3. 170",
+  "uncertainty_values": [
+    {
+      "as_published": "1. 64",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.64",
+      "value": 1.64,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.090",
+      "value": 3.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3. 170",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "MELTING POINT                 1863       K              BOILING POINT",
+    "ENTHALPY OF MELTING                      ltJ            ENTHALPY OF VAPORIZATION                            kJ",
+    "                                         kJ             MOLAR VOLUME                           9.0240 Jjbar",
+    "                                                                                              90.240 ca 3",
+    "TRANSITIONS IN REFERENCE STATE OXIDES",
+    "  SiOz•• •••••    ALPHA -     BETA TRANSITION 844 K.",
+    "HEAT CAPACITY EQUATION",
+    "        4.0573z1QZ-          7.0986I10-~       T        3.1744z103 T-0•5",
+    "             ( EQUATION VALID FROM             298 -   1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 28, 30, 32, 33, 36, 43, 46",
+      "detector_only": false
+    }
+  ]
+}

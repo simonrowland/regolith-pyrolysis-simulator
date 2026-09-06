@@ -1,0 +1,146 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0321",
+  "census_id": "high-temperature-printed-page-347",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "LARNITE",
+  "formula_as_published": "Ca 2 Si0 4",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 970 K.                m' crystals (bredigite) 970 to 1710 K.",
+    "                   m crystals 1710 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Ca 2 Si0 4 :     Crystals 298.15 to 970 K.                m' crystals (bredigite) 970 to 1710 K.",
+    "                   m crystals 1710 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "FORBATION FRO II THE ELEIIENTS",
+  "formula_weight": {
+    "as_published": "172.244",
+    "value": 172.244,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      353
+    ],
+    "printed_pages": [
+      347
+    ],
+    "pdftotext_layout_page_file": "page-353.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 37, 39, 45, 47, 52, 54"
+  ],
+  "title_line_as_published": "LARNITE                                                                               FORBULA iEIGHT    172.244",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Ca 2 Si0 4 :     Crystals 298.15 to 970 K.                m' crystals (bredigite) 970 to 1710 K.",
+    "                   m crystals 1710 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORBATION FRO II THE ELEIIENTS",
+    "                                                                                            GIBBS",
+    "TEIIP.         ( H;-H;98 )/T     so      -(G;-H~ 98 }/T        cop    ERTHlLPY           FREE ENERGY     Log Kf",
+    "                                   T",
+    "                Jjaol•K        J/aol•K      Jjaol•K         Jjaol•K          kJ/aol         ltJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "Jjaol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "Jjaol•K",
+    "heat_capacity": "Jjaol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "ltJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 24,
+  "uncertainty_line_as_published": "UtiCEBT AINTY                     0.84             0.84                        3.220          3.225       0.565",
+  "uncertainty_values": [
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.220",
+      "value": 3.22,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.225",
+      "value": 3.225,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.565",
+      "value": 0.565,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Ca 2 Si0 4 :     Crystals 298.15 to 970 K.                m' crystals (bredigite) 970 to 1710 K.",
+    "                   m crystals 1710 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "!IELTI IIG POI liT                2403       K              BOIL IIIG POIBT                               K",
+    "ENTHALPY OP !ELTING                          ltJ            ENTHALPY OP VAPOBIZATIOtl",
+    "                                             kJ             IIOLAB VOLUIIE                       5. 1600 J/bar",
+    "                                                                                                51.600 ca 3",
+    "TRAtiSITIOIIS Ill REFERENCE STATE ELEI!EIITS",
+    "      ClLCIUI! •••• ALPHA-BETA 720, ft.              P. BETA 1112, B. P.        1755 K.",
+    "      SILICON •••• II. P. 1685 K.",
+    "BEAT CAPACITY EQUATION",
+    "           2.4871z102- 8.3145z10-• T       2.0521z1oa T-a·s",
+    "              (EQUATION VALID FROft 298 - 970 I)",
+    " c;       134.557 •   0.046108 T",
+    "              (EQUATION VALID FBOII 970 -                 1710 I)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 37, 39, 45, 47, 52, 54",
+      "detector_only": false
+    }
+  ]
+}

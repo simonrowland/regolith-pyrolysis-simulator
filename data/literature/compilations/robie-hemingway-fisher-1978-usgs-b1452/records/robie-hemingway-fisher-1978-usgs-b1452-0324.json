@@ -1,0 +1,131 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0324",
+  "census_id": "high-temperature-printed-page-350",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "CALCIU!I OLIVINE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "FOB!IATION FRO!! THE OXIDES",
+  "formula_weight": {
+    "as_published": "172.244",
+    "value": 172.244,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      356
+    ],
+    "printed_pages": [
+      350
+    ],
+    "pdftotext_layout_page_file": "page-356.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "10 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 22, 23, 24, 25, 26, 29, 31, 33, 34"
+  ],
+  "title_line_as_published": "CALCIU!I OLIVINE                                                                 FORftULA WEIGHT          172.244",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "              Crystals 298.15 to 1120 K.               Calcium oliYine is the stable fora of",
+    "              dicalci~•     silicate below 1120 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                  FOB!IATION FRO!! THE OXIDES",
+    "                                                                                          GIBBS",
+    "TMP.    ( H~- H~ 98 )/T      so      -cG;-a ; 98 }/T      cop    ENTHALPY              FREE ENERGY         Log Kf",
+    "                              T",
+    "         J;aol•K          J;aol•K      J/aol•K       J/IIOl•K           kJ;aol            kJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J;aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/IIOl•K",
+    "formation_enthalpy": "kJ;aol",
+    "formation_gibbs_energy": "kJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 11,
+  "uncertainty_line_as_published": "OBCERTAINTY                  0.84            o. 84                        1.000             1.020",
+  "uncertainty_values": [
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 84",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.000",
+      "value": 1.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.020",
+      "value": 1.02,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                                         BOlLI HG POINT                                       K",
+    "ENTHALPY OF IIELTIIIG                   kJ             ENTHALPY OF VAPORIZATION                             kJ",
+    "                                        kJ           !!OL AB VOL U!IB                          5.9110 J/bar",
+    "                                                                                              59. 110 ca 3",
+    "TRANSITIONS IN REFERENCE STATE OIIDES",
+    "  SiOz••••••• ALPHA- BETA TRANSITIOH 844 K.",
+    "HEAT CAPACITY EQUATIOH",
+    " c~    1.J257x10Z + 5.2510x1o-z T      1.9049x10• T-z",
+    "          (EQUATION VALID FRO!! 298 - 1200 K)",
+    "REPEBEHCE        45          120                                            93                           CO!! PILED",
+    "                                                                           229                            1- 9-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 10 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 22, 23, 24, 25, 26, 29, 31, 33, 34",
+      "detector_only": false
+    }
+  ]
+}
