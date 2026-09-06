@@ -1899,6 +1899,14 @@ def test_sio_source_validated_domain_covers_process_envelope(
     assert in_range.status == "ok"
     assert mid_envelope.status == "ok"
     assert process_cap.status == "ok"
+    # Pre-pilot hex captures at clean HEAD 1daa41b0; these pin arithmetic,
+    # not empirical accuracy (the source-grounded anchors below still apply).
+    assert in_range.diagnostic["vapor_pressures_Pa"]["SiO"].hex() == (
+        "0x1.6adedc06bbbddp+2"
+    )
+    assert process_cap.diagnostic["vapor_pressures_Pa"]["SiO"].hex() == (
+        "0x1.06962f1845780p+14"
+    )
     for result in (in_range, mid_envelope, process_cap):
         assert result.diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
         assert "SiO" not in result.diagnostic["extrapolated_beyond_valid_range_K"]
@@ -1984,20 +1992,106 @@ def test_builtin_provider_marks_sio_standard_reaction_source_authoritative(
     assert source == "builtin_authoritative:standard_reaction_term"
 
 
-def test_sio_oxide_vapor_extrapolation_fails_loud_beyond_process_bound(
+@pytest.mark.parametrize("temperature_K", [2273.16, 2473.15])
+def test_sio_oxide_vapor_extrapolation_predicts_with_certified_band(
     vapor_pressure_data,
+    temperature_K,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    result = provider.dispatch(_si_only_vapor_request_at_T_K(temperature_K))
+    diagnostic = result.diagnostic
+    notice = diagnostic["extrapolated_beyond_valid_range_K"]["SiO"]
 
-    with pytest.raises(
-        VaporPressureComputationError,
-        match=(
-            "oxide_vapor_pressure_out_of_validated_range: "
-            "species=SiO .*valid_range_K=\\[1400, 2273.15\\] "
-            "extrapolation_allowed_range_K=absent"
+    assert result.status == "ok"
+    assert diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
+    assert notice == {
+        "temperature_K": temperature_K,
+        "valid_range_K": (1400.0, 2273.15),
+        "authority_level": "extrapolated",
+        "reason": "oxide_vapor_pressure_out_of_validated_range",
+    }
+    assert diagnostic["vapor_pressure_numerator_provenance"]["SiO"][
+        "extrapolation_notice"
+    ] == notice
+    source = diagnostic["vapor_pressures_source"]["SiO"]
+    assert source == (
+        "builtin_extrapolation_limited:standard_reaction_term:"
+        "extrapolated_beyond_valid_range_K"
+    )
+    from simulator.grind_preflight import _is_noncertifying_vapor_extrapolation
+
+    assert _is_noncertifying_vapor_extrapolation("SiO", source)
+
+
+def test_sio_extrapolation_notice_reaches_public_numeric_answer(vapor_pressure_data):
+    import json
+    from simulator.vapour_rail.batch import (
+        FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+        FluxActivationContext,
+        PressureValue,
+    )
+    from simulator.vapour_rail.instrumentation import serialize_vapour_answer
+    from simulator.vapour_rail.request import VapourResolveState
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    result = provider.dispatch(_si_only_vapor_request_at_T_K(2473.15))
+    diagnostic = result.diagnostic
+    catalog = provider._vapour_rail_catalog
+    state = VapourResolveState(
+        temperature_K=2473.15,
+        process_phase="pyrolysis",
+        total_pressure_Pa=0.1,
+        fO2_bar=diagnostic["pO2_bar"],
+        source_reaction_activities=diagnostic["activities"],
+        source_reaction_activity_provider=diagnostic["activities_provider"],
+        source_reaction_activity_evidence_refs={"SiO": "t838-provider-replay"},
+        source_reaction_activity_standard_states={
+            "SiO": catalog.species["SiO"].source_reaction_activity.standard_state,
+        },
+        source_reaction_activity_provenance=diagnostic[
+            "vapor_pressure_numerator_provenance"
+        ],
+    )
+    answer = catalog.resolve_batch(
+        {"process.cleaned_melt": {"SiO2": 1.0}},
+        state,
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
         ),
+    ).channel("SiO")
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa > 0.0
+    assert answer.is_flux_active
+    assert answer.certification_ceiling == "never"
+    assert answer.verdict_status == "status_bearing_non_authoritative"
+    public = json.loads(json.dumps(serialize_vapour_answer(answer), allow_nan=False))
+    assert public["extra"]["extrapolation_notice"] == {
+        "temperature_K": 2473.15,
+        "valid_range_K": [1400.0, 2273.15],
+        "authority_level": "extrapolated",
+        "reason": "oxide_vapor_pressure_out_of_validated_range",
+    }
+
+
+@pytest.mark.parametrize("temperature_K", [1900.0, 2473.15])
+def test_sio_prediction_still_refuses_missing_or_invalid_inputs(
+    vapor_pressure_data, temperature_K,
+):
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    evaluator = provider._vapour_rail_catalog.evaluator_for_hot_train("SiO")
+    with pytest.raises(CatalogCompileError, match="explicit source_activity"):
+        evaluator.evaluate(temperature_K, pO2_bar=1.0e-9)
+    with pytest.raises(CatalogCompileError, match="explicit transport_headspace"):
+        evaluator.evaluate(temperature_K, source_activity=1.0)
+    for invalid in (-1.0, float("nan")):
+        with pytest.raises(CatalogCompileError, match="source_activity"):
+            evaluator.evaluate(temperature_K, source_activity=invalid, pO2_bar=1.0e-9)
+    with pytest.raises(
+        CatalogCompileError, match="pO2_bar",
     ):
-        provider.dispatch(_si_only_vapor_request_at_T_K(2273.16))
+        evaluator.evaluate(temperature_K, source_activity=1.0, pO2_bar=float("nan"))
 
 
 def test_ellingham_fit_band_extrapolation_is_diagnostic(

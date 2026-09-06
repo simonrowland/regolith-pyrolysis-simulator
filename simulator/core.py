@@ -3536,6 +3536,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         surface_schedule: Mapping[str, Any],
         *,
         sample_time_h: float,
+        unavailable: dict[str, str] | None = None,
     ) -> dict[str, float]:
         if self.lab_geometry is None:
             if surface_schedule:
@@ -3549,10 +3550,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             profile_key = str(getattr(surface, "temperature_profile", "") or "")
             if profile_key:
                 if profile_key not in surface_schedule:
-                    raise LabScheduleValidationError(
+                    refusal = LabScheduleValidationError(
                         "lab_schedule_missing_surface_temperature: "
                         f"{profile_key}"
                     )
+                    if unavailable is None:
+                        raise refusal
+                    unavailable[surface.surface_id] = str(refusal)
+                    continue
                 points = surface_schedule[profile_key]
                 temperatures_C[surface.surface_id] = interpolate_schedule_points(
                     points,
@@ -3585,14 +3590,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     "lab_schedule.surface_temperature_C requires lab_geometry",
                 )
             return
+        unavailable: dict[str, str] = {}
         temperatures_C = self._resolve_lab_surface_temperatures(
             surface_schedule,
             sample_time_h=sample_time_h,
+            unavailable=unavailable,
         )
+        self.condensation_model.wall_temperature_input_refusals = unavailable
         if temperatures_C:
             self.condensation_model.update_pipe_segment_temperatures(
                 temperatures_C
             )
+        if unavailable and self.condensation_model.operating_history:
+            history = self.condensation_model.operating_history[-1]
+            history['pipe_segment_temperatures_C'] = {
+                name: temperature for name, temperature in history.get('pipe_segment_temperatures_C', {}).items()
+                if name not in unavailable
+            }
 
     def _headspace_downstream_pressure_bar(
         self,
@@ -12967,7 +12981,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.campaign_mgr.apply_c2a_staged_gas_controls(self.melt)
         self._sync_c2a_staged_overhead_gas_control()
         self.melt.validate_melt_pressures()
-        self.validate_lab_surface_temperature_resolver()
 
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()

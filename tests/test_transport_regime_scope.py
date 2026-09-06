@@ -108,12 +108,8 @@ def test_stage0_provider_computes_and_marks_transitional_kn(campaign_name):
     assert not continuum_validity_refuses(result.diagnostic)
 
 
-def test_pyrolysis_provider_still_refuses_transitional_kn():
-    """Same production provider; C4 must still fail-close.
-
-    Pre-fix refuses but does not name campaign/process_regime/asking_site.
-    Those fields make this red-by-revert without weakening the guard.
-    """
+def test_pyrolysis_provider_extrapolates_with_original_domain_context():
+    """Finite C4 continuum prediction keeps stage, domain and demoted authority."""
 
     result = _w3_result_with_controls(
         1.0,
@@ -122,26 +118,28 @@ def test_pyrolysis_provider_still_refuses_transitional_kn():
         gas_temperature_K=_TRANSITIONAL_T_K,
         campaign_name="C4",
     )
-    assert result.status == "refused"
-    assert result.diagnostic["reason"] == (
+    assert result.status == "ok"
+    notice = result.diagnostic["continuum_extrapolation_notice"]
+    assert notice["reason"] == (
         "viscous_p_bulk_transport_out_of_domain"
     )
-    assert result.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert result.diagnostic["evaporation_flux_kg_hr"] is None
-    assert result.diagnostic["campaign_name"] == "C4"
-    assert result.diagnostic["stage"] == "C4"
-    assert result.diagnostic["process_regime"] == (
+    assert notice["evaporation_flux_status"] == "extrapolated"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
+    assert notice["campaign_name"] == "C4"
+    assert notice["stage"] == "C4"
+    assert notice["process_regime"] == (
         ProcessRegime.PYROLYSIS_EXTRACTION.value
     )
-    assert result.diagnostic["asking_site"] == (
+    assert notice["asking_site"] == (
         "engines.builtin.evaporation_flux"
     )
-    assert result.diagnostic["doctrine_category"] == 1
-    assert continuum_validity_refuses(result.diagnostic)
+    assert notice["doctrine_category"] == 2
+    assert notice["authority_level"] == "extrapolated"
+    assert not continuum_validity_refuses(notice)
 
 
-def test_missing_campaign_still_refuses_transitional_kn():
-    """Omitting stage is category 1, not a silent bakeout carve-out."""
+def test_missing_campaign_does_not_certify_transitional_kn():
+    """An unknown stage retains the finite model's extrapolated authority."""
 
     result = _w3_result_with_controls(
         1.0,
@@ -149,9 +147,11 @@ def test_missing_campaign_still_refuses_transitional_kn():
         pipe_diameter_m=_PIPE_M,
         gas_temperature_K=_TRANSITIONAL_T_K,
     )
-    assert result.status == "refused"
-    assert result.diagnostic["process_regime"] == ProcessRegime.UNKNOWN.value
-    assert continuum_validity_refuses(result.diagnostic)
+    assert result.status == "ok"
+    notice = result.diagnostic["continuum_extrapolation_notice"]
+    assert notice["process_regime"] == ProcessRegime.UNKNOWN.value
+    assert notice["authority_level"] == "extrapolated"
+    assert not continuum_validity_refuses(notice)
 
 
 def test_c0_production_controls_drive_provider_mark_not_refusal():

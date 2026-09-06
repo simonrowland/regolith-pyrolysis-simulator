@@ -15,6 +15,180 @@ from simulator.state import (
 )
 
 
+def test_predict_flag_wall_certified_value_retains_bits():
+    notices = {}
+    pressure = condensation._antoine_psat_pa("Mg", 1000.0, antoine_extrapolations=notices)
+    # Exact 1daa41b0 result for the admitted Mg fit, unchanged arithmetic.
+    assert pressure.hex() == "0x1.7e0cc19ec4f89p+10"
+    assert notices == {}
+
+
+@pytest.mark.parametrize(("temperature", "pressure_hex", "band"), [
+    (500.0, "0x1.8f7e06aa69f40p-17", [701.0, 1361.0]),
+    (1500.0, "0x1.17121f336b398p+18", [701.0, 1361.0]),
+])
+def test_predict_flag_wall_values_keep_source_fit_and_authority(temperature, pressure_hex, band):
+    diagnostic = {}
+    condensation._wall_deposition_driving_pressure_pa(
+        "Mg", 1.0e6, temperature, diagnostic_out=diagnostic,
+    )
+    assert diagnostic["wall_saturation_pressure_pa"].hex() == pressure_hex
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["valid_range_K"] == band
+    assert notice["temperature_K"] == temperature
+    assert "metal_vapor_pressure_out_of_source_certified_range" in notice["reason"]
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+
+
+def test_predict_flag_cold_na_pole_is_unavailable_with_band():
+    diagnostic = {}
+    condensation._wall_deposition_driving_pressure_pa(
+        "Na", 100.0, 298.15, diagnostic_out=diagnostic,
+    )
+    assert diagnostic["wall_saturation_pressure_pa"] is None
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "unavailable"
+    assert notice["valid_range_K"] == [924.0, 1118.0]
+    assert "no extrapolation available" in notice["reason"]
+
+
+def test_predict_flag_missing_wall_input_is_typed_and_hour_completes(monkeypatch):
+    from simulator.runner import PyrolysisRun
+    from simulator.run_executor import RunExecutor
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
+
+    original = condensation._species_vapor_data
+
+    def missing_coefficient(species, **kwargs):
+        import copy
+        data = copy.deepcopy(original(species, **kwargs))
+        if species == "Mg":
+            del data["pure_component_antoine"]["B"]
+        return data
+
+    monkeypatch.setattr(condensation, "_species_vapor_data", missing_coefficient)
+    with pytest.raises(condensation.DepositionInputRefusal):
+        condensation._antoine_psat_pa("Mg", 1000.0)
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=1,
+        mass_kg=1000.0, backend_name="internal-analytical",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=dynamic_lab_schedule(), force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status == "ok", execution.error_message
+    assert len(execution.snapshots) == 1
+    document = run._build_output(execution)
+    authority = document["per_hour_summary"][0]["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
+    refusals = authority["wall_saturation_pressure_refusals_by_species"]["Mg"]
+    assert any(record["refusal_type"] == "DepositionInputRefusal" for record in refusals.values()), refusals
+
+
+@pytest.mark.parametrize("hours", [2, 24])
+def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
+    from simulator.runner import PyrolysisRun
+    from simulator.run_executor import RunExecutor
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
+
+    schedule = dynamic_lab_schedule()
+    schedule["id"] = "RH03-paired-temperature"
+    schedule["furnace_ceiling_C"] = 2200.0
+    for knot in schedule["melt_temperature_C"]:
+        knot["value"] = 2200.0
+    if hours > schedule["duration_h"]:
+        schedule["duration_h"] = float(hours)
+        for profile in (schedule["melt_temperature_C"], schedule["chamber_pressure_mbar"],
+                        *schedule["surface_temperature_C"].values()):
+            profile.append({**profile[-1], "t_h": float(hours)})
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=hours,
+        mass_kg=1000.0, backend_name="internal-analytical",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=schedule, force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status == "ok", execution.error_message
+    assert len(execution.snapshots) == hours
+    document = run._build_output(execution)
+    for row in document["per_hour_summary"]:
+        if row["T_C"] == 2200.0:
+            melt_notice = row["vapour_batch_summary"]["metadata"]["extrapolation_notices_by_species"]["SiO"]
+            assert melt_notice["authority_level"] == "extrapolated"
+            assert melt_notice["temperature_K"] == 2473.15
+            assert melt_notice["valid_range_K"] == [1400.0, 2273.15]
+        wall = row["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
+        assert wall["authoritative_for_coating"] is False
+        assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
+        refused = wall["wall_saturation_pressure_refusals_by_species"]
+        assert {"Na", "Al2"} <= refused.keys()
+        assert all(any("no extrapolation available" in record["reason"]
+                       for record in refused[species].values()) for species in ("Na", "Al2"))
+    assert document["per_hour_summary"][0]["T_C"] == 2200.0
+    if hours == 24:
+        assert any(record.get("refusal_type") == "DepositionInputRefusal"
+                   and record["wall_temperature_K"] is None
+                   and "lab_schedule_missing_surface_temperature" in record["reason"]
+                    for records in refused.values() for record in records.values())
+        transport = wall["evaporation_transport_notices_by_species"]
+        assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
+        assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
+        assert transport["Si"]["evaporation"]["authority_level"] == "unavailable"
+        assert transport["Si"]["evaporation"]["refusal_type"] == "EvaporationFluxConfigurationError"
+    pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
+    assert pareto["Mg"]["authority_level"] == "extrapolated"
+    assert pareto["Na"]["status"] == "unavailable"
+    assert pareto["Al2"]["status"] == "unavailable"
+    assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
+    if hours == 24:
+        assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
+        assert pareto["Si"]["evaporation_transport_notices"] == transport["Si"]
+
+
+@pytest.mark.parametrize(("species", "temperature"), [("Na", 417.0), ("Mg", 115.0)])
+def test_predict_flag_underflow_is_unavailable(species, temperature):
+    diagnostic = {}
+    condensation._wall_deposition_driving_pressure_pa(species, 100.0, temperature, diagnostic_out=diagnostic)
+    assert diagnostic["wall_saturation_pressure_pa"] is None
+    assert "no extrapolation available" in diagnostic["wall_saturation_pressure_refusal_reason"]
+
+
+def test_predict_flag_pareto_unavailable_keeps_extrapolation():
+    from types import SimpleNamespace
+    from simulator.diagnostics import pressure_coating_pareto_diagnostic
+
+    notice = {"authority_level": "extrapolated", "temperature_K": 500.0,
+              "valid_range_K": [701.0, 1361.0], "reason": "outside source band"}
+    sim = SimpleNamespace(condensation_model=SimpleNamespace(
+        last_sticking_alpha_provenance_notice={
+            "wall_saturation_pressure_extrapolations_by_species": {"Mg": {"wall": notice}}
+        }))
+    result = pressure_coating_pareto_diagnostic(sim)
+    entry = result["by_species"]["Mg"]
+    assert entry["status"] == "unavailable"
+    assert entry["wall_saturation_pressure_extrapolations"]["wall"] == notice
+
+
+def test_predict_flag_wall_history_keeps_both_source_band_misses():
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0, species_partial_pressures_mbar={"Mg": 1.0},
+        gas_temperature_C=1700.0, campaign_name="C0",
+    )
+    for temperature in (500.0, 1500.0, 1000.0):
+        wall_deposit_candidate_for_surface_kg(
+            model, species="Mg", rate_kg_hr=1.0, T_cond_C=1200.0,
+            melt_temperature_C=1700.0, wall_temperature_C=temperature - 273.15,
+            surface_area_m2=1.0,
+        )
+    records = model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"]["Mg"]
+    assert {record["temperature_K"] for record in records.values()} == {500.0, 1500.0}
+    assert all(record["authority_level"] == "extrapolated" for record in records.values())
+
+
 def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
     out_context: dict[str, object] = {}
     out_value = condensation.alpha_s("Fe", 1600.0, out_context)
@@ -125,11 +299,12 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
             antoine_extrapolations=sio_extrap,
             antoine_extrapolation_warnings=sio_warns,
         )
-    assert sio_extrap == {}
-    assert sio_warns == []
+    refusal = sio_extrap["SiO#wall:1173.15"]
+    assert refusal["authority_level"] == "unavailable"
+    assert "no extrapolation available" in refusal["reason"]
 
 
-def test_wall_deposit_query_reports_out_of_domain_antoine_refusal():
+def test_wall_deposit_query_reports_out_of_domain_antoine_prediction():
     magnesium_vapor = condensation._species_vapor_data(
         "Mg",
         vapor_pressure_data=condensation.VAPOR_PRESSURE_DATA,
@@ -174,13 +349,13 @@ def test_wall_deposit_query_reports_out_of_domain_antoine_refusal():
         antoine_extrapolation_warnings=warnings,
     )
 
-    assert candidate_kg == {
-        "status": "unavailable",
-        "reason": "above_source_certified_range",
-        "terminal_refusal": False,
-        "species": "Mg",
-        "wall_temperature_K": pytest.approx(wall_temperature_K),
-    }
+    assert candidate_kg == 0.0
+    notice = model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
+    ]["Mg"]["default_pipe"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["valid_range_K"] == pure_range_K
+    assert notice["temperature_K"] == pytest.approx(wall_temperature_K)
     assert any(
         "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
         in warning

@@ -522,6 +522,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     ),
     melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
     gas_resistance_enabled: bool = True,
+    extrapolate_continuum: bool = False,
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
@@ -643,7 +644,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             knudsen = float(knudsen_number)
         except (TypeError, ValueError):
             knudsen = math.inf
-    from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
+    from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN, VISCOUS_KNUDSEN_MAX
 
     if math.isnan(knudsen) or knudsen < 0.0:
         raise EvaporationFluxConfigurationError(
@@ -652,19 +653,18 @@ def _series_resistance_evaporation_flux_kg_m2_s(
 
     gas_weight = 0.0
     if gas_resistance_enabled:
-        if knudsen < VISCOUS_KNUDSEN_MAX:
+        if knudsen < VISCOUS_KNUDSEN_MAX or (
+            extrapolate_continuum
+            and VISCOUS_KNUDSEN_MAX <= knudsen < FREE_MOLECULAR_KNUDSEN_MIN
+        ):
             gas_weight = 1.0
         # Premise: an open free-molecular vacuum has no stagnant carrier-gas
         # film. Therefore R_g=0 locally. Continuum branch: k_g=M*Sh*D/(L*R*T)
         # [s/m], R_g=1/k_g [m/s], only for Kn < VISCOUS_KNUDSEN_MAX (0.01).
-        # TRANSPORT-MODEL VALIDITY (not a Kn safety/coating gate): ledger-
-        # authoritative yields refuse when Kn >= VISCOUS_KNUDSEN_MAX and
-        # overhead_pressure > 0, because evolved P_bulk still comes from the
-        # viscous-only Poiseuille model (simulator/overhead.py). The 0.6.3
-        # optimizer floor (~1 mbar, Kn≈0.004) never enters that domain; t-379
-        # (0.7) supplies transitional/molecular conductance and lifts the
-        # validity refusal. Do not invent a molecular-flow model here. True
-        # vacuum (overhead_pressure=0) remains the reconstructible HKL bound.
+        # The provider and its Pareto replay may continue this same finite
+        # continuum expression into transitional Kn, carrying extrapolated
+        # authority. This is not a transitional conductance fit. Keep the
+        # existing free-molecular HKL branch and unflagged diagnostic sweeps.
 
     r_gas = 0.0
     k_mt_kg_s_m2_pa = 0.0
@@ -1155,6 +1155,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             else (str(campaign_name_raw).strip() or None)
         )
         domain_refusal = None
+        continuum_extrapolation = None
         if gas_resistance_enabled and overhead_pressure_pa > 0.0:
             kn_domain = _kn_eval(
                 overhead_pressure_pa,
@@ -1176,6 +1177,23 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             if (
                 active_gas_transport_species
                 and continuum_validity_refuses(domain_refusal)
+            ):
+                if domain_refusal.get("reason") == "viscous_p_bulk_transport_out_of_domain":
+                    continuum_extrapolation = {
+                        **{key: value for key, value in domain_refusal.items()
+                           if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")},
+                        "status": "extrapolated",
+                        "authority_level": "extrapolated",
+                        "authority_class": "extrapolated",
+                        "doctrine_category": 2,
+                        "ledger_yields_authorized": True,
+                        "evaporation_flux_status": "extrapolated",
+                        "detail": domain_refusal["detail"] + "; finite continuation of the same continuum fit; not certified transitional transport",
+                    }
+            if (
+                active_gas_transport_species
+                and continuum_validity_refuses(domain_refusal)
+                and continuum_extrapolation is None
             ):
                 domain_diagnostic = dict(domain_refusal)
                 _attach_missing_alpha_records(
@@ -1357,6 +1375,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     T_gas_K=gas_temperature_K,
                     melt_resistance_enabled=melt_resistance_enabled,
                     gas_resistance_enabled=uses_gas_resistance,
+                    extrapolate_continuum=continuum_extrapolation is not None,
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
                 )
@@ -1365,12 +1384,17 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     "policy": "fail_loud_missing_transport_parameters",
                     "carrier_gas": carrier_gas,
                     "reason": str(exc),
+                    "refusal_type": type(exc).__name__,
+                    "status": "unavailable",
+                    "authority_level": "unavailable",
                 }
                 continue
             computable_transport_species.add(species)
             J_kg_s_m2 = series_flux.flux_kg_s_m2
 
             series_diagnostic = series_flux.as_diagnostic()
+            if continuum_extrapolation is not None and uses_gas_resistance:
+                series_diagnostic["continuum_extrapolation_notice"] = dict(continuum_extrapolation)
             if alpha_authority_status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
                 series_diagnostic[ALPHA_AUTHORITY_STATUS_FIELD] = (
                     alpha_authority_status
@@ -1479,6 +1503,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "missing molar_mass_g_mol for evaporation species in "
                 "data/vapor_pressures.yaml: "
                 + ", ".join(sorted(missing_molar_mass))
+            )
+        if continuum_extrapolation is not None:
+            diagnostic["continuum_extrapolation_notice"] = continuum_extrapolation
+            warning_messages.append(
+                "viscous_p_bulk_transport_out_of_domain: EXTRAPOLATED finite continuum flux; "
+                "source domain and evaluated Kn remain attached"
             )
         if (
             domain_refusal is not None

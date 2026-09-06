@@ -2210,33 +2210,44 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if T_K < valid_low:
                     continue
                 if T_K > valid_high:
-                    extrapolation_allowed_range = _range_tuple(
-                        data.get("extrapolation_allowed_range_K")
-                    )
-                    if extrapolation_allowed_range is None:
-                        raise VaporPressureComputationError(
-                            "oxide_vapor_pressure_out_of_validated_range: "
-                            f"species={name} temperature_K={T_K:.2f} "
-                            f"valid_range_K=[{valid_low:g}, {valid_high:g}] "
-                            "extrapolation_allowed_range_K=absent"
+                    if name == "SiO":
+                        # t-838 pilot: the domain miss demotes evidence, not
+                        # the numeric source reaction. Other rails retain their
+                        # existing admission policy until separately reviewed.
+                        oxide_vapor_extrapolations[name] = {
+                            "temperature_K": T_K,
+                            "valid_range_K": (valid_low, valid_high),
+                            "authority_level": "extrapolated",
+                            "reason": "oxide_vapor_pressure_out_of_validated_range",
+                        }
+                    else:
+                        extrapolation_allowed_range = _range_tuple(
+                            data.get("extrapolation_allowed_range_K")
                         )
-                    allowed_low, allowed_high = extrapolation_allowed_range
-                    if T_K < allowed_low or T_K > allowed_high:
-                        raise VaporPressureComputationError(
-                            "oxide_vapor_pressure_out_of_validated_range: "
-                            f"species={name} temperature_K={T_K:.2f} "
-                            f"valid_range_K=[{valid_low:g}, {valid_high:g}] "
-                            "extrapolation_allowed_range_K="
-                            f"[{allowed_low:g}, {allowed_high:g}]"
-                        )
-                    oxide_vapor_extrapolations[name] = {
-                        "temperature_K": T_K,
-                        "valid_range_K": (valid_low, valid_high),
-                        "extrapolation_allowed_range_K": (
-                            allowed_low,
-                            allowed_high,
-                        ),
-                    }
+                        if extrapolation_allowed_range is None:
+                            raise VaporPressureComputationError(
+                                "oxide_vapor_pressure_out_of_validated_range: "
+                                f"species={name} temperature_K={T_K:.2f} "
+                                f"valid_range_K=[{valid_low:g}, {valid_high:g}] "
+                                "extrapolation_allowed_range_K=absent"
+                            )
+                        allowed_low, allowed_high = extrapolation_allowed_range
+                        if T_K < allowed_low or T_K > allowed_high:
+                            raise VaporPressureComputationError(
+                                "oxide_vapor_pressure_out_of_validated_range: "
+                                f"species={name} temperature_K={T_K:.2f} "
+                                f"valid_range_K=[{valid_low:g}, {valid_high:g}] "
+                                "extrapolation_allowed_range_K="
+                                f"[{allowed_low:g}, {allowed_high:g}]"
+                            )
+                        oxide_vapor_extrapolations[name] = {
+                            "temperature_K": T_K,
+                            "valid_range_K": (valid_low, valid_high),
+                            "extrapolation_allowed_range_K": (
+                                allowed_low,
+                                allowed_high,
+                            ),
+                        }
                     warnings.append(
                         f"{name} oxide-vapor Antoine fit extrapolated beyond "
                         f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
@@ -2309,6 +2320,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # acquisition flag); the pressure remains continuous for every
                     # status-bearing compiled carrier.
             else:
+                # Premise: above-band SiO retains its source reaction fit.
+                # Algebra: log10(P_reference/Pa) = A - B/(T_K+C), unchanged;
+                # B and T_K+C carry K, so the exponent is dimensionless.
+                # At the certified edge the same expression is continuous.
+                # This preserves the trend, not a certified error bound.
                 log_P = A - B / (T_K + C)
                 P_reference_Pa = _pow10_pressure_or_raise(
                     log_P,
@@ -2400,12 +2416,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 retain_analytical_channel or P_eq_Pa > 1e-15
             ):
                 vapor_pressures[name] = P_eq_Pa
-                # Oxide rows outside valid_range_K but inside an optional
-                # extrapolation_allowed_range_K remain diagnostic-limited
-                # (head demotion + suffix). SiO's source-validated domain now
-                # equals the process envelope [1400, 2273.15] K, so that band
-                # is no longer extrapolation; T above valid_range with no
-                # allowed band already raised above.
+                # Above-band predictions remain diagnostic-limited, including
+                # the SiO continuation without a second certified interval.
                 oxide_extrapolated = name in oxide_vapor_extrapolations
                 source_label = vapor_pressure_source_label(
                     (
@@ -2447,6 +2459,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
+                if name == "SiO" and oxide_extrapolated:
+                    vapor_pressure_provenance[name]["extrapolation_notice"] = dict(
+                        oxide_vapor_extrapolations[name]
+                    )
                 if compiled_evaluator is not None:
                     vapor_pressure_provenance[name][
                         "P_reference_model_Pa"

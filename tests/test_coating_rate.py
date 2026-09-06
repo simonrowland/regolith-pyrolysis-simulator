@@ -154,8 +154,9 @@ def test_cold_wall_below_certified_antoine_range_deposits() -> None:
 
     assert flux > 0.0
     assert diagnostic["net_mol_m2_s"] == pytest.approx(flux)
-    assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(0.0)
+    assert diagnostic["wall_saturation_pressure_pa"] > 0.0
     assert diagnostic["wall_saturation_pressure_refused"] is False
+    assert diagnostic["wall_saturation_pressure_notice"]["authority_level"] == "extrapolated"
 
     model = CondensationModel(
         CondensationTrain.create_default(),
@@ -209,11 +210,10 @@ def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
     )
 
     assert flux == pytest.approx(0.0)
-    assert diagnostic["wall_saturation_pressure_refused"] is True
-    assert (
-        diagnostic["wall_saturation_pressure_refusal_reason"]
-        == "above_source_certified_range"
-    )
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    assert diagnostic["wall_saturation_pressure_pa"] > 100.0
+    assert diagnostic["wall_saturation_pressure_notice"]["authority_level"] == "extrapolated"
+    assert diagnostic["wall_saturation_pressure_notice"]["valid_range_K"] == [1800.0, 3100.0]
 
     model = CondensationModel(
         CondensationTrain.create_default(),
@@ -235,20 +235,12 @@ def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
         wall_temperature_C=2926.85,
         surface_area_m2=1.0,
     )
-    assert unavailable == {
-        "status": "unavailable",
-        "reason": "above_source_certified_range",
-        "terminal_refusal": False,
-        "species": "Fe",
-        "wall_temperature_K": pytest.approx(3200.0),
-    }
-    assert model.last_wall_deposition_rate_shadow_candidate == {}
-    refusal_notice = model.last_sticking_alpha_provenance_notice[
-        "wall_saturation_pressure_refusals_by_species"
+    assert unavailable == 0.0
+    pressure_notice = model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
     ]["Fe"]["default_pipe"]
-    assert refusal_notice["status"] == "refused"
-    assert refusal_notice["reason"] == unavailable["reason"]
-    assert refusal_notice["wall_saturation_pressure_pa"] is None
+    assert pressure_notice["authority_level"] == "extrapolated"
+    assert pressure_notice["temperature_K"] == 3200.0
     model.pipe_segments = [
         PipeSegment("hot", "melt", "stage_1", 2926.85, 1.0, 0.12)
     ]
@@ -257,7 +249,7 @@ def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
         T_cond_C=model.condensation_temperatures_C["Fe"],
         melt_temperature_C=2926.85, supply_by_segment_kg={"hot": 1.0},
     ) == {}
-    assert model.last_wall_deposition_rate_shadow_candidate == {}
+    assert model.last_wall_deposition_rate_shadow_candidate["hot"]["Fe"]["wall_saturation_pressure_notice"] == pressure_notice
 
 
 @pytest.mark.parametrize("invalid_data", [
@@ -294,21 +286,15 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
         surface_area_m2=1.0,
     )
     if invalid_data:
-        expected = (
-            WallSaturationPressureRefusal
-            if invalid_data == "pure_component_antoine" else DepositionInputRefusal
-        )
-        with pytest.raises(expected) as refused:
+        with pytest.raises(DepositionInputRefusal) as refused:
             wall_deposit_candidate_for_surface_kg(model, **kwargs)
         assert refused.value.terminal_refusal is True
     else:
-        assert wall_deposit_candidate_for_surface_kg(model, **kwargs) == {
-            "status": "unavailable",
-            "reason": "source_certified_range_refused",
-            "terminal_refusal": False,
-            "species": species,
-            "wall_temperature_K": pytest.approx(2073.15),
-        }
+        record = wall_deposit_candidate_for_surface_kg(model, **kwargs)
+        assert record["status"] == "unavailable"
+        assert "no extrapolation available" in record["reason"]
+        assert record["terminal_refusal"] is False
+        assert record["wall_temperature_K"] == pytest.approx(2073.15)
     assert model.last_wall_deposition_rate_shadow_candidate == {}
 
 
@@ -589,7 +575,7 @@ def test_opt_in_diagnostics_are_golden_neutral() -> None:
 
 
 @pytest.mark.parametrize("include_diagnostics", [False, True])
-def test_lunar_payload_preserves_unavailable_mg_wall_channel(
+def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     include_diagnostics: bool,
 ) -> None:
     payload = PyrolysisRun(
@@ -602,12 +588,13 @@ def test_lunar_payload_preserves_unavailable_mg_wall_channel(
     assert payload["status"] == "ok"
     assert len(payload["per_hour_summary"]) == 24
     pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
-    assert pareto["by_species"]["Mg"] == {
-        "status": "unavailable",
-        "reason": "above_source_certified_range",
-        "current_wall_deposit_flux_kg_hr": None,
-        "cumulative_wall_deposit_kg": None,
-    }
+    magnesium = pareto["by_species"]["Mg"]
+    assert magnesium["status"] == "unavailable"
+    assert magnesium["reason"] == "species_absent_from_latest_evaporation_series_diagnostic"
+    assert magnesium["authority_level"] == "extrapolated"
+    records = magnesium["wall_saturation_pressure_extrapolations"]
+    assert records
+    assert all(record["authority_level"] == "extrapolated" for record in records.values())
 
 
 def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None:

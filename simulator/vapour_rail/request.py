@@ -1456,6 +1456,13 @@ def refusal_closure(
                     ),
                     "status": getattr(evaluation, "status", None),
                 }
+                source_notice = state.source_reaction_activity_provenance.get(
+                    rule.species_id, {}
+                ).get("extrapolation_notice")
+                if source_notice is not None:
+                    # Keep the melt source's band/reason attached to its public
+                    # pressure answer, through the existing extensible carrier.
+                    evaluation_extra["extrapolation_notice"] = dict(source_notice)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping
 

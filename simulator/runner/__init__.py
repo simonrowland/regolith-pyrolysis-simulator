@@ -2618,6 +2618,7 @@ def build_per_hour_summary(
     # into the per-hour UI/runner surface (artifact schema may change;
     # physical outputs remain shadow-equal).
     condensation_model = getattr(sim, "condensation_model", None)
+    wall_notice = getattr(condensation_model, "last_sticking_alpha_provenance_notice", {}) or {}
     refusals = dict(
         getattr(condensation_model, "last_condensation_refusals_by_species", {})
         or {}
@@ -2635,6 +2636,26 @@ def build_per_hour_summary(
                 "metadata": batch_report.get("metadata"),
             }
         )
+        pressure_notices = {
+            species: dict(channel["extra"]["extrapolation_notice"])
+            for species, channel in batch_report.get("channels_by_species", {}).items()
+            if channel.get("extra", {}).get("extrapolation_notice")
+        }
+        metadata = dict(summary["vapour_batch_summary"].get("metadata") or {})
+        if pressure_notices:
+            metadata["extrapolation_notices_by_species"] = _json_safe(pressure_notices)
+        if any(wall_notice.get(key) for key in (
+            "wall_saturation_pressure_extrapolations_by_species",
+            "wall_saturation_pressure_refusals_by_species",
+            "evaporation_transport_notices_by_species",
+        )):
+            metadata["wall_deposit_sticking_authority"] = _json_safe(
+                wall_deposit_sticking_authority_status(
+                    summary["wall_deposit_cumulative_kg"], wall_notice,
+                )
+            )
+        if metadata:
+            summary["vapour_batch_summary"]["metadata"] = metadata
     overlay = dict(getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {})
     if overlay:
         summary["vapour_batch_flux_overlay"] = _json_safe(overlay)

@@ -1364,10 +1364,10 @@ def test_provider_refuses_universal_melt_renewal_model():
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_refuses_transitional_kn_domain_without_fabricating_zero_flux():
+def test_provider_extrapolates_finite_continuum_without_fabricating_zero_flux():
     # Kn≈0.1 at T=2023 K, D=0.12 m, P≈3.63 Pa — transitional. Viscous
-    # Poiseuille P_bulk is out of domain: flux is not evaluated, not zero.
-    # Not a Kn safety/coating gate. Free-molecular + viscous paths remain.
+    # Poiseuille P_bulk is out of domain: continue its finite source model
+    # with authority demoted, including the existing continuum gas resistance.
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=3.632,
@@ -1375,21 +1375,24 @@ def test_provider_refuses_transitional_kn_domain_without_fabricating_zero_flux()
         gas_temperature_K=2023.15,
     )
 
-    assert result.status == "refused"
-    assert result.diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
-    assert result.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert result.diagnostic["evaporation_flux_kg_hr"] is None
-    assert result.diagnostic["affected_species"] == ("Na",)
-    assert result.diagnostic["process_regime"] == "unknown"
-    assert result.diagnostic["asking_site"] == "engines.builtin.evaporation_flux"
-    assert result.diagnostic["ledger_yields_authorized"] is False
-    assert result.diagnostic["authority_class"] == "diagnostic-limited"
-    assert result.diagnostic["p_bulk_transport_domain"] == (
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
+    notice = result.diagnostic["continuum_extrapolation_notice"]
+    assert notice["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["doctrine_category"] == 2
+    assert notice["evaporation_flux_status"] == "extrapolated"
+    assert notice["affected_species"] == ("Na",)
+    assert notice["p_bulk_transport_domain"] == (
         "out_of_domain_transitional"
     )
-    assert result.diagnostic["knudsen_number"] > 0.01
-    assert result.diagnostic["knudsen_number"] < 10.0
-    assert "transport_model_validity_domain" in result.diagnostic["framing"]
+    assert notice["knudsen_number"] > 0.01
+    assert notice["knudsen_number"] < 10.0
+    assert "Kn < 0.01" in notice["model_domain"]
+    assert notice["gas_temperature_K"] == 2023.15
+    series = result.diagnostic["evaporation_series_resistance"]["Na"]
+    assert series["r_gas"] > 0.0
+    assert series["continuum_extrapolation_notice"] == notice
     assert any(
         "viscous_p_bulk_transport_out_of_domain" in w for w in result.warnings
     )
@@ -1403,7 +1406,7 @@ def test_provider_refuses_transitional_kn_domain_without_fabricating_zero_flux()
 
     with pytest.raises(EvaporationFluxRefusal) as ei:
         refuse_viscous_p_bulk_out_of_domain(
-            knudsen_number=result.diagnostic["knudsen_number"],
+            knudsen_number=notice["knudsen_number"],
             overhead_pressure_pa=3.632,
             pipe_diameter_m=0.12,
             gas_temperature_K=2023.15,
@@ -1412,7 +1415,7 @@ def test_provider_refuses_transitional_kn_domain_without_fabricating_zero_flux()
 
 
 @pytest.mark.xdist_group("serial")
-def test_transitional_refusal_reports_actual_and_commanded_pressure():
+def test_transitional_extrapolation_reports_actual_and_commanded_pressure():
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=3.632,
@@ -1421,20 +1424,20 @@ def test_transitional_refusal_reports_actual_and_commanded_pressure():
         gas_temperature_K=2023.15,
     )
 
-    assert result.status == "refused"
-    assert result.diagnostic["overhead_pressure_pa"] == pytest.approx(3.632)
-    assert result.diagnostic["commanded_pressure_pa"] == 0.0
-    assert result.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert result.diagnostic["evaporation_flux_kg_hr"] is None
+    assert result.status == "ok"
+    notice = result.diagnostic["continuum_extrapolation_notice"]
+    assert notice["overhead_pressure_pa"] == pytest.approx(3.632)
+    assert notice["commanded_pressure_pa"] == 0.0
+    assert notice["evaporation_flux_status"] == "extrapolated"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
 
 
 @pytest.mark.xdist_group("serial")
-def test_prepass_records_missing_alpha_on_transitional_domain_refusal():
+def test_prepass_records_missing_alpha_with_transitional_extrapolation():
     """b-194: a request-level missing alpha must not stay silent in the
     transport pre-pass. Unity remains the Hertz-Knudsen screening ceiling
     (Na still loads ``affected_species``), but the same ``missing_alpha``
-    record the authoritative loop emits must be on the early-return
-    diagnostic.
+    record the authoritative loop emits must remain on the diagnostic.
     """
 
     vacuum = _w3_result_with_controls(1.0, alpha={})
@@ -1460,13 +1463,14 @@ def test_prepass_records_missing_alpha_on_transitional_domain_refusal():
         "missing_evaporation_alpha"
     )
 
-    assert transitional.status == "refused"
-    assert transitional.diagnostic["reason"] == (
+    assert transitional.status == "ok"
+    notice = transitional.diagnostic["continuum_extrapolation_notice"]
+    assert notice["reason"] == (
         "viscous_p_bulk_transport_out_of_domain"
     )
-    assert transitional.diagnostic["affected_species"] == ("Na",)
-    assert transitional.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert transitional.diagnostic["evaporation_flux_kg_hr"] is None
+    assert notice["affected_species"] == ("Na",)
+    assert notice["authority_level"] == "extrapolated"
+    assert transitional.diagnostic["evaporation_flux_kg_hr"] == {}
     assert set(transitional.diagnostic["missing_alpha"]) == {"Na"}
     prepass_record = transitional.diagnostic["missing_alpha"]["Na"]
     assert prepass_record["policy"] == vacuum_record["policy"]
@@ -1489,7 +1493,7 @@ def test_prepass_records_missing_alpha_on_transitional_domain_refusal():
 
 
 @pytest.mark.xdist_group("serial")
-def test_evaporation_caller_preserves_domain_reason_with_missing_alpha(
+def test_evaporation_caller_keeps_missing_alpha_unavailable_without_aborting(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -1509,9 +1513,9 @@ def test_evaporation_caller_preserves_domain_reason_with_missing_alpha(
         pipe_diameter_m=0.12,
         gas_temperature_K=2023.15,
     )
-    assert result.status == "refused"
-    assert result.diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
-    assert result.diagnostic["evaporation_flux_status"] == "not_evaluated"
+    assert result.status == "ok"
+    assert result.diagnostic["continuum_extrapolation_notice"]["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
     assert set(result.diagnostic["missing_alpha"]) == {"CrO", "CrO2"}
     assert any("CrO, CrO2" in warning for warning in result.warnings)
 
@@ -1534,13 +1538,8 @@ def test_evaporation_caller_preserves_domain_reason_with_missing_alpha(
         diagnostics={},
         liquid_fraction=1.0,
     )
-    with pytest.raises(EvaporationFluxRefusal) as exc:
-        sim._calculate_evaporation(equilibrium)
-
-    assert exc.value.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert str(exc.value) == exc.value.reason
+    sim._calculate_evaporation(equilibrium)
     for key in ("missing_alpha", "species_refusals"):
-        assert exc.value.diagnostic[key] == result.diagnostic[key]
         assert sim._last_evaporation_flux_diagnostic[key] == result.diagnostic[key]
 
 

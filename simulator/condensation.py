@@ -2053,6 +2053,7 @@ class CondensationModel:
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
+        self.wall_temperature_input_refusals: dict[str, str] = {}
         self.last_transport_parameter_notice: dict[str, Any] = {}
         self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
         # VR-11 / B2: consumer-facing condensation refusal channel.
@@ -2824,7 +2825,8 @@ class CondensationModel:
         )
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
-            self.pipe_segments,
+            [segment for segment in self.pipe_segments
+             if segment.name not in self.wall_temperature_input_refusals],
             evap_flux.species_kg_hr,
             margin_C=self.cold_spot_margin_C,
             upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
@@ -3050,6 +3052,8 @@ class CondensationModel:
             )
             candidate_segments = self._mixed_temperature_wall_candidate_segments(
                 species)
+            candidate_segments = [segment for segment in candidate_segments
+                                  if segment.name not in self.wall_temperature_input_refusals]
             if candidate_segments:
                 alpha_records = [
                     _wall_alpha_record(
@@ -3294,6 +3298,16 @@ class CondensationModel:
         sticking_notice['vapour_carrier_lineage_by_deposited_species'] = (
             wall_carrier_lineage_by_deposited_species
         )
+        extrapolations = self.last_sticking_alpha_provenance_notice.get(
+            'wall_saturation_pressure_extrapolations_by_species', {}
+        )
+        if extrapolations:
+            sticking_notice['wall_saturation_pressure_extrapolations_by_species'] = copy.deepcopy(extrapolations)
+        transport_notices = self.last_sticking_alpha_provenance_notice.get(
+            'evaporation_transport_notices_by_species', {}
+        )
+        if transport_notices:
+            sticking_notice['evaporation_transport_notices_by_species'] = copy.deepcopy(transport_notices)
         prior_refusals = self.last_sticking_alpha_provenance_notice.get(
             'wall_saturation_pressure_refusals_by_species',
             {},
@@ -3735,6 +3749,8 @@ class CondensationModel:
             for segment in self._mixed_temperature_wall_candidate_segments(
                 species,
             ):
+                if segment.name in self.wall_temperature_input_refusals:
+                    continue
                 _record_wall_surface_antoine_telemetry(
                     species,
                     segment.wall_temperature_C,
@@ -4031,6 +4047,8 @@ class CondensationModel:
                 for segment in self._mixed_temperature_wall_candidate_segments(
                     species
                 ):
+                    if segment.name in self.wall_temperature_input_refusals:
+                        continue
                     _record_wall_surface_antoine_telemetry(
                         species,
                         segment.wall_temperature_C,
@@ -5359,6 +5377,9 @@ def _record_antoine_extrapolation(
     record = {
         'temperature_K': T_K,
         'valid_range_K': (valid_low, valid_high),
+        'authority_level': 'extrapolated',
+        'reason': 'wall_saturation_pressure_out_of_validated_range',
+        'status': 'extrapolated',
     }
     if antoine_extrapolations is not None:
         existing_records = [
@@ -5405,7 +5426,6 @@ def _antoine_psat_pa(
     )
     has_legacy_antoine = any(
         isinstance(block, Mapping)
-        and not _missing_required_antoine_keys(block)
         for block_name in _ANTOINE_COEFFICIENT_BLOCKS
         if (block := data.get(block_name)) is not None
     )
@@ -5418,6 +5438,15 @@ def _antoine_psat_pa(
         evaluator = compiled_catalog_for(
             catalog_payload, emit_u0_request_rules=False
         ).evaluator_for(species)
+        if evaluator.activity_exponent or evaluator.pO2_exponent:
+            refusal = WallSaturationPressureRefusal(species, T_K,
+                "no extrapolation available: source reaction requires "
+                "source_activity/pO2 and is not a wall saturation curve; "
+                f"valid_range_K={evaluator.valid_temperature_K} temperature_K={T_K}"
+            )
+            refusal.valid_range_K = evaluator.valid_temperature_K
+            refusal.band_scope = "source_reaction_not_wall_saturation"
+            raise refusal
         evaluation = evaluator.evaluate(T_K)
         if evaluation.out_of_range:
             if antoine_extrapolations is not None:
@@ -5426,6 +5455,8 @@ def _antoine_psat_pa(
                     "valid_range_K": evaluator.valid_temperature_K,
                     "status": evaluation.status,
                     "acquisition_flag": evaluation.acquisition_flag,
+                    "authority_level": "extrapolated",
+                    "reason": evaluation.status,
                 }
             if (
                 antoine_extrapolation_warnings is not None
@@ -5434,8 +5465,12 @@ def _antoine_psat_pa(
                 antoine_extrapolation_warnings.append(str(evaluation.status))
         return evaluation.pressure_pa
     from engines.builtin.vapor_pressure import (
+        VaporPressureRangeError,
+        _coefficient_mapping,
         reconstructed_vapor_pressure_authority_limit,
         require_antoine_source_certified_temperature,
+        vapor_pressure_source_equation_range_K,
+        vapor_pressure_valid_range_K,
         wall_condensation_antoine_coefficients,
     )
 
@@ -5458,24 +5493,38 @@ def _antoine_psat_pa(
         data,
         temperature_K=T_K,
     )
-    if not isinstance(antoine, Mapping):
-        return None
-    try:
-        A = float(antoine.get('A', 0.0))
-        B = float(antoine.get('B', 0.0))
-        C = float(antoine.get('C', 0.0))
-        T_K = float(T_K)
-    except (TypeError, ValueError):
-        return None
-    if not (A > 0.0 and math.isfinite(T_K) and T_K + C > 0.0):
-        return None
-    require_antoine_source_certified_temperature(
-        species,
-        data,
-        coefficient_block,
-        T_K,
-        consumer="wall_condensation",
+    source_band = vapor_pressure_source_equation_range_K(
+        data, coefficient_block, T_K,
+    ) or vapor_pressure_valid_range_K(data, coefficient_block, T_K)
+    if not antoine:
+        declared = _coefficient_mapping(data, coefficient_block, temperature_K=T_K)
+        if declared:
+            for key in ("A", "B", "C"):
+                _deposition_finite_scalar(f"{coefficient_block}.{key}", declared.get(key))
+        refusal = WallSaturationPressureRefusal(species, T_K,
+            "no extrapolation available: wall fit absent or outside its finite positive-denominator branch; "
+            f"valid_range_K={source_band}")
+        refusal.valid_range_K = source_band
+        raise refusal
+    A, B, C = (
+        _deposition_finite_scalar(f"{coefficient_block}.{key}", antoine.get(key))
+        for key in ("A", "B", "C")
     )
+    T_K = _deposition_finite_scalar("T_wall_K", T_K)
+    if T_K <= 0.0 or A <= 0.0:
+        raise DepositionInputRefusal("wall_antoine", (A, T_K), "requires A > 0 and T > 0")
+    if T_K + C <= 0.0:
+        refusal = WallSaturationPressureRefusal(species, T_K,
+            f"no extrapolation available: Antoine denominator T+C <= 0; valid_range_K={source_band}")
+        refusal.valid_range_K = source_band
+        raise refusal
+    domain_reason = None
+    try:
+        require_antoine_source_certified_temperature(
+            species, data, coefficient_block, T_K, consumer="wall_condensation",
+        )
+    except VaporPressureRangeError as exc:
+        domain_reason = str(exc)
     _record_antoine_extrapolation(
         species,
         T_K,
@@ -5484,8 +5533,28 @@ def _antoine_psat_pa(
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
+    if domain_reason is not None:
+        if antoine_extrapolation_warnings is not None and domain_reason not in antoine_extrapolation_warnings:
+            antoine_extrapolation_warnings.append(domain_reason)
+        if antoine_extrapolations is not None:
+            antoine_extrapolations[f"{species}#wall:{T_K}"] = {
+                "temperature_K": T_K,
+                "valid_range_K": source_band,
+                "authority_level": "extrapolated",
+                "reason": domain_reason,
+                "status": "extrapolated",
+            }
     # Same Antoine form used by equilibrium.py and builtin vapor pressure.
-    return 10.0 ** (A - B / (T_K + C))
+    try:
+        pressure_pa = 10.0 ** (A - B / (T_K + C))
+    except OverflowError:
+        pressure_pa = math.inf
+    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        refusal = WallSaturationPressureRefusal(species, T_K,
+            f"no extrapolation available: Antoine pressure is not representable as finite positive; valid_range_K={source_band}")
+        refusal.valid_range_K = source_band
+        raise refusal
+    return pressure_pa
 
 
 def _try_antoine_psat_pa(
@@ -5507,6 +5576,12 @@ def _try_antoine_psat_pa(
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError
     from simulator.vapour_rail.catalog import CatalogCompileError
+    from simulator.vapour_rail.nasa_cea import NasaCeaDomainError
+    from simulator.vapour_rail.shomate import ShomateDomainError
+
+    antoine_extrapolations, antoine_extrapolation_warnings = _resolve_antoine_telemetry(
+        antoine_extrapolations, antoine_extrapolation_warnings,
+    )
 
     try:
         pressure_pa = _antoine_psat_pa(
@@ -5517,7 +5592,16 @@ def _try_antoine_psat_pa(
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             enforce_hot_train_applicability=enforce_hot_train_applicability,
         )
-    except (CatalogCompileError, VaporPressureRangeError) as exc:
+    except (CatalogCompileError, VaporPressureRangeError, NasaCeaDomainError, ShomateDomainError,
+            WallSaturationPressureRefusal, DepositionInputRefusal) as exc:
+        if antoine_extrapolations is not None:
+            antoine_extrapolations[f"{species}#wall:{T_K}"] = {
+                "temperature_K": T_K, "status": "refused", "reason": str(exc),
+                "authority_level": "unavailable",
+                "valid_range_K": getattr(exc, "valid_range_K", None),
+                "band_scope": getattr(exc, "band_scope", "wall_saturation_pressure"),
+                "refusal_type": type(exc).__name__,
+            }
         if (
             antoine_extrapolation_warnings is not None
             and str(exc) not in antoine_extrapolation_warnings
@@ -6084,6 +6168,8 @@ def _wall_deposition_driving_pressure_pa(
         antoine_extrapolations,
         antoine_extrapolation_warnings,
     )
+    if antoine_extrapolations is None:
+        antoine_extrapolations = {}
     P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
         species,
         T_surface_K,
@@ -6129,7 +6215,8 @@ def _wall_deposition_driving_pressure_pa(
             species,
             vapor_pressure_data=vapor_pressure_data,
         )
-        if admission_refusal is not None:
+        refusal_record = (antoine_extrapolations or {}).get(f"{species}#wall:{T_surface_K}", {})
+        if admission_refusal is not None and refusal_record.get("refusal_type") != "DepositionInputRefusal":
             raise WallSaturationPressureRefusal(
                 species,
                 T_surface_K,
@@ -6141,18 +6228,6 @@ def _wall_deposition_driving_pressure_pa(
             vapor_pressure_data=vapor_pressure_data,
             antoine_extrapolations=antoine_extrapolations,
         )
-        if range_relation == "below":
-            # P_sat decreases monotonically as T falls; at T << T_boil,
-            # P_sat/P_local -> 0, so P_local - P_sat -> P_local. This is the
-            # cold-limit derivation, not an Antoine extrapolation.
-            if diagnostic_out is not None:
-                diagnostic_out["wall_saturation_pressure_pa"] = 0.0
-                diagnostic_out["wall_saturation_pressure_refused"] = False
-                diagnostic_out["wall_saturation_pressure_status"] = (
-                    "derived_below_certified_range_limit"
-                )
-            return max(0.0, local_pressure_pa)
-
         if range_relation == "above":
             refusal_reason = "above_source_certified_range"
         elif saturation_pressure_refused:
@@ -6171,6 +6246,10 @@ def _wall_deposition_driving_pressure_pa(
             diagnostic_out["wall_saturation_pressure_refusal_reason"] = (
                 refusal_reason
             )
+            record = (antoine_extrapolations or {}).get(f"{species}#wall:{T_surface_K}")
+            if record is not None:
+                diagnostic_out["wall_saturation_pressure_notice"] = dict(record)
+                diagnostic_out["wall_saturation_pressure_refusal_reason"] = record["reason"]
             return 0.0
         raise WallSaturationPressureRefusal(
             species,
@@ -6180,6 +6259,13 @@ def _wall_deposition_driving_pressure_pa(
     if diagnostic_out is not None:
         diagnostic_out["wall_saturation_pressure_pa"] = P_sat_pa
         diagnostic_out["wall_saturation_pressure_refused"] = False
+        record = (antoine_extrapolations or {}).get(f"{species}#wall:{T_surface_K}")
+        if record is None:
+            record = next((value for key, value in (antoine_extrapolations or {}).items()
+                if str(key).split('#', 1)[0] == species and value.get('temperature_K') == T_surface_K
+                and value.get('authority_level') == 'extrapolated'), None)
+        if record is not None:
+            diagnostic_out["wall_saturation_pressure_notice"] = dict(record)
     if reactivity_class == 'reactive':
         if P_sat_pa < local_pressure_pa:
             return max(0.0, local_pressure_pa - P_sat_pa)

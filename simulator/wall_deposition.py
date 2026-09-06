@@ -19,6 +19,27 @@ from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 SECONDS_PER_HOUR = 3600.0
 
 
+def _record_wall_pressure_notice(
+    model: Any,
+    kind: str,
+    species: str,
+    segment: str,
+    record: Mapping[str, Any],
+) -> None:
+    records = model.last_sticking_alpha_provenance_notice.setdefault(kind, {}).setdefault(species, {})
+    if any(
+        existing == record for key, existing in records.items()
+        if key == segment or key.startswith(f"{segment}#")
+    ):
+        return
+    key = segment
+    suffix = 2
+    while key in records:
+        key = f"{segment}#{suffix}"
+        suffix += 1
+    records[key] = dict(record)
+
+
 def wall_deposit_candidate_kg(
     model: Any,
     *,
@@ -50,7 +71,9 @@ def wall_deposit_candidates_by_segment_kg(
     supply_by_segment_kg: Mapping[str, float],
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> dict[str, float]:
-    from simulator.condensation import _deposition_finite_scalar
+    from simulator.condensation import (
+        DepositionInputRefusal, WallSaturationPressureRefusal, _deposition_finite_scalar,
+    )
 
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
     if rate_kg_hr <= 0.0 or not model.pipe_segments:
@@ -67,21 +90,35 @@ def wall_deposit_candidates_by_segment_kg(
             )),
             rate_kg_hr,
         )
-        candidate = wall_deposit_candidate_for_surface_kg(
-            model,
-            species=species,
-            rate_kg_hr=supply_kg,
-            T_cond_C=T_cond_C,
-            melt_temperature_C=melt_temperature_C,
-            wall_temperature_C=segment.wall_temperature_C,
-            surface_area_m2=_wall_geometry_conductance_weight(segment),
-            pipe_diameter_m=float(
-                getattr(segment, "inner_diameter_m", model.pipe_diameter_m)
-            ),
-            regime_factor=_segment_wall_regime_factor(model, segment),
-            segment=segment,
-            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-        )
+        try:
+            candidate = wall_deposit_candidate_for_surface_kg(
+                model,
+                species=species,
+                rate_kg_hr=supply_kg,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+                wall_temperature_C=segment.wall_temperature_C,
+                surface_area_m2=_wall_geometry_conductance_weight(segment),
+                pipe_diameter_m=float(
+                    getattr(segment, "inner_diameter_m", model.pipe_diameter_m)
+                ),
+                regime_factor=_segment_wall_regime_factor(model, segment),
+                segment=segment,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            )
+        except (DepositionInputRefusal, WallSaturationPressureRefusal) as exc:
+            record = {
+                "status": "refused", "reason": str(exc), "refusal_type": type(exc).__name__,
+                "output_status": "status_bearing", "authority_level": "unavailable",
+                "wall_temperature_K": (
+                    None if getattr(exc, "parameter", None) == "T_wall_K"
+                    else segment.wall_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+                ),
+                "wall_saturation_pressure_pa": None,
+            }
+            _record_wall_pressure_notice(model, "wall_saturation_pressure_refusals_by_species",
+                                         species, segment.name, record)
+            continue
         if isinstance(candidate, Mapping) and candidate.get("status") == "unavailable":
             # No wall quantity: leave this supply on the existing gas-train route.
             continue
@@ -155,6 +192,12 @@ def wall_deposit_candidate_for_surface_kg(
         _wall_material_config,
         classify_knudsen_regime,
     )
+
+    temperature_refusal = getattr(model, "wall_temperature_input_refusals", {}).get(
+        str(getattr(segment, "name", "default_pipe"))
+    )
+    if temperature_refusal:
+        raise DepositionInputRefusal("T_wall_K", None, temperature_refusal)
 
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
     surface_area_m2 = _deposition_finite_scalar("surface_area_m2", surface_area_m2)
@@ -310,24 +353,21 @@ def wall_deposit_candidate_for_surface_kg(
         )
     if rate_diagnostic.get("wall_saturation_pressure_refused"):
         refusal_reason = rate_diagnostic["wall_saturation_pressure_refusal_reason"]
-        notice = model.last_sticking_alpha_provenance_notice
-        notice.setdefault("wall_saturation_pressure_refusals_by_species", {}).setdefault(
-            species, {}
-        )[str(getattr(segment, "name", "default_pipe"))] = {
+        _record_wall_pressure_notice(model, "wall_saturation_pressure_refusals_by_species",
+            species, str(getattr(segment, "name", "default_pipe")), {
             "status": "refused",
             "reason": refusal_reason,
             "output_status": "status_bearing",
             "wall_temperature_K": T_wall_K,
             "wall_saturation_pressure_pa": None,
-        }
+            **rate_diagnostic.get("wall_saturation_pressure_notice", {}),
+        })
         source_data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
         source_only_wall_channel = (
             source_data.get("fit_target") == "standard_reaction_term"
             and "pure_component_antoine" not in source_data
         )
-        if refusal_reason == "above_source_certified_range" or (
-            refusal_reason == "source_certified_range_refused" and source_only_wall_channel
-        ):
+        if source_only_wall_channel or rate_diagnostic.get("wall_saturation_pressure_notice", {}).get("refusal_type") == "DepositionInputRefusal":
             from engines.builtin.vapor_pressure import (
                 _coefficient_mapping,
                 wall_condensation_antoine_coefficients,
@@ -369,11 +409,15 @@ def wall_deposit_candidate_for_surface_kg(
                 "species": species,
                 "wall_temperature_K": T_wall_K,
             }
-        raise WallSaturationPressureRefusal(
-            species,
-            T_wall_K,
-            refusal_reason,
-        )
+        return {
+            "status": "unavailable", "reason": refusal_reason,
+            "terminal_refusal": False, "species": species,
+            "wall_temperature_K": T_wall_K,
+        }
+    pressure_notice = rate_diagnostic.get("wall_saturation_pressure_notice")
+    if pressure_notice is not None:
+        _record_wall_pressure_notice(model, "wall_saturation_pressure_extrapolations_by_species",
+            species, str(getattr(segment, "name", "default_pipe")), pressure_notice)
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa
     rate_diagnostic["total_pressure_pa"] = overhead_pressure_pa
     wall_saturation_pressure_pa = rate_diagnostic.get(

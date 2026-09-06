@@ -359,6 +359,12 @@ def wall_deposit_sticking_authority_status(
         if status == VAPOUR_CARRIER_AUTHORITY_MISSING
     ))
     carrier_authority_kwargs = {
+        "evaporation_transport_notices_by_species": notice.get(
+            "evaporation_transport_notices_by_species", {}
+        ),
+        "wall_saturation_pressure_extrapolations_by_species": notice.get(
+            "wall_saturation_pressure_extrapolations_by_species", {}
+        ),
         "vapour_carrier_authority_by_species": carrier_authority,
         "vapour_carrier_lineage_by_deposited_species": carrier_lineage,
         "non_authoritative_carrier_species": (
@@ -901,9 +907,13 @@ def _wall_deposit_authority_payload(
     refused_carrier_species: Sequence[str] = (),
     proven_zero_carrier_species: Sequence[str] = (),
     missing_carrier_authority_species: Sequence[str] = (),
+    wall_saturation_pressure_extrapolations_by_species: Mapping[str, Any] | None = None,
+    evaporation_transport_notices_by_species: Mapping[str, Any] | None = None,
     out_of_domain_alpha_species: Sequence[str] = (),
     message: str | None = None,
 ) -> dict[str, Any]:
+    if wall_saturation_pressure_extrapolations_by_species or evaporation_transport_notices_by_species:
+        authoritative = False
     if message is None:
         if authoritative:
             message = (
@@ -949,6 +959,18 @@ def _wall_deposit_authority_payload(
         "grounding_target": WALL_STICKING_ALPHA_GROUNDING_TARGET,
         "message": message,
     }
+    if wall_saturation_pressure_extrapolations_by_species:
+        payload["wall_saturation_pressure_extrapolations_by_species"] = _plain_mapping(
+            wall_saturation_pressure_extrapolations_by_species
+        )
+        payload["authority_level"] = "extrapolated"
+        payload["message"] += " Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached."
+    if evaporation_transport_notices_by_species:
+        payload["evaporation_transport_notices_by_species"] = _plain_mapping(
+            evaporation_transport_notices_by_species
+        )
+        payload["authority_level"] = "extrapolated"
+        payload["message"] += " Evaporation transport includes EXTRAPOLATED or unavailable channels; source domains and reasons remain attached."
     if surface_geometry_provenance:
         payload["surface_geometry_provenance"] = _plain_mapping(
             surface_geometry_provenance)
@@ -1444,11 +1466,34 @@ def _finite_float(value: Any) -> float | None:
     return number
 
 
+def _attach_pareto_source_notices(
+    by_species: dict[str, Any], wall_notice: Mapping[str, Any],
+) -> None:
+    for species, carrier in wall_notice.get("vapour_carrier_authority_by_species", {}).items():
+        if not isinstance(carrier, Mapping):
+            continue
+        notice = carrier.get("extra", {}).get("extrapolation_notice")
+        if notice:
+            entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_series_metadata_unavailable"})
+            entry["vapour_pressure_extrapolation_notice"] = _plain_mapping(notice)
+            entry["authority_level"] = "extrapolated"
+            if entry.get("status") == "ok":
+                entry["status"] = "extrapolated"
+    for species, records in wall_notice.get("evaporation_transport_notices_by_species", {}).items():
+        entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_transport_unavailable"})
+        entry["evaporation_transport_notices"] = _plain_mapping(records)
+        authority = "extrapolated" if any(record.get("authority_level") == "extrapolated" for record in records.values()) else "unavailable"
+        entry["authority_level"] = authority
+        if entry.get("status") == "ok":
+            entry["status"] = authority
+
+
 def _pressure_coating_pareto_unavailable(
     target_species: Sequence[str],
     reason: str,
     *,
     alpha_authority_status_by_species: Mapping[str, str] | None = None,
+    wall_notice: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     diagnostic = {
         "schema_version": "pressure-coating-pareto-v1",
@@ -1461,10 +1506,19 @@ def _pressure_coating_pareto_unavailable(
             for species in target_species
         },
     }
+    for key, output_key in (
+        ("wall_saturation_pressure_refusals_by_species", "wall_saturation_pressure_refusals"),
+        ("wall_saturation_pressure_extrapolations_by_species", "wall_saturation_pressure_extrapolations"),
+    ):
+        for species, records in (wall_notice or {}).get(key, {}).items():
+            entry = diagnostic["by_species"].setdefault(str(species), {"status": "unavailable", "reason": reason})
+            entry[output_key] = _plain_mapping(records)
+            entry["authority_level"] = "unavailable" if "refusals" in key else "extrapolated"
     if alpha_authority_status_by_species:
         diagnostic["alpha_authority_status_by_species"] = dict(
             alpha_authority_status_by_species
         )
+    _attach_pareto_source_notices(diagnostic["by_species"], wall_notice or {})
     return diagnostic
 
 
@@ -1486,6 +1540,7 @@ def pressure_coating_pareto_diagnostic(
 
     condensation_model = getattr(sim, "condensation_model", None)
     latest_evap = dict(getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {})
+    wall_notice = getattr(condensation_model, "last_sticking_alpha_provenance_notice", {}) or {}
     series_by_species = dict(latest_evap.get("evaporation_series_resistance") or {})
     raw_alpha_authority_status_by_species = dict(
         getattr(sim, "_alpha_authority_status_by_species_engaged", {}) or {}
@@ -1508,6 +1563,7 @@ def pressure_coating_pareto_diagnostic(
         return _pressure_coating_pareto_unavailable(
             target_species,
             "knudsen_regime_diagnostic_unavailable",
+            wall_notice=wall_notice,
             alpha_authority_status_by_species=(
                 alpha_authority_status_by_species
             ),
@@ -1531,6 +1587,7 @@ def pressure_coating_pareto_diagnostic(
         return _pressure_coating_pareto_unavailable(
             target_species,
             "knudsen_characteristic_length_unavailable",
+            wall_notice=wall_notice,
             alpha_authority_status_by_species=(
                 alpha_authority_status_by_species
             ),
@@ -1580,6 +1637,7 @@ def pressure_coating_pareto_diagnostic(
         return _pressure_coating_pareto_unavailable(
             target_species,
             "controlling_knudsen_segment_unavailable",
+            wall_notice=wall_notice,
             alpha_authority_status_by_species=(
                 alpha_authority_status_by_species
             ),
@@ -1599,13 +1657,16 @@ def pressure_coating_pareto_diagnostic(
     wall_refusals = _wall_saturation_pressure_refusals_by_species(
         getattr(condensation_model, "last_sticking_alpha_provenance_notice", {}) or {}
     )
+    wall_extrapolations = (
+        getattr(condensation_model, "last_sticking_alpha_provenance_notice", {}) or {}
+    ).get("wall_saturation_pressure_extrapolations_by_species", {})
     current_pressure_pa = _first_finite(
         knudsen_diagnostic.get("overhead_pressure_mbar"),
         getattr(getattr(sim, "overhead", None), "pressure_mbar", 0.0),
     ) * 100.0
 
     by_species: dict[str, Any] = {}
-    for species in dict.fromkeys((*target_species, *wall_refusals)):
+    for species in dict.fromkeys((*target_species, *wall_refusals, *wall_extrapolations)):
         name = str(species)
         series = dict(series_by_species.get(name) or {})
         molar_mass = _molar_mass_kg_mol(sim, name, MOLAR_MASS)
@@ -1615,6 +1676,7 @@ def pressure_coating_pareto_diagnostic(
                 "reason": next(iter(wall_refusals[name].values()))["reason"],
                 "current_wall_deposit_flux_kg_hr": None,
                 "cumulative_wall_deposit_kg": None,
+                "wall_saturation_pressure_refusals": wall_refusals[name],
             }
             continue
         if not series or molar_mass is None:
@@ -1648,6 +1710,7 @@ def pressure_coating_pareto_diagnostic(
             "cold_skull_envelope": _cold_skull_envelope_for_replay(series),
             "carrier_gas": carrier_gas,
             "T_gas_K": gas_temperature_K,
+            "extrapolate_continuum": bool(series.get("continuum_extrapolation_notice")),
             "melt_resistance_enabled": bool(
                 series.get("melt_resistance_enabled", False)
             ),
@@ -1726,6 +1789,15 @@ def pressure_coating_pareto_diagnostic(
                 for pressure_pa in pressure_points
             ],
         }
+
+    for name, records in wall_extrapolations.items():
+        entry = by_species[name]
+        entry["wall_saturation_pressure_extrapolations"] = _plain_mapping(records)
+        entry["authority_level"] = "extrapolated"
+        if entry.get("status") != "unavailable":
+            entry["status"] = "extrapolated"
+
+    _attach_pareto_source_notices(by_species, wall_notice)
 
     diagnostic = {
         "schema_version": "pressure-coating-pareto-v1",
