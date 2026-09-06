@@ -1,0 +1,140 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0184",
+  "census_id": "high-temperature-printed-page-210",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "PRASEODY!IU! SESQUIOIIDE (HEX)",
+  "formula_as_published": "Pr 2 0 3",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Pr 2 0 3 :    Crystals 298.15 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "FORKATIOI FRO! THE ELEMENTS",
+  "formula_weight": {
+    "as_published": "329.814",
+    "value": 329.814,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      216
+    ],
+    "printed_pages": [
+      210
+    ],
+    "pdftotext_layout_page_file": "page-216.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 31, 33, 36, 38"
+  ],
+  "title_line_as_published": "PRASEODY!IU! SESQUIOIIDE (HEX)                                                       FORftULA WEIGHT    329.814",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Pr 2 0 3 :    Crystals 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORKATIOI FRO! THE ELEMENTS",
+    "                                                                                           GIBBS",
+    "TEMP.         cu;-u~ 98 )/T      so      -(G;-u~ 98 )/T      Co",
+    "                                                              p     ENTHALPY            FREE EKERGY      Log Kf",
+    "                                  T",
+    "   K           Jjaol•K        J/mol•K      J/aol•K        J/aol•K        lr.J/1101         lr.Jjaol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jjaol•K",
+    "entropy": "J/mol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "lr.J/1101",
+    "formation_gibbs_energy": "lr.Jjaol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 18,
+  "uncertainty_line_as_published": "UNCERTAiliTY                     4.20             4.20                      6.690            6.700         1.174",
+  "uncertainty_values": [
+    {
+      "as_published": "4.20",
+      "value": 4.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.20",
+      "value": 4.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "6.690",
+      "value": 6.69,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "6.700",
+      "value": 6.7,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.174",
+      "value": 1.174,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Pr 2 0 3 :    Crystals 298.15 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "!ELTING POINT                               K            BOIL! NG POI NT                                  K",
+    "EHTHALPY OP KELTING                         k.J          ENTHALPY OF VAPOBIZATIOH                         lr.J",
+    "                                            k.J          ftOLAR VOLUME                           4.6530 Jjbar",
+    "                                                                                                46.530 ca 3",
+    "TRANSITIONS IN REFERENCE STATE ELE!EWTS",
+    "    PRASEODYMIUM ALPHA-BETA 1068, ft. P. 1204 K.",
+    "HEAT CAPACITY EQUATION",
+    "             1.3845x10Z +      2.0864x1o-z T    4.0b16x102           r-o·s",
+    "               (EQUATION VALID FROM       298- 1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 31, 33, 36, 38",
+      "detector_only": false
+    }
+  ]
+}
