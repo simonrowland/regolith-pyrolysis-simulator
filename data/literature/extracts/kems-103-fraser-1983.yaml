@@ -1,0 +1,1166 @@
+schema_version: literature_extract.v1
+source_id: kems-103-fraser-1983
+source:
+  citation: >-
+    Fraser, D. G., Rammensee, W. & Jones, R. H. (1983), "The mixing
+    properties of melts in the system NaAlSi2O6-KAlSi2O6 determined by
+    Knudsen Cell Mass Spectrometry", Bulletin de Minéralogie 106(1-2),
+    111-117. DOI 10.3406/bulmi.1983.7673.
+  doi: 10.3406/bulmi.1983.7673
+  url: https://www.persee.fr/doc/bulmi_0180-9210_1983_act_106_1_7673
+  year: 1983
+extraction:
+  method: >-
+    Official Persée HTML (DC.rights=free) plus official page/illustration
+    renders. PDF at citation_pdf_url answered HTTP 403 altcha challenge and
+    was not fetched. Table I, Table II and Appendix 1 transcribed from
+    Persée renderIllustration PNGs (not HTML "~" grids); every cell
+    visually certified against the 1340 px page renders. Figures 1-7 listed
+    figure-only; not digitised this round. Measured ion-current ratios
+    (Appendix 1) kept distinct from least-squares regressions (Table I)
+    and Gibbs-Duhem activity coefficients (Table II).
+  date: '2026-09-06'
+  worker: wave-W2-kems-103-fraser-1983
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-103-fraser-1983/kems-103-fraser-1983/
+review_status: draft
+fidelity_samples:
+  - species: NaAlSi2O6
+    observable: activity_coefficient
+    observation_id: fraser_1983_table2_gamma_NaAlSi2O6
+    field: gamma_XNa_0_4_1200C
+    value: 1.032
+    locator:
+      published_page: 114
+      table: '2'
+      note: Table II gamma_NaAlSi2O6 at X_Na=0.4, 1200 °C as printed 1.032 (±0.03)
+  - species: NaAlSi2O6
+    observable: activity_coefficient
+    observation_id: fraser_1983_table1_ln_INa_IK_regression
+    field: slope_XNa_0_96
+    value: 6629
+    locator:
+      published_page: 114
+      table: '1'
+      note: Table I slope at X_Na=0.96 as printed 6629
+  - species: NaAlSi2O6
+    observable: rate_series
+    observation_id: fraser_1983_appendix1_ln_INa_IK
+    field: ln_INa_over_IK_run1_XJd_0_96
+    value: 3.325
+    locator:
+      published_page: 116
+      table: appendix1
+      note: Appendix 1 first row X_Jd=0.96 run 1, ln I_Na/I_K = 3.325
+  - species: NaAlSi2O6
+    observable: rate_series
+    observation_id: fraser_1983_kems_mo_cell_geometry
+    field: orifice_diameter_mm
+    value: 0.3
+    locator:
+      published_page: 113
+      paragraph: experimental
+      note: 0.3 mm diameter effusion holes drilled in the centres of the Mo lids
+species:
+  NaAlSi2O6:
+    observations:
+    - observation_id: fraser_1983_kems_mo_cell_geometry
+      type: rate_series
+      locator:
+        published_page: 113
+        paragraph: experimental
+        figure: '1'
+        note: Mo Knudsen cells, effusion orifice, ionization voltage, sample mass
+      T_range_K: [1423.15, 1803.15]
+      phase: NaAlSi2O6-KAlSi2O6_pseudobinary_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Authors (p.116): run-products examined at the end of each experiment
+          were glassy clear showing no signs of crystallization. Abstract and
+          experimental section treat the samples as melts.
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: KMS_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        cell_material_as_published: Mo
+        cell_height_cm: 2.1
+        cell_internal_diameter_cm: 1.2
+        cell_shape: internally_round_bottomed_cylindrical
+        lid_thickness_mm: 1.0
+        orifice_diameter_mm: 0.3
+        orifice_knife_edge: conical_back_drilling_from_inside
+        ionization_voltage_V: -30
+        ionization_voltage_note: >-
+          Used so as to lie below the appearance potentials of Na2+ and K2+
+          which could be detected at higher voltages.
+        sample_mass_mg: 300
+        furnace_block: rotatable Ta furnace block containing four Knudsen cells
+        empty_cell: one cell always kept empty and run as a blank
+        thermocouples: four Pt 30% Rh / Pt 6% Rh
+        spectrometer: Riber quadrupole mass spectrometer
+        detector: Tracor Northern TN 2000 SiLi on Cambridge Microscan 9 (post-run probe)
+        vapour_pressure_order_of_magnitude_torr: 1.0e-5
+        clausing_numeric: null
+        clausing_note: >-
+          Authors use a Clausing factor of 1 only as the least favourable
+          case in a mass-loss bound (p.113). Numeric Clausing for the 0.3 mm
+          orifice is not tabulated — do not invent.
+        missing_for_motzfeldt:
+          - numeric_clausing_factor_value
+          - orifice_channel_length
+          - sample_surface_area
+      uncertainty:
+        note: method apparatus paper; mixing data in Table I, Table II, Appendix 1
+      equipment:
+        orifice_area:
+          value: 7.068583e-08
+          units: m2
+          diameter_m: 0.0003
+          orifice_shape: circular_effusion
+          inferred: true
+          inference: area = π (d/2)^2 from stated effusion orifice diameter 0.3 mm
+          locator:
+            published_page: 113
+            paragraph: experimental
+            note: 0.3 mm diameter effusion holes drilled in the centres
+        cell_material:
+          value: Mo (internally round-bottomed cylindrical Knudsen cells; close-fitting Mo lids)
+          locator:
+            published_page: 113
+            paragraph: experimental
+            note: cylindrical Knudsen cells machined out of Mo
+    - observation_id: fraser_1983_table1_ln_INa_IK_regression
+      type: activity_coefficient
+      locator:
+        published_page: 114
+        table: '1'
+        figure: '2'
+        note: Table I regression coefficients of ln I_Na/I_K vs 1/T
+      T_range_K: [1426.74, 1801.48]
+      phase: NaAlSi2O6-KAlSi2O6_pseudobinary_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: melts; post-run glasses showed no crystallization (p.116)
+      standard_state: >-
+        Ion-current ratio regressions feeding Belton-Fruehan activity
+        ratios (eqs. 9-13). Not yet gamma.
+      regime: kems_effusion
+      units: slope of ln(I_Na/I_K) vs 1/T (K); intercept dimensionless
+      uncertainty:
+        note: >-
+          Table I "Standard Deviation of I_Na/I_K values" is the printed
+          residual scatter of ln I_Na/I_K about the regression, not a
+          slope sigma. Appendix 1 % error is a separate per-point envelope.
+      values:
+        quantity: ln_INa_over_IK_vs_invT_least_squares
+        method_class: derived_least_squares
+        system: NaAlSi2O6-KAlSi2O6
+        system_class: silicate_melt
+        oxide_formula_as_published: NaAlSi2O6
+        composition_basis: mole_fraction_NaAlSi2O6_equals_X_Na_equals_X_Jd
+        slope_XNa_0_96: 6629
+        regression_as_printed: ln(I_Na/I_K) vs 1/T; coefficients in Table I
+        rows:
+        - X_Na: 0.96
+          X_Jd: 0.96
+          slope: 6629
+          intercept: -0.6185
+          std_dev_ln_INa_over_IK: 0.0506
+        - X_Na: 0.92
+          X_Jd: 0.92
+          slope: 5824
+          intercept: -0.8286
+          std_dev_ln_INa_over_IK: 0.0708
+        - X_Na: 0.85
+          X_Jd: 0.85
+          slope: 4596
+          intercept: -0.7147
+          std_dev_ln_INa_over_IK: 0.0904
+        - X_Na: 0.75
+          X_Jd: 0.75
+          slope: 2862
+          intercept: -0.1117
+          std_dev_ln_INa_over_IK: 0.0403
+        - X_Na: 0.60
+          X_Jd: 0.60
+          slope: 3521
+          intercept: -1.223
+          std_dev_ln_INa_over_IK: 0.0547
+        - X_Na: 0.45
+          X_Jd: 0.45
+          slope: 3718
+          intercept: -1.937
+          std_dev_ln_INa_over_IK: 0.0259
+    - observation_id: fraser_1983_table2_gamma_NaAlSi2O6
+      type: activity_coefficient
+      locator:
+        published_page: 114
+        table: '2'
+        figure: '3'
+        equation: '[13]'
+        note: Table II activity coefficients of NaAlSi2O6 in NaAlSi2O6-KAlSi2O6 melts
+      T_range_K: [1473.15, 1873.15]
+      phase: NaAlSi2O6-KAlSi2O6_pseudobinary_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: melts; glassy quench products (p.116)
+      standard_state: >-
+        Raoultian / pure liquid NaAlSi2O6. gamma_NaAlSi2O6 = a_NaAlSi2O6 /
+        X_NaAlSi2O6 as in eq. [13] (the K-component form is printed; the
+        Na-component coefficients in Table II are the integrated result).
+        Pure-end-member row X_Na=1.0 is gamma=1.000 by definition.
+      regime: kems_effusion
+      units: dimensionless Raoultian gamma
+      uncertainty:
+        note: >-
+          Authors (p.114): errors estimated by integrating alternative
+          curves through max/min error bars on Fig. 3 and counting squares.
+          Range from zero at X_NaAlSi2O6=1.0 up to around ±4% in the worst
+          case at X_NaAlSi2O6=0.4. Table II prints parenthetical ± only on
+          the X_Na=0.4 row, on X_Na=0.75 at 1600 °C (±~0.02), and on
+          X_Na=1.0 at 1600 °C (± 0). Do not invent ± for other cells.
+      values:
+        quantity: activity_and_raoultian_gamma
+        method_class: derived_gibbs_duhem_integration
+        system: NaAlSi2O6-KAlSi2O6
+        system_class: silicate_melt
+        oxide_formula_as_published: NaAlSi2O6
+        composition_basis: mole_fraction_NaAlSi2O6_equals_X_Na
+        gamma_definition: >-
+          Table II header is Y_NaAlSi2O6 (gamma). Authors obtain values
+          from regression lines through Fig. 2 by computing ln I_Na/I_K
+          at each composition and T, plotting the Belton-Fruehan integrand
+          (eq. 13) in Fig. 3, and integrating two straight-line segments
+          with a slope change at X_Na=0.75. 1600 °C is an evaluation of
+          those regressions; measured 1/T in Appendix 1 spans about
+          1154-1528 °C (abstract 1150-1530 °C).
+        gamma_KAlSi2O6: absent
+        gamma_KAlSi2O6_note: >-
+          True absence, not 0. p.114: compositions more K-rich than
+          X_Lc=0.6 were not investigated because of high liquidus
+          temperatures; activity coefficients of the KAlSi2O6 component
+          could not be determined by integration.
+        gamma_XNa_0_4_1200C: 1.032
+        T_C_columns: [1200, 1300, 1400, 1500, 1600]
+        rows:
+        - X_Na: 0.4
+          T_C: 1200.0
+          T_K: 1473.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.032
+          gamma_uncertainty: 0.03
+          gamma_uncertainty_as_printed: '±0.03'
+        - X_Na: 0.4
+          T_C: 1300.0
+          T_K: 1573.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.043
+          gamma_uncertainty: 0.02
+          gamma_uncertainty_as_printed: '±0.02'
+        - X_Na: 0.4
+          T_C: 1400.0
+          T_K: 1673.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.043
+          gamma_uncertainty: 0.02
+          gamma_uncertainty_as_printed: '±0.02'
+        - X_Na: 0.4
+          T_C: 1500.0
+          T_K: 1773.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.050
+          gamma_uncertainty: 0.02
+          gamma_uncertainty_as_printed: '±0.02'
+        - X_Na: 0.4
+          T_C: 1600.0
+          T_K: 1873.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 0.998
+          gamma_uncertainty: 0.04
+          gamma_uncertainty_as_printed: '±~0.04'
+        - X_Na: 0.5
+          T_C: 1200.0
+          T_K: 1473.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.022
+        - X_Na: 0.5
+          T_C: 1300.0
+          T_K: 1573.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.039
+        - X_Na: 0.5
+          T_C: 1400.0
+          T_K: 1673.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.046
+        - X_Na: 0.5
+          T_C: 1500.0
+          T_K: 1773.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.057
+        - X_Na: 0.5
+          T_C: 1600.0
+          T_K: 1873.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.041
+        - X_Na: 0.60
+          T_C: 1200.0
+          T_K: 1473.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.014
+        - X_Na: 0.60
+          T_C: 1300.0
+          T_K: 1573.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.035
+        - X_Na: 0.60
+          T_C: 1400.0
+          T_K: 1673.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.048
+        - X_Na: 0.60
+          T_C: 1500.0
+          T_K: 1773.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.063
+        - X_Na: 0.60
+          T_C: 1600.0
+          T_K: 1873.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.069
+        - X_Na: 0.7
+          T_C: 1200.0
+          T_K: 1473.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.008
+        - X_Na: 0.7
+          T_C: 1300.0
+          T_K: 1573.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.031
+        - X_Na: 0.7
+          T_C: 1400.0
+          T_K: 1673.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.051
+        - X_Na: 0.7
+          T_C: 1500.0
+          T_K: 1773.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.069
+        - X_Na: 0.7
+          T_C: 1600.0
+          T_K: 1873.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.086
+        - X_Na: 0.75
+          T_C: 1200.0
+          T_K: 1473.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.005
+        - X_Na: 0.75
+          T_C: 1300.0
+          T_K: 1573.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.029
+        - X_Na: 0.75
+          T_C: 1400.0
+          T_K: 1673.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.051
+        - X_Na: 0.75
+          T_C: 1500.0
+          T_K: 1773.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.070
+        - X_Na: 0.75
+          T_C: 1600.0
+          T_K: 1873.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.089
+          gamma_uncertainty: 0.02
+          gamma_uncertainty_as_printed: '±~0.02'
+        - X_Na: 0.8
+          T_C: 1200.0
+          T_K: 1473.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.004
+        - X_Na: 0.8
+          T_C: 1300.0
+          T_K: 1573.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.018
+        - X_Na: 0.8
+          T_C: 1400.0
+          T_K: 1673.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.032
+        - X_Na: 0.8
+          T_C: 1500.0
+          T_K: 1773.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.045
+        - X_Na: 0.8
+          T_C: 1600.0
+          T_K: 1873.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.056
+        - X_Na: 0.9
+          T_C: 1200.0
+          T_K: 1473.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.001
+        - X_Na: 0.9
+          T_C: 1300.0
+          T_K: 1573.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.005
+        - X_Na: 0.9
+          T_C: 1400.0
+          T_K: 1673.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.008
+        - X_Na: 0.9
+          T_C: 1500.0
+          T_K: 1773.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.011
+        - X_Na: 0.9
+          T_C: 1600.0
+          T_K: 1873.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.014
+        - X_Na: 1.0
+          T_C: 1200.0
+          T_K: 1473.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.000
+        - X_Na: 1.0
+          T_C: 1300.0
+          T_K: 1573.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.000
+        - X_Na: 1.0
+          T_C: 1400.0
+          T_K: 1673.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.000
+        - X_Na: 1.0
+          T_C: 1500.0
+          T_K: 1773.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.000
+        - X_Na: 1.0
+          T_C: 1600.0
+          T_K: 1873.15
+          T_K_arithmetic: T_K = T_C + 273.15
+          gamma: 1.000
+          gamma_uncertainty: 0.0
+          gamma_uncertainty_as_printed: '± 0'
+    - observation_id: fraser_1983_appendix1_ln_INa_IK
+      type: rate_series
+      locator:
+        published_page: 116
+        table: appendix1
+        note: Appendix 1 list of runs and experimental data, continues p.117
+      T_range_K: [1426.74, 1801.48]
+      phase: NaAlSi2O6-KAlSi2O6_pseudobinary_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: melts; glassy quench products (p.116)
+      standard_state: measured ion-current ratio; not yet activity
+      regime: kems_effusion
+      units: ln(I_Na/I_K) dimensionless; 1/T as 10^4 K^-1
+      uncertainty:
+        note: >-
+          Appendix 1 % Error includes the standard deviations of the original
+          peak fits to the mass spectrometer data and an error of 1% added
+          for fluctuations in temperature control and non-linearities in the
+          amplifier gain (p.117 explanatory notes).
+      values:
+        quantity: ln_INa_over_IK_vs_invT
+        method_class: measured_direct
+        system: NaAlSi2O6-KAlSi2O6
+        system_class: silicate_melt
+        ion_species_as_published: ['23Na', '39K']
+        isotopic_abundances_as_published:
+          '23Na': 100
+          '39K': 93.3
+        ln_INa_over_IK_run1_XJd_0_96: 3.325
+        rows:
+        - X_Jd: 0.96
+          run_no: 1
+          invT_times_1e4_per_K: 5.987
+          ln_INa_over_IK: 3.325
+          pct_error: 4.7
+          T_K: 1670.2856
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 2
+          invT_times_1e4_per_K: 5.989
+          ln_INa_over_IK: 3.323
+          pct_error: 4.7
+          T_K: 1669.7278
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 3
+          invT_times_1e4_per_K: 5.991
+          ln_INa_over_IK: 3.347
+          pct_error: 4.0
+          T_K: 1669.1704
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 4
+          invT_times_1e4_per_K: 5.987
+          ln_INa_over_IK: 3.384
+          pct_error: 4.2
+          T_K: 1670.2856
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 5
+          invT_times_1e4_per_K: 6.351
+          ln_INa_over_IK: 3.582
+          pct_error: 6.5
+          T_K: 1574.5552
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 6
+          invT_times_1e4_per_K: 6.365
+          ln_INa_over_IK: 3.646
+          pct_error: 4.3
+          T_K: 1571.0919
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 7
+          invT_times_1e4_per_K: 6.798
+          ln_INa_over_IK: 3.751
+          pct_error: 12.7
+          T_K: 1471.0209
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 8
+          invT_times_1e4_per_K: 6.524
+          ln_INa_over_IK: 3.695
+          pct_error: 4.2
+          T_K: 1532.8020
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 9
+          invT_times_1e4_per_K: 6.521
+          ln_INa_over_IK: 3.714
+          pct_error: 4.9
+          T_K: 1533.5071
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 10
+          invT_times_1e4_per_K: 6.161
+          ln_INa_over_IK: 3.509
+          pct_error: 4.1
+          T_K: 1623.1131
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 11
+          invT_times_1e4_per_K: 6.154
+          ln_INa_over_IK: 3.501
+          pct_error: 5.6
+          T_K: 1624.9594
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 12
+          invT_times_1e4_per_K: 5.775
+          ln_INa_over_IK: 3.238
+          pct_error: 4.2
+          T_K: 1731.6017
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 13
+          invT_times_1e4_per_K: 5.780
+          ln_INa_over_IK: 3.260
+          pct_error: 3.6
+          T_K: 1730.1038
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 14
+          invT_times_1e4_per_K: 6.786
+          ln_INa_over_IK: 3.759
+          pct_error: 16.1
+          T_K: 1473.6222
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 15
+          invT_times_1e4_per_K: 6.784
+          ln_INa_over_IK: 3.849
+          pct_error: 11.6
+          T_K: 1474.0566
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 16
+          invT_times_1e4_per_K: 6.376
+          ln_INa_over_IK: 3.645
+          pct_error: 4.6
+          T_K: 1568.3814
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.96
+          run_no: 17
+          invT_times_1e4_per_K: 6.391
+          ln_INa_over_IK: 3.655
+          pct_error: 7.6
+          T_K: 1564.7004
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 1
+          invT_times_1e4_per_K: 5.992
+          ln_INa_over_IK: 2.579
+          pct_error: 4.4
+          T_K: 1668.8919
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 2
+          invT_times_1e4_per_K: 6.363
+          ln_INa_over_IK: 2.817
+          pct_error: 4.0
+          T_K: 1571.5857
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 3
+          invT_times_1e4_per_K: 6.771
+          ln_INa_over_IK: 3.143
+          pct_error: 5.0
+          T_K: 1476.8867
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 4
+          invT_times_1e4_per_K: 6.525
+          ln_INa_over_IK: 2.910
+          pct_error: 4.3
+          T_K: 1532.5670
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 5
+          invT_times_1e4_per_K: 6.156
+          ln_INa_over_IK: 2.769
+          pct_error: 6.4
+          T_K: 1624.4314
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 6
+          invT_times_1e4_per_K: 5.776
+          ln_INa_over_IK: 2.531
+          pct_error: 5.1
+          T_K: 1731.3019
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 7
+          invT_times_1e4_per_K: 5.780
+          ln_INa_over_IK: 2.571
+          pct_error: 4.5
+          T_K: 1730.1038
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 8
+          invT_times_1e4_per_K: 6.787
+          ln_INa_over_IK: 3.133
+          pct_error: 8.3
+          T_K: 1473.4050
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 9
+          invT_times_1e4_per_K: 6.403
+          ln_INa_over_IK: 2.985
+          pct_error: 5.0
+          T_K: 1561.7679
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 10
+          invT_times_1e4_per_K: 6.087
+          ln_INa_over_IK: 2.857
+          pct_error: 6.0
+          T_K: 1642.8454
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.92
+          run_no: 11
+          invT_times_1e4_per_K: 6.146
+          ln_INa_over_IK: 2.832
+          pct_error: 4.4
+          T_K: 1627.0745
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 1
+          invT_times_1e4_per_K: 5.990
+          ln_INa_over_IK: 2.047
+          pct_error: 4.7
+          T_K: 1669.4491
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 2
+          invT_times_1e4_per_K: 6.363
+          ln_INa_over_IK: 2.168
+          pct_error: 3.4
+          T_K: 1571.5857
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 3
+          invT_times_1e4_per_K: 6.791
+          ln_INa_over_IK: 2.392
+          pct_error: 4.0
+          T_K: 1472.5372
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 4
+          invT_times_1e4_per_K: 6.525
+          ln_INa_over_IK: 2.308
+          pct_error: 6.4
+          T_K: 1532.5670
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 5
+          invT_times_1e4_per_K: 6.158
+          ln_INa_over_IK: 2.016
+          pct_error: 3.3
+          T_K: 1623.9039
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 6
+          invT_times_1e4_per_K: 5.777
+          ln_INa_over_IK: 1.974
+          pct_error: 4.1
+          T_K: 1731.0023
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 7
+          invT_times_1e4_per_K: 5.551
+          ln_INa_over_IK: 1.781
+          pct_error: 4.4
+          T_K: 1801.4772
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 8
+          invT_times_1e4_per_K: 6.786
+          ln_INa_over_IK: 2.322
+          pct_error: 8.8
+          T_K: 1473.6222
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 9
+          invT_times_1e4_per_K: 6.406
+          ln_INa_over_IK: 2.279
+          pct_error: 4.9
+          T_K: 1561.0365
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 10
+          invT_times_1e4_per_K: 6.104
+          ln_INa_over_IK: 2.267
+          pct_error: 5.3
+          T_K: 1638.2700
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.85
+          run_no: 11
+          invT_times_1e4_per_K: 6.147
+          ln_INa_over_IK: 2.255
+          pct_error: 4.0
+          T_K: 1626.8098
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 1
+          invT_times_1e4_per_K: 6.143
+          ln_INa_over_IK: 1.630
+          pct_error: 4.7
+          T_K: 1627.8691
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 2
+          invT_times_1e4_per_K: 6.148
+          ln_INa_over_IK: 1.633
+          pct_error: 2.9
+          T_K: 1626.5452
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 3
+          invT_times_1e4_per_K: 6.773
+          ln_INa_over_IK: 1.814
+          pct_error: 10.0
+          T_K: 1476.4506
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 4
+          invT_times_1e4_per_K: 6.789
+          ln_INa_over_IK: 1.754
+          pct_error: 6.5
+          T_K: 1472.9710
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 5
+          invT_times_1e4_per_K: 6.359
+          ln_INa_over_IK: 1.788
+          pct_error: 3.5
+          T_K: 1572.5743
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 6
+          invT_times_1e4_per_K: 6.362
+          ln_INa_over_IK: 1.720
+          pct_error: 3.4
+          T_K: 1571.8328
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 7
+          invT_times_1e4_per_K: 6.362
+          ln_INa_over_IK: 1.755
+          pct_error: 4.3
+          T_K: 1571.8328
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 8
+          invT_times_1e4_per_K: 6.042
+          ln_INa_over_IK: 1.595
+          pct_error: 2.6
+          T_K: 1655.0811
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 9
+          invT_times_1e4_per_K: 6.048
+          ln_INa_over_IK: 1.578
+          pct_error: 2.8
+          T_K: 1653.4392
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 10
+          invT_times_1e4_per_K: 6.038
+          ln_INa_over_IK: 1.609
+          pct_error: 2.3
+          T_K: 1656.1775
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 11
+          invT_times_1e4_per_K: 5.839
+          ln_INa_over_IK: 1.591
+          pct_error: 3.0
+          T_K: 1712.6220
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 12
+          invT_times_1e4_per_K: 6.281
+          ln_INa_over_IK: 1.711
+          pct_error: 5.2
+          T_K: 1592.1032
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 13
+          invT_times_1e4_per_K: 6.283
+          ln_INa_over_IK: 1.713
+          pct_error: 3.1
+          T_K: 1591.5964
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 14
+          invT_times_1e4_per_K: 6.590
+          ln_INa_over_IK: 1.825
+          pct_error: 5.2
+          T_K: 1517.4507
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 15
+          invT_times_1e4_per_K: 6.601
+          ln_INa_over_IK: 1.812
+          pct_error: 6.8
+          T_K: 1514.9220
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 16
+          invT_times_1e4_per_K: 6.611
+          ln_INa_over_IK: 1.818
+          pct_error: 7.6
+          T_K: 1512.6305
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 17
+          invT_times_1e4_per_K: 6.622
+          ln_INa_over_IK: 1.745
+          pct_error: 4.2
+          T_K: 1510.1178
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 18
+          invT_times_1e4_per_K: 6.635
+          ln_INa_over_IK: 1.774
+          pct_error: 12.3
+          T_K: 1507.1590
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.75
+          run_no: 19
+          invT_times_1e4_per_K: 6.573
+          ln_INa_over_IK: 1.779
+          pct_error: 7.1
+          T_K: 1521.3753
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 1
+          invT_times_1e4_per_K: 6.123
+          ln_INa_over_IK: 0.845
+          pct_error: 2.6
+          T_K: 1633.1863
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 2
+          invT_times_1e4_per_K: 6.137
+          ln_INa_over_IK: 0.884
+          pct_error: 2.4
+          T_K: 1629.4606
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 3
+          invT_times_1e4_per_K: 6.778
+          ln_INa_over_IK: 1.145
+          pct_error: 4.4
+          T_K: 1475.3615
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 4
+          invT_times_1e4_per_K: 6.784
+          ln_INa_over_IK: 1.197
+          pct_error: 9.0
+          T_K: 1474.0566
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 5
+          invT_times_1e4_per_K: 6.361
+          ln_INa_over_IK: 1.004
+          pct_error: 2.7
+          T_K: 1572.0799
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 6
+          invT_times_1e4_per_K: 6.342
+          ln_INa_over_IK: 1.014
+          pct_error: 2.9
+          T_K: 1576.7897
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 7
+          invT_times_1e4_per_K: 6.343
+          ln_INa_over_IK: 1.026
+          pct_error: 3.8
+          T_K: 1576.5411
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 8
+          invT_times_1e4_per_K: 6.046
+          ln_INa_over_IK: 0.969
+          pct_error: 2.6
+          T_K: 1653.9861
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 9
+          invT_times_1e4_per_K: 6.046
+          ln_INa_over_IK: 0.969
+          pct_error: 2.5
+          T_K: 1653.9861
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 10
+          invT_times_1e4_per_K: 5.859
+          ln_INa_over_IK: 0.898
+          pct_error: 2.3
+          T_K: 1706.7759
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 11
+          invT_times_1e4_per_K: 5.850
+          ln_INa_over_IK: 0.762
+          pct_error: 2.9
+          T_K: 1709.4017
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 12
+          invT_times_1e4_per_K: 5.858
+          ln_INa_over_IK: 0.769
+          pct_error: 2.7
+          T_K: 1707.0673
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 13
+          invT_times_1e4_per_K: 5.942
+          ln_INa_over_IK: 0.919
+          pct_error: 2.7
+          T_K: 1682.9350
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 14
+          invT_times_1e4_per_K: 5.948
+          ln_INa_over_IK: 0.918
+          pct_error: 2.7
+          T_K: 1681.2374
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 15
+          invT_times_1e4_per_K: 5.946
+          ln_INa_over_IK: 0.920
+          pct_error: 2.4
+          T_K: 1681.8029
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 16
+          invT_times_1e4_per_K: 5.944
+          ln_INa_over_IK: 0.923
+          pct_error: 2.9
+          T_K: 1682.3688
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 17
+          invT_times_1e4_per_K: 5.945
+          ln_INa_over_IK: 0.919
+          pct_error: 2.7
+          T_K: 1682.0858
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 18
+          invT_times_1e4_per_K: 5.840
+          ln_INa_over_IK: 0.754
+          pct_error: 2.4
+          T_K: 1712.3288
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 19
+          invT_times_1e4_per_K: 5.837
+          ln_INa_over_IK: 0.770
+          pct_error: 2.7
+          T_K: 1713.2088
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 20
+          invT_times_1e4_per_K: 6.281
+          ln_INa_over_IK: 0.981
+          pct_error: 2.9
+          T_K: 1592.1032
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 21
+          invT_times_1e4_per_K: 6.607
+          ln_INa_over_IK: 1.114
+          pct_error: 3.7
+          T_K: 1513.5462
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 22
+          invT_times_1e4_per_K: 6.573
+          ln_INa_over_IK: 1.147
+          pct_error: 5.2
+          T_K: 1521.3753
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.60
+          run_no: 23
+          invT_times_1e4_per_K: 7.009
+          ln_INa_over_IK: 1.195
+          pct_error: 8.5
+          T_K: 1426.7371
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 1
+          invT_times_1e4_per_K: 6.125
+          ln_INa_over_IK: 0.300
+          pct_error: 2.3
+          T_K: 1632.6531
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 2
+          invT_times_1e4_per_K: 6.140
+          ln_INa_over_IK: 0.337
+          pct_error: 2.6
+          T_K: 1628.6645
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 3
+          invT_times_1e4_per_K: 6.789
+          ln_INa_over_IK: 0.559
+          pct_error: 3.4
+          T_K: 1472.9710
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 4
+          invT_times_1e4_per_K: 6.777
+          ln_INa_over_IK: 0.585
+          pct_error: 3.2
+          T_K: 1475.5792
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 5
+          invT_times_1e4_per_K: 6.350
+          ln_INa_over_IK: 0.447
+          pct_error: 4.0
+          T_K: 1574.8031
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 6
+          invT_times_1e4_per_K: 6.356
+          ln_INa_over_IK: 0.453
+          pct_error: 3.8
+          T_K: 1573.3166
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 7
+          invT_times_1e4_per_K: 6.349
+          ln_INa_over_IK: 0.450
+          pct_error: 3.3
+          T_K: 1575.0512
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 8
+          invT_times_1e4_per_K: 6.060
+          ln_INa_over_IK: 0.327
+          pct_error: 3.2
+          T_K: 1650.1650
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 9
+          invT_times_1e4_per_K: 6.053
+          ln_INa_over_IK: 0.318
+          pct_error: 4.0
+          T_K: 1652.0734
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 10
+          invT_times_1e4_per_K: 5.845
+          ln_INa_over_IK: 0.235
+          pct_error: 2.5
+          T_K: 1710.8640
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 11
+          invT_times_1e4_per_K: 6.290
+          ln_INa_over_IK: 0.442
+          pct_error: 2.9
+          T_K: 1589.8251
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 12
+          invT_times_1e4_per_K: 6.595
+          ln_INa_over_IK: 0.546
+          pct_error: 4.3
+          T_K: 1516.3002
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 13
+          invT_times_1e4_per_K: 6.581
+          ln_INa_over_IK: 0.511
+          pct_error: 4.8
+          T_K: 1519.5259
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
+        - X_Jd: 0.45
+          run_no: 14
+          invT_times_1e4_per_K: 7.006
+          ln_INa_over_IK: 0.640
+          pct_error: 9.2
+          T_K: 1427.3480
+          T_K_arithmetic: T_K = 10000 / (1/T x 10^4 as printed)
