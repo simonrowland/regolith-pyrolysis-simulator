@@ -224,6 +224,403 @@ species:
         interfacial_reaction: 'Mn(dissolved_in_Fe_l) -> Mn(g)  # metal system, no oxide bond'
         semantics: competing_observation_do_not_average
         note: Olette α_B ≫1 — relative volatility, NOT HKL α∈[0,1]. Fence preserved.
+    - observation_id: homma_1966_mn_olette_experimental_quoted_deep
+      supersedes: homma_1966_mn_olette_alpha_exp_table1
+      class: measured
+      type: alpha
+      locator:
+        page: '517'
+        table: '1'
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      quote: 'printed_row,6502-1,6502-1,6502-1,6502-2,6502-2,6502-2,6412-14,6412-14,6412-14
+
+        mother_alloy_%Mn,1.05,,,1.74,,,2.89,,
+
+        t(min),5,10,15,5,10,15,5,10,15
+
+        %Mn,0.22,0.046,0.013,0.37,0.083,0.035,0.40,0.053,0.013
+
+        l0(g),149.6,151.0,150.6,150.1,149.6,149.6,150.4,150.2,150.3
+
+        l(g),146.5,144.6,142.1,146.1,143.3,142.6,144.2,141.1,137.3
+
+        alpha_Mn(exp.),115,99,91,113,122,119,233,115,79
+
+        alpha_Mn(theo.),1095,,,,,,,,
+
+        lambda_Mn,124,,,115,,,150,,
+
+        k_Mn(exp.),0.013,0.014,0.013,0.016,0.013,0.012,0.021,0.015,0.017
+
+        k_Mn(theo.),0.0074,0.0066,0.0064,0.012,0.010,0.010,0.017,0.015,0.015
+
+        omega_Mn,0.015,0.014,0.014,0.019,0.019,0.018,0.023,0.021,0.021
+
+        '
+      phase: liquid_Fe_Mn_alloy
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      uncertainty:
+        note: No numerical alpha uncertainty printed in table.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        alpha: 115
+        method_class: measured_direct
+        not_hkl_langmuir_coefficient: true
+        system_class: molten_metal
+        olette_alpha_exp_series:
+        - melt: 6502-1
+          t_min: 5
+          alpha_exp: 115
+          quote: Melt 6502-1; t(min) 5; alpha_Mn(exp.) 115
+        - melt: 6502-1
+          t_min: 10
+          alpha_exp: 99
+          quote: Melt 6502-1; t(min) 10; alpha_Mn(exp.) 99
+        - melt: 6502-1
+          t_min: 15
+          alpha_exp: 91
+          quote: Melt 6502-1; t(min) 15; alpha_Mn(exp.) 91
+        - melt: 6502-2
+          t_min: 5
+          alpha_exp: 113
+          quote: Melt 6502-2; t(min) 5; alpha_Mn(exp.) 113
+        - melt: 6502-2
+          t_min: 10
+          alpha_exp: 122
+          quote: Melt 6502-2; t(min) 10; alpha_Mn(exp.) 122
+        - melt: 6502-2
+          t_min: 15
+          alpha_exp: 119
+          quote: Melt 6502-2; t(min) 15; alpha_Mn(exp.) 119
+        - melt: 6412-14
+          t_min: 5
+          alpha_exp: 233
+          quote: Melt 6412-14; t(min) 5; alpha_Mn(exp.) 233
+        - melt: 6412-14
+          t_min: 10
+          alpha_exp: 115
+          quote: Melt 6412-14; t(min) 10; alpha_Mn(exp.) 115
+        - melt: 6412-14
+          t_min: 15
+          alpha_exp: 79
+          quote: Melt 6412-14; t(min) 15; alpha_Mn(exp.) 79
+        note: Direct reduction of measured composition and mass using Olette's equation; relative volatility,
+          not HKL alpha. Theoretical and fitted quantities excluded.
+    - observation_id: homma_1966_mn_olette_theoretical_quoted_deep
+      class: model
+      type: alpha
+      locator:
+        page: '517'
+        table: '1'
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      quote: alpha_Mn(theo.) 1095
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      values:
+        method_class: model_derived
+        olette_alpha_theoretical: 1095
+        not_hkl_langmuir_coefficient: true
+        note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained
+          without a measured alpha scalar.
+        admission_status: model_output_not_measurement
+      uncertainty:
+        note: No numerical uncertainty printed for theoretical coefficient.
+      admission_status: model_output_not_measurement
+    - observation_id: homma_1966_mn_masses_6502_1_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: '517'
+        table: '1'
+        source_path: tables/kems-001-homma-1966/table-1.csv
+        note: Melt 6502-1
+      quote: 't(min) 5; l0(g) 149.6; l(g) 146.5
+
+        t(min) 10; l0(g) 151.0; l(g) 144.6
+
+        t(min) 15; l0(g) 150.6; l(g) 142.1'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Mn_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6502-1
+        series:
+        - t_min: 5
+          initial_mass_g: 149.6
+          final_mass_g: 146.5
+          quote: t(min) 5; l0(g) 149.6; l(g) 146.5
+        - t_min: 10
+          initial_mass_g: 151
+          final_mass_g: 144.6
+          quote: t(min) 10; l0(g) 151.0; l(g) 144.6
+        - t_min: 15
+          initial_mass_g: 150.6
+          final_mass_g: 142.1
+          quote: t(min) 15; l0(g) 150.6; l(g) 142.1
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_mn_masses_6502_2_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: '517'
+        table: '1'
+        source_path: tables/kems-001-homma-1966/table-1.csv
+        note: Melt 6502-2
+      quote: 't(min) 5; l0(g) 150.1; l(g) 146.1
+
+        t(min) 10; l0(g) 149.6; l(g) 143.3
+
+        t(min) 15; l0(g) 149.6; l(g) 142.6'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Mn_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6502-2
+        series:
+        - t_min: 5
+          initial_mass_g: 150.1
+          final_mass_g: 146.1
+          quote: t(min) 5; l0(g) 150.1; l(g) 146.1
+        - t_min: 10
+          initial_mass_g: 149.6
+          final_mass_g: 143.3
+          quote: t(min) 10; l0(g) 149.6; l(g) 143.3
+        - t_min: 15
+          initial_mass_g: 149.6
+          final_mass_g: 142.6
+          quote: t(min) 15; l0(g) 149.6; l(g) 142.6
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_mn_masses_6412_14_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: '517'
+        table: '1'
+        source_path: tables/kems-001-homma-1966/table-1.csv
+        note: Melt 6412-14
+      quote: 't(min) 5; l0(g) 150.4; l(g) 144.2
+
+        t(min) 10; l0(g) 150.2; l(g) 141.1
+
+        t(min) 15; l0(g) 150.3; l(g) 137.3'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Mn_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6412-14
+        series:
+        - t_min: 5
+          initial_mass_g: 150.4
+          final_mass_g: 144.2
+          quote: t(min) 5; l0(g) 150.4; l(g) 144.2
+        - t_min: 10
+          initial_mass_g: 150.2
+          final_mass_g: 141.1
+          quote: t(min) 10; l0(g) 150.2; l(g) 141.1
+        - t_min: 15
+          initial_mass_g: 150.3
+          final_mass_g: 137.3
+          quote: t(min) 15; l0(g) 150.3; l(g) 137.3
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_mn_olette_class_fence_quoted_deep
+      supersedes: homma_1966_mn_olette_class_fence_b1
+      class: measured
+      type: alpha
+      locator:
+        page: '517'
+        table: '1'
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      quote: alpha_Mn(exp.) 115
+      phase: liquid_Fe_Mn_alloy
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      uncertainty:
+        note: No numerical alpha uncertainty printed in table.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        alpha: 115
+        method_class: measured_direct
+        not_hkl_langmuir_coefficient: true
+        system_class: molten_metal
+        note: Direct reduction of measured composition and mass using Olette's equation; relative volatility,
+          not HKL alpha. Theoretical and fitted quantities excluded.
+    - observation_id: homma_1966_mn_fitted_constants_quoted_deep
+      supersedes: homma_1966_mn_specific_evaporation_constant
+      class: model
+      type: rate_series
+      admission_status: model_output_not_measurement
+      locator:
+        page: '519'
+        table: 4, 5
+      quote: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+        Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+        Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+        Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+        Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+        Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+        Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+        Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+        Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+        Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+        Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+        Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+        Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+        Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+        Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+        Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+        Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+        Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+        '
+      regime: vacuum_induction_free_evaporation_steel_melt
+      units: 'K_E: sec^-1; K_S: cm sec^-1'
+      values:
+        quantity: fitted_first_order_evaporation_constants
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        rows:
+        - alloy: Fe-Mn
+          melt: 6411-15
+          K_E_as_printed: 4.4x10^-3
+          K_S_as_printed: 8.1x10^-3
+          locator:
+            page: '519'
+            table: '4'
+          quote: Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+        - alloy: Fe-Mn
+          melt: 6411-1
+          K_E_as_printed: 4.2x10^-3
+          K_S_as_printed: 7.8x10^-3
+          locator:
+            page: '519'
+            table: '4'
+          quote: Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+        - alloy: Fe-Mn
+          melt: 6409-2
+          K_E_as_printed: 4.6x10^-3
+          K_S_as_printed: 8.5x10^-3
+          locator:
+            page: '519'
+            table: '4'
+          quote: Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+        - alloy: Fe-Mn
+          melt: 6411-2
+          K_E_as_printed: 5.0x10^-3
+          K_S_as_printed: 9.2x10^-3
+          locator:
+            page: '519'
+            table: '4'
+          quote: Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+        - alloy: Fe-C-Mn
+          melt: 6501-11
+          K_E_as_printed: 5.8x10^-3
+          K_S_as_printed: 1.1x10^-2
+          locator:
+            page: '519'
+            table: '4'
+          quote: Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+        - alloy: Fe-C-Mn
+          melt: 6501-12
+          K_E_as_printed: 4.8x10^-3
+          K_S_as_printed: 8.8x10^-3
+          locator:
+            page: '519'
+            table: '4'
+          quote: Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+        - alloy: Fe-Mn
+          melt: 6502-1
+          K_E_as_printed: 5.4x10^-3
+          K_S_as_printed: 9.9x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+        - alloy: Fe-Mn
+          melt: 6502-2
+          K_E_as_printed: 5.0x10^-3
+          K_S_as_printed: 9.2x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+        - alloy: Fe-Mn
+          melt: 6412-14
+          K_E_as_printed: 6.5x10^-3
+          K_S_as_printed: 1.2x10^-2
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+        note: Fitted concentration-decay constants, not measured flux/time-series points. Closest existing
+          type retained under controller ruling; numeric strings preserve printed exponents. Surface/bulk
+          ratios retained separately as inverse table evidence.
+      uncertainty:
+        note: No fitted-constant uncertainty printed in tables.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
   Cu:
     observations:
     - observation_id: homma_1966_cu_specific_evaporation_constant
@@ -381,6 +778,443 @@ species:
         interfacial_reaction: 'Cu(dissolved_in_Fe_l) -> Cu(g)  # metal system, no oxide bond'
         semantics: competing_observation_do_not_average
         note: Olette α_B ≫1 — relative volatility, NOT HKL α∈[0,1]. Fence preserved.
+    - observation_id: homma_1966_cu_olette_experimental_quoted_deep
+      supersedes: homma_1966_cu_olette_alpha_exp_table2
+      class: measured
+      type: alpha
+      locator:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      quote: 'printed_row,6503-12,6503-12,6503-12,6503-12,6503-11,6503-11,6503-11,6503-11,6503-16,6503-16,6503-16,6503-16,6503-28,6503-28,6503-28,6503-28
+
+        mother_alloy_%Cu,1.04,,,,1.74,,,,2.65,,,,4.57,,,
+
+        t(min),5,10,15,20,5,10,15,20,5,10,15,20,5,10,15,20
+
+        %Cu,0.42,0.27,0.078,0.054,0.81,0.23,0.11,0.073,1.26,0.71,0.44,0.30,2.48,1.82,0.87,0.51
+
+        l0(g),151.1,152.8,151.2,150.8,148.5,152.4,149.1,149.5,151.3,150.8,150.4,149.8,149.0,150.7,151.0,149.6
+
+        l(g),147.5,148.4,144.3,141.1,145.3,143.7,142.7,139.8,147.1,144.8,143.1,142.1,144.5,144.8,142.6,139.6
+
+        alpha_Cu(exp.),51,60,73,53,68,47,101,65,55,59,67,73,70,70,32,83
+
+        alpha_Cu(theo.),143,,,,,,,,143,,,,,,,
+
+        lambda_Cu,67,,,,70,,,,44,,,,36,,,
+
+        k_Cu(exp.),0.025,0.020,0.018,0.022,0.029,0.028,0.016,0.021,0.036,0.034,0.026,0.026,0.047,0.041,0.059,0.031
+
+        k_Cu(theo.),0.016,0.015,0.014,0.014,0.022,0.019,0.019,0.018,0.028,0.025,0.024,0.023,0.043,0.040,0.035,0.034
+
+        omega_Cu,0.022,0.021,0.021,0.020,0.028,0.025,0.024,0.024,0.039,0.036,0.035,0.034,0.058,0.056,0.051,0.049
+
+        '
+      phase: liquid_Fe_Cu_alloy
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      uncertainty:
+        note: No numerical alpha uncertainty printed in table.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        alpha: 51
+        method_class: measured_direct
+        not_hkl_langmuir_coefficient: true
+        system_class: molten_metal
+        olette_alpha_exp_series:
+        - melt: 6503-12
+          t_min: 5
+          alpha_exp: 51
+          quote: Melt 6503-12; t(min) 5; alpha_Cu(exp.) 51
+        - melt: 6503-12
+          t_min: 10
+          alpha_exp: 60
+          quote: Melt 6503-12; t(min) 10; alpha_Cu(exp.) 60
+        - melt: 6503-12
+          t_min: 15
+          alpha_exp: 73
+          quote: Melt 6503-12; t(min) 15; alpha_Cu(exp.) 73
+        - melt: 6503-12
+          t_min: 20
+          alpha_exp: 53
+          quote: Melt 6503-12; t(min) 20; alpha_Cu(exp.) 53
+        - melt: 6503-11
+          t_min: 5
+          alpha_exp: 68
+          quote: Melt 6503-11; t(min) 5; alpha_Cu(exp.) 68
+        - melt: 6503-11
+          t_min: 10
+          alpha_exp: 47
+          quote: Melt 6503-11; t(min) 10; alpha_Cu(exp.) 47
+        - melt: 6503-11
+          t_min: 15
+          alpha_exp: 101
+          quote: Melt 6503-11; t(min) 15; alpha_Cu(exp.) 101
+        - melt: 6503-11
+          t_min: 20
+          alpha_exp: 65
+          quote: Melt 6503-11; t(min) 20; alpha_Cu(exp.) 65
+        - melt: 6503-16
+          t_min: 5
+          alpha_exp: 55
+          quote: Melt 6503-16; t(min) 5; alpha_Cu(exp.) 55
+        - melt: 6503-16
+          t_min: 10
+          alpha_exp: 59
+          quote: Melt 6503-16; t(min) 10; alpha_Cu(exp.) 59
+        - melt: 6503-16
+          t_min: 15
+          alpha_exp: 67
+          quote: Melt 6503-16; t(min) 15; alpha_Cu(exp.) 67
+        - melt: 6503-16
+          t_min: 20
+          alpha_exp: 73
+          quote: Melt 6503-16; t(min) 20; alpha_Cu(exp.) 73
+        - melt: 6503-28
+          t_min: 5
+          alpha_exp: 70
+          quote: Melt 6503-28; t(min) 5; alpha_Cu(exp.) 70
+        - melt: 6503-28
+          t_min: 10
+          alpha_exp: 70
+          quote: Melt 6503-28; t(min) 10; alpha_Cu(exp.) 70
+        - melt: 6503-28
+          t_min: 15
+          alpha_exp: 32
+          quote: Melt 6503-28; t(min) 15; alpha_Cu(exp.) 32
+        - melt: 6503-28
+          t_min: 20
+          alpha_exp: 83
+          quote: Melt 6503-28; t(min) 20; alpha_Cu(exp.) 83
+        note: Direct reduction of measured composition and mass using Olette's equation; relative volatility,
+          not HKL alpha. Theoretical and fitted quantities excluded.
+    - observation_id: homma_1966_cu_olette_theoretical_quoted_deep
+      class: model
+      type: alpha
+      locator:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      quote: alpha_Cu(theo.) 143
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      values:
+        method_class: model_derived
+        olette_alpha_theoretical: 143
+        not_hkl_langmuir_coefficient: true
+        note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained
+          without a measured alpha scalar.
+        admission_status: model_output_not_measurement
+      uncertainty:
+        note: No numerical uncertainty printed for theoretical coefficient.
+      admission_status: model_output_not_measurement
+    - observation_id: homma_1966_cu_masses_6503_12_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+        note: Melt 6503-12
+      quote: 't(min) 5; l0(g) 151.1; l(g) 147.5
+
+        t(min) 10; l0(g) 152.8; l(g) 148.4
+
+        t(min) 15; l0(g) 151.2; l(g) 144.3
+
+        t(min) 20; l0(g) 150.8; l(g) 141.1'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Cu_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6503-12
+        series:
+        - t_min: 5
+          initial_mass_g: 151.1
+          final_mass_g: 147.5
+          quote: t(min) 5; l0(g) 151.1; l(g) 147.5
+        - t_min: 10
+          initial_mass_g: 152.8
+          final_mass_g: 148.4
+          quote: t(min) 10; l0(g) 152.8; l(g) 148.4
+        - t_min: 15
+          initial_mass_g: 151.2
+          final_mass_g: 144.3
+          quote: t(min) 15; l0(g) 151.2; l(g) 144.3
+        - t_min: 20
+          initial_mass_g: 150.8
+          final_mass_g: 141.1
+          quote: t(min) 20; l0(g) 150.8; l(g) 141.1
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_cu_masses_6503_11_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+        note: Melt 6503-11
+      quote: 't(min) 5; l0(g) 148.5; l(g) 145.3
+
+        t(min) 10; l0(g) 152.4; l(g) 143.7
+
+        t(min) 15; l0(g) 149.1; l(g) 142.7
+
+        t(min) 20; l0(g) 149.5; l(g) 139.8'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Cu_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6503-11
+        series:
+        - t_min: 5
+          initial_mass_g: 148.5
+          final_mass_g: 145.3
+          quote: t(min) 5; l0(g) 148.5; l(g) 145.3
+        - t_min: 10
+          initial_mass_g: 152.4
+          final_mass_g: 143.7
+          quote: t(min) 10; l0(g) 152.4; l(g) 143.7
+        - t_min: 15
+          initial_mass_g: 149.1
+          final_mass_g: 142.7
+          quote: t(min) 15; l0(g) 149.1; l(g) 142.7
+        - t_min: 20
+          initial_mass_g: 149.5
+          final_mass_g: 139.8
+          quote: t(min) 20; l0(g) 149.5; l(g) 139.8
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_cu_masses_6503_16_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+        note: Melt 6503-16
+      quote: 't(min) 5; l0(g) 151.3; l(g) 147.1
+
+        t(min) 10; l0(g) 150.8; l(g) 144.8
+
+        t(min) 15; l0(g) 150.4; l(g) 143.1
+
+        t(min) 20; l0(g) 149.8; l(g) 142.1'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Cu_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6503-16
+        series:
+        - t_min: 5
+          initial_mass_g: 151.3
+          final_mass_g: 147.1
+          quote: t(min) 5; l0(g) 151.3; l(g) 147.1
+        - t_min: 10
+          initial_mass_g: 150.8
+          final_mass_g: 144.8
+          quote: t(min) 10; l0(g) 150.8; l(g) 144.8
+        - t_min: 15
+          initial_mass_g: 150.4
+          final_mass_g: 143.1
+          quote: t(min) 15; l0(g) 150.4; l(g) 143.1
+        - t_min: 20
+          initial_mass_g: 149.8
+          final_mass_g: 142.1
+          quote: t(min) 20; l0(g) 149.8; l(g) 142.1
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_cu_masses_6503_28_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+        note: Melt 6503-28
+      quote: 't(min) 5; l0(g) 149.0; l(g) 144.5
+
+        t(min) 10; l0(g) 150.7; l(g) 144.8
+
+        t(min) 15; l0(g) 151.0; l(g) 142.6
+
+        t(min) 20; l0(g) 149.6; l(g) 139.6'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Cu_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6503-28
+        series:
+        - t_min: 5
+          initial_mass_g: 149
+          final_mass_g: 144.5
+          quote: t(min) 5; l0(g) 149.0; l(g) 144.5
+        - t_min: 10
+          initial_mass_g: 150.7
+          final_mass_g: 144.8
+          quote: t(min) 10; l0(g) 150.7; l(g) 144.8
+        - t_min: 15
+          initial_mass_g: 151
+          final_mass_g: 142.6
+          quote: t(min) 15; l0(g) 151.0; l(g) 142.6
+        - t_min: 20
+          initial_mass_g: 149.6
+          final_mass_g: 139.6
+          quote: t(min) 20; l0(g) 149.6; l(g) 139.6
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_cu_olette_class_fence_quoted_deep
+      supersedes: homma_1966_cu_olette_class_fence_b1
+      class: measured
+      type: alpha
+      locator:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      quote: alpha_Cu(exp.) 51
+      phase: liquid_Fe_Cu_alloy
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      uncertainty:
+        note: No numerical alpha uncertainty printed in table.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        alpha: 51
+        method_class: measured_direct
+        not_hkl_langmuir_coefficient: true
+        system_class: molten_metal
+        note: Direct reduction of measured composition and mass using Olette's equation; relative volatility,
+          not HKL alpha. Theoretical and fitted quantities excluded.
+    - observation_id: homma_1966_cu_fitted_constants_quoted_deep
+      supersedes: homma_1966_cu_specific_evaporation_constant
+      class: model
+      type: rate_series
+      admission_status: model_output_not_measurement
+      locator:
+        page: '519'
+        table: '5'
+      quote: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+        Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+        Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+        Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+        Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+        Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+        Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+        Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+        Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+        Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+        Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+        '
+      regime: vacuum_induction_free_evaporation_steel_melt
+      units: 'K_E: sec^-1; K_S: cm sec^-1'
+      values:
+        quantity: fitted_first_order_evaporation_constants
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        rows:
+        - alloy: Fe-Cu
+          melt: 6503-12
+          K_E_as_printed: 3.0x10^-3
+          K_S_as_printed: 5.6x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+        - alloy: Fe-Cu
+          melt: 6503-11
+          K_E_as_printed: 3.1x10^-3
+          K_S_as_printed: 5.8x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+        - alloy: Fe-Cu
+          melt: 6503-16
+          K_E_as_printed: 2.2x10^-3
+          K_S_as_printed: 4.1x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+        - alloy: Fe-Cu
+          melt: 6503-28
+          K_E_as_printed: 1.8x10^-3
+          K_S_as_printed: 3.4x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+        note: Fitted concentration-decay constants, not measured flux/time-series points. Closest existing
+          type retained under controller ruling; numeric strings preserve printed exponents. Surface/bulk
+          ratios retained separately as inverse table evidence.
+      uncertainty:
+        note: No fitted-constant uncertainty printed in tables.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
   Sn:
     observations:
     - observation_id: homma_1966_sn_specific_evaporation_constant
@@ -484,6 +1318,370 @@ species:
         interfacial_reaction: 'Sn(dissolved_in_Fe_l) -> Sn(g)  # metal system, no oxide bond'
         semantics: competing_observation_do_not_average
         note: Olette α_B ≫1 — relative volatility, NOT HKL α∈[0,1]. Fence preserved.
+    - observation_id: homma_1966_sn_olette_experimental_quoted_deep
+      supersedes: homma_1966_sn_olette_alpha_exp_table3
+      class: measured
+      type: alpha
+      locator:
+        page: '518'
+        table: '3'
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      quote: 'printed_row,6503-15,6503-15,6503-15,6503-15,6503-14,6503-14,6503-14,6503-14,6504-1,6504-1,6504-1,6504-1
+
+        mother_alloy_%Sn,0.98,,,,1.84,,,,3.13,,,
+
+        t(min),5,10,15,20,5,10,15,20,5,10,15,20
+
+        %Sn,0.77,0.65,0.43,0.45,1.57,1.14,1.06,0.88,2.24,1.98,1.54,1.70
+
+        l0(g),151.5,150.7,151.8,151.1,150.3,150.1,148.1,148.5,150.1,150.1,150.0,149.8
+
+        l(g),149.4,147.3,146.7,146.0,147.7,146.3,143.0,142.4,144.7,145.5,144.1,144.3
+
+        alpha_Sn(exp.),19,24,31,27,23,28,22,24,13,23,33,28
+
+        alpha_Sn(theo.),20,,,,,,,,,,,
+
+        lambda_Sn,19,,,,15,,,,18,,,
+
+        k_Sn(exp.),0.055,0.053,0.040,0.043,0.092,0.050,0.059,0.053,0.099,0.066,0.052,0.057
+
+        k_Sn(theo.),0.058,0.057,0.057,0.057,0.066,0.064,0.064,0.063,0.076,0.074,0.072,0.073
+
+        omega_Sn,0.061,0.060,0.059,0.059,0.084,0.082,0.082,0.081,0.081,0.080,0.077,0.078
+
+        '
+      phase: liquid_Fe_Sn_alloy
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      uncertainty:
+        note: No numerical alpha uncertainty printed in table.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        alpha: 19
+        method_class: measured_direct
+        not_hkl_langmuir_coefficient: true
+        system_class: molten_metal
+        olette_alpha_exp_series:
+        - melt: 6503-15
+          t_min: 5
+          alpha_exp: 19
+          quote: Melt 6503-15; t(min) 5; alpha_Sn(exp.) 19
+        - melt: 6503-15
+          t_min: 10
+          alpha_exp: 24
+          quote: Melt 6503-15; t(min) 10; alpha_Sn(exp.) 24
+        - melt: 6503-15
+          t_min: 15
+          alpha_exp: 31
+          quote: Melt 6503-15; t(min) 15; alpha_Sn(exp.) 31
+        - melt: 6503-15
+          t_min: 20
+          alpha_exp: 27
+          quote: Melt 6503-15; t(min) 20; alpha_Sn(exp.) 27
+        - melt: 6503-14
+          t_min: 5
+          alpha_exp: 23
+          quote: Melt 6503-14; t(min) 5; alpha_Sn(exp.) 23
+        - melt: 6503-14
+          t_min: 10
+          alpha_exp: 28
+          quote: Melt 6503-14; t(min) 10; alpha_Sn(exp.) 28
+        - melt: 6503-14
+          t_min: 15
+          alpha_exp: 22
+          quote: Melt 6503-14; t(min) 15; alpha_Sn(exp.) 22
+        - melt: 6503-14
+          t_min: 20
+          alpha_exp: 24
+          quote: Melt 6503-14; t(min) 20; alpha_Sn(exp.) 24
+        - melt: 6504-1
+          t_min: 5
+          alpha_exp: 13
+          quote: Melt 6504-1; t(min) 5; alpha_Sn(exp.) 13
+        - melt: 6504-1
+          t_min: 10
+          alpha_exp: 23
+          quote: Melt 6504-1; t(min) 10; alpha_Sn(exp.) 23
+        - melt: 6504-1
+          t_min: 15
+          alpha_exp: 33
+          quote: Melt 6504-1; t(min) 15; alpha_Sn(exp.) 33
+        - melt: 6504-1
+          t_min: 20
+          alpha_exp: 28
+          quote: Melt 6504-1; t(min) 20; alpha_Sn(exp.) 28
+        note: Direct reduction of measured composition and mass using Olette's equation; relative volatility,
+          not HKL alpha. Theoretical and fitted quantities excluded.
+    - observation_id: homma_1966_sn_olette_theoretical_quoted_deep
+      class: model
+      type: alpha
+      locator:
+        page: '518'
+        table: '3'
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      quote: alpha_Sn(theo.) 20
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      values:
+        method_class: model_derived
+        olette_alpha_theoretical: 20
+        not_hkl_langmuir_coefficient: true
+        note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained
+          without a measured alpha scalar.
+        admission_status: model_output_not_measurement
+      uncertainty:
+        note: No numerical uncertainty printed for theoretical coefficient.
+      admission_status: model_output_not_measurement
+    - observation_id: homma_1966_sn_masses_6503_15_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: '518'
+        table: '3'
+        source_path: tables/kems-001-homma-1966/table-3.csv
+        note: Melt 6503-15
+      quote: 't(min) 5; l0(g) 151.5; l(g) 149.4
+
+        t(min) 10; l0(g) 150.7; l(g) 147.3
+
+        t(min) 15; l0(g) 151.8; l(g) 146.7
+
+        t(min) 20; l0(g) 151.1; l(g) 146.0'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Sn_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6503-15
+        series:
+        - t_min: 5
+          initial_mass_g: 151.5
+          final_mass_g: 149.4
+          quote: t(min) 5; l0(g) 151.5; l(g) 149.4
+        - t_min: 10
+          initial_mass_g: 150.7
+          final_mass_g: 147.3
+          quote: t(min) 10; l0(g) 150.7; l(g) 147.3
+        - t_min: 15
+          initial_mass_g: 151.8
+          final_mass_g: 146.7
+          quote: t(min) 15; l0(g) 151.8; l(g) 146.7
+        - t_min: 20
+          initial_mass_g: 151.1
+          final_mass_g: 146
+          quote: t(min) 20; l0(g) 151.1; l(g) 146.0
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_sn_masses_6503_14_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: '518'
+        table: '3'
+        source_path: tables/kems-001-homma-1966/table-3.csv
+        note: Melt 6503-14
+      quote: 't(min) 5; l0(g) 150.3; l(g) 147.7
+
+        t(min) 10; l0(g) 150.1; l(g) 146.3
+
+        t(min) 15; l0(g) 148.1; l(g) 143.0
+
+        t(min) 20; l0(g) 148.5; l(g) 142.4'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Sn_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6503-14
+        series:
+        - t_min: 5
+          initial_mass_g: 150.3
+          final_mass_g: 147.7
+          quote: t(min) 5; l0(g) 150.3; l(g) 147.7
+        - t_min: 10
+          initial_mass_g: 150.1
+          final_mass_g: 146.3
+          quote: t(min) 10; l0(g) 150.1; l(g) 146.3
+        - t_min: 15
+          initial_mass_g: 148.1
+          final_mass_g: 143
+          quote: t(min) 15; l0(g) 148.1; l(g) 143.0
+        - t_min: 20
+          initial_mass_g: 148.5
+          final_mass_g: 142.4
+          quote: t(min) 20; l0(g) 148.5; l(g) 142.4
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_sn_masses_6504_1_deep
+      class: measured
+      type: rate_series
+      locator:
+        page: '518'
+        table: '3'
+        source_path: tables/kems-001-homma-1966/table-3.csv
+        note: Melt 6504-1
+      quote: 't(min) 5; l0(g) 150.1; l(g) 144.7
+
+        t(min) 10; l0(g) 150.1; l(g) 145.5
+
+        t(min) 15; l0(g) 150.0; l(g) 144.1
+
+        t(min) 20; l0(g) 149.8; l(g) 144.3'
+      regime: vacuum_induction_free_evaporation_steel_melt
+      phase: liquid_Fe_Sn_alloy
+      units: g; min
+      uncertainty:
+        note: No numerical mass uncertainty printed.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        quantity: initial_and_final_sample_mass_by_holding_time
+        method_class: measured_direct
+        system_class: molten_metal
+        melt: 6504-1
+        series:
+        - t_min: 5
+          initial_mass_g: 150.1
+          final_mass_g: 144.7
+          quote: t(min) 5; l0(g) 150.1; l(g) 144.7
+        - t_min: 10
+          initial_mass_g: 150.1
+          final_mass_g: 145.5
+          quote: t(min) 10; l0(g) 150.1; l(g) 145.5
+        - t_min: 15
+          initial_mass_g: 150
+          final_mass_g: 144.1
+          quote: t(min) 15; l0(g) 150.0; l(g) 144.1
+        - t_min: 20
+          initial_mass_g: 149.8
+          final_mass_g: 144.3
+          quote: t(min) 20; l0(g) 149.8; l(g) 144.3
+        note: Separate melt samples at each hold time. Total alloy mass, not species-resolved flux. No mass
+          difference or rate calculated.
+    - observation_id: homma_1966_sn_olette_class_fence_quoted_deep
+      supersedes: homma_1966_sn_olette_class_fence_b1
+      class: measured
+      type: alpha
+      locator:
+        page: '518'
+        table: '3'
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      quote: alpha_Sn(exp.) 19
+      phase: liquid_Fe_Sn_alloy
+      regime: olette_relative_evaporation_coefficient
+      units: dimensionless
+      uncertainty:
+        note: No numerical alpha uncertainty printed in table.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+      values:
+        alpha: 19
+        method_class: measured_direct
+        not_hkl_langmuir_coefficient: true
+        system_class: molten_metal
+        note: Direct reduction of measured composition and mass using Olette's equation; relative volatility,
+          not HKL alpha. Theoretical and fitted quantities excluded.
+    - observation_id: homma_1966_sn_fitted_constants_quoted_deep
+      supersedes: homma_1966_sn_specific_evaporation_constant
+      class: model
+      type: rate_series
+      admission_status: model_output_not_measurement
+      locator:
+        page: '519'
+        table: '5'
+      quote: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+        Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+        Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+        Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+        Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+        Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+        Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+        Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+        Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+        Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+        Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+        '
+      regime: vacuum_induction_free_evaporation_steel_melt
+      units: 'K_E: sec^-1; K_S: cm sec^-1'
+      values:
+        quantity: fitted_first_order_evaporation_constants
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        rows:
+        - alloy: Fe-Sn
+          melt: 6503-15
+          K_E_as_printed: 8.4x10^-4
+          K_S_as_printed: 1.6x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+        - alloy: Fe-Sn
+          melt: 6503-14
+          K_E_as_printed: 6.5x10^-4
+          K_S_as_printed: 1.2x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+        - alloy: Fe-Sn
+          melt: 6504-1
+          K_E_as_printed: 8.0x10^-4
+          K_S_as_printed: 1.5x10^-3
+          locator:
+            page: '519'
+            table: '5'
+          quote: Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+        note: Fitted concentration-decay constants, not measured flux/time-series points. Closest existing
+          type retained under controller ruling; numeric strings preserve printed exponents. Surface/bulk
+          ratios retained separately as inverse table evidence.
+      uncertainty:
+        note: No fitted-constant uncertainty printed in tables.
+        temperature_C: 20
+        locator:
+          page: '515'
+          section: II
+        quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
 fidelity_samples:
 - species: Mn
   observable: rate_series
@@ -559,3 +1757,608 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     note: Olette fence pin
+- species: Mn
+  observation_id: homma_1966_mn_olette_experimental_quoted_deep
+  field: alpha
+  value: 115
+  locator:
+    page: '517'
+    table: '1'
+    source_path: tables/kems-001-homma-1966/table-1.csv
+    quote: alpha_Mn(exp.) 115
+- species: Cu
+  observation_id: homma_1966_cu_olette_experimental_quoted_deep
+  field: alpha
+  value: 51
+  locator:
+    page: 517–518
+    table: '2'
+    source_path: tables/kems-001-homma-1966/table-2.csv
+    quote: alpha_Cu(exp.) 51
+- species: Sn
+  observation_id: homma_1966_sn_olette_experimental_quoted_deep
+  field: alpha
+  value: 19
+  locator:
+    page: '518'
+    table: '3'
+    source_path: tables/kems-001-homma-1966/table-3.csv
+    quote: alpha_Sn(exp.) 19
+corrections:
+- observation_id: homma_1966_mn_olette_alpha_exp_table1
+  field: quote
+  old: null
+  new: 'printed_row,6502-1,6502-1,6502-1,6502-2,6502-2,6502-2,6412-14,6412-14,6412-14
+
+    mother_alloy_%Mn,1.05,,,1.74,,,2.89,,
+
+    t(min),5,10,15,5,10,15,5,10,15
+
+    %Mn,0.22,0.046,0.013,0.37,0.083,0.035,0.40,0.053,0.013
+
+    l0(g),149.6,151.0,150.6,150.1,149.6,149.6,150.4,150.2,150.3
+
+    l(g),146.5,144.6,142.1,146.1,143.3,142.6,144.2,141.1,137.3
+
+    alpha_Mn(exp.),115,99,91,113,122,119,233,115,79
+
+    alpha_Mn(theo.),1095,,,,,,,,
+
+    lambda_Mn,124,,,115,,,150,,
+
+    k_Mn(exp.),0.013,0.014,0.013,0.016,0.013,0.012,0.021,0.015,0.017
+
+    k_Mn(theo.),0.0074,0.0066,0.0064,0.012,0.010,0.010,0.017,0.015,0.015
+
+    omega_Mn,0.015,0.014,0.014,0.019,0.019,0.018,0.023,0.021,0.021
+
+    '
+  page: '517'
+  quote: 'printed_row,6502-1,6502-1,6502-1,6502-2,6502-2,6502-2,6412-14,6412-14,6412-14
+
+    mother_alloy_%Mn,1.05,,,1.74,,,2.89,,
+
+    t(min),5,10,15,5,10,15,5,10,15
+
+    %Mn,0.22,0.046,0.013,0.37,0.083,0.035,0.40,0.053,0.013
+
+    l0(g),149.6,151.0,150.6,150.1,149.6,149.6,150.4,150.2,150.3
+
+    l(g),146.5,144.6,142.1,146.1,143.3,142.6,144.2,141.1,137.3
+
+    alpha_Mn(exp.),115,99,91,113,122,119,233,115,79
+
+    alpha_Mn(theo.),1095,,,,,,,,
+
+    lambda_Mn,124,,,115,,,150,,
+
+    k_Mn(exp.),0.013,0.014,0.013,0.016,0.013,0.012,0.021,0.015,0.017
+
+    k_Mn(theo.),0.0074,0.0066,0.0064,0.012,0.010,0.010,0.017,0.015,0.015
+
+    omega_Mn,0.015,0.014,0.014,0.019,0.019,0.018,0.023,0.021,0.021
+
+    '
+  note: Quote supplement only, as permitted by deepening brief; parent object unchanged. Mixed experimental/model
+    parent superseded by separated evidence.
+- observation_id: homma_1966_mn_olette_class_fence_b1
+  field: quote
+  old: null
+  new: alpha_Mn(exp.) 115; つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  page: 517; 515
+  quote: alpha_Mn(exp.) 115; つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  note: Quote supplement only; parent unchanged. Temperature in legacy row converts Celsius to Kelvin
+    by adding 273.15.
+- observation_id: homma_1966_mn_specific_evaporation_constant
+  field: quote
+  old: null
+  new: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+    Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+    Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+    Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+    Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+    Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+    Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+    Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+    Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+    Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+    Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+    Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+    Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+    Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+
+    つぎに真空に排気し1600°C±20°Cに5minないし20min保持し'
+  page: 519; 515
+  quote: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+    Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+    Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+    Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+    Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+    Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+    Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+    Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+    Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+    Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+    Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+    Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+    Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+    Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+
+    つぎに真空に排気し1600°C±20°Cに5minないし20min保持し'
+  note: Quote supplement only; parent unchanged. Fitted constants are model; concentration ratios inverse.
+    Legacy rate_series typing remains unresolved. Celsius-to-Kelvin conversion adds 273.15.
+- observation_id: homma_1966_cu_olette_alpha_exp_table2
+  field: quote
+  old: null
+  new: 'printed_row,6503-12,6503-12,6503-12,6503-12,6503-11,6503-11,6503-11,6503-11,6503-16,6503-16,6503-16,6503-16,6503-28,6503-28,6503-28,6503-28
+
+    mother_alloy_%Cu,1.04,,,,1.74,,,,2.65,,,,4.57,,,
+
+    t(min),5,10,15,20,5,10,15,20,5,10,15,20,5,10,15,20
+
+    %Cu,0.42,0.27,0.078,0.054,0.81,0.23,0.11,0.073,1.26,0.71,0.44,0.30,2.48,1.82,0.87,0.51
+
+    l0(g),151.1,152.8,151.2,150.8,148.5,152.4,149.1,149.5,151.3,150.8,150.4,149.8,149.0,150.7,151.0,149.6
+
+    l(g),147.5,148.4,144.3,141.1,145.3,143.7,142.7,139.8,147.1,144.8,143.1,142.1,144.5,144.8,142.6,139.6
+
+    alpha_Cu(exp.),51,60,73,53,68,47,101,65,55,59,67,73,70,70,32,83
+
+    alpha_Cu(theo.),143,,,,,,,,143,,,,,,,
+
+    lambda_Cu,67,,,,70,,,,44,,,,36,,,
+
+    k_Cu(exp.),0.025,0.020,0.018,0.022,0.029,0.028,0.016,0.021,0.036,0.034,0.026,0.026,0.047,0.041,0.059,0.031
+
+    k_Cu(theo.),0.016,0.015,0.014,0.014,0.022,0.019,0.019,0.018,0.028,0.025,0.024,0.023,0.043,0.040,0.035,0.034
+
+    omega_Cu,0.022,0.021,0.021,0.020,0.028,0.025,0.024,0.024,0.039,0.036,0.035,0.034,0.058,0.056,0.051,0.049
+
+    '
+  page: 517–518
+  quote: 'printed_row,6503-12,6503-12,6503-12,6503-12,6503-11,6503-11,6503-11,6503-11,6503-16,6503-16,6503-16,6503-16,6503-28,6503-28,6503-28,6503-28
+
+    mother_alloy_%Cu,1.04,,,,1.74,,,,2.65,,,,4.57,,,
+
+    t(min),5,10,15,20,5,10,15,20,5,10,15,20,5,10,15,20
+
+    %Cu,0.42,0.27,0.078,0.054,0.81,0.23,0.11,0.073,1.26,0.71,0.44,0.30,2.48,1.82,0.87,0.51
+
+    l0(g),151.1,152.8,151.2,150.8,148.5,152.4,149.1,149.5,151.3,150.8,150.4,149.8,149.0,150.7,151.0,149.6
+
+    l(g),147.5,148.4,144.3,141.1,145.3,143.7,142.7,139.8,147.1,144.8,143.1,142.1,144.5,144.8,142.6,139.6
+
+    alpha_Cu(exp.),51,60,73,53,68,47,101,65,55,59,67,73,70,70,32,83
+
+    alpha_Cu(theo.),143,,,,,,,,143,,,,,,,
+
+    lambda_Cu,67,,,,70,,,,44,,,,36,,,
+
+    k_Cu(exp.),0.025,0.020,0.018,0.022,0.029,0.028,0.016,0.021,0.036,0.034,0.026,0.026,0.047,0.041,0.059,0.031
+
+    k_Cu(theo.),0.016,0.015,0.014,0.014,0.022,0.019,0.019,0.018,0.028,0.025,0.024,0.023,0.043,0.040,0.035,0.034
+
+    omega_Cu,0.022,0.021,0.021,0.020,0.028,0.025,0.024,0.024,0.039,0.036,0.035,0.034,0.058,0.056,0.051,0.049
+
+    '
+  note: Quote supplement only, as permitted by deepening brief; parent object unchanged. Mixed experimental/model
+    parent superseded by separated evidence.
+- observation_id: homma_1966_cu_olette_class_fence_b1
+  field: quote
+  old: null
+  new: alpha_Cu(exp.) 51; つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  page: 517–518; 515
+  quote: alpha_Cu(exp.) 51; つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  note: Quote supplement only; parent unchanged. Temperature in legacy row converts Celsius to Kelvin
+    by adding 273.15.
+- observation_id: homma_1966_cu_specific_evaporation_constant
+  field: quote
+  old: null
+  new: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+    Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+    Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+    Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+    Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+    Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+    Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+    Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+    Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+
+    つぎに真空に排気し1600°C±20°Cに5minないし20min保持し'
+  page: 519; 515
+  quote: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+    Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+    Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+    Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+    Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+    Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+    Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+    Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+    Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+
+    つぎに真空に排気し1600°C±20°Cに5minないし20min保持し'
+  note: Quote supplement only; parent unchanged. Fitted constants are model; concentration ratios inverse.
+    Legacy rate_series typing remains unresolved. Celsius-to-Kelvin conversion adds 273.15.
+- observation_id: homma_1966_sn_olette_alpha_exp_table3
+  field: quote
+  old: null
+  new: 'printed_row,6503-15,6503-15,6503-15,6503-15,6503-14,6503-14,6503-14,6503-14,6504-1,6504-1,6504-1,6504-1
+
+    mother_alloy_%Sn,0.98,,,,1.84,,,,3.13,,,
+
+    t(min),5,10,15,20,5,10,15,20,5,10,15,20
+
+    %Sn,0.77,0.65,0.43,0.45,1.57,1.14,1.06,0.88,2.24,1.98,1.54,1.70
+
+    l0(g),151.5,150.7,151.8,151.1,150.3,150.1,148.1,148.5,150.1,150.1,150.0,149.8
+
+    l(g),149.4,147.3,146.7,146.0,147.7,146.3,143.0,142.4,144.7,145.5,144.1,144.3
+
+    alpha_Sn(exp.),19,24,31,27,23,28,22,24,13,23,33,28
+
+    alpha_Sn(theo.),20,,,,,,,,,,,
+
+    lambda_Sn,19,,,,15,,,,18,,,
+
+    k_Sn(exp.),0.055,0.053,0.040,0.043,0.092,0.050,0.059,0.053,0.099,0.066,0.052,0.057
+
+    k_Sn(theo.),0.058,0.057,0.057,0.057,0.066,0.064,0.064,0.063,0.076,0.074,0.072,0.073
+
+    omega_Sn,0.061,0.060,0.059,0.059,0.084,0.082,0.082,0.081,0.081,0.080,0.077,0.078
+
+    '
+  page: '518'
+  quote: 'printed_row,6503-15,6503-15,6503-15,6503-15,6503-14,6503-14,6503-14,6503-14,6504-1,6504-1,6504-1,6504-1
+
+    mother_alloy_%Sn,0.98,,,,1.84,,,,3.13,,,
+
+    t(min),5,10,15,20,5,10,15,20,5,10,15,20
+
+    %Sn,0.77,0.65,0.43,0.45,1.57,1.14,1.06,0.88,2.24,1.98,1.54,1.70
+
+    l0(g),151.5,150.7,151.8,151.1,150.3,150.1,148.1,148.5,150.1,150.1,150.0,149.8
+
+    l(g),149.4,147.3,146.7,146.0,147.7,146.3,143.0,142.4,144.7,145.5,144.1,144.3
+
+    alpha_Sn(exp.),19,24,31,27,23,28,22,24,13,23,33,28
+
+    alpha_Sn(theo.),20,,,,,,,,,,,
+
+    lambda_Sn,19,,,,15,,,,18,,,
+
+    k_Sn(exp.),0.055,0.053,0.040,0.043,0.092,0.050,0.059,0.053,0.099,0.066,0.052,0.057
+
+    k_Sn(theo.),0.058,0.057,0.057,0.057,0.066,0.064,0.064,0.063,0.076,0.074,0.072,0.073
+
+    omega_Sn,0.061,0.060,0.059,0.059,0.084,0.082,0.082,0.081,0.081,0.080,0.077,0.078
+
+    '
+  note: Quote supplement only, as permitted by deepening brief; parent object unchanged. Mixed experimental/model
+    parent superseded by separated evidence.
+- observation_id: homma_1966_sn_olette_class_fence_b1
+  field: quote
+  old: null
+  new: alpha_Sn(exp.) 19; つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  page: 518; 515
+  quote: alpha_Sn(exp.) 19; つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  note: Quote supplement only; parent unchanged. Temperature in legacy row converts Celsius to Kelvin
+    by adding 273.15.
+- observation_id: homma_1966_sn_specific_evaporation_constant
+  field: quote
+  old: null
+  new: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+    Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+    Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+    Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+    Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+    Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+    Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+    Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+    Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+
+    つぎに真空に排気し1600°C±20°Cに5minないし20min保持し'
+  page: 519; 515
+  quote: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+    Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+    Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+    Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+    Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+    Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+    Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+    Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+    Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+
+    つぎに真空に排気し1600°C±20°Cに5minないし20min保持し'
+  note: Quote supplement only; parent unchanged. Fitted constants are model; concentration ratios inverse.
+    Legacy rate_series typing remains unresolved. Celsius-to-Kelvin conversion adds 273.15.
+- observation_id: homma_1966_crucible_area_numeric_b1
+  field: quote
+  old: null
+  new: 使用したるつぼ(CP-2)の寸法は内径38mm，外径49mm，高さ120mmである．
+  page: '515'
+  quote: 使用したるつぼ(CP-2)の寸法は内径38mm，外径49mm，高さ120mmである．
+  note: Quote supplement only. Geometry is metadata. Legacy inferred area is pi*(38e-3/2)^2 m2, rounded
+    to 0.0011341149; not a printed area or measured rate. Parent unchanged.
+table_evidence:
+- table: '1'
+  page: '517'
+  source_path: tables/kems-001-homma-1966/table-1.csv
+  quote: 'printed_row,6502-1,6502-1,6502-1,6502-2,6502-2,6502-2,6412-14,6412-14,6412-14
+
+    mother_alloy_%Mn,1.05,,,1.74,,,2.89,,
+
+    t(min),5,10,15,5,10,15,5,10,15
+
+    %Mn,0.22,0.046,0.013,0.37,0.083,0.035,0.40,0.053,0.013
+
+    l0(g),149.6,151.0,150.6,150.1,149.6,149.6,150.4,150.2,150.3
+
+    l(g),146.5,144.6,142.1,146.1,143.3,142.6,144.2,141.1,137.3
+
+    alpha_Mn(exp.),115,99,91,113,122,119,233,115,79
+
+    alpha_Mn(theo.),1095,,,,,,,,
+
+    lambda_Mn,124,,,115,,,150,,
+
+    k_Mn(exp.),0.013,0.014,0.013,0.016,0.013,0.012,0.021,0.015,0.017
+
+    k_Mn(theo.),0.0074,0.0066,0.0064,0.012,0.010,0.010,0.017,0.015,0.015
+
+    omega_Mn,0.015,0.014,0.014,0.019,0.019,0.018,0.023,0.021,0.021
+
+    '
+  classification:
+    masses_compositions_times: measured
+    alpha_exp_and_k_exp: measured
+    alpha_theo_k_theo_lambda_omega: model
+  note: Blank cells preserve printed merged-cell layout; see table provenance.
+- table: '2'
+  page: 517–518
+  source_path: tables/kems-001-homma-1966/table-2.csv
+  quote: 'printed_row,6503-12,6503-12,6503-12,6503-12,6503-11,6503-11,6503-11,6503-11,6503-16,6503-16,6503-16,6503-16,6503-28,6503-28,6503-28,6503-28
+
+    mother_alloy_%Cu,1.04,,,,1.74,,,,2.65,,,,4.57,,,
+
+    t(min),5,10,15,20,5,10,15,20,5,10,15,20,5,10,15,20
+
+    %Cu,0.42,0.27,0.078,0.054,0.81,0.23,0.11,0.073,1.26,0.71,0.44,0.30,2.48,1.82,0.87,0.51
+
+    l0(g),151.1,152.8,151.2,150.8,148.5,152.4,149.1,149.5,151.3,150.8,150.4,149.8,149.0,150.7,151.0,149.6
+
+    l(g),147.5,148.4,144.3,141.1,145.3,143.7,142.7,139.8,147.1,144.8,143.1,142.1,144.5,144.8,142.6,139.6
+
+    alpha_Cu(exp.),51,60,73,53,68,47,101,65,55,59,67,73,70,70,32,83
+
+    alpha_Cu(theo.),143,,,,,,,,143,,,,,,,
+
+    lambda_Cu,67,,,,70,,,,44,,,,36,,,
+
+    k_Cu(exp.),0.025,0.020,0.018,0.022,0.029,0.028,0.016,0.021,0.036,0.034,0.026,0.026,0.047,0.041,0.059,0.031
+
+    k_Cu(theo.),0.016,0.015,0.014,0.014,0.022,0.019,0.019,0.018,0.028,0.025,0.024,0.023,0.043,0.040,0.035,0.034
+
+    omega_Cu,0.022,0.021,0.021,0.020,0.028,0.025,0.024,0.024,0.039,0.036,0.035,0.034,0.058,0.056,0.051,0.049
+
+    '
+  classification:
+    masses_compositions_times: measured
+    alpha_exp_and_k_exp: measured
+    alpha_theo_k_theo_lambda_omega: model
+  note: Blank cells preserve printed merged-cell layout; see table provenance.
+- table: '3'
+  page: '518'
+  source_path: tables/kems-001-homma-1966/table-3.csv
+  quote: 'printed_row,6503-15,6503-15,6503-15,6503-15,6503-14,6503-14,6503-14,6503-14,6504-1,6504-1,6504-1,6504-1
+
+    mother_alloy_%Sn,0.98,,,,1.84,,,,3.13,,,
+
+    t(min),5,10,15,20,5,10,15,20,5,10,15,20
+
+    %Sn,0.77,0.65,0.43,0.45,1.57,1.14,1.06,0.88,2.24,1.98,1.54,1.70
+
+    l0(g),151.5,150.7,151.8,151.1,150.3,150.1,148.1,148.5,150.1,150.1,150.0,149.8
+
+    l(g),149.4,147.3,146.7,146.0,147.7,146.3,143.0,142.4,144.7,145.5,144.1,144.3
+
+    alpha_Sn(exp.),19,24,31,27,23,28,22,24,13,23,33,28
+
+    alpha_Sn(theo.),20,,,,,,,,,,,
+
+    lambda_Sn,19,,,,15,,,,18,,,
+
+    k_Sn(exp.),0.055,0.053,0.040,0.043,0.092,0.050,0.059,0.053,0.099,0.066,0.052,0.057
+
+    k_Sn(theo.),0.058,0.057,0.057,0.057,0.066,0.064,0.064,0.063,0.076,0.074,0.072,0.073
+
+    omega_Sn,0.061,0.060,0.059,0.059,0.084,0.082,0.082,0.081,0.081,0.080,0.077,0.078
+
+    '
+  classification:
+    masses_compositions_times: measured
+    alpha_exp_and_k_exp: measured
+    alpha_theo_k_theo_lambda_omega: model
+  note: Blank cells preserve printed merged-cell layout; see table provenance.
+- table: '4'
+  page: '519'
+  source_path: tables/kems-001-homma-1966/table-4.csv
+  quote: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+    Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+    Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+    Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+    Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+    '
+  classification:
+    evaporation_constants: model
+    surface_bulk_concentration_ratios: inverse
+  note: Blank cells preserve printed merged-cell layout; see table provenance.
+- table: '5'
+  page: '519'
+  source_path: tables/kems-001-homma-1966/table-5.csv
+  quote: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+    Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+    Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+    Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+    Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+    Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+    Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+    Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+    Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+    Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+    Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+    '
+  classification:
+    evaporation_constants: model
+    surface_bulk_concentration_ratios: inverse
+  note: Blank cells preserve printed merged-cell layout; see table provenance.
+- table: '6'
+  page: '519'
+  source_path: tables/kems-001-homma-1966/table-6.csv
+  quote: 'Alloying element,gamma_B^0,P_B^0(atm),C_B(gamma_B=gamma_B^0)
+
+    Mn,1.3,6.4x10^-2,0.0011
+
+    Cu,10.1,1.15x10^-3,0.00842
+
+    Sn,1.93,1.15x10^-3,0.050
+
+    '
+  classification:
+    activity_coefficients_vapor_pressures: secondary_compilation
+    C_B: model
+  note: 'Thermodynamic inputs compiled from cited literature; not measured by Homma. Footnote: P_Fe^0=7.60x10^-5
+    atm (8).'
+equipment_metadata:
+- observation_id: homma_1966_crucible_geometry_metadata_deep
+  supersedes: homma_1966_crucible_area_numeric_b1
+  class: measured
+  locator:
+    page: '515'
+    section: II
+  quote: 使用したるつぼ(CP-2)の寸法は内径38mm，外径49mm，高さ120mmである．
+  crucible_inner_diameter_mm: 38
+  crucible_outer_diameter_mm: 49
+  crucible_height_mm: 120
+  note: Printed geometry only; inferred surface area in immutable legacy row is not an observation.
+source_conditions:
+- locator:
+    page: '516'
+    section: II
+  quote: 溶解中の真空度は10⁻²～10⁻³mmHgの範囲にある．
+  note: Quote supplement for legacy chamber-pressure fields. Printed range, no new pressure observation.
