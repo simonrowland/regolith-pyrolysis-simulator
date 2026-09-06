@@ -1,0 +1,152 @@
+{
+  "record_id": "cp-p063-08",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 69,
+  "page": 63,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR FRAMEWORK STRUCTURE SILICATE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "MICROCLINE",
+  "formula_candidate": "KAlSi 30a",
+  "header_and_units_raw": "NAME AND FOIUIJLA                 ENTROPY\n                                 J·.,r,-IC,\n                                                     A1           A2\n                                                                  (T)\n                                                                               A3\n                                                                              u-2>\n                                                                                              A4\n                                                                                          (T.o.&)\n                                                                                                          A5\n                                                                                                         (T2)\n                                                                                                                  T ranee\n                                                                                                                     K\n                                                                                                                            T.\n                                                                                                                             K\n                                                                                                                                   '-\".\n                                                                                                                                   kJ·.,r1\n",
+  "source_text": "MICROCLINE                              214.2    7.595E+02   -2. 171E-01   4.746E+06    -9.527E+03   6.433E-05      298\nKAlSi 30a                                 0.4                                                                      1400",
+  "rows": [
+    {
+      "raw": "MICROCLINE                              214.2    7.595E+02   -2. 171E-01   4.746E+06    -9.527E+03   6.433E-05      298",
+      "tokens": [
+        {
+          "raw": "MICROCLINE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 10
+        },
+        {
+          "raw": "214.2",
+          "value": 214.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 40,
+          "end_offset": 45
+        },
+        {
+          "raw": "7.595E+02",
+          "value": 759.5,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 49,
+          "end_offset": 58
+        },
+        {
+          "raw": "-2.",
+          "value": -2.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 61,
+          "end_offset": 64
+        },
+        {
+          "raw": "171E-01",
+          "value": 17.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 65,
+          "end_offset": 72
+        },
+        {
+          "raw": "4.746E+06",
+          "value": 4746000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 75,
+          "end_offset": 84
+        },
+        {
+          "raw": "-9.527E+03",
+          "value": -9527.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 88,
+          "end_offset": 98
+        },
+        {
+          "raw": "6.433E-05",
+          "value": 6.433e-05,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 101,
+          "end_offset": 110
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 116,
+          "end_offset": 119
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "KAlSi 30a                                 0.4                                                                      1400",
+      "tokens": [
+        {
+          "raw": "KAlSi",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 5
+        },
+        {
+          "raw": "30a",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 6,
+          "end_offset": 9
+        },
+        {
+          "raw": "0.4",
+          "value": 0.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 42,
+          "end_offset": 45
+        },
+        {
+          "raw": "1400",
+          "value": 1400.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 115,
+          "end_offset": 119
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '-2. 171E-01'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A2', '-2. 171E-01')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 48,
+  "source_line_end": 49
+}
