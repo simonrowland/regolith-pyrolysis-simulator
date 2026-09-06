@@ -1,7 +1,7 @@
 schema_version: literature_extract.v1
 source_id: kems-036-sesko-2024
 source:
-  citation: "Šeško, R., Lamboley, K., Cutard, T., Grill, L., Reiss, P. & Cowley, A. (2024), \"Oxygen production by solar vapor-phase pyrolysis of lunar regolith simulant\", Acta Astronautica 224:215–225, DOI 10.1016/j.actaastro.2024.08.009"
+  citation: "Šeško, R., Lamboley, K., Cutard, T., Grill, L., Reiss, P. & Cowley, A. (2024), \"Oxygen production by solar vapor-phase pyrolysis of lunar regolith simulant\", Acta Astronautica 224:215–225, DOI 10.1016/j.actaastro.2024.08.009. PDF not on disk (CC BY, fetch bot-blocked; see sidecar docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md)"
   doi: 10.1016/j.actaastro.2024.08.009
   year: 2024
 extraction:
@@ -274,3 +274,85 @@ species:
         semantics: bound_not_point_ordering
       uncertainty:
         note: printed range 5–8 wt%; no single-point EDX table
+  Fe:
+    observations:
+    - observation_id: sesko_2024_deposit_Fe_edx_qualitative
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+        page: 221
+        figure: '15'
+        paragraph: bottom brown layer has a higher concentration of iron
+      T_range_K:
+      - 1750.0
+      - 1900.0
+      phase: EAC-1A_crucible_deposit
+      condensed_form:
+        state: condensate_on_alumina_crucible
+        metastable: false
+        basis: explicit_author
+        note: Preferential Fe-then-Na deposition inferred from EDX maps; Fe is not a tabulated wt%.
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: wt_percent
+      values:
+        quantity: deposit_Fe_qualitative
+        evidence_class: measured_edx
+        Fe_as_published: traces_in_bottom_brown_layer_not_a_wt_pct
+        material: EAC-1A
+        semantics: bound_not_point_ordering
+        note: No Fe wt% table. Absence of a number is not zero Fe.
+      uncertainty:
+        note: qualitative EDX only; no printed sigma
+      equipment:
+        cell_material:
+          value: alumina ceramic crucible
+          locator:
+            page: 217
+            paragraph: experimental_procedure
+        chamber_pressure:
+          value:
+            min_mbar: 1.0e-7
+            max_mbar: 1.0e-2
+            qualifier: oscillating_range
+          units: mbar
+          locator:
+            page: 217
+            paragraph: During the exposure, vacuum pressure measurements oscillated
+  Si:
+    observations:
+    - observation_id: sesko_2024_deposit_Si_edx_range
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+        page: 221
+        paragraph: Si ranging from 7 to 20 wt%
+      T_range_K:
+      - 1750.0
+      - 1900.0
+      phase: EAC-1A_crucible_deposit
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: wt_percent
+      values:
+        quantity: deposit_Si_wt_pct_range
+        evidence_class: measured_edx
+        Si_wt_pct_range: [7, 20]
+        material: EAC-1A
+        pO2_as_published: not_independently_controlled
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: printed range 7–20 wt%; no single-point EDX table
+      equipment:
+        cell_material:
+          value: alumina ceramic crucible
+          locator:
+            page: 217
+            paragraph: experimental_procedure
+        chamber_pressure:
+          value:
+            min_mbar: 1.0e-7
+            max_mbar: 1.0e-2
+            qualifier: oscillating_range
+          units: mbar
+          locator:
+            page: 217
+            paragraph: During the exposure, vacuum pressure measurements oscillated
