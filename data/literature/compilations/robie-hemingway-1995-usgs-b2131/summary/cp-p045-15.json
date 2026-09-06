@@ -1,0 +1,186 @@
+{
+  "record_id": "cp-p045-15",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 51,
+  "page": 45,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SULFIDE AND SULFOSALT MINERALS",
+  "name_as_published": "PYRITE",
+  "formula_as_published": "Fes2",
+  "phase_as_published": [],
+  "header_and_units_raw": "NAME AND FORJIJLA         ENTROPY          A1           A2            A3          A4            A5      T range   Tt~n    Ac..Ho\n                         J·mor'·IC'                    (T)          (T\"2)       (T~-~)         (T2)        IC      IC    kJ·.,l\"'\n\n",
+  "source_text": "PYRITE                       52.9     -2.032E+01   5.030E-02    -3.200E+06    1.787E+03                   298\nFes2                          0.1                                                                        1015",
+  "rows": [
+    {
+      "label_raw": "PYRITE",
+      "cells": {
+        "entropy": {
+          "raw": "52.9",
+          "value": 52.9,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 29,
+          "end_offset": 33
+        },
+        "A1": {
+          "raw": "-2.032E+01",
+          "value": -20.32,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 38,
+          "end_offset": 48
+        },
+        "A2": {
+          "raw": "5.030E-02",
+          "value": 0.0503,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 51,
+          "end_offset": 60
+        },
+        "A3": {
+          "raw": "-3.200E+06",
+          "value": -3200000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 64,
+          "end_offset": 74
+        },
+        "A4": {
+          "raw": "1.787E+03",
+          "value": 1787.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 78,
+          "end_offset": 87
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 106,
+          "end_offset": 109
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "Fes2",
+      "cells": {
+        "entropy": {
+          "raw": "0.1",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 30,
+          "end_offset": 33
+        },
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "1015",
+          "value": 1015.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 105,
+          "end_offset": 109
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [],
+  "ambiguities": [
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 55,
+  "source_line_end": 56
+}
