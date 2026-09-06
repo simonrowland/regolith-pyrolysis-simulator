@@ -20,10 +20,84 @@ extraction:
     model (kems-036 / MODEL RULE). Appearance potentials and apparatus facts
     are instrument/method, not Psat series. Missing cells left absent, never 0.
     No unit conversion. No MinerU. DOI none: doi.org 404 on guessed 10.13168/cs.1975.* stems.
+    DEEP-kems-093-piacente-1975 (2026-09-06): 400 dpi re-read of Table I (PDF p.4 /
+    published p.292) and 200 dpi re-read of Figs 1–6 captions. Parent observation
+    objects left bit-identical. Nine unquoted figure-only measured rows superseded
+    with quoted class-tagged replacements. Table I cells unchanged.
   date: '2026-09-06'
-  worker: wave-W2-kems-093-piacente-1975
-  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-093-piacente-1975/kems-093-piacente-1975/
+  worker: DEEP-kems-093-piacente-1975
+  provenance_path: docs-private/research/2026-09-06-deepening/DEEP-kems-093-piacente-1975/kems-093-piacente-1975/
 review_status: draft
+corrections:
+  # Quote overlays for the nine unquoted measured figure-only rows. Parent
+  # observation objects are not rewritten (PARENT RULE); quotes also live on
+  # the superseding observation_ids listed below.
+  - observation_id: piacente_1975_fe_fig2_thoria_figure_only
+    field: printed_quote
+    old: absent
+    new: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+    page: 291
+    quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+  - observation_id: piacente_1975_fe_fig3_zirconia_figure_only
+    field: printed_quote
+    old: absent
+    new: "Fig. 3. Vaporiazation with the use of a zirconia cell; log (I+T) vs. 1/T"
+    page: 293
+    quote: "Fig. 3. Vaporiazation with the use of a zirconia cell; log (I+T) vs. 1/T"
+  - observation_id: piacente_1975_fe_fig4_rhenium_figure_only
+    field: printed_quote
+    old: absent
+    new: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+    page: 294
+    quote: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+  - observation_id: piacente_1975_fe_fig5_psat_figure_only
+    field: printed_quote
+    old: absent
+    new: "Fig. 5. Partial pressures of gaseous phase components, and total pressure vs. temperature."
+    page: 295
+    quote: "Fig. 5. Partial pressures of gaseous phase components, and total pressure vs. temperature."
+  - observation_id: piacente_1975_fe_fig6_vs_pure_figure_only
+    field: printed_quote
+    old: absent
+    new: >-
+      Fig. 6. A comparison of the temperature dependence of Fe and SiO partial
+      pressures established in the present study, with published partial pressure
+      values for these components over pure Fe and SiO2.
+    page: 296
+    quote: >-
+      Fig. 6. A comparison of the temperature dependence of Fe and SiO partial
+      pressures established in the present study, with published partial pressure
+      values for these components over pure Fe and SiO2.
+  - observation_id: piacente_1975_sio_fig2_4_5_figure_only
+    field: printed_quote
+    old: absent
+    new: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+    page: 291
+    quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+  - observation_id: piacente_1975_sio_fig6_vs_cristobalite_figure_only
+    field: printed_quote
+    old: absent
+    new: >-
+      Fig. 6. A comparison of the temperature dependence of Fe and SiO partial
+      pressures established in the present study, with published partial pressure
+      values for these components over pure Fe and SiO2.
+    page: 296
+    quote: >-
+      Fig. 6. A comparison of the temperature dependence of Fe and SiO partial
+      pressures established in the present study, with published partial pressure
+      values for these components over pure Fe and SiO2.
+  - observation_id: piacente_1975_mg_fig2_4_5_figure_only
+    field: printed_quote
+    old: absent
+    new: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+    page: 291
+    quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+  - observation_id: piacente_1975_o2_fig4_5_figure_only
+    field: printed_quote
+    old: absent
+    new: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+    page: 294
+    quote: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
 fidelity_samples:
   - path: species.Fe.observations[piacente_1975_fe_table1_second_law].values.points[0].delta_H_sub_kJ_mole
     value: 407.4
@@ -481,6 +555,130 @@ species:
         n_points: absent
       uncertainty:
         note: alumina interaction; no usable Fe P(T)
+    - observation_id: piacente_1975_fe_fig2_thoria_figure_only_quoted
+      supersedes: piacente_1975_fe_fig2_thoria_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '2'
+        published_page: 291
+        pdf_page_index: 3
+      quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+      T_range_K: [1680.0, 1920.0]
+      phase: vapor_over_olivine_in_thoria
+      regime: kems_effusion
+      units: log(I+T) as plotted
+      values:
+        quantity: log_IT_vs_1_over_T_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        printed_quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+        table_csv: tables/kems-093-piacente-1975/f2.provenance.yaml
+      uncertainty:
+        note: figure caption prints no numeric point coordinates and no plus-minus
+    - observation_id: piacente_1975_fe_fig3_zirconia_figure_only_quoted
+      supersedes: piacente_1975_fe_fig3_zirconia_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '3'
+        published_page: 293
+        pdf_page_index: 5
+      quote: "Fig. 3. Vaporiazation with the use of a zirconia cell; log (I+T) vs. 1/T"
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_in_zirconia
+      regime: kems_effusion
+      units: log(I+T) as plotted
+      values:
+        quantity: log_IT_vs_1_over_T_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        printed_quote: "Fig. 3. Vaporiazation with the use of a zirconia cell; log (I+T) vs. 1/T"
+        caption_spelling_as_printed: Vaporiazation
+        table_csv: tables/kems-093-piacente-1975/f3.provenance.yaml
+      uncertainty:
+        note: figure caption prints no numeric point coordinates and no plus-minus
+    - observation_id: piacente_1975_fe_fig4_rhenium_figure_only_quoted
+      supersedes: piacente_1975_fe_fig4_rhenium_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '4'
+        published_page: 294
+        pdf_page_index: 6
+      quote: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+      T_range_K: [1699.0, 1920.0]
+      phase: vapor_over_olivine_in_rhenium
+      regime: kems_effusion
+      units: log(I+T) as plotted
+      values:
+        quantity: log_IT_vs_1_over_T_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        printed_quote: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+        table_csv: tables/kems-093-piacente-1975/f4.provenance.yaml
+      uncertainty:
+        note: figure caption prints no numeric point coordinates and no plus-minus
+    - observation_id: piacente_1975_fe_fig5_psat_figure_only_quoted
+      supersedes: piacente_1975_fe_fig5_psat_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '5'
+        published_page: 295
+        pdf_page_index: 7
+      quote: "Fig. 5. Partial pressures of gaseous phase components, and total pressure vs. temperature."
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      regime: kems_effusion
+      units: kPa as plotted (-log P)
+      values:
+        quantity: partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        printed_quote: "Fig. 5. Partial pressures of gaseous phase components, and total pressure vs. temperature."
+        activity_claim_as_printed: almost unitary activity versus pure Fe
+        table_csv: tables/kems-093-piacente-1975/f5.provenance.yaml
+      uncertainty:
+        note: figure caption prints no tabulated P(T) points and no plus-minus
+    - observation_id: piacente_1975_fe_fig6_vs_pure_figure_only_quoted
+      supersedes: piacente_1975_fe_fig6_vs_pure_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '6'
+        published_page: 296
+        pdf_page_index: 8
+      quote: >-
+        Fig. 6. A comparison of the temperature dependence of Fe and SiO partial
+        pressures established in the present study, with published partial pressure
+        values for these components over pure Fe and SiO2.
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_vs_pure_Fe
+      regime: kems_effusion
+      units: kPa as plotted (-log P)
+      values:
+        quantity: partial_pressure_overlay_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        literature_overlay: Hultgren et al. 1967 pure Fe vapour pressure [7]
+        n_points: absent
+        printed_quote: >-
+          Fig. 6. A comparison of the temperature dependence of Fe and SiO partial
+          pressures established in the present study, with published partial pressure
+          values for these components over pure Fe and SiO2.
+        table_csv: tables/kems-093-piacente-1975/f6.provenance.yaml
+      uncertainty:
+        note: figure caption prints no tabulated P(T) points and no plus-minus
   SiO:
     observations:
     - observation_id: piacente_1975_sio_table1_second_law
@@ -616,6 +814,64 @@ species:
         n_points: absent
       uncertainty:
         note: no tabulated P(T) points
+    - observation_id: piacente_1975_sio_fig2_4_5_figure_only_quoted
+      supersedes: piacente_1975_sio_fig2_4_5_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '2'
+        published_page: 291
+        pdf_page_index: 3
+        note: also Fig. 3 p.293, Fig. 4 p.294, Fig. 5 p.295
+      quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      regime: kems_effusion
+      units: as plotted
+      values:
+        quantity: log_IT_and_partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        figures: ['2', '3', '4', '5']
+        printed_quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+        additional_quotes:
+          fig3: "Fig. 3. Vaporiazation with the use of a zirconia cell; log (I+T) vs. 1/T"
+          fig4: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+          fig5: "Fig. 5. Partial pressures of gaseous phase components, and total pressure vs. temperature."
+      uncertainty:
+        note: figure captions print no numeric point coordinates and no plus-minus
+    - observation_id: piacente_1975_sio_fig6_vs_cristobalite_figure_only_quoted
+      supersedes: piacente_1975_sio_fig6_vs_cristobalite_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '6'
+        published_page: 296
+        pdf_page_index: 8
+      quote: >-
+        Fig. 6. A comparison of the temperature dependence of Fe and SiO partial
+        pressures established in the present study, with published partial pressure
+        values for these components over pure Fe and SiO2.
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_vs_cristobalite
+      regime: kems_effusion
+      units: kPa as plotted
+      values:
+        quantity: partial_pressure_overlay_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        literature_overlay: Porter, Chupka & Inghram 1955 SiO over cristobalite [9]
+        n_points: absent
+        printed_quote: >-
+          Fig. 6. A comparison of the temperature dependence of Fe and SiO partial
+          pressures established in the present study, with published partial pressure
+          values for these components over pure Fe and SiO2.
+        table_csv: tables/kems-093-piacente-1975/f6.provenance.yaml
+      uncertainty:
+        note: figure caption prints no tabulated P(T) points and no plus-minus
   Mg:
     observations:
     - observation_id: piacente_1975_mg_table1_second_law
@@ -756,6 +1012,34 @@ species:
         figures: ['2', '3', '4', '5']
       uncertainty:
         note: no tabulated point coordinates
+    - observation_id: piacente_1975_mg_fig2_4_5_figure_only_quoted
+      supersedes: piacente_1975_mg_fig2_4_5_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '2'
+        published_page: 291
+        pdf_page_index: 3
+        note: also Fig. 3 p.293, Fig. 4 p.294, Fig. 5 p.295
+      quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      regime: kems_effusion
+      units: as plotted
+      values:
+        quantity: log_IT_and_partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        figures: ['2', '3', '4', '5']
+        printed_quote: "Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T."
+        additional_quotes:
+          fig3: "Fig. 3. Vaporiazation with the use of a zirconia cell; log (I+T) vs. 1/T"
+          fig4: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+          fig5: "Fig. 5. Partial pressures of gaseous phase components, and total pressure vs. temperature."
+      uncertainty:
+        note: figure captions print no numeric point coordinates and no plus-minus
   O2:
     observations:
     - observation_id: piacente_1975_o2_table1_second_law
@@ -905,6 +1189,32 @@ species:
         figures: ['4', '5']
       uncertainty:
         note: no tabulated point coordinates
+    - observation_id: piacente_1975_o2_fig4_5_figure_only_quoted
+      supersedes: piacente_1975_o2_fig4_5_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        figure: '4'
+        published_page: 294
+        pdf_page_index: 6
+        note: also Fig. 5 p.295
+      quote: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+      T_range_K: [1699.0, 1920.0]
+      phase: vapor_over_olivine_in_rhenium
+      regime: kems_effusion
+      units: as plotted
+      values:
+        quantity: log_IT_and_partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        figures: ['4', '5']
+        printed_quote: "Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T."
+        additional_quotes:
+          fig5: "Fig. 5. Partial pressures of gaseous phase components, and total pressure vs. temperature."
+      uncertainty:
+        note: figure captions print no numeric point coordinates and no plus-minus
   FeO:
     observations:
     - observation_id: piacente_1975_feo_highT_re_detected_not_tabulated
@@ -957,3 +1267,11 @@ species:
           Battery must refuse as model_output_not_measurement.
       uncertainty:
         note: not a measured equilibrium constant
+
+deepening:
+  dispatch_id: DEEP-kems-093-piacente-1975
+  date: '2026-09-06'
+  parent_policy: Original observation objects retained byte-for-byte; replacements use supersedes.
+  battery_limitation: Battery does not honor supersedes; parent figure-only rows can still be listed.
+  tables: One printed table (Table I, published p.292 / PDF p.4) transcribed cell-for-cell in tables/kems-093-piacente-1975/t1.csv. Figs 1-6 remain figure-only.
+  quote_convention: Figure-only quotes are the printed English captions. Caption of Fig. 3 retains printed spelling Vaporiazation.
