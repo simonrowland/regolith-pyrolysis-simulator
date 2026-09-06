@@ -1,0 +1,131 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0273",
+  "census_id": "high-temperature-printed-page-299",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "WITHERITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "FOR!ATIOII .FRO! THE OIIDES",
+  "formula_weight": {
+    "as_published": "197.349",
+    "value": 197.349,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      305
+    ],
+    "printed_pages": [
+      299
+    ],
+    "pdftotext_layout_page_file": "page-305.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "22 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 20, 23, 24, 26, 27, 28, 29, 31, 34, 37, 38, 39, 40, 42, 43, 47, 48, 51, 52, 53, 54, 55"
+  ],
+  "title_line_as_published": "WITHERITE                                                                        FOB!ULA WEIGHT           197.349",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "             orthorhombic crystals .298.15 to 1079 K.               Tetragonal crystals 1079 to",
+    "             1241 K.     Cubic crystals 1241 to 1600 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                  FOR!ATIOII .FRO! THE OIIDES",
+    "                                                                                          GIBBS",
+    "TE!P.     (a;-u; 98 )/T      So",
+    "                              T       -(G;-H~g 8 )/T      CD",
+    "                                                            p     ENTHALPY            .FREE .EIEBGY        Loq Kf",
+    "  K          Jjaol•lt     J/aol•K       J/aol•lt       J/aol•K         ltJ/aol           ltJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jjaol•lt",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•lt",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "ltJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 24,
+  "uncertainty_line_as_published": "UIICEIT liiiTY               2.09              2.09                      o. 770             0.780",
+  "uncertainty_values": [
+    {
+      "as_published": "2.09",
+      "value": 2.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.09",
+      "value": 2.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 770",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.780",
+      "value": 0.78,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "I!ELTIIIG POINT                          K             BOILIIiG POINT                                      K",
+    "ENTHALPY OF !ELTIIIG                     ltJ           EIITHALPI OF VAPORIZATlOII                          ltJ",
+    "                                         ltJ           BOLAR VOLUI!E                           4.51:110 J/bar",
+    "                                                                                              45.810 ca 3",
+    "TRANSITIOIIS Ill RE.FEREIICE STATE OXIDES",
+    "HEAT CAPACITY EQUATIONS",
+    "        81.001 + 5.6484x1o-z T                    J.3107x10• T-:t",
+    "           (EQUATION VALID .FRO!               298 - 1079 It)",
+    "BEFEBEIICE       155          120                                            4                        CO!PILED",
+    "                                                                                                       6-28-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 22 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 20, 23, 24, 26, 27, 28, 29, 31, 34, 37, 38, 39, 40, 42, 43, 47, 48, 51, 52, 53, 54, 55",
+      "detector_only": false
+    }
+  ]
+}
