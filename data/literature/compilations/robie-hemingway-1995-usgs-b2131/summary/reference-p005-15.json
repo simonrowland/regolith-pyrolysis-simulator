@@ -1,0 +1,175 @@
+{
+  "record_id": "reference-p005-15",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 11,
+  "page": 5,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES Of ELEMENTS IN THEIR REFERENCE STATE AT 298.15 K",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "GRAPHITE (REFERENCE STATE)",
+  "formula_candidate": "c",
+  "header_and_units_raw": "NNE AND FORJIJLA                    WEIGHT     ENTROPY     VOLUME   ENTHALPY     FREE      LOG(K)    REFERENCES\n                                                                                ENERGY\n                                                  s•        v•\n                                                            a}\n                                                                     .....       Ali.\n                                     Sl      J·mol·1 ·C1            kJ·mor1    kJ •mol·1            s        H/G    c\n",
+  "source_text": "GRAPHITE (REFERENCE STATE)          12.011         5.74    5.298         0.0        0.0     0.00    85              85\nc                                                  o. 10   0.001",
+  "rows": [
+    {
+      "raw": "GRAPHITE (REFERENCE STATE)          12.011         5.74    5.298         0.0        0.0     0.00    85              85",
+      "tokens": [
+        {
+          "raw": "GRAPHITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 8
+        },
+        {
+          "raw": "(REFERENCE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 9,
+          "end_offset": 19
+        },
+        {
+          "raw": "STATE)",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 20,
+          "end_offset": 26
+        },
+        {
+          "raw": "12.011",
+          "value": 12.011,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 36,
+          "end_offset": 42
+        },
+        {
+          "raw": "5.74",
+          "value": 5.74,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 51,
+          "end_offset": 55
+        },
+        {
+          "raw": "5.298",
+          "value": 5.298,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 59,
+          "end_offset": 64
+        },
+        {
+          "raw": "0.0",
+          "value": 0.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 73,
+          "end_offset": 76
+        },
+        {
+          "raw": "0.0",
+          "value": 0.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 84,
+          "end_offset": 87
+        },
+        {
+          "raw": "0.00",
+          "value": 0.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 92,
+          "end_offset": 96
+        },
+        {
+          "raw": "85",
+          "value": 85.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 100,
+          "end_offset": 102
+        },
+        {
+          "raw": "85",
+          "value": 85.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 116,
+          "end_offset": 118
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "c                                                  o. 10   0.001",
+      "tokens": [
+        {
+          "raw": "c",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 1
+        },
+        {
+          "raw": "o.",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 51,
+          "end_offset": 53
+        },
+        {
+          "raw": "10",
+          "value": 10.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 54,
+          "end_offset": 56
+        },
+        {
+          "raw": "0.001",
+          "value": 0.001,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 59,
+          "end_offset": 64
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "entropy: unparsed printed OCR token 'o. 10'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(2, 'entropy', 'o. 10')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_disagreement"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 54,
+  "source_line_end": 55
+}

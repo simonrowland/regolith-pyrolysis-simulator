@@ -1,0 +1,204 @@
+{
+  "record_id": "reference-p006-06",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 12,
+  "page": 6,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF ELEMENTS IN THEIR REFERENCE STATE AT 298.15 K",
+  "name_as_published": "CHLORINE (REFERENCE STATE)",
+  "formula_as_published": "CL 2",
+  "phase_as_published": [
+    "(REFERENCE STATE)",
+    "(IDEAL GAS)"
+  ],
+  "header_and_units_raw": "    NAME AND FORMULA                  WEIGHT     ENTROPY     VOLUME   ENTHALPY     FREE      LOG(K)    REFERENCES\n                                                                                  ENERGY\n                                                    so         yo       4,H 0       '-'0\n                                       Sl      J ·mor'·IC'    r;,}    kJ•110l-1   kJ·110r'            s    H/G    c\n",
+  "source_text": "    CHLORINE (REFERENCE STATE)        70.905       223.08 24789.7          o.o         0.0     0.00   67          67\n    CL 2      (IDEAL GAS)                            0.01     0.2                                     85          85",
+  "rows": [
+    {
+      "label_raw": "CHLORINE (REFERENCE STATE)",
+      "cells": {
+        "weight": {
+          "raw": "70.905",
+          "value": 70.905,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 38,
+          "end_offset": 44
+        },
+        "entropy": {
+          "raw": "223.08",
+          "value": 223.08,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 51,
+          "end_offset": 57
+        },
+        "volume": {
+          "raw": "24789.7",
+          "value": 24789.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 58,
+          "end_offset": 65
+        },
+        "formation_enthalpy": {
+          "raw": "o.o",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 75,
+          "end_offset": 78
+        },
+        "formation_gibbs": {
+          "raw": "0.0",
+          "value": 0.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 87,
+          "end_offset": 90
+        },
+        "log_kf": {
+          "raw": "0.00",
+          "value": 0.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 95,
+          "end_offset": 99
+        },
+        "reference_entropy": {
+          "raw": "67",
+          "value": 67.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 102,
+          "end_offset": 104
+        },
+        "reference_enthalpy_gibbs": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "reference_heat_capacity": {
+          "raw": "67",
+          "value": 67.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 114,
+          "end_offset": 116
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "CL 2      (IDEAL GAS)",
+      "cells": {
+        "weight": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "entropy": {
+          "raw": "0.01",
+          "value": 0.01,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 53,
+          "end_offset": 57
+        },
+        "volume": {
+          "raw": "0.2",
+          "value": 0.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 62,
+          "end_offset": 65
+        },
+        "formation_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "formation_gibbs": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "log_kf": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "reference_entropy": {
+          "raw": "85",
+          "value": 85.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 102,
+          "end_offset": 104
+        },
+        "reference_enthalpy_gibbs": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "reference_heat_capacity": {
+          "raw": "85",
+          "value": 85.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 114,
+          "end_offset": 116
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [
+    {
+      "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
+      "residual_kJ_per_mol": 0.0,
+      "rounding_tolerance_kJ_per_mol": 0.08854004751267629,
+      "disagreement": false
+    }
+  ],
+  "ambiguities": [
+    "formation_enthalpy: unparsed printed OCR token 'o.o'",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_disagreement"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 26,
+  "source_line_end": 27
+}
