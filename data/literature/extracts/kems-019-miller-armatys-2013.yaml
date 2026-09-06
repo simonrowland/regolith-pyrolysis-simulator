@@ -1,0 +1,433 @@
+schema_version: literature_extract.v1
+source_id: kems-019-miller-armatys-2013
+source:
+  citation: 'Miller, M. and Armatys, K. (2013), "Twenty Years of Knudsen Effusion Mass Spectrometry: Studies Performed in the Period 1990-2010", The Open Thermodynamics Journal 7:2-9, DOI 10.2174/1874396X01307010002 (open access; CC BY-NC 3.0 as printed)'
+  doi: 10.2174/1874396X01307010002
+  url: https://doi.org/10.2174/1874396X01307010002
+  year: 2013
+extraction:
+  method: 'pdftotext -layout of held 9-page OA PDF (sha256 0b30fe164d51...; byte-identical to official Bentham TOTHERJ-7-2.pdf). Tables 1-7 are publisher supplementary material, true-absence from this PDF. Narrative silicate/oxide compilation rows transcribed from Sections 3.2 and 4. Numbered references [1]-[63] into tables/citation-manifest.csv with conservative DOI resolution. No MinerU. No figure digitisation (pdfimages empty). No numbers invented.'
+  date: '2026-09-06'
+  worker: wave-WA-1
+  provenance_path: docs-private/research/2026-09-06-wave-A/WA-1/kems-019-miller-armatys-2013/
+review_status: draft
+fidelity_samples:
+  - species: SiO
+    observable: rate_series
+    observation_id: miller_2013_silica_vapour_species
+    field: typical_vapour_species_as_published
+    value: SiO(g), O2/O(g)
+    locator:
+      page: 7
+      pdf_page_index: 7
+      section: "4. OXIDES"
+      note: "Silica-containing materials vaporize typically as SiO(g), O2/O(g)"
+  - species: Al
+    observable: rate_series
+    observation_id: miller_2013_al2o_major_al_species
+    field: major_al_species_as_published
+    value: Al2O(g)
+    locator:
+      page: 7
+      pdf_page_index: 7
+      section: "4. OXIDES"
+      note: "Al2O(g) is a major Al-containing species in all the system containing Al2O3"
+  - species: Ca
+    observable: rate_series
+    observation_id: miller_2013_gaseous_silicates_minor
+    field: species_as_published
+    value: CaSiO3, BaSiO3, SrSiO, and AlSiO
+    locator:
+      page: 7
+      pdf_page_index: 7
+      section: "4. OXIDES"
+      note: "Few gaseous silicates were identified; exemplified by CaSiO3, BaSiO3, SrSiO, and AlSiO"
+  - species: Na
+    observable: rate_series
+    observation_id: miller_2013_zaitsev_na2o_sio2
+    field: system_as_published
+    value: Na2O-SiO2
+    locator:
+      page: 9
+      pdf_page_index: 9
+      paragraph: "[63]"
+      note: "Reference [63] title as printed: Thermodynamics of Na2O-SiO2 melts"
+species:
+  Al:
+    observations:
+    - observation_id: miller_2013_al2o_major_al_species
+      type: rate_series
+      locator:
+        page: 7
+        pdf_page_index: 7
+        published_page: 7
+        section: "4. OXIDES"
+        paragraph: aluminate systems / Al2O3-containing systems
+      phase: oxide_and_aluminate_systems
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        major_al_species_as_published: Al2O(g)
+        minor_species_as_published: CaAlO(g)
+        condensed_phase_as_published: systems containing Al2O3 as one of the oxide components
+        note: "As printed: Al2O(g) is a major Al-containing species in all the system containing Al2O3 as one of the oxide components. The same deals with the aluminate systems, where only minor amounts of CaAlO(g) could be identified in the cited studies. No numeric partial pressures in this PDF."
+        cited_primary: Supplementary Tables 4-5 (true-absence from held PDF)
+      uncertainty:
+        note: none stated; species presence only
+  Ca:
+    observations:
+    - observation_id: miller_2013_gaseous_silicates_minor
+      type: rate_series
+      locator:
+        page: 7
+        pdf_page_index: 7
+        published_page: 7
+        section: "4. OXIDES"
+        paragraph: silica-containing materials / gaseous silicates
+      phase: multicomponent_silicate_systems
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        species_as_published: CaSiO3, BaSiO3, SrSiO, and AlSiO
+        abundance_as_published: all being the minor components of the equilibrium vapours
+        condensed_phase_as_published: multicomponent silicate systems
+        note: "As printed: Few gaseous silicates were identified in the multicomponent silicate systems; they can be exemplified by CaSiO3, BaSiO3, SrSiO, and AlSiO all being the minor components of the equilibrium vapours. No numeric partial pressures in this PDF."
+        cited_primary: the cited studies; Supplementary Tables 4-5 (true-absence)
+      uncertainty:
+        note: none stated; species presence only
+    - observation_id: miller_2013_alkaline_earth_borate_vapour
+      type: rate_series
+      locator:
+        page: 7
+        pdf_page_index: 7
+        published_page: 7
+        section: "4. OXIDES"
+        paragraph: boron oxide-containing systems
+      phase: borate_and_silicate_glasses
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        species_as_published: Ca(BO2)2, SrBO2, BaBO2
+        also_as_published: BO, B2O2, B2O3; ABO2 (A – alkali metal); dimeric borate species A2(BO2)2
+        condensed_phase_as_published: boron oxide-containing systems / borate or silicate glasses
+        note: "As printed. No numeric partial pressures. Glass inventory itself is Supplementary Table 5 (true-absence)."
+        cited_primary: Supplementary material, Table 5 (true-absence from held PDF)
+      uncertainty:
+        note: none stated; species presence only
+  Fe:
+    observations:
+    - observation_id: miller_2013_zaitsev_fe_si_nonmetal
+      type: rate_series
+      locator:
+        page: 5
+        pdf_page_index: 5
+        published_page: 5
+        section: "3.2 Thermodynamic Properties of Condensed Phases"
+        paragraph: metal-nonmetal systems; Zaitsev et al.
+      phase: liquid_and_solid_metal_nonmetal
+      regime: kems_effusion
+      units: none (activities named, not tabulated)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        system_as_published: different binary and ternary systems containing non-metal element (B, Si, or P) in addition to Mn, Cr, and Fe
+        authors_as_published: Zaitsev et al.
+        properties_as_published: thermodynamic activities of components (liquid); thermodynamic properties of binary compounds (borides, silicides, phosphides) from the thermodynamic activities (solid)
+        note: "As printed. No numeric activities or partial pressures in this PDF. System list is Supplementary Table 3 (true-absence)."
+        cited_primary: Zaitsev et al.; Supplementary material, Table 3 (true-absence)
+      uncertainty:
+        note: none stated
+  K:
+    observations:
+    - observation_id: miller_2013_alkali_borate_vapour
+      type: rate_series
+      locator:
+        page: 7
+        pdf_page_index: 7
+        published_page: 7
+        section: "4. OXIDES"
+        paragraph: boron oxide-containing systems
+      phase: borate_and_silicate_glasses
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        species_as_published: ABO2 (A – alkali metal); dimeric borate species A2(BO2)2
+        condensed_phase_as_published: boron oxide-containing systems
+        note: "A includes Na and K as alkali metals. No numeric partial pressures. Shared prose with the Na observation."
+        cited_primary: Supplementary material, Table 5 (true-absence)
+      uncertainty:
+        note: none stated; species presence only
+  Na:
+    observations:
+    - observation_id: miller_2013_zaitsev_na2o_sio2
+      type: rate_series
+      locator:
+        page: 7
+        pdf_page_index: 7
+        published_page: 7
+        section: "4. OXIDES / mixed oxide-halide"
+        paragraph: slag models (e.g. [63])
+      phase: silicate_melt
+      regime: kems_effusion
+      units: none (system index only; no activities tabulated here)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        system_as_published: Na2O-SiO2
+        role_as_published: slag models (e.g. [63])
+        cited_primary: "[63] A.I. Zaitsev, A.D. Litvina, B.M. Mogutnov, Thermodynamics of Na2O-SiO2 melts, Inorganic Materials, vol. 33, pp. 1265-1273, 1997"
+        cited_primary_doi: ""
+        cited_primary_doi_note: "printed 1997 vol. 33 has no Crossref DOI. Related English translation Inorganic Materials 36 (2000) 529-543 DOI 10.1007/BF02757949 is not accepted as the printed citation."
+        note: "Body cites [63] as an example of slag-model mixed oxide/halide-adjacent studies. Numeric melt thermodynamics are in the primary, not in this review PDF."
+      uncertainty:
+        note: none stated in this review
+  SiO:
+    observations:
+    - observation_id: miller_2013_supp_tables_1_7_true_absence
+      type: rate_series
+      locator:
+        page: 4
+        pdf_page_index: 4
+        published_page: 4
+        section: "2.4 Thermodynamic Properties"
+        paragraph: Supplementary material Tables 1-7
+      phase: metals_alloys_oxides_glasses_fullerenes
+      regime: kems_effusion
+      units: none (tables not present in this PDF)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        tables_as_published:
+          - {id: "1", contents: "pure metals"}
+          - {id: "2", contents: "alloys"}
+          - {id: "3", contents: "metal-nonmetal"}
+          - {id: "4", contents: "oxide"}
+          - {id: "5", contents: "glass"}
+          - {id: "6", contents: "halide-oxide"}
+          - {id: "7", contents: "fullerene"}
+        completeness: true-absence_from_held_PDF
+        authors_claim: "Sample compositions, temperature range, gas species identified as well as thermodynamic quantities reported in the particular paper are given in Tables if available from the original paper given in Supplementary material."
+        supplement_status: "Publisher landing 2026-09-06 lists only TOTHERJ-7-2.pdf. Supplementary URL probes 404 or redirect to homepage. HAL 0, arXiv 0, EuropePMC 0, OSTI 404."
+        note: "Tables 1-7 are not missing because the paper has no tables — they are in supplementary material that is not in the held PDF. Owner-gated acquisition of that file."
+      uncertainty:
+        note: not applicable; no cells
+    - observation_id: miller_2013_silica_vapour_species
+      type: rate_series
+      locator:
+        page: 7
+        pdf_page_index: 7
+        published_page: 7
+        section: "4. OXIDES"
+        paragraph: silica-containing materials
+      phase: silica_containing_materials
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        typical_vapour_species_as_published: SiO(g), O2/O(g)
+        also_as_published: the component metal oxides if their volatility is high enough
+        sio_note_as_published: High stability of the gaseous silicium monoxide is very well established.
+        condensed_phase_as_published: silica-containing materials
+        note: "As printed. No numeric p(SiO). Glass/oxide system inventory is Supplementary Tables 4-5 (true-absence)."
+        cited_primary: Supplementary Tables 4-5 (true-absence)
+      uncertainty:
+        note: none stated; species presence only
+    - observation_id: miller_2013_borate_silicate_glasses
+      type: rate_series
+      locator:
+        page: 7
+        pdf_page_index: 7
+        published_page: 7
+        section: "4. OXIDES"
+        paragraph: Over 30 binary and multicomponent borate or silicate glasses
+      phase: borate_or_silicate_glasses
+      regime: kems_effusion
+      units: none (count of papers/systems; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        n_systems_as_published: Over 30
+        n_systems_note: count of binary and multicomponent borate or silicate glasses studied in the reviewed period; not a vapour-pressure value
+        condensed_phase_as_published: binary and multicomponent borate or silicate glasses
+        cited_primary: Supplementary material, Table 5 (true-absence from held PDF)
+        note: "As printed. The table of systems is supplementary. Do not treat 'Over 30' as a measured observable for the battery."
+      uncertainty:
+        note: none stated
+    - observation_id: miller_2013_chatillon_silica_phosphates
+      type: rate_series
+      locator:
+        page: 7
+        pdf_page_index: 7
+        published_page: 7
+        section: "4. OXIDES"
+        paragraph: Chatillon et al. ternary systems containing silica in addition to the metal phosphates
+      phase: ternary_silica_metal_phosphate
+      regime: kems_effusion
+      units: none (activities named as the aim; not tabulated)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        system_as_published: ternary systems containing silica in addition to the metal phosphates
+        authors_as_published: Chatillon et al.
+        aim_as_published: Determination of the thermodynamic activities of components
+        note: "As printed. No numeric activities in this PDF. Chatillon is not given a numbered cite on this sentence; apparatus papers include [21]."
+        cited_primary: Chatillon et al.; numbered cite not printed on this sentence
+      uncertainty:
+        note: none stated
+    - observation_id: miller_2013_sio2_steam_hydroxides
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 6
+        published_page: 6
+        section: "4. OXIDES"
+        paragraph: Vaporisation of SiO2, V2O5, and TcxOy in the H2O atmosphere
+      phase: oxide_plus_steam
+      regime: kems_effusion
+      units: none (species class only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        systems_as_published: SiO2, V2O5, and TcxOy in the H2O atmosphere
+        species_class_as_published: Gaseous hydroxides and oxyhydroxides were identified in these studies in addition to the vapour species present over respective pure oxides
+        note: "As printed. Hydroxide formulae are not enumerated. No numeric partial pressures."
+        cited_primary: Supplementary material, Table 4 (true-absence)
+      uncertainty:
+        note: none stated
+    - observation_id: miller_2013_refractory_oxide_small_alpha
+      type: alpha
+      locator:
+        page: 6
+        pdf_page_index: 6
+        published_page: 6
+        section: "4. OXIDES"
+        paragraph: small vaporization coefficient, particularly for the refractory oxides
+      phase: refractory_oxides
+      regime: kems_effusion
+      units: none (qualitative; no numeric alpha)
+      values:
+        quantity: qualitative_vaporization_coefficient
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Another specific problem for the vaporization investigations of oxide systems is a small vaporization coefficient, particularly for the refractory oxides."
+        operational_consequence_as_published: "Possibly large ratio between vaporisation (sample) surface and effusion orifice area should be, therefore, kept in the vaporisation study."
+        orifice_check_cite: "[61]"
+        note: "Qualitative. No numeric alpha. Missing is absent, never 0."
+      uncertainty:
+        note: none stated; qualitative only
+    - observation_id: miller_2013_kems_p_and_t_window
+      type: rate_series
+      locator:
+        page: 2
+        pdf_page_index: 2
+        published_page: 2
+        section: "2.1 Principles of the Method"
+      phase: method
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: method_capability_window
+        semantics: method_geometry_reference_not_measured_species_observation
+        method_class: method_only
+        p_range_as_published: generally between 10-5 and 10 Pa
+        p_range_note: "Printed as 10-5 (layout of 10^{-5}) to 10 Pa. Stored as printed; no unit conversion."
+        T_ceiling_as_published: up to temperatures above 2500 K
+        note: "Method capability of KEMS as stated by Miller & Armatys, not a measured series."
+      uncertainty:
+        note: none stated
+    - observation_id: miller_2013_ir_cell_2200k
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 6
+        published_page: 6
+        section: "4. OXIDES"
+        paragraph: Hilpert et al. Ir effusion cells
+      phase: method
+      regime: kems_effusion
+      units: K as printed
+      values:
+        quantity: method_capability_window
+        semantics: method_geometry_reference_not_measured_species_observation
+        method_class: method_only
+        cell_material_as_published: Ir
+        T_max_as_published: temperatures up to 2200 K
+        T_max_K: 2200.0
+        T_max_derivation: "printed 'up to 2200 K' → 2200.0 K (identity; no conversion)"
+        authors_as_published: Hilpert et al.
+        other_cell_materials_as_published: "Pt, Mo, W, Ir, and Re (of which Pt and Ir are chemically the most inert); at very high-temperature studies of oxide samples limited to Mo, W and Re; silica or ceramic materials as Al2O3, ZrO2, BN mostly used for alloys"
+        note: "Equipment/method compilation. Not a measured species observation."
+      equipment:
+        cell_material:
+          value: Ir
+          locator:
+            page: 6
+            pdf_page_index: 6
+            paragraph: Hilpert et al. Ir effusion cells
+          inferred: false
+      uncertainty:
+        note: none stated
+  Ti:
+    observations:
+    - observation_id: miller_2013_ti_oxides_and_titanates
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 6
+        published_page: 6
+        section: "4. OXIDES"
+        paragraph: Ti10O19 and titanates of the perovskite structure
+      phase: pure_and_pseudobinary_oxides
+      regime: kems_effusion
+      units: none (system names only)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        pure_compound_as_published: Ti10O19
+        class_as_published: Titanates, chromates, vanadates, and gallates of the perovskite structure
+        note: "As printed. Vapour species and T ranges for these systems are in Supplementary Table 4 (true-absence). No numeric p(TiOx) here."
+        cited_primary: Supplementary material, Table 4 (true-absence)
+      uncertainty:
+        note: none stated
+    - observation_id: miller_2013_popovic_pzt
+      type: rate_series
+      locator:
+        page: 8
+        pdf_page_index: 8
+        published_page: 8
+        paragraph: "[55]"
+      phase: PbO-ZrO2-TiO2
+      regime: kems_effusion
+      units: none (citation index only)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        system_as_published: PbO-ZrO2-TiO2
+        cited_primary: "[55] A. Popovic, B. Malic, L. Bencze, Knudsen cell mass spectrometric investigation of the PbO-ZrO2-TiO2System, Rapid Communications in Mass Spectrometry, vol. 13, pp. 1129-1137, 1999"
+        cited_primary_doi: 10.1002/(sici)1097-0231(19990630)13:12<1129::aid-rcm630>3.0.co;2-k
+        body_role: "example of the monomer/dimer method for thermodynamic activities (Section 2.4)"
+        note: "Numeric PZT KEMS data are in the primary, not in this review."
+      uncertainty:
+        note: none stated in this review
