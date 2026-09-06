@@ -1,0 +1,971 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "hemingway-haas-robinson-1982-usgs-b1544",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "usgs-b1544-kaolinite",
+  "table_number_as_published": null,
+  "name_as_published": "Kaolinite",
+  "formula_as_published": null,
+  "phase_as_published": "Crystals 298.15 to 1000 K. -~~------------------------------------------------------------------------------",
+  "formula_weight_as_published": "258.161",
+  "printed_pages": [
+    59,
+    60
+  ],
+  "pdf_pages": [
+    65,
+    66
+  ],
+  "formation_bases": [
+    "from_the_elements",
+    "from_the_oxides"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_increment_over_T": "J/mol·K",
+    "entropy": "J/mol·K",
+    "planck_function": "J/mol·K",
+    "heat_capacity": "J/mol·K",
+    "formation_enthalpy": "kJ/mol",
+    "formation_gibbs_energy": "kJ/mol",
+    "log_kf": "dimensionless"
+  },
+  "compiled_as_published": "9-30-79",
+  "molar_volume_J_per_bar_as_published": "9.9520",
+  "molar_volume_cm3_as_published": "99.520",
+  "melting_point_as_published": null,
+  "heat_capacity_equations_as_published": [
+    "Go • 749.175 6.77102x10- 2 T- 8.27864x10 3 T- 0 · 5 + 1.49195x1o 6 T- 2",
+    "p (EQUATION VALID FROM 200 1000 K)"
+  ],
+  "reference_state_notes_as_published": [
+    "TRANSITIONS IN REFERENCE STATE ELEMENTS",
+    "ALUMINUM••. M. P. 933 K.",
+    "SILICON•••• M. P. 1685 K."
+  ],
+  "uncertainty": {
+    "from_the_elements": {
+      "entropy": {
+        "as_published": "1.02",
+        "value": "1.02",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "1.02",
+        "value": "1.02",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "0.77",
+        "value": "0.77",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation_enthalpy": {
+        "as_published": "(1.065)",
+        "value": "1.065",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      },
+      "formation_gibbs_energy": {
+        "as_published": "(0.982)",
+        "value": "0.982",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      },
+      "log_kf": {
+        "as_published": "(0.172)",
+        "value": "0.172",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
+    },
+    "from_the_oxides": {
+      "entropy": {
+        "as_published": "1.02",
+        "value": "1.02",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "1.02",
+        "value": "1.02",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "0.77",
+        "value": "0.77",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation_enthalpy": {
+        "as_published": "1.065",
+        "value": "1.065",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation_gibbs_energy": {
+        "as_published": "0.982",
+        "value": "0.982",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "log_kf": {
+        "as_published": "0.172",
+        "value": "0.172",
+        "ocr_suspect": false,
+        "flags": []
+      }
+    }
+  },
+  "rows": [
+    {
+      "temperature": {
+        "as_published": ":198.15",
+        "value": "198.15",
+        "ocr_suspect": true,
+        "flags": [
+          "ocr_substitution_candidate_not_a_correction"
+        ]
+      },
+      "enthalpy_increment_over_T": {
+        "as_published": "0.000",
+        "value": "0.000",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "entropy": {
+        "as_published": "204.97",
+        "value": "204.97",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "204.97",
+        "value": "204.97",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "246.14",
+        "value": "246.14",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation": {
+        "from_the_elements": {
+          "enthalpy": {
+            "as_published": "-4119.780",
+            "value": "-4119.780",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "gibbs_energy": {
+            "as_published": "-3799.611",
+            "value": "-3799.611",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "log_kf": {
+            "as_published": "665.679",
+            "value": "665.679",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        },
+        "from_the_oxides": {
+          "enthalpy": {
+            "as_published": "-51.055",
+            "value": "-51.055",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "gibbs_energy": {
+            "as_published": "-30.571",
+            "value": "-30.571",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "log_kf": {
+            "as_published": "5.356",
+            "value": "5.356",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        }
+      },
+      "identity_checks": {
+        "planck_vs_S_minus_HHT": {
+          "ok": true,
+          "delta": "0.000",
+          "relation": "-(G-H298)/T = S - (H-H298)/T"
+        },
+        "logKf_vs_dG_from_the_elements": {
+          "ok": false,
+          "delta": "335.942596643552255586118319",
+          "predicted_log_kf": "1001.621596643552255586118319",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        },
+        "logKf_vs_dG_from_the_oxides": {
+          "ok": true,
+          "delta": "-0.000087764736673735918251094",
+          "predicted_log_kf": "5.355912235263326264081748906",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        }
+      },
+      "ocr_suspect": true
+    },
+    {
+      "temperature": {
+        "as_published": "·~00",
+        "value": null,
+        "ocr_suspect": true,
+        "flags": [
+          "unparsed_printed_token"
+        ]
+      },
+      "enthalpy_increment_over_T": {
+        "as_published": "68.780",
+        "value": "68.780",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "entropy": {
+        "as_published": "284.03",
+        "value": "284.03",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "215.25",
+        "value": "215.25",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "290.40",
+        "value": "290.40",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation": {
+        "from_the_elements": {
+          "enthalpy": {
+            "as_published": "-4121.208",
+            "value": "-4121.208",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "gibbs_energy": {
+            "as_published": "-3689.902",
+            "value": "-3689.902",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "log_kf": {
+            "as_published": "481.854",
+            "value": "481.854",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        },
+        "from_the_oxides": {
+          "enthalpy": {
+            "as_published": "-137.391",
+            "value": "-137.391",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "gibbs_energy": {
+            "as_published": "-16.597",
+            "value": "-16.597",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "log_kf": {
+            "as_published": "2.167",
+            "value": "2.167",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        }
+      },
+      "identity_checks": {
+        "planck_vs_S_minus_HHT": {
+          "ok": true,
+          "delta": "0.000",
+          "relation": "-(G-H298)/T = S - (H-H298)/T"
+        },
+        "logKf_vs_dG_from_the_elements": {
+          "ok": null,
+          "delta": null,
+          "reason": "missing_or_unparsed"
+        },
+        "logKf_vs_dG_from_the_oxides": {
+          "ok": true,
+          "delta": "0.000345872817997183881803926",
+          "predicted_log_kf": "2.167345872817997183881803926",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        }
+      },
+      "ocr_suspect": true
+    },
+    {
+      "temperature": {
+        "as_published": "500",
+        "value": "500",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "enthalpy_increment_over_T": {
+        "as_published": "115.990",
+        "value": "115.990",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "entropy": {
+        "as_published": "351.94",
+        "value": "351.94",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "235.95",
+        "value": "235.95",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "317.20",
+        "value": "317.20",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation": {
+        "from_the_elements": {
+          "enthalpy": {
+            "as_published": "-4120.173",
+            "value": "-4120.173",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "gibbs_energy": {
+            "as_published": "-3582.177",
+            "value": "-3582.177",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "log_kf": {
+            "as_published": "374.229",
+            "value": "374.229",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        },
+        "from_the_oxides": {
+          "enthalpy": {
+            "as_published": "-135.216",
+            "value": "-135.216",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "gibbs_energy": {
+            "as_published": "13.350",
+            "value": "13.350",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "log_kf": {
+            "as_published": "-1.395",
+            "value": "-1.395",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        }
+      },
+      "identity_checks": {
+        "planck_vs_S_minus_HHT": {
+          "ok": true,
+          "delta": "0.000",
+          "relation": "-(G-H298)/T = S - (H-H298)/T"
+        },
+        "logKf_vs_dG_from_the_elements": {
+          "ok": true,
+          "delta": "-0.0015354387634055231105023",
+          "predicted_log_kf": "374.2274645612365944768894977",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        },
+        "logKf_vs_dG_from_the_oxides": {
+          "ok": true,
+          "delta": "0.000335065271060437196019406",
+          "predicted_log_kf": "-1.394664934728939562803980594",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        }
+      },
+      "ocr_suspect": false
+    },
+    {
+      "temperature": {
+        "as_published": "600",
+        "value": "600",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "enthalpy_increment_over_T": {
+        "as_published": "151.042",
+        "value": "151.042",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "entropy": {
+        "as_published": "411.38",
+        "value": "411.38",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "260.34",
+        "value": "260.34",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "334.09",
+        "value": "334.09",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation": {
+        "from_the_elements": {
+          "enthalpy": {
+            "as_published": "-4117.887",
+            "value": "-4117.887",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "gibbs_energy": {
+            "as_published": "-3474.764",
+            "value": "-3474.764",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "log_kf": {
+            "as_published": "302.506",
+            "value": "302.506",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        },
+        "from_the_oxides": {
+          "enthalpy": {
+            "as_published": "-133.059",
+            "value": "-133.059",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "gibbs_energy": {
+            "as_published": "42.862",
+            "value": "42.862",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "log_kf": {
+            "as_published": "-3.731",
+            "value": "-3.731",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        }
+      },
+      "identity_checks": {
+        "planck_vs_S_minus_HHT": {
+          "ok": true,
+          "delta": "-0.002",
+          "relation": "-(G-H298)/T = S - (H-H298)/T"
+        },
+        "logKf_vs_dG_from_the_elements": {
+          "ok": true,
+          "delta": "-0.0009121561505024340192992",
+          "predicted_log_kf": "302.5050878438494975659807008",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        },
+        "logKf_vs_dG_from_the_oxides": {
+          "ok": true,
+          "delta": "-0.000468691158040420780537843",
+          "predicted_log_kf": "-3.731468691158040420780537843",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        }
+      },
+      "ocr_suspect": false
+    },
+    {
+      "temperature": {
+        "as_published": ":700",
+        "value": "700",
+        "ocr_suspect": true,
+        "flags": [
+          "ocr_substitution_candidate_not_a_correction"
+        ]
+      },
+      "enthalpy_increment_over_T": {
+        "as_published": "178.000",
+        "value": "178.000",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "entropy": {
+        "as_published": "463.74",
+        "value": "463.74",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "285.74",
+        "value": "285.74",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "344.52",
+        "value": "344.52",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation": {
+        "from_the_elements": {
+          "enthalpy": {
+            "as_published": "-4115.089",
+            "value": "-4115.089",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "gibbs_energy": {
+            "as_published": "-3367.809",
+            "value": "-3367.809",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "log_kf": {
+            "as_published": "251.310",
+            "value": "251.310",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        },
+        "from_the_oxides": {
+          "enthalpy": {
+            "as_published": "-131.327",
+            "value": "-131.327",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "gibbs_energy": {
+            "as_published": "72.043",
+            "value": "72.043",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "log_kf": {
+            "as_published": "-5.376",
+            "value": "-5.376",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        }
+      },
+      "identity_checks": {
+        "planck_vs_S_minus_HHT": {
+          "ok": true,
+          "delta": "0.000",
+          "relation": "-(G-H298)/T = S - (H-H298)/T"
+        },
+        "logKf_vs_dG_from_the_elements": {
+          "ok": true,
+          "delta": "-0.0010048601104751167837837",
+          "predicted_log_kf": "251.3089951398895248832162163",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        },
+        "logKf_vs_dG_from_the_oxides": {
+          "ok": true,
+          "delta": "0.000085291991600164628829643",
+          "predicted_log_kf": "-5.375914708008399835371170357",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        }
+      },
+      "ocr_suspect": true
+    },
+    {
+      "temperature": {
+        "as_published": "BOO",
+        "value": "800",
+        "ocr_suspect": true,
+        "flags": [
+          "ocr_substitution_candidate_not_a_correction"
+        ]
+      },
+      "enthalpy_increment_over_T": {
+        "as_published": "199.226",
+        "value": "199.226",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "entropy": {
+        "as_published": "510.17",
+        "value": "510.17",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "310.94",
+        "value": "310.94",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "350.48",
+        "value": "350.48",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation": {
+        "from_the_elements": {
+          "enthalpy": {
+            "as_published": "-4112.291",
+            "value": "-4112.291",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "gibbs_energy": {
+            "as_published": "-3261.240",
+            "value": "-3261.240",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "log_kf": {
+            "as_published": "212.938",
+            "value": "212.938",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        },
+        "from_the_oxides": {
+          "enthalpy": {
+            "as_published": "-130.314",
+            "value": "-130.314",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "gibbs_energy": {
+            "as_published": "101.007",
+            "value": "101.007",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "log_kf": {
+            "as_published": "-6.595",
+            "value": "-6.595",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        }
+      },
+      "identity_checks": {
+        "planck_vs_S_minus_HHT": {
+          "ok": true,
+          "delta": "0.004",
+          "relation": "-(G-H298)/T = S - (H-H298)/T"
+        },
+        "logKf_vs_dG_from_the_elements": {
+          "ok": true,
+          "delta": "-0.0008711734360084363832550",
+          "predicted_log_kf": "212.9371288265639915636167450",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        },
+        "logKf_vs_dG_from_the_oxides": {
+          "ok": true,
+          "delta": "-0.000080574071441873602138011",
+          "predicted_log_kf": "-6.595080574071441873602138011",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        }
+      },
+      "ocr_suspect": true
+    },
+    {
+      "temperature": {
+        "as_published": "900",
+        "value": "900",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "enthalpy_increment_over_T": {
+        "as_published": "216.209",
+        "value": "216.209",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "entropy": {
+        "as_published": "551.63",
+        "value": "551.63",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "335.43",
+        "value": "335.43",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "353.18",
+        "value": "353.18",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation": {
+        "from_the_elements": {
+          "enthalpy": {
+            "as_published": "-4109.855",
+            "value": "-4109.855",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "gibbs_energy": {
+            "as_published": "-3154.980",
+            "value": "-3154.980",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "log_kf": {
+            "as_published": "183.111",
+            "value": "183.111",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        },
+        "from_the_oxides": {
+          "enthalpy": {
+            "as_published": "-130.802",
+            "value": "-130.802",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "gibbs_energy": {
+            "as_published": "129.974",
+            "value": "129.974",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "log_kf": {
+            "as_published": "-7.544",
+            "value": "-7.544",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        }
+      },
+      "identity_checks": {
+        "planck_vs_S_minus_HHT": {
+          "ok": true,
+          "delta": "-0.009",
+          "relation": "-(G-H298)/T = S - (H-H298)/T"
+        },
+        "logKf_vs_dG_from_the_elements": {
+          "ok": true,
+          "delta": "-0.0007221901327614708571496",
+          "predicted_log_kf": "183.1102778098672385291428504",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        },
+        "logKf_vs_dG_from_the_oxides": {
+          "ok": true,
+          "delta": "0.000505192407024938165435964",
+          "predicted_log_kf": "-7.543494807592975061834564036",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        }
+      },
+      "ocr_suspect": false
+    },
+    {
+      "temperature": {
+        "as_published": "1000",
+        "value": "1000",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "enthalpy_increment_over_T": {
+        "as_published": "229.937",
+        "value": "229.937",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "entropy": {
+        "as_published": "588.88",
+        "value": "588.88",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "planck_function": {
+        "as_published": "358.94",
+        "value": "358.94",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "heat_capacity": {
+        "as_published": "353.45",
+        "value": "353.45",
+        "ocr_suspect": false,
+        "flags": []
+      },
+      "formation": {
+        "from_the_elements": {
+          "enthalpy": {
+            "as_published": "-4129.370",
+            "value": "-4129.370",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "gibbs_energy": {
+            "as_published": "-3047.479",
+            "value": "-3047.479",
+            "ocr_suspect": false,
+            "flags": []
+          },
+          "log_kf": {
+            "as_published": "159.185",
+            "value": "159.185",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        },
+        "from_the_oxides": {
+          "enthalpy": {
+            "as_published": "-129.698",
+            "value": "-129.698",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "gibbs_energy": {
+            "as_published": "158.885",
+            "value": "158.885",
+            "ocr_suspect": false,
+            "flags": [],
+            "footnote_markers": [
+              "*"
+            ]
+          },
+          "log_kf": {
+            "as_published": "-8.299",
+            "value": "-8.299",
+            "ocr_suspect": false,
+            "flags": []
+          }
+        }
+      },
+      "identity_checks": {
+        "planck_vs_S_minus_HHT": {
+          "ok": true,
+          "delta": "0.003",
+          "relation": "-(G-H298)/T = S - (H-H298)/T"
+        },
+        "logKf_vs_dG_from_the_elements": {
+          "ok": true,
+          "delta": "-0.0010261939020970069546076",
+          "predicted_log_kf": "159.1839738060979029930453924",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        },
+        "logKf_vs_dG_from_the_oxides": {
+          "ok": true,
+          "delta": "-0.000301054472193349667058305",
+          "predicted_log_kf": "-8.299301054472193349667058305",
+          "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
+        }
+      },
+      "ocr_suspect": false
+    }
+  ],
+  "row_count": 8,
+  "ocr_suspect_row_count": 4,
+  "identity_disagreements": [
+    {
+      "row_index": 0,
+      "temperature_as_published": ":198.15",
+      "check": "logKf_vs_dG_from_the_elements",
+      "delta": "335.942596643552255586118319"
+    }
+  ],
+  "ambiguities": [
+    "identity_disagreement logKf_vs_dG_from_the_elements T=:198.15 delta=335.942596643552255586118319",
+    "formula_as_published_not_recovered_from_ocr; not inferred"
+  ],
+  "source_locator": {
+    "pdf": "source/hemingway-haas-robinson-1982-usgs-b1544.pdf",
+    "pdf_pages": [
+      65,
+      66
+    ],
+    "printed_pages": [
+      59,
+      60
+    ]
+  }
+}
