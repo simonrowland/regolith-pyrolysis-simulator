@@ -1,0 +1,190 @@
+{
+  "record_id": "cp-p041-13",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 47,
+  "page": 41,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SELECTED ELEMENTS",
+  "name_as_published": "CERilM",
+  "formula_as_published": "Ce",
+  "phase_as_published": [
+    "(crystal)"
+  ],
+  "header_and_units_raw": "NAME AND FORMULA    ENTROPY            A1             A2           A3            A4             A5      Trange     T..         A..H•\n                   J •110l\",·l(1                     (T)         n-z,          n~-•,           (T2)        IC       IC     kJ•110l\"1\n\n",
+  "source_text": "CERilM                  72.00 1.4017E+01        1.9292E·02 ·1.0802E+05      1.4469E+02                    298\nCe (crystal)             4.00                                                                             999",
+  "rows": [
+    {
+      "label_raw": "CERilM",
+      "cells": {
+        "entropy": {
+          "raw": "72.00",
+          "value": 72.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 24,
+          "end_offset": 29
+        },
+        "A1": {
+          "raw": "1.4017E+01",
+          "value": 14.017,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 30,
+          "end_offset": 40
+        },
+        "A2": {
+          "raw": "1.9292E·02",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 48,
+          "end_offset": 58
+        },
+        "A3": {
+          "raw": "·1.0802E+05",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 59,
+          "end_offset": 70
+        },
+        "A4": {
+          "raw": "1.4469E+02",
+          "value": 144.69,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 76,
+          "end_offset": 86
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 106,
+          "end_offset": 109
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "Ce (crystal)",
+      "cells": {
+        "entropy": {
+          "raw": "4.00",
+          "value": 4.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 25,
+          "end_offset": 29
+        },
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "999",
+          "value": 999.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 106,
+          "end_offset": 109
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '1.9292E·02'",
+    "A3: unparsed printed OCR token '·1.0802E+05'",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 50,
+  "source_line_end": 51
+}

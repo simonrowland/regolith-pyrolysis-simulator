@@ -1,0 +1,152 @@
+{
+  "record_id": "cp-p041-11",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 47,
+  "page": 41,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SELECTED ELEMENTS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "CALCilM",
+  "formula_candidate": "Ca",
+  "header_and_units_raw": "NAME AND FORMULA    ENTROPY            A1             A2           A3            A4             A5      Trange     T..         A..H•\n                   J •110l\",·l(1                     (T)         n-z,          n~-•,           (T2)        IC       IC     kJ•110l\"1\n\n",
+  "source_text": "CALCilM                 42.90 -2.659E+01         5.236E-02    -4.877E+05     7.442E+02    -9.772E-06       298\nCa («·crystal)           o. 10                                                                            716",
+  "rows": [
+    {
+      "raw": "CALCilM                 42.90 -2.659E+01         5.236E-02    -4.877E+05     7.442E+02    -9.772E-06       298",
+      "tokens": [
+        {
+          "raw": "CALCilM",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 7
+        },
+        {
+          "raw": "42.90",
+          "value": 42.9,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 24,
+          "end_offset": 29
+        },
+        {
+          "raw": "-2.659E+01",
+          "value": -26.59,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 30,
+          "end_offset": 40
+        },
+        {
+          "raw": "5.236E-02",
+          "value": 0.05236,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 49,
+          "end_offset": 58
+        },
+        {
+          "raw": "-4.877E+05",
+          "value": -487700.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 62,
+          "end_offset": 72
+        },
+        {
+          "raw": "7.442E+02",
+          "value": 744.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 77,
+          "end_offset": 86
+        },
+        {
+          "raw": "-9.772E-06",
+          "value": -9.772e-06,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 90,
+          "end_offset": 100
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 107,
+          "end_offset": 110
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "Ca («·crystal)           o. 10                                                                            716",
+      "tokens": [
+        {
+          "raw": "Ca",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 2
+        },
+        {
+          "raw": "(«·crystal)",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 3,
+          "end_offset": 14
+        },
+        {
+          "raw": "o.",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 25,
+          "end_offset": 27
+        },
+        {
+          "raw": "10",
+          "value": 10.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 28,
+          "end_offset": 30
+        },
+        {
+          "raw": "716",
+          "value": 716.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 106,
+          "end_offset": 109
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "entropy: unparsed printed OCR token 'o. 10'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(2, 'entropy', 'o. 10')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 44,
+  "source_line_end": 45
+}
