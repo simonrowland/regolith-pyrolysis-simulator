@@ -111,6 +111,60 @@ def extract_comparator(monkeypatch):
     return install
 
 
+@pytest.mark.parametrize("markers", [
+    *[{key: role} for key in ("class", "class_tag", "scientific_class")
+      for role in ("model", "derived", "inverse", "figure_only", "compilation_only")],
+    {"admission_status": "model_output_not_measurement"},
+    {"admission_status": "rejected_model_output_not_measurement"},
+    {"method_class": "model_derived"},
+    {"method_class": "derived_gibbs_duhem"},
+    {"method_class": "secondary_compilation"},
+])
+@pytest.mark.parametrize("nested", [False, True])
+def test_extract_roles_cannot_select_or_score_numeric_records(extract_comparator, markers, nested):
+    from scripts.calibration_battery import extract_rows
+    obs = extract_comparator("match")
+    (obs.values if nested else obs.admission_metadata).update(markers)
+    # Even a comparator returning numbers cannot bypass source-role admission.
+    rows = extract_rows()
+    assert len(rows) == 2
+    assert all(not row["selected"] and not row["score_eligible"] for row in rows)
+    assert all(set(row["signed_residual"].values()) == {None} for row in rows)
+
+
+def test_superseded_extract_is_outside_selected_denominator(extract_comparator, monkeypatch):
+    from dataclasses import replace
+    from scripts.calibration_battery import extract_rows
+    from simulator.diagnostic_helpers import extract_reproduction as e
+    obs = replace(extract_comparator("match"), adoption_basis="superseded")
+    monkeypatch.setattr(e, "load_adopted_observations", lambda: [obs])
+    rows = extract_rows()
+    assert rows and all(not row["selected"] and not row["score_eligible"] for row in rows)
+
+
+def test_equal_measurements_without_supersession_remain_independent(extract_comparator, monkeypatch):
+    from dataclasses import replace
+    from scripts.calibration_battery import extract_rows
+    from simulator.diagnostic_helpers import extract_reproduction as e
+    first = extract_comparator("match")
+    second = replace(first, observation_id="independent_class_measurement")
+    original_evaluate = e.evaluate_observation
+    def evaluate(obs, **kwargs):
+        result = original_evaluate(obs, **kwargs)
+        records = [replace(r, case_id=obs.case_id,
+                           observable_id=r.observable_id.replace(first.observation_id, obs.observation_id))
+                   for r in result.records]
+        return e.ObservationEvaluation(obs, records=records)
+    monkeypatch.setattr(e, "evaluate_observation", evaluate)
+    monkeypatch.setattr(e, "load_adopted_observations", lambda: [first, second])
+    rows = extract_rows()
+    assert len(rows) == 4
+    assert all(row["selected"] and row["score_eligible"] for row in rows)
+    assert {row["source_observation_id"] for row in rows} == {
+        first.observation_id, second.observation_id,
+    }
+
+
 def test_material_incompatibility_preserves_raw_alpha_without_scoring(extract_comparator):
     from scripts.calibration_battery import extract_rows
     extract_comparator("out-of-domain")

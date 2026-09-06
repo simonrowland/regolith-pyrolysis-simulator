@@ -195,7 +195,7 @@ def extract_rows():
     from simulator.diagnostic_helpers import extract_reproduction as e
     observations = e.load_adopted_observations()
     vp = e.load_vapor_pressure_data()
-    rows, seen, physical = [], {}, {}
+    rows, seen = [], {}
     for obs in observations:
         # All canonical KEMS records plus the adopted bench/reference pins.
         try:
@@ -206,11 +206,12 @@ def extract_rows():
         notices = result.findings + result.runtime_notes + result.skip_reasons
         if result.skip_reason:
             notices.append(result.skip_reason)
-        value_status = str(obs.values.get("status", ""))
-        admission = str(obs.values.get("admission_status", ""))
-        selected = not any(t in value_status + admission for t in ("rejected", "inadmissible", "withdrawn"))
+        # Selection and reproduction share source-role admission. A refused
+        # role cannot regain eligibility through an alternate status spelling.
+        admission_reason = e.observation_admission_reason(obs)
+        selected = admission_reason is None
         if not selected:
-            notices.append(f"source admission: {value_status}; {admission}")
+            notices.append(f"source admission: {admission_reason}")
         # These are source roles, not guesses based on residual or test outcome.
         kind = "derived measurement" if obs.obs_type == "activity_coefficient" else "direct experiment"
         if obs.obs_type in {"gibbs_table", "transition_point"}:
@@ -293,27 +294,15 @@ def extract_rows():
                 conditions={**conditions, **dict(record.coordinate)},
                 rail=rail_for(record.species or obs.species_id, obs.obs_type),
                 evidence=kind, source_doi=obs.source_doi, notices=point_notices, selected=point_selected,
-                authority=authority, score_allowed=not adopted_model)
+                authority=authority, score_allowed=admission_reason is None and not adopted_model)
             row["raw"]["alpha_context"] = clean(domain)
             if obs.values.get("alpha_kind") in {"condensation_growth_not_evaporation", "condensation_sticking_not_evaporation"}:
                 row["observable"] = obs.values["alpha_kind"]
             row["raw"]["source_observation"] = clean(source)
             row["source_observation_id"] = obs.observation_id
             row["source_evidence_scope"] = record.evidence_scope
-            # Class-axis re-transcriptions have different IDs but identical
-            # source, physical conditions and numeric targets. Keep aliases.
-            signature = (obs.source_id, obs.species_id, obs.obs_type, obs.values.get("sample"),
-                         json.dumps(clean(record.coordinate), sort_keys=True), record.expected_value,
-                         record.actual_value, json.dumps(clean(obs.T_range_K)))
-            if (finite(record.expected_value) and signature in physical and
-                    ("_class" in obs.observation_id or "_class" in physical[signature]["source_observation_id"])):
-                original = physical[signature]
-                original.setdefault("observation_aliases", []).append(row["observation_id"])
-                row["duplicate_of"] = original["observation_id"]
-                row["selected"] = row["score_eligible"] = False
-                row["notices"].append("duplicate transcription; retained outside selected denominator")
-            elif finite(record.expected_value):
-                physical[signature] = row
+            # Explicit supersession edges already exclude parents. Equal
+            # numeric values alone cannot identify duplicate measurements.
             seen[key] = row
             rows.append(row)
     return rows

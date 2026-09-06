@@ -131,7 +131,9 @@ def test_store_yields_adopted_target_type_observations(
     assert adopted_observations, "extract store produced zero ADOPTED observations"
     types = {obs.obs_type for obs in adopted_observations}
     assert types == TARGET_TYPES
-    kems = [obs for obs in adopted_observations if obs.source_id.startswith("kems-")]
+    # Superseded rows are retained provenance, not adopted data points.
+    kems = [obs for obs in adopted_observations
+            if obs.source_id.startswith("kems-") and obs.adoption_basis != "superseded"]
     # B1 harvest + class-tagged fence rows expanded the KEMS surface; keep the
     # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
     # 2026-08-27 harvest + d-006 gate: KEMS observations/sources are the
@@ -140,7 +142,7 @@ def test_store_yields_adopted_target_type_observations(
     # b-480: 15 added KEMS sources; coverage includes typed-skipped evidence.
     assert len({obs.source_id for obs in kems}) == 45
     for obs in adopted_observations:
-        assert obs.is_priority_winner or obs.adoption_basis == "mass_spec_extract"
+        assert obs.is_priority_winner or obs.adoption_basis in {"mass_spec_extract", "superseded"}
         assert obs.source_id
         assert obs.observation_id
         assert obs.species_id
@@ -290,6 +292,75 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     pin_ok, pin_skip, _ = rail_alpha_comparability(obs)
     assert pin_ok is True
     assert pin_skip is None
+
+
+@pytest.mark.parametrize("markers", [
+    {"evidence_kind": "model"},
+    {"measurement_status": "model_output_not_measurement"},
+    {"status": "typed_refusal"},
+    {"admission_status": "rejected_model_output_not_measurement"},
+    {"class": "model"},
+    {"admission_status": "model_output_not_measurement"},
+    *[{key: role} for key in ("class", "class_tag", "scientific_class")
+      for role in ("model", "derived", "inverse", "figure_only", "compilation_only")],
+    *[{"method_class": method} for method in (
+        "model_derived", "derived_gibbs_duhem", "model_derived_inverse_fit",
+        "figure_only_measured_kems", "secondary_compilation",
+    )],
+])
+@pytest.mark.parametrize("nested", [False, True])
+def test_refused_markers_never_score(monkeypatch, markers, nested) -> None:
+    import extract_merge
+    values = {"alpha": 0.02, "system_class": "silicate_melt"}
+    row = {
+        "observation_id": "refused", "type": "alpha", "phase": "silicate_melt",
+        "T_range_K": [1700, 1700], "values": values,
+        "condensed_form": {"state": "liquid_melt", "metastable": False},
+    }
+    (values if nested else row).update(markers)
+    doc = {"source_id": "kems-fixture", "review_status": "reviewed",
+           "species": {"Fe": {"observations": [row]}}}
+    monkeypatch.setattr(extract_merge, "load_extracts", lambda directory: [doc])
+    obs, = load_adopted_observations()
+    ev = evaluate_observation(obs)
+    assert ev.skip_reason.startswith("typed-refusal:")
+    assert ev.records
+    assert not any(r.status in SCORING_STATUSES for r in ev.records)
+    assert all((obs.values if nested else obs.admission_metadata)[key] == value
+               for key, value in markers.items())
+
+
+@pytest.mark.parametrize("length", [2, 3])
+@pytest.mark.parametrize("split", [False, True])
+def test_supersession_adopts_only_terminal_identity(monkeypatch, length, split) -> None:
+    import extract_merge
+    rows = []
+    for i in range(length):
+        row = {"observation_id": f"row-{i}", "type": "alpha",
+               "phase": "silicate_melt", "T_range_K": [1700, 1700],
+               "values": {"alpha": 0.02, "system_class": "silicate_melt"},
+               "condensed_form": {"state": "liquid_melt", "metastable": False}}
+        if i:
+            row["supersedes"] = f"row-{i - 1}"
+        rows.append(row)
+    terminal_ids = [f"row-{length - 1}"]
+    if split:
+        rows.append({**rows[-1], "observation_id": "split-child", "supersedes": "row-0"})
+        terminal_ids.append("split-child")
+    doc = {"source_id": "kems-fixture", "review_status": "reviewed",
+           "species": {"Fe": {"observations": rows}}}
+    monkeypatch.setattr(extract_merge, "load_extracts", lambda directory: [doc])
+    observations = load_adopted_observations()
+    assert [o.observation_id for o in observations if o.adoption_basis != "superseded"] == terminal_ids
+    assert next(o for o in observations if o.observation_id == "row-1").admission_metadata["supersedes"] == "row-0"
+    evaluations = evaluate_all(observations=observations)
+    assert [e.observation.observation_id for e in evaluations
+            if any(r.status in SCORING_STATUSES for r in e.records)] == terminal_ids
+    assert sum(e.skip_reason == "typed-refusal:superseded" for e in evaluations) == length - 1
+    coverage = coverage_summary(evaluations)
+    assert coverage["observations"] == coverage["comparable"] == len(terminal_ids)
+    assert coverage["gap_points"] == 0
+    assert len(coverage["entries"]) == length + int(split)
 
 
 @pytest.mark.parametrize("species", ("Ca", "Ti", "Na"))
@@ -1268,15 +1339,15 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
     (
         (
             "stolyarova_1992_binary_wilson_model_parameters_table2",
-            "typed-refusal:thermodynamic_model_parameter_not_activity_measurement",
+            "typed-refusal:model_output_not_measurement",
         ),
         (
             "halwax_2024_cao_third_law_formation_enthalpy",
-            "typed-refusal:pure_solid_thermochemistry_not_melt_activity",
+            "typed-refusal:superseded",
         ),
         (
             "halwax_2024_mgo_third_law_formation_enthalpy",
-            "typed-refusal:pure_solid_thermochemistry_not_melt_activity",
+            "typed-refusal:superseded",
         ),
     ),
 )
@@ -1293,7 +1364,7 @@ def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
         observation,
         vapor_pressure_data=load_vapor_pressure_data(),
     )
-    assert evaluation.records == []
+    assert not any(r.status in SCORING_STATUSES for r in evaluation.records)
     assert evaluation.skip_reason == skip_reason
     assert evaluation.skip_reasons == [skip_reason]
 
@@ -1320,7 +1391,8 @@ def test_wetzel_model_tables_refuse_as_model_output() -> None:
             observation,
             vapor_pressure_data=load_vapor_pressure_data(),
         )
-        assert evaluation.records == []
+        assert evaluation.records
+        assert not any(r.status in SCORING_STATUSES for r in evaluation.records)
         assert evaluation.skip_reason == "typed-refusal:model_output_not_measurement"
         assert evaluation.skip_reasons == [evaluation.skip_reason]
 
@@ -1329,9 +1401,10 @@ def test_transition_point_is_an_adopted_target_type(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
     assert "transition_point" in TARGET_TYPES
-    rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"]
-    # b-480: nine added transition rows; all remain typed coverage refusals.
-    assert len(rows) == 74
+    rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"
+            and obs.adoption_basis != "superseded"]
+    # Three superseded transition parents remain provenance only: 74 - 3.
+    assert len(rows) == 71
     # NIST NBP/melting rows are priority winners; kems-020 Hastie Na2SO4
     # second-law prose is extract-adopted (mass_spec_extract).
     assert all(
@@ -1550,7 +1623,9 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # battery, not hand-estimated.
     # 2026-08-27 harvest + d-006 binary-melt gate + DeMaria figure-only
     # withdrawal. Numbers are the LIVE studio battery after snapshot regen.
-    assert coverage["observations"] == len(adopted_observations) == 570
+    assert coverage["observations"] == sum(
+        obs.adoption_basis != "superseded" for obs in adopted_observations
+    ) == 570
     assert coverage["comparable"] == 67
     assert coverage["skipped"] == 503
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]

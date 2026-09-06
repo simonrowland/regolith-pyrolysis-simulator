@@ -119,17 +119,6 @@ points:
   temperature_K: 2273.0
   residual: -0.21000000000000002
   band_residual: 0.02
-- key: fedkin_2006_fe_class_b1:T=2123
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_class_b1
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0791812460476249
-  band_dex: 0.01
-  status: mismatch
-  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
-    2026-08-08).
-  temperature_K: 2123.0
 - key: fedkin_2006_fe_hashimoto_langmuir_table3:T=1973
   case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
   source_id: kems-005-fedkin-2006
@@ -170,27 +159,6 @@ points:
   status: mismatch
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 2273.0
-- key: sossi_2019_k_class_b1:T=1698.15
-  case_id: kems-012-sossi-2019::sossi_2019_k_class_b1
-  source_id: kems-012-sossi-2019
-  observation_type: alpha
-  species: K
-  residual_dex: 0.8860566476931632
-  band_dex: 0.01
-  status: match
-  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
-    2026-08-08).
-  temperature_K: 1698.15
-- key: sossi_2019_k_open_furnace_alpha_e_context:T=1698.15
-  case_id: kems-012-sossi-2019::sossi_2019_k_open_furnace_alpha_e_context
-  source_id: kems-012-sossi-2019
-  observation_type: alpha
-  species: K
-  residual_dex: 0.8860566476931632
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1698.15
 - key: fedkin_2006_table3_mg_hashimoto_langmuir:T=1973
   case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
   source_id: fedkin-grossman-ghiorso-2006
@@ -279,27 +247,6 @@ points:
   temperature_K: 2273.0
   residual: -0.07
   band_residual: 0.02
-- key: fedkin_2006_mg_class_b1:T=2123
-  case_id: kems-005-fedkin-2006::fedkin_2006_mg_class_b1
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.0791812460476248
-  band_dex: 0.01
-  status: match
-  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
-    2026-08-08).
-  temperature_K: 2123.0
-- key: schaefer_fegley_2004_mg_forsterite_alpha_s_survey:T=2243
-  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
-  source_id: kems-008-schaefer-fegley-2004
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.0
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2243.0
 - key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=1873
   case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
   source_id: kems-010-richter-2007
@@ -452,70 +399,6 @@ points:
   residual: -0.10721665192129436
   band_residual: 0.01
   extrapolated: true
-- key: fedkin_2006_sio_hashimoto_table3_complete_b1:T=1973
-  case_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.17431584757931465
-  band_dex: 0.01
-  status: mismatch
-  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
-    2026-08-08).
-  temperature_K: 1973.0
-- key: fedkin_2006_sio_hashimoto_table3_complete_b1:T=2073
-  case_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.2864548231913682
-  band_dex: 0.01
-  status: mismatch
-  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
-    2026-08-08).
-  temperature_K: 2073.0
-- key: fedkin_2006_sio_hashimoto_table3_complete_b1:T=2173
-  case_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.32150855070082623
-  band_dex: 0.01
-  status: mismatch
-  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
-    2026-08-08).
-  temperature_K: 2173.0
-- key: fedkin_2006_sio_hashimoto_table3_complete_b1:T=2273
-  case_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.31029653438705807
-  band_dex: 0.01
-  status: mismatch
-  note: Class-comparable residual pin; residual reported, not tuned (si-comparability
-    2026-08-08).
-  temperature_K: 2273.0
-- key: schaefer_fegley_2004_sio_alpha_s_survey:T=2273:point=0
-  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
-  source_id: kems-008-schaefer-fegley-2004
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.40986276901889873
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2273.0
-- key: schaefer_fegley_2004_sio_alpha_s_survey:T=2273:point=1
-  case_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
-  source_id: kems-008-schaefer-fegley-2004
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.28910723531712
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2273.0
 - key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=1873
   case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
   source_id: kems-010-richter-2007
@@ -586,19 +469,6 @@ points:
 # as self-agreement-excluded under the std2 provenance guard.
 # --- tp2 fragment ---
 # --- tp3 fragment ---
-- key: sossi_2019_k_table4_gamma_this_work:gamma
-  case_id: kems-012-sossi-2019::sossi_2019_k_table4_gamma_this_work
-  source_id: kems-012-sossi-2019
-  observation_type: activity_coefficient
-  species: K
-  residual_dex: 0.7983546364719307
-  band_dex: 0.01
-  status: mismatch
-  note: 2026-08-26 kems-012 remine. Table 4 γ_i (this work)=2.2e-4 vs engine DeMaria/Sossi-Fegley 3.5e-5.
-    Residual reported, not tuned. Derived under authors-adopted α_e=1; not a vacuum Langmuir alpha and
-    not a mass_spec pin.
-  temperature_K: 1673.15
-# --- tp4 fragment ---
 - key: BIC57_VO_absolute_points:T=1875
   case_id: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points
   source_id: berkowitz-chupka-inghram-1957
@@ -876,8 +746,8 @@ points:
 # a_single_cation^cations (docs/chemistry-methods.md 3.1). 24 SiO2 + 1 Na2O
 # points become comparable; the 22 off-anchor-T alkali rows remain
 # assumed-input (out_of_gamma_domain) with residuals recorded, not certified.
-- key: ms2000_044_na2o_activity_xsio2_0709_t1673:activity
-  case_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0709_t1673
+- key: ms2000_044_na2o_activity_xsio2_0709_t1673_class_quote_r2:activity
+  case_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0709_t1673_class_quote_r2
   source_id: kems-ms2000-044
   observation_type: activity_coefficient
   species: Na2O
@@ -886,250 +756,6 @@ points:
   status: mismatch
   note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
   temperature_K: 1673.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0500_t1473:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0500_t1473
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 1.7139928779205253
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1473.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0543_t1473:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0543_t1473
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 1.5850165007680914
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1473.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0591_t1323:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0591_t1323
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 1.5773535089852415
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1323.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0630_t1323:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1323
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 1.390778375760676
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1323.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0630_t1523:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1523
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 1.2361087209325996
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1523.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0674_t1373:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0674_t1373
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.7017949986839229
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1373.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0722_t1323:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1323
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.17108136807163843
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1323.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0722_t1673:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1673
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.16205674242155
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1673.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0770_t1073:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0770_t1073
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.020611282603714885
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1073.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0811_t1173:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0811_t1173
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.03831727315582838
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1173.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0848_t1573:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0848_t1573
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.040467987605065654
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1573.0
-- key: ms2000_044_sio2_activity_k_system_xsio2_0892_t1723:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0892_t1723
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.03865757816645655
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1723.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0349_t1373:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0349_t1373
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 4.748737003490594
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1373.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0382_t1383:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0382_t1383
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 3.6954778929149623
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1383.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0405_t1423:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0405_t1423
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 3.264815249420232
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1423.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0430_t1473:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0430_t1473
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 2.8577852065535425
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1473.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0477_t1373:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0477_t1373
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 2.2527804270177767
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1373.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0524_t1573:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0524_t1573
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 1.2406147620708052
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1573.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0573_t1473:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0573_t1473
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.756775323832919
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1473.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0625_t1573:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0625_t1573
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.35872424276808706
-  band_dex: 0.01
-  status: mismatch
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
-  temperature_K: 1573.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0671_t1173:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0671_t1173
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.16917143317012504
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1173.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0709_t1673:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0709_t1673
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.01055520322387619
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1673.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0753_t1273:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0753_t1273
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.08535881636203684
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1273.0
-- key: ms2000_044_sio2_activity_na_system_xsio2_0805_t1473:activity
-  case_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0805_t1473
-  source_id: kems-ms2000-044
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 0.10607047615985558
-  band_dex: 0.01
-  status: match
-  note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1.'
-  temperature_K: 1473.0
-
-# 2026-08-27 newly comparable points (studio regen). Existing
-# committed residuals are preserved verbatim. Residuals reported,
-# not tuned. ts1985 SiO2 large dex is the b-309 Raoultian FINDING.
 - key: fedkin_2006_mg_hashimoto_langmuir_table3:T=1973
   case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
   source_id: kems-005-fedkin-2006
@@ -1196,14 +822,3 @@ points:
   status: match
   note: Newly comparable Zhang 2021 Table 4 K evaporation coefficient at 1673.15 K. Residual reported, not tuned.
   temperature_K: 1673.15
-- key: ts1985_sio2_gibbs_duhem_1200C_X0500:activity
-  case_id: "ts1985::ts1985_sio2_gibbs_duhem_1200C_X0500"
-  source_id: ts1985
-  observation_type: activity_coefficient
-  species: SiO2
-  residual_dex: 1.744004273277598
-  band_dex: 0.01
-  residual: 0.3273233333333333
-  status: mismatch
-  note: "b-309: engine assumes ideal Raoultian a_SiO2; measured activity coefficient is ~0.012. Large residual (~1.74 dex) is the FINDING, recorded not tuned."
-  temperature_K: 1473.15

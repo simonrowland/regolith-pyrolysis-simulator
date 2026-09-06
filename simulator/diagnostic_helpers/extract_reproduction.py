@@ -240,6 +240,8 @@ class AdoptedObservation:
     # the 2018-Table-2 guard missed the engine's Na2O coefficient being
     # parameterized from Sossi 2019 Table 4 of the same corpus).
     source_doi: str | None = None
+    # Preserve source spellings until the extract schema canonicalizes them.
+    admission_metadata: Mapping[str, Any] = field(default_factory=dict)
 
     @property
     def case_id(self) -> str:
@@ -299,11 +301,88 @@ def load_vapor_pressure_data(
     return dict(data)
 
 
+def _refusal_marker_reason(markers: Mapping[str, Any]) -> str | None:
+    # Explicit source roles, not ID/prose substrings or residual-based guesses.
+    for key in ("class", "class_tag", "scientific_class", "evidence_kind"):
+        role = markers.get(key)
+        if role in _ROLE_REFUSALS:
+            return _ROLE_REFUSALS[role]
+    method = markers.get("method_class")
+    for role, methods in _EXCLUDED_METHOD_ROLES.items():
+        if method in methods:
+            return _ROLE_REFUSALS[role]
+    for key in ("admission_status", "measurement_status", "status", "alpha_role", "evidence_kind"):
+        marker = markers.get(key)
+        if marker in _MARKER_REFUSALS:
+            return _MARKER_REFUSALS[marker]
+    return None
+
+
+_ROLE_REFUSALS = {
+    "model": "model_output_not_measurement",
+    "derived": "derived_quantity_not_measurement",
+    "inverse": "inverse_model_not_measurement",
+    "figure_only": "unsupported_observable:figure_only_not_digitized",
+    "compilation_only": "compilation_only_not_measurement",
+}
+_EXCLUDED_METHOD_ROLES = {
+    "model": {
+        "model", "model_derived", "model_derived_second_law_fit",
+        "model_derived_and_compiled", "model_derived_from_Kstar_and_external_gamma",
+        "model_derived_from_Kstar_with_alpha_e_adopted_unity", "model_derived_assumption",
+    },
+    "inverse": {"model_derived_inverse_fit"},
+    "derived": {
+        "derived", "author_derived", "derived_gibbs_duhem", "derived_least_squares",
+        "derived_gibbs_duhem_integration", "derived_from_figure_8_linear_portion",
+        "derived_from_kems_equilibrium_constants",
+        "derived_third_law_from_measured_kems_and_janaf_fef",
+        "authors_preferred_average_of_kems_derived_gammas",
+    },
+    "figure_only": {"figure_only", "figure_only_measured_kems"},
+    "compilation_only": {
+        "review_compilation", "secondary_compilation",
+        "secondary_compilation_reprinted_as_feedstock", "compilation_calculated_table",
+        "compilation_foreign", "compilation_derived", "qualitative_review_compilation",
+        "literature_psat_not_this_work",
+    },
+}
+_MARKER_REFUSALS = {
+    **{key: "model_output_not_measurement" for key in (
+        "model_output_not_measurement", "rejected_model_output",
+        "rejected_model_output_not_measurement", "model_proxy",
+        "model_parameters_not_measured_activity_coefficients",
+        "authors_adopted_model_value_not_measurement",
+    )},
+    **{key: "unsupported_observable:figure_only_not_digitized" for key in (
+        "figure_only", "figure_only_or_proxy", "rejected_no_figure_reading",
+        "rejected_no_complete_figure_digitization", "measured_activity_figure_only",
+        "measured_dotted_contours_figure_only",
+    )},
+    **{key: "compilation_only_not_measurement" for key in (
+        "compilation_selected_from_measured", "competing_compilation", "compilation_citation",
+    )},
+    "estimated_not_direct": "derived_quantity_not_measurement",
+    "literature_gamma_inverse_model_not_measurement": "inverse_model_not_measurement",
+    "typed_refusal": "typed_refusal",
+    "rejected": "rejected",
+    "inadmissible": "inadmissible",
+    "withdrawn": "withdrawn",
+}
+
+
+def observation_admission_reason(obs: AdoptedObservation) -> str | None:
+    """Shared scoring/selection gate; supersession is resolved by the loader."""
+    if obs.adoption_basis == "superseded":
+        return "superseded"
+    return _refusal_marker_reason(obs.admission_metadata) or _refusal_marker_reason(obs.values)
+
+
 def load_adopted_observations(
     *,
     extracts_dir: Path | None = None,
 ) -> list[AdoptedObservation]:
-    """Return the reproduction scope: priority winners plus every KEMS row.
+    """Return reproduction scope, including coverage-only superseded provenance.
 
     VALUE-PRECEDENCE intentionally chooses one source for production data, but
     that is not a license for the validation harness to erase the remaining
@@ -343,6 +422,13 @@ def load_adopted_observations(
 
     adopted: list[AdoptedObservation] = []
     for species_id, block in sorted((view.get("species") or {}).items()):
+        # Every edge removes its parent from scoring, so A <- B <- C leaves
+        # only C. Source/species scope prevents unrelated ID collisions.
+        superseded = {
+            (str(row.get("source_id") or ""), str(row["supersedes"]))
+            for row in block.get("observations") or []
+            if row.get("supersedes")
+        }
         for obs in block.get("observations") or []:
             otype = str(obs.get("type") or "")
             source_id = str(obs.get("source_id") or "")
@@ -413,8 +499,17 @@ def load_adopted_observations(
                     is_priority_winner=is_priority_winner,
                     geometry_assumption=geometry,
                     adoption_basis=(
-                        "priority_winner" if is_priority_winner else "mass_spec_extract"
+                        "superseded"
+                        if (source_id, str(obs.get("observation_id") or "")) in superseded
+                        else "priority_winner" if is_priority_winner else "mass_spec_extract"
                     ),
+                    admission_metadata={
+                        key: obs[key] for key in (
+                            "supersedes", "class", "class_tag", "scientific_class",
+                            "admission_status", "measurement_status", "status",
+                            "evidence_kind", "method_class", "alpha_role",
+                        ) if obs.get(key) is not None
+                    },
                     condensed_form=condensed_form,
                     source_doi=doi_by_source.get(source_id),
                 )
@@ -1776,6 +1871,24 @@ def evaluate_observation(
     vp_data = vapor_pressure_data or load_vapor_pressure_data()
     evaluation = ObservationEvaluation(observation=obs)
     evaluation.runtime_notes.append(obs.geometry_assumption)
+    # Refused quantities and superseded provenance contribute zero scored
+    # points regardless of which observable-specific evaluator would run.
+    refusal = observation_admission_reason(obs)
+    if refusal:
+        typed = f"{_TYPED_SKIP_PREFIX}{refusal}"
+        evaluation.skip_reason = typed
+        evaluation.skip_reasons.append(typed)
+        evaluation.records.append(_compare_point(
+            obs=obs, observable_id=f"{obs.observation_id}:admission",
+            species=obs.species_id, coordinate={"window": "admission"},
+            expected=None, uncertainty=None, actual=None,
+            units=str(obs.units or ""), runtime={"skip_reason": typed},
+            status_override=(
+                "ordering-not-evaluable"
+                if _is_qualitative_ordering_observation(obs) else None
+            ),
+        ))
+        return evaluation
     pO2, pO2_note = resolve_pO2_bar(obs)
     evaluation.runtime_notes.append(pO2_note)
 
@@ -4653,6 +4766,11 @@ def coverage_summary(
             }
         )
 
+    # Keep superseded identities in the ledger as provenance, but exclude
+    # them from every observation/point denominator (not a second datum).
+    ledger_entries = entries
+    entries = [entry for entry in entries if entry["adoption_basis"] != "superseded"]
+
     def grouped(key: str) -> list[dict[str, Any]]:
         buckets: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for entry in entries:
@@ -4689,7 +4807,7 @@ def coverage_summary(
         "comparable_points": sum(int(entry["comparable_points"]) for entry in entries),
         "gap_points": sum(int(entry["gap_points"]) for entry in entries),
         "skip_reasons": dict(sorted(skipped_reasons.items())),
-        "entries": entries,
+        "entries": ledger_entries,
         "by_type": grouped("type"),
         "by_family": grouped("comparison_family"),
         "by_species": grouped("species"),
@@ -4805,6 +4923,10 @@ def rollup_species_error_bars(
     findings_by_species: dict[str, list[str]] = {}
     types_by_species: dict[str, set[str]] = {}
     for ev in evaluations:
+        # Superseded parents remain in the provenance ledger, never the
+        # species error-bar denominator or gap count.
+        if ev.observation.adoption_basis == "superseded":
+            continue
         sid = ev.observation.species_id
         by_species.setdefault(sid, []).extend(ev.records)
         types_by_species.setdefault(sid, set()).add(ev.observation.obs_type)
