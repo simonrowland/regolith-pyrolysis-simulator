@@ -1,0 +1,136 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0359",
+  "census_id": "high-temperature-printed-page-385",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "BUCBYPTITE",
+  "formula_as_published": "LillSi0 4",
+  "phase_state_as_published": [
+    "a-eucrrptite 298.15 to 1300 l.                 ~-eucryptite     1300 to 1600 l."
+  ],
+  "description_lines_as_published": [
+    "LillSi0 4 :     a-eucrrptite 298.15 to 1300 l.                 ~-eucryptite     1300 to 1600 l."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "126.006",
+    "value": 126.006,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      391
+    ],
+    "printed_pages": [
+      385
+    ],
+    "pdftotext_layout_page_file": "page-391.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 32, 34"
+  ],
+  "title_line_as_published": "BUCBYPTITE                                                                          FOB!ULl lEIGHT    126.006",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "LillSi0 4 :     a-eucrrptite 298.15 to 1300 l.                 ~-eucryptite     1300 to 1600 l.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOIIIlTIOI FiO! THE BLEIIEITS",
+    "                                                                                        GIBBS",
+    "TB!P.       < a;-a; 98 )/T       soT     -<co;-a~ 98 )/T      cop    BITBlLP!        FBEB EIBBG!      Log It",
+    "  It          J/aol•l         J/aol•lt     J/aol•lt        Jjaol•K        ltJ/aol        kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "It",
+    "enthalpy_function": "J/aol•l",
+    "entropy": "J/aol•lt",
+    "negative_gibbs_function": "J/aol•lt",
+    "heat_capacity": "Jjaol•K",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 16,
+  "uncertainty_line_as_published": "UHCERT lilT!                     o.8o            o. 80                      1.980          1. 990      0.348",
+  "uncertainty_values": [
+    {
+      "as_published": "o.8o",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 80",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.980",
+      "value": 1.98,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1. 990",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.348",
+      "value": 0.348,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "LillSi0 4 :     a-eucrrptite 298.15 to 1300 l.                 ~-eucryptite     1300 to 1600 l."
+  ],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQ UlTIOI S",
+    "c;         2.4697z102-          2.0577z10~ r-o·s     1.2895z10• r-z",
+    "              ( EQUlTIOtl VALID FROII      298 - 1300 K)",
+    " c;        89.943 +    7.9203z1o-z T",
+    "              ( IQOlTIOH VALID FRO! 1300 - 1600 K)",
+    "REFBREICE        211             211                                          93                    COIIPILID",
+    "                                                                              15                     9- 8-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 32, 34",
+      "detector_only": false
+    }
+  ]
+}

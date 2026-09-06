@@ -1,0 +1,126 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0356",
+  "census_id": "high-temperature-printed-page-382",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "cr-SPODUftEIE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "186.090",
+    "value": 186.09,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      388
+    ],
+    "printed_pages": [
+      382
+    ],
+    "pdftotext_layout_page_file": "page-388.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 29, 32, 35, 41, 43, 44"
+  ],
+  "title_line_as_published": "cr-SPODUftEIE                                                                          FOR!ULJ. IIEIGBT         186.090",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "======================================================================~==~======",
+    "                         Crystals 298.15 to 1200 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                  FOBII.lTIOI FBOft THE OXIDES",
+    "                                                                                                GIBBS",
+    "TEI!P.     ( a;-a~ 98 }/T          so",
+    "                                    T    -(G;-a~ 98 )/T       CD",
+    "                                                               p      EITH.lLPY              FBEE EIIERGY        Log Kf",
+    "  K           J/mol•K       Jjmol•K        Jjmol•K        J/mol•K            kJ/1101            kJjmol",
+    "------------------------·-------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/mol•K",
+    "entropy": "Jjmol•K",
+    "negative_gibbs_function": "Jjmol•K",
+    "heat_capacity": "J/mol•K",
+    "formation_enthalpy": "kJ/1101",
+    "formation_gibbs_energy": "kJjmol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 9,
+  "uncertainty_line_as_published": "UIICEBT.liiiTI                  o.8o          o. 80                            2.300",
+  "uncertainty_values": [
+    {
+      "as_published": "o.8o",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 80",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.300",
+      "value": 2.3,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "!ELTING POINT                               K             BOILIBG PODIT                                           K",
+    "EliTHALPY OF I!ELTIIIG                      kJ            EITHALPY OP VAPORIZATIOII                               kJ",
+    "8 ~98 - Ho0                                 kJ            I!OLA B VOLU liE                           5.8370 Jjbar",
+    "                                                                                                    58.370 CIIJ",
+    "TBAIISITIOIIS Ill REPEBEHCE STATE OXIDES",
+    "  Si0 2 • • • • • • • .lLPH.l -    BETA TBAIISITIOII 844 ft •",
+    "HEAT CAPACITY EQO.lTIOii",
+    "          4.2117x10Z -            2.4005x1o-z T     4.7761z10~ T-o·s",
+    "              ( EQU.lT 1011 VALID FRO II     298 - 1200 K)",
+    "BEPEBEICE        211               211                                           93                         CO! PILED",
+    "                                                                                 15                             9-13-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 29, 32, 35, 41, 43, 44",
+      "detector_only": false
+    }
+  ]
+}
