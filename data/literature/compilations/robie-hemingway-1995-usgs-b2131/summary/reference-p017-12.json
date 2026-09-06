@@ -1,0 +1,167 @@
+{
+  "record_id": "reference-p017-12",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 23,
+  "page": 17,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES Of OXIDE AND HYDROXIDE MINERALS AT 298.15 K",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "",
+  "formula_candidate": null,
+  "header_and_units_raw": "NAME AND FORMULA                     WEIGHT   ENTROPY    VOLUME   ENTHALPY     FREE       LOG(K)       REFERENCES\n                                                                              ENERGY\n                                                                    A,H•       ¥•\n                                                                  kJ·.,r'    kJ·.,r'                  S    H/G    C\n\n",
+  "source_text": "                                    228.812     164.1     46.95    -1384.5    -1282.5     224.68 357 357 357\n                                                  0.2      0.06        1.4        1.4       0.25",
+  "rows": [
+    {
+      "raw": "                                    228.812     164.1     46.95    -1384.5    -1282.5     224.68 357 357 357",
+      "tokens": [
+        {
+          "raw": "228.812",
+          "value": 228.812,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 36,
+          "end_offset": 43
+        },
+        {
+          "raw": "164.1",
+          "value": 164.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 48,
+          "end_offset": 53
+        },
+        {
+          "raw": "46.95",
+          "value": 46.95,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 58,
+          "end_offset": 63
+        },
+        {
+          "raw": "-1384.5",
+          "value": -1384.5,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 67,
+          "end_offset": 74
+        },
+        {
+          "raw": "-1282.5",
+          "value": -1282.5,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 78,
+          "end_offset": 85
+        },
+        {
+          "raw": "224.68",
+          "value": 224.68,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 90,
+          "end_offset": 96
+        },
+        {
+          "raw": "357",
+          "value": 357.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 97,
+          "end_offset": 100
+        },
+        {
+          "raw": "357",
+          "value": 357.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 101,
+          "end_offset": 104
+        },
+        {
+          "raw": "357",
+          "value": 357.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 105,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "                                                  0.2      0.06        1.4        1.4       0.25",
+      "tokens": [
+        {
+          "raw": "0.2",
+          "value": 0.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 50,
+          "end_offset": 53
+        },
+        {
+          "raw": "0.06",
+          "value": 0.06,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 59,
+          "end_offset": 63
+        },
+        {
+          "raw": "1.4",
+          "value": 1.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 71,
+          "end_offset": 74
+        },
+        {
+          "raw": "1.4",
+          "value": 1.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 82,
+          "end_offset": 85
+        },
+        {
+          "raw": "0.25",
+          "value": 0.25,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 92,
+          "end_offset": 96
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "reference_entropy: unparsed printed OCR token '357 357'",
+    "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
+    "Substance name and formula missing from primary OCR layer at this numeric block",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_token_agreement_row_unverified"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 45,
+  "source_line_end": 46
+}
