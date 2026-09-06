@@ -1,0 +1,1446 @@
+{
+  "record_id": "high-temperature-p119",
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "table_kind": "high_temperature",
+  "table_number": null,
+  "page": 119,
+  "pdf_page": 125,
+  "name_as_published": "METHANE",
+  "formula_as_published": "CH4",
+  "phase_as_published": "Ideal gas, P • 1 bar, 298.15 to 1800 K",
+  "heading_as_published": "METHANE                                                                             Formula wt        16. 0431\n                                                                                                                    I\n\n\n\n\nCH4:       Ideal gas, P • 1 bar, 298.15 to 1800 K\n\n\n\n\n                                                                      FORMATION FROM THE ELEMENTS\n\n Temp.           cop                (HT-H~ 98 )/T   -(GT-H2 98 )/T\n\n  K            - - - - - - - J•mol-1·K- 1 - - - - - -                -       kJ•mol-1 - -",
+  "footer_as_published": "Melting T                    K                                            Boiling T               K\n\n                                                                          A_,HO                  kJ\n       0\nA,_H                        kJ                                                                                  I\n                                                                          Molar Vol.   2478.97 J•bar\"1          1\n\n\n\n\n8 298-HB               10.025 kJ                                                       24789.7    cml\n\n\n\n\n                                                                                                  2/25/9~\n\n                                                                                                            I\n\n\n\n\n                                                                                                            I\n\n\n\n\n                                                                                                            I",
+  "column_order": [
+    "temperature",
+    "cp",
+    "entropy",
+    "enthalpy_function",
+    "gibbs_function",
+    "formation_enthalpy",
+    "formation_gibbs",
+    "log_kf"
+  ],
+  "units_as_published": [
+    "  K            - - - - - - - J•mol-1·K- 1 - - - - - -                -       kJ•mol-1 - -"
+  ],
+  "metadata": [
+    {
+      "section": "heading",
+      "raw": "METHANE                                                                             Formula wt        16. 0431",
+      "raster_reading": "METHANE Formula wt 16.043",
+      "tokens": [
+        {
+          "raw": "16.",
+          "value": 16.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "0431",
+          "value": 431.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": "CH4:       Ideal gas, P • 1 bar, 298.15 to 1800 K",
+      "raster_reading": "CHy: Ideal gas, P = 1 bar, 298.15 to 1800 K |",
+      "tokens": [
+        {
+          "raw": "CH4:",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "1",
+          "value": 1.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "298.15",
+          "value": 298.15,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "1800",
+          "value": 1800.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": " Temp.           cop                (HT-H~ 98 )/T   -(GT-H2 98 )/T",
+      "raster_reading": "Temp. ce S$ — (HE-H3g9g)/T -(GR-H39g)/T Agu? Agce Log Ke",
+      "tokens": [
+        {
+          "raw": "98",
+          "value": 98.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "-(GT-H2",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "98",
+          "value": 98.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": "  K            - - - - - - - J•mol-1·K- 1 - - - - - -                -       kJ•mol-1 - -",
+      "raster_reading": "K —————. o-moi-}.- x- 2. —______ — kgJ-mo1~) —— |",
+      "tokens": [
+        {
+          "raw": "J•mol-1·K-",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "1",
+          "value": 1.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "kJ•mol-1",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "       0",
+      "raster_reading": "|",
+      "tokens": [
+        {
+          "raw": "0",
+          "value": 0.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                                                                          Molar Vol.   2478.97 J•bar\"1          1",
+      "raster_reading": "CHy: Ideal gas, P = 1 bar, 298.15 to 1800 K |",
+      "tokens": [
+        {
+          "raw": "2478.97",
+          "value": 2478.97,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "J•bar\"1",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "1",
+          "value": 1.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "8 298-HB               10.025 kJ                                                       24789.7    cml",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "tokens": [
+        {
+          "raw": "8",
+          "value": 8.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "298-HB",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "10.025",
+          "value": 10.025,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "24789.7",
+          "value": 24789.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                                                                                                  2/25/9~",
+      "raster_reading": "|",
+      "tokens": [
+        {
+          "raw": "2/25/9~",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "source_line": 24,
+      "raw": " 298.15        35.70       186.26       o.oo           186.26        -74.8          -50.7          8.88",
+      "raster_reading": "298.15 35.70 186.26 0.00 186.26 -74.8 -50.7 8.88",
+      "cells": {
+        "temperature": {
+          "raw": "298.15",
+          "value": 298.15,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "35.70",
+          "value": 35.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "186.26",
+          "value": 186.26,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "o.oo",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "186.26",
+          "value": 186.26,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-74.8",
+          "value": -74.8,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-50.7",
+          "value": -50.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "8.88",
+          "value": 8.88,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 25,
+      "raw": " 300           35.72       186.48       0.22           186.26        -74.9          -50.6          8.80",
+      "raster_reading": "300 35.72 186.48 0.22 186.26 -74.9 -50.6 8.80 |",
+      "cells": {
+        "temperature": {
+          "raw": "300",
+          "value": 300.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "35.72",
+          "value": 35.72,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "186.48",
+          "value": 186.48,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "0.22",
+          "value": 0.22,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "186.26",
+          "value": 186.26,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-74.9",
+          "value": -74.9,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-50.6",
+          "value": -50.6,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "8.80",
+          "value": 8.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 26,
+      "raw": " 400           39.91       197.22       9.52           187.70        -78.0          -42.0          5.48",
+      "raster_reading": "400 39.91 197.22 9.52 187.70 -78.0 -42.0 5.48",
+      "cells": {
+        "temperature": {
+          "raw": "400",
+          "value": 400.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "39.91",
+          "value": 39.91,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "197.22",
+          "value": 197.22,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "9.52",
+          "value": 9.52,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "187.70",
+          "value": 187.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-78.0",
+          "value": -78.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-42.0",
+          "value": -42.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "5.48",
+          "value": 5.48,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 27,
+      "raw": " 500           46.21       206.79      16.22           190.57        -80.8          -32.7          3.41",
+      "raster_reading": "500 46.21 206.79 16.22 190.57 -80.8 -32.7 3.41 |",
+      "cells": {
+        "temperature": {
+          "raw": "500",
+          "value": 500.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "46.21",
+          "value": 46.21,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "206.79",
+          "value": 206.79,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "16.22",
+          "value": 16.22,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "190.57",
+          "value": 190.57,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-80.8",
+          "value": -80.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-32.7",
+          "value": -32.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "3.41",
+          "value": 3.41,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 28,
+      "raw": " 600           52.42       215.77      21.74           194.03        -83.3          -22.8          1.98",
+      "raster_reading": "600 52.42 215.77 21.74 194.03 -83.3 -22.8 1.98 |",
+      "cells": {
+        "temperature": {
+          "raw": "600",
+          "value": 600.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "52.42",
+          "value": 52.42,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "215.77",
+          "value": 215.77,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "21.74",
+          "value": 21.74,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "194.03",
+          "value": 194.03,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-83.3",
+          "value": -83.3,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-22.8",
+          "value": -22.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "1.98",
+          "value": 1.98,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 29,
+      "raw": " 700           58.08       224.29      26.54           197.75        -85.4          -12.5          0.93",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "700",
+          "value": 700.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "58.08",
+          "value": 58.08,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "224.29",
+          "value": 224.29,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "26.54",
+          "value": 26.54,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "197.75",
+          "value": 197.75,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-85.4",
+          "value": -85.4,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-12.5",
+          "value": -12.5,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "0.93",
+          "value": 0.93,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 30,
+      "raw": " 800           63.14       232.38      30.80           201.58        -87.2           -2.0          0.13",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "800",
+          "value": 800.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "63.14",
+          "value": 63.14,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "232.38",
+          "value": 232.38,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "30.80",
+          "value": 30.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "201.58",
+          "value": 201.58,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-87.2",
+          "value": -87.2,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-2.0",
+          "value": -2.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "0.13",
+          "value": 0.13,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 31,
+      "raw": " 900           67.65       240.08      34.65           205.43        -88.6            8.8         -0.51",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "900",
+          "value": 900.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "67.65",
+          "value": 67.65,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "240.08",
+          "value": 240.08,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "34.65",
+          "value": 34.65,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "205.43",
+          "value": 205.43,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-88.6",
+          "value": -88.6,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "8.8",
+          "value": 8.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-0.51",
+          "value": -0.51,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 32,
+      "raw": "1000           71.67       247.42      38.16           209.27        -89.8           19.7         -1.03",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "1000",
+          "value": 1000.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "71.67",
+          "value": 71.67,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "247.42",
+          "value": 247.42,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "38.16",
+          "value": 38.16,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "209.27",
+          "value": 209.27,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-89.8",
+          "value": -89.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "19.7",
+          "value": 19.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-1.03",
+          "value": -1.03,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 33,
+      "raw": "1100           75.26       254.43      41.37           213.05        -90.7           30.7         -1.45",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "1100",
+          "value": 1100.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "75.26",
+          "value": 75.26,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "254.43",
+          "value": 254.43,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "41.37",
+          "value": 41.37,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "213.05",
+          "value": 213.05,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-90.7",
+          "value": -90.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "30.7",
+          "value": 30.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-1.45",
+          "value": -1.45,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 34,
+      "raw": "1200           78.48       261.11      44.33           216.78        -91.5           41.7         -1.82",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "1200",
+          "value": 1200.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "78.48",
+          "value": 78.48,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "261.11",
+          "value": 261.11,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "44.33",
+          "value": 44.33,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "216.78",
+          "value": 216.78,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-91.5",
+          "value": -91.5,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "41.7",
+          "value": 41.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-1.82",
+          "value": -1.82,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 35,
+      "raw": "1300           81.36       267.51      47.07           220.44        -92.0           52.9         -2.12",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "1300",
+          "value": 1300.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "81.36",
+          "value": 81.36,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "267.51",
+          "value": 267.51,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "47.07",
+          "value": 47.07,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "220.44",
+          "value": 220.44,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-92.0",
+          "value": -92.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "52.9",
+          "value": 52.9,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-2.12",
+          "value": -2.12,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 36,
+      "raw": "1400           83.95       273.64      49.61           224.02        -92.4           64.0         -2.39",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "1400",
+          "value": 1400.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "83.95",
+          "value": 83.95,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "273.64",
+          "value": 273.64,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "49.61",
+          "value": 49.61,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "224.02",
+          "value": 224.02,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-92.4",
+          "value": -92.4,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "64.0",
+          "value": 64.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-2.39",
+          "value": -2.39,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 37,
+      "raw": "1500           86.26       279.51      51.98           227.53        -92.7           75.2         -2.62",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "1500",
+          "value": 1500.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "86.26",
+          "value": 86.26,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "279.51",
+          "value": 279.51,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "51.98",
+          "value": 51.98,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "227.53",
+          "value": 227.53,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-92.7",
+          "value": -92.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "75.2",
+          "value": 75.2,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-2.62",
+          "value": -2.62,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 38,
+      "raw": "1600           88.33       285.14      54.19           230.95        -92.9           86.4         -2.82",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "1600",
+          "value": 1600.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "88.33",
+          "value": 88.33,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "285.14",
+          "value": 285.14,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "54.19",
+          "value": 54.19,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "230.95",
+          "value": 230.95,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-92.9",
+          "value": -92.9,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "86.4",
+          "value": 86.4,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-2.82",
+          "value": -2.82,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 39,
+      "raw": "1700           90.17       290.56      56.25           234.30        -92.9           97.6         -3.00",
+      "raster_reading": "700 58.08 224.29 26.54 197.75 ~85.4 12.5\n5\t1\t1\t1\t19\t8\t1324\t898\t58\t19\t83.411110\t0.93\n5\t1\t1\t1\t19\t9\t1407\t895\t1\t34\t83.411110\t|\n4\t1\t1\t1\t20\t0\t74\t928\t1334\t26\t-1\t\n5\t1\t1\t1\t20\t1\t74\t928\t43\t18\t95.529190\t800\n5\t1\t1\t1\t20\t2\t225\t929\t72\t18\t79.271965\t63.14\n5\t1\t1\t1\t20\t3\t360\t930\t89\t18\t79.271965\t232.38\n5\t1\t1\t1\t20\t4\t526\t930\t73\t18\t95.890297\t30.80\n5\t1\t1\t1\t20\t5\t736\t931\t88\t17\t95.096085\t201.58\n5\t1\t1\t1\t20\t6\t932\t930\t72\t18\t26.978149\t-87.2\n5\t1\t1\t1\t20\t7\t1143\t930\t59\t17\t88.969810\t-2.0\n5\t1\t1\t1\t20\t8\t1324\t929\t58\t18\t88.306900\t0.13\n5\t1\t1\t1\t20\t9\t1406\t930\t2\t24\t88.306900\t|\n4\t1\t1\t1\t21\t0\t74\t957\t1333\t26\t-1\t\n5\t1\t1\t1\t21\t1\t74\t959\t43\t17\t96.790657\t900\n5\t1\t1\t1\t21\t2\t225\t959\t72\t18\t89.357582\t67.65\n5\t1\t1\t1\t21\t3\t360\t960\t88\t17\t70.051399\t240.08\n5\t1\t1\t1\t21\t4\t526\t960\t72\t18\t93.082283\t34.65\n5\t1\t1\t1\t21\t5\t736\t960\t88\t18\t96.329269\t205.43\n5\t1\t1\t1\t21\t6\t932\t960\t74\t18\t53.270565\t-88.6\n5\t1\t1\t1\t21\t7\t1159\t959\t43\t18\t96.188774\t8.8\n5\t1\t1\t1\t21\t8\t1309\t959\t74\t18\t88.821159\t-0.51\n5\t1\t1\t1\t21\t9\t1406\t957\t1\t26\t54.224339\t|\n4\t1\t1\t1\t22\t0\t60\t985\t1347\t23\t-1\t\n5\t1\t1\t1\t22\t1\t60\t989\t57\t17\t96.898277\t1000\n5\t1\t1\t1\t22\t2\t225\t990\t72\t17\t72.062355\t71.67\n5\t1\t1\t1\t22\t3\t360\t990\t87\t18\t61.815769\t247.42\n5\t1\t1\t1\t22\t4\t526\t990\t73\t18\t95.805687\t38.16\n5\t1\t1\t1\t22\t5\t736\t991\t88\t17\t96.775826\t209.27\n5\t1\t1\t1\t22\t6\t932\t990\t73\t18\t89.177223\t-89.8\n5\t1\t1\t1\t22\t7\t1144\t990\t57\t18\t94.474510\t19.7\n5\t1\t1\t1\t22\t8\t1309\t989\t73\t18\t82.969978\t-1.03\n5\t1\t1\t1\t22\t9\t1406\t985\t1\t23\t53.578285\t|\n4\t1\t1\t1\t23\t0\t59\t1019\t1323\t20\t-1\t\n5\t1\t1\t1\t23\t1\t59\t1019\t58\t17\t96.195450\t1100\n5\t1\t1\t1\t23\t2\t224\t1020\t73\t18\t83.311958\t75.26\n5\t1\t1\t1\t23\t3\t360\t1020\t88\t18\t83.311958\t254.43\n5\t1\t1\t1\t23\t4\t526\t1020\t72\t18\t95.698212\t41.37\n5\t1\t1\t1\t23\t5\t736\t1021\t88\t18\t93.414581\t213.05\n5\t1\t1\t1\t23\t6\t932\t1021\t72\t17\t88.731018\t-90.7\n5\t1\t1\t1\t23\t7\t1143\t1020\t58\t18\t95.897202\t30.7\n5\t1\t1\t1\t23\t8\t1309\t1019\t73\t18\t33.000252\t71.45\n4\t1\t1\t1\t24\t0\t59\t1049\t1322\t20\t-1\t\n5\t1\t1\t1\t24\t1\t59\t1049\t58\t18\t96.461281\t1200\n5\t1\t1\t1\t24\t2\t224\t1050\t73\t17\t74.969543\t78.48\n5\t1\t1\t1\t24\t3\t360\t1050\t88\t18\t74.969543\t261.11\n5\t1\t1\t1\t24\t4\t525\t1050\t73\t19\t94.008049\t44.33\n5\t1\t1\t1\t24\t5\t736\t1051\t88\t18\t96.336571\t216.78\n5\t1\t1\t1\t24\t6\t931\t1050\t73\t18\t82.816086\t-91.5\n5\t1\t1\t1\t24\t7\t1143\t1050\t58\t18\t96.545662\t41.7\n5\t1\t1\t1\t24\t8\t1308\t1049\t73\t18\t67.588554\t-1.82\n4\t1\t1\t1\t25\t0\t59\t1079\t1322\t20\t-1\t\n5\t1\t1\t1\t25\t1\t59\t1079\t58\t18\t96.707970\t1300\n5\t1\t1\t1\t25\t2\t223\t1080\t74\t18\t79.603348\t81.36\n5\t1\t1\t1\t25\t3\t359\t1080\t89\t19\t71.321945\t267.51\n5\t1\t1\t1\t25\t4\t525\t1081\t73\t18\t93.383072\t47.07\n5\t1\t1\t1\t25\t5\t735\t1081\t89\t18\t93.348053\t220.44\n5\t1\t1\t1\t25\t6\t931\t1081\t74\t18\t85.321663\t-92.0\n5\t1\t1\t1\t25\t7\t1143\t1080\t58\t18\t96.681206\t52.9\n5\t1\t1\t1\t25\t8\t1309\t1080\t72\t18\t73.086456\t-2.12\n4\t1\t1\t1\t26\t0\t59\t1109\t1322\t20\t-1\t\n5\t1\t1\t1\t26\t1\t59\t1109\t57\t18\t96.528397\t1400\n5\t1\t1\t1\t26\t2\t223\t1110\t73\t18\t71.491882\t83.95\n5\t1\t1\t1\t26\t3\t359\t1110\t89\t19\t71.491882\t273.64\n5\t1\t1\t1\t26\t4\t525\t1111\t73\t18\t94.187691\t49.61\n5\t1\t1\t1\t26\t5\t736\t1111\t87\t18\t95.702583\t224.02\n5\t1\t1\t1\t26\t6\t931\t1111\t74\t18\t68.822823\t-92.4\n5\t1\t1\t1\t26\t7\t1143\t1110\t58\t18\t96.212044\t64.0\n5\t1\t1\t1\t26\t8\t1308\t1110\t73\t18\t84.934761\t-2.39\n4\t1\t1\t1\t27\t0\t59\t1131\t1346\t41\t-1\t\n5\t1\t1\t1\t27\t1\t59\t1140\t58\t18\t96.376038\t1500\n5\t1\t1\t1\t27\t2\t224\t1141\t73\t17\t80.721588\t86.26\n5\t1\t1\t1\t27\t3\t360\t1141\t88\t18\t80.721588\t279.51\n5\t1\t1\t1\t27\t4\t526\t1141\t73\t18\t96.817924\t51.98\n5\t1\t1\t1\t27\t5\t736\t1142\t87\t17\t95.734749\t227.53\n5\t1\t1\t1\t27\t6\t931\t1141\t73\t18\t87.933128\t-92.7\n5\t1\t1\t1\t27\t7\t1143\t1141\t57\t17\t89.698616\t75.2\n5\t1\t1\t1\t27\t8\t1308\t1140\t73\t18\t56.973198\t-2.62\n5\t1\t1\t1\t27\t9\t1404\t1131\t1\t41\t72.710640\t|\n4\t1\t1\t1\t28\t0\t59\t1170\t1346\t21\t-1\t\n5\t1\t1\t1\t28\t1\t59\t1170\t58\t18\t96.597885\t1600\n5\t1\t1\t1\t28\t2\t223\t1171\t74\t18\t81.161308\t88.33\n5\t1\t1\t1\t28\t3\t359\t1171\t89\t19\t89.625488\t285.14\n5\t1\t1\t1\t28\t4\t526\t1172\t72\t18\t90.816498\t54.19\n5\t1\t1\t1\t28\t5\t735\t1172\t88\t18\t96.833656\t230.95\n5\t1\t1\t1\t28\t6\t931\t1171\t73\t19\t84.532753\t-92.9\n5\t1\t1\t1\t28\t7\t1142\t1171\t59\t18\t96.083282\t86.4\n5\t1\t1\t1\t28\t8\t1308\t1170\t72\t19\t72.142479\t-2.82\n5\t1\t1\t1\t28\t9\t1404\t1173\t1\t18\t31.635670\t|\n4\t1\t1\t1\t29\t0\t59\t1192\t1346\t29\t-1\t\n5\t1\t1\t1\t29\t1\t59\t1201\t57\t18\t96.844055\t1700\n5\t1\t1\t1\t29\t2\t223\t1201\t73\t19\t68.376236\t90.17\n5\t1\t1\t1\t29\t3\t359\t1202\t88\t18\t48.919876\t290.56\n5\t1\t1\t1\t29\t4\t526\t1202\t72\t18\t96.625404\t56.25\n5\t1\t1\t1\t29\t5\t735\t1203\t88\t18\t93.718323\t234.30\n5\t1\t1\t1\t29\t6\t930\t1202\t74\t18\t87.709816\t-92.9\n5\t1\t1\t1\t29\t7\t1142\t1202\t59\t18\t96.503441\t97.6\n5\t1\t1\t1\t29\t8\t1308\t1201\t73\t18\t84.246056\t-3.00\n5\t1\t1\t1\t29\t9\t1403\t1192\t2\t35\t96.056419\t|\n4\t1\t1\t1\t30\t0\t59\t1231\t1345\t34\t-1\t\n5\t1\t1\t1\t30\t1\t59\t1231\t57\t18\t96.636299\t1800\n5\t1\t1\t1\t30\t2\t223\t1232\t74\t18\t76.711082\t91.80\n5\t1\t1\t1\t30\t3\t359\t1232\t88\t18\t76.711082\t295.76\n5\t1\t1\t1\t30\t4\t525\t1233\t73\t18\t95.078270\t58.18\n5\t1\t1\t1\t30\t5\t735\t1233\t87\t18\t95.622162\t237.57\n5\t1\t1\t1\t30\t6\t930\t1232\t74\t19\t89.188240\t-93.0\n5\t1\t1\t1\t30\t7\t1128\t1232\t73\t18\t95.764236\t108.8\n5\t1\t1\t1\t30\t8\t1308\t1231\t73\t19\t35.334572\t73.16\n5\t1\t1\t1\t30\t9\t1403\t1231\t1\t34\t32.278290\t|\n4\t1\t1\t1\t31\t0\t1403\t1274\t1\t7\t-1\t\n5\t1\t1\t1\t31\t1\t1403\t1274\t1\t7\t72.078743\t|\n4\t1\t1\t1\t32\t0\t57\t1305\t1346\t47\t-1\t\n5\t1\t1\t1\t32\t1\t57\t1323\t105\t23\t92.077469\tMelting\n5\t1\t1\t1\t32\t2\t177\t1325\t14\t16\t92.077469\tT\n5\t1\t1\t1\t32\t3\t388\t1326\t16\t16\t91.219299\tK\n5\t1\t1\t1\t32\t4\t1005\t1323\t105\t23\t92.020164\tBoiling\n5\t1\t1\t1\t32\t5\t1126\t1325\t15\t17\t91.258904\tT\n5\t1\t1\t1\t32\t6\t1307\t1324\t16\t17\t90.086990\tK\n5\t1\t1\t1\t32\t7\t1402\t1305\t1\t47\t78.606750\t|\n4\t1\t1\t1\t33\t0\t1402\t1353\t1\t15\t-1\t\n5\t1\t1\t1\t33\t1\t1402\t1353\t1\t15\t59.844276\ti\n4\t1\t1\t1\t34\t0\t1006\t1369\t396\t37\t-1\t\n5\t1\t1\t1\t34\t1\t1006\t1383\t10\t20\t33.613010\tA\n5\t1\t1\t1\t34\t2\t1041\t1385\t27\t19\t33.613010\tHe\n5\t1\t1\t1\t34\t3\t1284\t1375\t33\t31\t84.617500\tkJ\n5\t1\t1\t1\t34\t4\t1401\t1369\t1\t30\t92.442513\t|\n4\t1\t1\t1\t35\t0\t58\t1393\t1344\t51\t-1\t\n5\t1\t1\t1\t35\t1\t58\t1393\t59\t51\t0.000000\tAwe\n5\t1\t1\t1\t35\t2\t362\t1393\t35\t51\t49.974209\tkz\n5\t1\t1\t1\t35\t3\t1401\t1400\t1\t43\t80.335831\t|\n4\t1\t1\t1\t36\t0\t1004\t1441\t389\t22\t-1\t\n5\t1\t1\t1\t36\t1\t1004\t1445\t76\t18\t96.487648\tMolar\n5\t1\t1\t1\t36\t2\t1095\t1445\t57\t18\t95.472252\tVol.\n5\t1\t1\t1\t36\t3\t1187\t1445\t104\t18\t93.112831\t2478.97\n5\t1\t1\t1\t36\t4\t1307\t1441\t86\t21\t49.994164\tJ-bar’\n4\t1\t1\t1\t37\t0\t57\t1466\t1295\t36\t-1\t\n5\t1\t1\t1\t37\t1\t57\t1475\t105\t27\t50.845905\tH39g-H8\n5\t1\t1\t1\t37\t2\t285\t1476\t87\t18\t95.831459\t10.025\n5\t1\t1\t1\t37\t3\t390\t1476\t29\t18\t88.934319\tkJ\n5\t1\t1\t1\t37\t4\t1173\t1475\t104\t18\t86.677307\t24789.7\n5\t1\t1\t1\t37\t5\t1309\t1466\t43\t27\t1.581726\tcm\n4\t1\t1\t1\t38\t0\t1399\t1541\t1\t27\t-1\t\n5\t1\t1\t1\t38\t1\t1399\t1541\t1\t27\t80.464447\t|\n4\t1\t1\t1\t39\t0\t56\t1586\t1358\t37\t-1\t\n5\t1\t1\t1\t39\t1\t56\t1586\t1358\t37\t7.250109\ta\n4\t1\t1\t1\t40\t0\t1308\t1624\t103\t36\t-1\t\n5\t1\t1\t1\t40\t1\t1308\t1624\t103\t36\t94.665291\t2/25/94\n4\t1\t1\t1\t41\t0\t1398\t1678\t1\t26\t-1\t\n5\t1\t1\t1\t41\t1\t1398\t1678\t1\t26\t85.623367\t|\n4\t1\t1\t1\t42\t0\t1128\t1707\t270\t24\t-1\t\n5\t1\t1\t1\t42\t1\t1128\t1712\t2\t2\t6.471014\t:\n5\t1\t1\t1\t42\t2\t1397\t1707\t1\t24\t87.362686\t|\n4\t1\t1\t1\t43\t0\t1397\t1741\t1\t23\t-1\t\n5\t1\t1\t1\t43\t1\t1397\t1741\t1\t23\t64.805069\t|\n4\t1\t1\t1\t44\t0\t1395\t1900\t1\t30\t-1\t\n5\t1\t1\t1\t44\t1\t1395\t1900\t1\t30\t94.711823\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "1700",
+          "value": 1700.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "90.17",
+          "value": 90.17,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "290.56",
+          "value": 290.56,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "56.25",
+          "value": 56.25,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "234.30",
+          "value": 234.3,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-92.9",
+          "value": -92.9,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "97.6",
+          "value": 97.6,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-3.00",
+          "value": -3.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 40,
+      "raw": "1800           91.80       295.76      58.18           237.57        -93.0          108.8         -3.16",
+      "raster_reading": "CHy: Ideal gas, P = 1 bar, 298.15 to 1800 K |",
+      "cells": {
+        "temperature": {
+          "raw": "1800",
+          "value": 1800.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "91.80",
+          "value": 91.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "295.76",
+          "value": 295.76,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "58.18",
+          "value": 58.18,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "237.57",
+          "value": 237.57,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-93.0",
+          "value": -93.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "108.8",
+          "value": 108.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "-3.16",
+          "value": -3.16,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    }
+  ],
+  "ambiguities": [
+    {
+      "kind": "ocr_suspect",
+      "row": 0,
+      "columns": [
+        "enthalpy_function"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 1,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 3,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 4,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 5,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 6,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 7,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 8,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "identity_disagreement",
+      "row": 9,
+      "temperature_raw": "1100",
+      "checks": [
+        {
+          "identity": "formation_G=-R*T*ln(10)*log_Kf",
+          "residual_kJ_mol": 0.16393748342786907
+        }
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 9,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 10,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 11,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 12,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 13,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 14,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 15,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 16,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 0,
+      "tokens": [
+        "16.",
+        "0431"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 1,
+      "tokens": [
+        "CH4:"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 2,
+      "tokens": [
+        "98",
+        "-(GT-H2",
+        "98"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 3,
+      "tokens": [
+        "J•mol-1·K-",
+        "1",
+        "kJ•mol-1"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 4,
+      "tokens": [
+        "0"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 5,
+      "tokens": [
+        "2478.97",
+        "J•bar\"1"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 6,
+      "tokens": [
+        "298-HB"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 7,
+      "tokens": [
+        "2/25/9~"
+      ]
+    }
+  ],
+  "transcription_status": "transcribed_with_ocr_ambiguities"
+}
