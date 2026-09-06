@@ -204,6 +204,7 @@ species:
       values:
         quantity: starting_material_composition
         method_class: measured_direct
+        semantics: composition_table_not_species_rate
         system_class: silicate_melt
         starting_Ave_SiO2_wt_pct: 35.43
         starting_Ave_Al2O3_wt_pct: 3.16
@@ -256,6 +257,7 @@ species:
       values:
         quantity: run_conditions
         method_class: measured_direct
+        semantics: run_conditions_not_species_rate
         system_class: silicate_melt
         T_K_derivation: T_K = T_C + 273.15
         time_min_axis:
@@ -299,6 +301,7 @@ species:
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
+        semantics: composition_table_not_species_rate
         system_class: silicate_melt
         VF_note: VF wt % is identical with vaporized mass in mg because initial mass is 100.0 mg
         T_K_derivation: T_K = T_C + 273.15 from Table 2
@@ -815,6 +818,7 @@ species:
       values:
         quantity: quench_phase_compositions
         method_class: measured_direct
+        semantics: composition_table_not_species_rate
         system_class: silicate_melt
         pin_18B6_magnetite_Fe2O3_wt_pct: 59.94
         samples:
@@ -908,6 +912,7 @@ species:
       values:
         quantity: initial_stage_vaporization_rate_F
         method_class: derived_from_figure_8_linear_portion
+        semantics: mol_s_rate_not_hkl_area_flux
         system_class: silicate_melt
         derivation: Table 5 F is obtained from eqns (1)' and (2) with the experimental vaporization
           rate at the initial stage of vaporization (the maximum vaporization rate). That rate is the
@@ -954,7 +959,7 @@ species:
         note: Printed Uv column is 0.041 x 10^3 cm3/s at 1700 C etc. CSV stores the product.
           Pbar = (Pb+Po)/2 as printed. Knudsen flow predominates over viscous flow in this range.
     - observation_id: hashimoto_1983_table6_feo_vaporization_enthalpies
-      type: rate_series
+      type: gibbs_table
       locator:
         table: '6'
         published_page: 124
@@ -970,6 +975,7 @@ species:
       values:
         quantity: vaporization_reaction_enthalpies_JANAF
         method_class: secondary_compilation
+        semantics: janaf_enthalpy_compilation_not_species_rate
         system_class: pure_oxide_liquids
         T_K_as_published: 2000
         pin_reaction_2_delta_H_over_z_kcal_mol: 100.425
@@ -1013,7 +1019,8 @@ species:
       units: kcal/mol as published
       values:
         quantity: activation_energy_of_vaporization
-        method_class: derived_from_arrhenius_slope
+        method_class: model_derived
+        semantics: second_law_fit_not_measured_rate
         system_class: silicate_melt
         E_kcal_mol_range:
         - 93.7
@@ -1040,7 +1047,8 @@ species:
       units: dimensionless reaction order as published
       values:
         quantity: surface_reaction_order
-        method_class: derived_from_lnJ_lnC_slope
+        method_class: model_derived
+        semantics: second_law_fit_not_measured_rate
         system_class: silicate_melt
         nu_FeO_at_1700C: 1.204
         nu_FeO_at_2000C: 0.798
@@ -1051,10 +1059,10 @@ species:
     - observation_id: hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio
       type: alpha
       locator:
-        published_page: 126
-        pdf_page_index: 16
+        published_page: 128
+        pdf_page_index: 18
         equation: '14'
-        note: Hertz-Knudsen definition of alpha_i; alpha_i/alpha_j = 1 assumed in eqn 16
+        note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
       T_range_K:
       - 1973.15
       - 2273.15
@@ -1065,6 +1073,7 @@ species:
       values:
         quantity: vaporization_coefficient_alpha_i
         method_class: model_derived_assumption
+        semantics: assumed_unity_ratio_not_measured_alpha
         system_class: silicate_melt
         alpha_i_over_alpha_j_assumed: 1.0
         measured_alpha_status: absent
@@ -1160,6 +1169,7 @@ species:
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
+        semantics: composition_table_not_species_rate
         system_class: silicate_melt
         oxide: CaO
         missing_numeric_species_rate: true
@@ -1516,6 +1526,7 @@ species:
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
+        semantics: composition_table_not_species_rate
         system_class: silicate_melt
         oxide: MgO
         pin_20B6_MgO_wt_pct: 41.10
@@ -1783,7 +1794,8 @@ species:
       units: kcal/mol as published
       values:
         quantity: activation_energy_of_vaporization
-        method_class: derived_from_arrhenius_slope
+        method_class: model_derived
+        semantics: second_law_fit_not_measured_rate
         system_class: silicate_melt
         E_kcal_mol: 123.6
         derivation: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 123.6 kcal/mol is printed
@@ -1791,7 +1803,7 @@ species:
           kcal/mol (MgO(l) -> MgO(g), JANAF 2000 K).
         figure_10_points: figure-only
     - observation_id: hashimoto_1983_table6_mgo_vaporization_enthalpies
-      type: rate_series
+      type: gibbs_table
       locator:
         table: '6'
         published_page: 124
@@ -1807,6 +1819,7 @@ species:
       values:
         quantity: vaporization_reaction_enthalpies_JANAF
         method_class: secondary_compilation
+        semantics: janaf_enthalpy_compilation_not_species_rate
         reactions:
         - reaction_no: 18
           reactant: MgO
@@ -1922,6 +1935,7 @@ species:
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
+        semantics: composition_table_not_species_rate
         system_class: silicate_melt
         oxide: SiO2
         gas_species: SiO(g)
@@ -2189,7 +2203,8 @@ species:
       units: kcal/mol as published
       values:
         quantity: activation_energy_of_vaporization
-        method_class: derived_from_arrhenius_slope
+        method_class: model_derived
+        semantics: second_law_fit_not_measured_rate
         system_class: silicate_melt
         E_kcal_mol: 131.6
         derivation: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 131.6 kcal/mol is printed
@@ -2197,7 +2212,7 @@ species:
           kcal/mol (SiO2(l) -> SiO2(g), JANAF 2000 K).
         figure_10_points: figure-only
     - observation_id: hashimoto_1983_table6_sio2_vaporization_enthalpies
-      type: rate_series
+      type: gibbs_table
       locator:
         table: '6'
         published_page: 124
@@ -2213,6 +2228,7 @@ species:
       values:
         quantity: vaporization_reaction_enthalpies_JANAF
         method_class: secondary_compilation
+        semantics: janaf_enthalpy_compilation_not_species_rate
         pin_reaction_13_delta_H_over_z_kcal_mol: 122.799
         reactions:
         - reaction_no: 13
@@ -2264,6 +2280,7 @@ species:
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
+        semantics: composition_table_not_species_rate
         system_class: silicate_melt
         oxide: Al2O3
         missing_numeric_species_rate: true
@@ -2633,10 +2650,10 @@ fidelity_samples:
   field: alpha_i_over_alpha_j_assumed
   value: 1.0
   locator:
-    published_page: 126
-    pdf_page_index: 16
+    published_page: 128
+    pdf_page_index: 18
     equation: '16'
-    note: alpha_i/alpha_j = 1 is assumed in eqn 16
+    note: alpha_i/alpha_j = 1 is assumed in eqn 16; Hertz-Knudsen eqn (14) is published p. 128 / PDF p. 18
 - species: Mg
   observable: rate_series
   observation_id: hashimoto_1983_table3_mgo_residue_series
@@ -2668,7 +2685,7 @@ fidelity_samples:
     figure: '10'
     note: SiO2 activation energy 131.6 kcal/mol as printed
 - species: SiO
-  observable: rate_series
+  observable: gibbs_table
   observation_id: hashimoto_1983_table6_sio2_vaporization_enthalpies
   field: pin_reaction_13_delta_H_over_z_kcal_mol
   value: 122.799

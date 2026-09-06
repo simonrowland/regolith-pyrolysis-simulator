@@ -376,7 +376,13 @@ species:
         T_max_derivation: "printed 'up to 2200 K' → 2200.0 K (identity; no conversion)"
         authors_as_published: Hilpert et al.
         other_cell_materials_as_published: "Pt, Mo, W, Ir, and Re (of which Pt and Ir are chemically the most inert); at very high-temperature studies of oxide samples limited to Mo, W and Re; silica or ceramic materials as Al2O3, ZrO2, BN mostly used for alloys"
-        note: "Equipment/method compilation. Not a measured species observation."
+        other_cell_materials_locator:
+          page: 2
+          pdf_page_index: 2
+          published_page: 2
+          section: "2.1 Principles of the Method"
+          paragraph: Only few refractory materials, viz. Pt, Mo, W, Ir, and Re
+        note: "Equipment/method compilation. Not a measured species observation. Ir 2200 K is page 6; the other-cell-materials string is page 2."
       equipment:
         cell_material:
           value: Ir
@@ -413,10 +419,11 @@ species:
     - observation_id: miller_2013_popovic_pzt
       type: rate_series
       locator:
-        page: 8
-        pdf_page_index: 8
-        published_page: 8
+        page: 9
+        pdf_page_index: 9
+        published_page: 9
         paragraph: "[55]"
+        note: "Bibliography [55] is published/PDF page 9. Body mention of the monomer/dimer method [55] is published/PDF page 4."
       phase: PbO-ZrO2-TiO2
       regime: kems_effusion
       units: none (citation index only)
