@@ -1,0 +1,223 @@
+schema_version: literature_extract.v1
+source_id: kems-050-gorokhov-1977
+source:
+  citation: >
+    Gorokhov, L. N., Gusarov, A. V. et al. (1977), "Масс-спектрометрическое
+    определение энтальпий образования молекул CrO и CrO2" (Mass-spectrometric
+    determination of formation enthalpies of CrO and CrO2 molecules). Report,
+    Institute for High Temperatures of the USSR Academy of Sciences (IVTAN),
+    No. 43-77. IVTANTHERMO key [77ГОР/ГУС]. Quoted on
+    https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html Table Cr.T3 and
+    https://www.chem.msu.ru/rus/tsiv/Cr/allbibs.html.
+  doi: null
+  url: https://www.chem.msu.ru/rus/tsiv/Cr/allbibs.html
+  year: 1977
+  version: ivtan-report-43-77
+extraction:
+  method: >
+    Official OA HTML only. Located URL allbibs.html is the Cr bibliography
+    (HTTP 200); no publisher PDF of report 43-77 is linked. Numeric values
+    transcribed from print-CrO.html Table Cr.T3 HTML cells (real <table>, not
+    MinerU "~" grids). Table Cr.T3 header prints "Дата расчета: 3.12.2009":
+    II-law and III-law columns are the compilation's 2009 reprocessing of
+    Gorokhov KEMS, not the unseen 1977 point tables. Second-law labelled
+    model_derived. CrO2 Table Cr.T4 is cited on print-CrO2.html and is a
+    true absence on the OA pages. No unit conversion. No MinerU.
+  date: '2026-09-06'
+  worker: wave-W2-ivtan-report43-77
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-ivtan-report43-77/kems-050-gorokhov-1977
+review_status: draft
+fidelity_samples:
+  - species: CrO
+    observable: gibbs_table
+    observation_id: gorokhov_1977_t3_cro_alo_exchange_third_law_d0
+    field: D0_CrO_kJ_mol
+    value: 456.3
+    locator:
+      table: "Cr.T3"
+      source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+      record: "[77ГОР/ГУС]"
+      note: "Table Cr.T3 D0°(CrO) III закон = 456.3 ± 10 as printed"
+  - species: CrO
+    observable: gibbs_table
+    observation_id: gorokhov_1977_t3_cro_alo_exchange_third_law_d0
+    field: delta_rH0_III_law_kJ_mol
+    value: 50.690
+    locator:
+      table: "Cr.T3"
+      source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+      record: "[77ГОР/ГУС]"
+      note: "Table Cr.T3 ΔrH°0 III закон = 50.690 ± 8.6 as printed"
+  - species: CrO
+    observable: gibbs_table
+    observation_id: gorokhov_1977_t3_cro_alo_exchange_second_law
+    field: delta_rH0_II_law_kJ_mol
+    value: 88.7
+    locator:
+      table: "Cr.T3"
+      source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+      record: "[77ГОР/ГУС]"
+      note: "Table Cr.T3 ΔrH°0 II закон = 88.7 ± 38 as printed"
+  - path: species.CrO.observations[gorokhov_1977_t3_cro_alo_exchange_third_law_d0].values.n_points
+    value: 12
+    locator:
+      table: "Cr.T3"
+      source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+      note: "2242-2690 K, 12 точек as printed"
+species:
+  CrO:
+    observations:
+    - observation_id: gorokhov_1977_t3_cro_alo_exchange_second_law
+      type: gibbs_table
+      locator:
+        table: "Cr.T3"
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+        record: "[77ГОР/ГУС]"
+        note: >
+          Second-law ΔrH°0 for AlO + Cr = Al + CrO from Table Cr.T3 (computed
+          3.12.2009). Compilation reprocessing of Gorokhov 1977 KEMS; not a
+          measured ion-current series.
+      T_range_K:
+      - 2242.0
+      - 2690.0
+      phase: gas
+      standard_state: gaseous AlO, Cr, Al, CrO as printed in Table Cr.T3
+      regime: kems_second_law
+      units: kJ mol-1 as printed (T = 0 K)
+      uncertainty:
+        delta_rH0_II_law_kJ_mol: 38.0
+        as_printed: 88.7 ± 38
+        note: >
+          Printed full error on the II-law cell. Compilation text states table
+          errors include reproducibility, temperature trend of the reaction
+          enthalpy, thermodynamic-function error, and RTln(1.5) ionization
+          cross-section error for mass-spectrometric works.
+      values:
+        quantity: second_law_reaction_enthalpy_0K
+        evidence_kind: model
+        method_class: model_derived
+        law: II
+        reaction_as_printed: AlO + Cr = Al + CrO
+        T_range_K_as_printed: 2242-2690 K
+        n_points: 12
+        n_points_as_printed: 12 точек
+        delta_rH0_II_law_kJ_mol: 88.7
+        printed_quote: "88.7 ± 38"
+        table_csv: tables/kems-050-gorokhov-1977/t3.csv
+        compilation_computed_date: "3.12.2009"
+        report_internal_points: unseen
+        note: >
+          Second-law fit of the compilation's 2009 reprocessing. Battery must
+          refuse as typed-refusal:model_output_not_measurement. The 12 KEMS
+          points of report 43-77 are not on the OA HTML (unseen, not 0).
+    - observation_id: gorokhov_1977_t3_cro_alo_exchange_third_law_d0
+      type: gibbs_table
+      locator:
+        table: "Cr.T3"
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+        record: "[77ГОР/ГУС]"
+        paragraph: thermochemical_quantities
+        note: >
+          Table Cr.T3 III-law ΔrH°0 and D0°(CrO) for AlO + Cr = Al + CrO, plus
+          prose "В работе [77ГОР/ГУС] значение D°0(CrO) = 456.3 ± 10 кДж×моль-1".
+      T_range_K:
+      - 2242.0
+      - 2690.0
+      phase: gas
+      standard_state: gaseous AlO, Cr, Al, CrO as printed in Table Cr.T3
+      regime: kems_third_law
+      units: kJ mol-1 as printed (T = 0 K)
+      uncertainty:
+        delta_rH0_III_law_kJ_mol: 8.6
+        D0_CrO_kJ_mol: 10.0
+        as_printed_III_law: 50.690 ± 8.6
+        as_printed_D0: 456.3 ± 10
+        envelope_components_kJ_mol:
+          reproducibility: 2.6
+          ionization_cross_section: 8.2
+          D0_AlO: 5.0
+          thermodynamic_functions: 1.0
+        envelope_quote: >
+          Погрешность принятого значения включает следующие составляющие
+          (кДж×моль-1): 2.6 (погрешность воспроизводимости), 8.2 (неточность
+          сечений ионизации), 5.0 (неточность в D°0(AlO) и 1.0 (неточность
+          термодинамических функций).
+        note: >
+          Envelope components are the compilation's analysis of the Gorokhov
+          D0, not a second printed sigma on the table cell. Auxiliary
+          D°0(AlO)=507 ± 5 kJ mol-1 is from [82ГУР/ВЕЙ], not this report.
+      values:
+        quantity: third_law_dissociation_energy_0K
+        evidence_kind: compilation_selected_from_measured
+        method_class: review_compilation
+        law: III
+        reaction_as_printed: AlO + Cr = Al + CrO
+        T_range_K_as_printed: 2242-2690 K
+        n_points: 12
+        n_points_as_printed: 12 точек
+        delta_rH0_III_law_kJ_mol: 50.690
+        delta_rH0_III_law_printed_quote: "50.690 ± 8.6"
+        D0_CrO_kJ_mol: 456.3
+        D0_CrO_printed_quote: "D°0(CrO) = 456.3 ± 10 кДж×моль-1"
+        D0_CrO_table_cell_quote: "456.3 ± 10"
+        table_footer_DrH_kJ_mol: 456.300
+        table_footer_quote: "DrH° = 456.300 кДж × моль-1"
+        table_footer_reaction: CRO=CR+O
+        table_csv: tables/kems-050-gorokhov-1977/t3.csv
+        compilation_computed_date: "3.12.2009"
+        adopted_by_compilation_from_this_work: true
+        report_internal_points: unseen
+        auxiliary_D0_AlO_kJ_mol_from_gurvich1982: 507
+        auxiliary_D0_AlO_unc_kJ_mol: 5
+        auxiliary_D0_AlO_citation_key: "[82ГУР/ВЕЙ]"
+        note: >
+          Prose attributes D°0(CrO)=456.3±10 to work [77ГОР/ГУС] using
+          D°0(AlO)=507±5 from Gurvich 1982. Table Cr.T3 III-law cell is the
+          2009 compilation reprocessing. The 12 ion-current points of report
+          43-77 are unseen. Compilation conversions DfH°(CrO,g,0 K)=184.848±10
+          and DfH°(CrO,g,298.15 K)=186.308±10 are not stored here (compilation
+          thermo functions, not a Gorokhov printed formation enthalpy).
+  CrO2:
+    observations:
+    - observation_id: gorokhov_1977_cro2_isomolecular_cited_t4_absent
+      type: gibbs_table
+      locator:
+        table: "Cr.T4"
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: "[77ГОР/ГУС]"
+        paragraph: thermochemical_quantities
+        note: >
+          print-CrO2.html cites [77ГОР/ГУС] for Cr(g)+CrO2(g)=2CrO(g) and
+          points to table Cr.T4. That table is not on the OA HTML (true
+          absence). Report-internal CrO2 tables unseen. No T grid for this
+          reaction is printed on the OA pages.
+      phase: gas
+      standard_state: gaseous Cr, CrO2, CrO as printed
+      regime: kems_isomolecular
+      units: none_printed_for_this_report_on_oa_html
+      uncertainty:
+        note: >
+          No Gorokhov CrO2 enthalpy, n_points, or T grid is printed on
+          print-CrO2.html. Compilation adopted DfH°(CrO2,g,298.15 K)=-99.2±15
+          from [61GRI/BUR2] and [77ГОР/ГУС] jointly; that selected value is
+          already stored on source ivtan-cro2-g and is not re-attributed here.
+      values:
+        quantity: isomolecular_reaction_cited_without_numeric_table
+        evidence_kind: compilation_citation
+        method_class: review_compilation
+        semantics: bound_not_point_ordering
+        reaction_as_printed: Cr(г) + CrO2(г) = 2CrO(г)
+        printed_quote: >
+          масс-спектрометрических измерений ионных токов, из которых были
+          рассчитаны константы равновесия изомолекулярной реакции
+          Cr(г) + CrO2(г) = 2CrO(г) в работах [61GRI/BUR2] и [77ГОР/ГУС]
+          (таблица Cr.T4)
+        table_Cr_T4_on_oa_html: true_absence
+        report_internal_tables: unseen
+        n_points: absent
+        delta_rH: absent
+        T_range_K: absent
+        note: >
+          No CrO2 enthalpy, n_points, or T grid from report 43-77 is printed
+          on the OA HTML. Missing = absent, never 0. Compilation selected
+          DfH°(CrO2) lives on ivtan-cro2-g.
