@@ -2,7 +2,7 @@
 """Build INDEX.yaml + INDEX.md by walking --root. Canonical source_id = extract stem."""
 from __future__ import annotations
 
-import argparse, hashlib, json, re, subprocess, sys
+import argparse, hashlib, json, os, re, subprocess, sys
 from collections import defaultdict
 from pathlib import Path
 import yaml
@@ -15,6 +15,7 @@ ROW_KEYS = (
     "source_id", "aliases", "citation", "doi", "report_number", "identifier", "pdf_status", "pdf_path",
     "pdf_last_seen", "pdf_sha256", "pdf_tracked", "sidecar_path", "sidecar_missing_fields",
     "access_status", "extracts", "battery_datasets", "hunt_ids", "copies", "measurement_sets",
+    "corpus_status", "corpus",
 )
 YEAR_RE = re.compile(r"(19\d{2}|20\d{2})")
 DOI_RE = re.compile(r"10\.\d{4,9}/[^\s,;]+")
@@ -120,6 +121,70 @@ def parse_sidecar(path: Path) -> dict:
         fields["retrieved_date"] = date.group(1)
     if re.search(r"\b(open archive|OA|CC BY|NASA ADS open|J-STAGE OA|NTRS open)\b", text, re.I):
         fields["license_or_oa_basis"] = "OA (sidecar prose)"
+    aliases = {
+        "citation": "citation", "doi": "doi", "sha256": "sha256",
+        "retrieveddate": "retrieved_date", "retrievedat": "retrieved_date",
+        "retrieved": "retrieved_date", "retrievaldate": "retrieved_date",
+        "retrievedurl": "retrieval_url", "retrievalurl": "retrieval_url",
+        "obtainedfrom": "retrieval_url",
+        "officialopenurl": "retrieval_url", "url": "retrieval_url",
+        "licenseoroabasis": "license_or_oa_basis", "licence": "license_or_oa_basis",
+        "license": "license_or_oa_basis", "licencetext": "license_or_oa_basis",
+        "access": "access",
+    }
+    declared = set()
+    retrieval_priority = 0
+    lines = text.splitlines()
+    section = ""
+    for number, line in enumerate(lines):
+        heading = re.match(r"^##\s+(.+)", line)
+        if heading:
+            section = heading.group(1).lower()
+            field = aliases.get(re.sub(r"[^a-z0-9]", "", section))
+            if field and (field not in declared or field == "retrieval_url"):
+                paragraph = "\n".join(lines[number + 1:]).lstrip().split("\n\n", 1)[0]
+                line = f"{section}: {' '.join(paragraph.split())}"
+            else:
+                continue
+        if section.startswith("file ("):
+            continue
+        if line.strip().startswith("|"):
+            cells = line.strip().strip("|").split("|")
+            if len(cells) == 2:
+                line = f"{cells[0].strip()}: {cells[1].strip()}"
+        line = re.sub(r"^\s*[-*]\s+", "", line).replace("**", "").strip().strip("`")
+        key, sep, value = line.partition(":")
+        key = re.sub(r"[^a-z0-9]", "", key.lower())
+        field = aliases.get(key)
+        priority = 2 if key in {"retrievedurl", "retrievalurl", "obtainedfrom"} else 1
+        if not sep or not field:
+            continue
+        if field == "retrieval_url":
+            if priority <= retrieval_priority:
+                continue
+            retrieval_priority = priority
+        elif field in declared:
+            continue
+        declared.add(field)
+        value = value.strip().strip("`<>\"'")
+        if field == "access":
+            value = re.sub(r"^access:\s*", "", value, flags=re.I).strip("`")
+            value = re.split(r"[`\s]", value, maxsplit=1)[0]
+            fields[field] = value
+            continue
+        if value.lower() in {"", "null", "none", "n/a", "unknown", "—"}:
+            fields[field] = None
+            continue
+        if field in {"doi", "sha256", "retrieved_date", "retrieval_url"}:
+            pattern = {"doi": DOI_RE, "sha256": re.compile(r"[0-9a-f]{64}", re.I),
+                       "retrieved_date": re.compile(r"\d{4}-\d{2}-\d{2}"),
+                       "retrieval_url": re.compile(r"https?://[^\s<>`]+")}[field]
+            match = pattern.search(value)
+            value = match.group(0).rstrip("`>),.") if match else None
+        if value:
+            fields[field] = value
+        else:
+            fields[field] = None
     fields["local_paths"] = re.findall(r"(docs(?:-private)?/[^\s)\"']+\.pdf)", text)
     fields["missing_fields"] = [key for key in SIDECAR_FIELDS if not fields[key]]
     return fields
@@ -154,6 +219,7 @@ def collect_ids_and_dois(obj, ids: set[str], id_dois: dict[str, set[str]], nearb
 
 def load_extracts(root: Path) -> dict[str, dict]:
     extracts, directory = {}, root / "data/literature/extracts"
+    _, tracked = git_tracked_set(root)
     if not directory.is_dir():
         return extracts
     for path in sorted(directory.glob("*.yaml")):
@@ -163,8 +229,24 @@ def load_extracts(root: Path) -> dict[str, dict]:
         if isinstance(doc, dict) and doc.get("schema_version") == "literature_extract.v1":
             extracts[path.stem] = {
                 "doc": doc,
-                "files": [{"path": posix(path.relative_to(root)), "review_status": doc.get("review_status") or "unknown"}],
+                "files": [{"path": posix(path.relative_to(root)), "review_status": doc.get("review_status") or "unknown",
+                           "rows": sum(len(body.get("observations") or []) for body in (doc.get("species") or {}).values())}],
             }
+            locators = [row.get("locator") or {} for body in (doc.get("species") or {}).values()
+                        for row in body.get("observations") or []]
+            if any("docs-private/" in str(value) for locator in locators for value in locator.values()):
+                extracts[path.stem]["files"][0]["locator_status"] = "private_path"
+            paths = {str(value) for locator in locators for key, value in locator.items()
+                     if (key == "path" or key.endswith("_path")) and value}
+            for locator in paths:
+                if re.match(r"https?://", locator):
+                    continue
+                target = (root / locator).resolve()
+                relative = rel_to(target, root)
+                if ("docs-private" in target.parts or not target.is_relative_to(root)
+                        or (tracked is not None and relative not in tracked)):
+                    extracts[path.stem]["files"][0]["locator_status"] = "private_path"
+                    break
     return extracts
 
 def load_pdfs(root: Path) -> dict[str, dict]:
@@ -178,7 +260,55 @@ def load_pdfs(root: Path) -> dict[str, dict]:
             "sidecar_path": posix(sidecar.relative_to(root)) if sidecar.is_file() else None,
             "sidecar": parse_sidecar(sidecar) if sidecar.is_file() else None,
         }
+    for sidecar in sorted(directory.rglob("*.md")):
+        if sidecar.stem in found or sidecar.name == "README.md":
+            continue
+        info = parse_sidecar(sidecar)
+        if info.get("citation") or info.get("doi"):
+            found[sidecar.stem] = {
+                "path": None, "sha256": None,
+                "sidecar_path": posix(sidecar.relative_to(root)), "sidecar": info,
+            }
     return found
+
+def corpus_available(corpus: Path, commit: str | None) -> bool:
+    return bool(commit) or any((corpus / name).is_dir() for name in ("raw", "extracts", "ledger"))
+
+def corpus_pointers(corpus: Path, source_id: str, pdf_sha: str | None,
+                    extract_path: Path, commit: str | None) -> dict:
+    if not corpus_available(corpus, commit):
+        return dict.fromkeys(("raw", "sidecar", "text", "tables", "extract", "ledger", "commit"))
+    raw = corpus / "raw" / source_id / f"{source_id}.pdf"
+    sidecar = raw.parent / "sidecar.yaml"
+    extract = corpus / "extracts" / f"{source_id}.yaml"
+    ledger = corpus / "ledger" / f"{source_id}.yaml"
+    raw_sha = sha256_file(raw) if raw.is_file() else None
+    ledger_error = None
+    try:
+        stages = (load_yaml(ledger).get("stages") or {}) if ledger.is_file() else {}
+    except yaml.YAMLError as exc:
+        stages = {}
+        ledger_error = f"Invalid YAML: {exc.problem} at line {exc.problem_mark.line + 1}"
+    last = max(stages, key=lambda stage: (str((stages[stage] or {}).get("date") or ""),
+                                         list(stages).index(stage))) if stages else None
+    def directory(name):
+        path = corpus / name / source_id
+        return {"path": posix(path.relative_to(corpus)), "exists": path.is_dir(),
+                "file_count": sum(p.is_file() for p in path.rglob("*")) if path.is_dir() else 0}
+    return {
+        "raw": {"path": posix(raw.relative_to(corpus)), "present": raw.is_file(), "sha256": raw_sha,
+                "matches_simulator": raw_sha == pdf_sha if raw_sha and pdf_sha else None},
+        "sidecar": {"path": posix(sidecar.relative_to(corpus)), "present": sidecar.is_file()},
+        "text": directory("text"), "tables": directory("tables"),
+        "extract": {"path": posix(extract.relative_to(corpus)), "present": extract.is_file(),
+                    "matches_simulator": extract.read_bytes() == extract_path.read_bytes()
+                    if extract.is_file() and extract_path.is_file() else None},
+        "ledger": {"path": posix(ledger.relative_to(corpus)), "present": ledger.is_file(),
+                   "error": ledger_error,
+                   "last_stage": last, "date": str(stages[last].get("date"))
+                   if last and stages[last].get("date") is not None else None},
+        "commit": commit,
+    }
 
 def load_consumers(root: Path) -> tuple[list[dict], list[dict]]:
     def recs(paths):
@@ -246,8 +376,14 @@ def access_for(source_id: str, src: dict, sidecar: dict | None, compilations: di
                 return "OA"
             if any(part in raw for part in ("copyrighted", "commercial_license", "subscription")):
                 return "paywalled"
-    if sidecar and sidecar.get("license_or_oa_basis"):
-        return "OA"
+    if sidecar:
+        access = str(sidecar.get("access") or "").lower().strip("`")
+        if access in {"open", "oa"}:
+            return "OA"
+        if access in {"held", "paywalled", "unknown"}:
+            return access
+        if re.search(r"\b(OA|CC BY|Creative Commons|open access)\b", str(sidecar.get("license_or_oa_basis") or ""), re.I):
+            return "OA"
     return "OA" if any(host in str(src.get("url") or "") for host in OA_HOSTS) else "unknown"
 
 def build_alias_map(extracts, pdfs, measurements, presets):
@@ -315,6 +451,14 @@ def build_alias_map(extracts, pdfs, measurements, presets):
 
 def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_json: Path | None = None, root_label: str = ".") -> dict:
     root = root.resolve()
+    corpus = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+    corpus_commit = None
+    if (corpus / ".git").exists():
+        try:
+            result = subprocess.run(["git", "-C", str(corpus), "rev-parse", "HEAD"], capture_output=True, text=True)
+            corpus_commit = result.stdout.strip() if result.returncode == 0 else None
+        except OSError:
+            pass
     extracts, pdfs = load_extracts(root), load_pdfs(root)
     measurements, presets = load_consumers(root)
     access_path = root / "data/literature/compilations/access-status.yaml"
@@ -350,8 +494,9 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
         pdf = pdfs.get(pdf_stem) if pdf_stem else None
         src = dict(((extract or {}).get("doc") or {}).get("source") or {})
         if pdf and pdf.get("sidecar"):
-            src.setdefault("citation", pdf["sidecar"].get("citation"))
-            src.setdefault("doi", pdf["sidecar"].get("doi"))
+            for key in ("citation", "doi"):
+                if not src.get(key):
+                    src[key] = pdf["sidecar"].get(key)
         citation, doi, report = src.get("citation"), doi_of(src), report_number(src)
         pdf_path, sidecar_info, sidecar_path = (pdf["path"] if pdf else None), (pdf or {}).get("sidecar"), (pdf or {}).get("sidecar_path")
         copies, names = [], [source_id, *aliases]
@@ -363,7 +508,7 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
         if sidecar_info:
             last_seen += [p for p in sidecar_info.get("local_paths") or [] if (root / p).is_file() and p != pdf_path]
         last_seen = sorted({p for p in last_seen if p != pdf_path})
-        missing = [] if sidecar_path is None and pdf is None else list((sidecar_info or {}).get("missing_fields") or SIDECAR_FIELDS)
+        missing = list(sidecar_info["missing_fields"]) if sidecar_info else list(SIDECAR_FIELDS)
         if git_mode != "git":
             tracked_flag: bool | str | None = "unknown" if pdf_path else None
         else:
@@ -379,17 +524,22 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
         rows.append({
             "source_id": source_id, "aliases": aliases, "citation": citation, "doi": doi,
             "report_number": report, "identifier": doi or report,
-            "pdf_status": "present" if pdf else "ABSENT", "pdf_path": pdf_path, "pdf_last_seen": last_seen,
+            "pdf_status": "present" if pdf_path else "ABSENT", "pdf_path": pdf_path, "pdf_last_seen": last_seen,
             "pdf_sha256": (pdf or {}).get("sha256"), "pdf_tracked": tracked_flag, "sidecar_path": sidecar_path,
             "sidecar_missing_fields": missing,
-            "access_status": access_for(source_id, src, sidecar_info, compilations, bool(pdf)),
+            "access_status": access_for(source_id, src, sidecar_info, compilations, bool(pdf_path)),
             "extracts": list((extract or {}).get("files") or []),
             "battery_datasets": sorted(set(battery + measure_hits)),
             "hunt_ids": sorted(hunt_ids, key=hunt_sort_key), "copies": copies,
             "measurement_sets": sorted(set(measure_hits)),
+            "corpus_status": "available" if corpus_available(corpus, corpus_commit) else "unavailable",
+            "corpus": corpus_pointers(corpus, source_id, (pdf or {}).get("sha256"),
+                                      root / "data/literature/extracts" / f"{source_id}.yaml", corpus_commit),
         })
     pdfs_wo = sorted(r["source_id"] for r in rows if r["pdf_status"] == "present" and not r["extracts"])
     extracts_wo = sorted(r["source_id"] for r in rows if r["extracts"] and r["pdf_status"] == "ABSENT")
+    private_locators = [r["source_id"] for r in rows
+                        if any(item.get("locator_status") == "private_path" for item in r["extracts"])]
     untracked = sorted({rel for r in rows for rel in (r["pdf_path"], r["sidecar_path"]) if rel and git_mode == "git" and tracked is not None and rel not in tracked})
     sidecars_missing = [{"source_id": r["source_id"], "sidecar_path": r["sidecar_path"], "missing_fields": r["sidecar_missing_fields"]}
                         for r in rows if (r["pdf_status"] == "present" or r["sidecar_path"]) and r["sidecar_missing_fields"]]
@@ -399,11 +549,13 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
     return {
         "schema_version": SCHEMA, "generated_by": "data/literature/build_index.py",
         "scan": {"root": root_label, "private_roots_scanned": scanned, "private_roots_not_scanned": sorted(set(not_scanned)),
-                 "hunt_json": hunt_label, "notes": sorted(set(notes))},
+                 "hunt_json": hunt_label, "notes": sorted(set(notes)), "corpus_root": str(corpus)},
         "counts": {"sources": len(rows), "extracts": n_extracts, "pdfs_present_in_worktree": n_pdfs,
+                   "extracts_with_private_locators": len(private_locators),
                    "pdfs_tracked_99_kems_langmuir": n_tracked, "pdfs_without_extract": len(pdfs_wo),
                    "extracts_without_pdf": len(extracts_wo), "alias_groups_needing_resolution": len(collisions)},
         "gaps": {"pdfs_without_extract": pdfs_wo, "extracts_without_pdf": extracts_wo, "untracked_files": untracked,
+                 "extracts_with_private_locators": private_locators,
                  "sidecars_missing_fields": sidecars_missing, "source_id_collisions": collisions},
         "sources": rows,
     }
@@ -419,6 +571,8 @@ def render_md(index: dict) -> str:
         "Canonical `source_id` is the extract filename stem. Preset ids are aliases, never rows.",
         "", "## Scan", "",
         f"- root: `{scan['root']}`",
+        f"- corpus root: `{scan['corpus_root']}` (raw/text/tables/ledger paths below are relative to this root)",
+        "- Ledger stage: latest dated event; same-date ties use ledger insertion order.",
         f"- private_roots_scanned: {_ticks(scan['private_roots_scanned']).replace('—', '(none)')}",
         f"- private_roots_not_scanned: {_ticks(scan['private_roots_not_scanned']).replace('—', '(none)')}",
         f"- hunt_json: `{scan['hunt_json']}`" if scan.get("hunt_json") else "- hunt_json: (not provided)",
@@ -429,13 +583,14 @@ def render_md(index: dict) -> str:
         f"- Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: {counts['pdfs_tracked_99_kems_langmuir']}",
         f"- PDFs with no extract: {counts['pdfs_without_extract']}", f"- Extracts with no PDF: {counts['extracts_without_pdf']}",
         f"- Alias groups needing owner/controller resolution: {counts['alias_groups_needing_resolution']}",
+        f"- Extracts with private/non-public row locators: {counts['extracts_with_private_locators']}",
         "", "## Sources", "",
-        "| source_id | aliases | citation | DOI / report | PDF | sha256 | access | extract (review) | battery | hunts |",
-        "|---|---|---|---|---|---|---|---|---|---|",
+        "| source_id | citation | DOI / report | PDF (simulator, sha8) | corpus raw / text / tables | extract (rows, review) | ledger stage |",
+        "|---|---|---|---|---|---|---|",
     ]
     for row in index["sources"]:
         cite = (row.get("citation") or "").replace("|", "\\|")
-        cite = cite[:87] + "..." if len(cite) > 90 else cite
+        cite = " ".join(cite.split())
         ident = row.get("doi") or row.get("report_number") or row.get("identifier") or ""
         if row["pdf_status"] == "present":
             pdf = f"`{row['pdf_path']}`"
@@ -443,17 +598,30 @@ def render_md(index: dict) -> str:
             pdf = "ABSENT; " + row["pdf_last_seen"][0].replace("|", "\\|")
         else:
             pdf = "ABSENT"
-        extracts = ", ".join(f"`{i['path']}` ({i['review_status']})" for i in row.get("extracts") or []) or "—"
+        extracts = ", ".join(f"`{i['path']}` ({i['rows']} rows, {i['review_status']}"
+                             + (", private_path" if i.get("locator_status") == "private_path" else "")
+                             + ")" for i in row.get("extracts") or []) or "—"
+        corpus = row["corpus"]
+        if row["corpus_status"] == "unavailable":
+            pointers, ledger = "unavailable", "—"
+        else:
+            raw = corpus["raw"]
+            pointers = f"`{raw['path']}` ({'present' if raw['present'] else 'ABSENT'}, {(raw['sha256'] or '')[:8]})"
+            for name in ("text", "tables"):
+                item = corpus[name]
+                pointers += f"; `{item['path']}/` ({item['file_count']} files, {'exists' if item['exists'] else 'ABSENT'})"
+            event = corpus["ledger"]
+            ledger = f"`{event['path']}`: {event['last_stage'] or '—'} ({event['date'] or '—'})"
         lines.append(
-            f"| `{row['source_id']}` | {_ticks(row.get('aliases') or [])} | {cite} | {ident} | {pdf} | "
-            f"`{(row.get('pdf_sha256') or '')[:12]}` | {row.get('access_status')} | {extracts} | "
-            f"{_ticks(row.get('battery_datasets') or [])} | {', '.join(row.get('hunt_ids') or []) or '—'} |"
+            f"| `{row['source_id']}` | {cite} | {ident} | {pdf}, `{(row.get('pdf_sha256') or '')[:8]}` | "
+            f"{pointers} | {extracts} | {ledger} |"
         )
     def block(title, items, fmt=lambda x: f"- `{x}`"):
         lines.extend(["", f"### {title}", ""])
         lines.extend(fmt(x) for x in items) if items else lines.append("(none)")
     block("PDFs with no extract", gaps["pdfs_without_extract"])
     block("Extracts with no PDF", gaps["extracts_without_pdf"])
+    block("Extracts needing public row locators (b-477)", gaps["extracts_with_private_locators"])
     block("Untracked files", gaps["untracked_files"])
     lines += ["", "### Sidecars missing fields", "",
               "Required sibling fields: citation, DOI, license/OA basis, sha256, retrieved date, retrieval URL.", ""]
