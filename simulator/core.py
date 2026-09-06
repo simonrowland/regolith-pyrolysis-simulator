@@ -3506,7 +3506,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         getter = getattr(self.campaign_mgr, "_lab_schedule", None)
         if not callable(getter):
             return None
-        return getter(self.melt.campaign)
+        # Surface schedules belong to the run, across campaign transitions.
+        campaign = (
+            self.record.snapshots[0].campaign
+            if self.record.snapshots else self.melt.campaign
+        )
+        return getter(campaign)
 
     def _active_surface_temperature_schedule(
         self,
@@ -3559,10 +3564,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     unavailable[surface.surface_id] = str(refusal)
                     continue
                 points = surface_schedule[profile_key]
-                temperatures_C[surface.surface_id] = interpolate_schedule_points(
-                    points,
-                    sample_time_h,
-                )
+                try:
+                    temperatures_C[surface.surface_id] = interpolate_schedule_points(
+                        points,
+                        sample_time_h,
+                    )
+                except LabScheduleValidationError as exc:
+                    if unavailable is None:
+                        raise
+                    from simulator.condensation import DepositionInputRefusal
+
+                    raise DepositionInputRefusal(
+                        "T_wall_K", None, f"{profile_key}: {exc}",
+                    ) from exc
                 continue
             if surface.surface_id in surface_schedule:
                 temperatures_C[surface.surface_id] = interpolate_schedule_points(
@@ -13149,7 +13163,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or bool(evap_flux.carrier_authority_by_species)
         ):
             self._configure_condensation_operating_conditions(evap_flux)
-            self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
+            self._apply_lab_surface_temperatures(sample_time_h=float(self.melt.hour) + 1.0)
             overhead_flux = self._route_to_condensation(evap_flux)
             evap_flux = self._ledger_committed_evap_flux_this_tick
             effective_transport_capacity = (

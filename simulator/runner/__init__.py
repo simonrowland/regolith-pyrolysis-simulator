@@ -3945,8 +3945,9 @@ def build_sio_yield_report(
             "wall_deposit_overhead_pressure_mbar": float(
                 operating_entry.get("overhead_pressure_mbar", 0.0) or 0.0
             ),
-            "wall_deposit_liner_temperature_C": float(
-                operating_entry.get("wall_temperature_C", 0.0) or 0.0
+            "wall_deposit_liner_temperature_C": (
+                None if operating_entry.get("wall_temperature_C") is None
+                else float(operating_entry["wall_temperature_C"])
             ),
             "wall_deposit_knudsen_number": float(
                 operating_entry.get("knudsen_number", 0.0) or 0.0

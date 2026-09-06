@@ -207,7 +207,7 @@ def wall_deposit_candidate_for_surface_kg(
             model, "wall_saturation_pressure_refusals_by_species",
             species, str(segment.name), record,
         )
-        return {**record, "status": "unavailable", "species": species}
+        raise refusal
 
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
     surface_area_m2 = _deposition_finite_scalar("surface_area_m2", surface_area_m2)

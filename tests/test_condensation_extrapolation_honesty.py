@@ -153,10 +153,8 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
                        for record in refused[species].values()) for species in ("Na", "Al2"))
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
     if hours == 24:
-        assert any(record.get("refusal_type") == "DepositionInputRefusal"
-                   and record["wall_temperature_K"] is None
-                   and "lab_schedule_missing_surface_temperature" in record["reason"]
-                    for records in refused.values() for record in records.values())
+        assert not any(record.get("refusal_type") == "DepositionInputRefusal"
+                       for records in refused.values() for record in records.values())
         transport = wall["evaporation_transport_notices_by_species"]
         assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
         assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
@@ -173,10 +171,12 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
 
 
 @pytest.mark.parametrize("all_missing", [False, True], ids=["partial", "all"])
-def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(all_missing):
+def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(monkeypatch, all_missing):
     from types import MethodType, SimpleNamespace
     from simulator.core import PyrolysisSimulator
     from simulator.lab_geometry import parse_lab_geometry
+    from simulator.run_executor import RunExecutor
+    from simulator.runner import PyrolysisRun
     from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
 
     model = condensation.CondensationModel(CondensationTrain(stages=[]), wall_temperature_C=25.0)
@@ -215,6 +215,109 @@ def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(all_missing):
     assert model.wall_temperature_C == 25.0
     assert model.wall_temperature_input_refusals == {}
     assert "wall_temperature_input_refusals" not in history
+
+    original = PyrolysisSimulator._resolve_lab_surface_temperatures
+
+    def omit_runtime(self, surface_schedule, *, sample_time_h, unavailable=None):
+        if unavailable is not None:
+            surface_schedule = {
+                key: value for key, value in surface_schedule.items()
+                if key != "holder_profile" and not all_missing
+            }
+        return original(
+            self, surface_schedule, sample_time_h=sample_time_h, unavailable=unavailable,
+        )
+
+    monkeypatch.setattr(PyrolysisSimulator, "_resolve_lab_surface_temperatures", omit_runtime)
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=1,
+        mass_kg=1000.0, backend_name="internal-analytical",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=dynamic_lab_schedule(), force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status == "failed"
+    assert len(execution.snapshots) == 0
+    assert isinstance(execution.failure_exception, condensation.DepositionInputRefusal)
+    assert execution.failure_exception.terminal_refusal is True
+    assert execution.failure_exception.parameter == "T_wall_K"
+    assert "holder_profile" in execution.error_message
+
+
+@pytest.mark.parametrize("missing_knot", [False, True], ids=["complete", "missing_knot"])
+def test_runtime_wall_profile_uses_run_time_after_campaign_transition(monkeypatch, missing_knot):
+    from simulator.core import PyrolysisSimulator
+    from simulator.run_executor import RunExecutor
+    from simulator.runner import PyrolysisRun
+    from simulator.state import CampaignPhase
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=2,
+        mass_kg=1000.0, backend_name="internal-analytical",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=dynamic_lab_schedule(), force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    session.advance()
+    sim = session.simulator
+    assert sim.melt.hour == 1
+    sim.start_campaign(CampaignPhase.C3_K)
+    assert sim.melt.campaign_hour == 0
+    original = PyrolysisSimulator._resolve_lab_surface_temperatures
+
+    def omit_runtime_knot(self, surface_schedule, *, sample_time_h, unavailable=None):
+        if missing_knot and unavailable is not None:
+            surface_schedule = {
+                **surface_schedule,
+                "holder_profile": surface_schedule["holder_profile"][:-1],
+            }
+        return original(
+            self, surface_schedule, sample_time_h=sample_time_h, unavailable=unavailable,
+        )
+
+    monkeypatch.setattr(PyrolysisSimulator, "_resolve_lab_surface_temperatures", omit_runtime_knot)
+    execution = RunExecutor().execute_session(session, hours=1)
+    if missing_knot:
+        assert execution.status == "failed"
+        assert len(execution.snapshots) == 0
+        assert isinstance(execution.failure_exception, condensation.DepositionInputRefusal)
+        assert execution.failure_exception.terminal_refusal is True
+        assert execution.failure_exception.parameter == "T_wall_K"
+        assert "holder_profile" in execution.error_message
+        assert "lab_schedule_sample_time_outside_declared_window" in execution.error_message
+        assert sim.melt.hour == 1
+    else:
+        assert execution.status == "ok", execution.error_message
+        assert len(execution.snapshots) == 1
+        assert sim.melt.hour == 2
+        assert sim.condensation_model.operating_history[-1]["pipe_segment_temperatures_C"] == {
+            "holder": 1500.0, "condenser": 25.0,
+        }
+
+
+def test_sio_wall_temperature_diagnostic_keeps_missing_value_unavailable(monkeypatch):
+    from simulator.runner import PyrolysisRun, build_sio_yield_report
+
+    original = PyrolysisRun._run_session
+
+    def missing_history_temperature(self, session):
+        result = original(self, session)
+        assert result["status"] == "ok"
+        history = session.simulator.condensation_model.operating_history
+        assert history
+        for entry in history:
+            entry["wall_temperature_C"] = None
+        return result
+
+    monkeypatch.setattr(PyrolysisRun, "_run_session", missing_history_temperature)
+    _, diagnostics = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti", hours=1,
+        include_diagnostics=True, allow_unmeasured_alpha_fallback=True,
+    )
+    assert diagnostics["wall_deposit_liner_temperature_C"] is None
 
 
 @pytest.mark.parametrize(("species", "temperature"), [("Na", 417.0), ("Mg", 115.0)])
