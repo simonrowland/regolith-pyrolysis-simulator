@@ -1,32 +1,73 @@
 schema_version: literature_extract.v1
 source_id: kems-035-sauerborn-2005
 source:
-  citation: "Sauerborn, M. (2005), \"Pyrolyse von Metalloxiden und Silikaten unter Vakuum mit konzentrierter Solarstrahlung\", Dissertation, Rheinische Friedrich-Wilhelms-Universität Bonn"
+  citation: Sauerborn, M. (2005), "Pyrolyse von Metalloxiden und Silikaten unter Vakuum mit konzentrierter
+    Solarstrahlung", Dissertation, Rheinische Friedrich-Wilhelms-Universität Bonn
   year: 2005
+  url: https://hdl.handle.net/20.500.11811/2298
+  identifier: urn:nbn:de:hbz:5N-05707
+  doi: null
 extraction:
-  method: pdftotext -layout of German text-layer PDF + visual certification of Tabellen 2.1, 4.1, 5.1, 5.2, 5.3, 5.4, 5.6, 5.7, 5.8; QMS figures and Abb. 2.2 not digitized
-  date: '2026-08-27'
-  worker: tail-close
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/
+  method: RH-49 r2. Parent observation objects restored from 655f3db3. Merged r1 grids / blank-foil /
+    QMS-mass table / EMPA full grid split to new observation_ids. Abb. 5.23 re-digitised from 300 dpi
+    pdftoppm with labelled-tick calibration (P2O5 Messung 4 on-chart 0.12 wt%; pts 5-6 absent). Official
+    bonndoc OA PDF (pdftotext -layout + 150/300 dpi pdftoppm). T_K = T_C + 273.15 where converted.
+  date: '2026-09-06'
+  worker: hunt-RH-49-r2
+  provenance_path: docs-private/research/2026-09-06-hunts/RH-49/kems-035-sauerborn-2005/
 review_status: draft
 fidelity_samples:
-  - species: Na
-    observable: rate_series
-    observation_id: sauerborn_2005_table53_jsc1_run_log
-    field: MS1_Tmax_C
-    value: 1542
-    locator:
-      page: 79
-      table: '5.3'
-      note: maximale Probentemperatur MS1
-  - species: Na
-    observable: rate_series
-    observation_id: sauerborn_2005_table54_ms1_cold_trap_edx
-    field: MS1_foil_Na_atom_pct_mean
-    value: 9.6
-    locator:
-      page: 85
-      table: '5.4'
+- species: Na
+  observable: rate_series
+  observation_id: sauerborn_2005_table53_jsc1_run_log
+  field: MS1_Tmax_C
+  value: 1542
+  locator:
+    page: 79
+    table: '5.3'
+    note: maximale Probentemperatur MS1
+- species: Na
+  observable: rate_series
+  observation_id: sauerborn_2005_table54_ms1_cold_trap_edx
+  field: MS1_foil_Na_atom_pct_mean
+  value: 9.6
+  locator:
+    page: 85
+    table: '5.4'
+- species: Na
+  observable: gibbs_table
+  observation_id: sauerborn_2005_fig22_jsc1_oxide_pie
+  field: Na2O_wt_pct
+  value: 2.7
+  locator:
+    page: 17
+    figure: '2.2'
+    note: JSC-1 pie label Na2O
+- species: Fe
+  observable: gibbs_table
+  observation_id: sauerborn_2005_table56_ms5c_epma_full_grid
+  field: spot4_SiO2
+  value: 40.34
+  locator:
+    page: 103
+    table: '5.6'
+    note: Nr. 4 Olivin SiO2
+- species: Na
+  observable: rate_series
+  observation_id: sauerborn_2005_table55_ms2_cold_trap_edx
+  field: MS2_foil_Na_atom_pct_mean
+  value: 3.5
+  locator:
+    page: 91
+    table: '5.5'
+- species: O2
+  observable: rate_series
+  observation_id: sauerborn_2005_mass_loss_series
+  field: MS2_mass_loss_wt_pct
+  value: 3.2
+  locator:
+    page: 88
+    paragraph: 3,2 % ihres Gewichtes verloren
 species:
   Na:
     observations:
@@ -42,8 +83,10 @@ species:
       units: wt_percent_element
       values:
         quantity: bulk_element_wt_pct
-        headers_as_published: 'Element | Hochland-Region (Apollo 14, Apollo 16) | Mare-Region (Apollo 12, Luna)'
-        caption_as_published: 'Atomare Zusammensetzung verschiedener Mondstaubproben unterschiedlicher Mondmissionen und -regionen (in Gew.%.) [HeVa 91].'
+        headers_as_published: Element | Hochland-Region (Apollo 14, Apollo 16) | Mare-Region (Apollo 12,
+          Luna)
+        caption_as_published: Atomare Zusammensetzung verschiedener Mondstaubproben unterschiedlicher
+          Mondmissionen und -regionen (in Gew.%.) [HeVa 91].
         method_class: secondary_compilation
         rows:
         - sample: Apollo 14
@@ -93,6 +136,37 @@ species:
         decimal_comma_as_published: true
       uncertainty:
         note: compilation; no uncertainty printed
+    - observation_id: sauerborn_2005_table22_lunar_mineral_vol
+      type: gibbs_table
+      locator:
+        table: '2.2'
+        page: 16
+      T_range_K: null
+      phase: lunar_regolith_compilation_HeVa91
+      regime: compiled_composition
+      units: vol_percent
+      values:
+        quantity: bulk_mineral_vol_pct
+        caption_as_published: Mineralogische Zusammensetzung verschiedener Mondstaubproben unterschiedlicher
+          Mondmissionen und -regionen (in Vol.-%) [HeVa 91].
+        method_class: secondary_compilation
+        rows:
+        - sample: Apollo 16
+          region: Hochland
+          Plagioklas: 45
+          Pyroxen: 4
+          Olivin: 1
+          Ilmenit: 1
+          Glaeser: 49
+        - sample: Apollo 17
+          region: Mare
+          Plagioklas: 16
+          Pyroxen: 31
+          Olivin: 1
+          Ilmenit: 6
+          Glaeser: 46
+      uncertainty:
+        note: compilation; no uncertainty printed
     - observation_id: sauerborn_2005_jsc1_composition_figure_only_blocked
       type: gibbs_table
       locator:
@@ -107,7 +181,8 @@ species:
       values:
         quantity: jsc1_oxide_suite
         status: typed_refusal
-        reason: JSC-1 bulk oxides appear only in Abbildung 2.2; Table 4.1 points to Kapitel 2.1.2 rather than reprinting numbers. Figure digitization forbidden.
+        reason: JSC-1 bulk oxides appear only in Abbildung 2.2; Table 4.1 points to Kapitel 2.1.2 rather
+          than reprinting numbers. Figure digitization forbidden.
         MELTS_liquidus_C_as_published: 1264
         MELTS_liquidus_locator:
           page: 17
@@ -117,6 +192,116 @@ species:
         semantics: bound_not_point_ordering
       uncertainty:
         note: not applicable
+    - observation_id: sauerborn_2005_fig22_jsc1_oxide_pie
+      type: gibbs_table
+      locator:
+        figure: '2.2'
+        page: 17
+        paragraph: Kapitel 2.1.2
+      T_range_K: null
+      phase: JSC-1_lunar_soil_simulant
+      condensed_form:
+        state: granular_simulant_as_loaded
+        metastable: false
+        basis: explicit_author
+        note: Feedstock for the solar-furnace runs. Oxide numbers are printed pie labels after McKay et
+          al. 1994 [MKCa 94], not a Sauerborn wet-chemical analysis.
+      regime: analytical_composition
+      units: wt_percent
+      values:
+        quantity: jsc1_and_apollo14163_oxide_pie_labels
+        method_class: secondary_compilation_reprinted_as_feedstock
+        citation_as_published: MKCa 94
+        apollo14_nr_14163_oxide_wt_pct:
+          SiO2: 47.3
+          Al2O3: 17.8
+          CaO: 11.4
+          MgO: 9.6
+          FeO: 10.5
+          Fe2O3: 0.0
+          K2O: 0.6
+          TiO2: 1.6
+          Na2O: 0.7
+        jsc1_oxide_wt_pct:
+          SiO2: 47.7
+          Al2O3: 15.0
+          CaO: 10.4
+          MgO: 9.0
+          FeO: 7.4
+          Fe2O3: 3.4
+          K2O: 0.8
+          TiO2: 1.6
+          Na2O: 2.7
+        Na2O_wt_pct: 2.7
+        jsc1_prose_complements_not_in_pie:
+          K2O: 0.82
+          P2O5: 0.66
+          Na2O: 2.7
+          locator:
+            page: 109
+            paragraph: 'Na2O: 2,7 Gew.%, K2O: 0,82 Gew.%, P2O5: 0,66 Gew.%'
+            quote: 'Trotz der geringen Konzentration der leicht flüchtigen Elemente (Na2O: 2,7 Gew.%,
+              K2O: 0,82 Gew.%, P2O5: 0,66 Gew.%) im Mondstaub-Simulat'
+            quote_en: 'Despite the low concentration of the volatile elements (Na2O: 2.7 wt%, K2O: 0.82
+              wt%, P2O5: 0.66 wt%) in the lunar-dust simulant'
+        MELTS_liquidus_C_as_published: 1264
+        MELTS_liquidus_K: 1537.15
+        MELTS_liquidus_locator:
+          page: 17
+          paragraph: Eine Untersuchung mit dem Simulationsprogramm MELTS
+        table_41_ca_1265_C: 1265
+        mineralogy_as_published:
+          jsc1_glass_vol_pct_approx: 50
+          mare_pyroxene_pct: 54-60
+          mare_plagioclase_pct: 30-33
+          mare_olivine_pct: ~1
+          mare_ilmenite_pct: 2-10
+          mare_chromite_pct: <1
+        note: Pie labels read from 200 dpi render of Abb. 2.2. MinerU HTML pie dump was rejected. P2O5
+          and MnO are absent from the pie (true absence on the figure). Prose K2O 0.82 vs pie 0.8 retained
+          as competing printed values; not averaged.
+      uncertainty:
+        note: no uncertainty printed on the pie; prose K2O 0.82 vs pie 0.8 is source rounding, not transcription
+          error
+    - observation_id: sauerborn_2005_table41_sample_inventory
+      type: rate_series
+      locator:
+        table: '4.1'
+        page: 51
+      T_range_K: null
+      phase: JSC-1_and_simple_oxides_as_loaded
+      regime: solar_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: sample_and_holder_inventory
+        jsc1_powder_mass_g_range:
+        - 0.6
+        - 7.8
+        jsc1_pellet_mass_mg_range:
+        - 40
+        - 180
+        jsc1_holder: plasmagespritzte Aluminiumoxidkeramik (Schale or Tiegel)
+        jsc1_glass_mixture_melting_C_as_published: 1265
+        reference_oxides:
+          SiO2:
+            purity_wt_pct: 99.5
+            mp_C: 1710
+          CaO:
+            purity_wt_pct: 99.95
+            mp_C: 2572
+          ZnO:
+            purity_wt_pct: 99.99
+            mp_C: 1975
+        note: JSC-1 chemism points to Kapitel 2.1.2 / Abb. 2.2 rather than reprinting numbers.
+      uncertainty:
+        note: none printed
+      equipment:
+        cell_material:
+          value: plasmagespritzte Aluminiumoxidkeramik (Schale or Tiegel) for powder JSC-1; Tantal Drahttraeger
+            for pellets
+          locator:
+            page: 51
+            table: '4.1'
     - observation_id: sauerborn_2005_table53_jsc1_run_log
       type: rate_series
       locator:
@@ -136,7 +321,8 @@ species:
       units: as_published
       values:
         quantity: jsc1_run_surface_temperature_log
-        headers_as_published: 'maximale Probentemperatur (Tmax) | Probenmasse | Bestrahlungsdauer der Hochtemperaturphase (Shutter > 10 % geöffnet)'
+        headers_as_published: maximale Probentemperatur (Tmax) | Probenmasse | Bestrahlungsdauer der Hochtemperaturphase
+          (Shutter > 10 % geöffnet)
         MS1_Tmax_C: 1542
         MS2_Tmax_C: 1563
         MS4_Tmax_C: 1425
@@ -163,7 +349,8 @@ species:
           high_T_duration_s: 174
           t_above_1400_C_s: 45
         pO2_as_published: not_independently_controlled
-        note: Full heating/cooling-rate grid is in tables.md. Tmax vs Tabelle 5.8 contradiction preserved on the 5.8 observation.
+        note: Full heating/cooling-rate grid is in tables.md. Tmax vs Tabelle 5.8 contradiction preserved
+          on the 5.8 observation.
       uncertainty:
         note: IR-camera surface temperatures; no printed sigma on Tmax
       equipment:
@@ -178,6 +365,99 @@ species:
           locator:
             page: 68
             table: '5.1'
+    - observation_id: sauerborn_2005_table53_heating_cooling_grid
+      type: rate_series
+      locator:
+        table: '5.3'
+        page: 79
+        note: full t(Tmax>T) and Aufheiz-/Abkühlraten grid; parent row keeps selected Tmax/mass/duration
+          only
+      T_range_K:
+      - 1698.15
+      - 1853.15
+      phase: JSC-1_solar_furnace_melt
+      regime: solar_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: jsc1_run_heating_cooling_grid
+        headers_as_published: maximale Probentemperatur (Tmax) | Probenmasse | Bestrahlungsdauer der Hochtemperaturphase
+          (Shutter > 10 % geöffnet) | t(Tmax>T) | Aufheiz-/Abkühlraten
+        T_conversion_comment: T_K = T_C + 273.15 (1542 C = 1815.15 K; 1563 C = 1836.15 K; 1425 C = 1698.15
+          K; 1580 C = 1853.15 K)
+        runs:
+        - id: MS1
+          Tmax_C: 1542
+          Tmax_K: 1815.15
+          mass_g: 0.717
+          high_T_duration_s: 77
+          t_above_800_C_s: 195
+          t_above_1000_C_s: 105
+          t_above_1200_C_s: 55
+          t_above_1400_C_s: 31
+          heat_TVH_to_800_C_per_s: 58.9
+          heat_TVH_to_1000_C_per_s: 58.9
+          heat_TVH_to_Tmax_C_per_s: 13.1
+          heat_max_C_per_s: 58.9
+          cool_shutter_to_1000_C_per_s: -16.4
+          cool_shutter_to_800_C_per_s: -6.1
+          cool_shutter_to_600_C_per_s: -3.1
+          cool_max_C_per_s: -57.6
+        - id: MS2
+          Tmax_C: 1563
+          Tmax_K: 1836.15
+          mass_g: 0.991
+          high_T_duration_s: 55
+          t_above_800_C_s: 96
+          t_above_1000_C_s: 60
+          t_above_1200_C_s: 40
+          t_above_1400_C_s: 30
+          heat_TVH_to_800_C_per_s: 62.5
+          heat_TVH_to_1000_C_per_s: 62.5
+          heat_TVH_to_Tmax_C_per_s: 51.2
+          heat_max_C_per_s: 92.5
+          cool_shutter_to_1000_C_per_s: -38.3
+          cool_shutter_to_800_C_per_s: -16.8
+          cool_shutter_to_600_C_per_s: -5.7
+          cool_max_C_per_s: -87.5
+        - id: MS4
+          Tmax_C: 1425
+          Tmax_K: 1698.15
+          mass_g: 1.002
+          high_T_duration_s: 38
+          t_above_800_C_s: 157
+          t_above_1000_C_s: 43
+          t_above_1200_C_s: 25
+          t_above_1400_C_s: 10
+          heat_TVH_to_800_C_per_s: 70.0
+          heat_TVH_to_1000_C_per_s: 46.3
+          heat_TVH_to_Tmax_C_per_s: 21.8
+          heat_max_C_per_s: 70.0
+          cool_shutter_to_1000_C_per_s: -32.1
+          cool_shutter_to_800_C_per_s: -5.2
+          cool_shutter_to_600_C_per_s: -1.0
+          cool_max_C_per_s: -75.0
+        - id: MS5
+          Tmax_C: 1580
+          Tmax_K: 1853.15
+          mass_g: 7.856
+          high_T_duration_s: 174
+          t_above_800_C_s: 251
+          t_above_1000_C_s: 173
+          t_above_1200_C_s: 100
+          t_above_1400_C_s: 45
+          heat_TVH_to_800_C_per_s: 17.6
+          heat_TVH_to_1000_C_per_s: 8.1
+          heat_TVH_to_Tmax_C_per_s: 6.1
+          heat_max_C_per_s: 27.3
+          cool_shutter_to_1000_C_per_s: -9.8
+          cool_shutter_to_800_C_per_s: -7.4
+          cool_shutter_to_600_C_per_s: -1.1
+          cool_max_C_per_s: -38.4
+        preheat_Tmax_C: zwischen 500 °C und 600 °C
+        note: IR-camera surface temperatures. Tmax vs Tabelle 5.8 contradiction (MS1 1542 vs 1560 C) preserved
+          on the 5.8 observation.
+      uncertainty:
+        note: IR-camera surface temperatures; no printed sigma on Tmax
     - observation_id: sauerborn_2005_table54_ms1_cold_trap_edx
       type: rate_series
       locator:
@@ -192,19 +472,39 @@ species:
       units: atom_percent_excluding_oxygen
       values:
         quantity: cold_trap_edx_atom_pct
-        headers_as_published: 'Na Mg Al Si P K Ca Ti Fe Cu (Atom.%; ohne Sauerstoffanteil)'
+        headers_as_published: Na Mg Al Si P K Ca Ti Fe Cu (Atom.%; ohne Sauerstoffanteil)
         MS1_foil_Na_atom_pct_mean: 9.6
         foil_without_splashes:
-          Na: {mean: 9.6, sd: 1.7}
-          Mg: {mean: 0.3, sd: 0.1}
-          Al: {mean: 0.4, sd: 0.1}
-          Si: {mean: 0.4, sd: 0.0}
-          P: {mean: 1.2, sd: 0.0}
-          K: {mean: 0.1, sd: 0.0}
-          Ca: {mean: 0.1, sd: 0.0}
-          Ti: {mean: 0.1, sd: 0.0}
-          Fe: {mean: 0.4, sd: 0.1}
-          Cu: {mean: 87.6, sd: 2.1}
+          Na:
+            mean: 9.6
+            sd: 1.7
+          Mg:
+            mean: 0.3
+            sd: 0.1
+          Al:
+            mean: 0.4
+            sd: 0.1
+          Si:
+            mean: 0.4
+            sd: 0.0
+          P:
+            mean: 1.2
+            sd: 0.0
+          K:
+            mean: 0.1
+            sd: 0.0
+          Ca:
+            mean: 0.1
+            sd: 0.0
+          Ti:
+            mean: 0.1
+            sd: 0.0
+          Fe:
+            mean: 0.4
+            sd: 0.1
+          Cu:
+            mean: 87.6
+            sd: 2.1
         splashes:
           Na: 42.0
           Mg: 0.4
@@ -222,6 +522,128 @@ species:
         note: Copper foil; Cu is substrate. Oxygen omitted from the table by author.
       uncertainty:
         note: printed Standardabweichung on foil means; splash is a single Wert
+    - observation_id: sauerborn_2005_table54_blank_foil_edx
+      type: rate_series
+      locator:
+        table: '5.4'
+        page: 85
+        note: unbehandelte Folie / blank foil block
+      T_range_K:
+      - 1815.15
+      - 1815.15
+      phase: JSC-1_MS1_cold_trap_deposit
+      regime: solar_vacuum_pyrolysis_condensation
+      units: atom_percent_excluding_oxygen
+      values:
+        quantity: blank_foil_edx_atom_pct
+        blank_foil:
+          Na:
+            mean: 0.6
+            sd: 0.6
+          Mg:
+            mean: 0.1
+            sd: 0.1
+          Al:
+            mean: 0.3
+            sd: 0.2
+          Si:
+            mean: 0.1
+            sd: 0.1
+          P:
+            mean: 0.1
+            sd: 0.1
+          K:
+            mean: 0.0
+            sd: 0.0
+          Ca:
+            mean: 0.1
+            sd: 0.1
+          Ti:
+            mean: 0.0
+            sd: 0.0
+          Fe:
+            mean: 0.1
+            sd: 0.1
+          Cu:
+            mean: 98.6
+            sd: 3.5
+        blank_foil_Na_mean: 0.6
+        note: Copper foil blank from Tabelle 5.4. Values > 1 atom% lie in background noise per caption,
+          except the Na/P enrichment on the exposed foil.
+      uncertainty:
+        note: printed Standardabweichung on blank-foil means
+    - observation_id: sauerborn_2005_table55_ms2_cold_trap_edx
+      type: rate_series
+      locator:
+        table: '5.5'
+        page: 91
+      T_range_K:
+      - 1836.15
+      - 1836.15
+      phase: JSC-1_MS2_cold_trap_deposit
+      regime: solar_vacuum_pyrolysis_condensation
+      units: atom_percent
+      values:
+        quantity: cold_trap_edx_atom_pct
+        headers_as_published: O Na Mg Al Si P K Ca Ti Fe Ta
+        MS2_foil_Na_atom_pct_mean: 3.5
+        untreated_foil_mean:
+          O: 17.4
+          Na: 0.3
+          Mg: 0
+          Al: 0
+          Si: dash_Ta_overlap
+          P: 0.8
+          K: 0.2
+          Ca: 0.1
+          Ti: 0
+          Fe: 0.1
+          Ta: 81.1
+        untreated_foil_sd:
+          O: 1.3
+          Na: 0.2
+          Mg: 0
+          Al: 0
+          Si: dash_Ta_overlap
+          P: 0.4
+          K: 0.2
+          Ca: 0.1
+          Ti: 0
+          Fe: 0.1
+          Ta: 1.5
+        MS2_foil_mean:
+          O: 39.4
+          Na: 3.5
+          Mg: 0
+          Al: 0
+          Si: dash_Ta_overlap
+          P: 1.3
+          K: 0.3
+          Ca: 0.2
+          Ti: 0.1
+          Fe: 0.1
+          Ta: 55.0
+        MS2_foil_sd:
+          O: 5.2
+          Na: 1.1
+          Mg: 0
+          Al: 0
+          Si: dash_Ta_overlap
+          P: 0.3
+          K: 0.1
+          Ca: 0.1
+          Ti: 0.1
+          Fe: 0.2
+          Ta: 6.0
+        Ta_mean_as_published: '55.'
+        Si_as_published: '-'
+        Si_note: 'footnote 10: Si lines overlapped by dominant Ta; no concrete value for a weak Si signal'
+        Tmax_C_from_table53: 1563
+        scans_exclude_splashes: true
+        note: 'Tantalum foil. Caption: values > 1 atom% lie in background-noise error except the stated
+          Na (and possible P) rise and the O/Ta oxidation of the foil.'
+      uncertainty:
+        note: printed Standardabweichung; Si is a dash (true absence), not 0
     - observation_id: sauerborn_2005_table58_outgassing_peaks
       type: rate_series
       locator:
@@ -236,7 +658,8 @@ species:
       units: as_published
       values:
         quantity: ausheiz_peak_duration_and_pressure_ratio
-        headers_as_published: 'Probe | Masse [g] | max. Temp. [°C] | Halbwertsbreite* der Ausheiz-Peaks | Verhältnis zwischen Peak-Höhe und Basisdruck'
+        headers_as_published: Probe | Masse [g] | max. Temp. [°C] | Halbwertsbreite* der Ausheiz-Peaks
+          | Verhältnis zwischen Peak-Höhe und Basisdruck
         runs:
         - id: leerer_Probentraeger
           mass_g: null
@@ -266,6 +689,379 @@ species:
         note: Bound >571 s stays a bound.
       uncertainty:
         note: none printed
+    - observation_id: sauerborn_2005_fig523_ms1_epma_glass
+      type: gibbs_table
+      locator:
+        figure: '5.23'
+        page: 83
+      T_range_K:
+      - 1815.15
+      - 1815.15
+      phase: JSC-1_MS1_basalt_glass
+      condensed_form:
+        state: quenched_fully_molten_glass
+        metastable: false
+        basis: explicit_author
+        note: MS1 fully molten; EMPA of basalt glass at cooler lower rim (pts 1-3) vs hotter upper rim
+          (pts 4-6).
+      regime: post_run_microprobe
+      units: wt_percent
+      values:
+        quantity: epma_glass_spot_series_digitised
+        caption_as_published: Elektronenstrahl-Mikrosonden Analysen der Probe MS1 an verschiedenen Stellen
+          des Basaltglases. Gegenüber den Messpunkten im kühleren unteren Bereich (im Diagramm links)
+          scheinen die Stellen im heißeren oberen Bereich deutlich verarmt an Natrium, Kalium und Phosphor
+          zu sein.
+        caption_en: Electron-microprobe analyses of sample MS1 at various locations in the basalt glass.
+          Relative to the measurement points in the cooler lower region (left in the diagram), the locations
+          in the hotter upper region appear clearly depleted in sodium, potassium and phosphorus.
+        axis_labels_as_published:
+          x: Messung Nr.
+          x_en: measurement no.
+          y: Gew.%
+          y_en: wt%
+        SUM_printed:
+        - 103.4
+        - 101.3
+        - 101.9
+        - 101.4
+        - 100.7
+        - 100.5
+        positions:
+        - Probenrand Unten
+        - Probenrand Unten
+        - Probenrand Unten
+        - Probenrand Oben
+        - Probenrand Oben
+        - Probenrand Oben
+        Na2O_digitised_wt_pct:
+        - 3.16
+        - 2.96
+        - 2.61
+        - 0.38
+        - 0.43
+        - 0.38
+        K2O_digitised_wt_pct:
+        - 0.71
+        - 0.73
+        - 0.64
+        - 0.15
+        - 0.15
+        - 0.16
+        P2O5_digitised_wt_pct:
+        - 0.78
+        - 0.56
+        - 0.5
+        - 0.12
+        - null
+        - null
+        P2O5_pt_4: on_chart_above_0.1_axis
+        P2O5_pts_5_to_6: below_0.1_axis_true_drop_not_zero_fill
+        FeO_digitised_wt_pct:
+        - 10.1
+        - 10.2
+        - 10.1
+        - 10.1
+        - 10.0
+        - 10.0
+        SiO2_digitised_wt_pct:
+        - 50.6
+        - 49.6
+        - 50.1
+        - 51.6
+        - 51.6
+        - 51.4
+        digitization_error_dex_log_axis: 0.08
+        SUM_digitization_error: 0.0
+        digitization:
+          dpi: 300
+          pdf_page: 83
+          render_px:
+            width: 2480
+            height: 3509
+          x_ticks:
+          - label: '0'
+            value: 0
+            px:
+            - 459
+            - 2605
+          - label: '1'
+            value: 1
+            px:
+            - 707
+            - 2605
+          - label: '2'
+            value: 2
+            px:
+            - 955
+            - 2605
+          - label: '3'
+            value: 3
+            px:
+            - 1203
+            - 2605
+          - label: '4'
+            value: 4
+            px:
+            - 1451
+            - 2605
+          - label: '5'
+            value: 5
+            px:
+            - 1699
+            - 2605
+          - label: '6'
+            value: 6
+            px:
+            - 1946
+            - 2605
+          - label: '7'
+            value: 7
+            px:
+            - 2195
+            - 2605
+          y_ticks_pass1:
+          - label: '100'
+            log10: 2.0
+            px:
+            - 459
+            - 1888
+          - label: '10'
+            log10: 1.0
+            px:
+            - 459
+            - 2127
+          - label: '1'
+            log10: 0.0
+            px:
+            - 459
+            - 2366
+          - label: '0.1'
+            log10: -1.0
+            px:
+            - 459
+            - 2605
+          y_ticks_pass2:
+          - label: '1000'
+            log10: 3.0
+            px:
+            - 459
+            - 1648
+          - label: '10'
+            log10: 1.0
+            px:
+            - 1800
+            - 2127
+          px_per_x_unit: 248.0
+          px_per_decade_pass1: 239.0
+          px_per_decade_pass2: 239.5
+          pass1_map: log10(Gew.%) = 2 - (y_px - 1888)/239  (ticks 100 and 0.1)
+          pass2_map: log10(Gew.%) = 3 - (y_px - 1648)/239.5  (ticks 1000 and 10)
+          note: Labelled ticks, not frame-as-data. SUM open squares at x=707/955/1203/1450/1699/1946 confirm
+            integer Messung 1-6. P2O5 green diamond at Messung 4 is above the 0.1 grid; Messung 5-6 have
+            no P2O5 marker (line leaves the frame).
+        points_pixel_pass1:
+          Na2O_y_px:
+          - 2246.5
+          - 2253.5
+          - 2266.3
+          - 2466.8
+          - 2453.2
+          - 2466.1
+          K2O_y_px:
+          - 2402.0
+          - 2398.8
+          - 2412.6
+          - 2561.1
+          - 2561.0
+          - 2558.1
+          P2O5_y_px:
+          - 2391.6
+          - 2425.7
+          - 2437.7
+          - 2582.7
+          - null
+          - null
+          FeO_y_px:
+          - 2126.4
+          - 2125.4
+          - 2126.1
+          - 2126.0
+          - 2127.3
+          - 2127.0
+          SiO2_y_px:
+          - 1958.7
+          - 1960.7
+          - 1959.7
+          - 1956.7
+          - 1956.7
+          - 1957.0
+        residual_dex_vs_pass2:
+          Na2O:
+          - -0.001
+          - -0.0011
+          - -0.0012
+          - -0.003
+          - -0.0028
+          - -0.003
+          K2O:
+          - -0.0024
+          - -0.0024
+          - -0.0025
+          - -0.0038
+          - -0.0038
+          - -0.0038
+          P2O5:
+          - -0.0023
+          - -0.0026
+          - -0.0027
+          - -0.004
+          - null
+          - null
+          FeO:
+          - 0.0
+          - 0.0
+          - 0.0
+          - 0.0
+          - 0.0
+          - 0.0
+          SiO2:
+          - 0.0015
+          - 0.0015
+          - 0.0015
+          - 0.0015
+          - 0.0015
+          - 0.0015
+        max_abs_residual_dex_vs_pass2: 0.004
+        note: 'SUM boxes are printed. Oxide traces digitised from 300 dpi log-y render using labelled
+          decade ticks. P2O5 Messung 4 is on-chart at 0.12 wt% (green diamond above the 0.1 grid). P2O5
+          Messung 5-6 have no marker; stored absent, not 0. Author: hot upper rim depleted in Na, K, P.
+          Every stored point''s pass-2 residual is ≤0.004 dex (stated band ±0.08 dex).'
+      uncertainty:
+        note: no printed sigma; digitization_error_dex_log_axis 0.08 on oxide traces; SUM is printed;
+          pass-2 residual ≤0.004 dex
+    - observation_id: sauerborn_2005_fig532_rfa_oxide_ratio
+      type: gibbs_table
+      locator:
+        figure: '5.32'
+        page: 88
+      T_range_K:
+      - 1698.15
+      - 1853.15
+      phase: JSC-1_RFA_reoxidised_bulk
+      regime: post_run_xrf_after_1000C_flux_oxidation
+      units: dimensionless_ratio
+      values:
+        quantity: RFA_MO_over_Al2O3_ratio_relative_to_MS0
+        method_note: RFA pellets fused in flux at ca. 1000 C in air; sample is fully oxidised. Oxygen-loss
+          information is destroyed (author p. 63). Ratios are cation-oxide change, not reduced-residue
+          FeO/O.
+        companion_figure: '5.31'
+        companion_figure_status: log_bar_chart_figure_only_for_absolute_wt_pct; prose supplies MS0 Na2O
+          2.7 / K2O 0.82 / P2O5 0.66 wt%
+        Al2O3_ratio_by_construction: 1.0
+        ratios:
+          SiO2:
+            MS2: 0.955
+            MS4: 0.97
+            MS5: 0.99
+          TiO2:
+            MS2: 0.955
+            MS4: 0.94
+            MS5: 0.985
+          Al2O3:
+            MS2: 1.0
+            MS4: 1.0
+            MS5: 1.0
+          Fe2O3:
+            MS2: 0.955
+            MS4: 0.945
+            MS5: 0.965
+          MgO:
+            MS2: 0.95
+            MS4: 0.93
+            MS5: 0.985
+          MnO:
+            MS2: 0.93
+            MS4: 0.925
+            MS5: 0.97
+          CaO:
+            MS2: 0.93
+            MS4: 0.94
+            MS5: 0.965
+          Na2O:
+            MS2: 0.59
+            MS4: 0.7
+            MS5: 0.7
+          K2O:
+            MS2: 0.68
+            MS4: 0.75
+            MS5: 0.75
+          P2O5:
+            MS2: 0.57
+            MS4: 0.7
+            MS5: 0.7
+        prose_MS2_volatile_reduction_pct:
+          range:
+          - 32
+          - 43
+          locator:
+            page: 89
+        prose_MS2_refractory_reduction_pct:
+          range:
+          - 5
+          - 7
+          locator:
+            page: 89
+        digitization_error_linear: 0.02
+        note: Digitised from 200 dpi linear 0.5-1.2 axis (minor grid 0.02). Abb. 5.31 log bars not used
+          as absolute wt%.
+        caption_as_published: Auswertung der Daten der RFA in Abbildung 5.31. Zu sehen ist das Veränderungsverhältnis
+          der einzelnen Oxidanteile (MO) bezüglich Al2O3 zwischen den verschiedenen bestrahlten Proben
+          und dem Ausgangsmaterial (MS0).
+        caption_en: Evaluation of the XRF data in Figure 5.31. Shown is the change ratio of the individual
+          oxide fractions (MO) with respect to Al2O3 between the various irradiated samples and the starting
+          material (MS0).
+        axis_labels_as_published:
+          x: SiO2, TiO2, Al2O3, Fe2O3, MgO, MnO, CaO, Na2O, K2O, P2O5
+          y: (MO/Al2O3)Probe / (MO/Al2O3)Ausgangsmaterial  [-]
+          y_en: (MO/Al2O3)_sample / (MO/Al2O3)_starting_material  [dimensionless]
+        digitization:
+          dpi: 300
+          pdf_page: 88
+          render_px:
+            width: 2480
+            height: 3509
+          y_ticks_pass1:
+          - label: '1.2'
+            value: 1.2
+            px:
+            - 577
+            - 2232
+          - label: '1.0'
+            value: 1.0
+            px:
+            - 577
+            - 2515
+          y_ticks_pass2:
+          - label: '1.1'
+            value: 1.1
+            px:
+            - 577
+            - 2374
+          - label: '0.9'
+            value: 0.9
+            px:
+            - 577
+            - 2656
+          px_per_unit_pass1: 1415.0
+          px_per_unit_pass2: 1410.0
+          note: Linear y; bars hang from 1.0. 300 dpi labelled ticks 1.2 (y=2232) and 1.0 (y=2515) give
+            1415 px/unit (pass 1). Pass 2 uses 1.1 (y=2374) and 0.9 (y=2656) at 1410 px/unit. Stored Na2O/K2O/P2O5
+            MS2 bottoms 0.59/0.68/0.57 re-read on pass-1 ticks (Δ 0.00 vs stored). Stated band ±0.02 linear.
+      uncertainty:
+        note: 'RFA error stated elsewhere as <1 % for good analyses (p. 142: ''Der Fehler liegt bei guten
+          Analysen unter 1 %.''); digitization_error_linear 0.02 on the ratio plot'
     - observation_id: sauerborn_2005_qms_traces_figure_only_blocked
       type: rate_series
       locator:
@@ -282,9 +1078,118 @@ species:
       values:
         quantity: qms_partial_pressure_time_series
         status: typed_refusal
-        reason: QMS/IR traces are figures. MinerU markdown dumps of those figures rejected. No printed p_i(T) table.
+        reason: QMS/IR traces are figures. MinerU markdown dumps of those figures rejected. No printed
+          p_i(T) table.
         admission_status: rejected_no_figure_reading
         semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+    - observation_id: sauerborn_2005_table32_qms_masses
+      type: rate_series
+      locator:
+        table: '3.2'
+        page: 44
+      T_range_K: null
+      phase: qms_mass_assignment
+      regime: qms_chamber
+      units: u
+      values:
+        quantity: qms_mass_to_species_assignment
+        qms_masses_table_32:
+          '2': H2
+          '14': N
+          '16': O
+          '17': OH
+          '18': H2O
+          '28': N2, CO, Si
+          '32': O2
+          '40': Ar, Ca
+          '43': AlO
+          '44': CO2, SiO
+          '56': Fe, CaO
+          '72': FeO
+        qms_masses_locator:
+          page: 44
+          table: '3.2'
+        note: Tabelle 3.2 mass-to-species map. Per-run QMS/IR time-series figures remain figure-only on
+          sauerborn_2005_qms_traces_figure_only_blocked.
+      uncertainty:
+        note: not applicable
+    - observation_id: sauerborn_2005_true_absence_alpha_gamma_psat
+      type: rate_series
+      locator:
+        page: 67
+        paragraph: Kapitel 5 Ergebnisse und Diskussion
+        note: full-paper audit of tables 2.1-2.3, 3.1-3.3, 4.1, 5.1-5.8, 7.1-7.3 and figures 1.1-7.21
+      T_range_K:
+      - 1473.15
+      - 1853.15
+      phase: JSC-1_solar_furnace_melt
+      regime: solar_vacuum_pyrolysis
+      units: none
+      values:
+        quantity: true_absence_ledger
+        status: typed_refusal
+        semantics: bound_not_point_ordering
+        equilibrium_partial_pressure_Na_Fe_O2: true_absence
+        activity_coefficient_gamma: true_absence
+        kinetic_alpha: true_absence
+        note: This dissertation is solar-furnace vacuum pyrolysis with chamber QMS, not Knudsen effusion.
+          No tabulated p_i(T) over the melt, no gamma, no Hertz-Knudsen alpha. Abb. 2.5 is DeMaria 1971
+          (foreign; already kems-022). Abb. 2.6 is Senior 1993 calculated Mare-regolith partial pressures
+          (model). Abb. 7.8 is Ede 86 compilation vapour-pressure curves. Chamber QMS p_O2 in Abb. 5.55/5.56
+          is baseline-normalised process gas, not melt equilibrium Psat.
+      uncertainty:
+        note: not applicable
+    - observation_id: sauerborn_2005_completeness_ledger
+      type: rate_series
+      locator:
+        page: 4
+        paragraph: Inhaltsverzeichnis
+      T_range_K: null
+      phase: full_dissertation
+      regime: audit
+      units: none
+      values:
+        quantity: table_and_figure_completeness
+        status: typed_refusal
+        semantics: bound_not_point_ordering
+        tables:
+          '2.1': extracted (Heiken/Vaniman 1991 compilation)
+          '2.2': extracted (Heiken/Vaniman 1991 compilation)
+          '2.3': true_absence_of_numeric_thermo (process-list proxy, not transcribed as observation)
+          '3.1': equipment_only (pump stands)
+          '3.2': equipment (QMS masses) stored on sauerborn_2005_table32_qms_masses
+          '3.3': equipment_only (gauges)
+          '4.1': extracted (sample/holder inventory)
+          '5.1': parent selected Tmax/mass/peaks; full t(T)/pressure grid on sauerborn_2005_table51_oxide_reference_full_grid
+            (ZnO t>800 C cell ILLEGIBLE)
+          '5.2': extracted
+          '5.3': parent selected Tmax/mass/duration; full heating/cooling grid on sauerborn_2005_table53_heating_cooling_grid
+          '5.4': extracted
+          '5.5': extracted
+          '5.6': parent selected spots 1/4/7; full 29-spot EMPA grid on sauerborn_2005_table56_ms5c_epma_full_grid
+          '5.7': extracted (qualitative ranking, not a measurement)
+          '5.8': extracted
+          '7.1': compilation_proxy (pyroxene classification; not extracted)
+          '7.2': compilation_proxy (high-T metals handbook; not extracted)
+          '7.3': equipment_only
+        figures_improving_battery:
+        - '2.2'
+        - '5.23'
+        - '5.32'
+        - '5.55'
+        - '5.56'
+        figures_model_or_foreign_proxy:
+          '2.5': DeMaria 1971 Knudsen-cell P(T) — foreign; use kems-022
+          '2.6': Senior 1993 calculated Mare-regolith partial pressures — model
+          '7.8': Ede 86 element vapour-pressure curves — compilation
+          '4.8': QMS 16u:32u calibration figure — figure-only
+        figures_figure_only: 1.1, 2.1, 2.3-2.4, 2.7-2.16, 3.1-3.13, 4.1-4.7, 4.9-4.14, 5.1-5.22, 5.24-5.30,
+          5.31 (absolute wt% log bars), 5.33-5.54, 5.57-5.64, 7.1-7.7, 7.9-7.21
+        unseen_tables: none — all numbered tables in the 151-page primary were seen
+        supplement: true_absence (no separate supplement; ULB Bonn electronic dissertation is the full
+          text)
       uncertainty:
         note: not applicable
   Fe:
@@ -308,8 +1213,9 @@ species:
       units: wt_percent
       values:
         quantity: epma_spot_analyses_wt_pct
-        headers_as_published: 'Nr. | SiO2 | TiO2 | Al2O3 | Cr2O3 | FeO | MnO | MgO | CaO | Na2O | NiO | Σ | Mineral | Detail-Info'
-        caption_as_published: 'Alle Angaben in Gew.%.'
+        headers_as_published: Nr. | SiO2 | TiO2 | Al2O3 | Cr2O3 | FeO | MnO | MgO | CaO | Na2O | NiO |
+          Σ | Mineral | Detail-Info
+        caption_as_published: Alle Angaben in Gew.%.
         spots_as_published_in_tables_md: true
         selected_spots:
         - Nr: 4
@@ -337,6 +1243,494 @@ species:
         note: Full 29-spot grid is in tables.md. Σ ≠ 100 and FeO 112.52 are printed mixed analyses.
       uncertainty:
         note: none printed; mixed-analysis sums >100 are source format, not transcription error
+    - observation_id: sauerborn_2005_table56_ms5c_epma_full_grid
+      type: gibbs_table
+      locator:
+        table: '5.6'
+        page: 103
+      T_range_K:
+      - 1853.15
+      - 1853.15
+      phase: JSC-1_MS5c_residue_polished_section
+      condensed_form:
+        state: quenched_partially_molten_residue
+        metastable: false
+        basis: explicit_author
+        note: EMPA of MS5c cross-section; mixed analyses print FeO > 100 wt%. Not a bulk melt composition.
+          MS5 melted fraction 43 wt% (prose p. 98); residual granulate 54 wt% in Abb. 5.47 caption.
+      regime: post_run_microprobe
+      units: wt_percent
+      values:
+        quantity: epma_spot_analyses_wt_pct_full_grid
+        headers_as_published: Nr. | SiO2 | TiO2 | Al2O3 | Cr2O3 | FeO | MnO | MgO | CaO | Na2O | NiO |
+          Σ | Mineral | Detail-Info
+        caption_as_published: Alle Angaben in Gew.%.
+        spot4_SiO2: 40.34
+        spots:
+        - Nr: 1
+          SiO2: 0.06
+          TiO2: 0.1
+          Al2O3: 0.06
+          Cr2O3: 11.75
+          FeO: 112.52
+          MnO: 0.05
+          MgO: 0.0
+          CaO: 0.0
+          Na2O: 0.0
+          NiO: 0.02
+          sum: 124.6
+          mineral: Mischanalyse
+          detail: Fe mit Chromit
+        - Nr: 2
+          SiO2: 0.17
+          TiO2: 49.85
+          Al2O3: 0.52
+          Cr2O3: 0.01
+          FeO: 39.91
+          MnO: 1.47
+          MgO: 5.09
+          CaO: 0.21
+          Na2O: 0.05
+          NiO: 0.0
+          sum: 97.3
+          mineral: Ilmenit
+          detail: null
+        - Nr: 3
+          SiO2: 19.29
+          TiO2: 2.44
+          Al2O3: 8.14
+          Cr2O3: 0.33
+          FeO: 53.91
+          MnO: 0.27
+          MgO: 4.15
+          CaO: 3.66
+          Na2O: 1.41
+          NiO: 0.07
+          sum: 93.7
+          mineral: Mischanalyse
+          detail: mit Fe3+?
+        - Nr: 4
+          SiO2: 40.34
+          TiO2: 0.03
+          Al2O3: 0.02
+          Cr2O3: 0.02
+          FeO: 15.39
+          MnO: 0.22
+          MgO: 42.79
+          CaO: 0.23
+          Na2O: 0.02
+          NiO: 0.18
+          sum: 99.2
+          mineral: Olivin
+          detail: Fo17-Fa83
+        - Nr: 5
+          SiO2: 22.21
+          TiO2: 0.74
+          Al2O3: 14.9
+          Cr2O3: 12.42
+          FeO: 23.55
+          MnO: 0.25
+          MgO: 31.73
+          CaO: 0.2
+          Na2O: 0.0
+          NiO: 0.12
+          sum: 106.1
+          mineral: Mischanalyse
+          detail: null
+        - Nr: 6
+          SiO2: 43.0
+          TiO2: 2.91
+          Al2O3: 23.42
+          Cr2O3: 0.04
+          FeO: 22.06
+          MnO: 0.16
+          MgO: 1.87
+          CaO: 9.76
+          Na2O: 3.87
+          NiO: 0.0
+          sum: 107.1
+          mineral: Mischanalyse
+          detail: null
+        - Nr: 7
+          SiO2: 50.61
+          TiO2: 0.08
+          Al2O3: 30.06
+          Cr2O3: 0.01
+          FeO: 0.78
+          MnO: 0.0
+          MgO: 0.17
+          CaO: 14.24
+          Na2O: 3.2
+          NiO: 0.01
+          sum: 99.2
+          mineral: Plagioklas
+          detail: An71-Al29
+        - Nr: 8
+          SiO2: 39.29
+          TiO2: 4.31
+          Al2O3: 12.1
+          Cr2O3: 0.05
+          FeO: 30.89
+          MnO: 0.27
+          MgO: 3.92
+          CaO: 4.99
+          Na2O: 3.85
+          NiO: 0.02
+          sum: 99.7
+          mineral: Mischanalyse
+          detail: null
+        - Nr: 9
+          SiO2: 0.39
+          TiO2: 7.67
+          Al2O3: 16.76
+          Cr2O3: 8.99
+          FeO: 52.76
+          MnO: 0.4
+          MgO: 7.37
+          CaO: 0.34
+          Na2O: 0.02
+          NiO: 0.02
+          sum: 94.7
+          mineral: Mischanalyse
+          detail: Spinell-Mix
+        - Nr: 10
+          SiO2: 6.12
+          TiO2: 0.68
+          Al2O3: 30.44
+          Cr2O3: 15.49
+          FeO: 23.88
+          MnO: 0.19
+          MgO: 16.72
+          CaO: 0.08
+          Na2O: 0.04
+          NiO: 0.15
+          sum: 93.8
+          mineral: Mischanalyse
+          detail: Spinell-Mix
+        - Nr: 11
+          SiO2: 0.19
+          TiO2: 1.14
+          Al2O3: 30.56
+          Cr2O3: 20.05
+          FeO: 29.25
+          MnO: 0.42
+          MgO: 12.2
+          CaO: 0.25
+          Na2O: 0.0
+          NiO: 0.13
+          sum: 94.2
+          mineral: Mischanalyse
+          detail: Spinell-Mix
+        - Nr: 12
+          SiO2: 22.15
+          TiO2: 3.42
+          Al2O3: 16.82
+          Cr2O3: 5.78
+          FeO: 45.13
+          MnO: 0.2
+          MgO: 5.22
+          CaO: 4.19
+          Na2O: 1.99
+          NiO: 0.06
+          sum: 104.9
+          mineral: Mischanalyse
+          detail: Fe?
+        - Nr: 42
+          SiO2: 14.9
+          TiO2: 4.99
+          Al2O3: 10.27
+          Cr2O3: 0.34
+          FeO: 59.25
+          MnO: 0.28
+          MgO: 6.22
+          CaO: 2.67
+          Na2O: 1.55
+          NiO: 0.06
+          sum: 100.5
+          mineral: Mischanalyse
+          detail: Fe?
+        - Nr: 43
+          SiO2: 13.94
+          TiO2: 5.29
+          Al2O3: 7.74
+          Cr2O3: 0.1
+          FeO: 57.16
+          MnO: 0.31
+          MgO: 5.92
+          CaO: 2.72
+          Na2O: 1.07
+          NiO: 0.06
+          sum: 94.3
+          mineral: Mischanalyse
+          detail: mit Fe3+?
+        - Nr: 44
+          SiO2: 34.6
+          TiO2: 3.64
+          Al2O3: 11.66
+          Cr2O3: 0.2
+          FeO: 36.57
+          MnO: 0.26
+          MgO: 6.08
+          CaO: 6.92
+          Na2O: 2.03
+          NiO: 0.03
+          sum: 102.0
+          mineral: Mischanalyse
+          detail: '?'
+          sum_as_published: '102.'
+        - Nr: 45
+          SiO2: 15.15
+          TiO2: 5.84
+          Al2O3: 8.41
+          Cr2O3: 0.19
+          FeO: 60.74
+          MnO: 0.38
+          MgO: 5.24
+          CaO: 2.73
+          Na2O: 2.04
+          NiO: 0.04
+          sum: 100.7
+          mineral: Mischanalyse
+          detail: Fe?
+        - Nr: 46
+          SiO2: 50.45
+          TiO2: 0.09
+          Al2O3: 30.86
+          Cr2O3: 0.0
+          FeO: 0.85
+          MnO: 0.01
+          MgO: 0.22
+          CaO: 15.05
+          Na2O: 2.77
+          NiO: 0.0
+          sum: 100.3
+          mineral: Plagioklas
+          detail: An75-Al25
+        - Nr: 47
+          SiO2: 51.65
+          TiO2: 0.13
+          Al2O3: 30.9
+          Cr2O3: 0.02
+          FeO: 0.99
+          MnO: 0.0
+          MgO: 0.22
+          CaO: 15.06
+          Na2O: 3.04
+          NiO: 0.01
+          sum: 102.0
+          mineral: Plagioklas
+          detail: An73-Al27
+          sum_as_published: '102.'
+        - Nr: 48
+          SiO2: 51.18
+          TiO2: 0.09
+          Al2O3: 31.48
+          Cr2O3: 0.0
+          FeO: 0.76
+          MnO: 0.01
+          MgO: 0.2
+          CaO: 15.05
+          Na2O: 2.81
+          NiO: 0.0
+          sum: 101.6
+          mineral: Plagioklas
+          detail: An75-Al25
+        - Nr: 49
+          SiO2: 31.06
+          TiO2: 3.94
+          Al2O3: 10.32
+          Cr2O3: 0.09
+          FeO: 40.8
+          MnO: 0.29
+          MgO: 5.03
+          CaO: 5.83
+          Na2O: 2.34
+          NiO: 0.04
+          sum: 99.7
+          mineral: Mischanalyse
+          detail: null
+        - Nr: 50
+          SiO2: 30.79
+          TiO2: 4.09
+          Al2O3: 16.91
+          Cr2O3: 0.55
+          FeO: 41.29
+          MnO: 0.2
+          MgO: 2.8
+          CaO: 6.65
+          Na2O: 2.36
+          NiO: 0.04
+          sum: 105.7
+          mineral: Mischanalyse
+          detail: Fe?
+        - Nr: 51
+          SiO2: 24.14
+          TiO2: 5.73
+          Al2O3: 8.32
+          Cr2O3: 0.22
+          FeO: 54.96
+          MnO: 0.31
+          MgO: 6.61
+          CaO: 4.42
+          Na2O: 1.57
+          NiO: 0.04
+          sum: 106.3
+          mineral: Mischanalyse
+          detail: Fe?
+        - Nr: 52
+          SiO2: 30.97
+          TiO2: 4.87
+          Al2O3: 13.77
+          Cr2O3: 0.3
+          FeO: 47.4
+          MnO: 0.22
+          MgO: 5.51
+          CaO: 5.84
+          Na2O: 2.06
+          NiO: 0.02
+          sum: 111.0
+          mineral: Mischanalyse
+          detail: Fe?
+          sum_as_published: '111.'
+        - Nr: 53
+          SiO2: 52.28
+          TiO2: 0.24
+          Al2O3: 27.8
+          Cr2O3: 0.02
+          FeO: 1.42
+          MnO: 0.0
+          MgO: 0.53
+          CaO: 13.24
+          Na2O: 3.96
+          NiO: 0.01
+          sum: 99.5
+          mineral: Plagioklas
+          detail: An65-Al35
+        - Nr: 54
+          SiO2: 35.35
+          TiO2: 3.81
+          Al2O3: 10.55
+          Cr2O3: 0.33
+          FeO: 34.95
+          MnO: 0.28
+          MgO: 7.85
+          CaO: 7.31
+          Na2O: 1.5
+          NiO: 0.0
+          sum: 101.9
+          mineral: Mischanalyse
+          detail: null
+        - Nr: 55
+          SiO2: 10.19
+          TiO2: 5.7
+          Al2O3: 9.2
+          Cr2O3: 0.12
+          FeO: 64.21
+          MnO: 0.31
+          MgO: 6.67
+          CaO: 2.2
+          Na2O: 0.96
+          NiO: 0.1
+          sum: 99.6
+          mineral: Mischanalyse
+          detail: Fe?
+        - Nr: 56
+          SiO2: 48.6
+          TiO2: 2.72
+          Al2O3: 9.81
+          Cr2O3: 0.02
+          FeO: 15.62
+          MnO: 0.32
+          MgO: 8.08
+          CaO: 11.69
+          Na2O: 1.72
+          NiO: 0.0
+          sum: 98.6
+          mineral: Pyroxen
+          detail: null
+        - Nr: 57
+          SiO2: 46.35
+          TiO2: 2.66
+          Al2O3: 12.49
+          Cr2O3: 0.05
+          FeO: 16.62
+          MnO: 0.26
+          MgO: 8.37
+          CaO: 11.69
+          Na2O: 1.71
+          NiO: 0.0
+          sum: 100.2
+          mineral: dunkles Pyroxen
+          detail: Augit?
+        - Nr: 58
+          SiO2: 50.88
+          TiO2: 2.2
+          Al2O3: 13.97
+          Cr2O3: 0.0
+          FeO: 12.07
+          MnO: 0.19
+          MgO: 5.63
+          CaO: 10.28
+          Na2O: 3.11
+          NiO: 0.01
+          sum: 98.3
+          mineral: helles Pyroxen
+          detail: Augit?
+        n_spots: 29
+        sum_not_renormalized: true
+        note: Full 29-spot grid from pdftotext -layout of p. 103, certified on 150 dpi render. Σ ≠ 100
+          and FeO 112.52 are printed mixed analyses. Nr 44/47 Σ printed '102.'; Nr 52 Σ printed '111.'
+          Stored as 102.0 / 111.0.
+      uncertainty:
+        note: none printed; mixed-analysis sums >100 are source format, not transcription error
+    - observation_id: sauerborn_2005_table57_evidence_ranking
+      type: rate_series
+      locator:
+        table: '5.7'
+        page: 104
+      T_range_K:
+      - 1698.15
+      - 1853.15
+      phase: JSC-1_solar_furnace_melt
+      regime: author_qualitative_ranking
+      units: none
+      values:
+        quantity: author_evidence_ranking_for_O2_release
+        scale_as_published: '- keine Daten, 0 kein Hinweis, X mögliches Indiz, XX erster Hinweis, XXX
+          deutlicher Hinweis, XXXX eindeutiger Nachweis'
+        rows:
+        - id: MS1
+          QMS_O2: XXX
+          RFA: '-'
+          REM_image: XX
+          EDX_sample: '-'
+          EMPA: XX
+          REM_EDX_foil: X
+        - id: MS2
+          QMS_O2: XXX
+          RFA: X
+          REM_image: XX
+          EDX_sample: XX
+          EMPA: '-'
+          REM_EDX_foil: XX
+        - id: MS4
+          QMS_O2: XX
+          RFA: X
+          REM_image: XX
+          EDX_sample: X
+          EMPA: '0'
+          REM_EDX_foil: X
+        - id: MS5
+          QMS_O2: XXX
+          RFA: X
+          REM_image: XX
+          EDX_sample: XX
+          EMPA: XXX
+          REM_EDX_foil: '-'
+        semantics: bound_not_point_ordering
+        note: Qualitative ranking, not a numeric p_i, gamma, or alpha.
+      uncertainty:
+        note: not applicable
   O2:
     observations:
     - observation_id: sauerborn_2005_table51_oxide_reference_runs
@@ -353,19 +1747,110 @@ species:
       units: as_published
       values:
         quantity: reference_run_log
-        headers_as_published: 'ohne Probe | CaO | SiO2 | ZnO'
+        headers_as_published: ohne Probe | CaO | SiO2 | ZnO
         CaO_Tmax_C: 1638
         SiO2_Tmax_C: 1400
         ZnO_Tmax_C: 1188
         empty_Tmax_C: 800
-        masses_g: {CaO: 0.7789, SiO2: 0.6719, ZnO: 0.6072}
-        highT_chamber_peak_mbar: {ohne_Probe: 3.2e-4, CaO: 6.1e-2, SiO2: 3.5e-3, ZnO: 2.7e-2}
+        masses_g:
+          CaO: 0.7789
+          SiO2: 0.6719
+          ZnO: 0.6072
+        highT_chamber_peak_mbar:
+          ohne_Probe: 0.00032
+          CaO: 0.061
+          SiO2: 0.0035
+          ZnO: 0.027
         SiO2_mass_loss_wt_pct_prose: 1.1
-        SiO2_mass_loss_locator: {page: 75, paragraph: Der ermittelte Massenverlust der Probe betrug 1,1 Gew.%}
+        SiO2_mass_loss_locator:
+          page: 75
+          paragraph: Der ermittelte Massenverlust der Probe betrug 1
+          1 Gew.%: null
         ZnO_t_above_800_C: ILLEGIBLE
         note: ZnO t(Tmax>800 °C) cell is clipped to a trailing s. Not filled.
       uncertainty:
         note: ILLEGIBLE cell not guessed
+    - observation_id: sauerborn_2005_table51_oxide_reference_full_grid
+      type: rate_series
+      locator:
+        table: '5.1'
+        page: 68
+      T_range_K:
+      - 1073.15
+      - 1911.15
+      phase: simple_oxide_and_empty_holder
+      regime: solar_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: reference_run_t_T_pressure_grid
+        headers_as_published: ohne Probe | CaO | SiO2 | ZnO
+        high_T_duration_s:
+          ohne_Probe: 33
+          CaO: 60
+          SiO2: 84
+          ZnO: 101
+        t_above_800_C_s:
+          ohne_Probe: 5
+          CaO: 170
+          SiO2: 137
+          ZnO: ILLEGIBLE
+        t_above_1000_C_s:
+          ohne_Probe: null
+          CaO: 91
+          SiO2: 113
+          ZnO: 172
+        t_above_1200_C_s:
+          ohne_Probe: null
+          CaO: 66
+          SiO2: 25
+          ZnO: null
+        t_above_1400_C_s:
+          ohne_Probe: null
+          CaO: 51
+          SiO2: 12
+          ZnO: null
+        t_above_1500_C_s:
+          ohne_Probe: null
+          CaO: 36
+          SiO2: null
+          ZnO: null
+        max_beam_power_W:
+          ohne_Probe: 7.0
+          CaO: 13.9
+          SiO2: 14.2
+          ZnO: 8.4
+        chamber_base_before_bake_mbar:
+          ohne_Probe: 0.00018
+          CaO: 0.00016
+          SiO2: 7.5e-05
+          ZnO: 0.00012
+        bake_peak_preheat_mbar:
+          ohne_Probe: 0.00021
+          CaO: 0.018
+          SiO2: 0.0017
+          ZnO: 0.00048
+        chamber_base_before_highT_mbar:
+          ohne_Probe: 0.00017
+          CaO: 0.00014
+          SiO2: 9.7e-05
+          ZnO: 0.00017
+        highT_chamber_peak_mbar:
+          ohne_Probe: 0.00032
+          CaO: 0.061
+          SiO2: 0.0035
+          ZnO: 0.027
+        pressure_unit_conversion_comment: '1 mbar = 100 Pa (highT peaks: 0.032 / 6.1 / 0.35 / 2.7 Pa)'
+        SiO2_mass_loss_wt_pct_prose: 1.1
+        SiO2_mass_loss_locator:
+          page: 75
+          paragraph: Der ermittelte Massenverlust der Probe betrug 1,1 Gew.%
+        ZnO_t_above_800_C: ILLEGIBLE
+        empty_preheat_duration_s: 1043
+        note: ZnO t(Tmax>800 °C) cell is clipped to a trailing s on both the text layer and the 150 dpi
+          render. Not filled. Missing t(T>T*) cells are dashes in the source (true absence), stored as
+          null not 0.
+      uncertainty:
+        note: ILLEGIBLE cell not guessed; no printed sigma
     - observation_id: sauerborn_2005_table52_cao_cold_trap_edx
       type: rate_series
       locator:
@@ -380,10 +1865,334 @@ species:
       units: atom_percent
       values:
         quantity: cold_trap_edx_atom_pct
-        headers_as_published: 'O Na Mg Al Si P K Ca Ti Fe Ta'
-        untreated_foil_mean: {O: 17.4, Na: 0.3, Mg: 0.0, Al: 0.0, Si: 0.0, P: 0.8, K: 0.2, Ca: 0.1, Ti: 0.0, Fe: 0.1, Ta: 81.1}
-        CaO_foil: {O: 48.0, Na: 0.3, Mg: 0.0, Al: 0.0, Si: 0.0, P: 0.8, K: 0.0, Ca: 2.0, Ti: 0.0, Fe: 0.0, Ta: 48.9}
+        headers_as_published: O Na Mg Al Si P K Ca Ti Fe Ta
+        untreated_foil_mean:
+          O: 17.4
+          Na: 0.3
+          Mg: 0.0
+          Al: 0.0
+          Si: 0.0
+          P: 0.8
+          K: 0.2
+          Ca: 0.1
+          Ti: 0.0
+          Fe: 0.1
+          Ta: 81.1
+        CaO_foil:
+          O: 48.0
+          Na: 0.3
+          Mg: 0.0
+          Al: 0.0
+          Si: 0.0
+          P: 0.8
+          K: 0.0
+          Ca: 2.0
+          Ti: 0.0
+          Fe: 0.0
+          Ta: 48.9
         Tmax_C_from_table51: 1638
-        note: Author states XRD found no pyrolysis products in the CaO residue, only CaO plus post-air Ca(OH)2.
+        note: Author states XRD found no pyrolysis products in the CaO residue, only CaO plus post-air
+          Ca(OH)2.
       uncertainty:
         note: untreated-foil Standardabweichung printed in tables.md
+    - observation_id: sauerborn_2005_table52_untreated_foil_sd
+      type: rate_series
+      locator:
+        table: '5.2'
+        page: 73
+        note: unbehandelte Folie Standardabweichung
+      T_range_K:
+      - 1911.15
+      - 1911.15
+      phase: CaO_cold_trap_on_tantalum
+      regime: solar_vacuum_pyrolysis_condensation
+      units: atom_percent
+      values:
+        quantity: untreated_foil_edx_standardabweichung
+        untreated_foil_sd:
+          O: 1.3
+          Na: 0.2
+          Mg: 0.0
+          Al: 0.0
+          Si: 0.0
+          P: 0.4
+          K: 0.2
+          Ca: 0.1
+          Ti: 0.0
+          Fe: 0.1
+          Ta: 1.5
+        note: Printed Standardabweichung on the untreated Ta foil in Tabelle 5.2. Post-run CaO sample
+          mass could not be determined (probe scattered).
+      uncertainty:
+        note: untreated-foil Standardabweichung printed
+    - observation_id: sauerborn_2005_mass_loss_series
+      type: rate_series
+      locator:
+        page: 88
+        paragraph: 3,2 % ihres Gewichtes verloren
+      T_range_K:
+      - 1673.15
+      - 1853.15
+      phase: JSC-1_and_SiO2_residues
+      regime: solar_vacuum_pyrolysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        MS2_mass_loss_wt_pct: 3.2
+        points:
+        - id: SiO2
+          mass_loss_wt_pct: 1.1
+          Tmax_C: 1400
+          Tmax_K: 1673.15
+          mass_g: 0.6719
+          locator:
+            page: 76
+        - id: MS1
+          mass_loss_wt_pct: 2.6
+          Tmax_C: 1542
+          Tmax_K: 1815.15
+          mass_g: 0.717
+          locator:
+            page: 82
+        - id: MS2
+          mass_loss_wt_pct: 3.2
+          Tmax_C: 1563
+          Tmax_K: 1836.15
+          mass_g: 0.991
+          locator:
+            page: 88
+        - id: MS5
+          mass_loss_wt_pct: 2.9
+          Tmax_C: 1580
+          Tmax_K: 1853.15
+          mass_g: 7.856
+          melted_fraction_wt_pct_prose: 43
+          residual_granulate_wt_pct_fig547: 54
+          locator:
+            page: 98
+        CaO_mass_loss: true_absence (sample scattered; mass after irradiation not determined)
+        MS4_mass_loss: unseen_in_prose
+        ZnO_mass_loss: unseen_in_prose
+        note: MS5 43 wt% melted vs Abb. 5.47 caption 54 wt% residual granulate (implies 46 wt% melted)
+          retained as competing printed values; not averaged. No mg/s rate table.
+      uncertainty:
+        note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
+    - observation_id: sauerborn_2005_fig555_o2_reference_normalized
+      type: rate_series
+      locator:
+        figure: '5.55'
+        page: 105
+      T_range_K:
+      - 1073.15
+      - 1911.15
+      phase: simple_oxide_and_empty_holder
+      regime: qms_chamber_baseline_normalised
+      units: mbar
+      values:
+        quantity: qms_O2_partial_pressure_vs_time_baseline_normalised
+        baseline_normalisation_as_published: 1e-7 mbar
+        not_melt_equilibrium_psat: true
+        prose_ZnO_O2_increase_factor: 1000
+        prose_ZnO_locator:
+          page: 105
+          paragraph: um das 1000-fache
+        points_digitised:
+        - id: ohne_Probe
+          t_mmss: '1:00'
+          p_O2_mbar: 1.0e-07
+          p_O2_Pa: 1.0e-05
+        - id: CaO_peak
+          t_mmss: '1:08'
+          p_O2_mbar: 8.0e-06
+          p_O2_Pa: 0.0008
+        - id: SiO2_highT
+          t_mmss: '1:20'
+          p_O2_mbar: 2.0e-07
+          p_O2_Pa: 2.0e-05
+        - id: ZnO_plateau
+          t_mmss: '1:20'
+          p_O2_mbar: 0.0001
+          p_O2_Pa: 0.01
+        unit_conversion_comment: p_Pa = p_mbar * 100
+        digitization_error_dex: 0.15
+        note: QMS p_O2 in the differentially pumped Messkreuz, baseline-normalised to 1e-7 mbar for inter-run
+          comparison. Not an equilibrium partial pressure over the condensed phase. ZnO 1000-fold rise
+          is printed prose, not a digitised point.
+        caption_as_published: Verlauf der O2-Partildrücke der Referenzversuche in der Hochtemperaturphase.
+          Für den Vergleich wurde der Basisdruck aller Experimente auf 10^-7 mbar normiert.
+        caption_en: O2 partial-pressure traces of the reference runs in the high-temperature phase. For
+          comparison the baseline pressure of every experiment was normalised to 10^-7 mbar.
+        axis_labels_as_published:
+          x: '[m:ss]'
+          y: O2-Partialdruck [mbar]
+          y_en: O2 partial pressure [mbar]
+        digitization:
+          dpi: 300
+          pdf_page: 105
+          y_ticks_log10_mbar:
+          - '-4'
+          - '-5'
+          - '-6'
+          - '-7'
+          - '-8'
+          note: 300 dpi labelled log decades 10^-4 … 10^-8. Stored points (ohne Probe 1:00 = 1e-7; CaO
+            1:08 = 8e-6; ZnO 1:20 = 1e-4) re-read on those ticks; pass-2 residual ~0.00 dex. Stated band
+            ±0.15 dex.
+      uncertainty:
+        note: digitization_error_dex 0.15; no printed sigma; QMS absolute calibration not tabulated
+      equipment:
+        chamber_pressure:
+          value: QMS Messkreuz; valve-set ~10x below chamber. Baseline of this figure forced to 1e-7 mbar.
+          units: mbar
+          locator:
+            page: 105
+            figure: '5.55'
+    - observation_id: sauerborn_2005_fig556_o2_vs_T_normalized
+      type: rate_series
+      locator:
+        figure: '5.56'
+        page: 107
+      T_range_K:
+      - 773.15
+      - 1853.15
+      phase: JSC-1_solar_furnace_chamber_gas
+      regime: qms_chamber_baseline_normalised
+      units: mbar
+      values:
+        quantity: qms_O2_partial_pressure_vs_T_baseline_normalised
+        baseline_normalisation_as_published: 1e-7 mbar
+        not_melt_equilibrium_psat: true
+        point_spacing_s_as_published: 1
+        O2_release_onset_C_as_published: 1400
+        O2_release_onset_K: 1673.15
+        full_melt_theory_C: 1261
+        outgassing_band_C:
+        - 1200
+        - 1300
+        points_digitised:
+        - id: MS1
+          T_C: 600
+          T_K: 873.15
+          p_O2_mbar: 1.0e-07
+          p_O2_Pa: 1.0e-05
+        - id: MS1
+          T_C: 1000
+          T_K: 1273.15
+          p_O2_mbar: 1.3e-07
+          p_O2_Pa: 1.3e-05
+        - id: MS1
+          T_C: 1200
+          T_K: 1473.15
+          p_O2_mbar: 1.9e-07
+          p_O2_Pa: 1.9e-05
+        - id: MS1
+          T_C: 1350
+          T_K: 1623.15
+          p_O2_mbar: 2.2e-08
+          p_O2_Pa: 2.2e-06
+        - id: MS2
+          T_C: 600
+          T_K: 873.15
+          p_O2_mbar: 1.0e-07
+          p_O2_Pa: 1.0e-05
+        - id: MS2
+          T_C: 1000
+          T_K: 1273.15
+          p_O2_mbar: 6.0e-08
+          p_O2_Pa: 6.0e-06
+        - id: MS2
+          T_C: 1200
+          T_K: 1473.15
+          p_O2_mbar: 3.5e-08
+          p_O2_Pa: 3.5e-06
+        - id: MS4
+          T_C: 600
+          T_K: 873.15
+          p_O2_mbar: 1.0e-07
+          p_O2_Pa: 1.0e-05
+        - id: MS4
+          T_C: 1000
+          T_K: 1273.15
+          p_O2_mbar: 3.2e-07
+          p_O2_Pa: 3.2e-05
+        - id: MS4
+          T_C: 1200
+          T_K: 1473.15
+          p_O2_mbar: 4.0e-07
+          p_O2_Pa: 4.0e-05
+        - id: MS5
+          T_C: 600
+          T_K: 873.15
+          p_O2_mbar: 1.0e-07
+          p_O2_Pa: 1.0e-05
+        - id: MS5
+          T_C: 950
+          T_K: 1223.15
+          p_O2_mbar: 3.5e-07
+          p_O2_Pa: 3.5e-05
+        - id: MS5
+          T_C: 1200
+          T_K: 1473.15
+          p_O2_mbar: 1.3e-07
+          p_O2_Pa: 1.3e-05
+        - id: MS5
+          T_C: 1350
+          T_K: 1623.15
+          p_O2_mbar: 1.1e-06
+          p_O2_Pa: 0.00011
+        above_1400_C: curves enter the green O2-release band; MS5 reaches the 1e-5 mbar axis (~1e-3 Pa).
+          Dense 1 s series not fully digitised.
+        unit_conversion_comment: p_Pa = p_mbar * 100; T_K = T_C + 273.15
+        digitization_error_dex: 0.15
+        note: 'NOT equilibrium p_O2 over the melt. Author: for comparison the pre-high-T baseline of every
+          run was forced to 1e-7 mbar. QMS sees the Messkreuz, ~one decade below chamber via the valve
+          (p. 44).'
+        caption_as_published: Verlauf des O2-Partildrucks in der Hochtemperaturphase in Abhängigkeit der
+          Temperatur der Versuche mit Mondstaub-Simulat. Für den Vergleich wurde der Basisdruck aller
+          Experimente auf 10^-7 mbar normiert.
+        caption_en: O2 partial pressure in the high-temperature phase versus temperature for the lunar-dust
+          simulant runs. For comparison the baseline of every experiment was normalised to 10^-7 mbar.
+        axis_labels_as_published:
+          x: '[°C]'
+          y: O2-Partialdruck [mbar]
+          y_en: O2 partial pressure [mbar]
+        digitization:
+          dpi: 300
+          pdf_page: 107
+          x_ticks_C:
+          - 500
+          - 600
+          - 700
+          - 800
+          - 900
+          - 1000
+          - 1100
+          - 1200
+          - 1300
+          - 1400
+          - 1500
+          - 1600
+          - 1700
+          y_ticks_log10_mbar:
+          - '-5'
+          - '-6'
+          - '-7'
+          - '-8'
+          note: 300 dpi labelled log decades 10^-5 … 10^-8 and x 500 … 1700 °C. Stored MS1 600 °C = 1e-7,
+            MS2 1200 °C = 3.5e-8, MS5 1350 °C = 1.1e-6 re-read on those ticks; pass-2 residual ~0.00 dex.
+            Stated band ±0.15 dex.
+      uncertainty:
+        note: digitization_error_dex 0.15; no printed sigma; baseline normalisation removes absolute p_O2
+      equipment:
+        chamber_pressure:
+          value: QMS Messkreuz baseline forced to 1e-7 mbar on this figure; chamber high-T peaks are in
+            Tabelle 5.8 (MS1 peak/base 17.1)
+          units: mbar
+          locator:
+            page: 107
+            figure: '5.56'
+        cell_material:
+          value: plasmagespritzte Aluminiumoxidkeramik
+          locator:
+            page: 51
+            table: '4.1'
