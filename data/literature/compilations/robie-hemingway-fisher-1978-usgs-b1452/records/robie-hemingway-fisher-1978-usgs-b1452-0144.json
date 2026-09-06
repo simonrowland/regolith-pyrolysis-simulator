@@ -1,0 +1,133 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0144",
+  "census_id": "high-temperature-printed-page-170",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "GERftANIUM DIOXIDE (QUARTZ TYPE)",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "FOBIIATION FROII THE ELEIIEHTS",
+  "formula_weight": {
+    "as_published": "104.589",
+    "value": 104.589,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      176
+    ],
+    "printed_pages": [
+      170
+    ],
+    "pdftotext_layout_page_file": "page-176.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 32, 34"
+  ],
+  "title_line_as_published": "GERftANIUM DIOXIDE (QUARTZ TYPE)                                                  PORftULA WEIGHT    104.589",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "         Crystals 298.15 to 1300 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBIIATION FROII THE ELEIIEHTS",
+    "                                                                                        GIBBS",
+    "TEMP.   ( H;-H~ 98 )/T      soT     -(G;-H~ 98 )/T       cop      ENTHALPY           FREE ENERGY      Log Kf",
+    "            Jjmol• K     Jjmol•K      J/mol•K        J/mol•K             kJ/mol         kJ/mol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "Jjmol• K",
+    "entropy": "Jjmol•K",
+    "negative_gibbs_function": "J/mol•K",
+    "heat_capacity": "J/mol•K",
+    "formation_enthalpy": "kJ/mol",
+    "formation_gibbs_energy": "kJ/mol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 12,
+  "uncertainty_line_as_published": "UNCERTAINTY                 o. :0           0.27                           0.800           (1.900      0.158",
+  "uncertainty_values": [
+    {
+      "as_published": "o. :0",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.27",
+      "value": 0.27,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.800",
+      "value": 0.8,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "(1.900",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.158",
+      "value": 0.158,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "MELTING POINT                          K             BOILING POINT                                     K",
+    "ENTHALPY OF MELTING                    kJ            ENTHALPY OF VAPORIZATION                          kJ",
+    "                                       kJ            IIOL.l R VOLU liE                        .2.41440 J/bal:",
+    "                                                                                             L4. 440 cm 3",
+    "TRANSITIONS IN REFEREMCE STATE ELEIEHTS",
+    "   GERllAIIIUM •• ll. P. 1210.4 K.",
+    "HEAT CAPACITY EQUATION",
+    "        1.L667x1(1Z - 1.015bx1o-z T     1.360itx103 T-o·s",
+    "           (EQUATION VALID Fi!Oft 298- 1350 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 32, 34",
+      "detector_only": false
+    }
+  ]
+}

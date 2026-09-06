@@ -1,0 +1,141 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0142",
+  "census_id": "high-temperature-printed-page-168",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "GADOLINIDK SESQUIOIIDE (KOIOCLINIC)",
+  "formula_as_published": "Gd 2 0 1",
+  "phase_state_as_published": [
+    "crystals 298.15 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Gd 2 0 1 :   crystals 298.15 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "362.498",
+    "value": 362.498,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      174
+    ],
+    "printed_pages": [
+      168
+    ],
+    "pdftotext_layout_page_file": "page-174.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 38, 40"
+  ],
+  "title_line_as_published": "GADOLINIDK SESQUIOIIDE (KOIOCLINIC)                                                  FOBIULA WEIGHT       362.498",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Gd 2 0 1 :   crystals 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 PORUTION PBOft THE ELEMENTS",
+    "                                                                                           GIBBS",
+    "             <H;-H~ 98 )/T",
+    "                                 0",
+    "TEMP.                           ST      -(G;-H~ 98 )/T      co",
+    "                                                             p      ENTHALPY            fREE E IIEBG Y     Log Kf",
+    "   K          J/IDOl•K       J/•ol•K      J/IDol•K       J/•ol• K          kJ/IDOl         kJ/IDOl",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/IDOl•K",
+    "entropy": "J/•ol•K",
+    "negative_gibbs_function": "J/IDol•K",
+    "heat_capacity": "J/•ol• K",
+    "formation_enthalpy": "kJ/IDOl",
+    "formation_gibbs_energy": "kJ/IDOl",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 17,
+  "uncertainty_line_as_published": "UNCERTAINTY                     0.85            0.85                         3.600            3.600         0.631",
+  "uncertainty_values": [
+    {
+      "as_published": "0.85",
+      "value": 0.85,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.85",
+      "value": 0.85,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.600",
+      "value": 3.6,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.600",
+      "value": 3.6,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.631",
+      "value": 0.631,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Gd 2 0 1 :   crystals 298.15 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "llELTING POINT                             K             BOILING POINT                                      K",
+    "ENTHALPY OP ftELTIHG                       kJ            ENTHALPY OF VAPORIZATION                           kJ",
+    "H~98 - H~                                  kJ            llOLlll VOLUIIE                         4.3400 J/bar",
+    "                                                                                                43.400 CID3",
+    "TRANSITIONS IN BEFEREHCE STATE ELEBEHTS",
+    "      GADOLINIUM. ALPHA-BETA 1533, ft. P. 1585 K.",
+    "HEAT CAPACITY EQUATION",
+    "             1.1925x10Z ~ 1.3585x1o-z T                 1.4J51x10Z T-0·5",
+    "                (EQUATION VALID FROB 298 -             1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 38, 40",
+      "detector_only": false
+    }
+  ]
+}

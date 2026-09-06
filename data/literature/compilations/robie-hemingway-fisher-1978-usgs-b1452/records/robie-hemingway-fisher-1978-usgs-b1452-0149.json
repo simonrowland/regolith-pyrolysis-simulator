@@ -1,0 +1,142 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0149",
+  "census_id": "high-temperature-printed-page-175",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "IIONTROYDITE",
+  "formula_as_published": "Hgo",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1000 K."
+  ],
+  "description_lines_as_published": [
+    "Hgo:     Crystals 298.15 to 1000 K."
+  ],
+  "formation_basis_header_as_published": "FORIIATION FRO II THE ELEIIENTS",
+  "formula_weight": {
+    "as_published": "216.589",
+    "value": 216.589,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      181
+    ],
+    "printed_pages": [
+      175
+    ],
+    "pdftotext_layout_page_file": "page-181.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 27, 29"
+  ],
+  "title_line_as_published": "IIONTROYDITE                                                                       FORIIULA WEIGHT     216.589",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Hgo:     Crystals 298.15 to 1000 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORIIATION FRO II THE ELEIIENTS",
+    "                                                                                         GIBBS",
+    "TEIIP.   ( H~-H~ 98 )/T",
+    "                              D",
+    "                             ST      -(G;-H~ 9 a)/T      cop      ENTHALPY            FREE ENERGY       Log Kf",
+    "           J/IIOl•K       J;ao1•K      J/aol•K        J;ao1•K           ltJ/1101         ltJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J/IIOl•K",
+    "entropy": "J;ao1•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J;ao1•K",
+    "formation_enthalpy": "ltJ/1101",
+    "formation_gibbs_energy": "ltJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 9,
+  "uncertainty_line_as_published": "UNCERTAINTY                  0.34             0.34                        0.050            0.060         0.011",
+  "uncertainty_values": [
+    {
+      "as_published": "0.34",
+      "value": 0.34,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.34",
+      "value": 0.34,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.050",
+      "value": 0.05,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.060",
+      "value": 0.06,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.011",
+      "value": 0.011,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Hgo:     Crystals 298.15 to 1000 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "IIELT.ING POINT                                       BOILING POINT                                      K",
+    "ENTHALPY OF IIELTING                    kJ            EJTHALPY OF VAPORIZATION                           ltJ",
+    "                                  9.113 .kJ           IIOLAR VOLUIIE                            1. 9320 J/bar",
+    "                                                                                              19.320     cm 3",
+    "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
+    "    IIERCURY •••• B. P. 629 K.",
+    "HEAT CAPACITY EQUATION",
+    "         73.566 +  3.0351x10-J T                 5.~510x10Z     T-0•5",
+    "            (EQUATION VALID FROII             298 - 1000 K)",
+    "R!FEIUNCE      24 7          247                                            258                      COli PILED",
+    "                                                                            247                        6- 'J-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 27, 29",
+      "detector_only": false
+    }
+  ]
+}

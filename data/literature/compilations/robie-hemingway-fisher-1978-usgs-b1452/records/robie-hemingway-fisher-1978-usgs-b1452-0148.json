@@ -1,0 +1,136 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0148",
+  "census_id": "high-temperature-printed-page-174",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "HAFNIA",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "FORMATION FROM THE ELEMENTS",
+  "formula_weight": {
+    "as_published": "210.489",
+    "value": 210.489,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      180
+    ],
+    "printed_pages": [
+      174
+    ],
+    "pdftotext_layout_page_file": "page-180.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer"
+  ],
+  "title_line_as_published": "HAFNIA                                                                              FORMULA WEIGHT      210.489",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "================================================================================",
+    "Hf0 2 :    Crystals 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORMATION FROM THE ELEMENTS",
+    "                                                                                          GIBBS",
+    "TEMP.      ( H~-H~9 8 )/T      so     -( G;-H; 98 }/T      CDp     EIITHALPY           FREE ENERGY       Log Kf",
+    "                                T",
+    "   K         J/aol•K        J/aol•K     J/aol• K        J/ao1• K         k.J/1101         kJ/mo1",
+    "-------------------------------------------------~------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol• K",
+    "heat_capacity": "J/ao1• K",
+    "formation_enthalpy": "k.J/1101",
+    "formation_gibbs_energy": "kJ/mo1",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 12,
+  "uncertainty_line_as_published": "UNCEBTAIITY                    0.42           0.42                      1.255                1.297        0.227",
+  "uncertainty_values": [
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.255",
+      "value": 1.255,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.297",
+      "value": 1.297,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.227",
+      "value": 0.227,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "MELTING POINT                 3173       K             BOILUIG POINT",
+    "ENTHALPY OF MELTING                      kJ            EHTHALPY OF VAPORIZATION                           kJ",
+    "                                         kJ            MOLAR VOLUME                             2.0823 J/bar",
+    "                                                                                               20.823 cm 3",
+    "TRANSITIOIIS IN REFEREIICE STATE ELEAENTS",
+    "    HAFNIUM •••• ALPHA-BETA 2013 K.",
+    "HEAT CAPACITY EQUATION",
+    "          95.584 +  2.0947x10-3 T                5. 3496x 1 OZ T-D • 5",
+    "             (EQUATION VALID FROM             298 - 1800 K)",
+    "BEFEREIICE     188            120                                           264                        COMPILED",
+    "                                                                                                        5-26-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer",
+      "detector_only": false
+    }
+  ]
+}

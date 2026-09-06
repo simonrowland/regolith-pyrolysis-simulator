@@ -1,0 +1,141 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0150",
+  "census_id": "high-temperature-printed-page-176",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "HOLftiUft SESQOIOXIDE (CUBIC)",
+  "formula_as_published": "Ho 2 0 1",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1800 1."
+  ],
+  "description_lines_as_published": [
+    "Ho 2 0 1 :    Crystals 298.15 to 1800 1."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "377.859",
+    "value": 377.859,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      182
+    ],
+    "printed_pages": [
+      176
+    ],
+    "pdftotext_layout_page_file": "page-182.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 37, 39"
+  ],
+  "title_line_as_published": "HOLftiUft SESQOIOXIDE (CUBIC)                                                       FORKULl WEIGHT     377.859",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Ho 2 0 1 :    Crystals 298.15 to 1800 1.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORftlTIOI FRO! THE ELEKEITS",
+    "                                                                                         GIBBS",
+    "TEMP.         ( a;-a~ 98 )/T      so      -(G;-a~ 98 ~/T      cop    EITHALPY         FREE EIBRGY       Log If",
+    "                                   T",
+    "   K           Jjaol•K         Jtaol•l      Jjaol•K        J/aol•l         kJjaol         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jjaol•K",
+    "entropy": "Jtaol•l",
+    "negative_gibbs_function": "Jjaol•K",
+    "heat_capacity": "J/aol•l",
+    "formation_enthalpy": "kJjaol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 17,
+  "uncertainty_line_as_published": "UNCBBTliiiTY                      0.12            0.32                       4.850          5.000        0.876",
+  "uncertainty_values": [
+    {
+      "as_published": "0.12",
+      "value": 0.12,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.32",
+      "value": 0.32,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.850",
+      "value": 4.85,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "5.000",
+      "value": 5.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.876",
+      "value": 0.876,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Ho 2 0 1 :    Crystals 298.15 to 1800 1."
+  ],
+  "auxiliary_lines_as_published": [
+    "IIELTING POINT                               It            BOIL! NG POI NT                               It",
+    "ENTHALPY OF KELTING                          kJ            ENTHALPY OF VAPORIZATION                      kJ",
+    "a;9a - H~                          21.004 kJ               llOLlR VOLOKE                        11.11900 J/bar",
+    "                                                                                               44.900 cal",
+    "TBAISITIONS IN REFEREMCE STATE ELBKEITS",
+    "      HOLKIUII •••• ALPHA-BETA 1701, II. P. 1743 K.",
+    "HEAT CAPACITY EQUATIOH",
+    "             74.141 +     2.2966%10-2 T              1.1132x10J T-0·5",
+    "                (EQUATION VALID FRO!              298 - 1800 K)",
+    "BEFBREIICE         207            235                                         235                     COKPILED",
+    "                                                                                                       5-19-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 37, 39",
+      "detector_only": false
+    }
+  ]
+}
