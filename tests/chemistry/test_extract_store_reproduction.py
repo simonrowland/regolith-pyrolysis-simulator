@@ -1374,16 +1374,25 @@ def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
 
 
 def test_wetzel_model_tables_refuse_as_model_output() -> None:
-    observation_ids = {
+    # PARENT RULE (b-483): the six quoted-model parents stay byte-identical
+    # rate_series containers and are superseded; the retype lives on the
+    # terminal ``*_gibbs`` children, which are the rows the store adopts.
+    parent_ids = {
         f"wetzel_gail_2013_table{table}_quoted_model" for table in range(1, 7)
     }
-    observations = [
+    observation_ids = {f"{parent}_gibbs" for parent in parent_ids}
+    wetzel = [
         row
         for row in load_adopted_observations()
         if row.source_id == "kems-011-wetzel-gail-2013"
-        and row.observation_id in observation_ids
     ]
+    parents = [row for row in wetzel if row.observation_id in parent_ids]
+    assert {row.observation_id for row in parents} == parent_ids
+    assert all(row.adoption_basis == "superseded" for row in parents)
+    assert all(row.obs_type == "rate_series" for row in parents)
+    observations = [row for row in wetzel if row.observation_id in observation_ids]
     assert {row.observation_id for row in observations} == observation_ids
+    assert all(row.adoption_basis != "superseded" for row in observations)
     for observation in observations:
         assert observation.obs_type == "gibbs_table"
         assert observation.values["method_class"] == "model_derived"
