@@ -1,57 +1,20 @@
 schema_version: literature_index.v1
 generated_by: data/literature/build_index.py
+scan:
+  root: .
+  private_roots_scanned: []
+  private_roots_not_scanned: []
+  hunt_json: null
+  notes:
+  - hunt_ids column empty; --hunt-json not provided
 counts:
-  sources: 133
+  sources: 105
   extracts: 104
   pdfs_present_in_worktree: 24
   pdfs_tracked_99_kems_langmuir: 24
   pdfs_without_extract: 1
   extracts_without_pdf: 81
-reconciliation_43_vs_25:
-  tracked_99_kems_langmuir_git: 24
-  main_checkout_99_kems_langmuir_including_untracked_smales: 25
-  aug27_campaign_census: 43
-  missing_from_tracked_dir: 18
-  per_file:
-  - source_id: kems-006-zhang-2021
-    last_seen: extract cites docs/references/pdfs/99-kems-langmuir/kems-006-zhang-2021.pdf (ABSENT); last
-      seen docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/ (missing)
-  - source_id: kems-014-drowart-2005
-    last_seen: last seen docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/ (missing)
-  - source_id: kems-020-hastie-1981-nbsir
-    last_seen: last seen docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/ (missing)
-  - source_id: kems-021-plante-1992-feo
-    last_seen: last seen docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/ (missing)
-  - source_id: kems-023-rammensee-1982
-    last_seen: OA wave 2026-08-27; PDF not on disk now
-  - source_id: kems-024-chastel-1987
-    last_seen: OA wave 2026-08-27; PDF not on disk now
-  - source_id: kems-025-mathieu
-    last_seen: OA wave 2026-08-27; PDF not on disk now
-  - source_id: kems-026-charles-1967
-    last_seen: OA wave 2026-08-27; PDF not on disk now
-  - source_id: kems-028-markova-1986
-    last_seen: listed in the 8-OA wave; later confirmed-not-OA
-  - source_id: kems-029
-    last_seen: OA wave 2026-08-27; PDF not on disk now
-  - source_id: kems-030
-    last_seen: OA wave 2026-08-27; PDF not on disk now
-  - source_id: kems-033-costa-2017
-    last_seen: OA wave 2026-08-27; PDF not on disk now
-  - source_id: kems-035-sauerborn-2005
-    last_seen: ocr-repair missing; papers-library copy at docs-private/deep-research/literature/sauerborn-2004-dlr-solar-furnace/source.pdf
-  - source_id: kems-036-sesko-2024
-    last_seen: ocr-repair missing; papers-library copy at docs-private/deep-research/literature/sesko-2022-thesis-solar-vapor-pyrolysis/source.pdf
-  - source_id: kems-038-matchett-2006
-    last_seen: ocr-repair missing; papers-library copy at docs-private/deep-research/literature/matchett-2006-vacuum-pyrolysis-thesis/source.pdf
-  - source_id: kems-040-stolyarova-2015
-    last_seen: last seen docs-private/research/2026-08-27-ocr-repair/kems-040-stolyarova-2015/ (missing)
-  - source_id: kems-042-plante-1979
-    last_seen: extract cites docs/references/pdfs/99-kems-langmuir/kems-042-nbs-sp561-v1-hastie-1979.pdf
-      (ABSENT)
-  - source_id: smales-1971-lpsc-12022
-    last_seen: untracked pair at main docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf
-      (absent from this worktree)
+  alias_groups_needing_resolution: 26
 gaps:
   pdfs_without_extract:
   - kems-045-sossi-2018-pnas-cr
@@ -137,14 +100,7 @@ gaps:
   - span-wagner-1996-co2-psat
   - stebbins-carmichael-weill-1983
   - wetzel-gail-2013-sio-arrhenius
-  untracked_files:
-  - docs/references/pdfs/02-thermochemistry/README.md (main checkout; not in this worktree)
-  - docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md (main checkout; not in this
-    worktree)
-  - docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.pdf (main checkout; not in
-    this worktree)
-  - docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md (main checkout; not in this worktree)
-  - docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf (main checkout; not in this worktree)
+  untracked_files: []
   sidecars_missing_fields:
   - source_id: kems-001-homma-1966
     sidecar_path: null
@@ -344,7 +300,7 @@ gaps:
     - sha256
     - retrieved_date
     - retrieval_url
-  - source_id: ms2000-044
+  - source_id: ts1985
     sidecar_path: null
     missing_fields: &id023
     - citation
@@ -353,7 +309,7 @@ gaps:
     - sha256
     - retrieved_date
     - retrieval_url
-  - source_id: ts1985
+  - source_id: yam1983
     sidecar_path: null
     missing_fields: &id024
     - citation
@@ -362,84 +318,188 @@ gaps:
     - sha256
     - retrieved_date
     - retrieval_url
-  - source_id: yam1983
-    sidecar_path: null
-    missing_fields: &id025
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
   source_id_collisions:
+  - type: filename_stem_mismatch
+    key: kems-ms2000-044
+    source_ids:
+    - kems-ms2000-044
+    - ms2000-044
+    resolution: owner/controller
+  - type: pdf_stem_vs_extract
+    key: kems-042-plante-1979
+    source_ids:
+    - kems-042-nbs-sp561-v1-hastie-1979
+    - kems-042-plante-1979
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1007/s11663-024-02995-6
+    source_ids:
+    - halwax_sergeev_mueller_schenk_2024
+    - kems-031-halwax-2024
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1016/j.actaastro.2024.08.009
+    source_ids:
+    - kems-036-sesko-2024
+    - sesko_2024
+    resolution: owner/controller
   - type: same_doi
     key: 10.1016/j.gca.2005.08.014
     source_ids:
+    - REF-014
     - fedkin-grossman-ghiorso-2006
     - kems-005-fedkin-2006
+    resolution: owner/controller
   - type: same_doi
     key: 10.1016/j.gca.2007.09.005
     source_ids:
     - kems-010-richter-2007
     - richter-et-al-2007
+    resolution: owner/controller
   - type: same_doi
     key: 10.1016/j.gca.2019.06.021
     source_ids:
     - kems-012-sossi-2019
     - sossi-et-al-2019
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1016/j.icarus.2003.08.023
+    source_ids:
+    - ref-016-sio-kems-1700-2000k
+    - sf04-magma-companion-workbook
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1016/j.pss.2009.09.011
+    source_ids:
+    - fray-schmitt-2009-ch4-1
+    - fray-schmitt-2009-co-1
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1063/1.1700984
+    source_ids:
+    - datz-1961-na2cl2
+    - datz-smith-taylor-1961-nacl-vapor
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1063/1.3253096
+    source_ids:
+    - REF-040
+    - kems-003-pound-1972
+    - pound-1972-cr-langmuir-knudsen
+    - pound-1972-mccabe-cr
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1063/1.555706
+    source_ids:
+    - lamoreaux-hildenbrand-1984
+    - ref-052-k-o-gas
+    - ref-052-na-o-gas
+    resolution: owner/controller
+  - type: same_doi
+    key: 10.1063/1.555799
+    source_ids:
+    - lamoreaux-hildenbrand-hildenbrand-1987
+    - lh87-al-o-gas-species
+    - lh87-cao-g
+    - lh87-mgo-g
+    resolution: owner/controller
+  - type: same_report
+    key: NTRS 20150002321
+    source_ids:
+    - costa-jacobson-2015
+    - kems-007-costa-2015
+    resolution: owner/controller
+  - type: source_id_alias
+    key: alcock-1984
+    source_ids:
+    - ref-032-al
+    - ref-032-bi
+    - ref-032-ca
+    - ref-032-fe-liquid-equation
+    - ref-032-k
+    - ref-032-mg
+    - ref-032-na
+    - ref-032-pb
+    - ref-032-si
+    - ref-032-zr
+    resolution: owner/controller
+  - type: source_id_alias
+    key: datz-1961
+    source_ids:
+    - datz-1961-na2cl2
+    - datz-and-smith-1961
+    - datz-smith-taylor-1961-nacl-vapor
+    resolution: owner/controller
+  - type: source_id_alias
+    key: fedkin-2006
+    source_ids:
+    - fedkin-grossman-ghiorso-2006
+    - kems-005-fedkin-2006
+    resolution: owner/controller
+  - type: source_id_alias
+    key: fray-2009
+    source_ids:
+    - fray-schmitt-2009-ch4-1
+    - fray-schmitt-2009-co-1
+    - fray-schmitt-2009-nh3
+    resolution: owner/controller
+  - type: source_id_alias
+    key: giauque-1939
+    source_ids:
+    - giauque-powell-1939-cl2
+    - giauque-ruehrwein-1939-hcn-psat
+    resolution: owner/controller
+  - type: source_id_alias
+    key: lamoreaux-1987
+    source_ids:
+    - lamoreaux-hildenbrand-hildenbrand-1987
+    - lh87-al-o-gas-species
+    - lh87-cao-g
+    - lh87-mgo-g
+    - lh87-pbo-g
+    resolution: owner/controller
   - type: source_id_alias
     key: pound-1972
     source_ids:
     - kems-003-pound-1972
     - pound-1972-cr-langmuir-knudsen
     - pound-1972-mccabe-cr
-  - type: source_id_alias
-    key: sossi-fegley-2018
-    source_ids:
-    - kems-041-sossi-fegley-2018
-    - sossi-fegley-2018
-  - type: source_id_alias
-    key: wetzel-gail-2013
-    source_ids:
-    - kems-011-wetzel-gail-2013
-    - wetzel-gail-2013-sio-arrhenius
-  - type: filename_stem_mismatch
-    key: ms2000-044
-    source_ids:
-    - kems-ms2000-044
-    - ms2000-044
-  - type: pdf_stem_vs_extract
-    key: kems-042
-    source_ids:
-    - kems-042-plante-1979
-    - kems-042-nbs-sp561-v1-hastie-1979
-  - type: source_id_alias
-    key: costa-2015
-    source_ids:
-    - costa-jacobson-2015
-    - kems-007-costa-2015
+    resolution: owner/controller
   - type: source_id_alias
     key: safarian-2013
     source_ids:
     - kems-009-safarian-2013
     - safarian-engh-2013-si-pure-langmuir
+    resolution: owner/controller
   - type: source_id_alias
-    key: schaefer-fegley-2004
+    key: schaefer-2004
     source_ids:
     - kems-008-schaefer-fegley-2004
     - sf04-magma-companion-workbook
-  - type: source_id_alias
-    key: halwax-2024
-    source_ids:
-    - kems-031-halwax-2024
-    - halwax_sergeev_mueller_schenk_2024
+    resolution: owner/controller
   - type: source_id_alias
     key: sesko-2024
     source_ids:
     - kems-036-sesko-2024
     - sesko_2024
+    - sesko_2024_vapor_phase_pyrolysis
+    resolution: owner/controller
+  - type: source_id_alias
+    key: sossi-2018
+    source_ids:
+    - kems-041-sossi-fegley-2018
+    - kems-045-sossi-2018-pnas-cr
+    - sossi-fegley-2018
+    resolution: owner/controller
+  - type: source_id_alias
+    key: wetzel-2013
+    source_ids:
+    - kems-011-wetzel-gail-2013
+    - wetzel-gail-2013-sio-arrhenius
+    resolution: owner/controller
 sources:
 - source_id: ames-walsh-white-1967
+  aliases: []
   citation: Ames, Walsh & White, J. Phys. Chem. 71 (1967) 2707–2718
   doi: null
   report_number: null
@@ -450,13 +510,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ames-walsh-white-1967.yaml
@@ -466,6 +520,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: banchor-matsui-naito-1986
+  aliases: []
   citation: Banchornheavakul, Matsui & Naito, J. Nucl. Sci. Technol. 23 (1986) 602–611
   doi: null
   report_number: null
@@ -476,13 +531,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/banchor-matsui-naito-1986.yaml
@@ -491,31 +540,8 @@ sources:
   hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: barin
-  citation: Ihsan Barin, Thermochemical Data of Pure Substances, Third Edition, VCH, 1995.
-  doi: 10.1002/9783527619825
-  report_number: null
-  identifier: 10.1002/9783527619825
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: paywalled
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
 - source_id: behrens-rosenblatt-1972
+  aliases: []
   citation: Behrens & Rosenblatt, J. Chem. Thermodyn. 4 (1972) 175–190
   doi: null
   report_number: null
@@ -526,13 +552,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/behrens-rosenblatt-1972.yaml
@@ -542,6 +562,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: berkowitz-chupka-inghram-1957
+  aliases: []
   citation: Berkowitz, Chupka & Inghram, J. Chem. Phys. 27 (1957) 87–90
   doi: null
   report_number: null
@@ -552,13 +573,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/berkowitz-chupka-inghram-1957.yaml
@@ -568,6 +583,8 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: costa-jacobson-2015
+  aliases:
+  - kems-007-costa-2015
   citation: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion
     Mass Spectrometry, NASA NTRS 20150002321
   doi: null
@@ -579,25 +596,18 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: OA
   extracts:
   - path: data/literature/extracts/costa-jacobson-2015.yaml
     review_status: draft
-  battery_datasets:
-  - scripts/calibration_battery.py
-  - vp30
+  battery_datasets: []
   hunt_ids: []
-  copies:
-  - docs-private/deep-research/literature/costa-jacobson-2015-olivine-kems/source.pdf
+  copies: []
   measurement_sets: []
 - source_id: datz-1961-na2cl2
+  aliases:
+  - datz-smith-taylor-1961-nacl-vapor
   citation: Datz, Smith & Taylor (1961) J. Chem. Phys. 34:558–564 DOI 10.1063/1.1700984 Na2Cl2 dimer over
     NaCl(l); JANAF Na2Cl2(g)
   doi: 10.1063/1.1700984
@@ -609,13 +619,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/datz-1961-na2cl2.yaml
@@ -625,6 +629,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: datz-and-smith-1961
+  aliases: []
   citation: Datz, S. & Smith, W. T. Jr. (and related Datz 1961 tabulations) — Na2Cl2 dissociation equilibrium
     constants (Table II lineage) as transcribed in vp-acquire-5 chloride-dimers DRAFT
   doi: null
@@ -636,13 +641,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/datz-and-smith-1961.yaml
@@ -652,6 +651,8 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: datz-smith-taylor-1961-nacl-vapor
+  aliases:
+  - datz-1961-na2cl2
   citation: 'Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–),
     molten alkali-halide vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H. (1961),
     "The Molecular Composition of Sodium Chloride Vapor", J. Chem. Phys. 34:558–564, DOI 10.1063/1.1700984
@@ -666,13 +667,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml
@@ -681,31 +676,10 @@ sources:
   hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: factsage
-  citation: FactSage thermochemical software and databases, Thermfact/CRCT and GTT-Technologies.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: paywalled
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
 - source_id: fedkin-grossman-ghiorso-2006
+  aliases:
+  - REF-014
+  - kems-005-fedkin-2006
   citation: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223,
     Table 3 pp. 212-213; primary vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145
   doi: 10.1016/j.gca.2005.08.014
@@ -717,22 +691,20 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml
     review_status: draft
-  battery_datasets: []
+  battery_datasets:
+  - data/literature/langmuir_knudsen_flux_validation.yaml
   hunt_ids: []
   copies: []
-  measurement_sets: []
+  measurement_sets:
+  - data/literature/langmuir_knudsen_flux_validation.yaml
 - source_id: fray-schmitt-2009-ch4-1
+  aliases:
+  - fray-schmitt-2009-co-1
   citation: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1
     correlation; disagreement vs Grundy already stored on the family row (~69.5% at 37 K).
   doi: 10.1016/j.pss.2009.09.011
@@ -744,13 +716,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/fray-schmitt-2009-ch4-1.yaml
@@ -760,6 +726,8 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: fray-schmitt-2009-co-1
+  aliases:
+  - fray-schmitt-2009-ch4-1
   citation: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CO-1
     correlation (coefficients in NASA NTRS 20210019502 supplementary Table 2). Row already records disagreement
     at 31 K (~513% vs Grundy); use FS09 as the independent promotion check, not a second fit of Grundy.
@@ -772,13 +740,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/fray-schmitt-2009-co-1.yaml
@@ -788,6 +750,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: fray-schmitt-2009-nh3
+  aliases: []
   citation: 'Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary
     Table 2). Alternate liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage),
     ~164–240 K liquid — independent of the 2024 QCM ice fit.'
@@ -800,13 +763,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/fray-schmitt-2009-nh3.yaml
@@ -816,6 +773,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: giauque-powell-1939-cl2
+  aliases: []
   citation: Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats of
     Fusion and Vaporization, and Entropy", J. Am. Chem. Soc. 61:1970–1974, DOI 10.1021/ja01877a012 — primary
     calorimetry/VP (use solid and liquid branches separately; do not promote a single Antoine across the
@@ -829,13 +787,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/giauque-powell-1939-cl2.yaml
@@ -845,6 +797,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: giauque-ruehrwein-1939-hcn-psat
+  aliases: []
   citation: Giauque, W.F. & Ruehrwein, R.A. (1939), "The Entropy of Hydrogen Cyanide. Heat Capacity, Heat
     of Vaporization and Vapor Pressure of Hydrogen Cyanide. The Structure of the Hydrogen Cyanide Molecule",
     J. Am. Chem. Soc. 61:2626–2633, DOI 10.1021/ja01265a030 — classical vapor-pressure / calorimetry primary.
@@ -857,13 +810,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/giauque-ruehrwein-1939-hcn-psat.yaml
@@ -873,6 +820,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: habermann-daane-1964
+  aliases: []
   citation: Habermann & Daane, J. Chem. Phys. 41 (1964) 2818–2827
   doi: null
   report_number: null
@@ -883,13 +831,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/habermann-daane-1964.yaml
@@ -898,65 +840,8 @@ sources:
   hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: halwax_sergeev_mueller_schenk_2024
-  citation: A. Halwax, D. Sergeev, M. Mueller, and J. Schenk, Enthalpy of Formation of Calcium and Magnesium
-    Oxide Obtained by Knudsen Effusion Mass Spectrometry, Metallurgical and Materials Transactions B 55
-    (2024) 821-835
-  doi: 10.1007/s11663-024-02995-6
-  report_number: null
-  identifier: 10.1007/s11663-024-02995-6
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/literature/kems_measurements.yaml
-  - data/presets/kems/halwax_2024_cao.yaml
-  - data/presets/kems/halwax_2024_mgo.yaml
-  - halwax_2024_cao
-  - halwax_2024_mgo
-  - scripts/calibration_battery.py
-  hunt_ids: []
-  copies: []
-  measurement_sets:
-  - data/literature/kems_measurements.yaml
-- source_id: hultgren
-  citation: R. Hultgren et al., Selected Values of the Thermodynamic Properties of the Elements, American
-    Society for Metals, 1973.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: paywalled
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
 - source_id: iapws-95-psat-liquid
+  aliases: []
   citation: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties
     of Ordinary Water Substance for General and Scientific Use", J. Phys. Chem. Ref. Data 31:387–535,
     DOI 10.1063/1.1461829; saturation pressure of liquid water (and ice via IAPWS ice formulations). Cross-check:
@@ -971,13 +856,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/iapws-95-psat-liquid.yaml
@@ -987,6 +866,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: iupac-o2-solid-psat
+  aliases: []
   citation: Wagner, W., Ewers, J. & Schmidt, R. oxygen multiparameter EOS / solid oxygen vapor-pressure
     evaluations (IUPAC); not FS09. Plant O2 is gas inventory, not frost Psat — validated frost row does
     not certify melt pO2.
@@ -999,13 +879,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/iupac-o2-solid-psat.yaml
@@ -1015,6 +889,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ivtan-mno-coo-thermo
+  aliases: []
   citation: IVTAN Thermodynamic Database electronic tables; per-species electronic-page identities retained
     below.
   doi: null
@@ -1026,13 +901,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ivtan-mno-coo-thermo.yaml
@@ -1042,33 +911,31 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: janaf-4th
+  aliases: []
   citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data
     Monograph 9 (1998)
-  doi: 10.18434/T42S31
+  doi: null
   report_number: Monograph 9
-  identifier: 10.18434/T42S31
+  identifier: Monograph 9
   pdf_status: ABSENT
   pdf_path: null
   pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: OA
   extracts:
   - path: data/literature/extracts/janaf-4th.yaml
     review_status: draft
-  battery_datasets: []
+  battery_datasets:
+  - data/literature/gibbs_battery_residual_ledger.yaml
   hunt_ids: []
   copies: []
-  measurement_sets: []
+  measurement_sets:
+  - data/literature/gibbs_battery_residual_ledger.yaml
 - source_id: kems-001-homma-1966
+  aliases: []
   citation: Homma, M., Ohno, R. & Ishida, T. (1966), "Evaporation of Manganese, Copper and Tin from Molten
     Iron under Vacuum", J. Japan Inst. Metals 30:515–520, DOI 10.2320/jinstmet1952.30.6_515
   doi: 10.2320/jinstmet1952.30.6_515
@@ -1076,8 +943,7 @@ sources:
   identifier: 10.2320/jinstmet1952.30.6_515
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-001-homma-1966.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-001-homma-1966.pdf
+  pdf_last_seen: []
   pdf_sha256: 697fe8c64d73886a86ae4b171613cf0aead21df80405d81f3458d3c446c21d14
   pdf_tracked: true
   sidecar_path: null
@@ -1086,16 +952,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-001-homma-1966.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-65
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-001-homma-1966.pdf
-  - docs-private/research/ocr-artifacts/kems-001-homma-1966/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-002-ohno-1967
+  aliases: []
   citation: Ohno, R. & Ishida, T. (1967), "Rate of Evaporation of Mn, Cu, Sn, Cr and S from Molten Iron
     under Vacuum", J. Japan Inst. Metals 31:1164–1169, DOI 10.2320/jinstmet1952.31.10_1164
   doi: 10.2320/jinstmet1952.31.10_1164
@@ -1103,8 +965,7 @@ sources:
   identifier: 10.2320/jinstmet1952.31.10_1164
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-002-ohno-1967.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-002-ohno-1967.pdf
+  pdf_last_seen: []
   pdf_sha256: 6cc070016e906739168814eba733772d3b9e258b969627d4e88856f0ffdd4687
   pdf_tracked: true
   sidecar_path: null
@@ -1113,16 +974,15 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-002-ohno-1967.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-66
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-002-ohno-1967.pdf
-  - docs-private/research/ocr-artifacts/kems-002-ohno-1967/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-003-pound-1972
+  aliases:
+  - REF-040
+  - pound-1972-cr-langmuir-knudsen
+  - pound-1972-mccabe-cr
   citation: Pound, G. M. (1972), "Selected values of evaporation and condensation coefficients for simple
     substances", J. Phys. Chem. Ref. Data 1:135-146, DOI 10.1063/1.3253096 (review compilation; Table
     1)
@@ -1131,8 +991,7 @@ sources:
   identifier: 10.1063/1.3253096
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.pdf
+  pdf_last_seen: []
   pdf_sha256: e9d7aa7924e4b6c8982e9dfc75cf3bf75a665d2c95ef55fe2424572120c5e5cb
   pdf_tracked: true
   sidecar_path: null
@@ -1142,15 +1001,15 @@ sources:
   - path: data/literature/extracts/kems-003-pound-1972.yaml
     review_status: draft
   battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-67
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-003-pound-1972.pdf
-  - docs-private/research/ocr-artifacts/kems-003-pound-1972/
-  measurement_sets: []
+  - data/literature/langmuir_knudsen_flux_validation.yaml
+  hunt_ids: []
+  copies: []
+  measurement_sets:
+  - data/literature/langmuir_knudsen_flux_validation.yaml
 - source_id: kems-005-fedkin-2006
+  aliases:
+  - REF-014
+  - fedkin-grossman-ghiorso-2006
   citation: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), "Vapor pressures and evaporation coefficients
     for melts of ferromagnesian chondrule-like compositions", Geochim. Cosmochim. Acta 70:206-223, DOI
     10.1016/j.gca.2005.08.014
@@ -1159,8 +1018,7 @@ sources:
   identifier: 10.1016/j.gca.2005.08.014
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.pdf
+  pdf_last_seen: []
   pdf_sha256: fb4370290c5d86efd97490de83c0e811dcaf75ae84050153f0636685e9e63600
   pdf_tracked: true
   sidecar_path: null
@@ -1170,16 +1028,13 @@ sources:
   - path: data/literature/extracts/kems-005-fedkin-2006.yaml
     review_status: draft
   battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-02
-  - RH-06
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-005-fedkin-2006.pdf
-  - docs-private/research/ocr-artifacts/kems-005-fedkin-2006/
-  measurement_sets: []
+  - data/literature/langmuir_knudsen_flux_validation.yaml
+  hunt_ids: []
+  copies: []
+  measurement_sets:
+  - data/literature/langmuir_knudsen_flux_validation.yaml
 - source_id: kems-006-zhang-2021
+  aliases: []
   citation: Zhang et al. (2021), vacuum evaporation of Na, K and Rb from a basaltic silicate melt; diffusion-limited
     alkali loss. PDF in docs/references/pdfs/99-kems-langmuir/kems-006-zhang-2021.pdf
   doi: null
@@ -1187,32 +1042,22 @@ sources:
   identifier: null
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-006-zhang-2021.pdf (cited by extract; ABSENT)
-  - docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/ (extract provenance_path; directory
-    missing)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-006-zhang-2021.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-44
+  battery_datasets: []
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-007-costa-2015
+  aliases:
+  - costa-jacobson-2015
   citation: Costa, G. C. C. & Jacobson, N. S. (2015), "Vaporization Studies of Olivine via Knudsen Effusion
     Mass Spectrometry", NASA NTRS 20150002321
   doi: null
@@ -1220,8 +1065,7 @@ sources:
   identifier: NTRS 20150002321
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-007-costa-2015.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-007-costa-2015.pdf
+  pdf_last_seen: []
   pdf_sha256: fa9c9c9297ace9cb9e677cba12351c3c326cdef6d7ae66d2d31f0688426374ff
   pdf_tracked: true
   sidecar_path: null
@@ -1230,18 +1074,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-007-costa-2015.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  - vp30
-  hunt_ids:
-  - RH-27
-  copies:
-  - docs-private/deep-research/literature/costa-jacobson-2015-olivine-kems/source.pdf
-  - docs-private/research/kems-corpus/pdfs/kems-007-costa-2015.pdf
-  - docs-private/research/ocr-artifacts/kems-007-costa-2015/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-008-schaefer-fegley-2004
+  aliases: []
   citation: Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization
     on Io", Icarus 169:216-241 (MAGMA code; α_s survey Table 10)
   doi: null
@@ -1249,8 +1087,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-008-schaefer-fegley-2004.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-008-schaefer-fegley-2004.pdf
+  pdf_last_seen: []
   pdf_sha256: c50765341a3be2cdd0e305cda582f996f4f3a7046469e327043a70493f46c46c
   pdf_tracked: true
   sidecar_path: null
@@ -1259,23 +1096,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-008-schaefer-fegley-2004.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  - vp30
-  hunt_ids:
-  - RH-02
-  - RH-05
-  - RH-07
-  - RH-38
-  - RH-99
-  - RH-102
-  copies:
-  - docs-private/deep-research/literature/schaefer-fegley-2004-io-lava/source.pdf
-  - docs-private/research/kems-corpus/pdfs/kems-008-schaefer-fegley-2004.pdf
-  - docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-009-safarian-2013
+  aliases: []
   citation: Safarian, J. & Engh, T. A. (2013), "Vacuum Evaporation of Pure Metals", Metall. Mater. Trans.
     A (Hertz-Knudsen / Schrage theory; pure Si context in corpus)
   doi: null
@@ -1283,8 +1109,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-009-safarian-2013.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-009-safarian-2013.pdf
+  pdf_last_seen: []
   pdf_sha256: 4b8330567349e54b9642880efc46f7633c1af7ccfa280ae3808cf8601fa624d3
   pdf_tracked: true
   sidecar_path: null
@@ -1293,17 +1118,13 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-009-safarian-2013.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-01
-  - RH-28
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-009-safarian-2013.pdf
-  - docs-private/research/ocr-artifacts/kems-009-safarian-2013/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-010-richter-2007
+  aliases:
+  - richter-et-al-2007
   citation: Richter, F. M., Janney, P. E., Mendybaev, R. A., Davis, A. M. & Wadhwa, M. (2007), "Elemental
     and isotopic fractionation of Type B CAI-like liquids by evaporation", Geochim. Cosmochim. Acta 71:5544-5564,
     DOI 10.1016/j.gca.2007.09.005
@@ -1312,8 +1133,7 @@ sources:
   identifier: 10.1016/j.gca.2007.09.005
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  pdf_last_seen: []
   pdf_sha256: b4155d8af4d8ab48ae6a90d954596d9d9daa5e3c5bb35d13b54480721ccb19a9
   pdf_tracked: true
   sidecar_path: null
@@ -1322,16 +1142,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-010-richter-2007.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-29
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-010-richter-2007.pdf
-  - docs-private/research/ocr-artifacts/kems-010-richter-2007/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-011-wetzel-gail-2013
+  aliases: []
   citation: 'Wetzel, S., Pucci, A. & Gail, H.-P. (2013), "Solid silicon monoxide: optical properties and
     growth coefficient α(T)", Astron. Astrophys. (SiO dust shell / UHV SiO evaporation study)'
   doi: null
@@ -1339,8 +1155,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.pdf
+  pdf_last_seen: []
   pdf_sha256: e4cfdd959dfed9f911cc6afc8a0dc8cdad009f31771596e28834eacf032ccf6b
   pdf_tracked: true
   sidecar_path: null
@@ -1349,17 +1164,13 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-011-wetzel-gail-2013.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-01
-  - RH-30
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-011-wetzel-gail-2013.pdf
-  - docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-012-sossi-2019
+  aliases:
+  - sossi-et-al-2019
   citation: 'Sossi, P. A., Klemme, S., O''Neill, H. St.C., Berndt, J. & Moynier, F. (2019), "Evaporation
     of moderately volatile elements from silicate melts: experiments and theory", Geochim. Cosmochim.
     Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021'
@@ -1368,8 +1179,7 @@ sources:
   identifier: 10.1016/j.gca.2019.06.021
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  pdf_last_seen: []
   pdf_sha256: fcf005d7380c2487eb97a24e0ab0aee05acc97d522428c87b6c4c765720020a4
   pdf_tracked: true
   sidecar_path: null
@@ -1378,18 +1188,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-012-sossi-2019.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-04
-  - RH-45
-  copies:
-  - docs-private/deep-research/literature/sossi-2019-gca-hkl-evaporation/source.pdf
-  - docs-private/research/kems-corpus/pdfs/kems-012-sossi-2019.pdf
-  - docs-private/research/ocr-artifacts/kems-012-sossi-2019/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-014-drowart-2005
+  aliases: []
   citation: 'Drowart, J., Chatillon, C., Hastie, J. & Bonnell, D. (2005), "High-temperature mass spectrometry:
     instrumental techniques, ionization cross-sections, pressure measurements, and thermodynamic data"
     (IUPAC Technical Report), Pure Appl. Chem. 77:683–737, DOI 10.1351/pac200577040683'
@@ -1398,33 +1202,21 @@ sources:
   identifier: 10.1351/pac200577040683
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/ (extract provenance_path; directory
-    missing)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-014-drowart-2005.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-10
-  - RH-37
-  - RH-46
+  battery_datasets: []
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-015-hashimoto-1983
+  aliases: []
   citation: Hashimoto, A. (1983), "Evaporation metamorphism in the early solar nebula — evaporation experiments
     on the melt FeO-MgO-SiO2-CaO-Al2O3", Geochem. J. 17:111-145
   doi: null
@@ -1432,8 +1224,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-015-hashimoto-1983.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-015-hashimoto-1983.pdf
+  pdf_last_seen: []
   pdf_sha256: d0948c1e8d6d843e9e30d8d85c6c25c9a0e5e7c9b97f6d55d6429132107d7af7
   pdf_tracked: true
   sidecar_path: null
@@ -1442,20 +1233,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-015-hashimoto-1983.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-01
-  - RH-02
-  - RH-09
-  - RH-31
-  - RH-38
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-015-hashimoto-1983.pdf
-  - docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-016-stolyarova-1992
+  aliases: []
   citation: Stolyarova, V., Shornikov, S., Ivanov, G. & Shultz, M. (1992), "High temperature mass spectrometric
     study of multicomponent silicate systems", Institute of Silicate Chemistry RAS
   doi: null
@@ -1463,8 +1246,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-016-stolyarova-1992.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-016-stolyarova-1992.pdf
+  pdf_last_seen: []
   pdf_sha256: d8cb86b6f118de8d78fd007b413e4c2ae8c38cc1f3f5de06c18ed3ac51967372
   pdf_tracked: true
   sidecar_path: null
@@ -1473,16 +1255,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-016-stolyarova-1992.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-11
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-016-stolyarova-1992.pdf
-  - docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-017-stolyarova-2013
+  aliases: []
   citation: Stolyarova, V.L. (2013), review/compilation on high-temperature mass spectrometry of oxide
     systems and ternary silicate melts (CAS, CTS, MAS, BTS families) — vapour composition map Table 1
   doi: null
@@ -1490,8 +1268,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-017-stolyarova-2013.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-017-stolyarova-2013.pdf
+  pdf_last_seen: []
   pdf_sha256: dd4c37200290a118557bfda5395d9553a2c52f7e7f2a694fd166e82679f63869
   pdf_tracked: true
   sidecar_path: null
@@ -1500,16 +1277,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-017-stolyarova-2013.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-32
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-017-stolyarova-2013.pdf
-  - docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-018-stolyarova-2012
+  aliases: []
   citation: Stolyarova, V. (2012), "Thermodynamic properties and vaporization processes of the ionic silicate
     melts" — review; Table 1 vapour composition over ternary ionic silicate systems
   doi: null
@@ -1517,8 +1290,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-018-stolyarova-2012.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-018-stolyarova-2012.pdf
+  pdf_last_seen: []
   pdf_sha256: 7a9c05dd81d50994911b82a891f0bc82f80994e4a30535b2c593ffeb441b4d2f
   pdf_tracked: true
   sidecar_path: null
@@ -1527,16 +1299,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-018-stolyarova-2012.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-33
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-018-stolyarova-2012.pdf
-  - docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-020-hastie-1981-nbsir
+  aliases: []
   citation: Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1981), "Alkali Vapor Transport in Coal Conversion
     and Combustion Systems", NBSIR 81-2279, National Bureau of Standards, May 1981 (interim report)
   doi: null
@@ -1544,31 +1312,21 @@ sources:
   identifier: NBSIR 81-2279
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/ (extract provenance_path;
-    directory missing)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-020-hastie-1981-nbsir.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-47
+  battery_datasets: []
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-021-plante-1992-feo
+  aliases: []
   citation: Plante, E. R., Hastie, J. W. & Kowalska, M. (1992), "Activity of FeO in the FeO-MgO-SiO2 System
     Determined by High Temperature Mass Spectrometry", ISIJ International 32(12):1276-1279, DOI 10.2355/isijinternational.32.1276
   doi: 10.2355/isijinternational.32.1276
@@ -1576,33 +1334,21 @@ sources:
   identifier: 10.2355/isijinternational.32.1276
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/ (extract provenance_path; directory
-    missing)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-021-plante-1992-feo.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-04
-  - RH-68
-  - RH-102
+  battery_datasets: []
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-022-demaria-1971
+  aliases: []
   citation: De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971), "Mass spectrometric investigation
     of the vaporization process of Apollo 12 lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380
   doi: null
@@ -1610,8 +1356,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.pdf
+  pdf_last_seen: []
   pdf_sha256: 6068fe24df64202e61bc4f7491f453d0f34158fff962d39dc90d356096fcd796
   pdf_tracked: true
   sidecar_path: null
@@ -1620,121 +1365,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - na-paired
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-02
-  - RH-05
-  - RH-12
-  - RH-81
-  copies:
-  - docs-private/deep-research/literature/demaria-1971-apollo-12022-kems/source.pdf
-  - docs-private/research/kems-corpus/pdfs/kems-022-demaria-1971.pdf
-  - docs-private/research/ocr-artifacts/kems-022-demaria-1971/
-  measurement_sets: []
-- source_id: kems-023-rammensee-1982
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs-private/RESUME-NOTES-2026-08-27.md (OA acquired 2026-08-27; PDF not on disk now)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: kems-024-chastel-1987
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs-private/RESUME-NOTES-2026-08-27.md (OA acquired 2026-08-27; PDF not on disk now)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: kems-025-mathieu
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs-private/RESUME-NOTES-2026-08-27.md (OA acquired 2026-08-27; PDF not on disk now)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: kems-026-charles-1967
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs-private/RESUME-NOTES-2026-08-27.md (OA acquired 2026-08-27; PDF not on disk now)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
-  extracts: []
   battery_datasets: []
   hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-027-plante-hastie-1983
+  aliases: []
   citation: Plante, E. R., Hastie, J. W. & Bonnell, D. W. (1983), NBSIR 83-2731, "Experimental and Theoretical
     Models for Transpiration Mass Spectrometry" (alkali-bearing glass KMS/TMS vaporization methods)
   doi: null
@@ -1742,8 +1378,7 @@ sources:
   identifier: NBSIR 83-2731
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-027-plante-hastie-1983.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-027-plante-hastie-1983.pdf
+  pdf_last_seen: []
   pdf_sha256: c246e1866d67faac6fd48d18051c60c57bddcf92c2dd2e3983abdda92e459df8
   pdf_tracked: true
   sidecar_path: null
@@ -1752,91 +1387,13 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-027-plante-hastie-1983.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-48
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-027-plante-hastie-1983.pdf
-  - docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/
-  measurement_sets: []
-- source_id: kems-028-markova-1986
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs-private/RESUME-NOTES-2026-08-27.md (listed in the 8-OA wave; later confirmed-not-OA)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: kems-029
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs-private/RESUME-NOTES-2026-08-27.md (OA acquired 2026-08-27; PDF not on disk now)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: kems-030
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs-private/RESUME-NOTES-2026-08-27.md (OA acquired 2026-08-27; PDF not on disk now)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
-  extracts: []
   battery_datasets: []
   hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-031-halwax-2024
+  aliases:
+  - halwax_sergeev_mueller_schenk_2024
   citation: Halwax, A., Sergeev, D., Müller, M. & Schenk, J. (2024), "Enthalpy of Formation of Calcium
     and Magnesium Oxide Obtained by Knudsen Effusion Mass Spectrometry", Metall. Mater. Trans. B, DOI
     10.1007/s11663-024-02995-6
@@ -1845,8 +1402,7 @@ sources:
   identifier: 10.1007/s11663-024-02995-6
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-031-halwax-2024.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-031-halwax-2024.pdf
+  pdf_last_seen: []
   pdf_sha256: 9d60e03e008c173aa5facb3eb80621f01f78e737e743b3547d8c19740132f026
   pdf_tracked: true
   sidecar_path: null
@@ -1856,24 +1412,23 @@ sources:
   - path: data/literature/extracts/kems-031-halwax-2024.yaml
     review_status: draft
   battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-69
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-031-halwax-2024.pdf
-  - docs-private/research/ocr-artifacts/kems-031-halwax-2024/
-  measurement_sets: []
+  - data/literature/kems_measurements.yaml
+  - data/presets/kems/halwax_2024_cao.yaml
+  - data/presets/kems/halwax_2024_mgo.yaml
+  hunt_ids: []
+  copies: []
+  measurement_sets:
+  - data/literature/kems_measurements.yaml
 - source_id: kems-032-copland-jacobson-2010
+  aliases: []
   citation: Copland, E. H. & Jacobson, N. S. (2010), "Measuring Thermodynamic Properties of Metals and
     Alloys With Knudsen Effusion Mass Spectrometry", NASA/TP—2010-216795
   doi: null
-  report_number: NASA/TP—2010-216795
-  identifier: NASA/TP—2010-216795
+  report_number: NTRS 20110001597
+  identifier: NTRS 20110001597
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-032-copland-jacobson-2010.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-032-copland-jacobson-2010.pdf
+  pdf_last_seen: []
   pdf_sha256: a72ca745e22531dc42dc7b4d59813ac8a38f255af86023e56f1d1098637dff92
   pdf_tracked: true
   sidecar_path: null
@@ -1882,41 +1437,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-032-copland-jacobson-2010.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-34
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-032-copland-jacobson-2010.pdf
-  - docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/
-  measurement_sets: []
-- source_id: kems-033-costa-2017
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs-private/RESUME-NOTES-2026-08-27.md (OA acquired 2026-08-27; PDF not on disk now)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
-  extracts: []
   battery_datasets: []
   hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-035-sauerborn-2005
+  aliases: []
   citation: Sauerborn, M. (2005), "Pyrolyse von Metalloxiden und Silikaten unter Vakuum mit konzentrierter
     Solarstrahlung", Dissertation, Rheinische Friedrich-Wilhelms-Universität Bonn
   doi: null
@@ -1924,33 +1450,23 @@ sources:
   identifier: null
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/ (extract provenance_path; directory
-    missing)
-  - docs-private/deep-research/literature/sauerborn-2004-dlr-solar-furnace/source.pdf (papers library;
-    present)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-49
+  battery_datasets: []
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-036-sesko-2024
+  aliases:
+  - sesko_2024
+  - sesko_2024_vapor_phase_pyrolysis
   citation: Šeško, R., Lamboley, K., Cutard, T., Grill, L., Reiss, P. & Cowley, A. (2024), "Oxygen production
     by solar vapor-phase pyrolysis of lunar regolith simulant", Acta Astronautica 224:215–225, DOI 10.1016/j.actaastro.2024.08.009
   doi: 10.1016/j.actaastro.2024.08.009
@@ -1958,33 +1474,24 @@ sources:
   identifier: 10.1016/j.actaastro.2024.08.009
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/ (extract provenance_path; directory
-    missing)
-  - docs-private/deep-research/literature/sesko-2022-thesis-solar-vapor-pyrolysis/source.pdf (papers library;
-    present)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-036-sesko-2024.yaml
     review_status: draft
   battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-50
+  - data/literature/vacuum_pyrolysis_measurements.yaml
+  - data/presets/vacuum_pyrolysis/sesko_2024.yaml
+  hunt_ids: []
   copies: []
-  measurement_sets: []
+  measurement_sets:
+  - data/literature/vacuum_pyrolysis_measurements.yaml
 - source_id: kems-037-richter-2002
+  aliases: []
   citation: 'Richter, F. M., Davis, A. M., Ebel, D. S. & Hashimoto, A. (2002), "Elemental and isotopic
     fractionation of Type B calcium-, aluminum-rich inclusions: experiments, theoretical considerations,
     and constraints on their thermal evolution", Geochim. Cosmochim. Acta 66:521-540'
@@ -1993,8 +1500,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-037-richter-2002.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-037-richter-2002.pdf
+  pdf_last_seen: []
   pdf_sha256: c64b38eacaa46219824d76d546304aa62e866e989e4260c7188d321e3122d8ae
   pdf_tracked: true
   sidecar_path: null
@@ -2003,17 +1509,12 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-037-richter-2002.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-35
-  copies:
-  - docs-private/deep-research/literature/richter-2002-gca-evaporation-isotope-frac/source.pdf
-  - docs-private/research/kems-corpus/pdfs/kems-037-richter-2002.pdf
-  - docs-private/research/ocr-artifacts/kems-037-richter-2002/
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
   measurement_sets: []
 - source_id: kems-038-matchett-2006
+  aliases: []
   citation: Matchett, J. (2006), "Production of Lunar Oxygen Through Vacuum Pyrolysis", Major Research
     Report MAE 298, The George Washington University, ADA443950
   doi: null
@@ -2021,33 +1522,21 @@ sources:
   identifier: ADA443950
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/ (extract provenance_path; directory
-    missing)
-  - docs-private/deep-research/literature/matchett-2006-vacuum-pyrolysis-thesis/source.pdf (papers library;
-    present)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-038-matchett-2006.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-70
+  battery_datasets: []
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-040-stolyarova-2015
+  aliases: []
   citation: 'Stolyarova, V. L. (2015), "Vaporization and Thermodynamics of Glass-Forming Oxide Melts:
     Mass Spectrometric Study and Modeling", J. Materials Science and Chemical Engineering 3:81–86, DOI
     10.4236/msce.2015.37009'
@@ -2056,31 +1545,21 @@ sources:
   identifier: 10.4236/msce.2015.37009
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs-private/research/2026-08-27-ocr-repair/kems-040-stolyarova-2015/ (extract provenance_path; directory
-    missing)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-040-stolyarova-2015.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-36
+  battery_datasets: []
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-041-sossi-fegley-2018
+  aliases: []
   citation: Sossi, P.A. & Fegley, B. Jr. (2018), review compilation of metal-oxide vapour speciation and
     melt activity coefficients (Table 1 pure oxides; Table 2 complex silicate melts)
   doi: null
@@ -2088,8 +1567,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.pdf
+  pdf_last_seen: []
   pdf_sha256: d46a4c09ea9b57e89f34ba41630dd839fb2f64ed4943a886b779bde262dca282
   pdf_tracked: true
   sidecar_path: null
@@ -2098,48 +1576,13 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-041-sossi-fegley-2018.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  - vp30
-  hunt_ids:
-  - RH-04
-  - RH-05
-  - RH-13
-  - RH-102
-  copies:
-  - docs-private/deep-research/literature/sossi-fegley-2018-volatility/source.pdf
-  - docs-private/research/kems-corpus/pdfs/kems-041-sossi-fegley-2018.pdf
-  - docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/
-  measurement_sets: []
-- source_id: kems-042-nbs-sp561-v1-hastie-1979
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-042-nbs-sp561-v1-hastie-1979.pdf (cited by extract kems-042-plante-1979;
-    ABSENT)
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
   battery_datasets: []
-  hunt_ids:
-  - RH-51
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-042-plante-1979
+  aliases:
+  - kems-042-nbs-sp561-v1-hastie-1979
   citation: Plante, E. R. (1979), "Vapor pressure measurements of potassium over K2O-SiO2 solutions by
     a Knudsen effusion, mass spectrometric method", in Hastie, J. W. (ed.), Characterization of High Temperature
     Vapors and Gases, NBS Special Publication 561, Vol. 1, pp. 265-281, National Bureau of Standards,
@@ -2149,38 +1592,28 @@ sources:
   identifier: NBS Special Publication 561
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-042-nbs-sp561-v1-hastie-1979.pdf (cited by extract; ABSENT)
+  pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-042-plante-1979.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-51
+  battery_datasets: []
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: kems-045-sossi-2018-pnas-cr
-  citation: Sossi, P. A., Moynier, F. & van Zuilen, K. (2018), PNAS 115, 10920–10925, DOI 10.1073/pnas.1809060115
-  doi: 10.1073/pnas.1809060115
+  aliases: []
+  citation: null
+  doi: null
   report_number: null
-  identifier: 10.1073/pnas.1809060115
+  identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/kems-045-sossi-2018-pnas-cr.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-045-sossi-2018-pnas-cr.pdf
+  pdf_last_seen: []
   pdf_sha256: 47384f82da878b0590098d9eaf0d3e7b8f828f665ca62aeb4d6b0a8631a36514
   pdf_tracked: true
   sidecar_path: null
@@ -2189,11 +1622,11 @@ sources:
   extracts: []
   battery_datasets: []
   hunt_ids: []
-  copies:
-  - docs-private/research/kems-corpus/pdfs/kems-045-sossi-2018-pnas-cr.pdf
-  - docs-private/research/ocr-artifacts/kems-045-sossi-2018-pnas-cr/
+  copies: []
   measurement_sets: []
 - source_id: kems-ms2000-044
+  aliases:
+  - ms2000-044
   citation: Tsaplin, A. A., Zaitsev, A. I., Shelkova, N. E. & Mogutnov, B. M., "Thermodynamic properties
     and phase equilibria in Na2O-SiO2 and K2O-SiO2 systems", conference preprint, 24 pp.
   doi: null
@@ -2201,8 +1634,7 @@ sources:
   identifier: null
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  pdf_last_seen: []
   pdf_sha256: 3d78f4e6403b3512176071c79a8ac88e263f7d87c5b1e0159e2e133fb0f4d1b1
   pdf_tracked: true
   sidecar_path: null
@@ -2211,66 +1643,14 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-ms2000-044.yaml
     review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-04
-  - RH-14
-  - RH-81
-  copies: []
-  measurement_sets: []
-- source_id: knacke-kubaschewski-hesselmann
-  citation: O. Knacke, O. Kubaschewski and K. Hesselmann, Thermochemical Properties of Inorganic Substances,
-    Second Edition, Springer/Verlag Stahleisen, 1991, two volumes.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: paywalled
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: kubaschewski-alcock
-  citation: O. Kubaschewski and C. B. Alcock, Metallurgical Thermochemistry, Fifth Edition, Pergamon Press,
-    1979.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: paywalled
-  extracts: []
   battery_datasets: []
   hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: lamoreaux-hildenbrand-1984
+  aliases:
+  - ref-052-k-o-gas
+  - ref-052-na-o-gas
   citation: Lamoreaux, R. H. & Hildenbrand, D. L., High Temperature Vaporization Behavior of Oxides. I.
     Alkali Metal Binary Oxides, J. Phys. Chem. Ref. Data 13 (1984) 151–173
   doi: 10.1063/1.555706
@@ -2282,23 +1662,20 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lamoreaux-hildenbrand-1984.yaml
     review_status: draft
   battery_datasets: []
-  hunt_ids:
-  - RH-08
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: lamoreaux-hildenbrand-hildenbrand-1987
+  aliases:
+  - lh87-al-o-gas-species
+  - lh87-cao-g
+  - lh87-mgo-g
   citation: Lamoreaux, R. H., Hildenbrand, D. L. & Brewer, L., High-Temperature Vaporization Behavior
     of Oxides II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg, J.
     Phys. Chem. Ref. Data 16 (1987) 419–443
@@ -2311,13 +1688,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lamoreaux-hildenbrand-hildenbrand-1987.yaml
@@ -2326,32 +1697,11 @@ sources:
   hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: landolt-boernstein-sgte
-  citation: SGTE, Thermodynamic Properties of Inorganic Materials, Landolt-Börnstein, New Series, Group
-    IV, Volume 19, Springer.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: paywalled
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
 - source_id: lh87-al-o-gas-species
+  aliases:
+  - lamoreaux-hildenbrand-hildenbrand-1987
+  - lh87-cao-g
+  - lh87-mgo-g
   citation: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443, DOI 10.1063/1.555799, Al–O gas species
     tables (AlO, Al2O, Al2O2 — note Al2O3(g) is often NOT the dominant vapor; confirm molecular identity
     before flip). JANAF AlO(g)/Al2O(g)/Al2O2(g) Chase 1998.
@@ -2364,13 +1714,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lh87-al-o-gas-species.yaml
@@ -2380,6 +1724,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: lh87-beo-g
+  aliases: []
   citation: LH87 BeO(g); JANAF BeO(g) — use one as fit, one as anchor at numeric land
   doi: null
   report_number: null
@@ -2390,13 +1735,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lh87-beo-g.yaml
@@ -2406,6 +1745,10 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: lh87-cao-g
+  aliases:
+  - lamoreaux-hildenbrand-hildenbrand-1987
+  - lh87-al-o-gas-species
+  - lh87-mgo-g
   citation: Lamoreaux, Hildenbrand & Brewer (1987) J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799,
     Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).
   doi: 10.1063/1.555799
@@ -2417,13 +1760,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lh87-cao-g.yaml
@@ -2433,6 +1770,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: lh87-geo-g
+  aliases: []
   citation: LH87 GeO(g); JANAF GeO(g); classical GeO sublimation measurements
   doi: null
   report_number: null
@@ -2443,13 +1781,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lh87-geo-g.yaml
@@ -2459,6 +1791,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: lh87-in2o-g
+  aliases: []
   citation: LH87 In–O gas (In2O); JANAF if present
   doi: null
   report_number: null
@@ -2469,13 +1802,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lh87-in2o-g.yaml
@@ -2485,6 +1812,10 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: lh87-mgo-g
+  aliases:
+  - lamoreaux-hildenbrand-hildenbrand-1987
+  - lh87-al-o-gas-species
+  - lh87-cao-g
   citation: Lamoreaux, R.H., Hildenbrand, D.L. & Brewer, L. (1987), "High-Temperature Vaporization Behavior
     of Oxides. II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg", J.
     Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799 (LH87 Table 3 — MgO(g) thermochemistry). Cross-check
@@ -2498,13 +1829,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lh87-mgo-g.yaml
@@ -2514,6 +1839,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: lh87-pbo-g
+  aliases: []
   citation: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443 PbO(g); JANAF PbO(g); Kazenas oxide
     evaporation KEMS.
   doi: null
@@ -2525,13 +1851,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lh87-pbo-g.yaml
@@ -2541,6 +1861,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: lh87-sno-g
+  aliases: []
   citation: LH87 SnO(g); JANAF SnO(g)
   doi: null
   report_number: null
@@ -2551,13 +1872,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/lh87-sno-g.yaml
@@ -2566,87 +1881,32 @@ sources:
   hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: ms2000-044
-  citation: Tsaplin, A. A., Zaitsev, A. I., Shelkova, N. E. & Mogutnov, B. M., "Thermodynamic properties
-    and phase equilibria in Na2O-SiO2 and K2O-SiO2 systems", conference preprint, 24 pp.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
-  pdf_sha256: 3d78f4e6403b3512176071c79a8ac88e263f7d87c5b1e0159e2e133fb0f4d1b1
-  pdf_tracked: true
-  sidecar_path: null
-  sidecar_missing_fields: *id023
-  access_status: held
-  extracts:
-  - path: data/literature/extracts/kems-ms2000-044.yaml
-    review_status: draft
-  battery_datasets:
-  - extract-reproduction
-  - scripts/calibration_battery.py
-  hunt_ids:
-  - RH-04
-  - RH-14
-  - RH-81
-  copies: []
-  measurement_sets: []
-- source_id: mtdata
-  citation: MTDATA thermodynamic software and databases, National Physical Laboratory.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: paywalled
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
 - source_id: nasa-cea-thermo
+  aliases: []
   citation: McBride, B. J., Zehe, M. J. & Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic
     Properties of Individual Species, NASA TP-2002-211556; NASA CEA thermo.inp (Glenn coefficient database).
   doi: null
-  report_number: NASA/TP-2002-211556
-  identifier: NASA/TP-2002-211556
+  report_number: null
+  identifier: null
   pdf_status: ABSENT
   pdf_path: null
   pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
+  sidecar_missing_fields: []
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/nasa-cea-thermo.yaml
     review_status: draft
-  battery_datasets: []
-  hunt_ids:
-  - RH-08
-  - RH-39
+  battery_datasets:
+  - data/literature/gibbs_battery_residual_ledger.yaml
+  hunt_ids: []
   copies: []
-  measurement_sets: []
+  measurement_sets:
+  - data/literature/gibbs_battery_residual_ledger.yaml
 - source_id: nist-srd69-p4
+  aliases: []
   citation: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage)
     — independent of oxide-carrier path. Plant carriers (preferred promotion targets): (1) PO/PO2 — JANAF
     PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto-class
@@ -2660,13 +1920,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/nist-srd69-p4.yaml
@@ -2676,33 +1930,8 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: nist-webbook
+  aliases: []
   citation: NIST Chemistry WebBook, SRD 69 (species thermochemistry pages)
-  doi: 10.18434/T4D303
-  report_number: NIST Standard Reference Database 69
-  identifier: 10.18434/T4D303
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: OA
-  extracts:
-  - path: data/literature/extracts/nist-webbook.yaml
-    review_status: draft
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: oneill-eggins-2002
-  citation: null
   doi: null
   report_number: null
   identifier: null
@@ -2712,21 +1941,17 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
+  sidecar_missing_fields: []
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/nist-webbook.yaml
+    review_status: draft
   battery_datasets: []
   hunt_ids: []
-  copies:
-  - docs-private/research/2026-08-18-bench-candidates/pdfs/oneill-eggins-2002.pdf
+  copies: []
   measurement_sets: []
 - source_id: pending-as2o3-second-primary
+  aliases: []
   citation: Second arsenolite vapor-pressure primary distinct from Behrens & Rosenblatt 1972 (e.g. earlier
     static-method series cited by BR72 itself — use BR72's cited experimental sources, not BR72 coefficients).
     JANAF As4O6 if tabulated.
@@ -2739,13 +1964,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-as2o3-second-primary.yaml
@@ -2755,6 +1974,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-bi2o3-kems
+  aliases: []
   citation: Oxide vaporization KEMS for Bi–O (Kazenas; search Bi4O6/BiO)
   doi: null
   report_number: null
@@ -2765,13 +1985,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-bi2o3-kems.yaml
@@ -2781,6 +1995,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-cacl2-kems-or-transpiration
+  aliases: []
   citation: 'Measured monomer/dimer salt vapor pressures: e.g. Hildenbrand / KEMS alkaline-earth chloride
     literature; Bloom & Welch molten CaCl2 VP. JANAF cannot self-validate a JANAF-derived Antoine.'
   doi: null
@@ -2792,13 +2007,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-cacl2-kems-or-transpiration.yaml
@@ -2808,6 +2017,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-dual-primary-oso4
+  aliases: []
   citation: Classical OsO4 vapor-pressure measurements (multiple 20th-c. lab series; e.g. Ogawa / later
     reviews). JANAF OsO4(g/l). With no fit yet, land first primary as fit and second as anchor in the
     same promotion commit.
@@ -2820,13 +2030,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-dual-primary-oso4.yaml
@@ -2836,6 +2040,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-kems-cro3
+  aliases: []
   citation: Chromia oxidizing vaporization CrO3(g) KEMS under high fO2
   doi: null
   report_number: null
@@ -2846,13 +2051,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-kems-cro3.yaml
@@ -2862,6 +2061,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-mg2cl4
+  aliases: []
   citation: MgCl2 dimerization equilibrium literature (not JANAF-only if JANAF is fit)
   doi: null
   report_number: null
@@ -2872,13 +2072,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-mg2cl4.yaml
@@ -2888,6 +2082,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-mgcl2-measured-vp
+  aliases: []
   citation: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
   doi: null
   report_number: null
@@ -2898,13 +2093,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-mgcl2-measured-vp.yaml
@@ -2914,6 +2103,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-p4o6-vp
+  aliases: []
   citation: Measured P4O6 vaporization (recover primary); SF18-T5 carrier role is review-only. JANAF if
     tables exist for P4O6(g).
   doi: null
@@ -2925,13 +2115,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-p4o6-vp.yaml
@@ -2941,6 +2125,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-pages-moo3-vp
+  aliases: []
   citation: MoO3 vaporization (Ackermann & Rauh; Blackburn) — this family is explicitly a cross-check
     surface; use a primary MoO3 series distinct from whatever coefficients sit on the row.
   doi: null
@@ -2952,13 +2137,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-pages-moo3-vp.yaml
@@ -2968,6 +2147,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-pages-p4o10-sublimation
+  aliases: []
   citation: Classical P4O10 sublimation vapor-pressure measurements (recover page-level primary independent
     of any rail fit); JANAF P4O10.
   doi: null
@@ -2979,13 +2159,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-pages-p4o10-sublimation.yaml
@@ -2995,6 +2169,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-pages-wo3-polymer-vp
+  aliases: []
   citation: Classical WO3 / (WO3)n polymer vaporization (Ackermann & Rauh; Blackburn); JANAF WO3(g) polymers
   doi: null
   report_number: null
@@ -3005,13 +2180,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-pages-wo3-polymer-vp.yaml
@@ -3021,6 +2190,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-re2o7-second-series
+  aliases: []
   citation: Second lab series for Re2O7 (search post-1952 effusion); or JANAF Re2O7 thermochemistry if
     not used in fit. Smith et al. 1952 is likely the fit source — need non-Smith primary for validated
     flip.
@@ -3033,13 +2203,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-re2o7-second-series.yaml
@@ -3049,6 +2213,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: pending-teo2-vp
+  aliases: []
   citation: Primary TeO2 vapor-pressure / effusion papers (recover pages)
   doi: null
   report_number: null
@@ -3059,13 +2224,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pending-teo2-vp.yaml
@@ -3074,64 +2233,11 @@ sources:
   hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: pomeroy_cardiff_2006
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/literature/vacuum_pyrolysis_measurements.yaml
-  - data/presets/vacuum_pyrolysis/pomeroy_cardiff_2006.yaml
-  - data/presets/vacuum_pyrolysis/robinot_2026.yaml
-  - pomeroy_cardiff_2006_vacuum_pyrolysis
-  - robinot_2026_vacuum_pyrolysis
-  - scripts/calibration_battery.py
-  hunt_ids: []
-  copies: []
-  measurement_sets:
-  - data/literature/vacuum_pyrolysis_measurements.yaml
-- source_id: pomeroy_cardiff_2006_vacuum_pyrolysis
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/presets/vacuum_pyrolysis/pomeroy_cardiff_2006.yaml
-  - pomeroy_cardiff_2006_vacuum_pyrolysis
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
 - source_id: pound-1972-cr-langmuir-knudsen
+  aliases:
+  - REF-040
+  - kems-003-pound-1972
+  - pound-1972-mccabe-cr
   citation: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary
     McCabe, Hudson & Paxton (1958), Trans. Met. Soc. AIME 212:102
   doi: 10.1063/1.3253096
@@ -3143,22 +2249,22 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pound-1972-cr-langmuir-knudsen.yaml
     review_status: draft
-  battery_datasets: []
+  battery_datasets:
+  - data/literature/langmuir_knudsen_flux_validation.yaml
   hunt_ids: []
   copies: []
-  measurement_sets: []
+  measurement_sets:
+  - data/literature/langmuir_knudsen_flux_validation.yaml
 - source_id: pound-1972-mccabe-cr
+  aliases:
+  - REF-040
+  - kems-003-pound-1972
+  - pound-1972-cr-langmuir-knudsen
   citation: McCabe, C.L., Hudson, R.G. & Paxton, H.W. (1958) Langmuir/Knudsen solid-Cr vaporization (as
     selected in Pound 1972 J. Phys. Chem. Ref. Data Table 1, DOI 10.1063/1.3253096) — already used for
     α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat
@@ -3172,22 +2278,19 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/pound-1972-mccabe-cr.yaml
     review_status: draft
-  battery_datasets: []
+  battery_datasets:
+  - data/literature/langmuir_knudsen_flux_validation.yaml
   hunt_ids: []
   copies: []
-  measurement_sets: []
+  measurement_sets:
+  - data/literature/langmuir_knudsen_flux_validation.yaml
 - source_id: rau-1974-se-vp
+  aliases: []
   citation: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation
     measurements (or NEA Chemical Thermodynamics of Selenium if Rau is fit). KEMS allotrope fractions
     separate from total P.
@@ -3200,13 +2303,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/rau-1974-se-vp.yaml
@@ -3216,6 +2313,8 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-016-sio-kems-1700-2000k
+  aliases:
+  - sf04-magma-companion-workbook
   citation: "(1) Costa, G.C.C. & Jacobson, N.S. (2015) olivine KEMS SiO partials —\n    Clausius–Clapeyron\
     \ A=7.83, B=22.43 (grid-25-sio cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016;\
     \ docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n(2) Schaefer, L. & Fegley,\
@@ -3232,13 +2331,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml
@@ -3248,6 +2341,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-al
+  aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)
     Chase 1998 (REF-020).
   doi: null
@@ -3259,13 +2353,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-al.yaml
@@ -3275,6 +2363,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-bi
+  aliases: []
   citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)
   doi: null
   report_number: null
@@ -3285,13 +2374,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-bi.yaml
@@ -3301,6 +2384,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-ca
+  aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)
     Chase 1998.
   doi: null
@@ -3312,13 +2396,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-ca.yaml
@@ -3328,6 +2406,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-fe-liquid-equation
+  aliases: []
   citation: 'Alcock, C.B., Itkin, V.P. & Horrigan, M.K. (1984), "Vapour Pressure Equations for the Metallic
     Elements: 298–2500 K", Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309
     (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).'
@@ -3340,13 +2419,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-fe-liquid-equation.yaml
@@ -3356,6 +2429,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-k
+  aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent
     of Fiock & Rodebush 1926.
   doi: null
@@ -3367,13 +2441,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-k.yaml
@@ -3383,6 +2451,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-mg
+  aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)
     Chase 1998 (REF-020) free-energy path as secondary.
   doi: null
@@ -3394,13 +2463,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-mg.yaml
@@ -3410,6 +2473,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-mn-if-not-in-fit
+  aliases: []
   citation: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984)
     REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure
     series cited therein. Do not use Chase 1998 as independent if it entered the fit residual.
@@ -3422,13 +2486,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-mn-if-not-in-fit.yaml
@@ -3438,6 +2496,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-na
+  aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations
     (298–2500 K evaluated set) — independent of Rodebush & Walters 1930 primary used by NIST Antoine.
   doi: null
@@ -3449,13 +2508,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-na.yaml
@@ -3465,6 +2518,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-pb
+  aliases: []
   citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected
     values for Pb.
   doi: null
@@ -3476,13 +2530,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-pb.yaml
@@ -3492,6 +2540,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-si
+  aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)
     Chase 1998.
   doi: null
@@ -3503,13 +2552,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-si.yaml
@@ -3519,6 +2562,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-th
+  aliases: []
   citation: Ackermann, R.J. & Rauh, E.G. (historical Argonne) thorium metal vapor pressure / effusion;
     Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.
   doi: null
@@ -3530,13 +2574,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-th.yaml
@@ -3546,6 +2584,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-032-zr
+  aliases: []
   citation: 'Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)
     Chase 1998. Oxide: JANAF ZrO(g)/ZrO2(g).'
   doi: null
@@ -3557,13 +2596,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-032-zr.yaml
@@ -3573,6 +2606,9 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-052-k-o-gas
+  aliases:
+  - lamoreaux-hildenbrand-1984
+  - ref-052-na-o-gas
   citation: Lamoreaux & Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species
     tables — independent of Fiock & Rodebush pure K.
   doi: 10.1063/1.555706
@@ -3584,13 +2620,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-052-k-o-gas.yaml
@@ -3600,6 +2630,9 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ref-052-na-o-gas
+  aliases:
+  - lamoreaux-hildenbrand-1984
+  - ref-052-k-o-gas
   citation: Lamoreaux, R.H. & Hildenbrand, D.L. (1984), "High Temperature Vaporization Behavior of Oxides.
     I. Alkali Metal Binary Oxides", J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project
     REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush Antoine.
@@ -3612,13 +2645,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/ref-052-na-o-gas.yaml
@@ -3628,6 +2655,8 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: richter-et-al-2007
+  aliases:
+  - kems-010-richter-2007
   citation: Richter, F. M. et al. (2007), Geochim. Cosmochim. Acta 71:5544-5564, abstract and Fig. 3 pp.
     5551-5553, DOI 10.1016/j.gca.2007.09.005
   doi: 10.1016/j.gca.2007.09.005
@@ -3639,13 +2668,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/richter-et-al-2007.yaml
@@ -3654,64 +2677,8 @@ sources:
   hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: robinot_2026
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/literature/vacuum_pyrolysis_measurements.yaml
-  - data/presets/vacuum_pyrolysis/pomeroy_cardiff_2006.yaml
-  - data/presets/vacuum_pyrolysis/robinot_2026.yaml
-  - pomeroy_cardiff_2006_vacuum_pyrolysis
-  - robinot_2026_vacuum_pyrolysis
-  - scripts/calibration_battery.py
-  hunt_ids: []
-  copies: []
-  measurement_sets:
-  - data/literature/vacuum_pyrolysis_measurements.yaml
-- source_id: robinot_2026_vacuum_pyrolysis
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/presets/vacuum_pyrolysis/robinot_2026.yaml
-  - robinot_2026_vacuum_pyrolysis
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
 - source_id: safarian-engh-2013-si-pure-langmuir
+  aliases: []
   citation: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
   doi: 10.1007/s11661-012-1464-2
   report_number: null
@@ -3722,13 +2689,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml
@@ -3737,66 +2698,9 @@ sources:
   hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: sesko_2024
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/literature/vacuum_pyrolysis_measurements.yaml
-  - data/presets/vacuum_pyrolysis/pomeroy_cardiff_2006.yaml
-  - data/presets/vacuum_pyrolysis/robinot_2026.yaml
-  - data/presets/vacuum_pyrolysis/sesko_2024.yaml
-  - pomeroy_cardiff_2006_vacuum_pyrolysis
-  - robinot_2026_vacuum_pyrolysis
-  - scripts/calibration_battery.py
-  - sesko_2024_vapor_phase_pyrolysis
-  hunt_ids: []
-  copies: []
-  measurement_sets:
-  - data/literature/vacuum_pyrolysis_measurements.yaml
-- source_id: sesko_2024_vapor_phase_pyrolysis
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/presets/vacuum_pyrolysis/sesko_2024.yaml
-  - sesko_2024_vapor_phase_pyrolysis
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
 - source_id: sf04-magma-companion-workbook
+  aliases:
+  - ref-016-sio-kems-1700-2000k
   citation: Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization
     on Io", Icarus 169:216-241; numerical MAGMA grid preserved in the VapoRock Schaefer2004-MAGMA-valid.xlsx
     companion workbook.
@@ -3809,24 +2713,19 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/sf04-magma-companion-workbook.yaml
     review_status: reviewed
   battery_datasets: []
-  hunt_ids:
-  - RH-81
+  hunt_ids: []
   copies: []
   measurement_sets: []
-- source_id: sgte
-  citation: Scientific Group Thermodata Europe databases and unary reference data.
+- source_id: smales-1971-lpsc-12022
+  aliases: []
+  citation: Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)", Proceedings
+    of the Second Lunar Science Conference 2, 1253–1258.
   doi: null
   report_number: null
   identifier: null
@@ -3836,42 +2735,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: smales-1971-lpsc-12022
-  citation: Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)", Proceedings
-    of the Second Lunar Science Conference 2, 1253–1258.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf (main checkout, untracked; absent
-    from this worktree)
-  - docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md (extract provenance_path;
-    missing)
-  pdf_sha256: 7af2b6b0f870ba5b92a3ec6f490449eb7c9fc2f20f069a8bab9a21762e014fec
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/smales-1971-lpsc-12022.yaml
@@ -3881,6 +2745,8 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: sossi-et-al-2019
+  aliases:
+  - kems-012-sossi-2019
   citation: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021
   doi: 10.1016/j.gca.2019.06.021
   report_number: null
@@ -3891,23 +2757,17 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/sossi-et-al-2019.yaml
     review_status: draft
   battery_datasets: []
   hunt_ids: []
-  copies:
-  - docs-private/deep-research/literature/sossi-2019-gca-hkl-evaporation/source.pdf
+  copies: []
   measurement_sets: []
 - source_id: sossi-fegley-2018
+  aliases: []
   citation: Sossi, P. A. & Fegley, B. Jr., Thermodynamics of Element Volatility and its Application to
     Planetary Processes, Reviews in Mineralogy and Geochemistry 84 (2018) 393–459
   doi: 10.2138/rmg.2018.84.11
@@ -3919,25 +2779,17 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/sossi-fegley-2018.yaml
     review_status: draft
-  battery_datasets:
-  - scripts/calibration_battery.py
-  - vp30
+  battery_datasets: []
   hunt_ids: []
-  copies:
-  - docs-private/deep-research/literature/sossi-fegley-2018-volatility/source.pdf
+  copies: []
   measurement_sets: []
 - source_id: span-wagner-1996-co2-psat
+  aliases: []
   citation: 'Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the Fluid
     Region from the Triple-Point Temperature to 1100 K at Pressures up to 800 MPa", J. Phys. Chem. Ref.
     Data 25:1509–1596, DOI 10.1063/1.555991 — CO2(s/l/g) saturation from multiparameter EOS (triple point
@@ -3952,13 +2804,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/span-wagner-1996-co2-psat.yaml
@@ -3968,6 +2814,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: stebbins-carmichael-weill-1983
+  aliases: []
   citation: Stebbins, J. F., Carmichael, I. S. E. & Weill, D. E. (1983), "The high temperature liquid
     and glass heat contents and the heats of fusion of diopside, albite, sanidine and nepheline", American
     Mineralogist 68, 717-730.
@@ -3976,21 +2823,11 @@ sources:
   identifier: null
   pdf_status: ABSENT
   pdf_path: null
-  pdf_last_seen:
-  - docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.pdf (main checkout, untracked;
-    absent from this worktree)
-  - docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md (extract provenance_path;
-    missing)
-  pdf_sha256: 5246cf5b6bfd79f16961aac8264757af04da1d308e5d6b860aac747a44b2d8d6
+  pdf_last_seen: []
+  pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/stebbins-carmichael-weill-1983.yaml
@@ -4000,6 +2837,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: ts1985
+  aliases: []
   citation: Tsukihashi, F. & Sano, N. (1985), "Measurement of the Activity of Na2O in Na2O-SiO2 Melts
     by Chemical Equilibration Method" / 「化学平衡法による Na2O-SiO2 系融体中の Na2O の活量の測定」, Tetsu-to-Hagane (鉄と鋼)
     71(7), 815-822.
@@ -4008,22 +2846,21 @@ sources:
   identifier: 10.2355/tetsutohagane1955.71.7_815
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/ts1985.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/ts1985.pdf
+  pdf_last_seen: []
   pdf_sha256: 8345faa48d38200c457cb0af9a15c44c4cddedad8c93cac3ca1d118de4a7c7c8
   pdf_tracked: true
   sidecar_path: null
-  sidecar_missing_fields: *id024
+  sidecar_missing_fields: *id023
   access_status: held
   extracts:
   - path: data/literature/extracts/ts1985.yaml
     review_status: draft
   battery_datasets: []
-  hunt_ids:
-  - RH-15
+  hunt_ids: []
   copies: []
   measurement_sets: []
 - source_id: wetzel-gail-2013-sio-arrhenius
+  aliases: []
   citation: Wetzel, S. & Gail, H.-P. (2013), Astron. Astrophys. 553:A92, DOI 10.1051/0004-6361/201220803
   doi: 10.1051/0004-6361/201220803
   report_number: null
@@ -4034,13 +2871,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: []
   access_status: unknown
   extracts:
   - path: data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml
@@ -4050,6 +2881,7 @@ sources:
   copies: []
   measurement_sets: []
 - source_id: yam1983
+  aliases: []
   citation: Yamaguchi, S., Imai, A. & Goto, K.S. (1983), "Measurement of Activity of Na2O in Na2O-SiO2
     Binary Melt Using Beta-Alumina as a Solid Electrolyte" / 「β-アルミナ固体電解質を用いた Na2O-SiO2 系融体中の Na2O の活量の測定」,
     J. Japan Inst. Metals (日本金属学会誌) 47(9), 736-742.
@@ -4058,72 +2890,16 @@ sources:
   identifier: 10.2320/jinstmet1952.47.9_736
   pdf_status: present
   pdf_path: docs/references/pdfs/99-kems-langmuir/yam1983.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/yam1983.pdf
+  pdf_last_seen: []
   pdf_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
   pdf_tracked: true
   sidecar_path: null
-  sidecar_missing_fields: *id025
+  sidecar_missing_fields: *id024
   access_status: held
   extracts:
   - path: data/literature/extracts/yam1983.yaml
     review_status: draft
   battery_datasets: []
-  hunt_ids:
-  - RH-16
-  copies: []
-  measurement_sets: []
-- source_id: yu_2025_acta_astronautica_235_723_735
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/literature/mre_measurements.yaml
-  - data/presets/mre/yu_2025_hollow_anode.yaml
-  - yu_2025_hollow_anode
-  hunt_ids: []
-  copies: []
-  measurement_sets:
-  - data/literature/mre_measurements.yaml
-- source_id: yu_2025_hollow_anode
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets:
-  - data/presets/mre/yu_2025_hollow_anode.yaml
-  - yu_2025_hollow_anode
   hunt_ids: []
   copies: []
   measurement_sets: []
