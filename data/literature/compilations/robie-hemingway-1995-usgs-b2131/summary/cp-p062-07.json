@@ -1,0 +1,160 @@
+{
+  "record_id": "cp-p062-07",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 68,
+  "page": 62,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR CHAIN STRUCTURE SILICATE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "TREMOLITE",
+  "formula_candidate": "ca~g5 SiSOz2COH> 2",
+  "header_and_units_raw": "NAME AND FORJIJLA             ENTROPY          A1           A2           A3            A4          AS       T   r.,..   Tbn    Aa..H·\n                             J·.,l·t.K'1                   (T)          n·2,        (T-o.&)       (T2)          IC       IC   kJ·.,r1\n\n",
+  "source_text": "TREMOLITE                       548.9      6.131E+03   -4. 189E+OO   5.139E+07    -8.566E+04   1.757E-03         298\nca~g5 SiSOz2COH> 2                1.3                                                                           1100",
+  "rows": [
+    {
+      "raw": "TREMOLITE                       548.9      6.131E+03   -4. 189E+OO   5.139E+07    -8.566E+04   1.757E-03         298",
+      "tokens": [
+        {
+          "raw": "TREMOLITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 9
+        },
+        {
+          "raw": "548.9",
+          "value": 548.9,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 32,
+          "end_offset": 37
+        },
+        {
+          "raw": "6.131E+03",
+          "value": 6131.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 43,
+          "end_offset": 52
+        },
+        {
+          "raw": "-4.",
+          "value": -4.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 55,
+          "end_offset": 58
+        },
+        {
+          "raw": "189E+OO",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 59,
+          "end_offset": 66
+        },
+        {
+          "raw": "5.139E+07",
+          "value": 51390000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 69,
+          "end_offset": 78
+        },
+        {
+          "raw": "-8.566E+04",
+          "value": -85660.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 82,
+          "end_offset": 92
+        },
+        {
+          "raw": "1.757E-03",
+          "value": 0.001757,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 95,
+          "end_offset": 104
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 113,
+          "end_offset": 116
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "ca~g5 SiSOz2COH> 2                1.3                                                                           1100",
+      "tokens": [
+        {
+          "raw": "ca~g5",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 5
+        },
+        {
+          "raw": "SiSOz2COH>",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 6,
+          "end_offset": 16
+        },
+        {
+          "raw": "2",
+          "value": 2.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 17,
+          "end_offset": 18
+        },
+        {
+          "raw": "1.3",
+          "value": 1.3,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 34,
+          "end_offset": 37
+        },
+        {
+          "raw": "1100",
+          "value": 1100.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 112,
+          "end_offset": 116
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '-4. 189E+OO'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A2', '-4. 189E+OO')]",
+    "Body label or prose enters numeric region: [('A2', '-4. 189E+OO')]",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 30,
+  "source_line_end": 31
+}

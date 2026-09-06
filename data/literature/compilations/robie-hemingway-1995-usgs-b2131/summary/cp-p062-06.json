@@ -1,0 +1,128 @@
+{
+  "record_id": "cp-p062-06",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 68,
+  "page": 62,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR CHAIN STRUCTURE SILICATE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "ACMITE",
+  "formula_candidate": "NaFeSi~6",
+  "header_and_units_raw": "NAME AND FORJIJLA             ENTROPY          A1           A2           A3            A4          AS       T   r.,..   Tbn    Aa..H·\n                             J·.,l·t.K'1                   (T)          n·2,        (T-o.&)       (T2)          IC       IC   kJ·.,r1\n\n",
+  "source_text": "ACMITE                           170.6     1.994E+02   6. 197E-02    -4.267E+06                                  298\nNaFeSi~6                           0.8                                                                          1300",
+  "rows": [
+    {
+      "raw": "ACMITE                           170.6     1.994E+02   6. 197E-02    -4.267E+06                                  298",
+      "tokens": [
+        {
+          "raw": "ACMITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 6
+        },
+        {
+          "raw": "170.6",
+          "value": 170.6,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 33,
+          "end_offset": 38
+        },
+        {
+          "raw": "1.994E+02",
+          "value": 199.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 43,
+          "end_offset": 52
+        },
+        {
+          "raw": "6.",
+          "value": 6.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 55,
+          "end_offset": 57
+        },
+        {
+          "raw": "197E-02",
+          "value": 1.97,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 58,
+          "end_offset": 65
+        },
+        {
+          "raw": "-4.267E+06",
+          "value": -4267000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 69,
+          "end_offset": 79
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 113,
+          "end_offset": 116
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "NaFeSi~6                           0.8                                                                          1300",
+      "tokens": [
+        {
+          "raw": "NaFeSi~6",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 8
+        },
+        {
+          "raw": "0.8",
+          "value": 0.8,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 35,
+          "end_offset": 38
+        },
+        {
+          "raw": "1300",
+          "value": 1300.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 112,
+          "end_offset": 116
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '6. 197E-02'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A2', '6. 197E-02')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 27,
+  "source_line_end": 28
+}
