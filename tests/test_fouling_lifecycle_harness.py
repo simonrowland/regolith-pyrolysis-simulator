@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from types import SimpleNamespace
 import ast
+import json
 import math
 
 import pytest
@@ -197,10 +198,9 @@ def test_harness_namespaces_live_runner_aggregate_parity_from_lifecycle_projecti
     ).run((0,))
 
     assert runner_verdict["campaigns_to_resinter"] == pytest.approx(5.0)
-    assert result.campaigns_to_resinter_total.to_dict() == {
-        "value": runner_verdict["aggregate_campaigns_to_resinter"],
-        "authoritative_for_resinter": runner_verdict["authoritative_for_resinter"],
-    }
+    assert result.campaigns_to_resinter_total.value == runner_verdict["aggregate_campaigns_to_resinter"]
+    assert result.campaigns_to_resinter_total.authoritative_for_resinter is runner_verdict["authoritative_for_resinter"]
+    assert result.campaigns_to_resinter_total.notices
     assert result.campaigns_to_resinter_total.value == pytest.approx(10.0 / 2.2)
 
 
@@ -323,10 +323,9 @@ def test_harness_derived_total_fails_closed_when_runner_authority_absent() -> No
         resinter_threshold_kg=None,
     ).run((0,))
 
-    assert result.campaigns_to_resinter_total.to_dict() == {
-        "value": "resinter_threshold_kg / 0.3",
-        "authoritative_for_resinter": False,
-    }
+    assert result.campaigns_to_resinter_total.value == "resinter_threshold_kg / 0.3"
+    assert result.campaigns_to_resinter_total.authoritative_for_resinter is False
+    assert result.campaigns_to_resinter_total.notices
 
 
 def test_harness_derived_total_fails_closed_for_keyless_partial_authority_payload() -> None:
@@ -346,10 +345,9 @@ def test_harness_derived_total_fails_closed_for_keyless_partial_authority_payloa
         resinter_threshold_kg=None,
     ).run((0,))
 
-    assert result.campaigns_to_resinter_total.to_dict() == {
-        "value": "resinter_threshold_kg / 0.3",
-        "authoritative_for_resinter": False,
-    }
+    assert result.campaigns_to_resinter_total.value == "resinter_threshold_kg / 0.3"
+    assert result.campaigns_to_resinter_total.authoritative_for_resinter is False
+    assert result.campaigns_to_resinter_total.notices
 
 
 def test_harness_rederives_resinter_authority_from_snapshot_provenance() -> None:
@@ -374,6 +372,7 @@ def test_harness_rederives_resinter_authority_from_snapshot_provenance() -> None
     assert result.campaigns_to_resinter_total.to_dict() == {
         "value": "resinter_threshold_kg / 0.3",
         "authoritative_for_resinter": True,
+        "notices": [],
     }
 
 
@@ -399,10 +398,9 @@ def test_harness_report_total_keeps_value_but_rederives_authority() -> None:
         resinter_threshold_kg=None,
     ).run((0,))
 
-    assert result.campaigns_to_resinter_total.to_dict() == {
-        "value": 99,
-        "authoritative_for_resinter": False,
-    }
+    assert result.campaigns_to_resinter_total.value == 99
+    assert result.campaigns_to_resinter_total.authoritative_for_resinter is False
+    assert result.campaigns_to_resinter_total.notices
 
 
 def test_harness_accepts_explicit_total_struct_and_preserves_authority_namespace() -> None:
@@ -413,6 +411,7 @@ def test_harness_accepts_explicit_total_struct_and_preserves_authority_namespace
             {("duct_a", "SiO"): 0.1},
             ledger=object(),
             campaigns_total=total,
+            authority=_alpha_notice("SiO"),
         )
 
     result = FoulingLifecycleHarness(
@@ -422,8 +421,115 @@ def test_harness_accepts_explicit_total_struct_and_preserves_authority_namespace
         thickness_limit_m=0.001,
     ).run((0,))
 
-    assert result.campaigns_to_resinter_total is total
+    assert result.campaigns_to_resinter_total == total
     assert result.lifecycle_projection.service_life_authoritative is False
+
+
+@pytest.mark.parametrize("total_source", ["typed", "mapping", "report", "derived"])
+@pytest.mark.parametrize(
+    "statuses",
+    [
+        ("certified", "certified"),
+        ("certified", "extrapolated"),
+        ("extrapolated", "certified"),
+        ("certified", "unavailable"),
+        ("unavailable", "certified"),
+    ],
+    ids=["certified", "extrapolated-last", "extrapolated-first", "unavailable-last", "unavailable-first"],
+)
+def test_harness_total_tracks_all_snapshot_authority(statuses, total_source) -> None:
+    extrapolation = {
+        "alpha_s_extrapolated": True,
+        "alpha_s_domain_status": "out_of_domain",
+        "alpha_s_authoritative_at_temperature": False,
+        "output_status": "status_bearing",
+        "reason": "temperature outside certified band",
+        "certified_temperature_range_k": [800.0, 1200.0],
+    }
+
+    def run_campaign(status: str) -> FoulingRunArtifact:
+        authority = _alpha_notice("SiO") if status != "unavailable" else {}
+        if status == "extrapolated":
+            authority["alpha_s_provenance_by_species"]["SiO"]["duct_a"].update(
+                extrapolation
+            )
+        total = CampaignsToResinterTotal(10.0, True)
+        return _artifact(
+            {("duct_a", "SiO"): 0.1},
+            authority=authority,
+            campaigns_total=(
+                total if total_source == "typed"
+                else total.to_dict() if total_source == "mapping"
+                else None
+            ),
+            result_document=(
+                {"fouling_rate": {"campaigns_to_resinter": 10.0,
+                                  "authoritative_for_resinter": True}}
+                if total_source == "report" else None
+            ),
+        )
+
+    result = FoulingLifecycleHarness(
+        run_campaign,
+        segment_area_m2={"duct_a": 1.0},
+        resinter_threshold_kg=1.0,
+    ).run(statuses)
+
+    expected_authority = all(status == "certified" for status in statuses)
+    total = result.campaigns_to_resinter_total
+    assert total.value == 10.0
+    assert total.authoritative_for_resinter is expected_authority
+    assert len(total.notices) == sum(status != "certified" for status in statuses)
+    payload = json.loads(json.dumps(result.to_dict()))
+    assert payload["campaigns_to_resinter_total"] == total.to_dict()
+    for index, record in enumerate(payload["run_records"]):
+        recorded_total = record["campaigns_to_resinter_total"]
+        assert recorded_total["value"] == 10.0
+        assert recorded_total["authoritative_for_resinter"] is all(
+            status == "certified" for status in statuses[:index + 1]
+        )
+        assert len(recorded_total["notices"]) == sum(
+            status != "certified" for status in statuses[:index + 1]
+        )
+    if "extrapolated" in statuses:
+        notice = payload["campaigns_to_resinter_total"]["notices"][0]
+        assert notice["authoritative_for_resinter"] is False
+        alpha = notice["alpha_s_provenance_by_species"]["SiO"]["duct_a"]
+        assert {key: alpha[key] for key in extrapolation} == extrapolation
+    if "unavailable" in statuses:
+        notice = payload["campaigns_to_resinter_total"]["notices"][0]
+        assert notice["authoritative_for_resinter"] is False
+        assert notice["missing_carrier_authority_species"] == ["SiO"]
+
+
+@pytest.mark.parametrize("total_source", ["typed", "mapping", "report"])
+def test_harness_preserves_uncertified_total_and_notices(total_source) -> None:
+    total = CampaignsToResinterTotal(
+        10.0, False, ({"reason": "extrapolated total", "authority": "extrapolated"},)
+    )
+
+    def run_campaign(_index: int) -> FoulingRunArtifact:
+        payload = total.to_dict()
+        return _artifact(
+            {("duct_a", "SiO"): 0.1},
+            authority=_alpha_notice("SiO"),
+            campaigns_total=(
+                total if total_source == "typed"
+                else payload if total_source == "mapping"
+                else None
+            ),
+            result_document=(
+                {"fouling_rate": {**payload, "campaigns_to_resinter": total.value}}
+                if total_source == "report" else None
+            ),
+        )
+
+    result = FoulingLifecycleHarness(
+        run_campaign,
+        segment_area_m2={"duct_a": 1.0},
+    ).run((0, 1))
+
+    assert result.campaigns_to_resinter_total.to_dict() == total.to_dict()
 
 
 def test_worst_segment_projection_stays_separate_from_total_resinter_basis() -> None:

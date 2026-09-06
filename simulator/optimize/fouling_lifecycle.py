@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Mapping, Sequence
 
 from simulator.coating_lifespan import (
@@ -106,6 +106,8 @@ class FoulingLifecycleHarness:
         records: list[FoulingLifecycleRunRecord] = []
         trajectory: list[NestedDeposit] = []
         ledgers: list[Any] = []
+        snapshots_authoritative = True
+        snapshot_notices: list[Mapping[str, Any]] = []
 
         for campaign_index, campaign_input in enumerate(campaign_inputs, start=1):
             artifact = _coerce_run_artifact(self._run_campaign(campaign_input))
@@ -151,6 +153,20 @@ class FoulingLifecycleHarness:
                 artifact,
                 snapshot=snapshot,
                 resinter_threshold_kg=self._resinter_threshold_kg,
+            )
+            authority = wall_deposit_sticking_authority_status(
+                snapshot.wall_deposit_by_segment_species_kg,
+                snapshot.wall_deposit_sticking_authority,
+            )
+            if not authority["authoritative_for_resinter"]:
+                snapshots_authoritative = False
+                snapshot_notices.append(authority)
+            total = replace(
+                total,
+                authoritative_for_resinter=(
+                    total.authoritative_for_resinter and snapshots_authoritative
+                ),
+                notices=(*total.notices, *snapshot_notices),
             )
             records.append(
                 FoulingLifecycleRunRecord(
@@ -219,7 +235,11 @@ def _campaigns_total_from_artifact(
     if isinstance(explicit, Mapping):
         return CampaignsToResinterTotal(
             value=explicit.get("value", explicit.get("campaigns_to_resinter", "infinite")),
-            authoritative_for_resinter=_authoritative_for_resinter(snapshot),
+            authoritative_for_resinter=(
+                bool(explicit.get("authoritative_for_resinter", True))
+                and _authoritative_for_resinter(snapshot)
+            ),
+            notices=tuple(explicit.get("notices", ())),
         )
     report = _find_fouling_report(artifact.result_document)
     if report is not None:
@@ -228,7 +248,11 @@ def _campaigns_total_from_artifact(
                 "aggregate_campaigns_to_resinter",
                 report.get("campaigns_to_resinter", "infinite"),
             ),
-            authoritative_for_resinter=_authoritative_for_resinter(snapshot),
+            authoritative_for_resinter=(
+                bool(report.get("authoritative_for_resinter", True))
+                and _authoritative_for_resinter(snapshot)
+            ),
+            notices=tuple(report.get("notices", ())),
         )
     return campaigns_to_resinter_total(
         snapshot.wall_deposit_by_segment_species_kg,

@@ -179,11 +179,16 @@ class LifecycleProjection:
 class CampaignsToResinterTotal:
     value: float | str
     authoritative_for_resinter: bool
+    notices: tuple[Mapping[str, Any], ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "notices", tuple(_freeze_value(item) for item in self.notices))
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "value": self.value,
             "authoritative_for_resinter": self.authoritative_for_resinter,
+            "notices": [_plain_authority_mapping(item) for item in self.notices],
         }
 
 
