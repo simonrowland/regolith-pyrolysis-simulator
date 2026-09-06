@@ -7,11 +7,165 @@ source:
   doi: 10.1016/j.gca.2005.08.014
   year: 2006
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap alpha extract
-  date: '2026-08-03'
-  worker: ocr-phase2b-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/
+  method: OCR-artifact transcription plus manual PDF table deepening; Tables 1, 2 and 4 checked cell-for-cell against 200 dpi renders
+  date: '2026-09-06'
+  worker: DEEP-kems-005-fedkin-2006
+  provenance_path: docs-private/research/2026-09-06-deepening/DEEP-kems-005-fedkin-2006/kems-005-fedkin-2006/
 review_status: draft
+corrections:
+- observation_id: fedkin_2006_fe_hashimoto_langmuir_table3
+  field: printed_quote
+  old: absent
+  new: &table3_quote |-
+    Table 3. Evaporation coefficients determined for the Hashimoto (1983) vacuum experiments.
+    Species | 1973 K This work | 1973 K Alexander (2004) | 2073 K This work | 2073 K Alexander (2004) | 2173 K This work | 2173 K Alexander (2004) | 2273 K This work | 2273 K Alexander (2004)
+    Fe | 0.23 ± 0.02 | 0.25 ± 0.03 | 0.25 ± 0.02 | 0.26 ± 0.04 | 0.24 ± 0.02 | 0.27 ± 0.02 | 0.23 ± 0.02 | 0.28 ± 0.01
+    Mg | 0.24 ± 0.01 | 0.27 ± 0.05 | 0.28 ± 0.01 | 0.28 ± 0.05 | 0.28 ± 0.01 | 0.28 ± 0.05 | 0.27 ± 0.01 | 0.29 ± 0.03
+    SiO | 0.12 ± 0.01 | 0.16 ± 0.02 | 0.17 ± 0.01 | 0.17 ± 0.02 | 0.20 ± 0.01 | 0.19 ± 0.02 | 0.21 ± 0.01 | 0.21 ± 0.02
+    Prior to evaporation, the pressure in the chamber was 1.3 × 10−8 bar.
+  page: '210, 212'
+  quote: *table3_quote
+- observation_id: fedkin_2006_fe_hashimoto_langmuir_table3
+  field: class
+  old: absent
+  new: inverse
+  page: 212
+  quote: Evaporation coefficients obtained for Fe(g), Mg(g), and SiO(g) by our modeling of the Hashimoto (1983) data are summarized in Table 3.
+- observation_id: fedkin_2006_fe_class_b1
+  field: printed_quote
+  old: absent
+  new: *table3_quote
+  page: '210, 212'
+  quote: *table3_quote
+- observation_id: fedkin_2006_fe_class_b1
+  field: class
+  old: absent
+  new: inverse
+  page: 212
+  quote: Evaporation coefficients obtained for Fe(g), Mg(g), and SiO(g) by our modeling of the Hashimoto (1983) data are summarized in Table 3.
+- observation_id: fedkin_2006_mg_hashimoto_langmuir_table3
+  field: printed_quote
+  old: absent
+  new: *table3_quote
+  page: '210, 212'
+  quote: *table3_quote
+- observation_id: fedkin_2006_mg_hashimoto_langmuir_table3
+  field: class
+  old: absent
+  new: inverse
+  page: 212
+  quote: Evaporation coefficients obtained for Fe(g), Mg(g), and SiO(g) by our modeling of the Hashimoto (1983) data are summarized in Table 3.
+- observation_id: fedkin_2006_mg_class_b1
+  field: printed_quote
+  old: absent
+  new: *table3_quote
+  page: '210, 212'
+  quote: *table3_quote
+- observation_id: fedkin_2006_mg_class_b1
+  field: class
+  old: absent
+  new: inverse
+  page: 212
+  quote: Evaporation coefficients obtained for Fe(g), Mg(g), and SiO(g) by our modeling of the Hashimoto (1983) data are summarized in Table 3.
+- observation_id: fedkin_2006_sio_hashimoto_langmuir_table3
+  field: printed_quote
+  old: absent
+  new: *table3_quote
+  page: '210, 212'
+  quote: *table3_quote
+- observation_id: fedkin_2006_sio_hashimoto_langmuir_table3
+  field: class
+  old: absent
+  new: inverse
+  page: 212
+  quote: Evaporation coefficients obtained for Fe(g), Mg(g), and SiO(g) by our modeling of the Hashimoto (1983) data are summarized in Table 3.
+- observation_id: fedkin_2006_sio_hashimoto_table3_complete_b1
+  field: printed_quote
+  old: absent
+  new: *table3_quote
+  page: '210, 212'
+  quote: *table3_quote
+- observation_id: fedkin_2006_sio_hashimoto_table3_complete_b1
+  field: class
+  old: absent
+  new: inverse
+  page: 212
+  quote: Evaporation coefficients obtained for Fe(g), Mg(g), and SiO(g) by our modeling of the Hashimoto (1983) data are summarized in Table 3.
+- observation_id: fedkin_2006_na_yu_langmuir
+  field: printed_quote
+  old: absent
+  new: &yu_quote |-
+    The decline in the concentrations of Na2O and K2O was measured as a function of time at 1723 K.
+    Fig. 4. Evaporation rate data for (A) Na and (B) K from the experiments of Yu et al. (2003) on a chondrule analog composition in low-pressure air, compared to predictions of the evaporation model for three values of evaporation coefficients for Na and K.
+    It is seen that the Na data are best fit by αNa = 0.26 ± 0.05 and the K data by αK = 0.13 ± 0.02.
+  page: '213, 214'
+  quote: *yu_quote
+- observation_id: fedkin_2006_na_yu_langmuir
+  field: class
+  old: absent
+  new: inverse
+  page: '213, 214'
+  quote: It is seen that the Na data are best fit by αNa = 0.26 ± 0.05 and the K data by αK = 0.13 ± 0.02.
+- observation_id: fedkin_2006_na_yu_langmuir
+  field: T_range_K
+  old: [1723.15, 1723.15]
+  new: [1723.0, 1723.0]
+  page: 213
+  quote: The decline in the concentrations of Na2O and K2O was measured as a function of time at 1723 K.
+- observation_id: fedkin_2006_na_class_b1
+  field: printed_quote
+  old: absent
+  new: *yu_quote
+  page: '213, 214'
+  quote: *yu_quote
+- observation_id: fedkin_2006_na_class_b1
+  field: class
+  old: absent
+  new: inverse
+  page: '213, 214'
+  quote: It is seen that the Na data are best fit by αNa = 0.26 ± 0.05 and the K data by αK = 0.13 ± 0.02.
+- observation_id: fedkin_2006_na_class_b1
+  field: T_range_K
+  old: [1723.15, 1723.15]
+  new: [1723.0, 1723.0]
+  page: 213
+  quote: The decline in the concentrations of Na2O and K2O was measured as a function of time at 1723 K.
+- observation_id: fedkin_2006_k_yu_langmuir
+  field: printed_quote
+  old: absent
+  new: *yu_quote
+  page: '213, 214'
+  quote: *yu_quote
+- observation_id: fedkin_2006_k_yu_langmuir
+  field: class
+  old: absent
+  new: inverse
+  page: '213, 214'
+  quote: It is seen that the Na data are best fit by αNa = 0.26 ± 0.05 and the K data by αK = 0.13 ± 0.02.
+- observation_id: fedkin_2006_k_yu_langmuir
+  field: T_range_K
+  old: [1723.15, 1723.15]
+  new: [1723.0, 1723.0]
+  page: 213
+  quote: The decline in the concentrations of Na2O and K2O was measured as a function of time at 1723 K.
+- observation_id: fedkin_2006_k_class_b1
+  field: printed_quote
+  old: absent
+  new: *yu_quote
+  page: '213, 214'
+  quote: *yu_quote
+- observation_id: fedkin_2006_k_class_b1
+  field: class
+  old: absent
+  new: inverse
+  page: '213, 214'
+  quote: It is seen that the Na data are best fit by αNa = 0.26 ± 0.05 and the K data by αK = 0.13 ± 0.02.
+- observation_id: fedkin_2006_k_class_b1
+  field: T_range_K
+  old: [1723.15, 1723.15]
+  new: [1723.0, 1723.0]
+  page: 213
+  quote: The decline in the concentrations of Na2O and K2O was measured as a function of time at 1723 K.
 species:
   Fe:
     observations:
@@ -190,6 +344,98 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
             paragraph: apparatus of primary experiment
             line_range: '171'
+    - observation_id: fedkin_2006_t4_mg_this_work_inverse
+      type: alpha
+      class: inverse
+      locator:
+        page: 219
+        table: '4'
+        row: Mg; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+      quote: |-
+        Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+        Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+        Mg | 0.14 ± 0.01 | 0.19 | 0.19 ± 0.01 | 0.16
+      T_range_K:
+      - 2073.0
+      - 2273.0
+      phase: FeO_free_CMAS_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FeO-free stage of the Wang et al. (2001) evaporation experiment
+      standard_state: CMAS-model equilibrium vapor pressure and inverse-fit free-evaporation coefficient
+      regime: langmuir_free_evaporation_inverse_model
+      units: dimensionless
+      values:
+        quantity: inverse_fitted_evaporation_coefficient
+        method_class: model_derived_inverse_fit
+        evidence_kind: model
+        measurement_status: model_output_not_measurement
+        status: typed_refusal
+        admission_status: rejected_model_output_not_measurement
+        refusal_reason: model_output_not_measurement
+        gas_species: Mg(g)
+        material: Wang_et_al_2001_FeO_free_CMAS_residue
+        per_temperature:
+        - T_K: 2073.0
+          alpha: 0.14
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.19
+          sigma: 0.01
+      uncertainty:
+        per_temperature:
+        - T_K: 2073.0
+          alpha_sigma: 0.01
+        - T_K: 2273.0
+          alpha_sigma: 0.01
+        note: ±0.01 is printed for both this-work Mg coefficients.
+    - observation_id: fedkin_2006_t4_mg_alexander_2001_inverse
+      type: alpha
+      class: inverse
+      locator:
+        page: 219
+        table: '4'
+        row: Mg; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+      quote: |-
+        Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+        Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+        Mg | 0.14 ± 0.01 | 0.19 | 0.19 ± 0.01 | 0.16
+        Because Alexander (2001) did not present error bars for his estimates, it is not known whether these are significant differences.
+      T_range_K:
+      - 2073.0
+      - 2273.0
+      phase: FeO_free_CMAS_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FeO-free stage of the Wang et al. (2001) evaporation experiment
+      standard_state: EQR-model equilibrium vapor pressure and inverse-fit free-evaporation coefficient
+      regime: langmuir_free_evaporation_inverse_model
+      units: dimensionless
+      values:
+        quantity: inverse_fitted_evaporation_coefficient
+        method_class: model_derived_inverse_fit
+        evidence_kind: model
+        measurement_status: model_output_not_measurement
+        status: typed_refusal
+        admission_status: rejected_model_output_not_measurement
+        refusal_reason: model_output_not_measurement
+        gas_species: Mg(g)
+        material: Wang_et_al_2001_FeO_free_CMAS_residue
+        model: Alexander_2001_EQR
+        per_temperature:
+        - T_K: 2073.0
+          alpha: 0.19
+        - T_K: 2273.0
+          alpha: 0.16
+      uncertainty:
+        reported_status: not_reported
+        note: Alexander (2001) did not present error bars for these estimates.
   SiO:
     observations:
     - observation_id: fedkin_2006_sio_hashimoto_langmuir_table3
@@ -305,6 +551,98 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
             paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
             section: '4.1'
+    - observation_id: fedkin_2006_t4_sio_this_work_inverse
+      type: alpha
+      class: inverse
+      locator:
+        page: 219
+        table: '4'
+        row: SiO; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+      quote: |-
+        Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+        Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+        SiO | 0.07 ± 0.01 | 0.11 | 0.08 ± 0.01 | 0.08
+      T_range_K:
+      - 2073.0
+      - 2273.0
+      phase: FeO_free_CMAS_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FeO-free stage of the Wang et al. (2001) evaporation experiment
+      standard_state: CMAS-model equilibrium vapor pressure and inverse-fit free-evaporation coefficient
+      regime: langmuir_free_evaporation_inverse_model
+      units: dimensionless
+      values:
+        quantity: inverse_fitted_evaporation_coefficient
+        method_class: model_derived_inverse_fit
+        evidence_kind: model
+        measurement_status: model_output_not_measurement
+        status: typed_refusal
+        admission_status: rejected_model_output_not_measurement
+        refusal_reason: model_output_not_measurement
+        gas_species: SiO(g)
+        material: Wang_et_al_2001_FeO_free_CMAS_residue
+        per_temperature:
+        - T_K: 2073.0
+          alpha: 0.07
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.08
+          sigma: 0.01
+      uncertainty:
+        per_temperature:
+        - T_K: 2073.0
+          alpha_sigma: 0.01
+        - T_K: 2273.0
+          alpha_sigma: 0.01
+        note: ±0.01 is printed for both this-work SiO coefficients.
+    - observation_id: fedkin_2006_t4_sio_alexander_2001_inverse
+      type: alpha
+      class: inverse
+      locator:
+        page: 219
+        table: '4'
+        row: SiO; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+      quote: |-
+        Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+        Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+        SiO | 0.07 ± 0.01 | 0.11 | 0.08 ± 0.01 | 0.08
+        Because Alexander (2001) did not present error bars for his estimates, it is not known whether these are significant differences.
+      T_range_K:
+      - 2073.0
+      - 2273.0
+      phase: FeO_free_CMAS_silicate_melt
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FeO-free stage of the Wang et al. (2001) evaporation experiment
+      standard_state: EQR-model equilibrium vapor pressure and inverse-fit free-evaporation coefficient
+      regime: langmuir_free_evaporation_inverse_model
+      units: dimensionless
+      values:
+        quantity: inverse_fitted_evaporation_coefficient
+        method_class: model_derived_inverse_fit
+        evidence_kind: model
+        measurement_status: model_output_not_measurement
+        status: typed_refusal
+        admission_status: rejected_model_output_not_measurement
+        refusal_reason: model_output_not_measurement
+        gas_species: SiO(g)
+        material: Wang_et_al_2001_FeO_free_CMAS_residue
+        model: Alexander_2001_EQR
+        per_temperature:
+        - T_K: 2073.0
+          alpha: 0.11
+        - T_K: 2273.0
+          alpha: 0.08
+      uncertainty:
+        reported_status: not_reported
+        note: Alexander (2001) did not present error bars for these estimates.
   Na:
     observations:
     - observation_id: fedkin_2006_na_yu_langmuir
@@ -314,8 +652,8 @@ species:
         figure: '4'
         line_range: 241-243
       T_range_K:
-      - 1723.15
-      - 1723.15
+      - 1723.0
+      - 1723.0
       phase: silicate_melt
       condensed_form:
         state: unresolved
@@ -344,8 +682,8 @@ species:
         figure: '4'
         line_range: 241-243
       T_range_K:
-      - 1723.15
-      - 1723.15
+      - 1723.0
+      - 1723.0
       phase: silicate_melt_chondrule_analog_Yu2003
       condensed_form:
         state: unresolved
@@ -389,8 +727,8 @@ species:
         figure: '4'
         line_range: 241-243
       T_range_K:
-      - 1723.15
-      - 1723.15
+      - 1723.0
+      - 1723.0
       phase: silicate_melt
       condensed_form:
         state: unresolved
@@ -418,8 +756,8 @@ species:
         figure: '4'
         line_range: 241-243
       T_range_K:
-      - 1723.15
-      - 1723.15
+      - 1723.0
+      - 1723.0
       phase: silicate_melt_chondrule_analog_Yu2003
       condensed_form:
         state: unresolved
@@ -515,3 +853,220 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
     note: B1 class-tag pin K=0.13
+- species: Mg
+  observable: alpha
+  observation_id: fedkin_2006_t4_mg_this_work_inverse
+  field: per_temperature
+  value:
+  - T_K: 2073.0
+    alpha: 0.14
+    sigma: 0.01
+  - T_K: 2273.0
+    alpha: 0.19
+    sigma: 0.01
+  locator:
+    page: 219
+    table: '4'
+    row: Mg; 2073 K; This work; 0.14 ± 0.01
+- species: Mg
+  observable: alpha
+  observation_id: fedkin_2006_t4_mg_alexander_2001_inverse
+  field: per_temperature
+  value:
+  - T_K: 2073.0
+    alpha: 0.19
+  - T_K: 2273.0
+    alpha: 0.16
+  locator:
+    page: 219
+    table: '4'
+    row: Mg; 2273 K; Alexander (2001); 0.16
+- species: SiO
+  observable: alpha
+  observation_id: fedkin_2006_t4_sio_this_work_inverse
+  field: per_temperature
+  value:
+  - T_K: 2073.0
+    alpha: 0.07
+    sigma: 0.01
+  - T_K: 2273.0
+    alpha: 0.08
+    sigma: 0.01
+  locator:
+    page: 219
+    table: '4'
+    row: SiO; 2273 K; This work; 0.08 ± 0.01
+- species: SiO
+  observable: alpha
+  observation_id: fedkin_2006_t4_sio_alexander_2001_inverse
+  field: per_temperature
+  value:
+  - T_K: 2073.0
+    alpha: 0.11
+  - T_K: 2273.0
+    alpha: 0.08
+  locator:
+    page: 219
+    table: '4'
+    row: SiO; 2073 K; Alexander (2001); 0.11
+table_metadata:
+- table: '1'
+  locator:
+    page: 208
+    pdf_page_index: 3
+    table: '1'
+    row: complete table
+    source_path: tables/kems-005-fedkin-2006/t1.csv
+  class: model
+  title: Gas species included in the calculation
+  columns: [column_1, column_2, column_3, column_4]
+  rows:
+  - [Ar, AlOH, Ca(OH)2, HCN]
+  - [H, AlH, Na, O2]
+  - [O, AlO2H, NaO, CO]
+  - [C, Al2O2, Na2, CO2]
+  - [N, '[blank]', NaOH, N2]
+  - [Si, Cr, NaH, 'NO']
+  - [SiO, CrO, (NaOH)2, CH]
+  - [SiO2, CrO2, NaCN, CH2]
+  - [SiH, CrO3, (NaCN)2, CH3]
+  - [Si2, CrN, K, CH4]
+  - [Si2C, Fe, K2, CN]
+  - [SiC2, FeO, KO, C2]
+  - [SiH4, Fe(OH)2, KOH, C2H]
+  - [SiN, Mg, (KOH)2, C2H2]
+  - [Si2N, MgO, KH, C2H4]
+  - [SiC, MgOH, KCN, C2N]
+  - [Ti, MgH, (KCN)2, C3]
+  - [TiO, Mg(OH)2, H2, NH3]
+  - [TiO2, MgN, H2O, N2H4]
+  - [Al, Ca, HO2, O3]
+  - [Al2O, CaO, OH, '[blank]']
+  - [AlO, CaOH, H2O2, '[blank]']
+  row_classes:
+  - {row: Ar, class: model}
+  - {row: H, class: model}
+  - {row: O, class: model}
+  - {row: C, class: model}
+  - {row: N, class: model}
+  - {row: Si, class: model}
+  - {row: SiO, class: model}
+  - {row: SiO2, class: model}
+  - {row: SiH, class: model}
+  - {row: Si2, class: model}
+  - {row: Si2C, class: model}
+  - {row: SiC2, class: model}
+  - {row: SiH4, class: model}
+  - {row: SiN, class: model}
+  - {row: Si2N, class: model}
+  - {row: SiC, class: model}
+  - {row: Ti, class: model}
+  - {row: TiO, class: model}
+  - {row: TiO2, class: model}
+  - {row: Al, class: model}
+  - {row: Al2O, class: model}
+  - {row: AlO, class: model}
+  quote: |-
+    Table 1. Gas species included in the calculation.
+    Ar | AlOH | Ca(OH)2 | HCN
+    H | AlH | Na | O2
+    O | AlO2H | NaO | CO
+    C | Al2O2 | Na2 | CO2
+    N | [blank] | NaOH | N2
+    Si | Cr | NaH | NO
+    SiO | CrO | (NaOH)2 | CH
+    SiO2 | CrO2 | NaCN | CH2
+    SiH | CrO3 | (NaCN)2 | CH3
+    Si2 | CrN | K | CH4
+    Si2C | Fe | K2 | CN
+    SiC2 | FeO | KO | C2
+    SiH4 | Fe(OH)2 | KOH | C2H
+    SiN | Mg | (KOH)2 | C2H2
+    Si2N | MgO | KH | C2H4
+    SiC | MgOH | KCN | C2N
+    Ti | MgH | (KCN)2 | C3
+    TiO | Mg(OH)2 | H2 | NH3
+    TiO2 | MgN | H2O | N2H4
+    Al | Ca | HO2 | O3
+    Al2O | CaO | OH | [blank]
+    AlO | CaOH | H2O2 | [blank]
+  note: Model species inventory, not observations. Blank display cells remain explicit blanks.
+- table: '2'
+  locator:
+    page: 210
+    pdf_page_index: 5
+    table: '2'
+    row: complete table
+    source_path: tables/kems-005-fedkin-2006/t2.csv
+  class: derived
+  title: Starting compositions for experiments investigated in this work (wt.%)
+  columns: [component, '1', '2', '3', '4', '5']
+  rows:
+  - [Na2O, '—', '—', '—', '2.75', '1.22']
+  - [MgO, '24.08', '26.1', '32.6', '21.25', '24.09']
+  - [Al2O3, '3.26', '2.90', '3.34', '3.56', '2.89']
+  - [SiO2, '35.19', '36.2', '40.6', '52.36', '34.63']
+  - [K2O, '—', '—', '—', '3.21', '0.16']
+  - [CaO, '2.54', '2.27', '2.70', '0.81', '1.86']
+  - [TiO2, '—', '0.11', '0.15', '0.2', '0.07']
+  - [Cr2O3, '—', '—', '—', '0.32', '—']
+  - [MnO, '—', '—', '—', '0.36', '—']
+  - [FeO, '34.94', '32.4', '20.6', '13.91', '20.55']
+  - [Fe, '—', '—', '—', '—', '14.53']
+  - [ΣREE2O3, '—', '0.17', '0.20', '—', '—']
+  - [Total, '100.01', '100.15', '100.19', '98.73', '100.00']
+  row_classes:
+  - {row: Na2O, class: derived}
+  - {row: MgO, class: derived}
+  - {row: Al2O3, class: derived}
+  - {row: SiO2, class: derived}
+  - {row: K2O, class: derived}
+  - {row: CaO, class: derived}
+  - {row: TiO2, class: derived}
+  - {row: Cr2O3, class: derived}
+  - {row: MnO, class: derived}
+  - {row: FeO, class: derived}
+  - {row: Fe, class: derived}
+  - {row: ΣREE2O3, class: derived}
+  - {row: Total, class: derived}
+  quote: |-
+    Table 2. Starting compositions for experiments investigated in this work (wt.%).
+    Component | 1 | 2 | 3 | 4 | 5
+    Na2O | — | — | — | 2.75 | 1.22
+    MgO | 24.08 | 26.1 | 32.6 | 21.25 | 24.09
+    Al2O3 | 3.26 | 2.90 | 3.34 | 3.56 | 2.89
+    SiO2 | 35.19 | 36.2 | 40.6 | 52.36 | 34.63
+    K2O | — | — | — | 3.21 | 0.16
+    CaO | 2.54 | 2.27 | 2.70 | 0.81 | 1.86
+    TiO2 | — | 0.11 | 0.15 | 0.2 | 0.07
+    Cr2O3 | — | — | — | 0.32 | —
+    MnO | — | — | — | 0.36 | —
+    FeO | 34.94 | 32.4 | 20.6 | 13.91 | 20.55
+    Fe | — | — | — | — | 14.53
+    ΣREE2O3 | — | 0.17 | 0.20 | — | —
+    Total | 100.01 | 100.15 | 100.19 | 98.73 | 100.00
+    Sources: 1, Hashimoto (1983); 2, Wang et al. (2001), 2073 K; 3, Wang et al. (2001), 2273 K; 4, Yu et al. (2003), composition 1; 5, Cohen et al. (2004).
+  note: Secondary starting-composition metadata used as model inputs. Printed em dashes remain missing and are not zeroes.
+- table: '4'
+  locator:
+    page: 219
+    pdf_page_index: 14
+    table: '4'
+    row: complete table
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  class: inverse
+  title: Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments
+  columns: [species, 2073 K This work, 2073 K Alexander (2001), 2273 K This work, 2273 K Alexander (2001)]
+  rows:
+  - [Mg, 0.14 ± 0.01, '0.19', 0.19 ± 0.01, '0.16']
+  - [SiO, 0.07 ± 0.01, '0.11', 0.08 ± 0.01, '0.08']
+  row_classes:
+  - {row: Mg, class: inverse}
+  - {row: SiO, class: inverse}
+  quote: |-
+    Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+    Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+    Mg | 0.14 ± 0.01 | 0.19 | 0.19 ± 0.01 | 0.16
+    SiO | 0.07 ± 0.01 | 0.11 | 0.08 ± 0.01 | 0.08
+    Because Alexander (2001) did not present error bars for his estimates, it is not known whether these are significant differences.
+  note: Inverse fits to Wang et al. measurements; not direct instrument readings. This-work uncertainties are printed; Alexander error bars are truly absent.
