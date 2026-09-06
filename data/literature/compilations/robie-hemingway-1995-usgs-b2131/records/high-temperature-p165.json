@@ -1,0 +1,820 @@
+{
+  "record_id": "high-temperature-p165",
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "table_kind": "high_temperature",
+  "table_number": null,
+  "page": 165,
+  "pdf_page": 171,
+  "name_as_published": "GALENA",
+  "formula_as_published": "PbS",
+  "phase_as_published": "Cubic crystals 298.15 to 900 K.         Reference state for sulfur is ideal s 2 gas at p •                   ~\n         bar.",
+  "heading_as_published": "GALENA                                                                                   Formula wt        239.26~\n\n\n\nPbS:     Cubic crystals 298.15 to 900 K.         Reference state for sulfur is ideal s 2 gas at p •                   ~\n         bar.\n\n\n\n                                                                        FORMATION FROM THE ELEMENTS\n\n Temp.          cop      soT         (HT-H~ 98 )/T   -(GT-H~ 98 )/T     AfHO              AfGO           Log Kf\n\n  K                               J•mol-1·K- 1                         -       kJ•mol-1 - -",
+  "footer_as_published": "Melting T                 1400 K                                              Boiling      T              K\n\n                                                                              A,.JJo                    kJ\n                                kJ\n                                                                             Molar Vol.           3 .149 J • bar·•i\n                                                                                                 31.49 cm3\n                                                                                                                  1\n\n\n\n                                  kJ\n\n\n                  A• -1.640E+02                  B• 8.830E-02              C• 9.946E+04\n\n                                                                                                          9/25/~2",
+  "column_order": [
+    "temperature",
+    "cp",
+    "entropy",
+    "enthalpy_function",
+    "gibbs_function",
+    "formation_enthalpy",
+    "formation_gibbs",
+    "log_kf"
+  ],
+  "units_as_published": [
+    "  K                               J•mol-1·K- 1                         -       kJ•mol-1 - -"
+  ],
+  "metadata": [
+    {
+      "section": "heading",
+      "raw": "GALENA                                                                                   Formula wt        239.26~",
+      "raster_reading": "GALENA Formula wt 239.266",
+      "tokens": [
+        {
+          "raw": "239.26~",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": "PbS:     Cubic crystals 298.15 to 900 K.         Reference state for sulfur is ideal s 2 gas at p •                   ~",
+      "raster_reading": "PbS: Cubic crystals 298.15 to 900 K. Reference state for sulfur is ideal Sj gas at p = 1",
+      "tokens": [
+        {
+          "raw": "298.15",
+          "value": 298.15,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "900",
+          "value": 900.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "2",
+          "value": 2.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": " Temp.          cop      soT         (HT-H~ 98 )/T   -(GT-H~ 98 )/T     AfHO              AfGO           Log Kf",
+      "raster_reading": "Temp. cg S$  (H3-H39g)/T -(GR-H39g)/T AgH® Agee Log Ke",
+      "tokens": [
+        {
+          "raw": "98",
+          "value": 98.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "98",
+          "value": 98.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": "  K                               J•mol-1·K- 1                         -       kJ•mol-1 - -",
+      "raster_reading": "K ————————_—_—  -mo17}- x72 —_____ — kJ-mol7) ——",
+      "tokens": [
+        {
+          "raw": "J•mol-1·K-",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "1",
+          "value": 1.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "kJ•mol-1",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "Melting T                 1400 K                                              Boiling      T              K",
+      "raster_reading": "K ————————_—_—  -mo17}- x72 —_____ — kJ-mol7) ——",
+      "tokens": [
+        {
+          "raw": "1400",
+          "value": 1400.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                                                                             Molar Vol.           3 .149 J • bar·•i",
+      "raster_reading": "500 52.80 118.07 20.65 97.42 -161.3 119.4\n5\t1\t1\t1\t12\t8\t1321\t854\t71\t18\t57.023930\t12.47\n5\t1\t1\t1\t12\t9\t1415\t859\t1\t8\t57.023930\t|\n4\t1\t1\t1\t13\t0\t84\t884\t1331\t27\t-1\t\n5\t1\t1\t1\t13\t1\t84\t884\t42\t18\t96.283119\t600\n5\t1\t1\t1\t13\t2\t234\t885\t73\t18\t83.433861\t54.44\n5\t1\t1\t1\t13\t3\t370\t885\t88\t18\t83.433861\t127.84\n5\t1\t1\t1\t13\t4\t535\t886\t74\t18\t95.768372\t26.14\n5\t1\t1\t1\t13\t5\t747\t886\t87\t18\t96.035583\t101.70\n5\t1\t1\t1\t13\t6\t926\t886\t89\t18\t81.483757\t-160.6\n5\t1\t1\t1\t13\t7\t1123\t885\t89\t18\t91.857361\t-111.0\n5\t1\t1\t1\t13\t8\t1335\t884\t57\t19\t75.304100\t9.67\n5\t1\t1\t1\t13\t9\t1414\t884\t1\t27\t56.012081\t|\n4\t1\t1\t1\t14\t0\t83\t914\t1332\t20\t-1\t\n5\t1\t1\t1\t14\t1\t83\t914\t43\t18\t96.430939\t700\n5\t1\t1\t1\t14\t2\t234\t915\t73\t18\t86.650604\t56.08\n5\t1\t1\t1\t14\t3\t370\t915\t88\t19\t81.043518\t136.36\n5\t1\t1\t1\t14\t4\t536\t916\t73\t18\t96.001106\t30.30\n5\t1\t1\t1\t14\t5\t747\t916\t86\t18\t96.024956\t106.05\n5\t1\t1\t1\t14\t6\t926\t916\t89\t18\t90.309601\t-164.8\n5\t1\t1\t1\t14\t7\t1123\t915\t89\t19\t89.586899\t-102.0\n5\t1\t1\t1\t14\t8\t1335\t915\t57\t18\t78.783875\t7.61\n5\t1\t1\t1\t14\t9\t1413\t916\t2\t18\t71.409531\t|\n4\t1\t1\t1\t15\t0\t83\t945\t1331\t26\t-1\t\n5\t1\t1\t1\t15\t1\t83\t945\t43\t17\t96.389496\t800\n5\t1\t1\t1\t15\t2\t233\t945\t73\t18\t77.021965\t57.72\n5\t1\t1\t1\t15\t3\t370\t946\t87\t17\t77.021965\t143.95\n5\t1\t1\t1\t15\t4\t535\t946\t73\t18\t95.980568\t33.63\n5\t1\t1\t1\t15\t5\t747\t947\t86\t18\t93.694366\t110.32\n5\t1\t1\t1\t15\t6\t926\t946\t88\t18\t86.686180\t-163.9\n5\t1\t1\t1\t15\t7\t1138\t945\t74\t19\t86.700943\t-93.1\n5\t1\t1\t1\t15\t8\t1335\t945\t57\t18\t0.000000\t6.08\n4\t1\t1\t1\t16\t0\t83\t975\t1309\t19\t-1\t\n5\t1\t1\t1\t16\t1\t83\t975\t43\t17\t94.834389\t900\n5\t1\t1\t1\t16\t2\t234\t976\t73\t17\t81.208267\t59.36\n5\t1\t1\t1\t16\t3\t370\t976\t88\t18\t73.466026\t150.84\n5\t1\t1\t1\t16\t4\t535\t976\t73\t18\t95.977127\t36.40\n5\t1\t1\t1\t16\t5\t747\t977\t86\t17\t92.012909\t114.45\n5\t1\t1\t1\t16\t6\t926\t977\t88\t17\t78.682037\t-162.9\n5\t1\t1\t1\t16\t7\t1138\t976\t73\t18\t52.599762\t-84.3\n5\t1\t1\t1\t16\t8\t1334\t976\t58\t17\t96.495529\t4.90\n4\t1\t1\t1\t17\t0\t66\t1333\t1341\t29\t-1\t\n5\t1\t1\t1\t17\t1\t66\t1339\t105\t23\t93.284187\tMelting\n5\t1\t1\t1\t17\t2\t186\t1340\t15\t18\t93.073456\tT\n5\t1\t1\t1\t17\t3\t414\t1340\t58\t18\t93.223755\t1400\n5\t1\t1\t1\t17\t4\t488\t1341\t15\t17\t92.686050\tK\n5\t1\t1\t1\t17\t5\t1015\t1339\t105\t23\t83.004730\tBoiling\n5\t1\t1\t1\t17\t6\t1181\t1340\t15\t18\t72.755493\tT\n5\t1\t1\t1\t17\t7\t1317\t1340\t16\t17\t86.404587\tK\n5\t1\t1\t1\t17\t8\t1406\t1333\t1\t24\t68.919357\t|\n4\t1\t1\t1\t18\t0\t1015\t1389\t391\t50\t-1\t\n5\t1\t1\t1\t18\t1\t1015\t1389\t26\t50\t4.341793\tA,\n5\t1\t1\t1\t18\t2\t1044\t1389\t34\t50\t4.341793\tgH®\n5\t1\t1\t1\t18\t3\t1294\t1391\t112\t34\t16.018639\tae\n4\t1\t1\t1\t19\t0\t66\t1421\t1340\t42\t-1\t\n5\t1\t1\t1\t19\t1\t66\t1425\t60\t38\t19.900570\t4,,H°\n5\t1\t1\t1\t19\t2\t457\t1421\t34\t37\t80.642609\tkg\n4\t1\t1\t1\t20\t0\t1015\t1453\t390\t32\t-1\t\n5\t1\t1\t1\t20\t1\t1015\t1461\t75\t18\t96.622833\tMolar\n5\t1\t1\t1\t20\t2\t1105\t1461\t57\t18\t96.276443\tVol.\n5\t1\t1\t1\t20\t3\t1227\t1460\t73\t18\t91.541977\t3.149\n5\t1\t1\t1\t20\t4\t1317\t1453\t88\t32\t27.686672\tJ+bart\n4\t1\t1\t1\t21\t0\t66\t1478\t1296\t45\t-1\t\n5\t1\t1\t1\t21\t1\t66\t1491\t105\t26\t27.683750\tH399-H§\n5\t1\t1\t1\t21\t2\t485\t1478\t34\t45\t68.185905\tka\n5\t1\t1\t1\t21\t3\t1214\t1490\t73\t19\t68.921700\t31.49\n5\t1\t1\t1\t21\t4\t1319\t1481\t43\t27\t87.504814\tcm?\n4\t1\t1\t1\t22\t0\t291\t1568\t1112\t32\t-1\t\n5\t1\t1\t1\t22\t1\t291\t1583\t30\t16\t74.665176\tA=\n5\t1\t1\t1\t22\t2\t337\t1581\t149\t18\t57.224457\t-1.640E+02\n5\t1\t1\t1\t22\t3\t654\t1583\t29\t17\t92.008842\tB=\n5\t1\t1\t1\t22\t4\t699\t1582\t133\t18\t86.422768\t8.830E-02\n5\t1\t1\t1\t22\t5\t969\t1583\t30\t16\t60.321789\tC=\n5\t1\t1\t1\t22\t6\t1015\t1581\t134\t18\t35.288483\t9.9468+04\n4\t1\t1\t1\t23\t0\t65\t1614\t1357\t23\t-1\t\n5\t1\t1\t1\t23\t1\t61\t1610\t158\t35\t22.465372\tina\n5\t1\t1\t1\t23\t2\t326\t1610\t135\t35\t8.140507\tmc\n5\t1\t1\t1\t23\t3\t562\t1610\t243\t35\t19.660559\ter\n5\t1\t1\t1\t23\t4\t1078\t1610\t258\t35\t13.891048\ta\n4\t1\t1\t1\t24\t0\t1317\t1636\t102\t27\t-1\t\n5\t1\t1\t1\t24\t1\t1317\t1636\t102\t27\t95.958977\t9/25/92\n4\t1\t1\t1\t25\t0\t1114\t1685\t287\t24\t-1\t\n5\t1\t1\t1\t25\t1\t1114\t1707\t2\t2\t12.334433\t:\n5\t1\t1\t1\t25\t2\t1400\t1685\t1\t19\t64.843018\t|\n4\t1\t1\t1\t26\t0\t1397\t1844\t1\t25\t-1\t\n5\t1\t1\t1\t26\t1\t1397\t1844\t1\t25\t78.818085\t|\n",
+      "tokens": [
+        {
+          "raw": "3",
+          "value": 3.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": ".149",
+          "value": 0.149,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                                                                                                 31.49 cm3",
+      "raster_reading": "500 52.80 118.07 20.65 97.42 -161.3 119.4\n5\t1\t1\t1\t12\t8\t1321\t854\t71\t18\t57.023930\t12.47\n5\t1\t1\t1\t12\t9\t1415\t859\t1\t8\t57.023930\t|\n4\t1\t1\t1\t13\t0\t84\t884\t1331\t27\t-1\t\n5\t1\t1\t1\t13\t1\t84\t884\t42\t18\t96.283119\t600\n5\t1\t1\t1\t13\t2\t234\t885\t73\t18\t83.433861\t54.44\n5\t1\t1\t1\t13\t3\t370\t885\t88\t18\t83.433861\t127.84\n5\t1\t1\t1\t13\t4\t535\t886\t74\t18\t95.768372\t26.14\n5\t1\t1\t1\t13\t5\t747\t886\t87\t18\t96.035583\t101.70\n5\t1\t1\t1\t13\t6\t926\t886\t89\t18\t81.483757\t-160.6\n5\t1\t1\t1\t13\t7\t1123\t885\t89\t18\t91.857361\t-111.0\n5\t1\t1\t1\t13\t8\t1335\t884\t57\t19\t75.304100\t9.67\n5\t1\t1\t1\t13\t9\t1414\t884\t1\t27\t56.012081\t|\n4\t1\t1\t1\t14\t0\t83\t914\t1332\t20\t-1\t\n5\t1\t1\t1\t14\t1\t83\t914\t43\t18\t96.430939\t700\n5\t1\t1\t1\t14\t2\t234\t915\t73\t18\t86.650604\t56.08\n5\t1\t1\t1\t14\t3\t370\t915\t88\t19\t81.043518\t136.36\n5\t1\t1\t1\t14\t4\t536\t916\t73\t18\t96.001106\t30.30\n5\t1\t1\t1\t14\t5\t747\t916\t86\t18\t96.024956\t106.05\n5\t1\t1\t1\t14\t6\t926\t916\t89\t18\t90.309601\t-164.8\n5\t1\t1\t1\t14\t7\t1123\t915\t89\t19\t89.586899\t-102.0\n5\t1\t1\t1\t14\t8\t1335\t915\t57\t18\t78.783875\t7.61\n5\t1\t1\t1\t14\t9\t1413\t916\t2\t18\t71.409531\t|\n4\t1\t1\t1\t15\t0\t83\t945\t1331\t26\t-1\t\n5\t1\t1\t1\t15\t1\t83\t945\t43\t17\t96.389496\t800\n5\t1\t1\t1\t15\t2\t233\t945\t73\t18\t77.021965\t57.72\n5\t1\t1\t1\t15\t3\t370\t946\t87\t17\t77.021965\t143.95\n5\t1\t1\t1\t15\t4\t535\t946\t73\t18\t95.980568\t33.63\n5\t1\t1\t1\t15\t5\t747\t947\t86\t18\t93.694366\t110.32\n5\t1\t1\t1\t15\t6\t926\t946\t88\t18\t86.686180\t-163.9\n5\t1\t1\t1\t15\t7\t1138\t945\t74\t19\t86.700943\t-93.1\n5\t1\t1\t1\t15\t8\t1335\t945\t57\t18\t0.000000\t6.08\n4\t1\t1\t1\t16\t0\t83\t975\t1309\t19\t-1\t\n5\t1\t1\t1\t16\t1\t83\t975\t43\t17\t94.834389\t900\n5\t1\t1\t1\t16\t2\t234\t976\t73\t17\t81.208267\t59.36\n5\t1\t1\t1\t16\t3\t370\t976\t88\t18\t73.466026\t150.84\n5\t1\t1\t1\t16\t4\t535\t976\t73\t18\t95.977127\t36.40\n5\t1\t1\t1\t16\t5\t747\t977\t86\t17\t92.012909\t114.45\n5\t1\t1\t1\t16\t6\t926\t977\t88\t17\t78.682037\t-162.9\n5\t1\t1\t1\t16\t7\t1138\t976\t73\t18\t52.599762\t-84.3\n5\t1\t1\t1\t16\t8\t1334\t976\t58\t17\t96.495529\t4.90\n4\t1\t1\t1\t17\t0\t66\t1333\t1341\t29\t-1\t\n5\t1\t1\t1\t17\t1\t66\t1339\t105\t23\t93.284187\tMelting\n5\t1\t1\t1\t17\t2\t186\t1340\t15\t18\t93.073456\tT\n5\t1\t1\t1\t17\t3\t414\t1340\t58\t18\t93.223755\t1400\n5\t1\t1\t1\t17\t4\t488\t1341\t15\t17\t92.686050\tK\n5\t1\t1\t1\t17\t5\t1015\t1339\t105\t23\t83.004730\tBoiling\n5\t1\t1\t1\t17\t6\t1181\t1340\t15\t18\t72.755493\tT\n5\t1\t1\t1\t17\t7\t1317\t1340\t16\t17\t86.404587\tK\n5\t1\t1\t1\t17\t8\t1406\t1333\t1\t24\t68.919357\t|\n4\t1\t1\t1\t18\t0\t1015\t1389\t391\t50\t-1\t\n5\t1\t1\t1\t18\t1\t1015\t1389\t26\t50\t4.341793\tA,\n5\t1\t1\t1\t18\t2\t1044\t1389\t34\t50\t4.341793\tgH®\n5\t1\t1\t1\t18\t3\t1294\t1391\t112\t34\t16.018639\tae\n4\t1\t1\t1\t19\t0\t66\t1421\t1340\t42\t-1\t\n5\t1\t1\t1\t19\t1\t66\t1425\t60\t38\t19.900570\t4,,H°\n5\t1\t1\t1\t19\t2\t457\t1421\t34\t37\t80.642609\tkg\n4\t1\t1\t1\t20\t0\t1015\t1453\t390\t32\t-1\t\n5\t1\t1\t1\t20\t1\t1015\t1461\t75\t18\t96.622833\tMolar\n5\t1\t1\t1\t20\t2\t1105\t1461\t57\t18\t96.276443\tVol.\n5\t1\t1\t1\t20\t3\t1227\t1460\t73\t18\t91.541977\t3.149\n5\t1\t1\t1\t20\t4\t1317\t1453\t88\t32\t27.686672\tJ+bart\n4\t1\t1\t1\t21\t0\t66\t1478\t1296\t45\t-1\t\n5\t1\t1\t1\t21\t1\t66\t1491\t105\t26\t27.683750\tH399-H§\n5\t1\t1\t1\t21\t2\t485\t1478\t34\t45\t68.185905\tka\n5\t1\t1\t1\t21\t3\t1214\t1490\t73\t19\t68.921700\t31.49\n5\t1\t1\t1\t21\t4\t1319\t1481\t43\t27\t87.504814\tcm?\n4\t1\t1\t1\t22\t0\t291\t1568\t1112\t32\t-1\t\n5\t1\t1\t1\t22\t1\t291\t1583\t30\t16\t74.665176\tA=\n5\t1\t1\t1\t22\t2\t337\t1581\t149\t18\t57.224457\t-1.640E+02\n5\t1\t1\t1\t22\t3\t654\t1583\t29\t17\t92.008842\tB=\n5\t1\t1\t1\t22\t4\t699\t1582\t133\t18\t86.422768\t8.830E-02\n5\t1\t1\t1\t22\t5\t969\t1583\t30\t16\t60.321789\tC=\n5\t1\t1\t1\t22\t6\t1015\t1581\t134\t18\t35.288483\t9.9468+04\n4\t1\t1\t1\t23\t0\t65\t1614\t1357\t23\t-1\t\n5\t1\t1\t1\t23\t1\t61\t1610\t158\t35\t22.465372\tina\n5\t1\t1\t1\t23\t2\t326\t1610\t135\t35\t8.140507\tmc\n5\t1\t1\t1\t23\t3\t562\t1610\t243\t35\t19.660559\ter\n5\t1\t1\t1\t23\t4\t1078\t1610\t258\t35\t13.891048\ta\n4\t1\t1\t1\t24\t0\t1317\t1636\t102\t27\t-1\t\n5\t1\t1\t1\t24\t1\t1317\t1636\t102\t27\t95.958977\t9/25/92\n4\t1\t1\t1\t25\t0\t1114\t1685\t287\t24\t-1\t\n5\t1\t1\t1\t25\t1\t1114\t1707\t2\t2\t12.334433\t:\n5\t1\t1\t1\t25\t2\t1400\t1685\t1\t19\t64.843018\t|\n4\t1\t1\t1\t26\t0\t1397\t1844\t1\t25\t-1\t\n5\t1\t1\t1\t26\t1\t1397\t1844\t1\t25\t78.818085\t|\n",
+      "tokens": [
+        {
+          "raw": "31.49",
+          "value": 31.49,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "cm3",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                                                                                                                  1",
+      "raster_reading": "PbS: Cubic crystals 298.15 to 900 K. Reference state for sulfur is ideal Sj gas at p = 1",
+      "tokens": [
+        {
+          "raw": "1",
+          "value": 1.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                  A• -1.640E+02                  B• 8.830E-02              C• 9.946E+04",
+      "raster_reading": "500 52.80 118.07 20.65 97.42 -161.3 119.4\n5\t1\t1\t1\t12\t8\t1321\t854\t71\t18\t57.023930\t12.47\n5\t1\t1\t1\t12\t9\t1415\t859\t1\t8\t57.023930\t|\n4\t1\t1\t1\t13\t0\t84\t884\t1331\t27\t-1\t\n5\t1\t1\t1\t13\t1\t84\t884\t42\t18\t96.283119\t600\n5\t1\t1\t1\t13\t2\t234\t885\t73\t18\t83.433861\t54.44\n5\t1\t1\t1\t13\t3\t370\t885\t88\t18\t83.433861\t127.84\n5\t1\t1\t1\t13\t4\t535\t886\t74\t18\t95.768372\t26.14\n5\t1\t1\t1\t13\t5\t747\t886\t87\t18\t96.035583\t101.70\n5\t1\t1\t1\t13\t6\t926\t886\t89\t18\t81.483757\t-160.6\n5\t1\t1\t1\t13\t7\t1123\t885\t89\t18\t91.857361\t-111.0\n5\t1\t1\t1\t13\t8\t1335\t884\t57\t19\t75.304100\t9.67\n5\t1\t1\t1\t13\t9\t1414\t884\t1\t27\t56.012081\t|\n4\t1\t1\t1\t14\t0\t83\t914\t1332\t20\t-1\t\n5\t1\t1\t1\t14\t1\t83\t914\t43\t18\t96.430939\t700\n5\t1\t1\t1\t14\t2\t234\t915\t73\t18\t86.650604\t56.08\n5\t1\t1\t1\t14\t3\t370\t915\t88\t19\t81.043518\t136.36\n5\t1\t1\t1\t14\t4\t536\t916\t73\t18\t96.001106\t30.30\n5\t1\t1\t1\t14\t5\t747\t916\t86\t18\t96.024956\t106.05\n5\t1\t1\t1\t14\t6\t926\t916\t89\t18\t90.309601\t-164.8\n5\t1\t1\t1\t14\t7\t1123\t915\t89\t19\t89.586899\t-102.0\n5\t1\t1\t1\t14\t8\t1335\t915\t57\t18\t78.783875\t7.61\n5\t1\t1\t1\t14\t9\t1413\t916\t2\t18\t71.409531\t|\n4\t1\t1\t1\t15\t0\t83\t945\t1331\t26\t-1\t\n5\t1\t1\t1\t15\t1\t83\t945\t43\t17\t96.389496\t800\n5\t1\t1\t1\t15\t2\t233\t945\t73\t18\t77.021965\t57.72\n5\t1\t1\t1\t15\t3\t370\t946\t87\t17\t77.021965\t143.95\n5\t1\t1\t1\t15\t4\t535\t946\t73\t18\t95.980568\t33.63\n5\t1\t1\t1\t15\t5\t747\t947\t86\t18\t93.694366\t110.32\n5\t1\t1\t1\t15\t6\t926\t946\t88\t18\t86.686180\t-163.9\n5\t1\t1\t1\t15\t7\t1138\t945\t74\t19\t86.700943\t-93.1\n5\t1\t1\t1\t15\t8\t1335\t945\t57\t18\t0.000000\t6.08\n4\t1\t1\t1\t16\t0\t83\t975\t1309\t19\t-1\t\n5\t1\t1\t1\t16\t1\t83\t975\t43\t17\t94.834389\t900\n5\t1\t1\t1\t16\t2\t234\t976\t73\t17\t81.208267\t59.36\n5\t1\t1\t1\t16\t3\t370\t976\t88\t18\t73.466026\t150.84\n5\t1\t1\t1\t16\t4\t535\t976\t73\t18\t95.977127\t36.40\n5\t1\t1\t1\t16\t5\t747\t977\t86\t17\t92.012909\t114.45\n5\t1\t1\t1\t16\t6\t926\t977\t88\t17\t78.682037\t-162.9\n5\t1\t1\t1\t16\t7\t1138\t976\t73\t18\t52.599762\t-84.3\n5\t1\t1\t1\t16\t8\t1334\t976\t58\t17\t96.495529\t4.90\n4\t1\t1\t1\t17\t0\t66\t1333\t1341\t29\t-1\t\n5\t1\t1\t1\t17\t1\t66\t1339\t105\t23\t93.284187\tMelting\n5\t1\t1\t1\t17\t2\t186\t1340\t15\t18\t93.073456\tT\n5\t1\t1\t1\t17\t3\t414\t1340\t58\t18\t93.223755\t1400\n5\t1\t1\t1\t17\t4\t488\t1341\t15\t17\t92.686050\tK\n5\t1\t1\t1\t17\t5\t1015\t1339\t105\t23\t83.004730\tBoiling\n5\t1\t1\t1\t17\t6\t1181\t1340\t15\t18\t72.755493\tT\n5\t1\t1\t1\t17\t7\t1317\t1340\t16\t17\t86.404587\tK\n5\t1\t1\t1\t17\t8\t1406\t1333\t1\t24\t68.919357\t|\n4\t1\t1\t1\t18\t0\t1015\t1389\t391\t50\t-1\t\n5\t1\t1\t1\t18\t1\t1015\t1389\t26\t50\t4.341793\tA,\n5\t1\t1\t1\t18\t2\t1044\t1389\t34\t50\t4.341793\tgH®\n5\t1\t1\t1\t18\t3\t1294\t1391\t112\t34\t16.018639\tae\n4\t1\t1\t1\t19\t0\t66\t1421\t1340\t42\t-1\t\n5\t1\t1\t1\t19\t1\t66\t1425\t60\t38\t19.900570\t4,,H°\n5\t1\t1\t1\t19\t2\t457\t1421\t34\t37\t80.642609\tkg\n4\t1\t1\t1\t20\t0\t1015\t1453\t390\t32\t-1\t\n5\t1\t1\t1\t20\t1\t1015\t1461\t75\t18\t96.622833\tMolar\n5\t1\t1\t1\t20\t2\t1105\t1461\t57\t18\t96.276443\tVol.\n5\t1\t1\t1\t20\t3\t1227\t1460\t73\t18\t91.541977\t3.149\n5\t1\t1\t1\t20\t4\t1317\t1453\t88\t32\t27.686672\tJ+bart\n4\t1\t1\t1\t21\t0\t66\t1478\t1296\t45\t-1\t\n5\t1\t1\t1\t21\t1\t66\t1491\t105\t26\t27.683750\tH399-H§\n5\t1\t1\t1\t21\t2\t485\t1478\t34\t45\t68.185905\tka\n5\t1\t1\t1\t21\t3\t1214\t1490\t73\t19\t68.921700\t31.49\n5\t1\t1\t1\t21\t4\t1319\t1481\t43\t27\t87.504814\tcm?\n4\t1\t1\t1\t22\t0\t291\t1568\t1112\t32\t-1\t\n5\t1\t1\t1\t22\t1\t291\t1583\t30\t16\t74.665176\tA=\n5\t1\t1\t1\t22\t2\t337\t1581\t149\t18\t57.224457\t-1.640E+02\n5\t1\t1\t1\t22\t3\t654\t1583\t29\t17\t92.008842\tB=\n5\t1\t1\t1\t22\t4\t699\t1582\t133\t18\t86.422768\t8.830E-02\n5\t1\t1\t1\t22\t5\t969\t1583\t30\t16\t60.321789\tC=\n5\t1\t1\t1\t22\t6\t1015\t1581\t134\t18\t35.288483\t9.9468+04\n4\t1\t1\t1\t23\t0\t65\t1614\t1357\t23\t-1\t\n5\t1\t1\t1\t23\t1\t61\t1610\t158\t35\t22.465372\tina\n5\t1\t1\t1\t23\t2\t326\t1610\t135\t35\t8.140507\tmc\n5\t1\t1\t1\t23\t3\t562\t1610\t243\t35\t19.660559\ter\n5\t1\t1\t1\t23\t4\t1078\t1610\t258\t35\t13.891048\ta\n4\t1\t1\t1\t24\t0\t1317\t1636\t102\t27\t-1\t\n5\t1\t1\t1\t24\t1\t1317\t1636\t102\t27\t95.958977\t9/25/92\n4\t1\t1\t1\t25\t0\t1114\t1685\t287\t24\t-1\t\n5\t1\t1\t1\t25\t1\t1114\t1707\t2\t2\t12.334433\t:\n5\t1\t1\t1\t25\t2\t1400\t1685\t1\t19\t64.843018\t|\n4\t1\t1\t1\t26\t0\t1397\t1844\t1\t25\t-1\t\n5\t1\t1\t1\t26\t1\t1397\t1844\t1\t25\t78.818085\t|\n",
+      "tokens": [
+        {
+          "raw": "-1.640E+02",
+          "value": -164.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "8.830E-02",
+          "value": 0.0883,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "9.946E+04",
+          "value": 99460.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                                                                                                          9/25/~2",
+      "raster_reading": "THERMODYNAMIC PROPERTIES AT HIGH TEMPERATURE OF INDIVIDUAL PHASES 165",
+      "tokens": [
+        {
+          "raw": "9/25/~2",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "source_line": 21,
+      "raw": " 298.15      49.49      91.70            o.oo            91.70        -162.6            -136.6            23.93",
+      "raster_reading": "298.15 49.49 91.70 0.00 91.70 -162.6 -136.6 23.93",
+      "cells": {
+        "temperature": {
+          "raw": "298.15",
+          "value": 298.15,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "49.49",
+          "value": 49.49,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "91.70",
+          "value": 91.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "o.oo",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "91.70",
+          "value": 91.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-162.6",
+          "value": -162.6,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-136.6",
+          "value": -136.6,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "23.93",
+          "value": 23.93,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 22,
+      "raw": " 300         49.52      92.01            0.31            91.70        -162.6            -136.4            23.76",
+      "raster_reading": "300 49.52 92.01 0.31 91.70 -162.6 -136.4 23.76",
+      "cells": {
+        "temperature": {
+          "raw": "300",
+          "value": 300.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "49.52",
+          "value": 49.52,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "92.01",
+          "value": 92.01,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "0.31",
+          "value": 0.31,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "91.70",
+          "value": 91.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-162.6",
+          "value": -162.6,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-136.4",
+          "value": -136.4,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "23.76",
+          "value": 23.76,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 23,
+      "raw": " 400         51.16     106.48           12.81            93.66        -161.9            -127.8            16.69",
+      "raster_reading": "400 51.16 106.48 12.81 93.66 -161.9 -127.8 16.69 |",
+      "cells": {
+        "temperature": {
+          "raw": "400",
+          "value": 400.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "51.16",
+          "value": 51.16,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "106.48",
+          "value": 106.48,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "12.81",
+          "value": 12.81,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "93.66",
+          "value": 93.66,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-161.9",
+          "value": -161.9,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-127.8",
+          "value": -127.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "16.69",
+          "value": 16.69,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 24,
+      "raw": " 500         52.80     118.07           20.65            97.42        -161.3            -119.4            12.47",
+      "raster_reading": "500 52.80 118.07 20.65 97.42 -161.3 119.4\n5\t1\t1\t1\t12\t8\t1321\t854\t71\t18\t57.023930\t12.47\n5\t1\t1\t1\t12\t9\t1415\t859\t1\t8\t57.023930\t|\n4\t1\t1\t1\t13\t0\t84\t884\t1331\t27\t-1\t\n5\t1\t1\t1\t13\t1\t84\t884\t42\t18\t96.283119\t600\n5\t1\t1\t1\t13\t2\t234\t885\t73\t18\t83.433861\t54.44\n5\t1\t1\t1\t13\t3\t370\t885\t88\t18\t83.433861\t127.84\n5\t1\t1\t1\t13\t4\t535\t886\t74\t18\t95.768372\t26.14\n5\t1\t1\t1\t13\t5\t747\t886\t87\t18\t96.035583\t101.70\n5\t1\t1\t1\t13\t6\t926\t886\t89\t18\t81.483757\t-160.6\n5\t1\t1\t1\t13\t7\t1123\t885\t89\t18\t91.857361\t-111.0\n5\t1\t1\t1\t13\t8\t1335\t884\t57\t19\t75.304100\t9.67\n5\t1\t1\t1\t13\t9\t1414\t884\t1\t27\t56.012081\t|\n4\t1\t1\t1\t14\t0\t83\t914\t1332\t20\t-1\t\n5\t1\t1\t1\t14\t1\t83\t914\t43\t18\t96.430939\t700\n5\t1\t1\t1\t14\t2\t234\t915\t73\t18\t86.650604\t56.08\n5\t1\t1\t1\t14\t3\t370\t915\t88\t19\t81.043518\t136.36\n5\t1\t1\t1\t14\t4\t536\t916\t73\t18\t96.001106\t30.30\n5\t1\t1\t1\t14\t5\t747\t916\t86\t18\t96.024956\t106.05\n5\t1\t1\t1\t14\t6\t926\t916\t89\t18\t90.309601\t-164.8\n5\t1\t1\t1\t14\t7\t1123\t915\t89\t19\t89.586899\t-102.0\n5\t1\t1\t1\t14\t8\t1335\t915\t57\t18\t78.783875\t7.61\n5\t1\t1\t1\t14\t9\t1413\t916\t2\t18\t71.409531\t|\n4\t1\t1\t1\t15\t0\t83\t945\t1331\t26\t-1\t\n5\t1\t1\t1\t15\t1\t83\t945\t43\t17\t96.389496\t800\n5\t1\t1\t1\t15\t2\t233\t945\t73\t18\t77.021965\t57.72\n5\t1\t1\t1\t15\t3\t370\t946\t87\t17\t77.021965\t143.95\n5\t1\t1\t1\t15\t4\t535\t946\t73\t18\t95.980568\t33.63\n5\t1\t1\t1\t15\t5\t747\t947\t86\t18\t93.694366\t110.32\n5\t1\t1\t1\t15\t6\t926\t946\t88\t18\t86.686180\t-163.9\n5\t1\t1\t1\t15\t7\t1138\t945\t74\t19\t86.700943\t-93.1\n5\t1\t1\t1\t15\t8\t1335\t945\t57\t18\t0.000000\t6.08\n4\t1\t1\t1\t16\t0\t83\t975\t1309\t19\t-1\t\n5\t1\t1\t1\t16\t1\t83\t975\t43\t17\t94.834389\t900\n5\t1\t1\t1\t16\t2\t234\t976\t73\t17\t81.208267\t59.36\n5\t1\t1\t1\t16\t3\t370\t976\t88\t18\t73.466026\t150.84\n5\t1\t1\t1\t16\t4\t535\t976\t73\t18\t95.977127\t36.40\n5\t1\t1\t1\t16\t5\t747\t977\t86\t17\t92.012909\t114.45\n5\t1\t1\t1\t16\t6\t926\t977\t88\t17\t78.682037\t-162.9\n5\t1\t1\t1\t16\t7\t1138\t976\t73\t18\t52.599762\t-84.3\n5\t1\t1\t1\t16\t8\t1334\t976\t58\t17\t96.495529\t4.90\n4\t1\t1\t1\t17\t0\t66\t1333\t1341\t29\t-1\t\n5\t1\t1\t1\t17\t1\t66\t1339\t105\t23\t93.284187\tMelting\n5\t1\t1\t1\t17\t2\t186\t1340\t15\t18\t93.073456\tT\n5\t1\t1\t1\t17\t3\t414\t1340\t58\t18\t93.223755\t1400\n5\t1\t1\t1\t17\t4\t488\t1341\t15\t17\t92.686050\tK\n5\t1\t1\t1\t17\t5\t1015\t1339\t105\t23\t83.004730\tBoiling\n5\t1\t1\t1\t17\t6\t1181\t1340\t15\t18\t72.755493\tT\n5\t1\t1\t1\t17\t7\t1317\t1340\t16\t17\t86.404587\tK\n5\t1\t1\t1\t17\t8\t1406\t1333\t1\t24\t68.919357\t|\n4\t1\t1\t1\t18\t0\t1015\t1389\t391\t50\t-1\t\n5\t1\t1\t1\t18\t1\t1015\t1389\t26\t50\t4.341793\tA,\n5\t1\t1\t1\t18\t2\t1044\t1389\t34\t50\t4.341793\tgH®\n5\t1\t1\t1\t18\t3\t1294\t1391\t112\t34\t16.018639\tae\n4\t1\t1\t1\t19\t0\t66\t1421\t1340\t42\t-1\t\n5\t1\t1\t1\t19\t1\t66\t1425\t60\t38\t19.900570\t4,,H°\n5\t1\t1\t1\t19\t2\t457\t1421\t34\t37\t80.642609\tkg\n4\t1\t1\t1\t20\t0\t1015\t1453\t390\t32\t-1\t\n5\t1\t1\t1\t20\t1\t1015\t1461\t75\t18\t96.622833\tMolar\n5\t1\t1\t1\t20\t2\t1105\t1461\t57\t18\t96.276443\tVol.\n5\t1\t1\t1\t20\t3\t1227\t1460\t73\t18\t91.541977\t3.149\n5\t1\t1\t1\t20\t4\t1317\t1453\t88\t32\t27.686672\tJ+bart\n4\t1\t1\t1\t21\t0\t66\t1478\t1296\t45\t-1\t\n5\t1\t1\t1\t21\t1\t66\t1491\t105\t26\t27.683750\tH399-H§\n5\t1\t1\t1\t21\t2\t485\t1478\t34\t45\t68.185905\tka\n5\t1\t1\t1\t21\t3\t1214\t1490\t73\t19\t68.921700\t31.49\n5\t1\t1\t1\t21\t4\t1319\t1481\t43\t27\t87.504814\tcm?\n4\t1\t1\t1\t22\t0\t291\t1568\t1112\t32\t-1\t\n5\t1\t1\t1\t22\t1\t291\t1583\t30\t16\t74.665176\tA=\n5\t1\t1\t1\t22\t2\t337\t1581\t149\t18\t57.224457\t-1.640E+02\n5\t1\t1\t1\t22\t3\t654\t1583\t29\t17\t92.008842\tB=\n5\t1\t1\t1\t22\t4\t699\t1582\t133\t18\t86.422768\t8.830E-02\n5\t1\t1\t1\t22\t5\t969\t1583\t30\t16\t60.321789\tC=\n5\t1\t1\t1\t22\t6\t1015\t1581\t134\t18\t35.288483\t9.9468+04\n4\t1\t1\t1\t23\t0\t65\t1614\t1357\t23\t-1\t\n5\t1\t1\t1\t23\t1\t61\t1610\t158\t35\t22.465372\tina\n5\t1\t1\t1\t23\t2\t326\t1610\t135\t35\t8.140507\tmc\n5\t1\t1\t1\t23\t3\t562\t1610\t243\t35\t19.660559\ter\n5\t1\t1\t1\t23\t4\t1078\t1610\t258\t35\t13.891048\ta\n4\t1\t1\t1\t24\t0\t1317\t1636\t102\t27\t-1\t\n5\t1\t1\t1\t24\t1\t1317\t1636\t102\t27\t95.958977\t9/25/92\n4\t1\t1\t1\t25\t0\t1114\t1685\t287\t24\t-1\t\n5\t1\t1\t1\t25\t1\t1114\t1707\t2\t2\t12.334433\t:\n5\t1\t1\t1\t25\t2\t1400\t1685\t1\t19\t64.843018\t|\n4\t1\t1\t1\t26\t0\t1397\t1844\t1\t25\t-1\t\n5\t1\t1\t1\t26\t1\t1397\t1844\t1\t25\t78.818085\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "500",
+          "value": 500.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "52.80",
+          "value": 52.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "118.07",
+          "value": 118.07,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "20.65",
+          "value": 20.65,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "97.42",
+          "value": 97.42,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-161.3",
+          "value": -161.3,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-119.4",
+          "value": -119.4,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "12.47",
+          "value": 12.47,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 25,
+      "raw": " 600         54.44     127.84           26.14           101.70        -160.6            -111.0             9.67",
+      "raster_reading": "500 52.80 118.07 20.65 97.42 -161.3 119.4\n5\t1\t1\t1\t12\t8\t1321\t854\t71\t18\t57.023930\t12.47\n5\t1\t1\t1\t12\t9\t1415\t859\t1\t8\t57.023930\t|\n4\t1\t1\t1\t13\t0\t84\t884\t1331\t27\t-1\t\n5\t1\t1\t1\t13\t1\t84\t884\t42\t18\t96.283119\t600\n5\t1\t1\t1\t13\t2\t234\t885\t73\t18\t83.433861\t54.44\n5\t1\t1\t1\t13\t3\t370\t885\t88\t18\t83.433861\t127.84\n5\t1\t1\t1\t13\t4\t535\t886\t74\t18\t95.768372\t26.14\n5\t1\t1\t1\t13\t5\t747\t886\t87\t18\t96.035583\t101.70\n5\t1\t1\t1\t13\t6\t926\t886\t89\t18\t81.483757\t-160.6\n5\t1\t1\t1\t13\t7\t1123\t885\t89\t18\t91.857361\t-111.0\n5\t1\t1\t1\t13\t8\t1335\t884\t57\t19\t75.304100\t9.67\n5\t1\t1\t1\t13\t9\t1414\t884\t1\t27\t56.012081\t|\n4\t1\t1\t1\t14\t0\t83\t914\t1332\t20\t-1\t\n5\t1\t1\t1\t14\t1\t83\t914\t43\t18\t96.430939\t700\n5\t1\t1\t1\t14\t2\t234\t915\t73\t18\t86.650604\t56.08\n5\t1\t1\t1\t14\t3\t370\t915\t88\t19\t81.043518\t136.36\n5\t1\t1\t1\t14\t4\t536\t916\t73\t18\t96.001106\t30.30\n5\t1\t1\t1\t14\t5\t747\t916\t86\t18\t96.024956\t106.05\n5\t1\t1\t1\t14\t6\t926\t916\t89\t18\t90.309601\t-164.8\n5\t1\t1\t1\t14\t7\t1123\t915\t89\t19\t89.586899\t-102.0\n5\t1\t1\t1\t14\t8\t1335\t915\t57\t18\t78.783875\t7.61\n5\t1\t1\t1\t14\t9\t1413\t916\t2\t18\t71.409531\t|\n4\t1\t1\t1\t15\t0\t83\t945\t1331\t26\t-1\t\n5\t1\t1\t1\t15\t1\t83\t945\t43\t17\t96.389496\t800\n5\t1\t1\t1\t15\t2\t233\t945\t73\t18\t77.021965\t57.72\n5\t1\t1\t1\t15\t3\t370\t946\t87\t17\t77.021965\t143.95\n5\t1\t1\t1\t15\t4\t535\t946\t73\t18\t95.980568\t33.63\n5\t1\t1\t1\t15\t5\t747\t947\t86\t18\t93.694366\t110.32\n5\t1\t1\t1\t15\t6\t926\t946\t88\t18\t86.686180\t-163.9\n5\t1\t1\t1\t15\t7\t1138\t945\t74\t19\t86.700943\t-93.1\n5\t1\t1\t1\t15\t8\t1335\t945\t57\t18\t0.000000\t6.08\n4\t1\t1\t1\t16\t0\t83\t975\t1309\t19\t-1\t\n5\t1\t1\t1\t16\t1\t83\t975\t43\t17\t94.834389\t900\n5\t1\t1\t1\t16\t2\t234\t976\t73\t17\t81.208267\t59.36\n5\t1\t1\t1\t16\t3\t370\t976\t88\t18\t73.466026\t150.84\n5\t1\t1\t1\t16\t4\t535\t976\t73\t18\t95.977127\t36.40\n5\t1\t1\t1\t16\t5\t747\t977\t86\t17\t92.012909\t114.45\n5\t1\t1\t1\t16\t6\t926\t977\t88\t17\t78.682037\t-162.9\n5\t1\t1\t1\t16\t7\t1138\t976\t73\t18\t52.599762\t-84.3\n5\t1\t1\t1\t16\t8\t1334\t976\t58\t17\t96.495529\t4.90\n4\t1\t1\t1\t17\t0\t66\t1333\t1341\t29\t-1\t\n5\t1\t1\t1\t17\t1\t66\t1339\t105\t23\t93.284187\tMelting\n5\t1\t1\t1\t17\t2\t186\t1340\t15\t18\t93.073456\tT\n5\t1\t1\t1\t17\t3\t414\t1340\t58\t18\t93.223755\t1400\n5\t1\t1\t1\t17\t4\t488\t1341\t15\t17\t92.686050\tK\n5\t1\t1\t1\t17\t5\t1015\t1339\t105\t23\t83.004730\tBoiling\n5\t1\t1\t1\t17\t6\t1181\t1340\t15\t18\t72.755493\tT\n5\t1\t1\t1\t17\t7\t1317\t1340\t16\t17\t86.404587\tK\n5\t1\t1\t1\t17\t8\t1406\t1333\t1\t24\t68.919357\t|\n4\t1\t1\t1\t18\t0\t1015\t1389\t391\t50\t-1\t\n5\t1\t1\t1\t18\t1\t1015\t1389\t26\t50\t4.341793\tA,\n5\t1\t1\t1\t18\t2\t1044\t1389\t34\t50\t4.341793\tgH®\n5\t1\t1\t1\t18\t3\t1294\t1391\t112\t34\t16.018639\tae\n4\t1\t1\t1\t19\t0\t66\t1421\t1340\t42\t-1\t\n5\t1\t1\t1\t19\t1\t66\t1425\t60\t38\t19.900570\t4,,H°\n5\t1\t1\t1\t19\t2\t457\t1421\t34\t37\t80.642609\tkg\n4\t1\t1\t1\t20\t0\t1015\t1453\t390\t32\t-1\t\n5\t1\t1\t1\t20\t1\t1015\t1461\t75\t18\t96.622833\tMolar\n5\t1\t1\t1\t20\t2\t1105\t1461\t57\t18\t96.276443\tVol.\n5\t1\t1\t1\t20\t3\t1227\t1460\t73\t18\t91.541977\t3.149\n5\t1\t1\t1\t20\t4\t1317\t1453\t88\t32\t27.686672\tJ+bart\n4\t1\t1\t1\t21\t0\t66\t1478\t1296\t45\t-1\t\n5\t1\t1\t1\t21\t1\t66\t1491\t105\t26\t27.683750\tH399-H§\n5\t1\t1\t1\t21\t2\t485\t1478\t34\t45\t68.185905\tka\n5\t1\t1\t1\t21\t3\t1214\t1490\t73\t19\t68.921700\t31.49\n5\t1\t1\t1\t21\t4\t1319\t1481\t43\t27\t87.504814\tcm?\n4\t1\t1\t1\t22\t0\t291\t1568\t1112\t32\t-1\t\n5\t1\t1\t1\t22\t1\t291\t1583\t30\t16\t74.665176\tA=\n5\t1\t1\t1\t22\t2\t337\t1581\t149\t18\t57.224457\t-1.640E+02\n5\t1\t1\t1\t22\t3\t654\t1583\t29\t17\t92.008842\tB=\n5\t1\t1\t1\t22\t4\t699\t1582\t133\t18\t86.422768\t8.830E-02\n5\t1\t1\t1\t22\t5\t969\t1583\t30\t16\t60.321789\tC=\n5\t1\t1\t1\t22\t6\t1015\t1581\t134\t18\t35.288483\t9.9468+04\n4\t1\t1\t1\t23\t0\t65\t1614\t1357\t23\t-1\t\n5\t1\t1\t1\t23\t1\t61\t1610\t158\t35\t22.465372\tina\n5\t1\t1\t1\t23\t2\t326\t1610\t135\t35\t8.140507\tmc\n5\t1\t1\t1\t23\t3\t562\t1610\t243\t35\t19.660559\ter\n5\t1\t1\t1\t23\t4\t1078\t1610\t258\t35\t13.891048\ta\n4\t1\t1\t1\t24\t0\t1317\t1636\t102\t27\t-1\t\n5\t1\t1\t1\t24\t1\t1317\t1636\t102\t27\t95.958977\t9/25/92\n4\t1\t1\t1\t25\t0\t1114\t1685\t287\t24\t-1\t\n5\t1\t1\t1\t25\t1\t1114\t1707\t2\t2\t12.334433\t:\n5\t1\t1\t1\t25\t2\t1400\t1685\t1\t19\t64.843018\t|\n4\t1\t1\t1\t26\t0\t1397\t1844\t1\t25\t-1\t\n5\t1\t1\t1\t26\t1\t1397\t1844\t1\t25\t78.818085\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "600",
+          "value": 600.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "54.44",
+          "value": 54.44,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "127.84",
+          "value": 127.84,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "26.14",
+          "value": 26.14,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "101.70",
+          "value": 101.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-160.6",
+          "value": -160.6,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-111.0",
+          "value": -111.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "9.67",
+          "value": 9.67,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 26,
+      "raw": " 700         56.08     136.36           30.30           106.05        -164.8            -102.0             7.61",
+      "raster_reading": "500 52.80 118.07 20.65 97.42 -161.3 119.4\n5\t1\t1\t1\t12\t8\t1321\t854\t71\t18\t57.023930\t12.47\n5\t1\t1\t1\t12\t9\t1415\t859\t1\t8\t57.023930\t|\n4\t1\t1\t1\t13\t0\t84\t884\t1331\t27\t-1\t\n5\t1\t1\t1\t13\t1\t84\t884\t42\t18\t96.283119\t600\n5\t1\t1\t1\t13\t2\t234\t885\t73\t18\t83.433861\t54.44\n5\t1\t1\t1\t13\t3\t370\t885\t88\t18\t83.433861\t127.84\n5\t1\t1\t1\t13\t4\t535\t886\t74\t18\t95.768372\t26.14\n5\t1\t1\t1\t13\t5\t747\t886\t87\t18\t96.035583\t101.70\n5\t1\t1\t1\t13\t6\t926\t886\t89\t18\t81.483757\t-160.6\n5\t1\t1\t1\t13\t7\t1123\t885\t89\t18\t91.857361\t-111.0\n5\t1\t1\t1\t13\t8\t1335\t884\t57\t19\t75.304100\t9.67\n5\t1\t1\t1\t13\t9\t1414\t884\t1\t27\t56.012081\t|\n4\t1\t1\t1\t14\t0\t83\t914\t1332\t20\t-1\t\n5\t1\t1\t1\t14\t1\t83\t914\t43\t18\t96.430939\t700\n5\t1\t1\t1\t14\t2\t234\t915\t73\t18\t86.650604\t56.08\n5\t1\t1\t1\t14\t3\t370\t915\t88\t19\t81.043518\t136.36\n5\t1\t1\t1\t14\t4\t536\t916\t73\t18\t96.001106\t30.30\n5\t1\t1\t1\t14\t5\t747\t916\t86\t18\t96.024956\t106.05\n5\t1\t1\t1\t14\t6\t926\t916\t89\t18\t90.309601\t-164.8\n5\t1\t1\t1\t14\t7\t1123\t915\t89\t19\t89.586899\t-102.0\n5\t1\t1\t1\t14\t8\t1335\t915\t57\t18\t78.783875\t7.61\n5\t1\t1\t1\t14\t9\t1413\t916\t2\t18\t71.409531\t|\n4\t1\t1\t1\t15\t0\t83\t945\t1331\t26\t-1\t\n5\t1\t1\t1\t15\t1\t83\t945\t43\t17\t96.389496\t800\n5\t1\t1\t1\t15\t2\t233\t945\t73\t18\t77.021965\t57.72\n5\t1\t1\t1\t15\t3\t370\t946\t87\t17\t77.021965\t143.95\n5\t1\t1\t1\t15\t4\t535\t946\t73\t18\t95.980568\t33.63\n5\t1\t1\t1\t15\t5\t747\t947\t86\t18\t93.694366\t110.32\n5\t1\t1\t1\t15\t6\t926\t946\t88\t18\t86.686180\t-163.9\n5\t1\t1\t1\t15\t7\t1138\t945\t74\t19\t86.700943\t-93.1\n5\t1\t1\t1\t15\t8\t1335\t945\t57\t18\t0.000000\t6.08\n4\t1\t1\t1\t16\t0\t83\t975\t1309\t19\t-1\t\n5\t1\t1\t1\t16\t1\t83\t975\t43\t17\t94.834389\t900\n5\t1\t1\t1\t16\t2\t234\t976\t73\t17\t81.208267\t59.36\n5\t1\t1\t1\t16\t3\t370\t976\t88\t18\t73.466026\t150.84\n5\t1\t1\t1\t16\t4\t535\t976\t73\t18\t95.977127\t36.40\n5\t1\t1\t1\t16\t5\t747\t977\t86\t17\t92.012909\t114.45\n5\t1\t1\t1\t16\t6\t926\t977\t88\t17\t78.682037\t-162.9\n5\t1\t1\t1\t16\t7\t1138\t976\t73\t18\t52.599762\t-84.3\n5\t1\t1\t1\t16\t8\t1334\t976\t58\t17\t96.495529\t4.90\n4\t1\t1\t1\t17\t0\t66\t1333\t1341\t29\t-1\t\n5\t1\t1\t1\t17\t1\t66\t1339\t105\t23\t93.284187\tMelting\n5\t1\t1\t1\t17\t2\t186\t1340\t15\t18\t93.073456\tT\n5\t1\t1\t1\t17\t3\t414\t1340\t58\t18\t93.223755\t1400\n5\t1\t1\t1\t17\t4\t488\t1341\t15\t17\t92.686050\tK\n5\t1\t1\t1\t17\t5\t1015\t1339\t105\t23\t83.004730\tBoiling\n5\t1\t1\t1\t17\t6\t1181\t1340\t15\t18\t72.755493\tT\n5\t1\t1\t1\t17\t7\t1317\t1340\t16\t17\t86.404587\tK\n5\t1\t1\t1\t17\t8\t1406\t1333\t1\t24\t68.919357\t|\n4\t1\t1\t1\t18\t0\t1015\t1389\t391\t50\t-1\t\n5\t1\t1\t1\t18\t1\t1015\t1389\t26\t50\t4.341793\tA,\n5\t1\t1\t1\t18\t2\t1044\t1389\t34\t50\t4.341793\tgH®\n5\t1\t1\t1\t18\t3\t1294\t1391\t112\t34\t16.018639\tae\n4\t1\t1\t1\t19\t0\t66\t1421\t1340\t42\t-1\t\n5\t1\t1\t1\t19\t1\t66\t1425\t60\t38\t19.900570\t4,,H°\n5\t1\t1\t1\t19\t2\t457\t1421\t34\t37\t80.642609\tkg\n4\t1\t1\t1\t20\t0\t1015\t1453\t390\t32\t-1\t\n5\t1\t1\t1\t20\t1\t1015\t1461\t75\t18\t96.622833\tMolar\n5\t1\t1\t1\t20\t2\t1105\t1461\t57\t18\t96.276443\tVol.\n5\t1\t1\t1\t20\t3\t1227\t1460\t73\t18\t91.541977\t3.149\n5\t1\t1\t1\t20\t4\t1317\t1453\t88\t32\t27.686672\tJ+bart\n4\t1\t1\t1\t21\t0\t66\t1478\t1296\t45\t-1\t\n5\t1\t1\t1\t21\t1\t66\t1491\t105\t26\t27.683750\tH399-H§\n5\t1\t1\t1\t21\t2\t485\t1478\t34\t45\t68.185905\tka\n5\t1\t1\t1\t21\t3\t1214\t1490\t73\t19\t68.921700\t31.49\n5\t1\t1\t1\t21\t4\t1319\t1481\t43\t27\t87.504814\tcm?\n4\t1\t1\t1\t22\t0\t291\t1568\t1112\t32\t-1\t\n5\t1\t1\t1\t22\t1\t291\t1583\t30\t16\t74.665176\tA=\n5\t1\t1\t1\t22\t2\t337\t1581\t149\t18\t57.224457\t-1.640E+02\n5\t1\t1\t1\t22\t3\t654\t1583\t29\t17\t92.008842\tB=\n5\t1\t1\t1\t22\t4\t699\t1582\t133\t18\t86.422768\t8.830E-02\n5\t1\t1\t1\t22\t5\t969\t1583\t30\t16\t60.321789\tC=\n5\t1\t1\t1\t22\t6\t1015\t1581\t134\t18\t35.288483\t9.9468+04\n4\t1\t1\t1\t23\t0\t65\t1614\t1357\t23\t-1\t\n5\t1\t1\t1\t23\t1\t61\t1610\t158\t35\t22.465372\tina\n5\t1\t1\t1\t23\t2\t326\t1610\t135\t35\t8.140507\tmc\n5\t1\t1\t1\t23\t3\t562\t1610\t243\t35\t19.660559\ter\n5\t1\t1\t1\t23\t4\t1078\t1610\t258\t35\t13.891048\ta\n4\t1\t1\t1\t24\t0\t1317\t1636\t102\t27\t-1\t\n5\t1\t1\t1\t24\t1\t1317\t1636\t102\t27\t95.958977\t9/25/92\n4\t1\t1\t1\t25\t0\t1114\t1685\t287\t24\t-1\t\n5\t1\t1\t1\t25\t1\t1114\t1707\t2\t2\t12.334433\t:\n5\t1\t1\t1\t25\t2\t1400\t1685\t1\t19\t64.843018\t|\n4\t1\t1\t1\t26\t0\t1397\t1844\t1\t25\t-1\t\n5\t1\t1\t1\t26\t1\t1397\t1844\t1\t25\t78.818085\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "700",
+          "value": 700.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "56.08",
+          "value": 56.08,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "136.36",
+          "value": 136.36,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "30.30",
+          "value": 30.3,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "106.05",
+          "value": 106.05,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-164.8",
+          "value": -164.8,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-102.0",
+          "value": -102.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "7.61",
+          "value": 7.61,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 27,
+      "raw": " 800         57.72     143.95           33.63           110.32        -163.9             -93.1             6.08",
+      "raster_reading": "500 52.80 118.07 20.65 97.42 -161.3 119.4\n5\t1\t1\t1\t12\t8\t1321\t854\t71\t18\t57.023930\t12.47\n5\t1\t1\t1\t12\t9\t1415\t859\t1\t8\t57.023930\t|\n4\t1\t1\t1\t13\t0\t84\t884\t1331\t27\t-1\t\n5\t1\t1\t1\t13\t1\t84\t884\t42\t18\t96.283119\t600\n5\t1\t1\t1\t13\t2\t234\t885\t73\t18\t83.433861\t54.44\n5\t1\t1\t1\t13\t3\t370\t885\t88\t18\t83.433861\t127.84\n5\t1\t1\t1\t13\t4\t535\t886\t74\t18\t95.768372\t26.14\n5\t1\t1\t1\t13\t5\t747\t886\t87\t18\t96.035583\t101.70\n5\t1\t1\t1\t13\t6\t926\t886\t89\t18\t81.483757\t-160.6\n5\t1\t1\t1\t13\t7\t1123\t885\t89\t18\t91.857361\t-111.0\n5\t1\t1\t1\t13\t8\t1335\t884\t57\t19\t75.304100\t9.67\n5\t1\t1\t1\t13\t9\t1414\t884\t1\t27\t56.012081\t|\n4\t1\t1\t1\t14\t0\t83\t914\t1332\t20\t-1\t\n5\t1\t1\t1\t14\t1\t83\t914\t43\t18\t96.430939\t700\n5\t1\t1\t1\t14\t2\t234\t915\t73\t18\t86.650604\t56.08\n5\t1\t1\t1\t14\t3\t370\t915\t88\t19\t81.043518\t136.36\n5\t1\t1\t1\t14\t4\t536\t916\t73\t18\t96.001106\t30.30\n5\t1\t1\t1\t14\t5\t747\t916\t86\t18\t96.024956\t106.05\n5\t1\t1\t1\t14\t6\t926\t916\t89\t18\t90.309601\t-164.8\n5\t1\t1\t1\t14\t7\t1123\t915\t89\t19\t89.586899\t-102.0\n5\t1\t1\t1\t14\t8\t1335\t915\t57\t18\t78.783875\t7.61\n5\t1\t1\t1\t14\t9\t1413\t916\t2\t18\t71.409531\t|\n4\t1\t1\t1\t15\t0\t83\t945\t1331\t26\t-1\t\n5\t1\t1\t1\t15\t1\t83\t945\t43\t17\t96.389496\t800\n5\t1\t1\t1\t15\t2\t233\t945\t73\t18\t77.021965\t57.72\n5\t1\t1\t1\t15\t3\t370\t946\t87\t17\t77.021965\t143.95\n5\t1\t1\t1\t15\t4\t535\t946\t73\t18\t95.980568\t33.63\n5\t1\t1\t1\t15\t5\t747\t947\t86\t18\t93.694366\t110.32\n5\t1\t1\t1\t15\t6\t926\t946\t88\t18\t86.686180\t-163.9\n5\t1\t1\t1\t15\t7\t1138\t945\t74\t19\t86.700943\t-93.1\n5\t1\t1\t1\t15\t8\t1335\t945\t57\t18\t0.000000\t6.08\n4\t1\t1\t1\t16\t0\t83\t975\t1309\t19\t-1\t\n5\t1\t1\t1\t16\t1\t83\t975\t43\t17\t94.834389\t900\n5\t1\t1\t1\t16\t2\t234\t976\t73\t17\t81.208267\t59.36\n5\t1\t1\t1\t16\t3\t370\t976\t88\t18\t73.466026\t150.84\n5\t1\t1\t1\t16\t4\t535\t976\t73\t18\t95.977127\t36.40\n5\t1\t1\t1\t16\t5\t747\t977\t86\t17\t92.012909\t114.45\n5\t1\t1\t1\t16\t6\t926\t977\t88\t17\t78.682037\t-162.9\n5\t1\t1\t1\t16\t7\t1138\t976\t73\t18\t52.599762\t-84.3\n5\t1\t1\t1\t16\t8\t1334\t976\t58\t17\t96.495529\t4.90\n4\t1\t1\t1\t17\t0\t66\t1333\t1341\t29\t-1\t\n5\t1\t1\t1\t17\t1\t66\t1339\t105\t23\t93.284187\tMelting\n5\t1\t1\t1\t17\t2\t186\t1340\t15\t18\t93.073456\tT\n5\t1\t1\t1\t17\t3\t414\t1340\t58\t18\t93.223755\t1400\n5\t1\t1\t1\t17\t4\t488\t1341\t15\t17\t92.686050\tK\n5\t1\t1\t1\t17\t5\t1015\t1339\t105\t23\t83.004730\tBoiling\n5\t1\t1\t1\t17\t6\t1181\t1340\t15\t18\t72.755493\tT\n5\t1\t1\t1\t17\t7\t1317\t1340\t16\t17\t86.404587\tK\n5\t1\t1\t1\t17\t8\t1406\t1333\t1\t24\t68.919357\t|\n4\t1\t1\t1\t18\t0\t1015\t1389\t391\t50\t-1\t\n5\t1\t1\t1\t18\t1\t1015\t1389\t26\t50\t4.341793\tA,\n5\t1\t1\t1\t18\t2\t1044\t1389\t34\t50\t4.341793\tgH®\n5\t1\t1\t1\t18\t3\t1294\t1391\t112\t34\t16.018639\tae\n4\t1\t1\t1\t19\t0\t66\t1421\t1340\t42\t-1\t\n5\t1\t1\t1\t19\t1\t66\t1425\t60\t38\t19.900570\t4,,H°\n5\t1\t1\t1\t19\t2\t457\t1421\t34\t37\t80.642609\tkg\n4\t1\t1\t1\t20\t0\t1015\t1453\t390\t32\t-1\t\n5\t1\t1\t1\t20\t1\t1015\t1461\t75\t18\t96.622833\tMolar\n5\t1\t1\t1\t20\t2\t1105\t1461\t57\t18\t96.276443\tVol.\n5\t1\t1\t1\t20\t3\t1227\t1460\t73\t18\t91.541977\t3.149\n5\t1\t1\t1\t20\t4\t1317\t1453\t88\t32\t27.686672\tJ+bart\n4\t1\t1\t1\t21\t0\t66\t1478\t1296\t45\t-1\t\n5\t1\t1\t1\t21\t1\t66\t1491\t105\t26\t27.683750\tH399-H§\n5\t1\t1\t1\t21\t2\t485\t1478\t34\t45\t68.185905\tka\n5\t1\t1\t1\t21\t3\t1214\t1490\t73\t19\t68.921700\t31.49\n5\t1\t1\t1\t21\t4\t1319\t1481\t43\t27\t87.504814\tcm?\n4\t1\t1\t1\t22\t0\t291\t1568\t1112\t32\t-1\t\n5\t1\t1\t1\t22\t1\t291\t1583\t30\t16\t74.665176\tA=\n5\t1\t1\t1\t22\t2\t337\t1581\t149\t18\t57.224457\t-1.640E+02\n5\t1\t1\t1\t22\t3\t654\t1583\t29\t17\t92.008842\tB=\n5\t1\t1\t1\t22\t4\t699\t1582\t133\t18\t86.422768\t8.830E-02\n5\t1\t1\t1\t22\t5\t969\t1583\t30\t16\t60.321789\tC=\n5\t1\t1\t1\t22\t6\t1015\t1581\t134\t18\t35.288483\t9.9468+04\n4\t1\t1\t1\t23\t0\t65\t1614\t1357\t23\t-1\t\n5\t1\t1\t1\t23\t1\t61\t1610\t158\t35\t22.465372\tina\n5\t1\t1\t1\t23\t2\t326\t1610\t135\t35\t8.140507\tmc\n5\t1\t1\t1\t23\t3\t562\t1610\t243\t35\t19.660559\ter\n5\t1\t1\t1\t23\t4\t1078\t1610\t258\t35\t13.891048\ta\n4\t1\t1\t1\t24\t0\t1317\t1636\t102\t27\t-1\t\n5\t1\t1\t1\t24\t1\t1317\t1636\t102\t27\t95.958977\t9/25/92\n4\t1\t1\t1\t25\t0\t1114\t1685\t287\t24\t-1\t\n5\t1\t1\t1\t25\t1\t1114\t1707\t2\t2\t12.334433\t:\n5\t1\t1\t1\t25\t2\t1400\t1685\t1\t19\t64.843018\t|\n4\t1\t1\t1\t26\t0\t1397\t1844\t1\t25\t-1\t\n5\t1\t1\t1\t26\t1\t1397\t1844\t1\t25\t78.818085\t|\n",
+      "cells": {
+        "temperature": {
+          "raw": "800",
+          "value": 800.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "57.72",
+          "value": 57.72,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "143.95",
+          "value": 143.95,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "33.63",
+          "value": 33.63,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "110.32",
+          "value": 110.32,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-163.9",
+          "value": -163.9,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-93.1",
+          "value": -93.1,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "6.08",
+          "value": 6.08,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    },
+    {
+      "source_line": 28,
+      "raw": " 900         59.36     150.84           36.40           114.45        -162.9             -84.3             4.90",
+      "raster_reading": "PbS: Cubic crystals 298.15 to 900 K. Reference state for sulfur is ideal Sj gas at p = 1",
+      "cells": {
+        "temperature": {
+          "raw": "900",
+          "value": 900.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "cp": {
+          "raw": "59.36",
+          "value": 59.36,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "entropy": {
+          "raw": "150.84",
+          "value": 150.84,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "enthalpy_function": {
+          "raw": "36.40",
+          "value": 36.4,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "114.45",
+          "value": 114.45,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-162.9",
+          "value": -162.9,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "formation_gibbs": {
+          "raw": "-84.3",
+          "value": -84.3,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "4.90",
+          "value": 4.9,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      }
+    }
+  ],
+  "ambiguities": [
+    {
+      "kind": "ocr_suspect",
+      "row": 0,
+      "columns": [
+        "enthalpy_function"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 2,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 3,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 4,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 5,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 6,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 7,
+      "columns": [
+        "temperature",
+        "cp",
+        "entropy",
+        "enthalpy_function",
+        "gibbs_function",
+        "formation_enthalpy",
+        "formation_gibbs",
+        "log_kf"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 0,
+      "tokens": [
+        "239.26~"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 1,
+      "tokens": [
+        "2"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 2,
+      "tokens": [
+        "98",
+        "98"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 3,
+      "tokens": [
+        "J•mol-1·K-",
+        "1",
+        "kJ•mol-1"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 4,
+      "tokens": [
+        "1400"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 5,
+      "tokens": [
+        ".149"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 6,
+      "tokens": [
+        "cm3"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 8,
+      "tokens": [
+        "9.946E+04"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 9,
+      "tokens": [
+        "9/25/~2"
+      ]
+    }
+  ],
+  "transcription_status": "transcribed_with_ocr_ambiguities"
+}
