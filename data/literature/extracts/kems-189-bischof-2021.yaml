@@ -1,0 +1,580 @@
+schema_version: literature_extract.v1
+source_id: kems-189-bischof-2021
+source:
+  citation: >-
+    Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2021),
+    "Vaporisation of group 13 elements from basaltic melts by Knudsen Effusion
+    Mass Spectrometry", Goldschmidt2021 abstracts (Virtual, 4-9 July 2021),
+    DOI 10.7185/gold2021.7353
+  doi: 10.7185/gold2021.7353
+  url: https://doi.org/10.7185/gold2021.7353
+  year: 2021
+  version: publishedVersion_1page_abstract
+  related_sources:
+    - source_id: kems-137-bischof-2023
+      doi: 10.1016/j.gca.2023.08.027
+      relation: later_full_paper_melt_activities_same_group
+      note: >-
+        GCA 360:1-15 (2023) reports numeric gamma(GaO1.5)/gamma(InO1.5) and
+        melt p(i) for An-Di eutectic KEMS. Different DOI; conference abstract
+        here has no tabulated gamma or Psat. Do not merge, remint, or copy
+        2023 numbers into this extract.
+    - source_id: kems-138-bischof-2023
+      doi: 10.1016/j.calphad.2022.102507
+      relation: later_full_paper_pure_oxide_kems_same_group
+      note: >-
+        Calphad 80:102507 (2023) reports tabulated pure-Ga2O3/In2O3 KEMS
+        partial pressures and 2nd/3rd-law enthalpies. Different DOI; this
+        2021 abstract prints only a qualitative pM2O > pM0 >> pMO order.
+        Do not merge or copy 2023 table cells here.
+extraction:
+  method: >-
+    Official OA PDF https://goldschmidtabstracts.info/2021/7353.pdf (HTTP 200
+    application/pdf, 118782 bytes, 1 page A4). DOI 10.7185/gold2021.7353
+    resolves (curl -sI HTTP 302 to goldschmidtabstracts.info abstractView).
+    Unpaywall is_oa true, oa_status bronze, license null. Crossref license
+    null. No MinerU. pdftotext -layout of the single page plus visual
+    certification of ion-charge superscripts against 150 dpi pdftoppm
+    (pdftotext collapses M^{2+} and M2+; page prints M+, M^{2+}, M^{3+},
+    M2+, MO+, M2O+). pdfimages -list empty: no embedded figures. No numbered tables.
+    Measured ion identities and the printed partial-pressure order kept
+    distinct from the qualitative activity comparison (no numeric gamma)
+    and from later 2023 tabulated values (not copied). Missing = absent,
+    never 0. No unit conversion. Tilde doping levels stored as printed
+    approximations.
+  date: '2026-09-06'
+  worker: wave-W3-kems-189-bischof-2021
+  provenance_path: docs-private/research/2026-09-06-wave-3/W3-kems-189-bischof-2021/kems-189-bischof-2021/
+review_status: draft
+fidelity_samples:
+  - species: Ga
+    observable: gibbs_table
+    observation_id: bischof_2021_kems_method_metadata
+    field: T_max_K_as_printed
+    value: 1750
+    locator:
+      page: 1
+      pdf_page_index: 1
+      paragraph: experimental
+      note: "heated by a tungsten wire furnace up to 1750 K"
+  - species: Ga
+    observable: gibbs_table
+    observation_id: bischof_2021_kems_method_metadata
+    field: electron_energy_eV
+    value: 60
+    locator:
+      page: 1
+      pdf_page_index: 1
+      paragraph: experimental
+      note: "ionised at 60 eV"
+  - species: Ga
+    observable: gibbs_table
+    observation_id: bischof_2021_andi_doping_ga_in
+    field: ppm_approx_low
+    value: 1000
+    locator:
+      page: 1
+      pdf_page_index: 1
+      paragraph: experimental
+      note: "doped with ~1000 and ~10,000 ppm of Ga and In"
+  - species: Ga2O3
+    observable: rate_series
+    observation_id: bischof_2021_pure_oxide_ions
+    field: ions_as_published
+    value: "M+, M^{2+}, M^{3+}, M2+, MO+ and M2O+ (M = Ga or In)"
+    locator:
+      page: 1
+      pdf_page_index: 1
+      paragraph: results
+      note: "page prints M+, M^{2+}, M^{3+}, M2+, MO+ and M2O+ (where M = Ga or In)"
+  - species: Ga2O3
+    observable: rate_series
+    observation_id: bischof_2021_pure_oxide_psat_order
+    field: order_as_printed
+    value: "pM2O > pM0 >> pMO"
+    locator:
+      page: 1
+      pdf_page_index: 1
+      paragraph: results
+      note: "partial pressures decline in the order pM2O > pM0 >> pMO"
+  - species: Ga
+    observable: activity_coefficient
+    observation_id: bischof_2021_gao15_activity_qualitative
+    field: comparison_as_printed
+    value: lower activities of GaO1.5 and InO1.5 in the liquid
+    locator:
+      page: 1
+      pdf_page_index: 1
+      paragraph: results
+      note: "the lower activities of GaO1.5 and InO1.5 in the liquid; no numeric gamma"
+  - species: Tl
+    observable: rate_series
+    observation_id: bischof_2021_tl_too_volatile
+    field: status_as_printed
+    value: too volatile to obtain useful signals at high temperatures
+    locator:
+      page: 1
+      pdf_page_index: 1
+      paragraph: results
+      note: "Tl proved to be too volatile to obtain useful signals at high temperatures"
+species:
+  Ga:
+    observations:
+    - observation_id: bischof_2021_kems_method_metadata
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: experimental
+        note: >-
+          Ir Knudsen cells, tungsten-wire furnace, 60 eV, Finnigan MAT 271.
+          Orifice diameter, Clausing factor, chamber pressure, and sample
+          mass are not printed on this 1-page abstract (do not copy from
+          kems-137/138).
+      phase: iridium_knudsen_cell_KEMS
+      condensed_form:
+        state: mixed_starting_materials
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Pure Ga2O3(s), In2O3(s), and anorthite-diopside eutectic glasses
+          as printed. Not a single condensed phase.
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as_printed
+      values:
+        quantity: KMS_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        cell_material_as_published: iridium
+        furnace_as_published: tungsten wire furnace
+        T_max_K_as_printed: 1750
+        electron_energy_eV: 60
+        spectrometer_as_published: Finnigan MAT 271
+        orifice_diameter_mm: absent
+        chamber_pressure: absent
+        quote_T: heated by a tungsten wire furnace up to 1750 K
+        quote_eV: ionised at 60 eV
+        quote_cell: placed in iridium Knudsen cells
+        quote_ms: resulting intensities measured on a Finnigan MAT 271 mass spectrometer
+        note: >-
+          Equipment facts printed on this abstract only. Numeric orifice
+          0.4 mm / chamber ~10^-6 mbar from the 2023 papers are not on
+          this page and are not stored here.
+      uncertainty:
+        note: none stated for geometry; T is an upper bound (up to 1750 K), not a dwell
+      equipment: &id001
+        cell_material:
+          value: Ir
+          locator:
+            page: 1
+            pdf_page_index: 1
+            paragraph: experimental
+            note: placed in iridium Knudsen cells
+          quote: placed in iridium Knudsen cells
+    - observation_id: bischof_2021_andi_doping_ga_in
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: experimental
+        note: "anorthite-diopside eutectic glasses doped with ~1000 and ~10,000 ppm of Ga and In"
+      phase: anorthite_diopside_eutectic_silicate_glass
+      condensed_form:
+        state: glass
+        metastable: false
+        basis: explicit_author
+        note: anorthite-diopside eutectic glasses as printed
+      standard_state: bulk dopant level as printed (ppm of Ga and In); oxide basis not stated
+      regime: analytical_composition
+      units: ppm_as_printed
+      values:
+        quantity: bulk_sample_composition
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        host_as_published: anorthite-diopside eutectic glasses
+        dopants_as_published: Ga and In
+        ppm_approx_low: 1000
+        ppm_approx_high: 10000
+        approximation_mark_as_printed: "~"
+        quote: "doped with ~1000 and ~10,000 ppm of Ga and In"
+        note: >-
+          Two approximate doping levels printed with tildes. No exact
+          analysed mole fractions. Do not substitute kems-137 Table 8 x(GaO1.5).
+      uncertainty:
+        note: "tilde as printed; no numeric sigma"
+      equipment: *id001
+    - observation_id: bischof_2021_melt_ga_ions
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: The ions M+, MO+ and M2O+ were observed for both Ga and In above the silicate melt
+      phase: anorthite_diopside_eutectic_silicate_melt
+      standard_state: ions observed above the silicate melt; no numeric partial pressures
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: measured_direct
+        ions_as_published: "M+, MO+ and M2O+"
+        M_as_published: Ga or In
+        quote: The ions M+, MO+ and M2O+ were observed for both Ga and In above the silicate melt
+        note: >-
+          Page prints M+, MO+ and M2O+. No tabulated I+ or p(i). Pure-oxide
+          ion list is the separate observation bischof_2021_pure_oxide_ions
+          (adds M^{2+}, M^{3+}, M2+).
+      uncertainty:
+        note: none stated; species presence only
+      equipment: *id001
+    - observation_id: bischof_2021_melt_ga_pM0_over_pM2O_higher
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: p(M0)/p(M2O) were higher than for pure oxides
+      phase: anorthite_diopside_eutectic_silicate_melt
+      standard_state: ratio of partial pressures relative to pure-oxide KEMS; no numeric ratio
+      regime: kems_effusion
+      units: none (ordering only; no numeric ratio)
+      values:
+        quantity: vapour_partial_pressure_ratio_ordering_no_numeric_P
+        semantics: bound_not_point_ordering
+        method_class: authors_reduced_from_ion_intensities
+        comparison_as_printed: p(M0)/p(M2O) were higher than for pure oxides
+        quote: however, p(M0)/p(M2O) were higher than for pure oxides
+        note: >-
+          Qualitative comparison after ionisation-cross-section and
+          fragmentation corrections. No numeric p(M0)/p(M2O) is printed
+          (absent, not 0). Do not copy kems-137 supplement p(i) rows.
+      uncertainty:
+        note: none stated
+      equipment: *id001
+    - observation_id: bischof_2021_gao15_activity_qualitative
+      type: activity_coefficient
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: the lower activities of GaO1.5 and InO1.5 in the liquid
+      phase: anorthite_diopside_eutectic_silicate_melt
+      standard_state: Raoultian GaO1.5(l) implied by oxide formula as printed; not a numeric gamma
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        oxide_formula_as_published: GaO1.5
+        method_class: qualitative_comparison
+        semantics: qualitative_comparison_not_numeric_gamma
+        comparison_as_printed: lower activities of GaO1.5 and InO1.5 in the liquid
+        quote: >-
+          We show that this behaviour reflects the lower activities of
+          GaO1.5 and InO1.5 in the liquid
+        note: >-
+          No numeric gamma, a, or A/B Henrian coefficients on this page
+          (absent, not 0). Numeric preferred gamma 0.036(6) lives on
+          kems-137 (different DOI) and is not copied here.
+      uncertainty:
+        note: none stated; qualitative only
+      equipment: *id001
+  In:
+    observations:
+    - observation_id: bischof_2021_andi_doping_in
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: experimental
+        note: "anorthite-diopside eutectic glasses doped with ~1000 and ~10,000 ppm of Ga and In"
+      phase: anorthite_diopside_eutectic_silicate_glass
+      condensed_form:
+        state: glass
+        metastable: false
+        basis: explicit_author
+        note: anorthite-diopside eutectic glasses as printed
+      standard_state: bulk dopant level as printed (ppm of Ga and In); oxide basis not stated
+      regime: analytical_composition
+      units: ppm_as_printed
+      values:
+        quantity: bulk_sample_composition
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        host_as_published: anorthite-diopside eutectic glasses
+        dopants_as_published: Ga and In
+        ppm_approx_low: 1000
+        ppm_approx_high: 10000
+        approximation_mark_as_printed: "~"
+        quote: "doped with ~1000 and ~10,000 ppm of Ga and In"
+        note: Same printed sentence as bischof_2021_andi_doping_ga_in; In half of the dopant pair.
+      uncertainty:
+        note: "tilde as printed; no numeric sigma"
+      equipment: *id001
+    - observation_id: bischof_2021_melt_in_ions
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: The ions M+, MO+ and M2O+ were observed for both Ga and In above the silicate melt
+      phase: anorthite_diopside_eutectic_silicate_melt
+      standard_state: ions observed above the silicate melt; no numeric partial pressures
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: measured_direct
+        ions_as_published: "M+, MO+ and M2O+"
+        M_as_published: Ga or In
+        quote: The ions M+, MO+ and M2O+ were observed for both Ga and In above the silicate melt
+        note: In half of the printed melt-ion sentence. No tabulated I+ or p(i).
+      uncertainty:
+        note: none stated; species presence only
+      equipment: *id001
+    - observation_id: bischof_2021_melt_in_pM0_over_pM2O_higher
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: p(M0)/p(M2O) were higher than for pure oxides
+      phase: anorthite_diopside_eutectic_silicate_melt
+      standard_state: ratio of partial pressures relative to pure-oxide KEMS; no numeric ratio
+      regime: kems_effusion
+      units: none (ordering only; no numeric ratio)
+      values:
+        quantity: vapour_partial_pressure_ratio_ordering_no_numeric_P
+        semantics: bound_not_point_ordering
+        method_class: authors_reduced_from_ion_intensities
+        comparison_as_printed: p(M0)/p(M2O) were higher than for pure oxides
+        quote: however, p(M0)/p(M2O) were higher than for pure oxides
+        note: In half of the printed ratio comparison. No numeric ratio is printed (absent, not 0).
+      uncertainty:
+        note: none stated
+      equipment: *id001
+    - observation_id: bischof_2021_ino15_activity_qualitative
+      type: activity_coefficient
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: the lower activities of GaO1.5 and InO1.5 in the liquid
+      phase: anorthite_diopside_eutectic_silicate_melt
+      standard_state: Raoultian InO1.5(l) implied by oxide formula as printed; not a numeric gamma
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        oxide_formula_as_published: InO1.5
+        method_class: qualitative_comparison
+        semantics: qualitative_comparison_not_numeric_gamma
+        comparison_as_printed: lower activities of GaO1.5 and InO1.5 in the liquid
+        quote: >-
+          We show that this behaviour reflects the lower activities of
+          GaO1.5 and InO1.5 in the liquid
+        note: >-
+          No numeric gamma on this page (absent, not 0). Numeric preferred
+          gamma 0.017(12) lives on kems-137 (different DOI) and is not
+          copied here.
+      uncertainty:
+        note: none stated; qualitative only
+      equipment: *id001
+  Tl:
+    observations:
+    - observation_id: bischof_2021_tl_too_volatile
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: Tl proved to be too volatile to obtain useful signals at high temperatures
+      phase: not_specified_for_Tl_on_this_page
+      standard_state: no useful KEMS signals as printed
+      regime: kems_effusion
+      units: none (non-detection statement; no pressures)
+      values:
+        quantity: not_reported_among_detected_species
+        semantics: bound_not_point_ordering
+        method_class: measured_direct
+        status_as_printed: too volatile to obtain useful signals at high temperatures
+        quote: Tl proved to be too volatile to obtain useful signals at high temperatures
+        note: >-
+          Group 13 target named in the opening sentence with Ga and In.
+          No ion list, no p(i), no doping level for Tl. High-temperature
+          window is not printed as a number for this non-detection
+          (the 1750 K furnace cap is the method observation).
+      uncertainty:
+        note: none stated
+      equipment: *id001
+  Ga2O3:
+    observations:
+    - observation_id: bischof_2021_pure_oxide_ions
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: >-
+          We detected the ions M+, M^{2+}, M^{3+}, M2+, MO+ and M2O+
+          (where M = Ga or In) above the pure oxides Ga2O3 and In2O3.
+          Superscripts certified from 150 dpi page render (not pdftotext).
+      phase: solid_Ga2O3_In2O3_KEMS
+      condensed_form:
+        state: crystalline
+        metastable: false
+        basis: explicit_author
+        note: Powders of pure Ga2O3(s), In2O3(s) as printed
+      standard_state: ions above the pure sesquioxides; no numeric partial pressures
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: measured_direct
+        ions_as_published: "M+, M^{2+}, M^{3+}, M2+, MO+ and M2O+ (M = Ga or In)"
+        ions_unicode_as_printed: "M+, M^{2+}, M^{3+}, M2+, MO+ and M2O+"
+        condensed_as_published: pure oxides Ga2O3 and In2O3
+        quote: >-
+          We detected the ions M+, M^{2+}, M^{3+}, M2+, MO+ and M2O+
+          (where M = Ga or In) above the pure oxides Ga2O3 and In2O3
+        note: >-
+          Charge vs nuclearity certified from the page render: M+ (atomic
+          1+), M^{2+} (atomic 2+), M^{3+} (atomic 3+), M2+ (dimer 1+),
+          MO+, M2O+. pdftotext emits a collapsed M2+ twice and is not
+          the data. No tabulated I+ or p(i) on this page.
+      uncertainty:
+        note: none stated; species presence only
+      equipment: *id001
+    - observation_id: bischof_2021_pure_oxide_psat_order
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: partial pressures decline in the order pM2O > pM0 >> pMO
+      phase: solid_Ga2O3_In2O3_KEMS
+      standard_state: authors-reduced partial-pressure order after ionisation-cross-section and fragmentation corrections
+      regime: kems_effusion
+      units: none (ordering only; no numeric P)
+      values:
+        quantity: vapour_partial_pressure_ordering_no_numeric_P
+        semantics: bound_not_point_ordering
+        method_class: authors_reduced_from_ion_intensities
+        order_as_printed: "pM2O > pM0 >> pMO"
+        quote: >-
+          Following corrections for ionisation cross sections and ion
+          fragmentation, we find that partial pressures decline in the
+          order pM2O > pM0 >> pMO, in agreement with previous work
+        note: >-
+          Directly reduced from measured ion intensities (corrections
+          named; no MAGMA/FactSage/2nd-law fit on this page). No numeric
+          Psat is printed (absent, not 0). Do not copy kems-138 Tables 8-13.
+      uncertainty:
+        note: none stated
+      equipment: *id001
+  In2O3:
+    observations:
+    - observation_id: bischof_2021_pure_in2o3_ions
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: ions above the pure oxides Ga2O3 and In2O3; In2O3 half of the same sentence
+      phase: solid_Ga2O3_In2O3_KEMS
+      condensed_form:
+        state: crystalline
+        metastable: false
+        basis: explicit_author
+        note: Powders of pure In2O3(s) as printed
+      standard_state: ions above the pure sesquioxides; no numeric partial pressures
+      regime: kems_effusion
+      units: none (species names only; no pressures)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: measured_direct
+        ions_as_published: "M+, M^{2+}, M^{3+}, M2+, MO+ and M2O+ (M = Ga or In)"
+        condensed_as_published: pure oxides Ga2O3 and In2O3
+        quote: >-
+          We detected the ions M+, M^{2+}, M^{3+}, M2+, MO+ and M2O+
+          (where M = Ga or In) above the pure oxides Ga2O3 and In2O3
+        note: In2O3 half of the printed pure-oxide ion sentence. No tabulated I+ or p(i).
+      uncertainty:
+        note: none stated; species presence only
+      equipment: *id001
+    - observation_id: bischof_2021_pure_in2o3_psat_order
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: pM2O > pM0 >> pMO; In2O3 half of the same reduced order
+      phase: solid_Ga2O3_In2O3_KEMS
+      standard_state: authors-reduced partial-pressure order after ionisation-cross-section and fragmentation corrections
+      regime: kems_effusion
+      units: none (ordering only; no numeric P)
+      values:
+        quantity: vapour_partial_pressure_ordering_no_numeric_P
+        semantics: bound_not_point_ordering
+        method_class: authors_reduced_from_ion_intensities
+        order_as_printed: "pM2O > pM0 >> pMO"
+        quote: >-
+          Following corrections for ionisation cross sections and ion
+          fragmentation, we find that partial pressures decline in the
+          order pM2O > pM0 >> pMO, in agreement with previous work
+        note: In2O3 half of the printed order. No numeric Psat is printed (absent, not 0).
+      uncertainty:
+        note: none stated
+      equipment: *id001
+  Ga2O:
+    observations:
+    - observation_id: bischof_2021_ga2o_dominant_gas_species
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: pM2O is the leading term of pM2O > pM0 >> pMO
+      phase: gas_over_pure_Ga2O3
+      standard_state: dominant vapour species from the printed order; no numeric P
+      regime: kems_effusion
+      units: none (ordering only; no numeric P)
+      values:
+        quantity: vapour_partial_pressure_ordering_no_numeric_P
+        semantics: bound_not_point_ordering
+        method_class: authors_reduced_from_ion_intensities
+        dominant_species_as_printed: M2O
+        order_as_printed: "pM2O > pM0 >> pMO"
+        quote: partial pressures decline in the order pM2O > pM0 >> pMO
+        note: Ga2O(g) is the M2O term for M = Ga. No numeric p(Ga2O) is printed (absent, not 0).
+      uncertainty:
+        note: none stated
+      equipment: *id001
+  In2O:
+    observations:
+    - observation_id: bischof_2021_in2o_dominant_gas_species
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        paragraph: results
+        note: pM2O is the leading term of pM2O > pM0 >> pMO
+      phase: gas_over_pure_In2O3
+      standard_state: dominant vapour species from the printed order; no numeric P
+      regime: kems_effusion
+      units: none (ordering only; no numeric P)
+      values:
+        quantity: vapour_partial_pressure_ordering_no_numeric_P
+        semantics: bound_not_point_ordering
+        method_class: authors_reduced_from_ion_intensities
+        dominant_species_as_printed: M2O
+        order_as_printed: "pM2O > pM0 >> pMO"
+        quote: partial pressures decline in the order pM2O > pM0 >> pMO
+        note: In2O(g) is the M2O term for M = In. No numeric p(In2O) is printed (absent, not 0).
+      uncertainty:
+        note: none stated
+      equipment: *id001
