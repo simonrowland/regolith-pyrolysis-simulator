@@ -4,15 +4,22 @@ source:
   citation: De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971), "Mass spectrometric investigation
     of the vaporization process of Apollo 12 lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380
   year: 1971
+  doi: null
+  url: https://ui.adsabs.harvard.edu/abs/1971LPSC....2.1367D
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) of Tables 1–8 + prior phase-2 geometry; multicarrier
-    ladder 2026-08-04 (mine-multicarrier-gk). Absolute P only from published tables — figure-only series
-    (Na, K, Fe, Ca, SiO, TiO, TiO2, Al monatomic) retained as qualitative/first-observed or figure-digitization
-    notes, not fabricated absolute series. Co-measurement groups documented in values.co_measured_with
-    lists of observation_ids (schema has no co_measurement_id field — proposed in findings).
-  date: '2026-08-04'
-  worker: mine-multicarrier-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/
+  method: >-
+    WA-3 (2026-09-06): pdftotext -layout of the held ADS JBIG2 scan is empty (one
+    bibcode token per page). Tables 1–8 transcribed from 200 dpi pdftoppm renders
+    (not MinerU "~" figure grids). Parent observation objects left unchanged;
+    Table 6 rows, silver/O–O2 calibration, and sample masses added as new
+    observation_ids. Prior method: OCR-artifact transcription (MinerU vlm) of
+    Tables 1–8 + prior phase-2 geometry; multicarrier ladder 2026-08-04
+    (mine-multicarrier-gk). Absolute P only from published tables — figure-only
+    series (Na, K, Fe, Ca, SiO, TiO, TiO2, Al monatomic; Fig. 8 composite) not
+    digitised in this round.
+  date: '2026-09-06'
+  worker: wave-WA-3
+  provenance_path: docs-private/research/2026-09-06-wave-A/WA-3/kems-022-demaria-1971/
 review_status: draft
 species:
   O2:
@@ -93,6 +100,65 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_sample_masses_splits
+      type: rate_series
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: On the whole 680.2 mg of sample 12022,57 and 928.6 mg of 12065,36
+      T_range_K:
+      - 1250.0
+      - 2500.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: mg as published
+      values:
+        quantity: condensed_sample_mass
+        method_class: measured_direct
+        gas_species: O2(g)
+        material: Apollo_12_12022_57_and_12065_36
+        condensed_phase: lunar_basalt
+        sample_12022_57_total_mg: 680.2
+        sample_12022_57_BC_mg:
+        - 167.6
+        - 162.6
+        sample_12022_57_NAA_mg: 350
+        sample_12065_36_total_mg: 928.6
+        sample_12065_36_BC_mg:
+        - 305
+        - 150
+        sample_12065_36_NAA_mg: 304
+        n_quantitative_vaporization_experiments: 6
+        composition_12022_note: chemical and mineralogical composition reported elsewhere (Smales 1971);
+          alkaline components 0.36 wt % Na2O and 0.068 wt % K2O (p. 1369)
+        composition_12065_note: this paper does not tabulate 12065 bulk oxides
+        multi_rotating_12065_Re_cell_mg: 106
+        multi_rotating_locator:
+          published_page: 1377
+          pdf_page_index: 11
+          paragraph: The rhenium crucible was loaded with 106 mgrs. of 12065 lunar sample
+      uncertainty:
+        note: masses as printed; 12022 BC+NAA (167.6+162.6+350=680.2) matches the total; 12065
+          series masses plus the 106 mg activity load are recorded separately from the 928.6 mg
+          whole-sample total (arithmetic not forced)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        cell_material:
+          value: Re
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
   Mn:
     observations:
     - observation_id: demaria_1971_mn_psat_table2_sample_12022
@@ -546,6 +612,109 @@ species:
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium, iron, and magnesium oxide crucibles
+    - observation_id: demaria_1971_table6_feo_dissociation
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Third-law heats of equilibrium reactions; reaction (4)
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: FeO(g) = Fe(g) + 1/2 O2(g)
+        reaction_number: 4
+        quantity: third_law_and_second_law_delta_H0
+        method_class: measured_direct
+        material: Apollo_12_12022_and_12065
+        condensed_phase: lunar_basalt_melt
+        gas_species_in_equilibrium:
+        - FeO(g)
+        - Fe(g)
+        - O2(g)
+        third_law_delta_H0_kcal_mol:
+          BC: 39 ± 2
+          NAA: 38 ± 2
+        second_law_delta_H0_kcal_mol:
+          BC: 38 ± 3
+          footnote: a
+        table: '6'
+      uncertainty:
+        note: printed ± on Table 6; third-law inclusive of calibration errors; second-law is the
+          standard deviation (authors)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        cell_material:
+          value: Re
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+    - observation_id: demaria_1971_silver_and_o_o2_calibration
+      type: rate_series
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: To convert ion intensities into pressures, the silver calibration (INGHRAM and DROWART, 1960), and, whenever possible, the O/O2 calibration, were utilized.
+      T_range_K:
+      - 1250.0
+      - 2500.0
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: pressure_calibration_standard
+        method_class: measured_direct
+        gas_species: Fe(g)
+        material: Apollo_12_lunar_basalt
+        calibration_standards:
+        - silver
+        - O_over_O2_dissociation
+        silver_reference: Inghram and Drowart 1960
+        o_o2_references:
+        - Brix and Herzberg 1954
+        - JANAF 1965
+        o_o2_basis: ratio of O+ and O2+ ion intensities and the O2 dissociation equilibrium constant
+        agreement_note: agreement between silver and O/O2 calibrations satisfactory at high temperatures;
+          at lower temperatures O+ fragment contribution makes O/O2 less reliable
+        ion_energy_eV:
+        - 30
+        - 70
+        ionization_cross_section_source: Mann 1967 (maxima, reduced to operating electron energy via
+          experimental ionization-efficiency curves)
+        absolute_P_formula: P = I_i^+ T / (S σ γ a_i)
+      uncertainty:
+        note: authors state at least a factor 2 uncertainty in absolute pressure values from the
+          calibration procedure (p. 1375)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        cell_material:
+          value: Re
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
   SiO:
     observations:
     - observation_id: demaria_1971_sio_lunar_basalt_kems_main_cell
@@ -700,6 +869,56 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_table6_sio2_dissociation
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Third-law heats of equilibrium reactions; reaction (1)
+      T_range_K:
+      - 1850.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: SiO2(g) = SiO(g) + 1/2 O2(g)
+        reaction_number: 1
+        quantity: third_law_delta_H0_table6_summary
+        method_class: measured_direct
+        material: Apollo_12_12022_and_12065
+        condensed_phase: lunar_basalt_melt
+        gas_species_in_equilibrium:
+        - SiO2(g)
+        - SiO(g)
+        - O2(g)
+        third_law_delta_H0_kcal_mol:
+          BC: 47 ± 2
+          NAA: 46 ± 2
+        table: '6'
+        detailed_third_law_points_observation_id: demaria_1971_sio2_sio_o2_equilibrium_table7
+      uncertainty:
+        note: printed ±2 on Table 6 inclusive of calibration; Table 7 mean 47.3 ± 0.3 is the
+          standard deviation on the third-law points
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        cell_material:
+          value: Re
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
   TiO:
     observations:
     - observation_id: demaria_1971_tio_tio2_figure6_comparable_pressures
@@ -801,6 +1020,105 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_table6_tio2_half_o2
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Third-law heats of equilibrium reactions; reaction (5)
+      T_range_K:
+      - 2000.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: TiO2(g) = TiO(g) + 1/2 O2(g)
+        reaction_number: 5
+        quantity: third_law_delta_H0_table6
+        method_class: measured_direct
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        gas_species_in_equilibrium:
+        - TiO2(g)
+        - TiO(g)
+        - O2(g)
+        third_law_delta_H0_kcal_mol:
+          BC: 83 ± 2
+          NAA: null
+        table: '6'
+      uncertainty:
+        note: printed ±2 on Table 6 BC; NAA column is a printed dash (true absence, not 0)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        cell_material:
+          value: Re
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+    - observation_id: demaria_1971_table6_tio2_atomic_o
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Third-law heats of equilibrium reactions; reaction (6)
+      T_range_K:
+      - 2000.0
+      - 2170.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: TiO2(g) = TiO(g) + O(g)
+        reaction_number: 6
+        quantity: third_law_and_second_law_delta_H0
+        method_class: measured_direct
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        gas_species_in_equilibrium:
+        - TiO2(g)
+        - TiO(g)
+        - O(g)
+        third_law_delta_H0_kcal_mol:
+          BC: null
+          NAA: 142 ± 3
+        second_law_delta_H0_kcal_mol:
+          NAA: 143 ± 8
+          footnote: a
+        table: '6'
+      uncertainty:
+        note: printed ± on Table 6; second-law 143 ± 8 is footnote a under the NAA column
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        cell_material:
+          value: Re
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
   Al2O:
     observations:
     - observation_id: demaria_1971_al2o_psat_table4
@@ -924,6 +1242,54 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_table6_al2o_o_2alo
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Third-law heats of equilibrium reactions; reaction (3)
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: Al2O(g) + O(g) = 2 AlO(g)
+        reaction_number: 3
+        quantity: third_law_delta_H0_table6
+        method_class: measured_direct
+        material: Apollo_12_lunar_basalt
+        condensed_phase: lunar_basalt_melt
+        gas_species_in_equilibrium:
+        - Al2O(g)
+        - O(g)
+        - AlO(g)
+        third_law_delta_H0_kcal_mol:
+          BC: 15.6 ± 2
+          NAA: null
+        table: '6'
+      uncertainty:
+        note: printed ±2 on Table 6 BC; NAA column is a printed dash (true absence, not 0)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        cell_material:
+          value: Re
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
   AlO:
     observations:
     - observation_id: demaria_1971_alo_psat_table4
@@ -1081,6 +1447,57 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_table6_alo_dissociation
+      type: gibbs_table
+      locator:
+        table: '6'
+        published_page: 1376
+        pdf_page_index: 10
+        paragraph: Third-law heats of equilibrium reactions; reaction (2)
+      T_range_K:
+      - 2360.0
+      - 2500.0
+      phase: lunar_basalt_melt_12065
+      regime: kems_effusion
+      units: kcal/mole as published
+      values:
+        reaction: AlO(g) = Al(g) + O(g)
+        reaction_number: 2
+        quantity: third_law_delta_H0_table6_summary
+        method_class: measured_direct
+        material: Apollo_12_12065
+        condensed_phase: lunar_basalt_melt
+        gas_species_in_equilibrium:
+        - AlO(g)
+        - Al(g)
+        - O(g)
+        third_law_delta_H0_kcal_mol:
+          BC: 112 ± 3
+          NAA: null
+        literature_compare_kcal_mol: 115 ± 5 (Drowart et al. 1960)
+        table: '6'
+        detailed_third_law_points_observation_id: demaria_1971_alo_al_o_kp_table8
+      uncertainty:
+        note: printed ±3 on Table 6 BC inclusive of calibration; Table 8 mean 112.2 ± 0.9 is
+          the standard deviation; NAA column is a printed dash (true absence, not 0)
+      equipment:
+        orifice_area:
+          value: 4.154756e-06
+          units: m2
+          diameter_m: 0.0023
+          orifice_shape: knife_edge
+          inferred: true
+          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        cell_material:
+          value: Re
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
   Al:
     observations:
     - observation_id: demaria_1971_al_monatomic_figure7
@@ -1856,3 +2273,81 @@ fidelity_samples:
   locator:
     table: '1'
     paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+- species: Al2O
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_al2o_o_2alo
+  field: third_law_delta_H0_kcal_mol
+  value:
+    BC: 15.6 ± 2
+    NAA: null
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (3) BC 15.6 ± 2 kcal/mole
+- species: Fe
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_feo_dissociation
+  field: second_law_delta_H0_kcal_mol
+  value:
+    BC: 38 ± 3
+    footnote: a
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (4) second-law BC 38 ± 3 kcal/mole (footnote a)
+- species: O2
+  observable: rate_series
+  observation_id: demaria_1971_sample_masses_splits
+  field: sample_12022_57_total_mg
+  value: 680.2
+  locator:
+    published_page: 1368
+    pdf_page_index: 2
+    paragraph: On the whole 680.2 mg of sample 12022,57
+- species: Fe
+  observable: rate_series
+  observation_id: demaria_1971_silver_and_o_o2_calibration
+  field: silver_reference
+  value: Inghram and Drowart 1960
+  locator:
+    published_page: 1368
+    pdf_page_index: 2
+    paragraph: the silver calibration (INGHRAM and DROWART, 1960)
+- species: SiO2
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_sio2_dissociation
+  field: third_law_delta_H0_kcal_mol
+  value:
+    BC: 47 ± 2
+    NAA: 46 ± 2
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (1) BC 47 ± 2, NAA 46 ± 2 kcal/mole
+- species: AlO
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_alo_dissociation
+  field: third_law_delta_H0_kcal_mol
+  value:
+    BC: 112 ± 3
+    NAA: null
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (2) BC 112 ± 3 kcal/mole
+- species: TiO2
+  observable: gibbs_table
+  observation_id: demaria_1971_table6_tio2_atomic_o
+  field: second_law_delta_H0_kcal_mol
+  value:
+    NAA: 143 ± 8
+    footnote: a
+  locator:
+    table: '6'
+    published_page: 1376
+    pdf_page_index: 10
+    note: Table 6 reaction (6) second-law NAA 143 ± 8 kcal/mole (footnote a)
