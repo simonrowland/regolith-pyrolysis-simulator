@@ -1,0 +1,137 @@
+{
+  "record_id": "cp-p050-01",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 56,
+  "page": 50,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "CRISTOBALITE",
+  "formula_candidate": "Si~",
+  "header_and_units_raw": "NAME AND FORMULA           ENTROPY             ~1            A2           A3            A4           AS     T range   Tan     4.H•\n                          J •IIOl-1•1(1                     (T)          u-2,        (T-o.&)       (T2)       K        K     kJ·110r1\n\n\n",
+  "source_text": "CRISTOBALITE                   43.4       -4. 160E+03    2.548E+OO   -6.286E+07     7.168E+04                 298\nSi~                             0.1                                                                           523",
+  "rows": [
+    {
+      "raw": "CRISTOBALITE                   43.4       -4. 160E+03    2.548E+OO   -6.286E+07     7.168E+04                 298",
+      "tokens": [
+        {
+          "raw": "CRISTOBALITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 12
+        },
+        {
+          "raw": "43.4",
+          "value": 43.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 31,
+          "end_offset": 35
+        },
+        {
+          "raw": "-4.",
+          "value": -4.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 42,
+          "end_offset": 45
+        },
+        {
+          "raw": "160E+03",
+          "value": 160000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 46,
+          "end_offset": 53
+        },
+        {
+          "raw": "2.548E+OO",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 57,
+          "end_offset": 66
+        },
+        {
+          "raw": "-6.286E+07",
+          "value": -62860000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 69,
+          "end_offset": 79
+        },
+        {
+          "raw": "7.168E+04",
+          "value": 71680.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 84,
+          "end_offset": 93
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 110,
+          "end_offset": 113
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "Si~                             0.1                                                                           523",
+      "tokens": [
+        {
+          "raw": "Si~",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 3
+        },
+        {
+          "raw": "0.1",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 32,
+          "end_offset": 35
+        },
+        {
+          "raw": "523",
+          "value": 523.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 110,
+          "end_offset": 113
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A1: unparsed printed OCR token '-4. 160E+03'",
+    "A2: unparsed printed OCR token '2.548E+OO'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A1', '-4. 160E+03')]",
+    "Body label or prose enters numeric region: [('A2', '2.548E+OO')]",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 13,
+  "source_line_end": 14
+}

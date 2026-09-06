@@ -1,0 +1,144 @@
+{
+  "record_id": "cp-p049-15",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 55,
+  "page": 49,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "QUARTZ",
+  "formula_candidate": "Si~",
+  "header_and_units_raw": "NAME AND FORIIJLA    ENTROPY            A1            A2            A3            A4            AS     T r.,ge   Tan     A.H·\n                    J•IIOl\"'·K\"'                     (T)          n·2,         (T.o.&)        (T2)       IC       IC     kJ·•r'\n\n\n",
+  "source_text": "QUARTZ                   41.5      a. 1145E+01    1.828E-02    -1.810E+05   -6.985E+02     5.406E-06     298\nSi~                       0.1                                                                            844",
+  "rows": [
+    {
+      "raw": "QUARTZ                   41.5      a. 1145E+01    1.828E-02    -1.810E+05   -6.985E+02     5.406E-06     298",
+      "tokens": [
+        {
+          "raw": "QUARTZ",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 6
+        },
+        {
+          "raw": "41.5",
+          "value": 41.5,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 25,
+          "end_offset": 29
+        },
+        {
+          "raw": "a.",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 35,
+          "end_offset": 37
+        },
+        {
+          "raw": "1145E+01",
+          "value": 11450.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 38,
+          "end_offset": 46
+        },
+        {
+          "raw": "1.828E-02",
+          "value": 0.01828,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 50,
+          "end_offset": 59
+        },
+        {
+          "raw": "-1.810E+05",
+          "value": -181000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 63,
+          "end_offset": 73
+        },
+        {
+          "raw": "-6.985E+02",
+          "value": -698.5,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 76,
+          "end_offset": 86
+        },
+        {
+          "raw": "5.406E-06",
+          "value": 5.406e-06,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 91,
+          "end_offset": 100
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 105,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "Si~                       0.1                                                                            844",
+      "tokens": [
+        {
+          "raw": "Si~",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 3
+        },
+        {
+          "raw": "0.1",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 26,
+          "end_offset": 29
+        },
+        {
+          "raw": "844",
+          "value": 844.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 105,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A1: unparsed printed OCR token 'a. 1145E+01'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A1', 'a. 1145E+01')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 55,
+  "source_line_end": 56
+}
