@@ -950,6 +950,34 @@ def _predicate_active(
     return active, detail
 
 
+def _applicability_evidence(
+    rule: RequestRule, state: VapourResolveState | None,
+) -> dict[str, Any]:
+    active, detail = _predicate_active(rule, state)
+    phase = state.process_phase if state else None
+    stage = state.stage if state else None
+    if (
+        rule.applicability_predicate not in {"stage0_only", "not_applicable", "inapplicable"}
+        and not (stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids)
+    ):
+        return {}
+    determined = (
+        rule.applicability_predicate in {"not_applicable", "inapplicable"}
+        or (rule.applicability_predicate == "stage0_only" and bool(phase or stage))
+        or (stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids)
+    )
+    return {
+        "predicate": rule.applicability_predicate,
+        "active": active,
+        "process_phase": phase,
+        "stage": stage,
+        "parent_species_ids": sorted(rule.parent_species_ids),
+        "species_id": rule.species_id,
+        "detail": detail,
+        "flux_dormant": not active and determined,
+    }
+
+
 def _executable_contract_refusal(rule: RequestRule) -> str | None:
     """Provider-independent missing-contract check (step 2).
 
@@ -1193,6 +1221,10 @@ def refusal_closure(
         *,
         source_reaction_activity: SourceReactionActivity | None = None,
     ) -> VapourAnswer:
+        extra: dict[str, Any] = {"detail": detail, "origin": rule.origin}
+        evidence = _applicability_evidence(rule, state)
+        if evidence:
+            extra["applicability_evidence"] = evidence
         return VapourAnswer(
             species_id=rule.species_id,
             pressure=PressureRefusal(code=code, detail=detail),
@@ -1208,7 +1240,7 @@ def refusal_closure(
             verdict_status=VERDICT_STATUS_BEARING_NON_AUTHORITATIVE,
             certification_ceiling=CERTIFICATION_CEILING_NEVER,
             refusal_code=code,
-            extra=MappingProxyType({"detail": detail, "origin": rule.origin}),
+            extra=MappingProxyType(extra),
             source_reaction_activity=source_reaction_activity,
         )
 
@@ -1612,6 +1644,9 @@ def refusal_closure(
             verdict = VERDICT_STATUS_BEARING_NON_AUTHORITATIVE
 
         extra_payload: dict[str, Any] = {"origin": rule.origin}
+        evidence = _applicability_evidence(rule, state)
+        if evidence:
+            extra_payload["applicability_evidence"] = evidence
         if _unit_activity_note is not None:
             from simulator.silent_zero import merge_notes_into_mapping
 
@@ -2262,6 +2297,8 @@ def allocate_selected_source(
             ),
             "replaced_catalog_attempt": dict(answer.extra),
         }
+        if "applicability_evidence" in answer.extra:
+            extra["applicability_evidence"] = dict(answer.extra["applicability_evidence"])
         residual = selected_source.validation_residual_dex_by_species.get(
             species_id
         )

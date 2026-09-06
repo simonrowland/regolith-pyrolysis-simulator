@@ -695,10 +695,11 @@ def test_evaporation_caller_dispatches_condensation_floor_to_provider(
     original_dispatch_and_commit = sim._dispatch_and_commit
     seen = []
 
-    def _spying_dispatch_and_commit(intent, *, control_inputs):
+    def _spying_dispatch_and_commit(intent, *, control_inputs, transition_meta=None):
         result = original_dispatch_and_commit(
             intent,
             control_inputs=control_inputs,
+            transition_meta=transition_meta,
         )
         if intent is ChemistryIntent.CONDENSATION_ROUTE:
             seen.append((dict(control_inputs), result))
@@ -1382,10 +1383,11 @@ def test_subfloor_holdup_persists_one_tick_then_accumulates_and_drains(
     seen_transitions = []
     original_dispatch_and_commit = sim._dispatch_and_commit
 
-    def _capture(intent, *, control_inputs):
+    def _capture(intent, *, control_inputs, transition_meta=None):
         result = original_dispatch_and_commit(
             intent,
             control_inputs=control_inputs,
+            transition_meta=transition_meta,
         )
         if intent is ChemistryIntent.CONDENSATION_ROUTE:
             seen_diagnostics.append(dict(result.diagnostic or {}))
@@ -1486,8 +1488,8 @@ def test_condensation_proposal_ignores_tier_one_phase_context_fields(
         seen = []
         original = sim._dispatch_and_commit
 
-        def _capture(intent, *, control_inputs):
-            result = original(intent, control_inputs=control_inputs)
+        def _capture(intent, *, control_inputs, transition_meta=None):
+            result = original(intent, control_inputs=control_inputs, transition_meta=transition_meta)
             if intent is ChemistryIntent.CONDENSATION_ROUTE:
                 seen.append((dict(control_inputs), result.transition))
             return result

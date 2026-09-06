@@ -15,6 +15,170 @@ from simulator.state import (
 )
 
 
+def _stage3_unavailable_psat_model():
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        wall_temperature_C=1500.0, overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
+        pipe_segment_temperatures_C={segment.name: 1500.0 for segment in model.pipe_segments},
+    )
+    model.wall_species_partial_pressures_pa = {"SiO": 100.0}
+    return model
+
+
+def test_stage3_unavailable_psat_predicts_flagged_capture():
+    model = _stage3_unavailable_psat_model()
+    outcomes = []
+    stage = next(stage for stage in model.train.stages if stage.stage_number == 3)
+    eta = model._condensation_efficiency(
+        stage=stage, species="SiO", T_cond_C=1050.0, residence_s=1.0,
+        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+    )
+    assert 0.0 < eta <= 1.0
+    flag = next(item for item in outcomes if item["status"] == "extrapolated")
+    assert flag["authority_level"] == "extrapolated"
+    assert flag["reason"] == "antoine_psat_unavailable_at_T"
+    assert flag["original_reason"]
+    assert flag["valid_range_K"]
+    assert flag["eta"] == eta
+
+
+def test_stage3_unavailable_psat_missing_flow_refuses():
+    model = _stage3_unavailable_psat_model()
+    model.wall_species_partial_pressures_pa = {}
+    stage = next(stage for stage in model.train.stages if stage.stage_number == 3)
+    with pytest.raises(condensation.DepositionInputRefusal):
+        model._condensation_efficiency(
+            stage=stage, species="SiO", T_cond_C=1050.0, residence_s=1.0,
+            available_kg=1.0, alpha_s_value=1.0,
+        )
+
+
+@pytest.mark.parametrize("case", ["positive", "zero_flow", "zero_area"])
+def test_declared_non_sio_extension_preserves_physical_zeros(case):
+    model = _stage3_unavailable_psat_model()
+    model.wall_species_partial_pressures_pa = {"Na2": 0.0 if case == "zero_flow" else 100.0}
+    stage = next(stage for stage in model.train.stages if stage.stage_number == 4)
+    if case == "zero_area":
+        model.stage_area_m2_by_stage = {"4": 0.0}
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+    )
+    if case == "positive":
+        assert 0.0 < eta <= 1.0
+        assert any(item["authority_level"] == "extrapolated" for item in outcomes)
+    else:
+        assert eta == 0.0
+        assert any(item["status"] == "pass_through" for item in outcomes)
+
+
+@pytest.mark.parametrize("area", [None, -1.0, float("nan"), float("inf"), "invalid"],
+                         ids=["missing", "negative", "nan", "infinite", "nonnumeric"])
+@pytest.mark.parametrize("stage_number", [0, 4, 5, 6])
+def test_declared_non_sio_extension_invalid_area_refuses(area, stage_number):
+    model = _stage3_unavailable_psat_model()
+    model.wall_species_partial_pressures_pa = {"Na2": 100.0}
+    model.stage_area_m2_by_stage = (
+        {} if area is None and stage_number == 4 else {str(stage_number): area}
+    )
+    stage = next(stage for stage in model.train.stages if stage.stage_number == stage_number)
+    outcomes = []
+    with pytest.raises(condensation.DepositionInputRefusal) as caught:
+        model._condensation_efficiency(
+            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+            available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+        )
+    assert caught.value.parameter == "stage_area_m2"
+    assert caught.value.terminal_refusal is True
+    assert not any(item["status"] == "pass_through" for item in outcomes)
+
+
+@pytest.mark.parametrize("stage_number", [0, 5, 6])
+def test_declared_non_sio_extension_noncollector_has_topology_evidence(stage_number):
+    model = _stage3_unavailable_psat_model()
+    model.wall_species_partial_pressures_pa = {"Na2": 100.0}
+    model.stage_area_m2_by_stage = {}
+    stage = next(stage for stage in model.train.stages if stage.stage_number == stage_number)
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+    )
+    assert eta == 0.0
+    outcome = next(item for item in outcomes if item["status"] == "pass_through")
+    assert outcome["reason"] == "no_capture_surface_in_train_topology"
+    assert outcome["applicability_evidence"] == {
+        "stage_number": stage_number, "target_species": [], "configured_capture_surface": False,
+    }
+
+
+def test_declared_non_sio_extension_explicit_noncollector_area_captures():
+    model = _stage3_unavailable_psat_model()
+    model.wall_species_partial_pressures_pa = {"Na2": 100.0}
+    model.stage_area_m2_by_stage = {"stage_5": 1.0}
+    stage = next(stage for stage in model.train.stages if stage.stage_number == 5)
+    eta = model._condensation_efficiency(
+        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+        available_kg=1.0, alpha_s_value=1.0,
+    )
+    assert 0.0 < eta <= 1.0
+
+
+def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
+    from simulator.runner import PyrolysisRun
+    from simulator.run_executor import RunExecutor
+
+    original = condensation.CondensationModel._condensation_efficiency
+
+    def missing_area(self, **kwargs):
+        areas = self.stage_area_m2_by_stage
+        if kwargs["species"] != "SiO":
+            self.stage_area_m2_by_stage = {}
+        try:
+            return original(self, **kwargs)
+        finally:
+            self.stage_area_m2_by_stage = areas
+
+    monkeypatch.setattr(condensation.CondensationModel, "_condensation_efficiency", missing_area)
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C0", hours=24,
+        additives_kg={}, allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status == "failed"
+    assert isinstance(execution.failure_exception, condensation.DepositionInputRefusal)
+    assert execution.failure_exception.parameter == "stage_area_m2"
+    assert execution.failure_exception.terminal_refusal is True
+    assert execution.session.simulator.melt.hour == len(execution.snapshots)
+    assert len(execution.snapshots) < 24
+
+
+def test_lunar_c0_24h_mass_and_oxygen_closure():
+    from simulator.runner import PyrolysisRun
+    from simulator.run_executor import RunExecutor
+    from simulator.accounting import AccountingQueries
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C0", hours=24,
+        additives_kg={}, allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status == "ok", execution.error_message
+    assert len(execution.snapshots) == 24
+    assert max(abs(row.mass_balance_error_pct) for row in execution.snapshots) <= 5e-12
+    sim = execution.session.simulator
+    report = sim.atom_ledger.close_report()
+    oxygen_mol = sum(atoms.get("O", 0.0) for atoms in report["atom_moles_by_account"].values())
+    assert oxygen_mol > 0.0
+    residual = report["element_atom_drift"]["whole_run_boundary_residual_mol_atoms"].get("O", 0.0)
+    assert abs(residual) / oxygen_mol * 100.0 <= 5e-12
+    partition = AccountingQueries(sim).oxygen_terminal_partition_kg()
+    assert abs(partition["total"] - partition["stored"] - partition["vented"] - partition["captured"]) / max(partition["total"], 1e-300) * 100.0 <= 5e-12
+
+
 def test_predict_flag_wall_certified_value_retains_bits():
     notices = {}
     pressure = condensation._antoine_psat_pa("Mg", 1000.0, antoine_extrapolations=notices)

@@ -2762,6 +2762,7 @@ class CondensationModel:
             vapour_carrier_authority_severity,
             vapour_carrier_authority_status,
         )
+        from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
 
         raw_carrier_authority = getattr(
             evap_flux, 'carrier_authority_by_species', {}
@@ -2793,14 +2794,39 @@ class CondensationModel:
         # One chokepoint: type admission-refusal and flux_dormant as the
         # refused status the evaporation debit reader already withholds on.
         non_debiting_reason_by_species: dict[str, str] = {}
+        cleanup_offgas_authorization: dict[str, dict[str, Any]] = {}
         for species in evap_flux.species_kg_hr:
+            current_status = carrier_authority_status_by_species.get(
+                species, VAPOUR_CARRIER_AUTHORITY_MISSING
+            )
             promoted, reason = _promote_non_debiting_carrier_status(
                 species,
-                carrier_authority_status_by_species.get(
-                    species, VAPOUR_CARRIER_AUTHORITY_MISSING
-                ),
+                current_status,
                 vapor_pressure_data=self.vapor_pressure_data,
             )
+            extra = carrier_authority_by_species.get(species, {}).get('extra', {})
+            evidence = extra.get('applicability_evidence', {})
+            campaign = str(getattr(getattr(melt, 'campaign', None), 'name', ''))
+            expected_stage = {'C0': 'stage0_p_carriers', 'C0B': 'c0b_p_cleanup'}.get(campaign)
+            if (
+                reason == REFUSAL_INAPPLICABLE_PREDICATE
+                and current_status in {
+                    VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+                    VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+                }
+                and evidence.get('active') is True
+                and evidence.get('predicate') == 'stage0_only'
+                and expected_stage is not None
+                and evidence.get('stage') == expected_stage
+                and evidence.get('process_phase') == 'hot_train'
+                and 'P2O5' in evidence.get('parent_species_ids', ())
+                and not _species_is_flux_dormant(species, vapor_pressure_data=self.vapor_pressure_data)
+            ):
+                # The source predicate authorizes cleanup evaporation, while
+                # hot-train condensation remains inapplicable. Carry vapor
+                # through the declared offgas route; never promote a refusal.
+                cleanup_offgas_authorization[species] = copy.deepcopy(evidence)
+                promoted, reason = current_status, None
             carrier_authority_status_by_species[species] = promoted
             if reason is not None:
                 non_debiting_reason_by_species[species] = reason
@@ -2854,6 +2880,7 @@ class CondensationModel:
             if (
                 carrier_authority_status_by_species.get(species)
                 in non_debiting_carrier_statuses
+                or species in cleanup_offgas_authorization
             ):
                 continue
             if not _species_has_antoine_data(
@@ -3008,6 +3035,14 @@ class CondensationModel:
 
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
 
+            if species in cleanup_offgas_authorization:
+                remaining_by_species[species] = float(rate_kg_hr)
+                condensation_authority_by_species[species].update({
+                    'authoritative_for_condensation': False,
+                    'routing_authorization': cleanup_offgas_authorization[species],
+                    'mass_disposition': 'declared_cleanup_offgas',
+                })
+                continue
             carrier_status = carrier_authority_status_by_species.get(
                 species, VAPOUR_CARRIER_AUTHORITY_MISSING
             )
@@ -3396,6 +3431,25 @@ class CondensationModel:
         for species, outcomes in efficiency_outcomes_by_species.items():
             if not outcomes:
                 continue
+            domain_outcome = next(
+                (item for item in outcomes if item.get('status') == 'extrapolated'),
+                None,
+            )
+            if domain_outcome is not None:
+                authority = condensation_authority_by_species.get(species)
+                if authority is not None:
+                    authority.update({
+                        'status': (
+                            VAPOUR_CARRIER_AUTHORITY_MISSING
+                            if authority['status'] == VAPOUR_CARRIER_AUTHORITY_MISSING
+                            else VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
+                        ),
+                        'authoritative_for_condensation': False,
+                        'authority_level': 'extrapolated',
+                        'reason': domain_outcome['reason'],
+                        'valid_range_K': domain_outcome['valid_range_K'],
+                        'stage_outcomes': list(outcomes),
+                    })
             if species in condensation_refusals_by_species:
                 existing = condensation_refusals_by_species[species]
                 if isinstance(existing, dict):
@@ -3405,11 +3459,9 @@ class CondensationModel:
                     existing['stage_outcomes'] = stage_list
                     condensation_refusals_by_species[species] = existing
                 continue
-            # Species-level rollup: pass-through (mass continues; not a hard
-            # species refusal). Consumers gate diagnostics, not flux, on this.
-            primary = outcomes[0]
+            primary = domain_outcome or outcomes[0]
             condensation_refusals_by_species[species] = {
-                'status': 'pass_through',
+                'status': 'extrapolated' if domain_outcome else 'pass_through',
                 'reason': str(primary.get('reason') or 'condensation_efficiency_zero'),
                 'output_status': 'status_bearing',
                 'stage_outcomes': list(outcomes),
@@ -3453,6 +3505,8 @@ class CondensationModel:
                 'authoritative_for_terminal_offgas': (
                     False
                     if retained_source_mass > 1e-15
+                    else carrier_authority_status_by_species[species] == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
+                    if species in cleanup_offgas_authorization
                     else authority['authoritative_for_condensation']
                     if remaining_mass > 1e-15
                     else None
@@ -4189,14 +4243,16 @@ class CondensationModel:
         pressure/Knudsen coupling.
 
         VR-11 / B3: the finite early-zero exits (non-positive residence
-        or alpha, missing Antoine Psat, nonpositive local pressure,
+        or alpha, nonpositive local pressure,
         nonpositive reference flux) mint typed pass-through outcomes
         into ``efficiency_outcomes`` (when provided) rather than
         returning a silent 0.0 with no consumer channel. Non-finite
         ``residence_s`` or ``alpha_s_value`` raise; a later
         available_kg / molar-mass non-finite or non-positive check
         returns 0.0 without minting. Numeric eta for finite valid
-        inputs is unchanged (golden-neutral).
+        inputs is unchanged. Unavailable SiO wall saturation uses the declared
+        reactive-product route and measured flowing pressure, with an
+        extrapolated outcome; missing or invalid inputs remain terminal.
         """
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
@@ -4227,19 +4283,105 @@ class CondensationModel:
 
         # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
         # range errors are typed refusals (b-127), never a fabricated 100 Pa.
+        psat_notices = antoine_extrapolations if antoine_extrapolations is not None else {}
         P_local_pa, psat_refused = _try_antoine_psat_pa(
             species,
             T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
             vapor_pressure_data=self.vapor_pressure_data,
-            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolations=psat_notices,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
+        domain_outcome = None
         if psat_refused or P_local_pa is None:
-            return _mint_zero(
-                'antoine_psat_unavailable_at_T',
-                T_cond_C=float(T_cond_C),
-                T_K=float(T_cond_C + CELSIUS_TO_KELVIN_OFFSET),
+            notice = psat_notices.get(
+                f'{species}#wall:{T_cond_C + CELSIUS_TO_KELVIN_OFFSET}', {}
             )
+            if notice.get('refusal_type') == 'CatalogCompileError':
+                raise DepositionInputRefusal(
+                    'vapor_pressure_data', species, str(notice.get('reason')),
+                )
+            if _valid_temperature_range_K(notice.get('valid_range_K')) is None:
+                raise DepositionInputRefusal(
+                    'valid_range_K', notice.get('valid_range_K'),
+                    'declared source band required for extrapolated routing',
+                )
+            declared_temperature = _deposition_finite_scalar(
+                'condensation_temperatures_C', _species_condensation_temperature_C(
+                    species, temps=self.condensation_temperatures_C,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                ),
+            )
+            if declared_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
+                raise DepositionInputRefusal(
+                    'condensation_temperatures_C', declared_temperature,
+                    'declared routing temperature must be above absolute zero',
+                )
+            P_local_pa = _deposition_finite_scalar(
+                'flowing_pressure_pa', self.wall_species_partial_pressures_pa.get(species)
+                if self._species_partial_pressures_configured else None,
+            )
+            if P_local_pa < 0.0:
+                raise DepositionInputRefusal(
+                    'flowing_pressure_pa', P_local_pa, 'pressure must be nonnegative',
+                )
+            if P_local_pa == 0.0:
+                return _mint_zero('nonpositive_flowing_pressure', flowing_pressure_pa=0.0)
+            # The existing Si/SiO2 reactive-product limit supplies P_sat ~= 0
+            # below the declared routing temperature. Flow supplies pressure;
+            # the 1 mbar routing reference never substitutes for measured flow.
+            domain_outcome = {
+                **notice,
+                'status': 'extrapolated',
+                'authority_level': 'extrapolated',
+                'reason': 'antoine_psat_unavailable_at_T',
+                'original_reason': notice.get('reason', 'uncovered_antoine_segment'),
+                'valid_range_K': notice.get('valid_range_K'),
+                'output_status': 'status_bearing',
+                'species': species,
+                'stage_number': int(stage.stage_number),
+                'T_cond_C': float(T_cond_C),
+                'flowing_pressure_pa': P_local_pa,
+                'routing_reference_temperature_C': declared_temperature,
+                'routing_reference_source': 'condensation_train.condensation_temperatures_C',
+                'saturation_pressure_policy': 'reactive_product_backstop',
+                'eta': 0.0,
+            }
+            if efficiency_outcomes is not None:
+                efficiency_outcomes.append(domain_outcome)
+            if species != 'SiO':
+                domain_outcome['saturation_pressure_policy'] = 'declared_pressure_isolated_stage_efficiency'
+                available_kg = _deposition_finite_scalar('available_kg', available_kg)
+                if available_kg < 0.0:
+                    raise DepositionInputRefusal('available_kg', available_kg, 'mass must be nonnegative')
+                if available_kg == 0.0:
+                    return _mint_zero('no_available_mass')
+                # The default hot duct, dust filter and turbine declare no
+                # condenser surface. Explicit area overrides still need validation.
+                if (
+                    stage.stage_number in (0, 5, 6)
+                    and not stage.target_species
+                    and f'stage_{stage.stage_number}' not in self.stage_area_m2_by_stage
+                    and str(stage.stage_number) not in self.stage_area_m2_by_stage
+                ):
+                    return _mint_zero(
+                        'no_capture_surface_in_train_topology',
+                        applicability_evidence={
+                            'stage_number': stage.stage_number,
+                            'target_species': [],
+                            'configured_capture_surface': False,
+                        },
+                    )
+                stage_area_m2 = _deposition_finite_scalar(
+                    'stage_area_m2',
+                    self._stage_area_m2_for_stage_number(stage.stage_number),
+                )
+                if stage_area_m2 == 0.0:
+                    return _mint_zero('no_configured_capture_area')
+                domain_outcome['eta'] = _pressure_isolated_stage_efficiency(
+                    stage, T_cond_C, residence_s, alpha_s_value,
+                )
+                domain_outcome['capture_budget_regularizer_notice'] = dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
+                return domain_outcome['eta']
         if P_local_pa <= 0.0:
             return _mint_zero(
                 'nonpositive_local_pressure',
@@ -4397,7 +4539,10 @@ class CondensationModel:
                 f'condensation efficiency for {species} in stage '
                 f'{int(getattr(stage, "stage_number", -1))} is not finite'
             )
-        return max(0.0, min(1.0, eta))
+        eta = max(0.0, min(1.0, eta))
+        if domain_outcome is not None:
+            domain_outcome['eta'] = eta
+        return eta
 
 
 def _authoritative_vapour_catalog_payload(

@@ -31,6 +31,7 @@ def test_internal_analytical_cold_path_still_ok_at_25_c():
     assert result.vapor_pressures_Pa == {}
     assert result.liquid_fraction is None
     assert result.phase_assemblage_available is False
+    assert result.diagnostics["vapor_pressure_zero_reason"] == "internal_analytical_below_400K"
 
 
 def test_internal_analytical_zero_mbar_is_admitted_vacuum():

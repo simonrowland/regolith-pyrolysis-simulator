@@ -1,4 +1,5 @@
 import json
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -534,6 +535,33 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     assert "not 1-decade fidelity" in actual["verdict"]
 
 
+@pytest.mark.parametrize("feedstock", ["lunar_mare_low_ti", "mars_basalt"])
+def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
+    report, diagnostics = build_sio_yield_report(
+        feedstock_id=feedstock,
+        hours=24,
+        include_diagnostics=True,
+        # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+        allow_unmeasured_alpha_fallback=True,
+    )
+
+    assert "wall_deposit_kg" in report
+    # This projection subtracts nearly equal bulk-melt SiO2 inventories;
+    # the canonical atom-ledger closure is pinned separately at 5e-12 percent.
+    assert diagnostics["closure_error_pct"] < 1e-6
+    assert report["sio_to_silica_fume_kg"]["stage_3_sio_zone_product"] > 0.0
+    authority = report["fouling_rate"]["sticking_alpha_authority"]
+    extrapolations = authority["wall_saturation_pressure_extrapolations_by_species"]
+    assert extrapolations
+    assert "Wall saturation includes EXTRAPOLATED quantities" in report["fouling_rate"]["status_reason"]
+    for by_segment in extrapolations.values():
+        assert by_segment
+        for event in by_segment.values():
+            assert event["authority_level"] == "extrapolated"
+            assert event["valid_range_K"]
+            assert event["reason"]
+
+
 def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     report, diagnostics = build_sio_yield_report(
         feedstock_id="lunar_mare_low_ti",
@@ -596,7 +624,12 @@ def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     assert authority["authoritative_for_condensation"] is False
     assert refusal["upstream_authority_status"] == "missing"
     assert refusal["authoritative_for_condensation"] is False
-    assert route.condensed_by_stage_species == {}
+    assert route.condensed_by_stage_species[3]["SiO"] > 0.0
+    assert authority["authority_level"] == "extrapolated"
+    assert authority["reason"] == "antoine_psat_unavailable_at_T"
+    assert authority["valid_range_K"]
+    assert (route.condensed_for_species("SiO") + route.wall_deposit_by_species.get("SiO", 0.0)
+            + route.remaining_by_species["SiO"]) == pytest.approx(1.0)
 
 
 def test_route_destinations_sum_to_evolved_budget():
@@ -656,7 +689,7 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     assert route.remaining_by_species["Ca"] >= 0.0
 
 
-def test_wall_mg_psat_uses_reconstructed_segment_and_refuses_outside_envelope():
+def test_wall_mg_psat_uses_reconstructed_segment_and_flags_outside_envelope():
     authority_limits: dict[str, dict[str, object]] = {}
     for temperature_K in (1361.0, 1361.001, 1363.15, 1366.0):
         assert condensation_module._antoine_psat_pa(
@@ -669,11 +702,15 @@ def test_wall_mg_psat_uses_reconstructed_segment_and_refuses_outside_envelope():
         ] is True
 
     for temperature_K in (700.0, 2273.151):
-        with pytest.raises(
-            VaporPressureRangeError,
-            match=r"species=Mg consumer=wall_condensation",
-        ):
-            condensation_module._antoine_psat_pa("Mg", temperature_K)
+        notices = {}
+        pressure = condensation_module._antoine_psat_pa(
+            "Mg", temperature_K, antoine_extrapolations=notices,
+        )
+        assert math.isfinite(pressure) and pressure > 0.0
+        notice = notices[f"Mg#wall:{temperature_K}"]
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["valid_range_K"] == [701.0, 1361.0]
+        assert notice["reason"]
 
     outside_authority_limits: dict[str, dict[str, object]] = {}
     assert condensation_module._antoine_psat_pa(
@@ -681,13 +718,11 @@ def test_wall_mg_psat_uses_reconstructed_segment_and_refuses_outside_envelope():
         1360.999,
         antoine_extrapolations=outside_authority_limits,
     ) > 0.0
-    with pytest.raises(VaporPressureRangeError):
-        condensation_module._antoine_psat_pa(
-            "Mg",
-            1366.001,
-            antoine_extrapolations=outside_authority_limits,
-        )
     assert outside_authority_limits == {}
+    assert condensation_module._antoine_psat_pa(
+        "Mg", 1366.001, antoine_extrapolations=outside_authority_limits,
+    ) > 0.0
+    assert outside_authority_limits["Mg"]["authority_level"] == "extrapolated"
 
     authority_limits = {}
     assert condensation_module._wall_deposition_driving_pressure_pa(
@@ -722,8 +757,10 @@ def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
         melt,
     )
 
-    assert route.antoine_extrapolations == {}
-    assert not route.antoine_extrapolation_warnings
+    authority = route.condensation_authority_by_species["SiO"]
+    assert authority["authority_level"] == "extrapolated"
+    assert authority["reason"] == "antoine_psat_unavailable_at_T"
+    assert authority["valid_range_K"] == certified_range_K
     assert route.wall_deposit_by_species["SiO"] > 0.0
 
 

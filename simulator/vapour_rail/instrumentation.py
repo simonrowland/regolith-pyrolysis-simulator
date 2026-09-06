@@ -465,7 +465,9 @@ def serialize_vapour_batch(batch: VapourBatch | None) -> dict[str, Any] | None:
         # A channel may be answerable yet dormant under the current epoch.
         # Batch serialization must expose one unambiguous activation truth.
         channel["is_flux_active"] = effective_active
-        channel["is_flux_dormant_by_epoch"] = union_eligible and not effective_active
+        channel["is_flux_dormant_by_epoch"] = (
+            union_eligible and not effective_active
+        ) or _channel_flux_gate_state(answer) == "dormant_by_epoch"
         channels[species_id] = channel
     refusals = {
         species_id: channel
@@ -733,6 +735,8 @@ def _channel_flux_gate_state(answer: VapourAnswer) -> str:
 
     pressure = answer.pressure
     flux = answer.flux
+    if answer.extra.get("applicability_evidence", {}).get("flux_dormant") is True:
+        return "dormant_by_epoch"
     if isinstance(pressure, PressureRefusal) or isinstance(flux, FluxRefusal):
         return "refusal"
     if isinstance(flux, FluxDiagnosticUpperBound) or isinstance(

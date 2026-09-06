@@ -1045,10 +1045,12 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
             f"kg/hr kernel={kernel_value:.6g} kg/hr (tol={tol:.3g})"
         )
 
-    assert set(kernel_flux) <= set(reference_flux), (
-        f"kernel emitted species the reference did not: "
-        f"{set(kernel_flux) - set(reference_flux)}"
-    )
+    # An explicit prototype alpha can lift a proxy-only reference below its
+    # reporting floor into a positive runtime channel (AlO on this trajectory).
+    extra_runtime_species = set(kernel_flux) - set(reference_flux)
+    assert extra_runtime_species <= set(
+        flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
+    ), f"runtime species lack measured reference or explicit alpha fallback: {extra_runtime_species}"
 
 
 # ---------------------------------------------------------------------------

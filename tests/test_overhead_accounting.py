@@ -676,8 +676,8 @@ def test_partial_sio_condensation_keeps_overhead_gas_in_mass_balance():
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
 
 
-def test_sio_condensation_without_saturation_or_carrier_authority_does_not_capture():
-    """Missing Antoine/carrier input must not invent stage capture or a zero."""
+def test_sio_declared_capture_preserves_missing_carrier_certification():
+    """Unavailable saturation predicts capture without inventing certification."""
 
     sim = _sio_train_sim()
     flux = EvaporationFlux(species_kg_hr={"SiO": 100.0}, total_kg_hr=100.0)
@@ -690,15 +690,15 @@ def test_sio_condensation_without_saturation_or_carrier_authority_does_not_captu
     stage_totals = sim.train.total_by_species()
     authority = sim.condensation_model.last_condensation_authority_by_species
 
-    assert "Si" not in condensed
-    assert "SiO2" not in condensed
-    assert "Si" not in stage_totals
-    assert overhead.get("SiO", 0.0) == pytest.approx(100.0)
-    assert str(authority.get("SiO", {}).get("status", "")) in {
-        "missing",
-        "status_bearing",
-        "refused",
-    }
+    assert condensed["Si"] > 0.0 and condensed["SiO2"] > 0.0
+    assert stage_totals["Si"] == pytest.approx(condensed["Si"])
+    assert overhead.get("SiO", 0.0) < 100.0
+    wall_total = sum(sum(sim.atom_ledger.kg_by_account(account).values())
+                     for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS)
+    assert sum(condensed.values()) + overhead.get("SiO", 0.0) + wall_total == pytest.approx(100.0)
+    assert authority["SiO"]["status"] == "missing"
+    assert authority["SiO"]["authoritative_for_condensation"] is False
+    assert authority["SiO"]["authority_level"] == "extrapolated"
 
 
 def test_step_drains_uncondensed_overhead_vapor_each_tick():

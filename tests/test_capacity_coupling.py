@@ -978,6 +978,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     snapshot = sim.step()
 
     ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
+    p_flux = sum(snapshot.evap_flux.species_kg_hr[species] for species in ("PO", "PO2", "P2"))
+    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.203221602697998, rel=1e-12, abs=1e-12)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1168,14 +1170,15 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # regrind floor that dropped PO dust at 28 -> 27). Every channel
         # still fluxes under the fallback — this is a value move plus one
         # floor-crossing dust transition, not a refusal-driven roster drop.
-        # Trio re-emitted on the studio under the CI grind engines.local.toml
-        # via scripts/emit_studio_pin_values.py; not hand-pasted.
+        # t-766 restores explicitly authorized P cleanup: +0.0023652560335202
+        # kg/h entirely PO/PO2/P2. Fresh executable probe, with unchanged
+        # non-P flux, moves transport and the P2O5 source debit accordingly.
         (
             1,
             1550.0,
-            3.203221602697998,
-            1299528.6872980625,
-            995.5601844409979,
+            3.205586858731518,
+            1300047.6164859626,
+            995.5566881453749,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1210,17 +1213,24 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # evaporate_Ca2, evaporate_Ti, evaporate_TiO, evaporate_TiO2, condense_Ca)
     # are retained. 1742cbb8 then drops evaporate_PO, evaporate_PO2, and
     # evaporate_P2 (stage0_only admission, not a Ca/Ti α refuse). Count
-    # 36→33. A return to 36 without a Stage-0 condensation context is
-    # the P1-1 hole reopening; a 33→26 drop is the b-136 silent-zero.
+    # 36→33. t-766 now separately authorizes cleanup offgas with the positive
+    # source predicate; condensation stays inactive for those P carriers.
     # b-314 (0c6d9811): 33 -> 34. The Al2O tier-2 proxy (alpha=0.3) no longer
     # satisfies the measured-alpha requirement; this fixture's opted-in
     # alpha=1.0 prototype fallback lifts its dust flux above the 1e-12 kg
     # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
     # drop: no channel is withdrawn.
-    assert len(sim.atom_ledger.transitions) == 34  # 36 minus evaporate_PO/PO2/P2 (1742cbb8), plus evaporate_Al2O floor-crossing (0c6d9811)
+    # t-766: three admitted P evaporations and nine flagged capture transitions.
+    assert len(sim.atom_ledger.transitions) == 46
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
+    assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"} <= ca_ti_reasons
+    assert {
+        "condense_SiO", "condense_Al2O", "condense_AlO", "condense_CaO_gas",
+        "condense_CrO", "condense_MgO_gas", "condense_SiO2_gas", "condense_TiO",
+        "condense_TiO2_gas",
+    } <= ca_ti_reasons
     # Six of the seven channels the refuse posture deleted appear as ledger
     # transitions at this head (1550 C / hour-1). evaporate_Ca2 is
     # channel-contract-complete under the HKL upper-bound α but does not
@@ -1240,30 +1250,26 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "condense_Ti",
-        "evaporate_TiO",
+        "condense_TiO",
         "evaporate_TiO2_gas",
+        "condense_TiO2_gas",
         "fe_redox_respeciation",
         "overhead_bleed",
     )
-    # P-carriers are b-189 admission refusals on this caller, not rail
-    # refusals: incoming status_bearing + FluxEligible does not authorize
-    # a hot-train melt debit when the declared predicate is stage0_only.
-    # Fe is admitted and still debits. Revert of condensation.py:4361-4366
-    # restores evaporate_PO/PO2/P2 and fails these pins.
+    # Admitted P source evidence authorizes cleanup offgas, not condensation.
     for p_species in ("PO", "PO2", "P2"):
-        assert f"evaporate_{p_species}" not in ca_ti_reasons, p_species
-        p_refusal = sim.condensation_model.last_condensation_refusals_by_species[
+        assert f"evaporate_{p_species}" in ca_ti_reasons, p_species
+        authority = sim.condensation_model.last_condensation_authority_by_species[
             p_species
         ]
-        assert p_refusal["reason"] == "inapplicable_by_declared_predicate"
-        assert p_refusal["mass_disposition"] == (
-            "retained_in_source_pending_authority"
-        )
-        assert p_refusal["remaining_mass_kg_hr"] == pytest.approx(0.0)
-        assert p_refusal["retained_in_source_mass_kg_hr"] > 0.0
-        assert p_refusal["mass_closure_error_kg_hr"] == pytest.approx(0.0)
-        assert p_species not in snapshot.evap_flux.species_kg_hr
+        evidence = authority["routing_authorization"]
+        assert evidence["active"] is True and evidence["stage"] == "stage0_p_carriers"
+        assert authority["authoritative_for_condensation"] is False
+        assert authority["mass_disposition"] == "declared_cleanup_offgas"
+        assert authority["remaining_mass_kg_hr"] > 0.0
+        assert authority["retained_in_source_mass_kg_hr"] == 0.0
+        assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
+        assert snapshot.evap_flux.species_kg_hr[p_species] > 0.0
     assert "evaporate_Fe" in ca_ti_reasons
     assert "condense_Fe" in ca_ti_reasons
     assert snapshot.mass_balance_error_pct <= 5.0e-12

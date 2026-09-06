@@ -720,6 +720,11 @@ def test_stage0_p_markers_activate_only_p2o5_sourced_rules() -> None:
         assert p_batch.channel("PO").refusal_code != (
             REFUSAL_INAPPLICABLE_PREDICATE
         )
+        evidence = p_batch.channel("PO").extra["applicability_evidence"]
+        assert evidence["active"] is True
+        assert evidence["stage"] == stage
+        assert evidence["parent_species_ids"] == ["P2O5"]
+        assert evidence["flux_dormant"] is False
 
         non_p_batch = resolve_vapour_batch(
             rules=(
@@ -739,6 +744,29 @@ def test_stage0_p_markers_activate_only_p2o5_sourced_rules() -> None:
         assert non_p_batch.channel("NaCl").refusal_code == (
             REFUSAL_INAPPLICABLE_PREDICATE
         )
+        assert non_p_batch.channel("NaCl").extra["applicability_evidence"]["flux_dormant"] is True
+
+
+@pytest.mark.parametrize("phase,stage", [(None, None), ("", None), (None, ""), ("", "")])
+def test_missing_cleanup_context_is_refused_not_dormant(phase, stage):
+    from simulator.vapour_rail.instrumentation import _channel_flux_gate_state
+
+    rule = RequestRule(
+        species_id="PO", source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"P2O5"}), required_source_atoms=frozenset({"P", "O"}),
+        solve_group_id="p_cleanup", applicability_predicate="stage0_only",
+        request_rule_kind="source_inventory_present", origin="catalog", formula_id="PO",
+        has_pressure_evaluator=True, has_alpha=True, has_route=True,
+    )
+    result = refusal_closure(
+        requested=frozenset({"PO"}), rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"P2O5": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0, process_phase=phase, stage=stage),
+    )
+    answer = result.answers["PO"]
+    assert answer.is_refused
+    assert answer.extra["applicability_evidence"]["active"] is False
+    assert _channel_flux_gate_state(answer) == "refusal"
 
 
 # ---------------------------------------------------------------------------
@@ -3432,6 +3460,36 @@ def test_allocated_real_catalog_answer_namespaces_replaced_attempt() -> None:
     assert catalog_writer_keys.isdisjoint(
         set(rendered["extra"]) - {namespace_key}
     )
+
+
+def test_selected_source_preserves_positive_cleanup_evidence():
+    state = VapourResolveState(
+        temperature_K=1711.0, process_phase="hot_train", stage="stage0_p_carriers",
+    )
+    rule = replace(
+        _selector_rule("PO"), parent_species_ids=frozenset({"P2O5"}),
+        required_source_atoms=frozenset({"P", "O"}), applicability_predicate="stage0_only",
+    )
+    answer = resolve_vapour_batch(
+        rules=(rule,), ledger_snapshot={"process.cleaned_melt": {"P2O5": 1.0}},
+        state=state, catalog_species=_stub_catalog_species("PO", pressure_pa=19.375),
+        flux_activation_context=_rg_activation_context(),
+    ).channel("PO")
+    selected = _selector_candidate(
+        "fresh/p", VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
+        {"PO": Decimal("29.625")}, evaluation_state=state,
+    )
+    allocated = allocate_selected_source(
+        answers={"PO": answer}, bundle_species_ids=frozenset({"PO"}),
+        selected_source=selected, bundle_identity=_selector_bundle_identity(selected), state=state,
+    )["PO"]
+    evidence = allocated.extra["applicability_evidence"]
+    assert evidence == answer.extra["applicability_evidence"]
+    assert evidence["active"] is True
+    assert evidence["stage"] == "stage0_p_carriers"
+    assert evidence["parent_species_ids"] == ["P2O5"]
+    assert allocated.pressure == PressureValue(Decimal("29.625"))
+    assert allocated.extra["replaced_catalog_attempt"] == dict(answer.extra)
 
 
 def test_bundle_candidate_must_be_admitted_for_every_member() -> None:

@@ -679,13 +679,14 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
     assert custom_stage4 > default_stage4
     assert custom_stage5 < default_stage5 * 0.8
 
-    default_sio_psat = condensation_module._antoine_psat_pa("SiO", 1700.0)
-    fallback_sio_psat = condensation_module._antoine_psat_pa(
-        "SiO",
-        1700.0,
-        vapor_pressure_data=custom_vapor_pressures,
-    )
-    assert fallback_sio_psat == default_sio_psat
+    with pytest.raises(condensation_module.WallSaturationPressureRefusal) as default:
+        condensation_module._antoine_psat_pa("SiO", 1700.0)
+    with pytest.raises(condensation_module.WallSaturationPressureRefusal) as fallback:
+        condensation_module._antoine_psat_pa(
+            "SiO", 1700.0, vapor_pressure_data=custom_vapor_pressures,
+        )
+    assert fallback.value.reason == default.value.reason
+    assert fallback.value.valid_range_K == default.value.valid_range_K
 
 
 def test_partial_custom_antoine_block_falls_back_to_global_coefficients():

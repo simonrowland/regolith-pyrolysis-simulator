@@ -1,5 +1,15 @@
 from __future__ import annotations
 
+
+def test_wall_lifespan_uses_net_signed_substrate_deposition():
+    from simulator.runner import _wall_fouling_lifespan_report
+
+    report = _wall_fouling_lifespan_report(
+        per_campaign_by_segment_species_kg={"wall": {"Si": -0.03, "FeSi": 0.08}},
+        existing_by_segment_species_kg={},
+    )
+    assert report["wall_deposit_kg_per_campaign"] == pytest.approx(0.05)
+
 import copy
 import hashlib
 import json

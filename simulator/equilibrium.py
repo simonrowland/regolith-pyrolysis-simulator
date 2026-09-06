@@ -368,6 +368,7 @@ class EquilibriumMixin:
                 liquid_fraction=None,
                 phase_assemblage_available=False,
                 status='ok',
+                diagnostics={'vapor_pressure_zero_reason': 'internal_analytical_below_400K'},
             )
 
         vapor_pressures = {}

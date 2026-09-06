@@ -216,7 +216,10 @@ def test_refusal_out_of_domain_and_proven_zero_stay_distinct(payload) -> None:
             antoine_extrapolations=extrapolations,
         )
     assert exc_info.value.reason == REFUSAL_INAPPLICABLE_PREDICATE
-    assert extrapolations == {}
+    notice = extrapolations["Pb#wall:1500.0"]
+    assert notice["status"] == "refused"
+    assert notice["authority_level"] == "unavailable"
+    assert REFUSAL_INAPPLICABLE_PREDICATE in notice["reason"]
 
     admitted_extrapolations: dict[str, dict] = {}
     pressure = _antoine_psat_pa(

@@ -880,6 +880,22 @@ class EvaporationMixin:
 
         if not vapor_pressures:
             if (
+                0.0 < T_K < 400.0
+                and getattr(equilibrium, 'status', None) == 'ok'
+                and (getattr(equilibrium, 'diagnostics', {}) or {}).get(
+                    'vapor_pressure_zero_reason'
+                ) == 'internal_analytical_below_400K'
+            ):
+                # The guarded producer explicitly skipped pressure evaluation
+                # under its existing kinetic floor; absent Pa alone is no proof.
+                self._last_evaporation_flux_diagnostic = {
+                    'reason': 'internal_analytical_below_400K',
+                    'evaporation_flux_kg_hr': {},
+                    'vapour_batch_flux_overlay': flux_overlay_report,
+                    'vapour_batch': batch_report,
+                }
+                return flux
+            if (
                 effective_pressure_source.physical_zero_reason is not None
                 and flux_overlay_report.get('batch_pa_by_species')
             ):
@@ -929,15 +945,13 @@ class EvaporationMixin:
             ):
                 return flux
             # When every channel is a typed non-debit outcome (genuine bound,
-            # refusal, zero, dormant) and none is eligible / missing-seam,
+            # zero, dormant) and none is refused / eligible / missing-seam,
             # empty flux is authorized, not an empty-provider false zero.
             _typed_non_debit = frozenset(
                 {
                     'zero_by_physics',
                     'upper_bound',
-                    'refusal',
                     'dormant_by_epoch',
-                    'incomplete_channel',
                 }
             )
             if (
@@ -951,7 +965,7 @@ class EvaporationMixin:
                     'reason': 'vapour_batch_all_channels_non_debiting',
                     'detail': (
                         'every requested vapour channel is a typed non-debit '
-                        'outcome (upper_bound / refusal / zero / dormant); '
+                        'outcome (upper_bound / zero / dormant); '
                         'empty flux is authorized'
                     ),
                     'batch_channel_states': channel_states,
@@ -3468,6 +3482,12 @@ class EvaporationMixin:
 
         kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
+            transition_meta={
+                'condensation_authority': dict(
+                    getattr(route_result, 'condensation_authority_by_species', {})
+                    .get(species, {})
+                ),
+            },
             control_inputs={
                 'species': species,
                 'condensed_kg': float(condensed_kg),

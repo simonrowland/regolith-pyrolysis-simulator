@@ -188,6 +188,15 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
         for account, area_m2 in segment_areas_m2.items()
     }
 
+    # Restored stage capture shares the same finite vapor budget with walls.
+    stage_capture_kg = sum(session.simulator.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).values())
+    assert stage_capture_kg > 0.0
+    capture_budget_kg = sum(expected_sio_kg.values())
+    wall_fraction = (capture_budget_kg - stage_capture_kg) / capture_budget_kg
+    expected_sio_kg = {account: kg * wall_fraction for account, kg in expected_sio_kg.items()}
+
     assert set(attribution) == set(expected_sio_kg)
     for account, sio_kg in expected_sio_kg.items():
         species_kg = attribution[account]
@@ -210,6 +219,8 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
     assert session.simulator.atom_ledger.kg_by_account(
         "process.wall_deposit"
     ) == {}
+    overhead_kg = session.simulator.atom_ledger.kg_by_account("process.overhead_gas").get("SiO", 0.0)
+    assert stage_capture_kg + sum(expected_sio_kg.values()) + overhead_kg == pytest.approx(1.0)
 
 
 def test_repeated_in_process_runs_keep_wall_attribution_deterministic():

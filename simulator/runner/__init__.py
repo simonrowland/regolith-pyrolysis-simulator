@@ -3475,7 +3475,7 @@ def _wall_fouling_lifespan_report(
 
     cfg = _wall_liner_resinter_config()
     per_segment = {
-        str(segment): sum(max(0.0, float(kg)) for kg in species_kg.values())
+        str(segment): max(0.0, sum(float(kg) for kg in species_kg.values()))
         for segment, species_kg in per_campaign_by_segment_species_kg.items()
     }
     per_segment = {key: value for key, value in per_segment.items() if value > 0.0}
@@ -3845,10 +3845,8 @@ def build_sio_yield_report(
     sio_retained_holdup_mol = float(retained_holdup.get("SiO", 0.0))
     # 2026-08-05 MC-4 wave 1B (a34318c): the SiO2(g) gas-exchange carrier
     # draws from the same SiO2 pool as SiO (1 mol SiO2_gas = 1 mol
-    # SiO2-equivalent) and escapes to offgas in this window; it must count
-    # as a chain destination or the projection reports a phantom ~2%
-    # non-closure (executed: lunar 4.7007953e-06 mol, mars 4.7355038e-06
-    # mol; the hard AtomLedger mass_balance_error_pct remains 0.0).
+    # SiO2-equivalent). Both escaped and condensed carrier must count as
+    # chain destinations; omitting restored capture invents ~2% non-closure.
     sio2_gas_escape_mol = float(terminal_offgas.get("SiO2_gas", 0.0))
     terminal_mol = (
         si_terminal_mol
@@ -3857,6 +3855,7 @@ def build_sio_yield_report(
         + sio_escape_mol
         + sio_retained_holdup_mol
         + sio2_gas_escape_mol
+        + float(condensation_train.get("SiO2_gas", 0.0))
     )
     if sio_evaporated_mol > 0.0:
         closure_error_pct = abs(

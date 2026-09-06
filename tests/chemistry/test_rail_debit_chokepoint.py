@@ -117,6 +117,77 @@ def _route_species(sim, species: str, rate_kg_hr: float, *, status: str | None):
     )
 
 
+@pytest.mark.parametrize("campaign,stage", [("C0", "stage0_p_carriers"), ("C0B", "c0b_p_cleanup")])
+@pytest.mark.parametrize("evidence_kind", ["admitted", "missing", "inactive", "wrong_stage", "refused"])
+def test_cleanup_offgas_requires_positive_predicate(
+    vapor_pressure_data, feedstocks_data, setpoints_data, campaign, stage, evidence_kind,
+):
+    from simulator.state import CampaignPhase
+
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.melt.campaign = CampaignPhase[campaign]
+    status = (VAPOUR_CARRIER_AUTHORITY_REFUSED if evidence_kind == "refused"
+              else VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING)
+    carrier = _carrier_record("PO", status)
+    if evidence_kind != "missing":
+        carrier["PO"]["extra"] = {"applicability_evidence": {
+            "active": evidence_kind != "inactive", "predicate": "stage0_only",
+            "stage": "other" if evidence_kind == "wrong_stage" else stage,
+            "process_phase": "hot_train", "parent_species_ids": ["P2O5"],
+        }}
+    before = sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"]
+    sim._route_to_condensation(EvaporationFlux(
+        species_kg_hr={"PO": 1e-6}, total_kg_hr=1e-6,
+        carrier_authority_by_species=carrier,
+    ))
+    authority = sim.condensation_model.last_condensation_authority_by_species["PO"]
+    after = sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"]
+    if evidence_kind == "admitted":
+        assert after < before
+        assert authority["routing_authorization"]["active"] is True
+        assert authority["authoritative_for_condensation"] is False
+    else:
+        assert after == before
+        assert authority["status"] == VAPOUR_CARRIER_AUTHORITY_REFUSED
+
+
+def test_stage3_extrapolation_flag_reaches_product_ledger(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    model = sim.condensation_model
+    model.configure_operating_conditions(
+        wall_temperature_C=1500.0, overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
+        pipe_segment_temperatures_C={segment.name: 1500.0 for segment in model.pipe_segments},
+    )
+    route = model.route(EvaporationFlux(
+        species_kg_hr={"SiO": 1e-6}, total_kg_hr=1e-6,
+        carrier_authority_by_species=_carrier_record("SiO", VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING),
+    ), sim.melt)
+    captured = route.condensed_by_stage_species[3]["SiO"]
+    assert captured > 0.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas", {"SiO": 1.0}, material_origin="feedstock",
+    )
+    credited = sim._dispatch_condensation_route("SiO", captured, {
+        "condensation_products_mol_per_mol_vapor": {"Si": 0.5, "SiO2": 0.5},
+    }, route)
+    assert credited > 0.0
+    products = sim.atom_ledger.kg_by_account("process.condensation_train")
+    assert products["Si"] > 0.0 and products["SiO2"] > 0.0
+    lots = [lot for transition in sim.atom_ledger.close_report()["transitions"]
+            for lot in transition["credits"] if lot["account"] == "process.condensation_train"]
+    assert lots
+    for lot in lots:
+        flag = lot["meta"]["condensation_authority"]
+        assert flag["authority_level"] == "extrapolated"
+        assert flag["reason"] == "antoine_psat_unavailable_at_T"
+        assert flag["valid_range_K"]
+        assert any(item.get("original_reason") for item in flag["stage_outcomes"])
+
+
 def test_admission_refusal_does_not_debit_parent_oxide(
     vapor_pressure_data,
     feedstocks_data,

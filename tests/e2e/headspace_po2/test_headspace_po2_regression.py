@@ -45,7 +45,11 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # 2026-08-05 MC-4 wave 1B (a34318c): the composed Na carrier set routes
     # the tick flux exactly; the residual Na roundoff dust is gone and the
     # audited overhead is now empty. HI-2 above remains <= 1e-12 %.
-    expected_overhead: dict[str, float] = {}
+    # Restored flagged routing leaves only these identified roundoff parcels.
+    expected_overhead: dict[str, float] = {
+        "Na": 1.994044623865321e-20,
+        "SiO2_gas": 9.409239450400745e-14,
+    }
     assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
         expected_overhead,
         rel=1.0e-12,
