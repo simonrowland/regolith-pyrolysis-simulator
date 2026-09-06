@@ -15,16 +15,18 @@ INDEX = ROOT / "web/report_viewer/index.html"
 SAMPLE = ROOT / "web/report_viewer/sample-run-artifact.json"
 RUNNER_MARS = ROOT / "tests/fixtures/runner/mars_basalt_C2A_12h.json"
 RUNNER_CI = ROOT / "tests/fixtures/runner/ci_carbonaceous_chondrite_C2B_12h.json"
+RUNNER_LUNAR = ROOT / "tests/fixtures/runner/lunar_mare_low_ti_C0_24h.json"
 _AUTO_ROWS = object()
 
 GRADE_TOKENS = ("soda_lime", "container_sls", "optical_clear", "use_grade")
+P15_ROUTE_CHIPS = ("qualified silica product", "flagged capture · not a product")
 
 
 def _js_num(value: float | int) -> str:
     text = json.dumps(value)
     if re.fullmatch(r"-?\d+\.0", text):
         return text[:-2]
-    return text
+    return re.sub(r"e([+-])0+(\d)", r"e\1\2", text)
 
 
 def _render(artifact: object, rows: object = _AUTO_ROWS, panel_source: str | None = None) -> str:
@@ -114,6 +116,18 @@ def _assert_traced_kg(rendered: str, field: str, amount: float, *, state: str | 
     )
 
 
+def _state_chips(fragment: str) -> list[str]:
+    return re.findall(r'data-p11-state-chip="([^"]+)"', fragment)
+
+
+def _assert_exclusive_silica_chips(card: str) -> list[str]:
+    chips = _state_chips(card)
+    assert len(chips) <= 1, f"two state chips on one silica figure: {chips}\n{card}"
+    if "qualified silica product" in chips and "flagged capture · not a product" in chips:
+        raise AssertionError(f"qualified and flagged chips both present\n{card}")
+    return chips
+
+
 def _runner_block(path: Path) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
     block = payload["product_classification"]
@@ -142,6 +156,11 @@ def _ci() -> tuple[dict, dict]:
     return block, block["classification"]
 
 
+def _lunar() -> tuple[dict, dict]:
+    block = _runner_block(RUNNER_LUNAR)
+    return block, block["classification"]
+
+
 def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     block, classification = _mars()
     html = _render(_wrapped(block))
@@ -163,7 +182,10 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     )
     _assert_traced_kg(metals_card, "O2_kg", metals["O2_kg"], state="qualified-product")
     _assert_traced_kg(
-        silica_card, "class_total_kg", silica["class_total_kg"], state="qualified-product"
+        silica_card,
+        "class_total_kg",
+        silica["class_total_kg"],
+        state="flagged-unqualified-capture",
     )
     _assert_traced_kg(
         silica_card,
@@ -171,6 +193,9 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
         silica["stage_3_capture_kg"],
         state="flagged-unqualified-capture",
     )
+    chips = _assert_exclusive_silica_chips(silica_card)
+    assert chips == ["flagged capture · not a product"]
+    assert "qualified silica product" not in silica_card
     _assert_traced_kg(
         mixed_card,
         "class_total_kg",
@@ -214,6 +239,19 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     assert "INDETERMINATE" not in html
     for token in GRADE_TOKENS:
         assert token not in html
+
+    # 0+0 on as-shipped Mars is not a hidden pass for sibling sums (F6).
+    attack = copy.deepcopy(block)
+    attack_silica = attack["classification"]["pure_silica_glass"]
+    attack_silica["class_total_kg"] = 3.0
+    attack_silica["stage_3_capture_kg"] = 10.0
+    attack_silica["stage_3_kg_by_species"] = {"SiO": 10.0}
+    attack_card = _card(_render(_wrapped(attack)), "silica")
+    _assert_traced_kg(attack_card, "class_total_kg", 3.0)
+    _assert_traced_kg(attack_card, "stage_3_capture_kg", 10.0)
+    assert 'title="13 kg"' not in attack_card
+    assert 'title="13.0 kg"' not in attack_card
+    assert _assert_exclusive_silica_chips(attack_card) == ["qualified silica product"]
 
 
 def test_p11_absent_block_sample_is_not_emitted() -> None:
@@ -270,7 +308,8 @@ def test_p11_unqualified_silica_consume_only_no_derived_third_number() -> None:
     assert f'title="{_js_num(derived)} kg"' not in html
     assert "unqualified_capture_kg" not in html
     assert "4.5−1" not in html and "4.5-1" not in html and "4.5 - 1" not in html
-    assert "flagged capture · not a product" in silica_card
+    assert _assert_exclusive_silica_chips(silica_card) == ["qualified silica product"]
+    assert 'title="5.5 kg"' not in html
 
 
 def test_p11_mutant_that_derives_capture_from_two_numbers_must_fail() -> None:
@@ -281,7 +320,7 @@ def test_p11_mutant_that_derives_capture_from_two_numbers_must_fail() -> None:
     silica["stage_3_kg_by_species"] = {"SiO": 4.5}
     source = PANEL.read_text(encoding="utf-8")
     mutant = source.replace(
-        'kgRow(row, "stage_3_capture_kg", "Stage 3 capture · kg", "flagged-unqualified-capture")',
+        'kgRow(row, "stage_3_capture_kg", "Stage 3 capture · kg", captureRole)',
         'kv("Derived capture · kg", exactValue(row.stage_3_capture_kg - row.class_total_kg, "kg"), '
         '"unqualified_capture_kg", "flagged-unqualified-capture")',
         1,
@@ -321,7 +360,7 @@ def test_p11_mutant_that_headlines_silicate_residual_as_ceramic_product_must_fai
     rump = classification["refractory_ceramic_rump"]
     source = PANEL.read_text(encoding="utf-8")
     mutant = source.replace(
-        '`<b>${quantityText(quantityClaim(row, "class_total_kg"))}</b></div>`',
+        '`<b>${quantityText(classClaim)}</b></div>`',
         '`<b>${quantityText(quantityClaim(row, "rump_silicate_residual_kg"))}</b></div>`',
         1,
     )
@@ -352,6 +391,9 @@ def test_p11_mixed_glass_early_tap_false_is_labelled_not_indeterminate() -> None
     assert mixed["note"] in _visible(_field_value(mixed_card, "note"))
     assert "NOT a product class" in mixed_card
     assert not re.search(r">PURE<", mixed_card)
+    class_label = _field(mixed_card, "class_total_kg")[1]
+    assert "Qualified product" not in class_label
+    assert "not a product" in class_label.lower()
 
 
 def test_p11_unavailable_null_block_is_not_zero() -> None:
@@ -399,6 +441,23 @@ def test_p11_unwrapped_only_block_is_not_sufficient() -> None:
     assert 'title="4 kg"' not in html
     assert 'title="0 kg"' not in html
     assert "qualified silica product" not in html
+
+    # Merge-after-classificationPresent must also fail this test (F6).
+    block, classification = _mars()
+    block["pure_silica_glass"] = {
+        "stage_3_capture_kg": 99.0,
+        "class_total_kg": 88.0,
+        "stage_3_kg_by_species": {"SiO": 99.0},
+    }
+    present_html = _render(_wrapped(block))
+    silica_card = _card(present_html, "silica")
+    real = classification["pure_silica_glass"]
+    _assert_traced_kg(silica_card, "class_total_kg", real["class_total_kg"])
+    _assert_traced_kg(silica_card, "stage_3_capture_kg", real["stage_3_capture_kg"])
+    assert 'title="88 kg"' not in silica_card
+    assert 'title="99 kg"' not in silica_card
+    assert 'title="88.0 kg"' not in silica_card
+    assert 'title="99.0 kg"' not in silica_card
 
 
 def test_p11_no_glass_grade_fabrication() -> None:
@@ -509,3 +568,160 @@ process.stdout.write(JSON.stringify(ids));
         r'p10-vapor-source\.js" defer></script>\s*<script src="\./panels/p11-deliverables\.js" defer></script>\s*<script src="\./panels/p12-carrier-pressure\.js" defer></script>',
         index,
     )
+
+
+def test_p11_silica_state_chips_are_mutually_exclusive() -> None:
+    mars_block, _ = _mars()
+    mars_card = _card(_render(_wrapped(mars_block)), "silica")
+    assert _assert_exclusive_silica_chips(mars_card) == ["flagged capture · not a product"]
+
+    lunar_block, lunar_cls = _lunar()
+    lunar_silica = lunar_cls["pure_silica_glass"]
+    assert lunar_silica["class_total_kg"] > 0
+    lunar_card = _card(_render(_wrapped(lunar_block)), "silica")
+    assert _assert_exclusive_silica_chips(lunar_card) == ["qualified silica product"]
+
+    block, classification = _mars()
+    silica = classification["pure_silica_glass"]
+    silica["stage_3_capture_kg"] = 4.5
+    silica["class_total_kg"] = 0.0
+    silica["stage_3_kg_by_species"] = {"SiO": 4.5}
+    block["markdown"] = "Stage 3 silica capture (not a product)\n"
+    zero_card = _card(_render(_wrapped(block)), "silica")
+    assert _assert_exclusive_silica_chips(zero_card) == ["flagged capture · not a product"]
+    assert "qualified silica product" not in zero_card
+    _assert_traced_kg(zero_card, "class_total_kg", 0.0, state="flagged-unqualified-capture")
+    _assert_traced_kg(zero_card, "stage_3_capture_kg", 4.5, state="flagged-unqualified-capture")
+
+
+def test_p11_mutant_that_emits_both_silica_route_chips_must_fail() -> None:
+    source = PANEL.read_text(encoding="utf-8")
+    mutant = source.replace(
+        'return chip("qualified silica product");',
+        'return chip("qualified silica product") + flagChip("flagged capture · not a product");',
+        1,
+    )
+    assert mutant != source
+    block, classification = _mars()
+    classification["pure_silica_glass"]["class_total_kg"] = 3.0
+    html = _render(_wrapped(block), panel_source=mutant)
+    silica_card = _card(html, "silica")
+    chips = _state_chips(silica_card)
+    assert "qualified silica product" in chips
+    assert "flagged capture · not a product" in chips
+    assert len(chips) >= 2
+
+
+def test_p11_lunar_qualified_silica_capture_is_not_flagged() -> None:
+    block, classification = _lunar()
+    silica = classification["pure_silica_glass"]
+    html = _render(_wrapped(block))
+    silica_card = _card(html, "silica")
+    assert _assert_exclusive_silica_chips(silica_card) == ["qualified silica product"]
+    _assert_traced_kg(
+        silica_card, "class_total_kg", silica["class_total_kg"], state="qualified-product"
+    )
+    _assert_traced_kg(
+        silica_card,
+        "stage_3_capture_kg",
+        silica["stage_3_capture_kg"],
+        state="qualified-product",
+    )
+    _assert_traced_kg(
+        silica_card,
+        "stage_3_kg_by_species.SiO2",
+        silica["stage_3_kg_by_species"]["SiO2"],
+        state="qualified-product",
+    )
+    assert "flagged capture · not a product" not in silica_card
+
+
+def test_p11_indeterminate_classification_kg_is_no_material() -> None:
+    block, classification = _mars()
+    classification["pure_silica_glass"]["class_total_kg"] = {"verdict": "INDETERMINATE"}
+    html = _render(_wrapped(block))
+    silica_card = _card(html, "silica")
+    state, inner = _field(silica_card, "class_total_kg")
+    assert state == "indeterminate"
+    assert "no material" in inner
+    assert "title=" not in inner
+    assert _assert_exclusive_silica_chips(silica_card) == ["flagged capture · not a product"]
+    assert "qualified silica product" not in silica_card
+
+    classification["pure_silica_glass"]["class_total_kg"] = "INDETERMINATE"
+    string_card = _card(_render(_wrapped(block)), "silica")
+    string_state, string_inner = _field(string_card, "class_total_kg")
+    assert string_state == "indeterminate"
+    assert "no material" in string_inner
+    assert _assert_exclusive_silica_chips(string_card) == ["flagged capture · not a product"]
+
+
+def test_p11_rump_class_total_is_not_hardcoded_floor_gloss() -> None:
+    block, classification = _lunar()
+    rump = classification["refractory_ceramic_rump"]
+    assert rump["class_total_kg"] != rump["rump_refractory_oxides_kg"]
+    html = _render(_wrapped(block))
+    rump_card = _card(html, "rump")
+    headline = re.search(
+        r'<div class="sec-p11-headline" data-field="class_total_kg" data-state="([^"]+)">(.*?)</div>',
+        rump_card,
+        re.DOTALL,
+    )
+    assert headline is not None
+    label = headline.group(2).split("<b>")[0]
+    assert "floor" not in label.lower()
+    assert f'title="{_js_num(rump["class_total_kg"])} kg"' in headline.group(2)
+    oxides_state, oxides_inner = _field(rump_card, "rump_refractory_oxides_kg")
+    assert oxides_state == "qualified-product"
+    assert "floor" in oxides_inner.lower()
+    _assert_traced_kg(
+        rump_card,
+        "rump_refractory_oxides_kg",
+        rump["rump_refractory_oxides_kg"],
+    )
+
+
+def test_p11_mutant_that_sums_silica_kg_must_fail_wrapped_runner() -> None:
+    source = PANEL.read_text(encoding="utf-8")
+    mutant = source.replace(
+        'kgRow(row, "class_total_kg", classLabel, classRole)',
+        'kv(classLabel, exactValue(row.class_total_kg + row.stage_3_capture_kg, "kg"), '
+        '"class_total_kg", classRole)',
+        1,
+    )
+    assert mutant != source
+    block, _ = _mars()
+    block["classification"]["pure_silica_glass"]["class_total_kg"] = 3.0
+    block["classification"]["pure_silica_glass"]["stage_3_capture_kg"] = 10.0
+    html = _render(_wrapped(block), panel_source=mutant)
+    silica_card = _card(html, "silica")
+    assert 'title="13 kg"' in silica_card
+    assert 'title="3 kg"' not in _field_value(silica_card, "class_total_kg")
+
+
+def test_p11_mutant_that_merges_p15_after_classification_present_must_fail() -> None:
+    source = PANEL.read_text(encoding="utf-8")
+    needle = (
+        "    if (classificationPresent && isRecord(classificationValue)) {\n"
+        "      classification = classificationValue;\n"
+        "    }"
+    )
+    mutant = source.replace(
+        needle,
+        needle
+        + "\n    if (isRecord(classification) && isRecord(block.pure_silica_glass)) {\n"
+        "      classification.pure_silica_glass = block.pure_silica_glass;\n"
+        "    }",
+        1,
+    )
+    assert mutant != source
+    block, _ = _mars()
+    block["pure_silica_glass"] = {
+        "stage_3_capture_kg": 99.0,
+        "class_total_kg": 88.0,
+        "stage_3_kg_by_species": {"SiO": 99.0},
+    }
+    html = _render(_wrapped(block), panel_source=mutant)
+    silica_card = _card(html, "silica")
+    assert 'title="88 kg"' in silica_card
+    assert 'title="99 kg"' in silica_card

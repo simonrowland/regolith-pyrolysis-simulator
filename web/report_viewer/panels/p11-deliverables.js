@@ -22,8 +22,12 @@
   }
 
   function chip(text, extraClass) {
-    const klass = extraClass ? ` sec-p11-chip ${extraClass}` : "sec-p11-chip";
-    return `<span class="${klass}">${esc(text)}</span>`;
+    const klass = extraClass ? `sec-p11-chip ${extraClass}` : "sec-p11-chip";
+    return `<span class="${klass}" data-p11-state-chip="${esc(text)}">${esc(text)}</span>`;
+  }
+
+  function flagChip(text) {
+    return `<p class="sec-p11-flag" data-p11-state-chip="${esc(text)}">${esc(text)}</p>`;
   }
 
   function speciesBadge(species) {
@@ -133,7 +137,7 @@
     return kv(label, stateSpan("not-emitted", "malformed"), key, "malformed");
   }
 
-  function speciesList(record, key, emptyText) {
+  function speciesList(record, key, emptyText, valueRole) {
     if (!isRecord(record) || !own(record, key)) {
       return `<div class="sec-p11-species-list" data-field="${esc(key)}" data-state="not-emitted">` +
         `${stateSpan("not-emitted", "not emitted")}</div>`;
@@ -152,9 +156,10 @@
       return `<div class="sec-p11-species-list" data-field="${esc(key)}" data-state="empty">` +
         `<p class="sec-p11-note">${esc(emptyText)}</p></div>`;
     }
+    const role = valueRole || "flagged-unqualified-capture";
     const rows = names.map((species) => {
       const claim = quantityClaim(map, species);
-      const state = claim.state === "value" ? "flagged-unqualified-capture" : claim.state;
+      const state = claim.state === "value" ? role : claim.state;
       return `<div class="sec-p11-kv" data-field="${esc(key)}.${esc(species)}" data-state="${esc(state)}">` +
         `<span>${speciesBadge(species)}</span><b>${quantityText(claim)}</b></div>`;
     }).join("");
@@ -206,12 +211,49 @@
     );
   }
 
-  function markdownSilicaFlag(markdown) {
-    if (typeof markdown !== "string") return "";
-    if (markdown.includes("Stage 3 silica capture (not a product)")) {
-      return `<p class="sec-p11-flag">${esc("flagged capture · not a product")}</p>`;
+  function silicaNonProductMark(markdown, row) {
+    if (typeof markdown === "string" && markdown.includes("Stage 3 silica capture (not a product)")) {
+      return true;
+    }
+    if (!isRecord(row) || !own(row, "flag")) return false;
+    const flag = row.flag;
+    if (typeof flag === "string" && flag.includes("not a product")) return true;
+    if (isRecord(flag) && typeof flag.status === "string" && flag.status.includes("not a product")) {
+      return true;
+    }
+    return false;
+  }
+
+  function silicaQualifiedProduct(row) {
+    const claim = quantityClaim(row, "class_total_kg");
+    return claim.state === "value" && claim.value > 0;
+  }
+
+  // P15 route statuses are mutually exclusive on this card: qualified
+  // product only when class_total_kg > 0; flagged capture only when the
+  // producer marked capture as non-product. Never both.
+  function silicaRouteChip(row, markdown) {
+    if (silicaQualifiedProduct(row)) {
+      return chip("qualified silica product");
+    }
+    if (silicaNonProductMark(markdown, row)) {
+      return flagChip("flagged capture · not a product");
     }
     return "";
+  }
+
+  function silicaClassRole(row, markdown) {
+    const claim = quantityClaim(row, "class_total_kg");
+    if (claim.state !== "value") return claim.state;
+    if (claim.value > 0) return "qualified-product";
+    if (silicaNonProductMark(markdown, row)) return "flagged-unqualified-capture";
+    return "qualified-product";
+  }
+
+  function silicaCaptureRole(row, markdown) {
+    if (silicaNonProductMark(markdown, row)) return "flagged-unqualified-capture";
+    if (silicaQualifiedProduct(row)) return "qualified-product";
+    return "value";
   }
 
   function producerFlag(record) {
@@ -270,14 +312,18 @@
         pendingBlock("Pure silica glass malformed", "classification.pure_silica_glass is present but is not an object."));
     }
     const row = bucket.value;
+    const classRole = silicaClassRole(row, markdown);
+    const captureRole = silicaCaptureRole(row, markdown);
+    const classLabel = classRole === "qualified-product"
+      ? "Qualified product · kg"
+      : "Class total · kg";
     return cardShell("silica", "", title, subtitle,
-      `${chip("qualified silica product")}` +
-      kgRow(row, "class_total_kg", "Qualified product · kg", "qualified-product") +
-      kgRow(row, "stage_3_capture_kg", "Stage 3 capture · kg", "flagged-unqualified-capture") +
-      markdownSilicaFlag(markdown) +
+      silicaRouteChip(row, markdown) +
+      kgRow(row, "class_total_kg", classLabel, classRole) +
+      kgRow(row, "stage_3_capture_kg", "Stage 3 capture · kg", captureRole) +
       producerFlag(row) +
       `<details class="sec-p11-disclosure"><summary>Stage 3 capture by species</summary>` +
-      speciesList(row, "stage_3_kg_by_species", "No Stage 3 species emitted.") +
+      speciesList(row, "stage_3_kg_by_species", "No Stage 3 species emitted.", captureRole) +
       `</details>`
     );
   }
@@ -285,8 +331,19 @@
   function mixedClassState(row) {
     const claim = quantityClaim(row, "class_total_kg");
     if (claim.state !== "value") return claim.state;
-    if (own(row, "early_tap_mode") && row.early_tap_mode === true) return "qualified-product";
+    if (own(row, "early_tap_mode") && row.early_tap_mode === true && claim.value > 0) {
+      return "qualified-product";
+    }
     return "flagged-unqualified-capture";
+  }
+
+  function mixedClassLabel(state) {
+    if (state === "qualified-product") return "Qualified product · kg";
+    if (state === "indeterminate") return "Class total · kg";
+    if (state === "unavailable" || state === "not-emitted" || state === "malformed") {
+      return "Class total · kg";
+    }
+    return "Class total · not a product · kg";
   }
 
   function renderGlassGrade(row) {
@@ -351,7 +408,7 @@
     const row = bucket.value;
     const classState = mixedClassState(row);
     return cardShell("mixed-glass", "", title, subtitle,
-      kv("Qualified product · kg", quantityText(quantityClaim(row, "class_total_kg")), "class_total_kg", classState) +
+      kv(mixedClassLabel(classState), quantityText(quantityClaim(row, "class_total_kg")), "class_total_kg", classState) +
       kgRow(row, "mixed_melt_residual_kg", "Mixed melt residual · kg", "flagged-unqualified-capture") +
       scalarRow(row, "early_tap_mode", "Early-tap mode") +
       scalarRow(row, "note", "Producer note") +
@@ -361,7 +418,7 @@
 
   function renderRump(classification) {
     const title = "Refractory rump · bedrock";
-    const subtitle = "Mandate class 4. class_total_kg is the refractory-oxide floor. Residual silicate, unextracted metals, other, and rump_total_kg are non-product inventory.";
+    const subtitle = "Mandate class 4. class_total_kg is the emitted class headline. rump_refractory_oxides_kg is the refractory-oxide floor. Residual silicate, unextracted metals, other, and rump_total_kg are non-product inventory.";
     const bucket = bucketRecord(classification, "refractory_ceramic_rump");
     if (!bucket.present) {
       return missingBucket("rump", "sec-p11-card--rump", title, subtitle, "Refractory rump not emitted");
@@ -375,10 +432,12 @@
         pendingBlock("Refractory rump malformed", "classification.refractory_ceramic_rump is present but is not an object."));
     }
     const row = bucket.value;
+    const classClaim = quantityClaim(row, "class_total_kg");
+    const classState = classClaim.state === "value" ? "qualified-product" : classClaim.state;
     return cardShell("rump", "sec-p11-card--rump", title, subtitle,
-      `<div class="sec-p11-headline" data-field="class_total_kg" data-state="${esc(quantityClaim(row, "class_total_kg").state === "value" ? "qualified-product" : quantityClaim(row, "class_total_kg").state)}">` +
-      `<span>Refractory-oxide floor · qualified product · kg</span>` +
-      `<b>${quantityText(quantityClaim(row, "class_total_kg"))}</b></div>` +
+      `<div class="sec-p11-headline" data-field="class_total_kg" data-state="${esc(classState)}">` +
+      `<span>Qualified product · kg</span>` +
+      `<b>${quantityText(classClaim)}</b></div>` +
       kgRow(row, "rump_refractory_oxides_kg", "Refractory oxides floor (by physics) · kg", "qualified-product") +
       kgRow(row, "rump_total_kg", "Residual inventory total (not a product total) · kg", "flagged-unqualified-capture") +
       kgRow(row, "rump_silicate_residual_kg", "Silicate residual · non-product inventory · kg", "flagged-unqualified-capture") +
