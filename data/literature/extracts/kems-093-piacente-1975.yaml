@@ -1,0 +1,959 @@
+schema_version: literature_extract.v1
+source_id: kems-093-piacente-1975
+source:
+  citation: >-
+    Piacente, V., Matoušek, J., Spoliti, M. & Di Paolo, V. (1975),
+    "Mass spectrometric investigation of the olivine vaporization process",
+    Silikáty č. 4, 1975, 289–299. Official archive PDF
+    https://www2.irsm.cas.cz/materialy/cs_content/1975/Piacente_CS_1975_0000.pdf
+  doi: null
+  url: https://www2.irsm.cas.cz/materialy/cs_content/1975/Piacente_CS_1975_0000.pdf
+  year: 1975
+extraction:
+  method: >-
+    Official IRSM CAS Ceramics-Silikaty archive PDF (HTTP 200 application/pdf,
+    1315009 B). Scanned Acrobat Image Conversion 2024-07-02. pdftotext -layout
+    is a noisy OCR layer and was not used as data. Table I transcribed from a
+    400 dpi pdftoppm render of PDF page 4 (published p. 292). Figs 1–6 listed
+    figure-only; Clausius–Clapeyron and P(T) grids were not digitised.
+    Second-law Table I enthalpies and averaged log P equations (2)–(3) labelled
+    model (kems-036 / MODEL RULE). Appearance potentials and apparatus facts
+    are instrument/method, not Psat series. Missing cells left absent, never 0.
+    No unit conversion. No MinerU. DOI none: doi.org 404 on guessed 10.13168/cs.1975.* stems.
+  date: '2026-09-06'
+  worker: wave-W2-kems-093-piacente-1975
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-093-piacente-1975/kems-093-piacente-1975/
+review_status: draft
+fidelity_samples:
+  - path: species.Fe.observations[piacente_1975_fe_table1_second_law].values.points[0].delta_H_sub_kJ_mole
+    value: 407.4
+    locator:
+      table: 'I'
+      published_page: 292
+      pdf_page_index: 4
+      note: Table I ThO2 Fe cell 407.4±9.2
+  - species: Fe
+    observable: gibbs_table
+    observation_id: piacente_1975_fe_table1_second_law
+    field: delta_H_sub_mean_kJ_mole
+    value: 410.3
+    locator:
+      table: 'I'
+      published_page: 292
+      pdf_page_index: 4
+      note: Table I mean-row Fe 410.3±12.6(a)
+  - species: Fe
+    observable: gibbs_table
+    observation_id: piacente_1975_fe_conclusions_mean
+    field: delta_H_sub_mean_kJ_mole
+    value: 420.3
+    locator:
+      published_page: 297
+      pdf_page_index: 9
+      paragraph: CONCLUSIONS
+      note: "mean values ... 420.3, 460.5, 548.5, 473.1 kJ/mole for Fe, SiO, Mg and O2"
+  - species: Fe
+    observable: psat_series
+    observation_id: piacente_1975_fe_cc_eq2
+    field: A
+    value: 9.34
+    locator:
+      equation: '2'
+      published_page: 294
+      pdf_page_index: 6
+      note: "log PFe (kPa) = (9.34±0.72) — (21.4±0.8) 10^3/T"
+  - species: SiO
+    observable: gibbs_table
+    observation_id: piacente_1975_sio_table1_second_law
+    field: delta_H_sub_mean_kJ_mole
+    value: 460.5
+    locator:
+      table: 'I'
+      published_page: 292
+      pdf_page_index: 4
+      note: Table I mean-row SiO 460.5±12.6(a)
+  - species: Mg
+    observable: gibbs_table
+    observation_id: piacente_1975_mg_table1_second_law
+    field: delta_H_sub_mean_kJ_mole
+    value: 548.5
+    locator:
+      table: 'I'
+      published_page: 292
+      pdf_page_index: 4
+      note: Table I mean-row Mg 548.5±12.6(a)
+  - species: O2
+    observable: gibbs_table
+    observation_id: piacente_1975_o2_table1_second_law
+    field: delta_H_sub_mean_kJ_mole
+    value: 473.1
+    locator:
+      table: 'I'
+      published_page: 292
+      pdf_page_index: 4
+      note: Table I Re and mean O2 473.1±13.0(b)
+  - path: species.Fe.observations[piacente_1975_kems_geometry_and_calibration].values.ionizing_electron_energy_eV
+    value: 45.0
+    locator:
+      published_page: 291
+      pdf_page_index: 3
+      note: ionizing electronic energy at its maximum efficiency (45 eV)
+species:
+  Fe:
+    observations:
+    - observation_id: piacente_1975_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 289
+        pdf_page_index: 1
+        section: PROCEDURE AND EXPERIMENTAL RESULTS
+        note: >-
+          Apparatus p.289–294; AP values p.290; 45 eV p.291; Ag calibration
+          and Mann/Colin cross sections p.293–294. SCHEMA has no metadata type.
+      T_range_K: [1673.0, 1925.0]
+      phase: olivine_10pct_fayalite_Knudsen
+      condensed_form:
+        state: crystalline
+        polymorph_name: olivine
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: olivine sample containing 10 % fayalite, cut from andesinic basalts
+      standard_state: silver-calibrated KEMS partial pressures (kPa)
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Bendix time of flight mass-spectrometer (mod. 3015)
+        ionizing_electron_energy_eV: 45.0
+        pyrometer: Leeds and Northrup optical pyrometer focused at the effusion hole
+        calibration: complete evaporation of a known quantity of silver before each experiment
+        pressure_equation_as_printed: "P_i = I_i^+ T / S σ_i a_i"
+        pressure_equation_number: 1
+        atomic_ionization_cross_sections: Mann 1967
+        molecular_cross_section_factor: 0.7
+        sigma_O2: 1.83
+        sigma_SiO: 4.37
+        tensimetric_agreement_pct_range: [20, 30]
+        sample_fayalite_pct: 10.0
+        appearance_potential_reference_Hg_eV_printed: "10,44"
+        appearance_potential_Fe_eV: 8.4
+        appearance_potential_SiO_eV: 2.0
+        appearance_potential_Mg_eV: 7.4
+        thoria_first_run_mass_mg: 160.0
+        thoria_second_run_mass_mg: 363.0
+        zirconia_mass_mg: 388.0
+        orifice_area: absent
+        quotes:
+          ionizing_electron_energy_eV:
+            published_page: 291
+            pdf_page_index: 3
+            printed: "(45 eV)"
+          sigma_O2:
+            published_page: 294
+            pdf_page_index: 6
+            printed: "the values 1.83 and 4.37 for O2 and SiO respectively"
+          sigma_SiO:
+            published_page: 294
+            pdf_page_index: 6
+            printed: "the values 1.83 and 4.37 for O2 and SiO respectively"
+          molecular_cross_section_factor:
+            published_page: 294
+            pdf_page_index: 6
+            printed: "by a factor of 0.7 (6)"
+          tensimetric_agreement_pct_range:
+            published_page: 294
+            pdf_page_index: 6
+            printed: "in agreement within 20—30 %"
+          sample_fayalite_pct:
+            published_page: 289
+            pdf_page_index: 1
+            printed: "olivine sample containing 10% fayalite"
+          appearance_potential_Fe_eV:
+            published_page: 290
+            pdf_page_index: 2
+            printed: "8.4±0.3; 2.0±0.3 and 7.4±0.4 eV"
+          appearance_potential_SiO_eV:
+            published_page: 290
+            pdf_page_index: 2
+            printed: "8.4±0.3; 2.0±0.3 and 7.4±0.4 eV"
+          appearance_potential_Mg_eV:
+            published_page: 290
+            pdf_page_index: 2
+            printed: "8.4±0.3; 2.0±0.3 and 7.4±0.4 eV"
+          appearance_potential_reference_Hg_eV_printed:
+            published_page: 290
+            pdf_page_index: 2
+            printed: "relative to Hg (10,44 eV [2])"
+          thoria_first_run_mass_mg:
+            published_page: 290
+            pdf_page_index: 2
+            printed: "160 mg of the sample was vaporized at temperatures ranging from 1680 to 2050 K"
+          thoria_second_run_mass_mg:
+            published_page: 291
+            pdf_page_index: 3
+            printed: "larger amount of the olivine sample (363 mg)"
+          zirconia_mass_mg:
+            published_page: 292
+            pdf_page_index: 4
+            printed: "The amount of olivine sample was 388 mg"
+          orifice_area:
+            published_page: 294
+            pdf_page_index: 6
+            printed: "the effective area of the effusion holes ... which are included in the instrument constant S"
+        note: >-
+          Orifice area is named as an uncertainty source and is not printed
+          as a number (absent, not 0). Crucible materials tried alumina,
+          ThO2, ZrO2, Pt, Re. Alumina data discarded.
+      uncertainty:
+        appearance_potential_Fe_eV: 0.3
+        appearance_potential_SiO_eV: 0.3
+        appearance_potential_Mg_eV: 0.4
+        as_printed: 8.4±0.3; 2.0±0.3 and 7.4±0.4 eV
+      equipment:
+        cell_material:
+          value: alumina, thorium dioxide, zirconium dioxide, platinum and rhenium Knudsen crucibles
+          locator:
+            published_page: 290
+            pdf_page_index: 2
+            paragraph: crucibles of various materials
+    - observation_id: piacente_1975_fe_table1_second_law
+      type: gibbs_table
+      locator:
+        table: 'I'
+        published_page: 292
+        pdf_page_index: 4
+        note: Table I Fe column; second-law ΔH_sub at 1800 K
+      T_range_K: [1673.0, 1925.0]
+      phase: olivine_10pct_fayalite
+      condensed_form:
+        state: crystalline
+        polymorph_name: olivine
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: 10 % fayalite
+      standard_state: partial molar enthalpy of sublimation of Fe from olivine, second law, 1800 K
+      regime: kems_second_law
+      units: kJ/mole as printed
+      values:
+        quantity: second_law_partial_molar_enthalpy_of_sublimation
+        evidence_kind: model
+        method_class: model_derived
+        law: II
+        average_T_K: 1800.0
+        delta_H_sub_mean_kJ_mole: 410.3
+        n_crucibles: 3
+        table_csv: tables/kems-093-piacente-1975/t1.csv
+        points:
+          - crucible: ThO2
+            T_low_K: 1680.0
+            T_high_K: 1920.0
+            delta_H_sub_kJ_mole: 407.4
+            printed_quote: "407.4±9.2"
+          - crucible: ZrO2
+            T_low_K: 1673.0
+            T_high_K: 1925.0
+            delta_H_sub_kJ_mole: 414.9
+            printed_quote: "414.9±13.4"
+          - crucible: Re
+            T_low_K: 1699.0
+            T_high_K: 1920.0
+            delta_H_sub_kJ_mole: 410.3
+            printed_quote: "410.3±7.9"
+        quotes:
+          delta_H_sub_mean_kJ_mole:
+            table: 'I'
+            published_page: 292
+            pdf_page_index: 4
+            printed: "410.3±12.6(a)"
+          average_T_K:
+            published_page: 292
+            pdf_page_index: 4
+            printed: "at the average temperature of 1800 °K"
+        note: >-
+          Second-law from relative slopes of log(I+T) vs 1/T. Battery must
+          refuse as model_output_not_measurement. Mean-row error is a
+          standard deviation (footnote a). Conclusions p.297 print 420.3
+          for Fe; that competing printed mean is a separate observation.
+      uncertainty:
+        ThO2_kJ_mole: 9.2
+        ZrO2_kJ_mole: 13.4
+        Re_kJ_mole: 7.9
+        mean_kJ_mole: 12.6
+        mean_error_kind: standard_deviation
+        as_printed_mean: 410.3±12.6(a)
+      equipment:
+        cell_material:
+          value: ThO2, ZrO2, Re
+          locator:
+            table: 'I'
+            published_page: 292
+            pdf_page_index: 4
+    - observation_id: piacente_1975_fe_conclusions_mean
+      type: gibbs_table
+      locator:
+        published_page: 297
+        pdf_page_index: 9
+        paragraph: CONCLUSIONS
+        note: Competing printed Fe mean vs Table I 410.3±12.6(a)
+      T_range_K: [1673.0, 1925.0]
+      phase: olivine_10pct_fayalite
+      standard_state: mean partial molar sublimation enthalpy as printed in CONCLUSIONS
+      regime: kems_second_law
+      units: kJ/mole as printed
+      values:
+        quantity: second_law_partial_molar_enthalpy_of_sublimation
+        evidence_kind: model
+        method_class: model_derived
+        semantics: competing_observation_do_not_average
+        delta_H_sub_mean_kJ_mole: 420.3
+        table_I_mean_kJ_mole: 410.3
+        printed_quote: "420.3, 460.5, 548.5, 473.1 kJ/mole for Fe, SiO, Mg and O2 respectively"
+        quotes:
+          delta_H_sub_mean_kJ_mole:
+            published_page: 297
+            pdf_page_index: 9
+            printed: "420.3, 460.5, 548.5, 473.1 kJ/mole for Fe, SiO, Mg and O2 respectively"
+          table_I_mean_kJ_mole:
+            table: 'I'
+            published_page: 292
+            pdf_page_index: 4
+            printed: "410.3±12.6(a)"
+        note: >-
+          Both 420.3 (CONCLUSIONS) and 410.3 (Table I mean) are printed.
+          Neither is overwritten. Not averaged.
+      uncertainty:
+        note: CONCLUSIONS sentence prints 420.3 with no ± on the Fe mean
+    - observation_id: piacente_1975_fe_cc_eq2
+      type: psat_series
+      locator:
+        equation: '2'
+        published_page: 294
+        pdf_page_index: 6
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      standard_state: averaged Clausius–Clapeyron log10 P(Fe) in kPa
+      regime: kems_effusion
+      units: kPa as printed (log P)
+      values:
+        quantity: clausius_clapeyron_averaged_log10_P_kPa
+        evidence_kind: model
+        method_class: model_derived
+        form: log10_P_kPa = A - B * 1.0e3 / T
+        A: 9.34
+        B: 21.4
+        gas_species: Fe
+        printed_quote: "log PFe (kPa) = (9.34±0.72) — (21.4±0.8) 10^3/T"
+        quotes:
+          A:
+            equation: '2'
+            published_page: 294
+            pdf_page_index: 6
+            printed: "(9.34±0.72)"
+          B:
+            equation: '2'
+            published_page: 294
+            pdf_page_index: 6
+            printed: "(21.4±0.8) 10^3/T"
+        note: >-
+          Averaged coefficients of every equation obtained in each series
+          (ThO2, ZrO2, Re). Errors are the maximum semi dispersion.
+          Not an ion-current series. Battery must refuse as
+          model_output_not_measurement. No conversion out of kPa.
+      uncertainty:
+        A: 0.72
+        B: 0.8
+        error_kind: maximum_semi_dispersion
+        as_printed: (9.34±0.72) — (21.4±0.8)
+    - observation_id: piacente_1975_fe_fig2_thoria_figure_only
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 291
+        pdf_page_index: 3
+      T_range_K: [1680.0, 1920.0]
+      phase: vapor_over_olivine_in_thoria
+      regime: kems_effusion
+      units: log(I+T) as plotted
+      values:
+        quantity: log_IT_vs_1_over_T_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        table_csv: tables/kems-093-piacente-1975/f2.provenance.yaml
+      uncertainty:
+        note: no tabulated point coordinates
+    - observation_id: piacente_1975_fe_fig3_zirconia_figure_only
+      type: psat_series
+      locator:
+        figure: '3'
+        published_page: 293
+        pdf_page_index: 5
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_in_zirconia
+      regime: kems_effusion
+      units: log(I+T) as plotted
+      values:
+        quantity: log_IT_vs_1_over_T_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+      uncertainty:
+        note: no tabulated point coordinates
+    - observation_id: piacente_1975_fe_fig4_rhenium_figure_only
+      type: psat_series
+      locator:
+        figure: '4'
+        published_page: 294
+        pdf_page_index: 6
+      T_range_K: [1699.0, 1920.0]
+      phase: vapor_over_olivine_in_rhenium
+      regime: kems_effusion
+      units: log(I+T) as plotted
+      values:
+        quantity: log_IT_vs_1_over_T_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+      uncertainty:
+        note: no tabulated point coordinates
+    - observation_id: piacente_1975_fe_fig5_psat_figure_only
+      type: psat_series
+      locator:
+        figure: '5'
+        published_page: 295
+        pdf_page_index: 7
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      regime: kems_effusion
+      units: kPa as plotted (-log P)
+      values:
+        quantity: partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        activity_claim_as_printed: almost unitary activity versus pure Fe
+      uncertainty:
+        note: no tabulated P(T) points
+    - observation_id: piacente_1975_fe_fig6_vs_pure_figure_only
+      type: psat_series
+      locator:
+        figure: '6'
+        published_page: 296
+        pdf_page_index: 8
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_vs_pure_Fe
+      regime: kems_effusion
+      units: kPa as plotted (-log P)
+      values:
+        quantity: partial_pressure_overlay_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        literature_overlay: Hultgren et al. 1967 pure Fe vapour pressure [7]
+        n_points: absent
+      uncertainty:
+        note: no tabulated P(T) points
+    - observation_id: piacente_1975_fe_alumina_discarded
+      type: rate_series
+      locator:
+        published_page: 290
+        pdf_page_index: 2
+        paragraph: Alumina crucible
+      phase: olivine_in_alumina
+      regime: kems_effusion
+      units: none_printed_usable
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        semantics: bound_not_point_ordering
+        usable_tensimetric_values: discarded
+        printed_quote: >-
+          The measurements were, therefore, unreliable and were not taken
+          into account.
+        n_points: absent
+      uncertainty:
+        note: alumina interaction; no usable Fe P(T)
+  SiO:
+    observations:
+    - observation_id: piacente_1975_sio_table1_second_law
+      type: gibbs_table
+      locator:
+        table: 'I'
+        published_page: 292
+        pdf_page_index: 4
+      T_range_K: [1673.0, 1925.0]
+      phase: olivine_10pct_fayalite
+      condensed_form:
+        state: crystalline
+        polymorph_name: olivine
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: 10 % fayalite
+      standard_state: partial molar enthalpy of sublimation of SiO from olivine, second law, 1800 K
+      regime: kems_second_law
+      units: kJ/mole as printed
+      values:
+        quantity: second_law_partial_molar_enthalpy_of_sublimation
+        evidence_kind: model
+        method_class: model_derived
+        law: II
+        average_T_K: 1800.0
+        delta_H_sub_mean_kJ_mole: 460.5
+        n_crucibles: 3
+        table_csv: tables/kems-093-piacente-1975/t1.csv
+        points:
+          - crucible: ThO2
+            T_low_K: 1680.0
+            T_high_K: 1920.0
+            delta_H_sub_kJ_mole: 456.8
+            printed_quote: "456.8±13.0"
+          - crucible: ZrO2
+            T_low_K: 1673.0
+            T_high_K: 1925.0
+            delta_H_sub_kJ_mole: 463.9
+            printed_quote: "463.9±11.3"
+          - crucible: Re
+            T_low_K: 1699.0
+            T_high_K: 1920.0
+            delta_H_sub_kJ_mole: 461.4
+            printed_quote: "461.4±8.8"
+        quotes:
+          delta_H_sub_mean_kJ_mole:
+            table: 'I'
+            published_page: 292
+            pdf_page_index: 4
+            printed: "460.5±12.6(a)"
+        note: Second-law. Battery must refuse as model_output_not_measurement.
+      uncertainty:
+        ThO2_kJ_mole: 13.0
+        ZrO2_kJ_mole: 11.3
+        Re_kJ_mole: 8.8
+        mean_kJ_mole: 12.6
+        mean_error_kind: standard_deviation
+        as_printed_mean: 460.5±12.6(a)
+    - observation_id: piacente_1975_sio_cc_eq2
+      type: psat_series
+      locator:
+        equation: '2'
+        published_page: 294
+        pdf_page_index: 6
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      standard_state: averaged Clausius–Clapeyron log10 P(SiO) in kPa
+      regime: kems_effusion
+      units: kPa as printed (log P)
+      values:
+        quantity: clausius_clapeyron_averaged_log10_P_kPa
+        evidence_kind: model
+        method_class: model_derived
+        form: log10_P_kPa = A - B * 1.0e3 / T
+        A: 10.21
+        B: 24.0
+        gas_species: SiO
+        printed_quote: "log PSiO (kPa) = (10.21±0.36) — (24.0±0.8) 10^3/T"
+        quotes:
+          A:
+            equation: '2'
+            published_page: 294
+            pdf_page_index: 6
+            printed: "(10.21±0.36)"
+          B:
+            equation: '2'
+            published_page: 294
+            pdf_page_index: 6
+            printed: "(24.0±0.8) 10^3/T"
+        note: Averaged coefficients. Maximum semi dispersion. model_output_not_measurement.
+      uncertainty:
+        A: 0.36
+        B: 0.8
+        error_kind: maximum_semi_dispersion
+        as_printed: (10.21±0.36) — (24.0±0.8)
+    - observation_id: piacente_1975_sio_fig2_4_5_figure_only
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 291
+        pdf_page_index: 3
+        note: also Fig. 3 p.293, Fig. 4 p.294, Fig. 5 p.295
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      regime: kems_effusion
+      units: as plotted
+      values:
+        quantity: log_IT_and_partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        figures: ['2', '3', '4', '5']
+      uncertainty:
+        note: no tabulated point coordinates
+    - observation_id: piacente_1975_sio_fig6_vs_cristobalite_figure_only
+      type: psat_series
+      locator:
+        figure: '6'
+        published_page: 296
+        pdf_page_index: 8
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_vs_cristobalite
+      regime: kems_effusion
+      units: kPa as plotted
+      values:
+        quantity: partial_pressure_overlay_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        literature_overlay: Porter, Chupka & Inghram 1955 SiO over cristobalite [9]
+        n_points: absent
+      uncertainty:
+        note: no tabulated P(T) points
+  Mg:
+    observations:
+    - observation_id: piacente_1975_mg_table1_second_law
+      type: gibbs_table
+      locator:
+        table: 'I'
+        published_page: 292
+        pdf_page_index: 4
+      T_range_K: [1673.0, 1925.0]
+      phase: olivine_10pct_fayalite
+      condensed_form:
+        state: crystalline
+        polymorph_name: olivine
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: 10 % fayalite
+      standard_state: partial molar enthalpy of sublimation of Mg from olivine, second law, 1800 K
+      regime: kems_second_law
+      units: kJ/mole as printed
+      values:
+        quantity: second_law_partial_molar_enthalpy_of_sublimation
+        evidence_kind: model
+        method_class: model_derived
+        law: II
+        average_T_K: 1800.0
+        delta_H_sub_mean_kJ_mole: 548.5
+        n_crucibles: 3
+        table_csv: tables/kems-093-piacente-1975/t1.csv
+        points:
+          - crucible: ThO2
+            T_low_K: 1680.0
+            T_high_K: 1920.0
+            delta_H_sub_kJ_mole: 545.5
+            printed_quote: "545.5±13.4"
+          - crucible: ZrO2
+            T_low_K: 1673.0
+            T_high_K: 1925.0
+            delta_H_sub_kJ_mole: 540.5
+            printed_quote: "540.5±12.6"
+          - crucible: Re
+            T_low_K: 1699.0
+            T_high_K: 1920.0
+            delta_H_sub_kJ_mole: 553.9
+            printed_quote: "553.9±10.0"
+        quotes:
+          delta_H_sub_mean_kJ_mole:
+            table: 'I'
+            published_page: 292
+            pdf_page_index: 4
+            printed: "548.5±12.6(a)"
+        note: Second-law. Battery must refuse as model_output_not_measurement.
+      uncertainty:
+        ThO2_kJ_mole: 13.4
+        ZrO2_kJ_mole: 12.6
+        Re_kJ_mole: 10.0
+        mean_kJ_mole: 12.6
+        mean_error_kind: standard_deviation
+        as_printed_mean: 548.5±12.6(a)
+    - observation_id: piacente_1975_mg_cc_eq2
+      type: psat_series
+      locator:
+        equation: '2'
+        published_page: 294
+        pdf_page_index: 6
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      standard_state: averaged Clausius–Clapeyron log10 P(Mg) in kPa
+      regime: kems_effusion
+      units: kPa as printed (log P)
+      values:
+        quantity: clausius_clapeyron_averaged_log10_P_kPa
+        evidence_kind: model
+        method_class: model_derived
+        form: log10_P_kPa = A - B * 1.0e3 / T
+        A: 12.18
+        B: 28.6
+        gas_species: Mg
+        printed_quote: "log PMg (kPa) = (12.18±0.68) — (28.6±0.7) 10^3/T"
+        quotes:
+          A:
+            equation: '2'
+            published_page: 294
+            pdf_page_index: 6
+            printed: "(12.18±0.68)"
+          B:
+            equation: '2'
+            published_page: 294
+            pdf_page_index: 6
+            printed: "(28.6±0.7) 10^3/T"
+        note: Averaged coefficients. Maximum semi dispersion. model_output_not_measurement.
+      uncertainty:
+        A: 0.68
+        B: 0.7
+        error_kind: maximum_semi_dispersion
+        as_printed: (12.18±0.68) — (28.6±0.7)
+    - observation_id: piacente_1975_mg_fraction_of_total_P
+      type: psat_series
+      locator:
+        published_page: 296
+        pdf_page_index: 8
+        paragraph: discussion
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      regime: kems_effusion
+      units: percent of total pressure as printed
+      values:
+        quantity: magnesium_partial_pressure_fraction_of_total
+        method_class: author_derived
+        evidence_kind: model
+        percent_of_total_pressure: 3.0
+        printed_quote: "the contribution of the magnesium partial pressure is almost negligible (3 %) with respect to the total pressure"
+        quotes:
+          percent_of_total_pressure:
+            published_page: 296
+            pdf_page_index: 8
+            printed: "(3 %)"
+        note: Author statement from this-work tensimetric values; not a P(T) series.
+      uncertainty:
+        note: no ± printed on the 3 %
+    - observation_id: piacente_1975_mg_fig2_4_5_figure_only
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 291
+        pdf_page_index: 3
+        note: also Fig. 3 p.293, Fig. 4 p.294, Fig. 5 p.295
+      T_range_K: [1673.0, 1925.0]
+      phase: vapor_over_olivine_10pct_fayalite
+      regime: kems_effusion
+      units: as plotted
+      values:
+        quantity: log_IT_and_partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        figures: ['2', '3', '4', '5']
+      uncertainty:
+        note: no tabulated point coordinates
+  O2:
+    observations:
+    - observation_id: piacente_1975_o2_table1_second_law
+      type: gibbs_table
+      locator:
+        table: 'I'
+        published_page: 292
+        pdf_page_index: 4
+      T_range_K: [1699.0, 1920.0]
+      phase: olivine_10pct_fayalite_in_rhenium
+      standard_state: partial molar enthalpy of sublimation of O2, second law, 1800 K
+      regime: kems_second_law
+      units: kJ/mole as printed
+      values:
+        quantity: second_law_partial_molar_enthalpy_of_sublimation
+        evidence_kind: model
+        method_class: model_derived
+        law: II
+        average_T_K: 1800.0
+        delta_H_sub_mean_kJ_mole: 473.1
+        n_crucibles_with_O2: 1
+        table_csv: tables/kems-093-piacente-1975/t1.csv
+        tho2_cell: absent
+        zro2_cell: absent
+        points:
+          - crucible: Re
+            T_low_K: 1699.0
+            T_high_K: 1920.0
+            delta_H_sub_kJ_mole: 473.1
+            printed_quote: "473.1±13.0"
+        quotes:
+          delta_H_sub_mean_kJ_mole:
+            table: 'I'
+            published_page: 292
+            pdf_page_index: 4
+            printed: "473.1±13.0(b)"
+        note: >-
+          ThO2 and ZrO2 O2 cells are blank (true absence, never 0).
+          Mean-row error is estimated (footnote b). model_output_not_measurement.
+      uncertainty:
+        Re_kJ_mole: 13.0
+        mean_kJ_mole: 13.0
+        mean_error_kind: estimated
+        as_printed_mean: 473.1±13.0(b)
+    - observation_id: piacente_1975_o2_cc_eq3
+      type: psat_series
+      locator:
+        equation: '3'
+        published_page: 295
+        pdf_page_index: 7
+      T_range_K: [1699.0, 1920.0]
+      phase: vapor_over_olivine_in_rhenium
+      standard_state: Clausius–Clapeyron log10 P(O2) in kPa
+      regime: kems_effusion
+      units: kPa as printed (log P)
+      values:
+        quantity: clausius_clapeyron_averaged_log10_P_kPa
+        evidence_kind: model
+        method_class: model_derived
+        form: log10_P_kPa = A - B * 1.0e3 / T
+        A: 10.4
+        B: 24.7
+        gas_species: O2
+        printed_quote: "log PO2 (kPa) = (10.4±0.9) — (24.7±1.1) 10^3/T"
+        quotes:
+          A:
+            equation: '3'
+            published_page: 295
+            pdf_page_index: 7
+            printed: "(10.4±0.9)"
+          B:
+            equation: '3'
+            published_page: 295
+            pdf_page_index: 7
+            printed: "(24.7±1.1) 10^3/T"
+        note: Error is the standard deviation (unlike eq. 2 semi-dispersion). model_output_not_measurement.
+      uncertainty:
+        A: 0.9
+        B: 1.1
+        error_kind: standard_deviation
+        as_printed: (10.4±0.9) — (24.7±1.1)
+    - observation_id: piacente_1975_o2_absent_oxide_cells
+      type: psat_series
+      locator:
+        published_page: 292
+        pdf_page_index: 4
+        paragraph: Platinum and rhenium crucibles
+      phase: vapor_over_olivine_in_alumina_thoria_zirconia
+      regime: kems_effusion
+      units: none_printed
+      values:
+        quantity: not_reported_among_detected_species
+        method_class: measured_direct
+        semantics: bound_not_point_ordering
+        printed_quote: >-
+          the oxygen has been not detected with certainty in any of the
+          experiments carried out with alumina, thoria and zirconia crucibles
+        n_points: absent
+        P: absent
+      uncertainty:
+        note: true absence of a certain O2 detection in those cells
+    - observation_id: piacente_1975_o2_platinum_insufficient
+      type: psat_series
+      locator:
+        published_page: 292
+        pdf_page_index: 4
+        paragraph: Platinum and rhenium crucibles
+      T_range_K: [1400.0, 1445.0]
+      phase: vapor_over_olivine_in_platinum
+      regime: kems_effusion
+      units: K as printed
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        semantics: bound_not_point_ordering
+        T_range_as_printed: "1400—1445 K"
+        printed_quote: >-
+          Owing to the low melting point of platinum very limited number of
+          measurements were carried out in a restricted temperature range
+          (1400—1445 K). Therefore, the data obtained were insufficient to
+          evaluate the partial enthalpies of evaporation.
+        n_points: absent
+        quotes:
+          T_range_as_printed:
+            published_page: 292
+            pdf_page_index: 4
+            printed: "(1400—1445 K)"
+      uncertainty:
+        note: oxygen detected in Pt but no enthalpy / CC equation
+    - observation_id: piacente_1975_o2_fig4_5_figure_only
+      type: psat_series
+      locator:
+        figure: '4'
+        published_page: 294
+        pdf_page_index: 6
+        note: also Fig. 5 p.295
+      T_range_K: [1699.0, 1920.0]
+      phase: vapor_over_olivine_in_rhenium
+      regime: kems_effusion
+      units: as plotted
+      values:
+        quantity: log_IT_and_partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        n_points: absent
+        figures: ['4', '5']
+      uncertainty:
+        note: no tabulated point coordinates
+  FeO:
+    observations:
+    - observation_id: piacente_1975_feo_highT_re_detected_not_tabulated
+      type: rate_series
+      locator:
+        published_page: 293
+        pdf_page_index: 5
+        paragraph: rhenium high-T
+      T_range_K: [1920.0, 2100.0]
+      phase: vapor_over_olivine_in_rhenium_above_melting
+      regime: kems_effusion
+      units: none_printed
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        semantics: bound_not_point_ordering
+        printed_quote: "SiO2+, FeO+ species, atomic oxygen and two rhenium oxides (ReO2+, ReO3+) were identified in this temperature range"
+        n_points: absent
+        P: absent
+      uncertainty:
+        note: identified above ~1920 K in Re; no P(T) table
+  Fe2SiO4:
+    observations:
+    - observation_id: piacente_1975_eq4_fayalite_mechanism_mueller
+      type: gibbs_table
+      locator:
+        equation: '4'
+        published_page: 295
+        pdf_page_index: 7
+      phase: fayalite
+      standard_state: Mueller 1965 proposed congruent-decomposition scheme, cited not measured here
+      regime: literature_mechanism
+      units: none
+      values:
+        quantity: proposed_vaporization_reaction
+        evidence_kind: model
+        method_class: model_derived
+        reaction_as_printed: "Fe2SiO4(s) ⇌ 2 Fe(s) + SiO2(s) + O2(g)"
+        citation_in_source: Mueller R. F., Geochim. Cosmochim. Acta 29 (1965) [8]
+        printed_quote: "Fe2SiO4(s) ⇌ 2 Fe(s) + SiO2(s) + O2(g)"
+        quotes:
+          reaction_as_printed:
+            equation: '4'
+            published_page: 295
+            pdf_page_index: 7
+            printed: "Fe2SiO4(s) ⇌ 2 Fe(s) + SiO2(s) + O2(g)"
+        note: >-
+          Cited scheme for pure/mixed fayalite, not a measured K of this work.
+          Authors argue the Fo90Fa10 olivine follows the same mechanism.
+          Battery must refuse as model_output_not_measurement.
+      uncertainty:
+        note: not a measured equilibrium constant
