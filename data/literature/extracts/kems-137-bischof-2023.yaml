@@ -65,6 +65,110 @@ fidelity_samples:
     table: '9'
     pdf_page_index: 30
     note: Table 9 Ga Tc50 ADeu 1874 K at 10^-6 bar; FactSage 8.2 model, not a KEMS gamma
+- species: Ga
+  observable: rate_series
+  observation_id: bischof_2023_ga_ion_currents_table4_r2
+  field: readings
+  value:
+  - ion: Ga2O+
+    sample: An-Di
+    intensity_cps: 16
+    scientific_class: measured
+    locator:
+      page: 10
+      table: '4'
+      record: body row 2
+    printed_quote: I_M2O+, An-Di [cps] | 16 2) | 152 3)
+    condition_quote: run 3_high at T = 1598 K
+    evidence_origin: this study
+  - ion: Ga+
+    sample: An-Di
+    intensity_cps: 287
+    scientific_class: measured
+    locator:
+      page: 10
+      table: '4'
+      record: body row 3
+    printed_quote: I_M+, An-Di [cps] | 287 2) | 2969 3)
+    condition_quote: run 3_high at T = 1598 K
+    evidence_origin: this study
+  - ion: Ga2O+
+    sample: p.o.
+    intensity_cps: 1668
+    scientific_class: measured
+    locator:
+      page: 10
+      table: '4'
+      record: body row 4
+    printed_quote: I_M2O+, p.o. [cps] | 1668 4) | 46669 5)
+    condition_quote: Bischof et al. (2023) at T = 1598 K
+    evidence_origin: reference measurement reproduced from cited Bischof et al. (2023)
+  - ion: Ga+
+    sample: p.o.
+    intensity_cps: 21462
+    scientific_class: measured
+    locator:
+      page: 10
+      table: '4'
+      record: body row 5
+    printed_quote: I_M+, p.o. [cps] | 21462 4) | 605097 5)
+    condition_quote: Bischof et al. (2023) at T = 1598 K
+    evidence_origin: reference measurement reproduced from cited Bischof et al. (2023)
+  locator:
+    page: 10
+    table: '4'
+- species: In
+  observable: rate_series
+  observation_id: bischof_2023_in_ion_currents_table4_r2
+  field: readings
+  value:
+  - ion: In2O+
+    sample: An-Di
+    intensity_cps: 152
+    scientific_class: measured
+    locator:
+      page: 10
+      table: '4'
+      record: body row 2
+    printed_quote: I_M2O+, An-Di [cps] | 16 2) | 152 3)
+    condition_quote: run 3_high, average of the intensities at T = 1539 K and T = 1547 K
+    evidence_origin: this study
+  - ion: In+
+    sample: An-Di
+    intensity_cps: 2969
+    scientific_class: measured
+    locator:
+      page: 10
+      table: '4'
+      record: body row 3
+    printed_quote: I_M+, An-Di [cps] | 287 2) | 2969 3)
+    condition_quote: run 3_high, average of the intensities at T = 1539 K and T = 1547 K
+    evidence_origin: this study
+  - ion: In2O+
+    sample: p.o.
+    intensity_cps: 46669
+    scientific_class: measured
+    locator:
+      page: 10
+      table: '4'
+      record: body row 4
+    printed_quote: I_M2O+, p.o. [cps] | 1668 4) | 46669 5)
+    condition_quote: Bischof et al. (2023), average of the intensities at T = 1535 K and T = 1548 K
+    evidence_origin: reference measurement reproduced from cited Bischof et al. (2023)
+  - ion: In+
+    sample: p.o.
+    intensity_cps: 605097
+    scientific_class: measured
+    locator:
+      page: 10
+      table: '4'
+      record: body row 5
+    printed_quote: I_M+, p.o. [cps] | 21462 4) | 605097 5)
+    condition_quote: Bischof et al. (2023), average of the intensities at T = 1535 K and T = 1548 K
+    evidence_origin: reference measurement reproduced from cited Bischof et al. (2023)
+  locator:
+    page: 10
+    table: '4'
 species:
   Ga:
     observations:
@@ -773,6 +877,658 @@ species:
           delta_IW_at_Tc50: 1.08
           Tc50_ADeu_K: 2662.0
         note: FactSage model output (50% condensation temperature), not a KEMS measurement and not a gamma.
+    - observation_id: bischof_2023_ga_ion_currents_table4_r2
+      type: rate_series
+      scientific_class: measured
+      locator:
+        page: 10
+        table: '4'
+      regime: kems_effusion
+      units: cps
+      printed_quote: I_M2O+, An-Di [cps] | 16 2) | 152 3); run 3_high at T = 1598 K; I_M+, An-Di [cps] | 287
+        2) | 2969 3); run 3_high at T = 1598 K; I_M2O+, p.o. [cps] | 1668 4) | 46669 5); Bischof et al. (2023)
+        at T = 1598 K; I_M+, p.o. [cps] | 21462 4) | 605097 5); Bischof et al. (2023) at T = 1598 K
+      values:
+        quantity: measured_KEMS_ion_intensities
+        method_class: measured KEMS
+        semantics: partial_ion_current_series_no_time_axis; An-Di and pure-oxide reference readings are distinct
+        readings:
+        - ion: Ga2O+
+          sample: An-Di
+          intensity_cps: 16
+          scientific_class: measured
+          locator:
+            page: 10
+            table: '4'
+            record: body row 2
+          printed_quote: I_M2O+, An-Di [cps] | 16 2) | 152 3)
+          condition_quote: run 3_high at T = 1598 K
+          evidence_origin: this study
+        - ion: Ga+
+          sample: An-Di
+          intensity_cps: 287
+          scientific_class: measured
+          locator:
+            page: 10
+            table: '4'
+            record: body row 3
+          printed_quote: I_M+, An-Di [cps] | 287 2) | 2969 3)
+          condition_quote: run 3_high at T = 1598 K
+          evidence_origin: this study
+        - ion: Ga2O+
+          sample: p.o.
+          intensity_cps: 1668
+          scientific_class: measured
+          locator:
+            page: 10
+            table: '4'
+            record: body row 4
+          printed_quote: I_M2O+, p.o. [cps] | 1668 4) | 46669 5)
+          condition_quote: Bischof et al. (2023) at T = 1598 K
+          evidence_origin: reference measurement reproduced from cited Bischof et al. (2023)
+        - ion: Ga+
+          sample: p.o.
+          intensity_cps: 21462
+          scientific_class: measured
+          locator:
+            page: 10
+            table: '4'
+            record: body row 5
+          printed_quote: I_M+, p.o. [cps] | 21462 4) | 605097 5)
+          condition_quote: Bischof et al. (2023) at T = 1598 K
+          evidence_origin: reference measurement reproduced from cited Bischof et al. (2023)
+        supporting_evidence:
+          semantics: Auxiliary tables retain independent row classes; calibration inputs, conditions, equations
+            and glass analyses are not ion-current observations.
+          tables:
+          - table: '1'
+            locator:
+              page: 6
+              table: '1'
+            evidence_role: isotope and mass calibration inputs; natural abundances, not measured ion currents
+            columns:
+            - Ga Species
+            - Ga m/z
+            - Ga Isotopic abundance [%]
+            - In Species
+            - In m/z
+            - In Isotopic abundance [%]
+            rows:
+            - cells:
+              - Ga+
+              - '69'
+              - '60.1'
+              - In+
+              - '115'
+              - '95.7'
+              scientific_class: derived
+              locator:
+                page: 6
+                table: '1'
+                record: body row 1
+              printed_quote: Ga+ | 69 | 60.1 | In+ | 115 | 95.7
+            - cells:
+              - ''
+              - ''
+              - ''
+              - ''
+              - '113'
+              - '4.3'
+              scientific_class: derived
+              locator:
+                page: 6
+                table: '1'
+                record: body row 2
+              printed_quote: ' |  |  |  | 113 | 4.3'
+            - cells:
+              - GaO+
+              - '85'
+              - '60.0'
+              - InO+
+              - '131'
+              - '95.5'
+              scientific_class: derived
+              locator:
+                page: 6
+                table: '1'
+                record: body row 3
+              printed_quote: GaO+ | 85 | 60.0 | InO+ | 131 | 95.5
+            - cells:
+              - Ga2+
+              - '138'
+              - '36.1'
+              - In2+
+              - '230'
+              - '91.6'
+              scientific_class: derived
+              locator:
+                page: 6
+                table: '1'
+                record: body row 4
+              printed_quote: Ga2+ | 138 | 36.1 | In2+ | 230 | 91.6
+            - cells:
+              - ''
+              - ''
+              - ''
+              - ''
+              - '228'
+              - '8.4'
+              scientific_class: derived
+              locator:
+                page: 6
+                table: '1'
+                record: body row 5
+              printed_quote: ' |  |  |  | 228 | 8.4'
+            - cells:
+              - Ga2O+
+              - '156'
+              - '47.9'
+              - In2O+
+              - '246'
+              - '91.4'
+              scientific_class: derived
+              locator:
+                page: 6
+                table: '1'
+                record: body row 6
+              printed_quote: Ga2O+ | 156 | 47.9 | In2O+ | 246 | 91.4
+            - cells:
+              - O2+
+              - '32'
+              - '99.5'
+              - O2+
+              - '32'
+              - '99.5'
+              scientific_class: derived
+              locator:
+                page: 6
+                table: '1'
+                record: body row 7
+              printed_quote: O2+ | 32 | 99.5 | O2+ | 32 | 99.5
+            transcription_note: Cells preserve printed values, uncertainties, footnote markers and merged-cell
+              blanks. Vertical bars in printed_quote delimit cells; flattened headers and formula typography
+              follow the reviewed CSV transcription.
+          - table: '2'
+            locator:
+              page: 6
+              table: '2'
+            evidence_role: experimental run metadata; sample weights and programmed measurement conditions
+            columns:
+            - Run
+            - Initial weight [mg]
+            - Final weight [mg]
+            - Isotherm T [K]
+            - Isotherm t [h]
+            - Polytherm T range [K]
+            - Polytherm T step [K]
+            - Equilibration time [min]
+            - Ramp
+            - Ions measured
+            rows:
+            - cells:
+              - 1_low, initially 1000 ppm
+              - '79.1'
+              - '79.1'
+              - '1742'
+              - '15'
+              - 1585-1695
+              - '10'
+              - '5'
+              - up
+              - Ga+; GaO+; Ga2+; Ga2O+; In+; InO+; In2+; In2O+; O2+
+              scientific_class: measured
+              locator:
+                page: 6
+                table: '2'
+                record: body row 1
+              printed_quote: 1_low, initially 1000 ppm | 79.1 | 79.1 | 1742 | 15 | 1585-1695 | 10 | 5 | up
+                | Ga+; GaO+; Ga2+; Ga2O+; In+; InO+; In2+; In2O+; O2+
+            - cells:
+              - 2_low, initially 1000 ppm
+              - '72.92'
+              - '71.97'
+              - '-'
+              - '-'
+              - 1400-1730
+              - '10'
+              - '5'
+              - up
+              - ''
+              scientific_class: measured
+              locator:
+                page: 6
+                table: '2'
+                record: body row 2
+              printed_quote: '2_low, initially 1000 ppm | 72.92 | 71.97 | - | - | 1400-1730 | 10 | 5 | up
+                | '
+            - cells:
+              - 3_high, initially 10000 ppm
+              - '38.69'
+              - '38.69'
+              - '-'
+              - '-'
+              - 1540-1640
+              - '10'
+              - '5'
+              - up
+              - ''
+              scientific_class: measured
+              locator:
+                page: 6
+                table: '2'
+                record: body row 3
+              printed_quote: '3_high, initially 10000 ppm | 38.69 | 38.69 | - | - | 1540-1640 | 10 | 5 | up
+                | '
+            transcription_note: Cells preserve printed values, uncertainties, footnote markers and merged-cell
+              blanks. Vertical bars in printed_quote delimit cells; flattened headers and formula typography
+              follow the reviewed CSV transcription.
+          - table: '3'
+            locator:
+              page: 9
+              table: '3'
+            evidence_role: adopted ionisation cross sections from cited Bischof et al. (2023); calibration
+              inputs, not new instrument readings
+            columns:
+            - Ga Species
+            - Ga sigma_i [A^2]
+            - In Species
+            - In sigma_i [A^2]
+            rows:
+            - cells:
+              - Ga+
+              - 7.96 ± 1.38
+              - In+
+              - 9.74 ± 1.48
+              scientific_class: derived
+              locator:
+                page: 9
+                table: '3'
+                record: body row 1
+              printed_quote: Ga+ | 7.96 ± 1.38 | In+ | 9.74 ± 1.48
+            - cells:
+              - GaO+
+              - 6.24 ± 1.35
+              - InO+
+              - 7.50 ± 1.45
+              scientific_class: derived
+              locator:
+                page: 9
+                table: '3'
+                record: body row 2
+              printed_quote: GaO+ | 6.24 ± 1.35 | InO+ | 7.50 ± 1.45
+            - cells:
+              - Ga2+
+              - 11.94 ± 1.97
+              - In2+
+              - 14.61 ± 2.09
+              scientific_class: derived
+              locator:
+                page: 9
+                table: '3'
+                record: body row 3
+              printed_quote: Ga2+ | 11.94 ± 1.97 | In2+ | 14.61 ± 2.09
+            - cells:
+              - Ga2O+
+              - 13.20 ± 2.08
+              - In2O+
+              - 16.03 ± 2.22
+              scientific_class: derived
+              locator:
+                page: 9
+                table: '3'
+                record: body row 4
+              printed_quote: Ga2O+ | 13.20 ± 2.08 | In2O+ | 16.03 ± 2.22
+            transcription_note: Cells preserve printed values, uncertainties, footnote markers and merged-cell
+              blanks. Vertical bars in printed_quote delimit cells; flattened headers and formula typography
+              follow the reviewed CSV transcription.
+          - table: '4'
+            locator:
+              page: 10
+              table: '4'
+            evidence_role: measured ion intensities and derived fragmentation correction; footnotes retain
+              run and reference distinctions
+            columns:
+            - Element
+            - Ga
+            - In
+            rows:
+            - cells:
+              - i_M2O+, 60 eV, orig. [%]
+              - 45.90 1)
+              - 40.52 1)
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 1
+              printed_quote: i_M2O+, 60 eV, orig. [%] | 45.90 1) | 40.52 1)
+            - cells:
+              - I_M2O+, An-Di [cps]
+              - 16 2)
+              - 152 3)
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 2
+              printed_quote: I_M2O+, An-Di [cps] | 16 2) | 152 3)
+            - cells:
+              - I_M+, An-Di [cps]
+              - 287 2)
+              - 2969 3)
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 3
+              printed_quote: I_M+, An-Di [cps] | 287 2) | 2969 3)
+            - cells:
+              - I_M2O+, p.o. [cps]
+              - 1668 4)
+              - 46669 5)
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 4
+              printed_quote: I_M2O+, p.o. [cps] | 1668 4) | 46669 5)
+            - cells:
+              - I_M+, p.o. [cps]
+              - 21462 4)
+              - 605097 5)
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 5
+              printed_quote: I_M+, p.o. [cps] | 21462 4) | 605097 5)
+            - cells:
+              - i_M+, 60 eV [%]
+              - 7.48 1)
+              - 9.61 1)
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 6
+              printed_quote: i_M+, 60 eV [%] | 7.48 1) | 9.61 1)
+            - cells:
+              - f_M+
+              - '0.18'
+              - '0.26'
+              scientific_class: derived
+              locator:
+                page: 10
+                table: '4'
+                record: body row 7
+              printed_quote: f_M+ | 0.18 | 0.26
+            - cells:
+              - 1)
+              - Bischof et al. (2023)
+              - ''
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 8
+              printed_quote: '1) | Bischof et al. (2023) | '
+            - cells:
+              - 2)
+              - run 3_high at T = 1598 K
+              - ''
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 9
+              printed_quote: '2) | run 3_high at T = 1598 K | '
+            - cells:
+              - 3)
+              - run 3_high average of the intensities at T = 1539 K and T = 1547 K
+              - ''
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 10
+              printed_quote: '3) | run 3_high average of the intensities at T = 1539 K and T = 1547 K | '
+            - cells:
+              - 4)
+              - Bischof et al. (2023) at T = 1598 K
+              - ''
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 11
+              printed_quote: '4) | Bischof et al. (2023) at T = 1598 K | '
+            - cells:
+              - 5)
+              - Bischof et al. (2023) average of the intensities at T = 1535 K and T = 1548 K
+              - ''
+              scientific_class: measured
+              locator:
+                page: 10
+                table: '4'
+                record: body row 12
+              printed_quote: '5) | Bischof et al. (2023) average of the intensities at T = 1535 K and T =
+                1548 K | '
+            transcription_note: Cells preserve printed values, uncertainties, footnote markers and merged-cell
+              blanks. Vertical bars in printed_quote delimit cells; flattened headers and formula typography
+              follow the reviewed CSV transcription.
+          - table: '5'
+            locator:
+              page: 13
+              table: '5'
+            evidence_role: derived oxygen partial-pressure relations; equations, not measured pressure points
+            columns:
+            - p(O2) derived from species
+            - Equation
+            rows:
+            - cells:
+              - pGa(O2)
+              - 0.51 p(Ga)
+              scientific_class: derived
+              locator:
+                page: 13
+                table: '5'
+                record: body row 1
+              printed_quote: pGa(O2) | 0.51 p(Ga)
+            - cells:
+              - pGaO(O2)
+              - 0.15 p(GaO)
+              scientific_class: derived
+              locator:
+                page: 13
+                table: '5'
+                record: body row 2
+              printed_quote: pGaO(O2) | 0.15 p(GaO)
+            - cells:
+              - pGa2O(O2)
+              - 0.45 p(Ga2O)
+              scientific_class: derived
+              locator:
+                page: 13
+                table: '5'
+                record: body row 3
+              printed_quote: pGa2O(O2) | 0.45 p(Ga2O)
+            - cells:
+              - pIn(O2)
+              - 0.40 p(In)
+              scientific_class: derived
+              locator:
+                page: 13
+                table: '5'
+                record: body row 4
+              printed_quote: pIn(O2) | 0.40 p(In)
+            - cells:
+              - pInO(O2)
+              - 0.12 p(InO)
+              scientific_class: derived
+              locator:
+                page: 13
+                table: '5'
+                record: body row 5
+              printed_quote: pInO(O2) | 0.12 p(InO)
+            - cells:
+              - PIn2O(O2)
+              - 0.36 p(In2O)
+              scientific_class: derived
+              locator:
+                page: 13
+                table: '5'
+                record: body row 6
+              printed_quote: PIn2O(O2) | 0.36 p(In2O)
+            transcription_note: Cells preserve printed values, uncertainties, footnote markers and merged-cell
+              blanks. Vertical bars in printed_quote delimit cells; flattened headers and formula typography
+              follow the reviewed CSV transcription.
+          - table: '6'
+            locator:
+              page: 15
+              table: '6'
+            evidence_role: measured EPMA glass compositions supporting the KEMS experiments
+            columns:
+            - Mass fraction [wt.%]
+            - 1_low Start
+            - 1_low End
+            - 2_low Start
+            - 2_low End
+            - 3_high Start
+            - 3_high End
+            rows:
+            - cells:
+              - SiO2
+              - 50.47 ± 0.09
+              - 50.60 ± 0.18
+              - 50.47 ± 0.09
+              - 50.46 ± 0.17
+              - 49.72 ± 0.09
+              - 49.92 ± 0.39
+              scientific_class: measured
+              locator:
+                page: 15
+                table: '6'
+                record: body row 1
+              printed_quote: SiO2 | 50.47 ± 0.09 | 50.60 ± 0.18 | 50.47 ± 0.09 | 50.46 ± 0.17 | 49.72 ± 0.09
+                | 49.92 ± 0.39
+            - cells:
+              - Al2O3
+              - 15.38 ± 0.08
+              - 15.31 ± 0.09
+              - 15.38 ± 0.08
+              - 15.48 ± 0.07
+              - 15.15 ± 0.08
+              - 15.22 ± 0.12
+              scientific_class: measured
+              locator:
+                page: 15
+                table: '6'
+                record: body row 2
+              printed_quote: Al2O3 | 15.38 ± 0.08 | 15.31 ± 0.09 | 15.38 ± 0.08 | 15.48 ± 0.07 | 15.15 ± 0.08
+                | 15.22 ± 0.12
+            - cells:
+              - MgO
+              - 10.42 ± 0.04
+              - 10.38 ± 0.10
+              - 10.42 ± 0.04
+              - 10.72 ± 0.08
+              - 10.27 ± 0.04
+              - 10.70 ± 0.07
+              scientific_class: measured
+              locator:
+                page: 15
+                table: '6'
+                record: body row 3
+              printed_quote: MgO | 10.42 ± 0.04 | 10.38 ± 0.10 | 10.42 ± 0.04 | 10.72 ± 0.08 | 10.27 ± 0.04
+                | 10.70 ± 0.07
+            - cells:
+              - CaO
+              - 23.63 ± 0.09
+              - 23.65 ± 0.27
+              - 23.63 ± 0.09
+              - 23.25 ± 0.05
+              - 23.28 ± 0.09
+              - 22.98 ± 0.08
+              scientific_class: measured
+              locator:
+                page: 15
+                table: '6'
+                record: body row 4
+              printed_quote: CaO | 23.63 ± 0.09 | 23.65 ± 0.27 | 23.63 ± 0.09 | 23.25 ± 0.05 | 23.28 ± 0.09
+                | 22.98 ± 0.08
+            - cells:
+              - Total
+              - 99.90 ± 0.16
+              - 99.94 ± 0.35
+              - 99.90 ± 0.16
+              - 99.91 ± 0.21
+              - 98.42 ± 0.16
+              - 98.82 ± 0.42
+              scientific_class: measured
+              locator:
+                page: 15
+                table: '6'
+                record: body row 5
+              printed_quote: Total | 99.90 ± 0.16 | 99.94 ± 0.35 | 99.90 ± 0.16 | 99.91 ± 0.21 | 98.42 ± 0.16
+                | 98.82 ± 0.42
+            transcription_note: Cells preserve printed values, uncertainties, footnote markers and merged-cell
+              blanks. Vertical bars in printed_quote delimit cells; flattened headers and formula typography
+              follow the reviewed CSV transcription.
+          - table: '7'
+            locator:
+              page: 16
+              table: '7'
+            evidence_role: measured LA-ICP-MS glass compositions supporting the KEMS experiments
+            columns:
+            - Sample
+            - Ga Start Amount [ppm]
+            - Ga End Amount [ppm]
+            - In Start Amount [ppm]
+            - In End Min. Amount [ppm]
+            - In End Max. Amount [ppm]
+            rows:
+            - cells:
+              - 1_low
+              - 720 ± 12
+              - 429 ± 9
+              - 47 ± 9
+              - 0.0065 ± 0.0043
+              - 0.05 ± 0.01
+              scientific_class: measured
+              locator:
+                page: 16
+                table: '7'
+                record: body row 1
+              printed_quote: 1_low | 720 ± 12 | 429 ± 9 | 47 ± 9 | 0.0065 ± 0.0043 | 0.05 ± 0.01
+            - cells:
+              - 2_low
+              - 720 ± 12
+              - 695 ± 22
+              - 47 ± 9
+              - 0.14 ± 0.01
+              - 0.85 ± 0.02
+              scientific_class: measured
+              locator:
+                page: 16
+                table: '7'
+                record: body row 2
+              printed_quote: 2_low | 720 ± 12 | 695 ± 22 | 47 ± 9 | 0.14 ± 0.01 | 0.85 ± 0.02
+            - cells:
+              - 3_high
+              - 7185 ± 618
+              - 7998 ± 73
+              - 5296 ± 560
+              - 890 ± 7
+              - 1715 ± 12
+              scientific_class: measured
+              locator:
+                page: 16
+                table: '7'
+                record: body row 3
+              printed_quote: 3_high | 7185 ± 618 | 7998 ± 73 | 5296 ± 560 | 890 ± 7 | 1715 ± 12
+            transcription_note: Cells preserve printed values, uncertainties, footnote markers and merged-cell
+              blanks. Vertical bars in printed_quote delimit cells; flattened headers and formula typography
+              follow the reviewed CSV transcription.
   In:
     observations:
     - observation_id: bischof_2023_ino15_gamma_preferred_1674k
@@ -1443,6 +2199,69 @@ species:
           delta_IW_at_Tc50: 1.26
           Tc50_ADeu_K: 2611.0
         note: FactSage model output (50% condensation temperature), not a KEMS measurement and not a gamma.
+    - observation_id: bischof_2023_in_ion_currents_table4_r2
+      type: rate_series
+      scientific_class: measured
+      locator:
+        page: 10
+        table: '4'
+      regime: kems_effusion
+      units: cps
+      printed_quote: I_M2O+, An-Di [cps] | 16 2) | 152 3); run 3_high, average of the intensities at T = 1539
+        K and T = 1547 K; I_M+, An-Di [cps] | 287 2) | 2969 3); run 3_high, average of the intensities at
+        T = 1539 K and T = 1547 K; I_M2O+, p.o. [cps] | 1668 4) | 46669 5); Bischof et al. (2023), average
+        of the intensities at T = 1535 K and T = 1548 K; I_M+, p.o. [cps] | 21462 4) | 605097 5); Bischof
+        et al. (2023), average of the intensities at T = 1535 K and T = 1548 K
+      values:
+        quantity: measured_KEMS_ion_intensities
+        method_class: measured KEMS
+        semantics: partial_ion_current_series_no_time_axis; An-Di and pure-oxide reference readings are distinct
+        readings:
+        - ion: In2O+
+          sample: An-Di
+          intensity_cps: 152
+          scientific_class: measured
+          locator:
+            page: 10
+            table: '4'
+            record: body row 2
+          printed_quote: I_M2O+, An-Di [cps] | 16 2) | 152 3)
+          condition_quote: run 3_high, average of the intensities at T = 1539 K and T = 1547 K
+          evidence_origin: this study
+        - ion: In+
+          sample: An-Di
+          intensity_cps: 2969
+          scientific_class: measured
+          locator:
+            page: 10
+            table: '4'
+            record: body row 3
+          printed_quote: I_M+, An-Di [cps] | 287 2) | 2969 3)
+          condition_quote: run 3_high, average of the intensities at T = 1539 K and T = 1547 K
+          evidence_origin: this study
+        - ion: In2O+
+          sample: p.o.
+          intensity_cps: 46669
+          scientific_class: measured
+          locator:
+            page: 10
+            table: '4'
+            record: body row 4
+          printed_quote: I_M2O+, p.o. [cps] | 1668 4) | 46669 5)
+          condition_quote: Bischof et al. (2023), average of the intensities at T = 1535 K and T = 1548 K
+          evidence_origin: reference measurement reproduced from cited Bischof et al. (2023)
+        - ion: In+
+          sample: p.o.
+          intensity_cps: 605097
+          scientific_class: measured
+          locator:
+            page: 10
+            table: '4'
+            record: body row 5
+          printed_quote: I_M+, p.o. [cps] | 21462 4) | 605097 5)
+          condition_quote: Bischof et al. (2023), average of the intensities at T = 1535 K and T = 1548 K
+          evidence_origin: reference measurement reproduced from cited Bischof et al. (2023)
+        supporting_evidence_observation_id: bischof_2023_ga_ion_currents_table4_r2
 corrections:
 - observation_id: bischof_2023_gao15_gamma_preferred_1700k
   field: printed_quote
