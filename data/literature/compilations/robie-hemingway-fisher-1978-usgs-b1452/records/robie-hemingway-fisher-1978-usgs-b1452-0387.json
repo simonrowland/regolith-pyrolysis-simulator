@@ -1,0 +1,125 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0387",
+  "census_id": "high-temperature-printed-page-413",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "AIIALBITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "262.225",
+    "value": 262.225,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      419
+    ],
+    "printed_pages": [
+      413
+    ],
+    "pdftotext_layout_page_file": "page-419.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "7 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 48, 49, 50, 52, 54, 56, 58"
+  ],
+  "title_line_as_published": "AIIALBITE                                                                     PORIIULA iBIGHT        262.225",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                 Crystals 298.15 to 1400 K.",
+    "                                                                 FORIIATION PRO!! THE O.IIDES",
+    "                                                                               GIBBS",
+    "TEftP.   <H;-a~98 )IT      ST",
+    "                             0",
+    "                                    -(G;-H;ga )/T      cop     ENTHALPY     FREE ENERGY     Log Kf",
+    "  K         J;aol•K     Jjaol•K       Jjaol•K       Jjaol• K         kJ/aol          kJ;aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "Jjaol•K",
+    "negative_gibbs_function": "Jjaol•K",
+    "heat_capacity": "Jjaol• K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ;aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 11,
+  "uncertainty_line_as_published": "UIC!RTAIJTY                o. 40           0.40                        2.450",
+  "uncertainty_values": [
+    {
+      "as_published": "o. 40",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.40",
+      "value": 0.4,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.450",
+      "value": 2.45,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "ftELTING POINT              1391                    BOlLING POUT                                       K",
+    "EWTHALPY OF !ELTING          59. 280 ltJ            ENTHALPY OF VAPORIZATION                           kJ",
+    "                             33.423 kJ              IIOLAR VOLOIIB                       10.0430 J/bar",
+    "                                                                                        100.430 ca 3",
+    "TUJSITIOIS I I !BFBRBNCB STAT! OIIDES",
+    "  Na 2 o ••••••• ft. P. 1193 K.",
+    "  SiOz••••••• ALPHA - BETA TBAJSITION 844 K.",
+    "HEAT CAPACITY BQOATIOI",
+    "             3.171101110• '£2",
+    "             (BQOATIOI VALID PBOII         298 - 1400 K)",
+    "BEF!IENCB        90         76                                           93                         COIIPILID",
+    "                           187                                          100                         10- 5-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 7 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 48, 49, 50, 52, 54, 56, 58",
+      "detector_only": false
+    }
+  ]
+}

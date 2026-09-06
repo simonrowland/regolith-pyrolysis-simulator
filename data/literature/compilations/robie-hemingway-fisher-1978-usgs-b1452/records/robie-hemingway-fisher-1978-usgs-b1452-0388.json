@@ -1,0 +1,140 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0388",
+  "census_id": "high-temperature-printed-page-414",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "262.225",
+    "value": 262.225,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      420
+    ],
+    "printed_pages": [
+      414
+    ],
+    "pdftotext_layout_page_file": "page-420.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required table title is absent from the OCR text layer",
+    "required formula line is absent from the OCR text layer",
+    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 33, 35, 39, 41"
+  ],
+  "title_line_as_published": "                                                                                  POBIIUL1 WEIGHT    262.225",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                     Glass 298.15 to 1200 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POBIIATIOI PRO II THE BLEI!IIITS",
+    "                                                                                        GIBBS",
+    "TEIIP.      ( H;-H~ 98 )/T      so      -( G;-H; 98 )/T      cop     EITHALPY        PBBB BURGY       Log Kf",
+    "                                 T",
+    "  K           Jjaol•K        J/aol•K      Jjaol•K         J/aol• K       kJ/aol         kJjaol",
+    "-------------------------------------------------------------------------~------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jjaol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "Jjaol•K",
+    "heat_capacity": "J/aol• K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJjaol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 13,
+  "uncertainty_line_as_published": "UICBRTAIIT!                     1. 50         1.50                        3.7(10          3.720        0.652",
+  "uncertainty_values": [
+    {
+      "as_published": "1. 50",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.50",
+      "value": 1.5,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.7(10",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.720",
+      "value": 3.72,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.652",
+      "value": 0.652,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "liE LTI IIG POI IT              1391       K              BOILIIIG PODT                                K",
+    "EJTHALP! OP IIELT IJG                      kJ           BITHALPY OP YAPOBIZATIOI                        ltJ",
+    "                                                        IIOLAB YOLU!IB                      11.0086 J/t)ar",
+    "                                                                                           110.086 cal",
+    "TRAISITIOJS I I REPBRBJCE STATE ELEIIEJTS",
+    "      SODIU! ••••• II. P. 370.98, B. P. 1175 K.",
+    "      ALUIII 110.11 ••• 11. P. 933 K.",
+    "      SILICOI •••• II. P. 1685 K.",
+    "HEAT CAPACITY EQUATIOJ",
+    " c;    = 9.1795x1oz-          0.38242 T        +   1.4740x1o-• rz            1.1511.1:10• r-o·s",
+    "               5.2796x1o• T- z",
+    "               ( BQUATIOII YlLID PIC II         2 98 - 1200 It)",
+    "BBPBBBJCB        152            227                                         93                      CO!IPIJ.BD",
+    "                                                                           269                      10-19-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required table title is absent from the OCR text layer; required formula line is absent from the OCR text layer; 6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 33, 35, 39, 41",
+      "detector_only": false
+    }
+  ]
+}
