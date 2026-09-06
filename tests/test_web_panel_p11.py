@@ -212,7 +212,6 @@ def _flagged_silica_product_block() -> dict:
         ]),
         record=SimpleNamespace(snapshots=snapshots),
     ))["pure_silica_glass"]
-    silica["switch_executed"] = True
     return {
         "classification": {
             "pure_silica_glass": silica,
@@ -687,7 +686,7 @@ def test_p11_mutant_that_emits_both_silica_route_chips_must_fail() -> None:
 
 def test_p11_switch_executed_class_total_tracks_flagged_stage_3_capture() -> None:
     silica = _flagged_silica_product_block()["classification"]["pure_silica_glass"]
-    assert silica["switch_executed"] is True
+    assert "switch_executed" not in silica
     assert silica["stage_3_capture_kg"] > 0
     assert silica["class_total_kg"] == silica["stage_3_capture_kg"]
 

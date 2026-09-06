@@ -146,15 +146,18 @@
     const silica = isSilicaStage ? asMap(asMap(productClassification)?.pure_silica_glass) : null;
     const silicaClassTotal = silica && hasNumber(silica.class_total_kg) ? silica.class_total_kg : null;
     const silicaCapture = silica && hasNumber(silica.stage_3_capture_kg) ? silica.stage_3_capture_kg : null;
-    const silicaQualified = silicaClassTotal !== null && silicaClassTotal > 0;
+    const silicaFlag = silica ? asMap(silica.flag) : null;
+    const silicaProduct = silicaClassTotal !== null && silicaClassTotal > 0;
+    const silicaFlaggedProduct = silicaProduct && silicaFlag !== null;
+    const silicaQualified = silicaProduct && !silicaFlaggedProduct;
     const silicaUnqualifiedCapture = isSilicaStage
       && silicaCapture !== null
       && silicaCapture > 0
-      && !silicaQualified;
+      && !silicaProduct;
     const emittedProductSpecies = !stage
       ? null
       : isSilicaStage
-        ? (silicaQualified ? (designatedProductSpecies || stageDefinition.productSpecies[0]) : null)
+        ? (silicaProduct ? (designatedProductSpecies || stageDefinition.productSpecies[0]) : null)
         : designatedProductSpecies;
     const emittedProduct = Boolean(emittedProductSpecies);
     const productClass = emittedProduct ? " sec-p15-stage--product" : "";
@@ -162,7 +165,9 @@
       ? ` style="--sec-p15-product:${esc(speciesColor(emittedProductSpecies))}"`
       : "";
     let routeStatus = "collection not implied";
-    if (stage && isSilicaStage && silicaQualified) {
+    if (stage && isSilicaStage && silicaFlaggedProduct) {
+      routeStatus = "flagged silica product";
+    } else if (stage && isSilicaStage && silicaQualified) {
       routeStatus = "qualified silica product";
     } else if (stage && silicaUnqualifiedCapture) {
       routeStatus = "flagged capture · not a product";
@@ -197,6 +202,26 @@
     const flaggedCapture = silicaUnqualifiedCapture
       ? `<p class="sec-p15-stage-flag">${esc("flagged capture · not a product")}</p>`
       : "";
+    let flaggedProduct = "";
+    if (silicaFlaggedProduct) {
+      const parts = [];
+      if (typeof silicaFlag.status === "string" && silicaFlag.status.trim()) {
+        parts.push(`status: ${silicaFlag.status.trim()}`);
+      }
+      if (hasOwn(silicaFlag, "authority")) {
+        parts.push(`authority: ${String(silicaFlag.authority)}`);
+      }
+      if (hasOwn(silicaFlag, "band")) {
+        const band = typeof silicaFlag.band === "string"
+          ? silicaFlag.band
+          : JSON.stringify(silicaFlag.band);
+        parts.push(`band: ${String(band)}`);
+      }
+      if (hasOwn(silicaFlag, "reason")) {
+        parts.push(`reason: ${String(silicaFlag.reason)}`);
+      }
+      flaggedProduct = `<p class="sec-p15-stage-flag">${esc(parts.join(" · "))}</p>`;
+    }
     // Empty-stage classification sentence only when the backend emitted a
     // verdict; inventing "backend's empty-stage classification" for a missing
     // verdict contradicts the PENDING badge and the artifact.
@@ -212,7 +237,7 @@
     return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; includes stage-routed tap metal; not condenser inventory${activeText}`)}">` +
       `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
       `<h4>${esc(label)}</h4>${routeNote}` +
-      `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${flaggedCapture}${warning}` +
+      `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${flaggedCapture}${flaggedProduct}${warning}` +
       metric("Designated + coproduct mass", stage.designated_kg, "kg", { min: 0 }) +
       metric("Impurity mass", stage.impurity_kg, "kg", { min: 0 }) +
       purityMetric +

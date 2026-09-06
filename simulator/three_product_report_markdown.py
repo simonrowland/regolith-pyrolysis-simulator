@@ -158,13 +158,14 @@ def format_three_product_markdown(
                 lines.append(
                     'Pure silica glass is not established. Qualification requires '
                     'positive capture following a recorded pO₂ hold → pN₂ SiO-release '
-                    'switch.'
+                    'switch, with authoritative SiO evidence for every capture.'
                 )
                 lines.append('')
             flag = bucket.get('flag')
             if isinstance(flag, Mapping):
                 lines.append(
                     '- Certification flag: '
+                    f"status={flag.get('status')}; "
                     f"authority={flag.get('authority')}; "
                     f"band={flag.get('band')}; "
                     f"reason={flag.get('reason')}"

@@ -130,6 +130,7 @@ def test_unqualified_silica_preserves_measured_capture_without_product_claim():
     assert '## 2. Pure silica glass' not in report
     assert 'Stage 3 capture: 1.442e-08 kg' in report
     assert 'recorded pO₂ hold → pN₂ SiO-release switch' in report
+    assert 'authoritative SiO evidence for every capture' in report
 
 
 def test_flagged_silica_product_reports_mass_and_certification_evidence():
@@ -150,6 +151,7 @@ def test_flagged_silica_product_reports_mass_and_certification_evidence():
 
     assert 'Silica glass: 2.500 kg' in report
     assert '**Class total**: 2.500 kg' in report
+    assert 'status=flagged prediction' in report
     assert 'authority=extrapolated' in report
     assert 'band=[1400.0, 2200.0]' in report
     assert 'reason=outside certified SiO source band' in report

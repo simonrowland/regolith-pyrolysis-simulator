@@ -335,6 +335,34 @@ def test_product_class_mass_evidence_serializes_metric_and_source_path(
         }
 
 
+def test_pure_silica_objective_uses_route_classified_product_not_raw_capture() -> None:
+    no_switch = {
+        "pure_silica_glass": {
+            "stage_3_capture_kg": 4.5,
+            "class_total_kg": 0.0,
+        }
+    }
+    flagged_switched_product = {
+        "pure_silica_glass": {
+            "stage_3_capture_kg": 4.5,
+            "class_total_kg": 4.5,
+            "flag": {
+                "status": "flagged prediction",
+                "authority": "extrapolated",
+                "band": [1400.0, 2200.0],
+                "reason": "outside certified SiO source band",
+            },
+        }
+    }
+
+    assert _metric_value(
+        "pure_silica_glass_kg", SimpleNamespace(), {}, no_switch
+    ) == pytest.approx(0.0)
+    assert _metric_value(
+        "pure_silica_glass_kg", SimpleNamespace(), {}, flagged_switched_product
+    ) == pytest.approx(4.5)
+
+
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
     sim = SimpleNamespace(
         energy_electrical_plus_evaporation_cumulative_kWh=18.0,

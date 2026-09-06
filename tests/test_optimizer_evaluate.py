@@ -2423,16 +2423,15 @@ def test_objectives_populated_only_for_feasible_runs() -> None:
     assert feasible.feasible
     assert feasible.failure_category is None
     assert feasible.objectives is not None
-    assert feasible.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
+    assert feasible.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
     assert feasible.objectives.as_mapping()["oxygen_kg"] == pytest.approx(3.0)
     silica_evidence = feasible.objectives.evidence["pure_silica_glass_kg"]
     assert silica_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
     assert silica_evidence["unqualified_capture_kg"] == pytest.approx(12.5)
     assert silica_evidence["qualified_product_kg"] == pytest.approx(0.0)
     notes = " ".join(silica_evidence["notes"])
-    assert "unqualified" in notes
-    assert "missing release path" in notes
-    assert "non-authoritative evidence" in notes
+    assert "not product" in notes
+    assert "missing recorded pO2-hold -> pN2 SiO-release switch" in notes
 
     infeasible = evaluate(
         _valid_patch(),
@@ -2476,7 +2475,18 @@ def _extrapolated_sio_carrier() -> dict[str, object]:
     }
 
 
-def _qualified_silica_snapshots(
+def _refused_sio_carrier() -> dict[str, object]:
+    return {
+        "species_id": "SiO",
+        "pressure": {"kind": "refusal", "reason": "missing SiO carrier input"},
+        "flux": {"kind": "refusal", "reason": "missing SiO carrier input"},
+        "is_refused": True,
+        "authority_level": "refused",
+        "reason": "missing SiO carrier input",
+    }
+
+
+def _switched_silica_snapshots(
     capture_kg: float = 12.5,
     *,
     authority: dict[str, object] | None = None,
@@ -2502,9 +2512,7 @@ def _qualified_silica_snapshots(
     )
 
 
-def test_silica_objective_values_qualified_and_unqualified_and_refuses_unavailable(
-    monkeypatch,
-) -> None:
+def test_silica_objective_separates_route_from_authority_and_refuses_unavailable() -> None:
     unqualified = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -2512,14 +2520,14 @@ def test_silica_objective_values_qualified_and_unqualified_and_refuses_unavailab
         profile=PROFILE,
         executor=FakeExecutor(_execution()),
     )
-    assert unqualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
+    assert unqualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
     unqualified_evidence = unqualified.objectives.evidence["pure_silica_glass_kg"]
     assert unqualified_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
     assert unqualified_evidence["unqualified_capture_kg"] == pytest.approx(12.5)
     assert unqualified_evidence["qualified_product_kg"] == pytest.approx(0.0)
 
     qualified_execution = _execution()
-    qualified_execution.simulator.record.snapshots = _qualified_silica_snapshots()
+    qualified_execution.simulator.record.snapshots = _switched_silica_snapshots()
     qualified = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -2534,7 +2542,7 @@ def test_silica_objective_values_qualified_and_unqualified_and_refuses_unavailab
     assert qualified_evidence["unqualified_capture_kg"] == pytest.approx(0.0)
 
     flagged_execution = _execution()
-    flagged_execution.simulator.record.snapshots = _qualified_silica_snapshots(
+    flagged_execution.simulator.record.snapshots = _switched_silica_snapshots(
         authority=_extrapolated_sio_carrier()
     )
     flagged = evaluate(
@@ -2546,9 +2554,9 @@ def test_silica_objective_values_qualified_and_unqualified_and_refuses_unavailab
     )
     assert flagged.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
     flagged_evidence = flagged.objectives.evidence["pure_silica_glass_kg"]
-    assert flagged_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
+    assert "flag" not in flagged_evidence
     assert flagged_evidence["qualified_product_kg"] == pytest.approx(0.0)
-    assert flagged_evidence["unqualified_capture_kg"] == pytest.approx(12.5)
+    assert flagged_evidence["unqualified_capture_kg"] == pytest.approx(0.0)
     assert flagged_evidence["certification_flag"] == {
         "status": "flagged prediction",
         "authority": "extrapolated",
@@ -2556,50 +2564,27 @@ def test_silica_objective_values_qualified_and_unqualified_and_refuses_unavailab
         "reason": "outside certified SiO source band",
     }
 
-    real_classify = objective_module.classify_products
-
-    def _refused_capture(sim, *, early_tap_mode: bool = False):
-        result = dict(real_classify(sim, early_tap_mode=early_tap_mode))
-        silica = dict(result.get("pure_silica_glass") or {})
-        silica["stage_3_capture_kg"] = None
-        result["pure_silica_glass"] = silica
-        return result
-
-    monkeypatch.setattr(objective_module, "classify_products", _refused_capture)
+    refused_execution = _execution()
+    refused_execution.simulator.record.snapshots = _switched_silica_snapshots(
+        authority=_refused_sio_carrier()
+    )
     refused = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
-        executor=FakeExecutor(_execution()),
+        executor=FakeExecutor(refused_execution),
     )
     assert refused.objectives.as_mapping()["pure_silica_glass_kg"] is None
     refused_evidence = refused.objectives.evidence["pure_silica_glass_kg"]
     assert refused_evidence["value_status"] == "unavailable"
     assert "flag" not in refused_evidence
-
-
-def test_silica_objective_reverts_to_zero_when_consumer_reads_class_total(
-    monkeypatch,
-) -> None:
-    def _reverted_class_total(product_classes):
-        return objective_module._nested_float(
-            product_classes, ("pure_silica_glass", "class_total_kg")
-        )
-
-    monkeypatch.setattr(
-        objective_module,
-        "_silica_capture_objective_value",
-        _reverted_class_total,
-    )
-    reverted = evaluate(
-        _valid_patch(),
-        "lunar_mare_low_ti",
-        "fast",
-        profile=PROFILE,
-        executor=FakeExecutor(_execution()),
-    )
-    assert reverted.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
+    assert refused_evidence["certification_flag"] == {
+        "status": "unavailable",
+        "authority": "refused",
+        "band": None,
+        "reason": "missing SiO carrier input",
+    }
 
 
 def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:

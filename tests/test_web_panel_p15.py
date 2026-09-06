@@ -4,6 +4,9 @@ import json
 from pathlib import Path
 import re
 import subprocess
+from types import SimpleNamespace
+
+from simulator.three_product_report import classify_products
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -189,6 +192,50 @@ def _stage_purity() -> dict:
             "warning": "non-designated condensate present",
         }
     }
+
+
+def _flagged_silica_product_classification() -> dict:
+    authority = {
+        "species_id": "SiO",
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "pending_validation",
+        "is_flux_active": True,
+        "authority_level": "extrapolated",
+        "valid_range_K": [1400.0, 2200.0],
+        "reason": "outside certified SiO source band",
+    }
+    snapshots = (
+        SimpleNamespace(
+            c2a_staged_gas={
+                "stage_name": "alkali_early_fe",
+                "gas_cover_mode": "po2_hold",
+            },
+            condensed_by_stage_species_delta={},
+            evap_flux=SimpleNamespace(carrier_authority_by_species={}),
+        ),
+        SimpleNamespace(
+            c2a_staged_gas={
+                "stage_name": "sio_window",
+                "gas_cover_mode": "pn2_sweep",
+            },
+            condensed_by_stage_species_delta={(3, "SiO"): 4.5},
+            evap_flux=SimpleNamespace(
+                carrier_authority_by_species={"SiO": authority}
+            ),
+        ),
+    )
+    return classify_products(SimpleNamespace(
+        train=SimpleNamespace(stages=[
+            None,
+            None,
+            None,
+            SimpleNamespace(collected_kg={"SiO": 4.5}),
+        ]),
+        record=SimpleNamespace(snapshots=snapshots),
+    ))
 
 
 def test_present_artifact_renders_route_specific_values_and_authority() -> None:
@@ -944,6 +991,43 @@ def test_p15_unqualified_silica_capture_is_flagged_not_product_glow() -> None:
     assert "sec-p15-stage--product" not in ungated
     assert "qualified silica product" not in ungated
     assert "flagged capture" not in ungated
+
+
+def test_p15_flagged_silica_product_keeps_product_route_and_flag() -> None:
+    stages = _stage_purity()
+    stages["stage_3_sio_zone"] = {
+        "label": "SiO Zone",
+        "designated_species_kg": {"SiO": 4.5},
+        "coproduct_species_kg": {},
+        "impurity_species_kg": {},
+        "designated_kg": 4.5,
+        "impurity_kg": 0.0,
+        "total_kg": 4.5,
+        "purity_fraction": 1.0,
+        "verdict": "PURE",
+    }
+    classification = _flagged_silica_product_classification()
+    silica = classification["pure_silica_glass"]
+    artifact = {
+        "timesteps": [{"hour": 1, "summary": {"campaign": "C2A"}, "ledger": {}}],
+        "terminal": {
+            "stage_purity": stages,
+            "product_classification": classification,
+        },
+    }
+
+    stage = _stage_card(_run_panel(artifact)["html"], "stage_3_sio_zone")
+
+    assert silica["class_total_kg"] == 4.5
+    assert silica["flag"]["authority"] == "extrapolated"
+    assert "sec-p15-stage--product" in stage
+    assert "flagged silica product" in stage
+    assert "qualified silica product" not in stage
+    assert "flagged capture · not a product" not in stage
+    assert "status: flagged prediction" in stage
+    assert "authority: extrapolated" in stage
+    assert "band: [1400,2200]" in stage
+    assert "reason: outside certified SiO source band" in stage
 
 
 def test_empty_stage_indeterminate_renders_as_no_material() -> None:
