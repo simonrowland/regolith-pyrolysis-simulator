@@ -1,0 +1,1058 @@
+schema_version: literature_compilation_manifest.v1
+source_id: hemingway-haas-robinson-1982-usgs-b1544
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source: &id001
+  database: USGS Bulletin 1544
+  citation: 'Hemingway, B. S., Haas, J. L., Jr. and Robinson, G. R., Jr., 1982, Thermodynamic properties of selected minerals
+    in the system Al2O3-CaO-SiO2-H2O at 298.15 K and 1 bar (10^5 pascals) pressure and at higher temperatures (Supplement
+    to Bulletin 1452): U.S. Geological Survey Bulletin 1544, 70 p.'
+  date_as_published: '1982'
+  official_url: https://pubs.usgs.gov/bul/1544/report.pdf
+  doi: 10.3133/b1544
+  licence: 'United States government work. USGS numbered series; public domain in the United States. Fetched from the official
+    pubs.usgs.gov host. USGS: ''Information presented on this website is considered public information and may be distributed
+    or copied.'''
+  retrieved_at: '2026-09-06T22:02:09Z'
+source_files:
+- path: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+- path: source/sidecar.yaml
+  sha256: 638d0c1c901ec0519752d4efb34688711e9374be03a5d50b4f4b1d964590ea6b
+corpus_status:
+  scope: every numeric table in USGS Bulletin 1544 (TABLE 1 plus per-substance T-grid tables)
+  extraction: pdftotext -bbox of the OCR text layer; page images used only where the OCR layer omitted a title
+  census_table_count: 33
+  transcribed_table_count: 33
+  untranscribed: []
+  ambiguities:
+  - OCR text layer, not a typeset source; ocr_suspect tokens retained raw and not corrected
+  - identity G=H-TS and delta-f G vs log Kf used as detectors only
+summary:
+  record_count: 33
+  record_ambiguity_count: 34
+  ocr_suspect_row_count: 90
+  identity_disagreement_count: 2
+  untranscribed_count: 0
+census:
+- record_id: usgs-b1544-table-1
+  kind: comparison_table
+  name_as_published: Enthalpies of formation from the elements at 298.15 K for selected phases taken from several literature
+    references
+  printed_pages: &id002
+  - 9
+  pdf_pages: &id003
+  - 15
+  row_count: 20
+  transcribed: true
+- record_id: usgs-b1544-corundum
+  kind: substance_t_grid
+  name_as_published: Corundum
+  printed_pages: &id005
+  - 15
+  pdf_pages: &id004
+  - 21
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-alooh-reference
+  kind: substance_t_grid
+  name_as_published: AlO(OH) Reference
+  printed_pages: &id007
+  - 16
+  pdf_pages: &id006
+  - 22
+  row_count: 8
+  transcribed: true
+- record_id: usgs-b1544-diaspore
+  kind: substance_t_grid
+  name_as_published: Diaspore
+  printed_pages: &id009
+  - 17
+  pdf_pages: &id008
+  - 23
+  row_count: 6
+  transcribed: true
+- record_id: usgs-b1544-boehmite
+  kind: substance_t_grid
+  name_as_published: Boehmite
+  printed_pages: &id011
+  - 18
+  pdf_pages: &id010
+  - 24
+  row_count: 6
+  transcribed: true
+- record_id: usgs-b1544-gibbsite
+  kind: substance_t_grid
+  name_as_published: Gibbsite
+  printed_pages: &id013
+  - 19
+  pdf_pages: &id012
+  - 25
+  row_count: 6
+  transcribed: true
+- record_id: usgs-b1544-lime
+  kind: substance_t_grid
+  name_as_published: Lime
+  printed_pages: &id015
+  - 20
+  pdf_pages: &id014
+  - 26
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-h2o-reference
+  kind: substance_t_grid
+  name_as_published: H2O reference
+  printed_pages: &id017
+  - 21
+  pdf_pages: &id016
+  - 27
+  row_count: 18
+  transcribed: true
+- record_id: usgs-b1544-quartz
+  kind: substance_t_grid
+  name_as_published: Quartz
+  printed_pages: &id019
+  - 22
+  pdf_pages: &id018
+  - 28
+  row_count: 18
+  transcribed: true
+- record_id: usgs-b1544-al2sio5-reference
+  kind: substance_t_grid
+  name_as_published: Al2SiO5 - Reference
+  printed_pages: &id021
+  - 23
+  - 24
+  pdf_pages: &id020
+  - 29
+  - 30
+  row_count: 20
+  transcribed: true
+- record_id: usgs-b1544-kyanite
+  kind: substance_t_grid
+  name_as_published: Kyanite
+  printed_pages: &id023
+  - 25
+  - 26
+  pdf_pages: &id022
+  - 31
+  - 32
+  row_count: 14
+  transcribed: true
+- record_id: usgs-b1544-andalusite
+  kind: substance_t_grid
+  name_as_published: Andalusite
+  printed_pages: &id025
+  - 27
+  - 28
+  pdf_pages: &id024
+  - 33
+  - 34
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-sillimanite
+  kind: substance_t_grid
+  name_as_published: Sillimanite
+  printed_pages: &id027
+  - 29
+  - 30
+  pdf_pages: &id026
+  - 35
+  - 36
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-ca3sio5-reference
+  kind: substance_t_grid
+  name_as_published: Ca3SiO5 - Reference
+  printed_pages: &id029
+  - 31
+  - 32
+  pdf_pages: &id028
+  - 37
+  - 38
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-larnite-reference
+  kind: substance_t_grid
+  name_as_published: Larnite Reference
+  printed_pages: &id031
+  - 33
+  - 34
+  pdf_pages: &id030
+  - 39
+  - 40
+  row_count: 20
+  transcribed: true
+- record_id: usgs-b1544-larnite
+  kind: substance_t_grid
+  name_as_published: Larnite
+  printed_pages: &id033
+  - 35
+  - 36
+  pdf_pages: &id032
+  - 41
+  - 42
+  row_count: 9
+  transcribed: true
+- record_id: usgs-b1544-calcium-olivine-reference
+  kind: substance_t_grid
+  name_as_published: Calcium olivine Reference
+  printed_pages: &id035
+  - 37
+  - 38
+  pdf_pages: &id034
+  - 43
+  - 44
+  row_count: 20
+  transcribed: true
+- record_id: usgs-b1544-calcium-olivine
+  kind: substance_t_grid
+  name_as_published: Calcium olivine
+  printed_pages: &id037
+  - 39
+  - 40
+  pdf_pages: &id036
+  - 45
+  - 46
+  row_count: 10
+  transcribed: true
+- record_id: usgs-b1544-rankinite
+  kind: substance_t_grid
+  name_as_published: Rankinite
+  printed_pages: &id039
+  - 41
+  - 42
+  pdf_pages: &id038
+  - 47
+  - 48
+  row_count: 12
+  transcribed: true
+- record_id: usgs-b1544-gehlenite
+  kind: substance_t_grid
+  name_as_published: Gehlenite
+  printed_pages: &id041
+  - 43
+  - 44
+  pdf_pages: &id040
+  - 49
+  - 50
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-grossulsr
+  kind: substance_t_grid
+  name_as_published: Grossulsr
+  printed_pages: &id043
+  - 45
+  - 46
+  pdf_pages: &id042
+  - 51
+  - 52
+  row_count: 12
+  transcribed: true
+- record_id: usgs-b1544-zoisite
+  kind: substance_t_grid
+  name_as_published: Zoisite
+  printed_pages: &id045
+  - 47
+  - 48
+  pdf_pages: &id044
+  - 53
+  - 54
+  row_count: 7
+  transcribed: true
+- record_id: usgs-b1544-casio3-reference
+  kind: substance_t_grid
+  name_as_published: CaSiO3 - Reference
+  printed_pages: &id047
+  - 49
+  - 50
+  pdf_pages: &id046
+  - 55
+  - 56
+  row_count: 18
+  transcribed: true
+- record_id: usgs-b1544-wollastonite
+  kind: substance_t_grid
+  name_as_published: Wollastonite
+  printed_pages: &id049
+  - 51
+  - 52
+  pdf_pages: &id048
+  - 57
+  - 58
+  row_count: 13
+  transcribed: true
+- record_id: usgs-b1544-cyclowollastonite-pseudowollastonite
+  kind: substance_t_grid
+  name_as_published: Cyclowollastonite (Pseudowollastonite)
+  printed_pages: &id051
+  - 53
+  - 54
+  pdf_pages: &id050
+  - 59
+  - 60
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-ca-al-pyroxene
+  kind: substance_t_grid
+  name_as_published: Ca-Al pyroxene
+  printed_pages: &id053
+  - 55
+  - 56
+  pdf_pages: &id052
+  - 61
+  - 62
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-anorthite
+  kind: substance_t_grid
+  name_as_published: Anorthite
+  printed_pages: &id055
+  - 57
+  - 58
+  pdf_pages: &id054
+  - 63
+  - 64
+  row_count: 16
+  transcribed: true
+- record_id: usgs-b1544-kaolinite
+  kind: substance_t_grid
+  name_as_published: Kaolinite
+  printed_pages: &id057
+  - 59
+  - 60
+  pdf_pages: &id056
+  - 65
+  - 66
+  row_count: 8
+  transcribed: true
+- record_id: usgs-b1544-dickite
+  kind: substance_t_grid
+  name_as_published: Dickite
+  printed_pages: &id059
+  - 61
+  - 62
+  pdf_pages: &id058
+  - 67
+  - 68
+  row_count: 7
+  transcribed: true
+- record_id: usgs-b1544-halloysite
+  kind: substance_t_grid
+  name_as_published: Halloysite
+  printed_pages: &id061
+  - 63
+  - 64
+  pdf_pages: &id060
+  - 69
+  - 70
+  row_count: 7
+  transcribed: true
+- record_id: usgs-b1544-pyrophyllite
+  kind: substance_t_grid
+  name_as_published: Pyrophyllite
+  printed_pages: &id063
+  - 65
+  - 66
+  pdf_pages: &id062
+  - 71
+  - 72
+  row_count: 10
+  transcribed: true
+- record_id: usgs-b1544-margarite
+  kind: substance_t_grid
+  name_as_published: Margarite
+  printed_pages: &id065
+  - 67
+  - 68
+  pdf_pages: &id064
+  - 73
+  - 74
+  row_count: 10
+  transcribed: true
+- record_id: usgs-b1544-prehnite
+  kind: substance_t_grid
+  name_as_published: Prehnite
+  printed_pages: &id067
+  - 69
+  - 70
+  pdf_pages: &id066
+  - 75
+  - 76
+  row_count: 10
+  transcribed: true
+feedstock_element_coverage:
+  Ag: 0
+  Al: 9
+  As: 0
+  Au: 0
+  B: 0
+  Ba: 0
+  Bi: 0
+  Br: 0
+  C: 0
+  Ca: 5
+  Cd: 0
+  Ce: 0
+  Cl: 0
+  Co: 0
+  Cr: 0
+  Cs: 0
+  Cu: 0
+  Dy: 0
+  Er: 0
+  Eu: 0
+  F: 0
+  Fe: 0
+  Ga: 0
+  Gd: 0
+  Ge: 0
+  H: 5
+  Hf: 0
+  Ho: 0
+  I: 0
+  In: 0
+  Ir: 0
+  K: 0
+  La: 0
+  Li: 0
+  Lu: 0
+  Mg: 0
+  Mn: 0
+  Mo: 0
+  N: 0
+  Na: 0
+  Nb: 0
+  Nd: 0
+  Ni: 0
+  O: 14
+  Os: 0
+  P: 0
+  Pb: 0
+  Pr: 0
+  Pt: 0
+  Rb: 0
+  S: 0
+  Sb: 0
+  Sc: 0
+  Se: 0
+  Si: 9
+  Sm: 0
+  Sn: 0
+  Sr: 0
+  Tb: 0
+  Te: 0
+  Th: 0
+  Ti: 0
+  Tm: 0
+  U: 0
+  V: 0
+  W: 0
+  Y: 0
+  Yb: 0
+  Zn: 0
+  Zr: 0
+entries:
+- record_id: usgs-b1544-table-1
+  formula: null
+  phase: null
+  name_as_published: Enthalpies of formation from the elements at 298.15 K for selected phases taken from several literature
+    references
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages:
+    - 15
+    printed_pages:
+    - 9
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-table-1.json
+  row_count: 20
+  ambiguities:
+  - table_1_header_prints_Hass (Haas) as OCR/typeset token; retained as published
+  - column_4_heading_token Remley/Hemley retained from OCR layer; not corrected
+  - blank cells retained as null; '-' means value not given as printed in the table headnote
+  ambiguity_count: 3
+  ocr_suspect_row_count: 49
+  printed_pages: *id002
+  pdf_pages: *id003
+- record_id: usgs-b1544-corundum
+  formula: Al2O3
+  phase: (Corundum), crystals 298.15 to melting point 2345 K.
+  name_as_published: Corundum
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id004
+    printed_pages: *id005
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-corundum.json
+  row_count: 16
+  ambiguities:
+  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 1
+  ocr_suspect_row_count: 2
+  printed_pages: *id005
+  pdf_pages: *id004
+- record_id: usgs-b1544-alooh-reference
+  formula: AlO(OH)
+  phase: 'AlO(OH): Diaspore crystals 298.15 to 571.86 K. Boehmite 571.86 to 800 K.'
+  name_as_published: AlO(OH) Reference
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id006
+    printed_pages: *id007
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-alooh-reference.json
+  row_count: 8
+  ambiguities: []
+  ambiguity_count: 0
+  ocr_suspect_row_count: 1
+  printed_pages: *id007
+  pdf_pages: *id006
+- record_id: usgs-b1544-diaspore
+  formula: AlO(OH)
+  phase: 'AlO(OH): Crystals 298.15 to 800 K. See reference table for AlO(OH).'
+  name_as_published: Diaspore
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id008
+    printed_pages: *id009
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-diaspore.json
+  row_count: 6
+  ambiguities: []
+  ambiguity_count: 0
+  ocr_suspect_row_count: 3
+  printed_pages: *id009
+  pdf_pages: *id008
+- record_id: usgs-b1544-boehmite
+  formula: AlO(OH)
+  phase: 'AlO(OH): Crystals 298.15 to 800 K. See reference table for AlO(OH).'
+  name_as_published: Boehmite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id010
+    printed_pages: *id011
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-boehmite.json
+  row_count: 6
+  ambiguities: []
+  ambiguity_count: 0
+  ocr_suspect_row_count: 0
+  printed_pages: *id011
+  pdf_pages: *id010
+- record_id: usgs-b1544-gibbsite
+  formula: Al(OH)3
+  phase: 'Al(OH) 3 : Crystals 298.15 to 800 K. Gibbsite decomposes above 480 K at 1 bar.'
+  name_as_published: Gibbsite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id012
+    printed_pages: *id013
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-gibbsite.json
+  row_count: 6
+  ambiguities: []
+  ambiguity_count: 0
+  ocr_suspect_row_count: 0
+  printed_pages: *id013
+  pdf_pages: *id012
+- record_id: usgs-b1544-lime
+  formula: CaO
+  phase: 'CaO: Crystals 298.15 to 1800K.'
+  name_as_published: Lime
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id014
+    printed_pages: *id015
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-lime.json
+  row_count: 16
+  ambiguities: []
+  ambiguity_count: 0
+  ocr_suspect_row_count: 1
+  printed_pages: *id015
+  pdf_pages: *id014
+- record_id: usgs-b1544-h2o-reference
+  formula: H2O
+  phase: 'H 2 0: Liquid 298.15 to 372.8 K. Ideal gas 372.8 to 1800 K.'
+  name_as_published: H2O reference
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id016
+    printed_pages: *id017
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-h2o-reference.json
+  row_count: 18
+  ambiguities:
+  - title_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 1
+  ocr_suspect_row_count: 2
+  printed_pages: *id017
+  pdf_pages: *id016
+- record_id: usgs-b1544-quartz
+  formula: SiO2
+  phase: Alpha quartz 298.15 to 844 K. Beta quartz 844 to 1800 K. Beta quartz is metastable above 1140 K.
+  name_as_published: Quartz
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id018
+    printed_pages: *id019
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-quartz.json
+  row_count: 18
+  ambiguities:
+  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id019
+  pdf_pages: *id018
+- record_id: usgs-b1544-al2sio5-reference
+  formula: Al2SiO5
+  phase: 1016.9 K. Sillimanite crystals 1016.9 to 1800 K.
+  name_as_published: Al2SiO5 - Reference
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id020
+    printed_pages: *id021
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-al2sio5-reference.json
+  row_count: 20
+  ambiguities:
+  - title_omitted_from_ocr_layer; transcribed from page image as a second reading
+  - oxides_page_row_count_3_!=_elements_20; not aligned by guess
+  - title_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 3
+  ocr_suspect_row_count: 1
+  printed_pages: *id021
+  pdf_pages: *id020
+- record_id: usgs-b1544-kyanite
+  formula: Al2SiO5
+  phase: Crystals 298.15 to 1600 K. See Al 2 Si0 5 reference table.
+  name_as_published: Kyanite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id022
+    printed_pages: *id023
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-kyanite.json
+  row_count: 14
+  ambiguities:
+  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id023
+  pdf_pages: *id022
+- record_id: usgs-b1544-andalusite
+  formula: Al2SiO5
+  phase: Crystals 298.15 to 1800 K. See Al 2 Si0 5 reference table.
+  name_as_published: Andalusite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id024
+    printed_pages: *id025
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-andalusite.json
+  row_count: 16
+  ambiguities:
+  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 1
+  ocr_suspect_row_count: 2
+  printed_pages: *id025
+  pdf_pages: *id024
+- record_id: usgs-b1544-sillimanite
+  formula: Al2SiO5
+  phase: Crystals 298.15 to 1800 K. See Al sto reference table. 2 5
+  name_as_published: Sillimanite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id026
+    printed_pages: *id027
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-sillimanite.json
+  row_count: 16
+  ambiguities:
+  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 1
+  ocr_suspect_row_count: 2
+  printed_pages: *id027
+  pdf_pages: *id026
+- record_id: usgs-b1544-ca3sio5-reference
+  formula: Ca3SiO5
+  phase: between 298 and 1800 K in this compound. GIBBS
+  name_as_published: Ca3SiO5 - Reference
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id028
+    printed_pages: *id029
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-ca3sio5-reference.json
+  row_count: 16
+  ambiguities:
+  - title_omitted_from_ocr_layer; transcribed from page image as a second reading
+  - title_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 2
+  ocr_suspect_row_count: 2
+  printed_pages: *id029
+  pdf_pages: *id028
+- record_id: usgs-b1544-larnite-reference
+  formula: null
+  phase: to 1710 K. Alpha crystals 1710 to 1800 K. GIBBS
+  name_as_published: Larnite Reference
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id030
+    printed_pages: *id031
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-larnite-reference.json
+  row_count: 20
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 0
+  printed_pages: *id031
+  pdf_pages: *id030
+- record_id: usgs-b1544-larnite
+  formula: null
+  phase: GIBBS
+  name_as_published: Larnite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id032
+    printed_pages: *id033
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-larnite.json
+  row_count: 9
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id033
+  pdf_pages: *id032
+- record_id: usgs-b1544-calcium-olivine-reference
+  formula: null
+  phase: to 1710 K. Alpha crystals 1710 to 1800 K.
+  name_as_published: Calcium olivine Reference
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id034
+    printed_pages: *id035
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-calcium-olivine-reference.json
+  row_count: 20
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id035
+  pdf_pages: *id034
+- record_id: usgs-b1544-calcium-olivine
+  formula: null
+  phase: Crystals 298.15 to 1200 K. See Calcium olivine reference table.
+  name_as_published: Calcium olivine
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id036
+    printed_pages: *id037
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-calcium-olivine.json
+  row_count: 10
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id037
+  pdf_pages: *id036
+- record_id: usgs-b1544-rankinite
+  formula: null
+  phase: ''
+  name_as_published: Rankinite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id038
+    printed_pages: *id039
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-rankinite.json
+  row_count: 12
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 3
+  printed_pages: *id039
+  pdf_pages: *id038
+- record_id: usgs-b1544-gehlenite
+  formula: null
+  phase: Crystals 298.15 to melting point 1863 K.
+  name_as_published: Gehlenite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id040
+    printed_pages: *id041
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-gehlenite.json
+  row_count: 16
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id041
+  pdf_pages: *id040
+- record_id: usgs-b1544-grossulsr
+  formula: null
+  phase: Crystals 298.15 to 1400 K.
+  name_as_published: Grossulsr
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id042
+    printed_pages: *id043
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-grossulsr.json
+  row_count: 12
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id043
+  pdf_pages: *id042
+- record_id: usgs-b1544-zoisite
+  formula: null
+  phase: ''
+  name_as_published: Zoisite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id044
+    printed_pages: *id045
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-zoisite.json
+  row_count: 7
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id045
+  pdf_pages: *id044
+- record_id: usgs-b1544-casio3-reference
+  formula: CaSiO3
+  phase: 'CaSi0 3 : Wollastonite crystals 298.15 to 1398 K. Cyclowollastonite is the stable phase above 1398 K.'
+  name_as_published: CaSiO3 - Reference
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id046
+    printed_pages: *id047
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-casio3-reference.json
+  row_count: 18
+  ambiguities:
+  - title_omitted_from_ocr_layer; transcribed from page image as a second reading
+  - title_omitted_from_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 2
+  ocr_suspect_row_count: 3
+  printed_pages: *id047
+  pdf_pages: *id046
+- record_id: usgs-b1544-wollastonite
+  formula: CaSi03
+  phase: 'CaSi0 3 : Crystals 298.15 to 1500 K. See CaSi0 reference table. 3'
+  name_as_published: Wollastonite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id048
+    printed_pages: *id049
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-wollastonite.json
+  row_count: 13
+  ambiguities: []
+  ambiguity_count: 0
+  ocr_suspect_row_count: 1
+  printed_pages: *id049
+  pdf_pages: *id048
+- record_id: usgs-b1544-cyclowollastonite-pseudowollastonite
+  formula: CaSi03
+  phase: 'CaSi0 3 : Crystals 298.15 to 1800 K. See CaSi0 3 reference table.'
+  name_as_published: Cyclowollastonite (Pseudowollastonite)
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id050
+    printed_pages: *id051
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-cyclowollastonite-pseudowollastonite.json
+  row_count: 16
+  ambiguities: []
+  ambiguity_count: 0
+  ocr_suspect_row_count: 1
+  printed_pages: *id051
+  pdf_pages: *id050
+- record_id: usgs-b1544-ca-al-pyroxene
+  formula: null
+  phase: Crystals 298.15 to 1800 K.
+  name_as_published: Ca-Al pyroxene
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id052
+    printed_pages: *id053
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-ca-al-pyroxene.json
+  row_count: 16
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id053
+  pdf_pages: *id052
+- record_id: usgs-b1544-anorthite
+  formula: null
+  phase: Crystals 298.15 to melting point 1830 K.
+  name_as_published: Anorthite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id054
+    printed_pages: *id055
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-anorthite.json
+  row_count: 16
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 0
+  printed_pages: *id055
+  pdf_pages: *id054
+- record_id: usgs-b1544-kaolinite
+  formula: null
+  phase: Crystals 298.15 to 1000 K. -~~------------------------------------------------------------------------------
+  name_as_published: Kaolinite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id056
+    printed_pages: *id057
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-kaolinite.json
+  row_count: 8
+  ambiguities:
+  - identity_disagreement logKf_vs_dG_from_the_elements T=:198.15 delta=335.942596643552255586118319
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 2
+  ocr_suspect_row_count: 4
+  printed_pages: *id057
+  pdf_pages: *id056
+- record_id: usgs-b1544-dickite
+  formula: null
+  phase: Crystals 298.15 to 900 K. -~~------------------------------------------------------------------------------
+  name_as_published: Dickite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id058
+    printed_pages: *id059
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-dickite.json
+  row_count: 7
+  ambiguities:
+  - identity_disagreement logKf_vs_dG_from_the_elements T=1100 delta=-306.2571875656077083895696869
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 2
+  ocr_suspect_row_count: 1
+  printed_pages: *id059
+  pdf_pages: *id058
+- record_id: usgs-b1544-halloysite
+  formula: null
+  phase: Crystals 298.15 to 900 K.
+  name_as_published: Halloysite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id060
+    printed_pages: *id061
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-halloysite.json
+  row_count: 7
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 0
+  printed_pages: *id061
+  pdf_pages: *id060
+- record_id: usgs-b1544-pyrophyllite
+  formula: null
+  phase: '-------------------------------------------------·-------------------------------'
+  name_as_published: Pyrophyllite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id062
+    printed_pages: *id063
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-pyrophyllite.json
+  row_count: 10
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id063
+  pdf_pages: *id062
+- record_id: usgs-b1544-margarite
+  formula: null
+  phase: ''
+  name_as_published: Margarite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id064
+    printed_pages: *id065
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-margarite.json
+  row_count: 10
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id065
+  pdf_pages: *id064
+- record_id: usgs-b1544-prehnite
+  formula: null
+  phase: ''
+  name_as_published: Prehnite
+  source: *id001
+  source_locator:
+    pdf: source/hemingway-haas-robinson-1982-usgs-b1544.pdf
+    pdf_pages: *id066
+    printed_pages: *id067
+  sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
+  path: records/usgs-b1544-prehnite.json
+  row_count: 10
+  ambiguities:
+  - formula_as_published_not_recovered_from_ocr; not inferred
+  ambiguity_count: 1
+  ocr_suspect_row_count: 1
+  printed_pages: *id067
+  pdf_pages: *id066

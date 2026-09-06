@@ -52,6 +52,10 @@ See `janaf/manifest.yaml`.
 (Thermo-Calc TDB: ELEMENT / FUNCTION / PHASE / PARAMETER G, TC, BM, BMAGN). Licence quote
 and coverage are in `sgte-unary/README.md`. Compilations still produce no scoring rows.
 
+`hemingway-haas-robinson-1982-usgs-b1544/` is a complete transcription of USGS Bulletin 1544
+(Hemingway, Haas & Robinson 1982): TABLE 1 plus every per-substance T-grid. Public-domain
+US government work. Loader refuses any T not on the printed grid. No battery scoring rows.
+
 `janaf-4th.yaml` (still under `../extracts/`) is **not JANAF**. It is a `review_status: draft` manual transcription of a few
 phosphorus carriers, pointing at `janaf.nist.gov` table URLs. The full NIST-JANAF 4th edition is
 ~1,800 species tables and is freely available. Completing the JANAF harvest is an open task.
