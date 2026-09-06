@@ -1,0 +1,188 @@
+{
+  "record_id": "cp-p044-03",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 50,
+  "page": 44,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SELECTED ELEMENTS",
+  "name_as_published": "ZINC",
+  "formula_as_published": "Zn",
+  "phase_as_published": [
+    "(crystal)"
+  ],
+  "header_and_units_raw": "NAME AND FORJIJLA        ENTROPY           A1           A2           A3           A4            AS     T rqe      T.     '-\"0\n                        J•mol\",·IC\",                   (T)         n-2,        (T-o.&)         (T2)      K         K     kJ·..,r1\n\n",
+  "source_text": "ZINC                         41.63     2.909E+01   -3.507E-03                -6.366E+01    1.161E-05      298    692.7      7.30\nZn (crystal)                  0.15                                                                     692.7",
+  "rows": [
+    {
+      "label_raw": "ZINC",
+      "cells": {
+        "entropy": {
+          "raw": "41.63",
+          "value": 41.63,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 29,
+          "end_offset": 34
+        },
+        "A1": {
+          "raw": "2.909E+01",
+          "value": 29.09,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 39,
+          "end_offset": 48
+        },
+        "A2": {
+          "raw": "-3.507E-03",
+          "value": -0.003507,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 51,
+          "end_offset": 61
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "-6.366E+01",
+          "value": -63.66,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 77,
+          "end_offset": 87
+        },
+        "A5": {
+          "raw": "1.161E-05",
+          "value": 1.161e-05,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 91,
+          "end_offset": 100
+        },
+        "temperature_range": {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 106,
+          "end_offset": 109
+        },
+        "transition_temperature": {
+          "raw": "692.7",
+          "value": 692.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 113,
+          "end_offset": 118
+        },
+        "transition_enthalpy": {
+          "raw": "7.30",
+          "value": 7.3,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 124,
+          "end_offset": 128
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "Zn (crystal)",
+      "cells": {
+        "entropy": {
+          "raw": "0.15",
+          "value": 0.15,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 30,
+          "end_offset": 34
+        },
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "692.7",
+          "value": 692.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 103,
+          "end_offset": 108
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [],
+  "ambiguities": [
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 18,
+  "source_line_end": 19
+}
