@@ -1,0 +1,146 @@
+{
+  "record_id": "cp-p058-03",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 64,
+  "page": 58,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR ORTHO AND RING STRUCTURE SILICATE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "ANDALUSITE",
+  "formula_candidate": "Al 2Si«Js",
+  "header_and_units_raw": "NAME AND FOIUIJLA             ENTROPY         A1            A2          A3            A4           AS     T range    T...    a_H•\n                             J·•r'·c'                      (T)         (T\"2)       (T-4.&)        (T2)         IC     IC    kJ·•l\"'\n\n",
+  "source_text": "ANDALUSITE                       91.4 2. 77306E+02     -6.588E-03 ·1.9141E+06 -2.2656E+03                      298\nAl 2Si«Js                         0.1                                                                      2000",
+  "rows": [
+    {
+      "raw": "ANDALUSITE                       91.4 2. 77306E+02     -6.588E-03 ·1.9141E+06 -2.2656E+03                      298",
+      "tokens": [
+        {
+          "raw": "ANDALUSITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 10
+        },
+        {
+          "raw": "91.4",
+          "value": 91.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 33,
+          "end_offset": 37
+        },
+        {
+          "raw": "2.",
+          "value": 2.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 38,
+          "end_offset": 40
+        },
+        {
+          "raw": "77306E+02",
+          "value": 7730600.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 41,
+          "end_offset": 50
+        },
+        {
+          "raw": "-6.588E-03",
+          "value": -0.006588,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 55,
+          "end_offset": 65
+        },
+        {
+          "raw": "·1.9141E+06",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 66,
+          "end_offset": 77
+        },
+        {
+          "raw": "-2.2656E+03",
+          "value": -2265.6,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 78,
+          "end_offset": 89
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 111,
+          "end_offset": 114
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "Al 2Si«Js                         0.1                                                                      2000",
+      "tokens": [
+        {
+          "raw": "Al",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 2
+        },
+        {
+          "raw": "2Si«Js",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 3,
+          "end_offset": 9
+        },
+        {
+          "raw": "0.1",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 34,
+          "end_offset": 37
+        },
+        {
+          "raw": "2000",
+          "value": 2000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 107,
+          "end_offset": 111
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "entropy: unparsed printed OCR token '91.4 2.'",
+    "A3: unparsed printed OCR token '·1.9141E+06'",
+    "First-row entropy unresolved",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'entropy', '91.4 2.')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 18,
+  "source_line_end": 19
+}
