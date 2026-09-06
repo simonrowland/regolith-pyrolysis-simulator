@@ -20,12 +20,12 @@
   "record_id": "BU-2156",
   "record_kind": "nasa7_polynomial",
   "name_as_published": "n-C17H36 HeptaDe",
-  "cas_as_published": "",
+  "cas_as_published": "112-39-0",
   "formula": "C17H36",
   "phase": "gas",
   "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "T 2/10",
   "calc_quality_as_published": "C",
   "composition": [
@@ -149,12 +149,30 @@
   },
   "coefficient_count": 15,
   "interval_count": 2,
-  "comment_block": [],
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "comment_block": [
+    "112-39-0",
+    "C17H34O2 Methyl Palmitate (Hexadecanoic Methyl ester) C15H31COOCH3",
+    "HF298=-702.075 kJ  HF Cp & S calculated using B3LYP/6-31G(d,p) corrected",
+    "atomization \"anharmonic\" data 300-5000 K  REF=Osmont et al IJCK 39,(2007),481",
+    "{HF298=701.82 kJ  REF=NIST 94 + Thergas;  HF298=711.3 kJ  REF=Freedman & Bagby",
+    "JAOCS 66,(1989),1601} HF298(liq)=-1441.8+/-3.8 kJ   REF=Gerasimov et al",
+    "Thermodin. Org. Soedin (1986),86.  Max Lst Sq Error Cp @ 1500 K 0.29.%",
+    "C17H36  n-Heptadecane Calculated from TRC10/75 data to 1000 K & extrapolated to",
+    "5000 K using Wilhoit's polynomials  HF298=-393.9+/-2.4 kJ  REF=Prosen & Rossini",
+    "J Res NBS (1945),263  HF298(liq)=-479.5+/-2.4 kJ  REF=ibid.  Max Lst Sq Error Cp",
+    "@ 200 K 0.78%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "cas_shared_across_prose_separated_polynomials",
+      "cas_as_published": "112-39-0",
+      "note": "Preceding stanza CAS retained as published; identity of later prose is not inferred."
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
-    "cas_line": null,
+    "cas_line": 24723,
     "header_line": 24739,
     "end_line": 24742
   },

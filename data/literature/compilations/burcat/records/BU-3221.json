@@ -20,12 +20,12 @@
   "record_id": "BU-3221",
   "record_kind": "nasa7_polynomial",
   "name_as_published": "SiC2",
-  "cas_as_published": "",
+  "cas_as_published": "108549=59-3",
   "formula": "SiC2",
   "phase": "gas",
   "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "tpis91",
   "calc_quality_as_published": "B",
   "composition": [
@@ -149,12 +149,24 @@
   },
   "coefficient_count": 15,
   "interval_count": 2,
-  "comment_block": [],
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "comment_block": [
+    "108549=59-3",
+    "SiC2   Cyclo SIGMA=2  STATWT=1  IAIBIC=81.66  Nu=1742,180,837  T0=1100  SIGMA=1",
+    "STATWT=1  IB=13.  Nu=1904,147,787  T0=11000.  SIGMA=1  STATWT=6   T0=13000",
+    "SIGMA=1  STATWT=2  T0=15000.  SIGMA=1  STATWT=6  T0=18000.   SIGMA=1  STATWT=3",
+    "T0=20070.   SIGMA=1  STATWT=2.  HF0=625+/-12 kJ  HF298=631.36 kJ  REF=Gurvich 91",
+    "corrected by B. McBride  Max Lst Sq Error Cp @ 2500 K **1.16%**"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "108549=59-3"
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
-    "cas_line": null,
+    "cas_line": 34225,
     "header_line": 34231,
     "end_line": 34234
   },

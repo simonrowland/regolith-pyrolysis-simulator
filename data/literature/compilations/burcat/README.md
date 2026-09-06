@@ -61,14 +61,23 @@ Do not score this compilation in the measurement battery.
 
 ## Known gaps and recorded ambiguities
 
-- Phase labels: `phase_as_published` is the parenthetical name suffix when
-  present (e.g. `solid`, `liquid`), else the NASA-7 G/S/L/C card character
-  (also stored as `phase_card_as_published`). `phase` is the derived
-  normalized label. Suffixes outside the closed allow-list map to
-  `condensed` and are listed as `phase_suffix_normalized_to_condensed`.
+- Phase labels use the NASA-7 card first: `G` maps to `gas`; non-gas states
+  retain `<card>/<state suffix>` (e.g. `S/solid`, `L/liquid`, `C/a-qz`).
+  Without a state suffix, S/L/C map to solid/L/C. Chemical parentheses such
+  as `(OO)` and `(E)` remain nomenclature in the name. `phase_as_published`
+  holds a recognized state suffix or the native card; `phase_card_as_published`
+  always preserves the card. Four genuine card/suffix conflicts are listed
+  as `phase_card_suffix_conflict`; neither token is discarded.
 - 39 comment-only CAS stanzas (no polynomial). Kept.
-- 5 records with `N/A` in the H298/R field; 5 coefficient-card misalignments
-  (including a leading `0` on `Li3+` card 4 and `E 00` missing exponent sign).
+- 5 records with `N/A` in H298/R remain null. Fifteen printed padded zeros
+  parse as zero. Li3+ card 4 is shifted; complete tokens before its terminal
+  card number are retained, with original column slices in the ambiguity.
+  Three irregular quality/MW/card header tails are likewise listed.
+- Repeated prose/polynomial groups retain the preceding CAS and all printed
+  comments; shared CAS associations and nonstandard CAS punctuation are listed.
+  Eleven unassigned stanza tails (eight cross-references, a Hg(N3)2 note,
+  a backtick and the footer) survive verbatim in record/manifest ambiguities;
+  they are not inferred to describe the preceding polynomial.
 - Quality marks `?` (W) and `Bx` (C2F3O) recorded, not normalized.
 - AIR and a few others print `WARNING!` in the formula slots (4-element
   NASA-7 limit). Nonstandard tokens kept.

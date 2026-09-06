@@ -84,24 +84,23 @@ _PHASE_TAGS = frozenset(
         "liq",
         "ref",
         "am",
+        "solid", "liquid", "Cr", "I'", "I-y", "II-r", "III,II",
+        "V", "a'", "a-qz", "an", "b-crt", "b-qz", "crI", "crII",
     }
 )
 _GAS_PHASE_TAGS = frozenset({"g", "G", "gas"})
 NASA7_PHASE_CHAR_NORMALIZED = {
     "G": "gas",
-    "S": "cr",
+    "S": "solid",
     "L": "L",
-    "C": "condensed",
+    "C": "C",
 }
 PHASE_NORMALIZATION_RULE = (
-    "phase_as_published is the parenthetical name suffix when present, else "
-    "the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). "
-    "phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / "
-    "NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list "
-    "is kept as that suffix; a suffix outside the allow-list maps to "
-    "'condensed' and is listed as phase_suffix_normalized_to_condensed "
-    "(never silently rewritten); no suffix + condensed CEA flag maps to "
-    "'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed."
+    "Native card/flag is primary: G or CEA 0 means gas. Recognized state "
+    "suffixes refine compatible non-gas cards and retain polymorph identity. "
+    "Other parentheses are nomenclature. phase_as_published preserves a state "
+    "suffix or the native token; conflicting state suffixes are recorded as "
+    "ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>."
 )
 
 COMPILATION_SOURCE = {
@@ -320,6 +319,7 @@ def parse_fortran_float(token: str) -> float:
         raise NasaGlennParseError("empty Fortran float token")
     # Published NASA-7 lines sometimes drop the exponent sign: "E 00".
     text = re.sub(r"([Ee])\s+(\d)", r"\1+\2", text)
+    text = re.sub(r"\s+(?=[Ee])", "", text)
     return float(text)
 
 
@@ -403,54 +403,39 @@ def resolve_phase(
     phase_flag_as_published: str = "",
     phase_char: str | None = None,
 ) -> tuple[str, str, list[dict[str, Any]]]:
-    """Return ``(phase_as_published, phase_normalized, ambiguities)``.
-
-    Published tokens are never rewritten. Normalization is a separate field;
-    any suffix mapped to ``condensed`` because it is outside the closed
-    allow-list is listed as an ambiguity (Glenn review F-1).
-    """
+    """Keep the native phase primary and refine it only with known state words."""
     ambiguities: list[dict[str, Any]] = []
     suffix = published_name_phase_suffix(name)
-    if suffix is not None:
-        phase_as_published = suffix
-        if suffix in _GAS_PHASE_TAGS:
-            return phase_as_published, "gas", ambiguities
-        if suffix in _PHASE_TAGS:
-            return phase_as_published, suffix, ambiguities
+    if suffix not in _PHASE_TAGS | _GAS_PHASE_TAGS:
+        suffix = None
+    native = phase_char or phase_flag_as_published.strip()
+    if phase_char:
+        phase = NASA7_PHASE_CHAR_NORMALIZED.get(phase_char, phase_char)
+    elif phase_flag == 0:
+        phase = "gas"
+    elif phase_flag is not None:
+        phase = f"CEA:{phase_flag}"
+    else:
+        phase = "not_parsed"
+    liquid = {"L", "l", "liq", "liquid"}
+    conflict = suffix is not None and (
+        (phase == "gas" and suffix not in _GAS_PHASE_TAGS)
+        or (phase != "gas" and suffix in _GAS_PHASE_TAGS)
+        or (phase_char == "S" and suffix in liquid)
+        or (phase_char == "L" and suffix not in liquid)
+    )
+    if conflict:
         ambiguities.append(
             {
-                "kind": "phase_suffix_normalized_to_condensed",
+                "kind": "phase_card_suffix_conflict",
+                "phase_card_as_published": native,
                 "phase_as_published": suffix,
-                "phase_normalized": "condensed",
-                "note": (
-                    "Parenthetical suffix kept verbatim in phase_as_published. "
-                    "Normalized phase is 'condensed' because the suffix is "
-                    "outside the closed allow-list "
-                    f"{sorted(_PHASE_TAGS)}. Records are not merged."
-                ),
+                "note": "Native phase takes precedence; conflicting suffix retained verbatim.",
             }
         )
-        return phase_as_published, "condensed", ambiguities
-    if phase_char:
-        phase_as_published = phase_char
-        if phase_char.upper() == "G":
-            return phase_as_published, "gas", ambiguities
-        mapped = NASA7_PHASE_CHAR_NORMALIZED.get(phase_char, "condensed")
-        if mapped == "condensed" and phase_char not in NASA7_PHASE_CHAR_NORMALIZED:
-            ambiguities.append(
-                {
-                    "kind": "phase_char_unmapped",
-                    "phase_as_published": phase_char,
-                    "phase_normalized": "condensed",
-                }
-            )
-        return phase_as_published, mapped, ambiguities
-    phase_as_published = (phase_flag_as_published or "").strip()
-    if phase_flag == 0:
-        return phase_as_published, "gas", ambiguities
-    if phase_flag is None:
-        return phase_as_published, "not_parsed", ambiguities
-    return phase_as_published, "condensed", ambiguities
+    if suffix is not None and phase != "gas":
+        phase = f"{phase_char or f'CEA:{phase_flag}'}/{suffix}"
+    return suffix or native, phase, ambiguities
 
 
 def _phase_label(name: str, phase_flag: int | None) -> str:
@@ -711,7 +696,7 @@ def parse_nasa7_coefficient_lines(
             for item in line_values
         ):
             scanned = [
-                _published(tok) for tok in _FLOAT_TOKEN_RE.findall(raw[:75] if len(raw) >= 75 else raw)
+                _published(tok) for tok in _FLOAT_TOKEN_RE.findall(raw.rstrip()[:-1])
             ]
             ambiguities.append(
                 {
@@ -722,21 +707,13 @@ def parse_nasa7_coefficient_lines(
                     "free_scanned_count": len(scanned),
                     "note": (
                         "15-character columns did not yield 5 Fortran floats; "
-                        "free-scanned tokens used for .value only. as_published "
-                        "keeps the column slices. Not silently repaired."
+                        "Complete tokens before the terminal card number used; "
+                        "original column slices retained here. Not silently repaired."
                     ),
                 }
             )
             if len(scanned) == NASA7_COEFFS_PER_LINE:
-                merged: list[PublishedNumber] = []
-                for column, scanned_item in zip(line_values, scanned):
-                    merged.append(
-                        PublishedNumber(
-                            as_published=column.as_published,
-                            value=scanned_item.value,
-                        )
-                    )
-                line_values = merged
+                line_values = scanned
         tokens.extend(line_values)
     if len(tokens) != NASA7_COEFFICIENT_COUNT:
         ambiguities.append(
@@ -772,16 +749,28 @@ def parse_nasa7_header_line(header_line: str) -> dict[str, Any]:
     t_min = _published(_col(header_line, 45, 55))
     t_max = _published(_col(header_line, 55, 65))
     tail = header_line[65:] if len(header_line) > 65 else ""
-    quality = ""
-    mw_token = ""
-    card_token = ""
+    quality = _col(header_line, 65, 68).strip()
+    mw_token = _col(header_line, 68, 78).strip()
+    card_token = _col(header_line, 78, 80).strip()
+    fixed_tail_ok = (
+        re.fullmatch(r"[A-Za-z?]{0,2}", quality)
+        and _FLOAT_TOKEN_RE.fullmatch(mw_token)
+        and card_token == "1"
+    )
     tail_match = re.match(
         r"\s*([A-Za-z?]{1,2})?\s*"
         r"([+-]?(?:\d+\.\d*|\.\d+|\d+)(?:[DdEe][+-]?\d+)?)\s*"
         r"(\d)\s*$",
         tail,
     )
-    if tail_match:
+    if fixed_tail_ok:
+        pass
+    elif tail_match:
+        ambiguities.append({
+            "kind": "nasa7_header_tail_columns_misaligned",
+            "tail_as_published": tail.rstrip(),
+            "note": "Columns 66-80 disagree with complete quality/MW/card tokens; both retained.",
+        })
         quality = tail_match.group(1) or ""
         mw_token = tail_match.group(2)
         card_token = tail_match.group(3)

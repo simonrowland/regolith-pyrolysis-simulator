@@ -22,10 +22,10 @@
   "name_as_published": "WCL6(III)",
   "cas_as_published": "13283-01-7",
   "formula": "WCl6",
-  "phase": "III",
+  "phase": "L/III",
   "phase_as_published": "III",
   "phase_card_as_published": "L",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "j12/66",
   "calc_quality_as_published": "C",
   "composition": [
@@ -154,8 +154,15 @@
     "WCl6 (S,L)  Data extracted by B. McBride from JANAF 12/66 tables  HF298=-593.71",
     "+/-25.1 kJ    Max Lst Sq Error Cp @ 300 K ***1.7%****"
   ],
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "phase_card_suffix_conflict",
+      "phase_card_as_published": "L",
+      "phase_as_published": "III",
+      "note": "Native phase takes precedence; conflicting suffix retained verbatim."
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
     "cas_line": 35780,

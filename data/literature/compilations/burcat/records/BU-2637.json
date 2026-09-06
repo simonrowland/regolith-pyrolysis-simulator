@@ -20,12 +20,12 @@
   "record_id": "BU-2637",
   "record_kind": "nasa7_polynomial",
   "name_as_published": "LiI(L)",
-  "cas_as_published": "",
+  "cas_as_published": "10377-51-2,",
   "formula": "LiI",
-  "phase": "L",
+  "phase": "L/L",
   "phase_as_published": "L",
   "phase_card_as_published": "L",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "tpis82",
   "calc_quality_as_published": "B",
   "composition": [
@@ -149,12 +149,21 @@
   },
   "coefficient_count": 15,
   "interval_count": 2,
-  "comment_block": [],
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "comment_block": [
+    "10377-51-2,",
+    "LiI Lithium Iodide Cristal cubic and Liquid  Data from Gurvich 1982  Vol4,245 as",
+    "reported by McBrid NASA HF298=-273.2+/-0.5 kJ  Max Lst Sq Error Cp @ 400 K 0.03%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "10377-51-2,"
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
-    "cas_line": null,
+    "cas_line": 29266,
     "header_line": 29273,
     "end_line": 29276
   },

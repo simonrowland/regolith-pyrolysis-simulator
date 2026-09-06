@@ -22,10 +22,10 @@
   "name_as_published": "HgO(cr)",
   "cas_as_published": "21908-53-2",
   "formula": "HgO",
-  "phase": "cr",
+  "phase": "C/cr",
   "phase_as_published": "cr",
   "phase_card_as_published": "C",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "j 6/62",
   "calc_quality_as_published": "B",
   "composition": [
@@ -154,8 +154,25 @@
     "HgO SOLID From JANAF 62 Tables  HF298=-90.789+/-0.1 kJ  HF0=-86.208 kJ",
     "REF=JANAF 1962  Max Lst Sq Error Cp @ 500 K 0.03%"
   ],
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "unassigned_post_polynomial_prose",
+      "note": "Published stanza tail, cross-reference or footer; no polynomial association inferred.",
+      "source_lines": [
+        28935,
+        28936,
+        28937,
+        28938
+      ],
+      "text_as_published": [
+        "",
+        "Hg(N3)2  Mercuric azide  (solid)  HF298=556.5 kJ  REF=Patnaik Comprehensive",
+        "Guide to Hazardous Properties of Chem Substances Wiley 2007.",
+        ""
+      ]
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
     "cas_line": 28928,

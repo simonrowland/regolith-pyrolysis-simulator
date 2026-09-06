@@ -22,10 +22,10 @@
   "name_as_published": "o-C6H5ClO Trans(E)",
   "cas_as_published": "95-57-8",
   "formula": "C6H5ClO",
-  "phase": "condensed",
-  "phase_as_published": "E",
+  "phase": "gas",
+  "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "T 1/06",
   "calc_quality_as_published": "C",
   "composition": [
@@ -157,18 +157,12 @@
     "758,714,693,567,555,495,451,381,361,265,240  HF298=-117.83 KJ  HF0=-100.9 kJ",
     "REF=Burcat G3B3 calc    Max Lst Sq Error Cp @ 1300 K 0.49%"
   ],
-  "ambiguity_count": 2,
+  "ambiguity_count": 1,
   "ambiguities": [
     {
       "kind": "name_occupies_full_18_column_field",
       "name_as_published": "o-C6H5ClO Trans(E)",
       "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
-    },
-    {
-      "kind": "phase_suffix_normalized_to_condensed",
-      "phase_as_published": "E",
-      "phase_normalized": "condensed",
-      "note": "Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am', 'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged."
     }
   ],
   "source_locator": {

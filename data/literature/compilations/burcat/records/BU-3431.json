@@ -25,7 +25,7 @@
   "phase": "gas",
   "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "g 2/98",
   "calc_quality_as_published": "B",
   "composition": [
@@ -155,8 +155,23 @@
     "Gordon & McBride NASA/TP-1999-208523  HF298=552.95 kJ  REF=B.McBride  Max Lst Sq",
     "Error Cp @ 1300 K 0.42%."
   ],
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "unassigned_post_polynomial_prose",
+      "note": "Published stanza tail, cross-reference or footer; no polynomial association inferred.",
+      "source_lines": [
+        36151,
+        36152,
+        36153
+      ],
+      "text_as_published": [
+        "",
+        "ZrC(s)  Zirconium Carbide  See CZr",
+        ""
+      ]
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
     "cas_line": 36143,

@@ -120,6 +120,8 @@ def test_every_record_round_trips_to_thermo_inp_numbers(manifest, record_docs) -
         fresh = rec.to_dict()
         if published_float_pairs(doc) != published_float_pairs(fresh):
             mismatches.append(f"{rec.record_id} published_numbers")
+        if doc["intervals"] != fresh["intervals"]:
+            mismatches.append(f"{rec.record_id} published_coefficient_tokens")
         if len(mismatches) > 20:
             break
     assert mismatches == []
@@ -145,34 +147,8 @@ def test_complete_ingest_keeps_inverted_ions_reactants_and_assigned_enthalpy(
     assert electron["phase_as_published"] == "0"
     sio2_aqz = by_name["SiO2(a-qz)"][0]
     assert sio2_aqz["phase_as_published"] == "a-qz"
-    assert sio2_aqz["phase"] == "condensed"
-    assert any(
-        item["kind"] == "phase_suffix_normalized_to_condensed"
-        and item["phase_as_published"] == "a-qz"
-        for item in sio2_aqz["ambiguities"]
-    )
-    unlisted = [
-        doc
-        for doc in docs
-        if any(
-            item.get("kind") == "phase_suffix_normalized_to_condensed"
-            for item in doc["ambiguities"]
-        )
-    ]
-    assert len(unlisted) == 16
-    suffixes = {
-        next(
-            item["phase_as_published"]
-            for item in doc["ambiguities"]
-            if item["kind"] == "phase_suffix_normalized_to_condensed"
-        )
-        for doc in unlisted
-    }
-    assert "a-qz" in suffixes
-    assert "b-qz" in suffixes
-    assert "b-crt" in suffixes
-    assert "crI" in suffixes
-    assert "an" in suffixes
+    assert sio2_aqz["phase"] == "CEA:1/a-qz"
+    assert all(doc["phase"] != "condensed" for doc in docs)
     assert "Air" in by_name
     assert by_name["Air"][0]["cea_section"] == "reactants"
     assigned = [
@@ -265,3 +241,33 @@ def test_nasa7_four_line_variant_parses_burcat_header_and_fifteen_coeffs() -> No
     assert coeffs[6].value == -7.18810718e00
     assert coeffs[7].value == 2.25225065e00
     assert coeffs[14].value == 0.0
+
+
+def test_same_formula_distinct_phase_census(record_docs) -> None:
+    import re
+    from collections import defaultdict
+
+    groups = defaultdict(dict)
+    for doc in record_docs:
+        header = doc["source_text"]["header_line"]
+        flag = int(header[50:52])
+        suffix = re.search(r"\(([^)]+)\)(?:,.*)?$", doc["name_as_published"])
+        if flag == 0:
+            assert doc["phase"] == "gas"
+        elif suffix:
+            assert doc["phase"] == f"CEA:{flag}/{suffix[1]}"
+        identity = (flag, suffix[1] if suffix and flag else None)
+        groups[doc["formula"]][identity] = doc["phase"]
+    for formula, phases in groups.items():
+        assert len(set(phases.values())) == len(phases), (formula, phases)
+
+
+def test_round_trip_rejects_format_only_coefficient_mutation(manifest, record_docs) -> None:
+    from copy import deepcopy
+
+    mutated = deepcopy(record_docs)
+    number = mutated[0]["intervals"][0]["a_coefficients"][0]
+    assert number["as_published"] != repr(number["value"])
+    number["as_published"] = repr(number["value"])
+    with pytest.raises(AssertionError):
+        test_every_record_round_trips_to_thermo_inp_numbers(manifest, mutated)

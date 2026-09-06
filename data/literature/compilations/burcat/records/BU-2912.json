@@ -22,10 +22,10 @@
   "name_as_published": "NaCL(cr)",
   "cas_as_published": "7647-14-5",
   "formula": "NaCl",
-  "phase": "cr",
+  "phase": "C/cr",
   "phase_as_published": "cr",
   "phase_card_as_published": "C",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "tpis82",
   "calc_quality_as_published": "B",
   "composition": [
@@ -76,32 +76,32 @@
       "xml_range_tag": "range_1000_to_Tmax",
       "a_coefficients": [
         {
-          "as_published": " 0.0       E+00",
-          "value": null
+          "as_published": "0.0       E+00",
+          "value": 0.0
         },
         {
-          "as_published": " 0.0       E 00",
-          "value": null
+          "as_published": "0.0       E 00",
+          "value": 0.0
         },
         {
-          "as_published": " 0.0       E 00",
-          "value": null
+          "as_published": "0.0       E 00",
+          "value": 0.0
         },
         {
-          "as_published": " 0.0       E 00",
-          "value": null
+          "as_published": "0.0       E 00",
+          "value": 0.0
         },
         {
-          "as_published": " 0.0       E 00",
-          "value": null
+          "as_published": "0.0       E 00",
+          "value": 0.0
         },
         {
-          "as_published": " 0.0       E+00",
-          "value": null
+          "as_published": "0.0       E+00",
+          "value": 0.0
         },
         {
-          "as_published": " 0.0       E+00",
-          "value": null
+          "as_published": "0.0       E+00",
+          "value": 0.0
         }
       ],
       "coefficient_count": 7
@@ -156,7 +156,7 @@
     "The solid polynomial represents only the 200-500 K interval. For the 500-1074 K",
     "temperatures use only the NASA 9 term polynomials. See NASA database."
   ],
-  "ambiguity_count": 6,
+  "ambiguity_count": 4,
   "ambiguities": [
     {
       "kind": "nasa7_fortran_exponent_missing_sign",
@@ -181,34 +181,6 @@
       "line_index": 0,
       "token_as_published": " 0.0       E 00",
       "note": "Value parsed by treating 'E 00' as 'E+00'; token kept as published."
-    },
-    {
-      "kind": "nasa7_coeff_columns_misaligned",
-      "line_index": 0,
-      "raw": " 0.0       E+00 0.0       E 00 0.0       E 00 0.0       E 00 0.0       E 00    2",
-      "fixed_width_tokens": [
-        " 0.0       E+00",
-        " 0.0       E 00",
-        " 0.0       E 00",
-        " 0.0       E 00",
-        " 0.0       E 00"
-      ],
-      "free_scanned_count": 10,
-      "note": "15-character columns did not yield 5 Fortran floats; free-scanned tokens used for .value only. as_published keeps the column slices. Not silently repaired."
-    },
-    {
-      "kind": "nasa7_coeff_columns_misaligned",
-      "line_index": 1,
-      "raw": " 0.0       E+00 0.0       E+00 1.69458981E+02-2.14572680E+00 1.00132155E-02    3",
-      "fixed_width_tokens": [
-        " 0.0       E+00",
-        " 0.0       E+00",
-        "1.69458981E+02",
-        "-2.14572680E+00",
-        "1.00132155E-02"
-      ],
-      "free_scanned_count": 7,
-      "note": "15-character columns did not yield 5 Fortran floats; free-scanned tokens used for .value only. as_published keeps the column slices. Not silently repaired."
     }
   ],
   "source_locator": {

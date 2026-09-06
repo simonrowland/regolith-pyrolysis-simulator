@@ -25,7 +25,7 @@
   "phase": "gas",
   "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "T11/20",
   "calc_quality_as_published": "Bx",
   "composition": [
@@ -155,8 +155,13 @@
     "IB-28.2151  IC=28.2453  Nu=1972,1250,1229,1169,787,662,534,527,408,388.5,233,",
     "46.61  HF298=-608.253+/-8. kJ REF=Burcat G3B3  Max Lst Sq Error Cp @ 1300 K 0.4%"
   ],
-  "ambiguity_count": 1,
+  "ambiguity_count": 2,
   "ambiguities": [
+    {
+      "kind": "nasa7_header_tail_columns_misaligned",
+      "tail_as_published": "  Bx  97.01601 1",
+      "note": "Columns 66-80 disagree with complete quality/MW/card tokens; both retained."
+    },
     {
       "kind": "nasa7_quality_nonstandard",
       "quality_as_published": "Bx"

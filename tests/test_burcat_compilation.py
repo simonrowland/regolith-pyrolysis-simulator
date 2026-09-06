@@ -124,6 +124,8 @@ def test_every_record_round_trips_to_thr_numbers(manifest, record_docs) -> None:
         fresh = rec.to_dict()
         if published_float_pairs(doc) != published_float_pairs(fresh):
             mismatches.append(f"{rec.record_id} published_numbers")
+        if doc["intervals"] != fresh["intervals"] or doc["hf298_div_r"] != fresh["hf298_div_r"]:
+            mismatches.append(f"{rec.record_id} published_coefficient_tokens")
         if len(mismatches) > 20:
             break
     assert mismatches == []
@@ -143,11 +145,8 @@ def test_complete_ingest_keeps_ions_condensed_comment_only_and_na_hf(
     ag_solid = by_name["Ag (solid)"][0]
     assert ag_solid["phase_as_published"] == "solid"
     assert ag_solid["phase_card_as_published"] == "S"
-    assert ag_solid["phase"] == "condensed"
-    assert any(
-        item["kind"] == "phase_suffix_normalized_to_condensed"
-        for item in ag_solid["ambiguities"]
-    )
+    assert ag_solid["phase"] == "S/solid"
+    assert by_name["Ag (liquid)"][0]["phase"] == "L/liquid"
     assert ag_solid["comment_block"]
     assert any("CODATA" in line for line in ag_solid["comment_block"])
     ions = [doc for doc in docs if doc["name_as_published"].endswith(("+", "-"))]
@@ -214,3 +213,120 @@ def test_formulas_absent_from_janaf_and_nasa_glenn(manifest, record_docs) -> Non
     recomputed = formulas_absent_from_janaf_and_glenn(parsed.records, janaf, glenn)
     assert {row["formula"] for row in recomputed} == unique_formulas
     assert any(len(formula) >= 4 for formula in unique_formulas)
+
+
+def test_same_formula_distinct_phase_census(record_docs) -> None:
+    import re
+    from collections import defaultdict
+
+    groups = defaultdict(dict)
+    gas_count = 0
+    for doc in record_docs:
+        if doc["record_kind"] != "nasa7_polynomial":
+            continue
+        card = doc["source_text"]["header_line"][44]
+        suffix = re.search(r"\(([^)]+)\)(?:,.*)?$", doc["name_as_published"])
+        if card == "G":
+            gas_count += 1
+            assert doc["phase"] == "gas", doc["record_id"]
+            if suffix and suffix[1] in {"s", "cr"}:
+                assert any(a["kind"] == "phase_card_suffix_conflict" for a in doc["ambiguities"])
+            identity = (card, None)
+        else:
+            identity = (card, suffix[1] if suffix else None)
+            if suffix:
+                assert doc["phase"] == f"{card}/{suffix[1]}", doc["record_id"]
+        groups[doc["formula"]][identity] = doc["phase"]
+    assert gas_count == 3051
+    assert all(doc["phase"] != "condensed" for doc in record_docs)
+    for formula, phases in groups.items():
+        assert len(set(phases.values())) == len(phases), (formula, phases)
+
+
+def test_fifteen_printed_padded_zero_coefficients_are_values(record_docs) -> None:
+    import re
+
+    count = 0
+    for doc in record_docs:
+        if doc["record_kind"] != "nasa7_polynomial":
+            continue
+        numbers = [n for iv in doc["intervals"] for n in iv["a_coefficients"]]
+        numbers.append(doc["hf298_div_r"])
+        raw = doc["source_text"]["coeff_lines"]
+        fields = [line[i:i+15].strip() for line in raw for i in range(0, 75, 15)]
+        for field, number in zip(fields, numbers):
+            if re.fullmatch(r"0\.0+\s+E[+ ]00", field):
+                count += 1
+                assert number["as_published"] == field
+                assert number["value"] == 0.0
+    assert count == 15
+
+
+@pytest.mark.parametrize("record_id,start,end,cas", [
+    ("BU-1835", 20629, 20631, "142-82-5"),
+    ("BU-2156", 24735, 24738, "112-39-0"),
+    ("BU-2473", 27823, 27824, "7440-55-3"),
+    ("BU-2636", 29266, 29268, "10377-51-2,"),
+    ("BU-2637", 29266, 29268, "10377-51-2,"),
+    ("BU-2818", 30706, 30706, "10102-43-9"),
+    ("BU-2988", 32133, 32134, "7723-14-0"),
+    ("BU-3221", 34225, 34230, "108549=59-3"),
+])
+def test_prose_between_polynomials_and_nonstandard_cas_are_retained(
+    record_docs, record_id, start, end, cas
+) -> None:
+    doc = next(d for d in record_docs if d["record_id"] == record_id)
+    lines = SOURCE.read_text(encoding="utf-8-sig").splitlines()
+    assert doc["cas_as_published"].split()[0] == cas
+    assert all(line in doc["comment_block"] for line in lines[start-1:end])
+
+
+def test_round_trip_rejects_format_only_coefficient_mutation(manifest, record_docs) -> None:
+    from copy import deepcopy
+
+    mutated = deepcopy(record_docs)
+    number = mutated[0]["intervals"][0]["a_coefficients"][0]
+    assert number["as_published"] != repr(number["value"])
+    number["as_published"] = repr(number["value"])
+    with pytest.raises(AssertionError):
+        test_every_record_round_trips_to_thr_numbers(manifest, mutated)
+
+
+def test_shifted_card_keeps_complete_exponent_and_printed_tokens(record_docs) -> None:
+    doc = next(d for d in record_docs if d["record_id"] == "BU-2666")
+    assert doc["source_text"]["coeff_lines"][2].rstrip().endswith("9.09964431E+04    4")
+    assert doc["hf298_div_r"]["as_published"] == "9.09964431E+04"
+    assert doc["hf298_div_r"]["value"] == 90996.4431
+    irregular_headers = {
+        d["record_id"]: d for d in record_docs
+        if any(a["kind"] == "nasa7_header_tail_columns_misaligned" for a in d["ambiguities"])
+    }
+    assert set(irregular_headers) == {"BU-0628", "BU-3016", "BU-3321"}
+    for record_id, quality, weight in [
+        ("BU-0628", "Bx", "97.01601"),
+        ("BU-3016", "B", "37.01607"),
+        ("BU-3321", "B", "121.41346"),
+    ]:
+        header_doc = irregular_headers[record_id]
+        assert header_doc["source_text"]["header_line"][65:].split() == [quality, weight, "1"]
+        assert header_doc["molecular_weight"]["as_published"] == weight
+        assert header_doc["molecular_weight"]["value"] == float(weight)
+
+
+def test_every_nonblank_source_line_is_retained(record_docs) -> None:
+    lines = SOURCE.read_text(encoding="utf-8-sig").splitlines()
+    retained = set()
+    residual_blocks = []
+    for doc in record_docs:
+        retained.update(doc["comment_block"])
+        retained.add(doc["source_text"]["header_line"])
+        retained.update(doc["source_text"]["coeff_lines"])
+        for ambiguity in doc["ambiguities"]:
+            if ambiguity["kind"] == "unassigned_post_polynomial_prose":
+                residual_blocks.append(ambiguity)
+                assert ambiguity["text_as_published"] == [lines[n-1] for n in ambiguity["source_lines"]]
+                retained.update(ambiguity["text_as_published"])
+    assert len(residual_blocks) == 11
+    # First published species CAS is line 120; the source preamble is not a stanza.
+    first_cas = min(d["source_locator"]["cas_line"] for d in record_docs if d["source_locator"]["cas_line"])
+    assert [(n+1, line) for n, line in enumerate(lines) if n >= first_cas-1 and line.strip() and line not in retained] == []

@@ -20,12 +20,12 @@
   "record_id": "BU-2818",
   "record_kind": "nasa7_polynomial",
   "name_as_published": "NO",
-  "cas_as_published": "",
+  "cas_as_published": "10102-43-9",
   "formula": "NO",
   "phase": "gas",
   "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "ATcT3E",
   "calc_quality_as_published": "A",
   "composition": [
@@ -149,9 +149,19 @@
   },
   "coefficient_count": 15,
   "interval_count": 2,
-  "comment_block": [],
-  "ambiguity_count": 1,
+  "comment_block": [
+    "10102-43-9",
+    "NO  GENERATED FROM ORIGINAL VALUES  HFO=90.767 KJ REF=Gurvich 1989",
+    "{HF298=91.089+/-0.062 kJ  REF=ATcT C 2011}. Max Lst Sq Error Cp @ 1300 K 0.30%",
+    "NO Recalculated by Ruscic from data ATcT ver. 1.122, 2017 HF298 = 91.121 \u00b1 0.065 kJ/mol "
+  ],
+  "ambiguity_count": 2,
   "ambiguities": [
+    {
+      "kind": "cas_shared_across_prose_separated_polynomials",
+      "cas_as_published": "10102-43-9",
+      "note": "Preceding stanza CAS retained as published; identity of later prose is not inferred."
+    },
     {
       "kind": "duplicate_name_as_published",
       "name_as_published": "NO",
@@ -164,7 +174,7 @@
   ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
-    "cas_line": null,
+    "cas_line": 30698,
     "header_line": 30707,
     "end_line": 30710
   },

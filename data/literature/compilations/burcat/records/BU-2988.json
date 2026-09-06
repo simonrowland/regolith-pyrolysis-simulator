@@ -20,12 +20,12 @@
   "record_id": "BU-2988",
   "record_kind": "nasa7_polynomial",
   "name_as_published": "P RED",
-  "cas_as_published": "",
+  "cas_as_published": "7723-14-0",
   "formula": "P",
   "phase": "gas",
   "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "T12/09",
   "calc_quality_as_published": "B",
   "composition": [
@@ -149,12 +149,24 @@
   },
   "coefficient_count": 15,
   "interval_count": 2,
-  "comment_block": [],
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "comment_block": [
+    "7723-14-0",
+    "P(cr) White Standard REFERENCE ELEMENT From Gurvich's Tables 1989 Corrected by",
+    "McBride for 300 K from JANAF   Max Lst Sq Error Cp @ 200 K 0.06%",
+    "P(cr) Red.  HF298=-17.460 kJ  HF0=-15.707 kJ  REF=JANAF 61  Max Lst Sq Error",
+    "Cp @ 400 K 0.28%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "cas_shared_across_prose_separated_polynomials",
+      "cas_as_published": "7723-14-0",
+      "note": "Preceding stanza CAS retained as published; identity of later prose is not inferred."
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
-    "cas_line": null,
+    "cas_line": 32121,
     "header_line": 32135,
     "end_line": 32138
   },

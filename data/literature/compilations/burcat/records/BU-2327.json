@@ -22,10 +22,10 @@
   "name_as_published": "Cr2O3(I')",
   "cas_as_published": "1308-38-9",
   "formula": "Cr2O3",
-  "phase": "condensed",
+  "phase": "S/I'",
   "phase_as_published": "I'",
   "phase_card_as_published": "S",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "T 8/13",
   "calc_quality_as_published": "B",
   "composition": [
@@ -154,15 +154,8 @@
     "Cr2O3 Chromium Oxide  CONDENSED   HF298(s)=-1140.6+/-1.7 kJ  REF=Gurvich 82",
     "{HF298(S)=-1134.70 +/- 8.4 kJ  REF=JANAF 73}  Max Lst Sq Error Cp @ 300 K 0.11%"
   ],
-  "ambiguity_count": 1,
-  "ambiguities": [
-    {
-      "kind": "phase_suffix_normalized_to_condensed",
-      "phase_as_published": "I'",
-      "phase_normalized": "condensed",
-      "note": "Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am', 'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged."
-    }
-  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
     "cas_line": 26596,

@@ -25,7 +25,7 @@
   "phase": "gas",
   "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "tpis82",
   "calc_quality_as_published": "",
   "composition": [
@@ -123,19 +123,19 @@
           "value": -1.81859927e-05
         },
         {
-          "as_published": "01.54783375E-0",
+          "as_published": "01.54783375E-08",
           "value": 1.54783375e-08
         },
         {
-          "as_published": "8-4.96883291E-1",
+          "as_published": "-4.96883291E-12",
           "value": -4.96883291e-12
         },
         {
-          "as_published": "2 8.92449696E+0",
+          "as_published": "8.92449696E+04",
           "value": 89244.9696
         },
         {
-          "as_published": "4-4.37169705E-0",
+          "as_published": "-4.37169705E-01",
           "value": -0.437169705
         }
       ],
@@ -143,8 +143,8 @@
     }
   ],
   "hf298_div_r": {
-    "as_published": "1 9.09964431E+0",
-    "value": 9.09964431,
+    "as_published": "9.09964431E+04",
+    "value": 90996.4431,
     "units_as_published": "H298/R (dimensionless, as printed)"
   },
   "coefficient_count": 15,
@@ -168,7 +168,7 @@
         "1 9.09964431E+0"
       ],
       "free_scanned_count": 5,
-      "note": "15-character columns did not yield 5 Fortran floats; free-scanned tokens used for .value only. as_published keeps the column slices. Not silently repaired."
+      "note": "15-character columns did not yield 5 Fortran floats; Complete tokens before the terminal card number used; original column slices retained here. Not silently repaired."
     }
   ],
   "source_locator": {

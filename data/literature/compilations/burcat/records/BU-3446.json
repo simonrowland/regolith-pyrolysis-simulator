@@ -25,7 +25,7 @@
   "phase": "gas",
   "phase_as_published": "G",
   "phase_card_as_published": "G",
-  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
   "date_as_published": "g10/99",
   "calc_quality_as_published": "",
   "composition": [
@@ -156,8 +156,39 @@
     "STATWT=1  T0=22000.  STATWT=3.  T0=25000.  STATWT=1  REF=Gurvich 82 + JANAF 65",
     "HF298=-317.043 kJ  REF=Gurvich 82  {HF298=-286.19 kJ  REF=JANAF 65 + Barin 95}"
   ],
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "unassigned_post_polynomial_prose",
+      "note": "Published stanza tail, cross-reference or footer; no polynomial association inferred.",
+      "source_lines": [
+        36264,
+        36265,
+        36266,
+        36267,
+        36268,
+        36269,
+        36270,
+        36271,
+        36272,
+        36273,
+        36274
+      ],
+      "text_as_published": [
+        "",
+        "Troughout Table 4 and 5 kJ/mol and kcal/mol are abbreviated as kJ and kcal.",
+        "",
+        "##!!##  - This CAS number was assigned to the species first described in the",
+        "A. Burcat paper cited as REF.",
+        "",
+        "[F&W notation]  The Frenklach-Wang abreviation system for aromatics and",
+        "polyciclyc compounds.",
+        "",
+        "",
+        ""
+      ]
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
     "cas_line": 36255,

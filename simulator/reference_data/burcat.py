@@ -84,8 +84,9 @@ _CAS_LINE_RE = re.compile(
         N/A
       | \d{1,7}-\d{2}-\d(?:[A-Za-z?]+)?
       | \d{1,7}-\d{2}-\d{2}
-      | \d{1,7}[.-]\d{2,4}[.-]\d{1,2}(?:[A-Za-z?]+)?
+      | \d{1,7}[.=\-]\d{2,4}[.=\-]\d{1,2}(?:[A-Za-z?]+)?
     )
+    ,?
     (?:\s+.+)?
     $""",
     re.VERBOSE,
@@ -259,9 +260,18 @@ def parse_burcat_thr(
     current_cas_line: int | None = None
     current_comments: list[str] = []
     saw_poly_in_stanza = False
+    pending_prose: list[tuple[int, str]] = []
 
     def flush_comment_only(end_line: int) -> None:
         nonlocal current_cas, current_cas_line, current_comments, saw_poly_in_stanza
+        if saw_poly_in_stanza and any(line.strip() for _, line in pending_prose):
+            records[-1].ambiguities.append({
+                "kind": "unassigned_post_polynomial_prose",
+                "note": "Published stanza tail, cross-reference or footer; no polynomial association inferred.",
+                "source_lines": [n for n, _ in pending_prose],
+                "text_as_published": [line for _, line in pending_prose],
+            })
+        pending_prose.clear()
         if not current_cas or saw_poly_in_stanza:
             current_cas = ""
             current_cas_line = None
@@ -322,6 +332,13 @@ def parse_burcat_thr(
             low = coeffs[7:14]
             hf = coeffs[14] if len(coeffs) > 14 else PublishedNumber(as_published="", value=None)
             ambiguities = list(parsed["ambiguities"]) + list(coeff_ambiguities)
+            if any(line.strip() for _, line in pending_prose):
+                ambiguities.append({
+                    "kind": "cas_shared_across_prose_separated_polynomials",
+                    "cas_as_published": current_cas,
+                    "note": "Preceding stanza CAS retained as published; identity of later prose is not inferred.",
+                })
+            pending_prose.clear()
             if current_cas and not re.match(r"^\d", current_cas) and current_cas != "N/A":
                 ambiguities.append(
                     {
@@ -404,14 +421,12 @@ def parse_burcat_thr(
             i += 1
             continue
         if current_cas and saw_poly_in_stanza and not line.strip():
+            pending_prose.append((i + 1, line))
             i += 1
             continue
         if current_cas and saw_poly_in_stanza and line.strip():
-            # File footer or unexpected prose after a completed stanza.
-            current_cas = ""
-            current_cas_line = None
-            current_comments = []
-            saw_poly_in_stanza = False
+            current_comments.append(line)
+            pending_prose.append((i + 1, line))
             i += 1
             continue
         i += 1
