@@ -1,0 +1,132 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0080",
+  "census_id": "high-temperature-printed-page-106",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "THORIUI! ( REFEREIICE STATE)",
+  "formula_as_published": "Th",
+  "phase_state_as_published": [
+    "Alpha c·rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
+    "          (body-centered cubic) 1636 to aelting point 2028 K."
+  ],
+  "description_lines_as_published": [
+    "Th:       Alpha c·rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
+    "          (body-centered cubic) 1636 to aelting point 2028 K."
+  ],
+  "formation_basis_header_as_published": "PORIIATION FRO II THE ELEIIE NTS",
+  "formula_weight": {
+    "as_published": "232.038",
+    "value": 232.038,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      112
+    ],
+    "printed_pages": [
+      106
+    ],
+    "pdftotext_layout_page_file": "page-112.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 14"
+  ],
+  "title_line_as_published": "THORIUI! ( REFEREIICE STATE)                                                         FORI'IULA WEIGHT     232.038",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Th:       Alpha c·rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
+    "          (body-centered cubic) 1636 to aelting point 2028 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 PORIIATION FRO II THE ELEIIE NTS",
+    "                                                                                            GIBBS"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "",
+    "entropy": "",
+    "negative_gibbs_function": "",
+    "heat_capacity": "",
+    "formation_enthalpy": "",
+    "formation_gibbs_energy": "",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 15,
+  "uncertainty_line_as_published": "TEIIP.      ( HT-H298 )/T       so       -( G;-H~ 98 )/T       Cp",
+  "uncertainty_values": [
+    {
+      "as_published": "( HT-H298 )/T",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "so",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "-( G;-H~ 98 )/T",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "Cp",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Th:       Alpha c·rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
+    "          (body-centered cubic) 1636 to aelting point 2028 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                  20 28                      BOILING POINT                         5061",
+    "ENTHALPY OF !!ELTING              16.120 kJ                ENTHALPY OF VAPORIZATION             51tt.460 kJ",
+    "                                     6. 510 kJ             IIOLAR VOLUIIE                         1.9788 J/bar",
+    "                                                                                                 19.7dll cm 3",
+    "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
+    "HEAT CAPACITY EQUATION",
+    "           23.317 • 1.2793x1o-z T                   5.i.i662 T-o·s",
+    "              (EQUATION VALID FROII              298- 1636 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 14",
+      "detector_only": false
+    }
+  ]
+}
