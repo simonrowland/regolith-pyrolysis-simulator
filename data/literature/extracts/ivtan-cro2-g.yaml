@@ -1,0 +1,719 @@
+schema_version: literature_extract.v1
+source_id: ivtan-cro2-g
+source:
+  citation: >
+    Osina, E. L. & Gorokhov, L. N. (2009-12-24). IVTANTHERMO electronic continuation,
+    Table 877, CrO2(g). Moscow State University, Faculty of Chemistry.
+    https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+  doi: null
+  url: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+  year: 2009
+  version: electronic-page-2009-12-24
+extraction:
+  method: >
+    Official HTML table transcription of https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html (nested integer/point/fraction
+    cells reconstructed without rounding). Local print PDF of those HTML bytes
+    used only for page locators and pdftotext cross-check. No MinerU. No unit
+    conversion. No Shomate/Antoine refit.
+  date: '2026-09-06'
+  worker: wave-W2-ivtan-cro2-g
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-ivtan-cro2-g/ivtan-cro2-g
+review_status: draft
+fidelity_samples:
+  - path: species.CrO2.observations[ivtan_cro2_g_table877_functions].values.points[2].Cp_J_molK
+    value: 44.651
+    locator:
+      page: 3
+      pdf_page_index: 3
+      table: "877"
+      note: "Table 877 row T=298.150; Cp=44.651 as printed"
+  - path: species.CrO2.observations[ivtan_cro2_g_table877_functions].values.points[2].lg_K
+    value: -162.3435
+    locator:
+      page: 3
+      pdf_page_index: 3
+      table: "877"
+      note: "Table 877 row T=298.150; lg K°=-162.3435 as printed"
+  - species: CrO2
+    observation_id: ivtan_cro2_g_adopted_deltafH
+    observable: gibbs_table
+    field: delta_fH_298_15_kJ_mol_as_printed
+    value: -99.2
+    locator:
+      page: 2
+      pdf_page_index: 2
+      paragraph: thermochemical_quantities
+      note: "DfH°(CrO2, g, 298.15 K) = -99.2 ± 15 kJ mol-1 as printed"
+  - species: CrO2
+    observation_id: ivtan_cro2_g_F_polynomials
+    observable: gibbs_table
+    field: n_segments
+    value: 2
+    locator:
+      page: 4
+      pdf_page_index: 4
+      table: "877"
+      note: "two printed F°(T) polynomial segments under Table 877"
+species:
+  CrO2:
+    observations:
+    - observation_id: ivtan_cro2_g_table877_functions
+      type: gibbs_table
+      locator:
+        table: "877"
+        page: 3
+        pdf_page_index: 3
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+        note: >
+          Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official
+          HTML print-CrO2.html. Calculated (model) thermodynamic functions,
+          not a measured Psat series.
+      T_range_K:
+      - 100.0
+      - 6000.0
+      phase: gas
+      standard_state: IVTAN ideal-gas standard state as tabulated (F°, S°, Cp, H-H0, lg K°)
+      regime: gas_standard_state_thermo
+      units: >
+        T_K; Cp_J_molK, F_J_molK, S_J_molK as J K-1 mol-1; H_minus_H0_kJ_mol as
+        kJ mol-1; lg_K dimensionless log10 K° for CRO2=CR+2O
+      uncertainty:
+        note: >
+          Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2,
+          3 and 3.5 J K-1 mol-1. Authors attribute this mainly to excited-state
+          energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator
+          approximation. Uncertainties of Cp, S, H-H0 and lg K are not printed
+          on the table (absent, not 0).
+        F_J_molK_at_T_K:
+          298.15: 1.0
+          1000.0: 2.0
+          3000.0: 3.0
+          6000.0: 3.5
+      values:
+        quantity: tabulated_thermo_functions
+        table_id: "877"
+        formula: CrO2
+        species_label: CrO2(g)
+        accuracy_class: 5-F
+        reaction: CRO2=CR+2O
+        method_class: compilation_calculated_table
+        model_approximation: rigid_rotor_harmonic_oscillator
+        n_excited_electronic_states_included: 7
+        evidence_kind: model
+        n_points: 61
+        points:
+        - T_K: 100.000
+          Cp_J_molK: 37.095
+          F_J_molK: 191.555
+          S_J_molK: 225.973
+          H_minus_H0_kJ_mol: 3.442
+          lg_K: -506.3048
+          pdf_page: 3
+        - T_K: 200.000
+          Cp_J_molK: 40.955
+          F_J_molK: 216.182
+          S_J_molK: 252.980
+          H_minus_H0_kJ_mol: 7.360
+          lg_K: -247.7050
+          pdf_page: 3
+        - T_K: 298.150
+          Cp_J_molK: 44.651
+          F_J_molK: 231.244
+          S_J_molK: 270.011
+          H_minus_H0_kJ_mol: 11.558
+          lg_K: -162.3435
+          pdf_page: 3
+        - T_K: 300.000
+          Cp_J_molK: 44.721
+          F_J_molK: 231.484
+          S_J_molK: 270.288
+          H_minus_H0_kJ_mol: 11.641
+          lg_K: -161.2696
+          pdf_page: 3
+        - T_K: 400.000
+          Cp_J_molK: 48.155
+          F_J_molK: 242.914
+          S_J_molK: 283.642
+          H_minus_H0_kJ_mol: 16.291
+          lg_K: -117.9620
+          pdf_page: 3
+        - T_K: 500.000
+          Cp_J_molK: 50.738
+          F_J_molK: 252.195
+          S_J_molK: 294.681
+          H_minus_H0_kJ_mol: 21.243
+          lg_K: -91.9356
+          pdf_page: 3
+        - T_K: 600.000
+          Cp_J_molK: 52.607
+          F_J_molK: 260.080
+          S_J_molK: 304.106
+          H_minus_H0_kJ_mol: 26.415
+          lg_K: -74.5623
+          pdf_page: 3
+        - T_K: 700.000
+          Cp_J_molK: 53.990
+          F_J_molK: 266.969
+          S_J_molK: 312.324
+          H_minus_H0_kJ_mol: 31.748
+          lg_K: -62.1397
+          pdf_page: 3
+        - T_K: 800.000
+          Cp_J_molK: 55.055
+          F_J_molK: 273.102
+          S_J_molK: 319.606
+          H_minus_H0_kJ_mol: 37.203
+          lg_K: -52.8144
+          pdf_page: 3
+        - T_K: 900.000
+          Cp_J_molK: 55.912
+          F_J_molK: 278.639
+          S_J_molK: 326.141
+          H_minus_H0_kJ_mol: 42.752
+          lg_K: -45.5557
+          pdf_page: 3
+        - T_K: 1000.000
+          Cp_J_molK: 56.629
+          F_J_molK: 283.690
+          S_J_molK: 332.070
+          H_minus_H0_kJ_mol: 48.380
+          lg_K: -39.7448
+          pdf_page: 3
+        - T_K: 1100.000
+          Cp_J_molK: 57.253
+          F_J_molK: 288.338
+          S_J_molK: 337.497
+          H_minus_H0_kJ_mol: 54.075
+          lg_K: -34.9876
+          pdf_page: 3
+        - T_K: 1200.000
+          Cp_J_molK: 57.812
+          F_J_molK: 292.646
+          S_J_molK: 342.504
+          H_minus_H0_kJ_mol: 59.829
+          lg_K: -31.0211
+          pdf_page: 3
+        - T_K: 1300.000
+          Cp_J_molK: 58.326
+          F_J_molK: 296.662
+          S_J_molK: 347.151
+          H_minus_H0_kJ_mol: 65.636
+          lg_K: -27.6631
+          pdf_page: 3
+        - T_K: 1400.000
+          Cp_J_molK: 58.805
+          F_J_molK: 300.425
+          S_J_molK: 351.492
+          H_minus_H0_kJ_mol: 71.493
+          lg_K: -24.7835
+          pdf_page: 3
+        - T_K: 1500.000
+          Cp_J_molK: 59.256
+          F_J_molK: 303.967
+          S_J_molK: 355.564
+          H_minus_H0_kJ_mol: 77.396
+          lg_K: -22.2868
+          pdf_page: 3
+        - T_K: 1600.000
+          Cp_J_molK: 59.684
+          F_J_molK: 307.313
+          S_J_molK: 359.402
+          H_minus_H0_kJ_mol: 83.343
+          lg_K: -20.1012
+          pdf_page: 3
+        - T_K: 1700.000
+          Cp_J_molK: 60.091
+          F_J_molK: 310.485
+          S_J_molK: 363.033
+          H_minus_H0_kJ_mol: 89.332
+          lg_K: -18.1720
+          pdf_page: 3
+        - T_K: 1800.000
+          Cp_J_molK: 60.480
+          F_J_molK: 313.501
+          S_J_molK: 366.479
+          H_minus_H0_kJ_mol: 95.361
+          lg_K: -16.4564
+          pdf_page: 3
+        - T_K: 1900.000
+          Cp_J_molK: 60.851
+          F_J_molK: 316.376
+          S_J_molK: 369.759
+          H_minus_H0_kJ_mol: 101.428
+          lg_K: -14.9208
+          pdf_page: 3
+        - T_K: 2000.000
+          Cp_J_molK: 61.205
+          F_J_molK: 319.124
+          S_J_molK: 372.889
+          H_minus_H0_kJ_mol: 107.531
+          lg_K: -13.5380
+          pdf_page: 3
+        - T_K: 2100.000
+          Cp_J_molK: 61.544
+          F_J_molK: 321.756
+          S_J_molK: 375.884
+          H_minus_H0_kJ_mol: 113.668
+          lg_K: -12.2864
+          pdf_page: 3
+        - T_K: 2200.000
+          Cp_J_molK: 61.870
+          F_J_molK: 324.282
+          S_J_molK: 378.754
+          H_minus_H0_kJ_mol: 119.839
+          lg_K: -11.1479
+          pdf_page: 3
+        - T_K: 2300.000
+          Cp_J_molK: 62.183
+          F_J_molK: 326.711
+          S_J_molK: 381.511
+          H_minus_H0_kJ_mol: 126.042
+          lg_K: -10.1079
+          pdf_page: 3
+        - T_K: 2400.000
+          Cp_J_molK: 62.485
+          F_J_molK: 329.050
+          S_J_molK: 384.164
+          H_minus_H0_kJ_mol: 132.275
+          lg_K: -9.1539
+          pdf_page: 3
+        - T_K: 2500.000
+          Cp_J_molK: 62.777
+          F_J_molK: 331.306
+          S_J_molK: 386.721
+          H_minus_H0_kJ_mol: 138.539
+          lg_K: -8.2758
+          pdf_page: 3
+        - T_K: 2600.000
+          Cp_J_molK: 63.060
+          F_J_molK: 333.485
+          S_J_molK: 389.189
+          H_minus_H0_kJ_mol: 144.831
+          lg_K: -7.4646
+          pdf_page: 3
+        - T_K: 2700.000
+          Cp_J_molK: 63.334
+          F_J_molK: 335.592
+          S_J_molK: 391.574
+          H_minus_H0_kJ_mol: 151.150
+          lg_K: -6.7130
+          pdf_page: 3
+        - T_K: 2800.000
+          Cp_J_molK: 63.599
+          F_J_molK: 337.633
+          S_J_molK: 393.882
+          H_minus_H0_kJ_mol: 157.497
+          lg_K: -6.0145
+          pdf_page: 3
+        - T_K: 2900.000
+          Cp_J_molK: 63.857
+          F_J_molK: 339.611
+          S_J_molK: 396.118
+          H_minus_H0_kJ_mol: 163.870
+          lg_K: -5.3638
+          pdf_page: 3
+        - T_K: 3000.000
+          Cp_J_molK: 64.106
+          F_J_molK: 341.531
+          S_J_molK: 398.287
+          H_minus_H0_kJ_mol: 170.268
+          lg_K: -4.7559
+          pdf_page: 3
+        - T_K: 3100.000
+          Cp_J_molK: 64.348
+          F_J_molK: 343.396
+          S_J_molK: 400.393
+          H_minus_H0_kJ_mol: 176.691
+          lg_K: -4.1867
+          pdf_page: 3
+        - T_K: 3200.000
+          Cp_J_molK: 64.581
+          F_J_molK: 345.210
+          S_J_molK: 402.440
+          H_minus_H0_kJ_mol: 183.137
+          lg_K: -3.6527
+          pdf_page: 3
+        - T_K: 3300.000
+          Cp_J_molK: 64.806
+          F_J_molK: 346.974
+          S_J_molK: 404.431
+          H_minus_H0_kJ_mol: 189.607
+          lg_K: -3.1505
+          pdf_page: 4
+        - T_K: 3400.000
+          Cp_J_molK: 65.022
+          F_J_molK: 348.693
+          S_J_molK: 406.369
+          H_minus_H0_kJ_mol: 196.098
+          lg_K: -2.6775
+          pdf_page: 4
+        - T_K: 3500.000
+          Cp_J_molK: 65.229
+          F_J_molK: 350.368
+          S_J_molK: 408.256
+          H_minus_H0_kJ_mol: 202.611
+          lg_K: -2.2311
+          pdf_page: 4
+        - T_K: 3600.000
+          Cp_J_molK: 65.427
+          F_J_molK: 352.001
+          S_J_molK: 410.097
+          H_minus_H0_kJ_mol: 209.144
+          lg_K: -1.8090
+          pdf_page: 4
+        - T_K: 3700.000
+          Cp_J_molK: 65.614
+          F_J_molK: 353.596
+          S_J_molK: 411.892
+          H_minus_H0_kJ_mol: 215.696
+          lg_K: -1.4093
+          pdf_page: 4
+        - T_K: 3800.000
+          Cp_J_molK: 65.791
+          F_J_molK: 355.153
+          S_J_molK: 413.644
+          H_minus_H0_kJ_mol: 222.266
+          lg_K: -1.0303
+          pdf_page: 4
+        - T_K: 3900.000
+          Cp_J_molK: 65.957
+          F_J_molK: 356.675
+          S_J_molK: 415.355
+          H_minus_H0_kJ_mol: 228.854
+          lg_K: -0.6703
+          pdf_page: 4
+        - T_K: 4000.000
+          Cp_J_molK: 66.113
+          F_J_molK: 358.163
+          S_J_molK: 417.027
+          H_minus_H0_kJ_mol: 235.457
+          lg_K: -0.3280
+          pdf_page: 4
+        - T_K: 4100.000
+          Cp_J_molK: 66.257
+          F_J_molK: 359.618
+          S_J_molK: 418.661
+          H_minus_H0_kJ_mol: 242.076
+          lg_K: -0.0019
+          pdf_page: 4
+        - T_K: 4200.000
+          Cp_J_molK: 66.390
+          F_J_molK: 361.043
+          S_J_molK: 420.260
+          H_minus_H0_kJ_mol: 248.708
+          lg_K: 0.3090
+          pdf_page: 4
+        - T_K: 4300.000
+          Cp_J_molK: 66.512
+          F_J_molK: 362.439
+          S_J_molK: 421.823
+          H_minus_H0_kJ_mol: 255.353
+          lg_K: 0.6058
+          pdf_page: 4
+        - T_K: 4400.000
+          Cp_J_molK: 66.622
+          F_J_molK: 363.806
+          S_J_molK: 423.354
+          H_minus_H0_kJ_mol: 262.010
+          lg_K: 0.8896
+          pdf_page: 4
+        - T_K: 4500.000
+          Cp_J_molK: 66.721
+          F_J_molK: 365.146
+          S_J_molK: 424.852
+          H_minus_H0_kJ_mol: 268.678
+          lg_K: 1.1611
+          pdf_page: 4
+        - T_K: 4600.000
+          Cp_J_molK: 66.809
+          F_J_molK: 366.460
+          S_J_molK: 426.319
+          H_minus_H0_kJ_mol: 275.354
+          lg_K: 1.4211
+          pdf_page: 4
+        - T_K: 4700.000
+          Cp_J_molK: 66.886
+          F_J_molK: 367.749
+          S_J_molK: 427.757
+          H_minus_H0_kJ_mol: 282.039
+          lg_K: 1.6705
+          pdf_page: 4
+        - T_K: 4800.000
+          Cp_J_molK: 66.953
+          F_J_molK: 369.014
+          S_J_molK: 429.166
+          H_minus_H0_kJ_mol: 288.731
+          lg_K: 1.9098
+          pdf_page: 4
+        - T_K: 4900.000
+          Cp_J_molK: 67.008
+          F_J_molK: 370.255
+          S_J_molK: 430.547
+          H_minus_H0_kJ_mol: 295.429
+          lg_K: 2.1398
+          pdf_page: 4
+        - T_K: 5000.000
+          Cp_J_molK: 67.053
+          F_J_molK: 371.475
+          S_J_molK: 431.901
+          H_minus_H0_kJ_mol: 302.133
+          lg_K: 2.3609
+          pdf_page: 4
+        - T_K: 5100.000
+          Cp_J_molK: 67.089
+          F_J_molK: 372.673
+          S_J_molK: 433.229
+          H_minus_H0_kJ_mol: 308.840
+          lg_K: 2.5738
+          pdf_page: 4
+        - T_K: 5200.000
+          Cp_J_molK: 67.115
+          F_J_molK: 373.850
+          S_J_molK: 434.532
+          H_minus_H0_kJ_mol: 315.550
+          lg_K: 2.7788
+          pdf_page: 4
+        - T_K: 5300.000
+          Cp_J_molK: 67.132
+          F_J_molK: 375.007
+          S_J_molK: 435.811
+          H_minus_H0_kJ_mol: 322.262
+          lg_K: 2.9765
+          pdf_page: 4
+        - T_K: 5400.000
+          Cp_J_molK: 67.140
+          F_J_molK: 376.145
+          S_J_molK: 437.066
+          H_minus_H0_kJ_mol: 328.976
+          lg_K: 3.1672
+          pdf_page: 4
+        - T_K: 5500.000
+          Cp_J_molK: 67.140
+          F_J_molK: 377.264
+          S_J_molK: 438.298
+          H_minus_H0_kJ_mol: 335.690
+          lg_K: 3.3514
+          pdf_page: 4
+        - T_K: 5600.000
+          Cp_J_molK: 67.131
+          F_J_molK: 378.364
+          S_J_molK: 439.508
+          H_minus_H0_kJ_mol: 342.404
+          lg_K: 3.5294
+          pdf_page: 4
+        - T_K: 5700.000
+          Cp_J_molK: 67.116
+          F_J_molK: 379.447
+          S_J_molK: 440.696
+          H_minus_H0_kJ_mol: 349.116
+          lg_K: 3.7016
+          pdf_page: 4
+        - T_K: 5800.000
+          Cp_J_molK: 67.093
+          F_J_molK: 380.513
+          S_J_molK: 441.863
+          H_minus_H0_kJ_mol: 355.826
+          lg_K: 3.8681
+          pdf_page: 4
+        - T_K: 5900.000
+          Cp_J_molK: 67.063
+          F_J_molK: 381.563
+          S_J_molK: 443.010
+          H_minus_H0_kJ_mol: 362.534
+          lg_K: 4.0295
+          pdf_page: 4
+        - T_K: 6000.000
+          Cp_J_molK: 67.028
+          F_J_molK: 382.597
+          S_J_molK: 444.136
+          H_minus_H0_kJ_mol: 369.239
+          lg_K: 4.1858
+          pdf_page: 4
+    - observation_id: ivtan_cro2_g_adopted_deltafH
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 2
+        paragraph: thermochemical_quantities
+        table: "877"
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        note: >
+          Prose adopted DfH° and DrH°; footer M, DH°(0), DH°(298.15 K), S°яд
+          on PDF page 4. Compilation selection of measured KEMS, not a raw
+          ion-current series.
+      T_range_K:
+      - 0.0
+      - 298.15
+      phase: gas
+      standard_state: IVTAN adopted formation / dissociation enthalpies for CrO2(g)
+      regime: gas_standard_state_thermo
+      units: kJ mol-1 (enthalpies); J K-1 mol-1 (S°яд); M as printed 83.9948
+      uncertainty:
+        note: >
+          Printed ±15 kJ mol-1 on both DfH°(298.15 K)=-99.2 and DrH°(0 K)=985.971.
+          Authors list reproducibility, ionization cross-sections, DfH°(Cr,g) and
+          thermodynamic-function error as the envelope components. Footer DH°
+          values are printed without a second uncertainty figure.
+        delta_fH_298_15_kJ_mol: 15.0
+        DrH_0_kJ_mol: 15.0
+      values:
+        quantity: adopted_formation_enthalpy
+        evidence_kind: compilation_selected_from_measured
+        method_class: review_compilation
+        formula: CrO2
+        delta_fH_298_15_kJ_mol_as_printed: -99.2
+        delta_fH_298_15_kJ_mol_table_footer: -99.200
+        delta_fH_0_kJ_mol_table_footer: -98.028
+        DrH_0_kJ_mol: 985.971
+        reaction: CrO2(g) = Cr(g) + 2O(g)
+        selection_reaction: Cr(g) + CrO2(g) = 2CrO(g)
+        selection_sources:
+        - "[61GRI/BUR2]"
+        - "[77ГОР/ГУС]"
+        selection_table_not_on_this_page: Cr.T4
+        excluded_reaction: CrO(g) + O(g) = CrO2(g)
+        excluded_reason: >
+          Grimley 1961 atomic-oxygen partial pressure judged unreliable (O2=2O
+          and Cr2O3=2Cr+3O checks).
+        M_as_printed: 83.9948
+        S_nuclear_J_molK: 6.366
+        adopted_r_CrO_angstrom: 1.60
+        adopted_r_CrO_angstrom_uncertainty: 0.02
+        adopted_angle_OCrO_deg: 128.0
+        adopted_angle_OCrO_deg_uncertainty: 4.0
+        IABC_uncertainty_g3_cm6: 3.0e-116
+        IABC_value: absent
+        nu_1_cm_m1: absent
+        nu_2_cm_m1: absent
+        nu_3_cm_m1: absent
+        nu_uncertainties_cm_m1:
+        - 30
+        - 20
+        - 20
+        molecular_constants_table: Cr.M1
+        molecular_constants_table_on_this_page: absent
+        note: >
+          Footer DH°(298.15 K)=-99.200 is the same adopted enthalpy as the prose
+          -99.2 ± 15, printed with extra digit. IABC product and vibrational
+          frequencies live in table Cr.M1, which is not on this URL (absent, not 0).
+    - observation_id: ivtan_cro2_g_gurvich1982_competing_deltafH
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 3
+        paragraph: gurvich_1982_comparison
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        note: "[82ГУР/ВЕЙ] competing DfH° quoted on this page; not adopted here"
+      T_range_K:
+      - 298.15
+      - 298.15
+      phase: gas
+      standard_state: Gurvich 1982 TSIV value as quoted by this IVTAN page
+      regime: gas_standard_state_thermo
+      units: kJ mol-1
+      uncertainty:
+        note: "±15 kJ mol-1 as printed for the Gurvich 1982 value"
+        delta_fH_298_15_kJ_mol: 15.0
+      values:
+        quantity: competing_formation_enthalpy
+        evidence_kind: competing_compilation
+        method_class: review_compilation
+        semantics: competing_observation_do_not_average
+        formula: CrO2
+        delta_fH_298_15_kJ_mol_as_printed: -108.038
+        citation_key: "[82ГУР/ВЕЙ]"
+        note: >
+          Same underlying KEMS data as the adopted -99.2 value, different
+          evaluation. Do not average with ivtan_cro2_g_adopted_deltafH.
+    - observation_id: ivtan_cro2_g_F_polynomials
+      type: gibbs_table
+      locator:
+        page: 4
+        pdf_page_index: 4
+        table: "877"
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        note: printed F°(T) polynomials under Table 877
+      T_range_K:
+      - 298.15
+      - 6000.0
+      phase: gas
+      standard_state: IVTAN F°(T) polynomial representation of Table 877
+      regime: gas_standard_state_thermo
+      units: F° in J K-1 mol-1 with x = T × 10^-4
+      uncertainty:
+        note: >
+          Polynomials are a printed model of the tabulated F° grid. No separate
+          polynomial-fit residual is printed (absent, not 0). Tabulated F°
+          uncertainties are on ivtan_cro2_g_table877_functions.
+      values:
+        quantity: F_polynomial
+        evidence_kind: model
+        method_class: compilation_calculated_table
+        n_segments: 2
+        x_definition: x = T * 1.0e-4
+        formula_as_printed: >
+          F°(T) = a0 + a_lnx ln x + a_x_m2 x^-2 + a_x_m1 x^-1 + a_x x + a_x2 x^2
+          + a_x3 x^3
+        segments:
+        - T_min_K_exclusive: 298.15
+          T_max_K_exclusive: 1500.00
+          a0: 356.287719727
+          a_lnx: 38.94165802
+          a_x_m2: -0.00143672083504
+          a_x_m1: 0.244931846857
+          a_x: 184.906555176
+          a_x2: -429.59753418
+          a_x3: 568.350341797
+        - T_min_K_exclusive: 1500.00
+          T_max_K_exclusive: 6000.00
+          a0: 396.82989502
+          a_lnx: 53.5830001831
+          a_x_m2: -0.00545618031174
+          a_x_m1: 0.853297233582
+          a_x: 23.1043167114
+          a_x2: -5.22404003143
+          a_x3: -1.16083025932
+        bibliography_on_page:
+        - key: "[61BRE/ROS]"
+          citation: "Brewer L., Rosenblatt G.M. -\"Dissociation Energies of Gaseous Metal Dioxides.\" Chem. Rev., 1961, 61, No.3, p.257-263"
+        - key: "[61GRI/BUR2]"
+          citation: "Grimley R.T., Burns R.P., Inghram M.G. -\"Thermodynamics of the Vaporization of Cr2O3: Dissociation Energies of CrO, CrO2, and CrO3.\" J. Chem. Phys., 1961, 34, No.2, p.664-667"
+        - key: "[63GOR/ROB]"
+          citation: "Gordon J.S., Robinson R. -'В сб.:Kinetics equilibria and performance of high-temperature system: Proc. of the 2nd Conf., 1962/Ed. G.S. Bahn. N.Y.;L.1963.' , 1963, p.39"
+        - key: "[63NAG]"
+          citation: "Nagarajan G. -\"Mean amplitudes of vibration and thermodynamic functions of chromium dioxide and chromium trioxide.\" Austral. J. Chem., 1963, 16, No.5, p.908-914"
+        - key: "[66SCH]"
+          citation: "Schick H.L. -'Thermodynamics of certain refractory compounds. N.Y.;L.:Acad. Press, 1966, vol. 1, 2.' , 1966"
+        - key: "[75СЕР/МАЛ]"
+          citation: "Серебреников Л.В., Мальцев А.А. -\"ИК спектры поглощения молекул двуокисей хрома и молибдена в матрице из аргона.\" Вестн. Моск.ун-та, сер. химия, 2, 1975, 16, No.2, с.251-261"
+        - key: "[77ГОР/ГУС]"
+          citation: "Горохов Л.Н., Гусаров А.В. и др. -\"Масс-спектрометрическое определение энтальпий образования молекул CrO и CrO2.\" Отчет, Институт высоких температур АН СССР, 1977, No. 43-77"
+        - key: "[82ГУР/ВЕЙ]"
+          citation: "Гурвич Л.В., Вейц И.В., Медведев В.А., Бергман Г.А., Юнгман В. С., Хачкурузов Г.А., и др. -'Термодинамические свойства индивидуальных веществ. Справочное издание в 4-х томах.' Редакторы: Глушко В.П. и др., Москва: Наука, 1982, с.1-620"
+        - key: "[85CHA/DAV]"
+          citation: "Chase M.W., Davies C.A., Downey J.R., Frurip D.J., McDonald R. A., Syverud A.N. -\"JANAF Thermochemical Tables.\"'JANAF thermochemical tables. Third edition. J. Phys. and Chem. Ref. Data.' , 1985, 14, No.Suppl.1, p.1-1856"
+        - key: "[88ALM/DOW]"
+          citation: "Almond M.J., Downs A.J. -\"Production of binary oxides by photolysis of M(CO)6 molecules (M=Cr, Mo or W) isolated in O2-doped argon matrices.\" J. Chem. Soc., Dalton Trans., 1988, p.809-817"
+        - key: "[88ALM/HAH]"
+          citation: "Almond M.J., Hahne M. -\"Formation of molecular chromium(IV) oxide (CrO2) by photolysis of Cr(CO)6 in O2-doped argon matrices.\" J. Chem. Soc., Dalton Trans., 1988, p.2255-2260"
+        - key: "[97CHE/BAR]"
+          citation: "Chertihin G.V., Bare W.D., Andrews L. -\"Reactions of laser-ablated chromium atoms with dioxygen. Infrared spectra of CrO, OCrO, CrOO, CrO3, Cr(OO)2, Cr2O2, Cr2O3 and Cr2O4 in solid argon.\" J. Chem. Phys., 1997, 107, No.8, p. 2798-2806"
+        - key: "[97WEN/JON]"
+          citation: "Wenthold P.G., Jonas K.-L., Lineberger W.C. - \"Ultraviolet photoelectron spectroscopy of the chromium dioxide negative ion.\" J. Chem. Phys., 1997, 106, No.23, p. 9961-9962"
+        - key: "[98ESP/BOR]"
+          citation: "Espelid O., Borve K., Jensen V.R. -\"Structure and thermodynamics of gaseous oxides, hydroxides, and mixed oxohydroxides of chromium: CrOm(OH)n(m, n=0-2) and CrO3. A computational study.\" J. Phys. Chem. A, 1998, 102, No.50, p. 10414-10423"
+        - key: "[98MAR]"
+          citation: "Martinez A. -\"Reaction of Cr atom with H2, N2, and O2: A density functional study.\" J. Phys. Chem. A, 1998, 102, No.8, p.1381-1388"
+        - key: "[98VEL/XIA]"
+          citation: "Veliah S., Xiang K., Pandey R., Recio J.M., Newsam J.M. - \"Density functional study of chromium oxide clusters: structures, bonding, vibrations and stability.\" J. Phys. B, 1998, 102, No.7, p.1126-1135"
+        - key: "[99ZHO/AND]"
+          citation: "Zhou M., Andrews L. -\"Infrared spectra and density functional calculations of the CrO2-, MoO2- and WO2- molecular anions in solid neon.\" J. Chem. Phys., 1999, 111, No.9, p. 4230-4238"
+        - key: "[2000GUT/RAO2]"
+          citation: "Gutsev G.L., Rao B.K., Jena P. -\"Systematic study of oxo, peroxo and superoxo isomers of 3d-metal dioxides and their anions.\" J. Phys. Chem. A, 2000, 104, No.51, p.11961-11971"
+        - key: "[2000LI/XU]"
+          citation: "Li G.-L., Xu W.-G., Li Q.-S. -\"A density functional theory study on low-lying states of CrO2.\" J. Mol. Struct. Theochem., 2000, 498, p.61-68"
+        - key: "[2001GUT/JEN]"
+          citation: "Gutsev G.L., Jena P., Zhai H.-J., Wang L.-S. -\"Electronic structure of chromium oxides, CrOn- and CrOn (n=1-5) from photoelectron spectroscopy and density functional theory calculations.\" J. Chem. Phys., 2001, 115, No.17, p.7935-7944"
+        - key: "[2008GRE]"
+          citation: "Grein F. -\"DFT and MRCI studies on ground and excited of CrO2.\" Chem. Phys., 2008, 343, p.231-240"
