@@ -1,0 +1,129 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0222",
+  "census_id": "high-temperature-printed-page-248",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "ZIHCITE",
+  "formula_as_published": "zno",
+  "phase_state_as_published": [
+    "crystals 298.15 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "zno:      crystals 298.15 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "81.379",
+    "value": 81.379,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      254
+    ],
+    "printed_pages": [
+      248
+    ],
+    "pdftotext_layout_page_file": "page-254.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 35, 37, 71"
+  ],
+  "title_line_as_published": "ZIHCITE                                                                           POBIULl &BIGHT     81.379",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "zno:      crystals 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POBilTIOI PRO! THE BLEIBITS",
+    "                                                                                       GIBBS",
+    "TBIP.      (H;-H~ 98 )/T       SD",
+    "                                T      -(c;;-H;98)/T      CDp     EITHlLPI           Pill BlDG!      Log 't",
+    "  K         J/aol•K        J/aol•K       J/aol•K       J/aol• K          kJ/aol        kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol• K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 19,
+  "uncertainty_line_as_published": "UICEBTlliTY                    0.40            0.40                        0.270          0.300       0.053",
+  "uncertainty_values": [
+    {
+      "as_published": "0.40",
+      "value": 0.4,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.40",
+      "value": 0.4,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.270",
+      "value": 0.27,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.300",
+      "value": 0.3,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.053",
+      "value": 0.053,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "zno:      crystals 298.15 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 35, 37, 71",
+      "detector_only": false
+    }
+  ]
+}

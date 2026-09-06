@@ -1,0 +1,141 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0229",
+  "census_id": "high-temperature-printed-page-255",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "COBALT SPINEL",
+  "formula_as_published": "Co 3 o.",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1000 K."
+  ],
+  "description_lines_as_published": [
+    "Co 3 o.:    Crystals 298.15 to 1000 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "240.797",
+    "value": 240.797,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      261
+    ],
+    "printed_pages": [
+      255
+    ],
+    "pdftotext_layout_page_file": "page-261.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28"
+  ],
+  "title_line_as_published": "COBALT SPINEL                                                                      FOBftULA WEIGHT    240.797",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Co 3 o.:    Crystals 298.15 to 1000 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBIUTION FBOft THE ELEftE!ITS",
+    "                                                                                         GIBBS",
+    "TEftP.      (a;-a~ 98 )/T      so      -(G;-a~ 98 )/T      cop         ENTHALPY       FREE ENERGY      Log Kf",
+    "                                T",
+    "   K         J/•ol•K        J/IIOl•K     J/1101• K      J/1101• K         kJ/ao1         kJ/ao1",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/•ol•K",
+    "entropy": "J/IIOl•K",
+    "negative_gibbs_function": "J/1101• K",
+    "heat_capacity": "J/1101• K",
+    "formation_enthalpy": "kJ/ao1",
+    "formation_gibbs_energy": "kJ/ao1",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 9,
+  "uncertainty_line_as_published": "UNCERTAINTY                    0.84            0.84                         8.500          8.500        1.489",
+  "uncertainty_values": [
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "8.500",
+      "value": 8.5,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "8.500",
+      "value": 8.5,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.489",
+      "value": 1.489,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Co 3 o.:    Crystals 298.15 to 1000 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "MELTING POINT                             K             BOILING POINT                                   K",
+    "ENTHALPY OF MELTING                       kJ            ENTHALPY OF VAPORIZATION                        kJ",
+    "                                          kJ            llOLAR VOLUME                          3.9770 J/bar",
+    "                                                                                              39.770 ca 3",
+    "TRANSITIONS IN REFEREHCE STATE ELEMENTS",
+    "    COBALT ••••• ALPHA-BETA 700, CURIE P. 1394•                  ft.    P. BETA 1768 K.",
+    "HEAT CAPACITY EQUATION",
+    "           -4.8355x102 +  0.34236 T               1.1845x10• T-o·s",
+    "               (EQUATION VALID FROft           298 - 1000 K)",
+    "REFEBE NCE       129           263                                           263                     COftPILED",
+    "                                                                                                      8- 4-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28",
+      "detector_only": false
+    }
+  ]
+}

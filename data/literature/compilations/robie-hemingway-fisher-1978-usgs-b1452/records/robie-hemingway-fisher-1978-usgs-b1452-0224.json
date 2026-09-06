@@ -1,0 +1,124 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0224",
+  "census_id": "high-temperature-printed-page-250",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "Tll.LITE",
+  "formula_as_published": "Al 2 Ti0 5",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Al 2 Ti0 5 :     Crystals 298.15 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "181.861",
+    "value": 181.861,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      256
+    ],
+    "printed_pages": [
+      250
+    ],
+    "pdftotext_layout_page_file": "page-256.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "16 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 22, 23, 24, 25, 26, 27, 29, 31, 33, 35, 36, 37, 38, 39, 40"
+  ],
+  "title_line_as_published": "Tll.LITE                                                                             FOBKULA WEIGHT    181.861",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Al 2 Ti0 5 :     Crystals 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOR!lTIOJ FRO II THE ELEMENTS",
+    "                                                                                          GIBBS",
+    "TEIIP.         ( H;-H~ 98 )/T      so",
+    "                                    T      -(G;-H~ 98 )/T      cop    EJITHALPY        FREE EBBBGY      .Log Kf",
+    "   K            Jjaol•K         J/aol•K      J/aol•K        J/aol•K         kJ/aol         kJ;aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jjaol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ;aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 16,
+  "uncertainty_line_as_published": "UBCEBTliBTY                        o. 84            0.84",
+  "uncertainty_values": [
+    {
+      "as_published": "o. 84",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Al 2 Ti0 5 :     Crystals 298.15 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "!ELTING POUT                                  K             BOILING POINT",
+    "EBTHALPY OF IIELTIBG                          kJ            EBTHALPY OF VAPORIZATION                     kJ",
+    "                                              ltJ           KOLAR VOLUIIE                      4.8750 J/bar",
+    "                                                                                              48.750 ca3",
+    "TRABSITIOBS IN REFEREBCE STATE E.LE!EliTS",
+    "      ALU!IBU! ••• ft. P. 933 K.",
+    "      TITABIUI! ••• ALPHA-BETA 1155• II. P. 1943 K.",
+    "HEAT CAPACITY EQUATION",
+    "           2.1110x1oz +           1.4609x1o-z T -  6.6101x10Z           r-o·s",
+    "                 (EQUATIOB VALID FROII       298- 1800 K)",
+    "BEFE.REBCE           21            120                                                                COIIPILED",
+    "                                                                                                       8- 2-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "16 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 22, 23, 24, 25, 26, 27, 29, 31, 33, 35, 36, 37, 38, 39, 40",
+      "detector_only": false
+    }
+  ]
+}
