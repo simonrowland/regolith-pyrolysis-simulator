@@ -1,0 +1,2467 @@
+schema_version: literature_extract.v1
+source_id: kems-140-heck-2025
+source:
+  citation: Heck, W. F., Herrmann, A. D. & Jackson, C. R. M. (2025), "Experimental degassing of moderately
+    volatile chalcophile elements from silicate melt with and without sulfur present", Geochim. Cosmochim.
+    Acta 402:153-172, DOI 10.1016/j.gca.2025.05.007
+  doi: 10.1016/j.gca.2025.05.007
+  url: https://doi.org/10.1016/j.gca.2025.05.007
+  year: 2025
+  related_sources:
+  - document: 10.17632/hpmts74ksr.1
+    relation: author_data_tables_mendeley
+    note: CC BY 4.0 data tables reported in the paper (Tables 1-6 and S1-S5).
+  - document: 10.1016/j.gca.2025.12.014
+    relation: publisher_erratum
+    note: Erratum GCA 413:267 (2026-01-15). CC-BY VOR. Typeset PDF not obtained (ScienceDirect 403 / CDN
+      400). Erratum body unseen this round.
+extraction:
+  method: 'Official OA: Crossref VOR CC BY 4.0. DOI resolves (curl -sI 302 linkinghub PII S0016703725002406).
+    ScienceDirect article/pdf HTTP 403 Cloudflare JS challenge — not bypassed. ars.els-cdn main.pdf HTTP
+    400 NONAUTHATTACH; am.pdf 404. LSU repository landing 200 but viewcontent 403 JS challenge — not bypassed.
+    HAL/PMC/EuropePMC empty. Tables 1-6 and S1-S5 transcribed from official Mendeley Data xlsx DOI 10.17632/hpmts74ksr.1
+    (CC BY 4.0); S1-S5 byte-identical to Elsevier CDN mmc1-mmc5.xlsx. Figures 1-12 from Elsevier CDN grN_lrg.jpg;
+    listed figure-only except Fig. 1 printed r_total labels. No MinerU. No unit conversion. Measured EPMA/LA-ICP-MS
+    kept distinct from inverse-model D, fitted K*/ΔH*/ΔS*, and magma-ocean Fig. 12. S1 printed 0 = below
+    detection limit (footnote), not a measured zero. Round 2 (review F-1/F-2/F-3): inverse-model Table 4 D
+    and Table S5 3L retyped gibbs_table + method_class model_derived (kems-036 convention) with semantics
+    inverse_model_fit_not_measured_rate; composition/run-log/ppm parked as gibbs_table not rate_series;
+    chamber_pressure 1.0 atm flagged inferred from printed atm=atmospheric air / log10 fO2=-0.68.'
+  date: '2026-09-06'
+  worker: wave-W2-kems-140-heck-2025
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-140-heck-2025/kems-140-heck-2025/
+review_status: draft
+fidelity_samples:
+- species: Ag
+  observable: gibbs_table
+  observation_id: heck_2025_t6_agop5_agg_ag_HS
+  field: delta_Hstar_kJ_mol
+  value: 212.91866
+  locator:
+    table: '6'
+    note: AgO.5(melt)=Ag(g)+0.25O2(g) ΔH*=212.91866 kJ/mol
+- species: Fe
+  observable: gibbs_table
+  observation_id: heck_2025_t2_starting_major_compositions
+  field: SiO2_avg_mass_pct
+  value: 39.60473454638624
+  locator:
+    table: '2'
+    note: MVE O2 SiO2 avg. mass % 39.60473454638624
+- species: Cu
+  observable: gibbs_table
+  observation_id: heck_2025_t3_initial_cu_ppm
+  field: ppm
+  value: 143.37566
+  locator:
+    table: '3'
+    note: Cu MVE O2 1673 K 143.37566 ppm
+- species: As
+  observable: gibbs_table
+  observation_id: heck_2025_t4_as_diffusivity_inverse_model
+  field: D_as_printed
+  value: 0.065083844
+  locator:
+    table: '4'
+    note: KFCMAS 4 1523 K As 0.065083844 (m/s2 *10-10)
+- species: Cu
+  observable: gibbs_table
+  observation_id: heck_2025_t5_logKstar_CuOp5_Cug_cu
+  field: log_Kstar
+  value: -5.57240534813701
+  locator:
+    table: '5'
+    note: CuO.5 1481 K log K*=-5.57240534813701
+- species: Cu
+  observable: gibbs_table
+  observation_id: heck_2025_t1_experimental_conditions
+  field: T_K
+  value: 1523
+  locator:
+    table: '1'
+    note: Ex 126 T=1523 K t=120 min KFCMAS 3
+- species: Cu
+  observable: gibbs_table
+  observation_id: heck_2025_s2_mvce_laicpms_profiles
+  field: Cu63
+  value: 172.8
+  locator:
+    table: S2
+    note: Ex 7 analysis 1 Cu 63 = 172.8 weight ppm
+- species: Ag
+  observable: gibbs_table
+  observation_id: heck_2025_t6_agop5_agg_ag_HS
+  field: delta_Sstar_J_mol_K
+  value: 85.326954
+  locator:
+    table: '6'
+    note: AgO.5 ΔS*=85.326954 J/mol K (abstract 85)
+species:
+  Cu:
+    observations:
+    - observation_id: heck_2025_abstract_reported_ranges
+      type: gibbs_table
+      locator:
+        paragraph: abstract
+        note: LSU Scholarly Repository / publisher abstract (PDF unseen)
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: as_printed_in_abstract
+      values:
+        quantity: abstract_reported_ranges
+        method_class: author_reported_envelope
+        semantics: author_envelope_includes_inverse_model_not_measured_rate
+        elements_as_printed: Cu, Zn, Ge, As, Ag, Cd, In, and Pb
+        T_K_as_printed: 1480–1773 K
+        fO2_as_printed: 10^−9 to atmospheric
+        fS2_as_printed: 0 or 10^−3 to 10^−2
+        duration_as_printed: 5 min to 24 h
+        diffusivity_m2_s_min: 6.5e-12
+        diffusivity_m2_s_max: 1.62e-09
+        diffusivity_T_K_as_printed: 1481 and 1673 K
+        apparent_evaporation_enthalpy_kJ_mol_min: 213
+        apparent_evaporation_enthalpy_kJ_mol_max: 1099
+        apparent_evaporation_entropy_J_mol_K_min: 85
+        apparent_evaporation_entropy_J_mol_K_max: 621
+        quote_diffusivity: The diffusivity values recovered for MVCEs between 1481 and 1673 K range from
+          6.5 × 10−12 to 1.62 × 10−9 m2/s.
+        quote_enthalpy: Apparent evaporation enthalpies range from 213 to 1099 kJ/mol and entropies range
+          from 85 to 621 J/mol K.
+        note: Envelope only; per-element values are Tables 4 and 6. Inverse-model recovered D and apparent
+          ΔH*/ΔS* — not Hertz-Knudsen rates.
+      uncertainty:
+        note: abstract ranges; no per-element sigma here
+      equipment: &id001
+        cell_material:
+          value: Pt or Re wire loop (not a Knudsen cell)
+          locator:
+            table: S1
+            note: Loop Comp column; Pt or Re as printed
+          quote: Loop Comp Pt / Re
+        chamber_pressure:
+          value: 1.0
+          units: atm
+          inferred: true
+          inference: Numeral 1.0 is not printed. Table 1 / S1 footnote prints atm=atmospheric air.
+            Table 1 Ex 7 prints log10 fO2=-0.68, the air value (fO2 approx 0.21) at 1 atm total.
+            The 1.0 atm scalar is inferred from that printed air token, not a table-cell 1.0.
+          note: 1-atm gas-mixing furnace inferred from Table 1 footnote atm=atmospheric air and
+            log10 fO2=-0.68 air rows.
+          locator:
+            table: '1'
+            note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+          quote: atm=atmospheric air
+          quote_air_row: Ex 7  -0.68  NA  5  1673  MVE O2
+    - observation_id: heck_2025_t1_experimental_conditions
+      type: gibbs_table
+      locator:
+        table: '1'
+        note: Mendeley Data Table_1_expt_cond.xlsx
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_printed
+      values:
+        quantity: experimental_run_conditions
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        n_runs: 81
+        footnote_as_printed: atm=atmospheric air, Exp=experiment
+        table_csv: tables/kems-140-heck-2025/t1.csv
+        runs:
+        - exp_number: 7
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 5
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 7  -0.68  NA  5  1673  MVE O2
+        - exp_number: 8
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 30
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 8  -0.68  NA  30  1673  MVE O2
+        - exp_number: 9
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 1398
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 9  -0.68  NA  1398  1673  MVE O2
+        - exp_number: 10
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 120
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 10  -0.68  NA  120  1673  MVE O2
+        - exp_number: 17
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 1227
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 17  -0.68  NA  1227  1673  MVE O2
+        - exp_number: 18
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 10
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 18  -0.68  NA  10  1673  MVE O2
+        - exp_number: 19
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 45
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 19  -0.68  NA  45  1673  MVE O2
+        - exp_number: 21
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 10
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 21  -0.68  NA  10  1673  MVE O2
+        - exp_number: 22
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 44
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 22  -0.68  NA  44  1673  MVE O2
+        - exp_number: 23
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 363
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 23  -0.68  NA  363  1673  MVE O2
+        - exp_number: 24
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 960
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 24  -0.68  NA  960  1673  MVE O2
+        - exp_number: 32
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 20
+          T_K: 1773
+          bulk_composition: MVE O2
+          quote: Ex 32  -0.68  NA  20  1773  MVE O2
+        - exp_number: 33
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 40
+          T_K: 1773
+          bulk_composition: MVE O2
+          quote: Ex 33  -0.68  NA  40  1773  MVE O2
+        - exp_number: 35
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 80
+          T_K: 1773
+          bulk_composition: MVE O2
+          quote: Ex 35  -0.68  NA  80  1773  MVE O2
+        - exp_number: 36
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 1024
+          T_K: 1773
+          bulk_composition: MVE O2
+          quote: Ex 36  -0.68  NA  1024  1773  MVE O2
+        - exp_number: 37
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 344
+          T_K: 1773
+          bulk_composition: MVE O2
+          quote: Ex 37  -0.68  NA  344  1773  MVE O2
+        - exp_number: 43
+          log10_fO2: -4.3049
+          log10_fS2: NA
+          time_min: 22
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 43  -4.3049  NA  22  1673  MVE O2
+        - exp_number: 44
+          log10_fO2: -5.3049
+          log10_fS2: NA
+          time_min: 20
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 44  -5.3049  NA  20  1673  MVE O2
+        - exp_number: 47
+          log10_fO2: -7.3144
+          log10_fS2: NA
+          time_min: 20
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 47  -7.3144  NA  20  1673  MVE O2
+        - exp_number: 71
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 20
+          T_K: 1673
+          bulk_composition: MVE O2
+          quote: Ex 71  -0.68  NA  20  1673  MVE O2
+        - exp_number: 104
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 10
+          T_K: 1480
+          bulk_composition: KFCMAS 3
+          quote: Ex 104  -9  NA  10  1480  KFCMAS 3
+        - exp_number: 105
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 32
+          T_K: 1480
+          bulk_composition: KFCMAS 3
+          quote: Ex 105  -9  NA  32  1480  KFCMAS 3
+        - exp_number: 106
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 106  -9  NA  30  1481  KFCMAS 3
+        - exp_number: 108
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 60
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 108  -9  NA  60  1481  KFCMAS 3
+        - exp_number: 109
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 90
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 109  -9  NA  90  1481  KFCMAS 3
+        - exp_number: 110
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 45
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 110  -9  NA  45  1481  KFCMAS 3
+        - exp_number: 111
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 242
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 111  -9  NA  242  1481  KFCMAS 3
+        - exp_number: 112
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 15
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 112  -9  NA  15  1481  KFCMAS 3
+        - exp_number: 113
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 32
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 113  -9  NA  32  1481  KFCMAS 3
+        - exp_number: 114
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 114  -9  NA  30  1481  KFCMAS 3
+        - exp_number: 115
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 60
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 115  -9  NA  60  1481  KFCMAS 3
+        - exp_number: 116
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 120
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 116  -9  NA  120  1481  KFCMAS 3
+        - exp_number: 118
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 187
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 118  -9  NA  187  1481  KFCMAS 3
+        - exp_number: 121
+          log10_fO2: -9
+          log10_fS2: NA
+          time_min: 45
+          T_K: 1481
+          bulk_composition: KFCMAS 3
+          quote: Ex 121  -9  NA  45  1481  KFCMAS 3
+        - exp_number: 122
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 30
+          T_K: 1523
+          bulk_composition: KFCMAS 3
+          quote: Ex 122  -0.68  NA  30  1523  KFCMAS 3
+        - exp_number: 123
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 60
+          T_K: 1523
+          bulk_composition: KFCMAS 3
+          quote: Ex 123  -0.68  NA  60  1523  KFCMAS 3
+        - exp_number: 124
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 15
+          T_K: 1523
+          bulk_composition: KFCMAS 3
+          quote: Ex 124  -0.68  NA  15  1523  KFCMAS 3
+        - exp_number: 125
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 240
+          T_K: 1523
+          bulk_composition: KFCMAS 3
+          quote: Ex 125  -0.68  NA  240  1523  KFCMAS 3
+        - exp_number: 126
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 120
+          T_K: 1523
+          bulk_composition: KFCMAS 3
+          quote: Ex 126  -0.68  NA  120  1523  KFCMAS 3
+        - exp_number: 127
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 994
+          T_K: 1523
+          bulk_composition: KFCMAS 3
+          quote: Ex 127  -0.68  NA  994  1523  KFCMAS 3
+        - exp_number: 128
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 CuS
+          quote: Ex 128  -9  -2.91  30  1481  KFCMAS 3 CuS
+        - exp_number: 129
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 15
+          T_K: 1481
+          bulk_composition: KFCMAS 3 CuS
+          quote: Ex 129  -9  -2.91  15  1481  KFCMAS 3 CuS
+        - exp_number: 130
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 60
+          T_K: 1481
+          bulk_composition: KFCMAS 3 CuS
+          quote: Ex 130  -9  -2.91  60  1481  KFCMAS 3 CuS
+        - exp_number: 131
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 180
+          T_K: 1481
+          bulk_composition: KFCMAS 3 CuS
+          quote: Ex 131  -9  -2.91  180  1481  KFCMAS 3 CuS
+        - exp_number: 134
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 AgS
+          quote: Ex 134  -9  -2.91  30  1481  KFCMAS 3 AgS
+        - exp_number: 135
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 60
+          T_K: 1481
+          bulk_composition: KFCMAS 3 AgS
+          quote: Ex 135  -9  -2.91  60  1481  KFCMAS 3 AgS
+        - exp_number: 136
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 90
+          T_K: 1481
+          bulk_composition: KFCMAS 3 AgS
+          quote: Ex 136  -9  -2.91  90  1481  KFCMAS 3 AgS
+        - exp_number: 137
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 15
+          T_K: 1481
+          bulk_composition: KFCMAS 3 AgS
+          quote: Ex 137  -9  -2.91  15  1481  KFCMAS 3 AgS
+        - exp_number: 138
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 GeS
+          quote: Ex 138  -9  -2.91  30  1481  KFCMAS 3 GeS
+        - exp_number: 141
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 AsS
+          quote: Ex 141  -9  -2.91  30  1481  KFCMAS 3 AsS
+        - exp_number: 142
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 ZnS
+          quote: Ex 142  -9  -2.91  30  1481  KFCMAS 3 ZnS
+        - exp_number: 144
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 PbS
+          quote: Ex 144  -9  -2.91  30  1481  KFCMAS 3 PbS
+        - exp_number: 145
+          log10_fO2: -9
+          log10_fS2: -2.91
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 InS
+          quote: Ex 145  -9  -2.91  30  1481  KFCMAS 3 InS
+        - exp_number: 153
+          log10_fO2: -9
+          log10_fS2: -2.613
+          time_min: 30
+          T_K: 1503
+          bulk_composition: KFCMAS 3 CuS
+          quote: Ex 153  -9  -2.613  30  1503  KFCMAS 3 CuS
+        - exp_number: 154
+          log10_fO2: -9
+          log10_fS2: -2.613
+          time_min: 30
+          T_K: 1503
+          bulk_composition: KFCMAS 3 AgS
+          quote: Ex 154  -9  -2.613  30  1503  KFCMAS 3 AgS
+        - exp_number: 155
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 503
+          T_K: 1523
+          bulk_composition: KFCMAS 4
+          quote: Ex 155  -0.68  NA  503  1523  KFCMAS 4
+        - exp_number: 157
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 45
+          T_K: 1481
+          bulk_composition: KFCMAS 3 ZnS
+          quote: Ex 157  -9  -2.525  45  1481  KFCMAS 3 ZnS
+        - exp_number: 159
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 ZnS
+          quote: Ex 159  -9  -2.525  30  1481  KFCMAS 3 ZnS
+        - exp_number: 160
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 20
+          T_K: 1481
+          bulk_composition: KFCMAS 3 ZnS
+          quote: Ex 160  -9  -2.525  20  1481  KFCMAS 3 ZnS
+        - exp_number: 161
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 94
+          T_K: 1481
+          bulk_composition: KFCMAS 3 ZnS
+          quote: Ex 161  -9  -2.525  94  1481  KFCMAS 3 ZnS
+        - exp_number: 162
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 60
+          T_K: 1481
+          bulk_composition: KFCMAS 3 ZnS
+          quote: Ex 162  -9  -2.525  60  1481  KFCMAS 3 ZnS
+        - exp_number: 163
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 20
+          T_K: 1481
+          bulk_composition: KFCMAS 3 PbS
+          quote: Ex 163  -9  -2.525  20  1481  KFCMAS 3 PbS
+        - exp_number: 165
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 PbS
+          quote: Ex 165  -9  -2.525  30  1481  KFCMAS 3 PbS
+        - exp_number: 169
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 47
+          T_K: 1481
+          bulk_composition: KFCMAS 3 PbS
+          quote: Ex 169  -9  -2.525  47  1481  KFCMAS 3 PbS
+        - exp_number: 170
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 79
+          T_K: 1481
+          bulk_composition: KFCMAS 3 PbS
+          quote: Ex 170  -9  -2.525  79  1481  KFCMAS 3 PbS
+        - exp_number: 189
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 20
+          T_K: 1481
+          bulk_composition: KFCMAS 3 InS
+          quote: Ex 189  -9  -2.525  20  1481  KFCMAS 3 InS
+        - exp_number: 190
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 InS
+          quote: Ex 190  -9  -2.525  30  1481  KFCMAS 3 InS
+        - exp_number: 191
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 46
+          T_K: 1481
+          bulk_composition: KFCMAS 3 InS
+          quote: Ex 191  -9  -2.525  46  1481  KFCMAS 3 InS
+        - exp_number: 195
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 GeS
+          quote: Ex 195  -9  -2.525  30  1481  KFCMAS 3 GeS
+        - exp_number: 197
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 20
+          T_K: 1481
+          bulk_composition: KFCMAS 3 AsS
+          quote: Ex 197  -9  -2.525  20  1481  KFCMAS 3 AsS
+        - exp_number: 199
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 AsS
+          quote: Ex 199  -9  -2.525  30  1481  KFCMAS 3 AsS
+        - exp_number: 200
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 59
+          T_K: 1481
+          bulk_composition: KFCMAS 3 AsS
+          quote: Ex 200  -9  -2.525  59  1481  KFCMAS 3 AsS
+        - exp_number: 201
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 20
+          T_K: 1481
+          bulk_composition: KFCMAS 3 GeS
+          quote: Ex 201  -9  -2.525  20  1481  KFCMAS 3 GeS
+        - exp_number: 203
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 101
+          T_K: 1481
+          bulk_composition: KFCMAS 3 InS
+          quote: Ex 203  -9  -2.525  101  1481  KFCMAS 3 InS
+        - exp_number: 207
+          log10_fO2: -9
+          log10_fS2: -2.525
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 CuS
+          quote: Ex 207  -9  -2.525  30  1481  KFCMAS 3 CuS
+        - exp_number: 208
+          log10_fO2: -9
+          log10_fS2: -2.269
+          time_min: 30
+          T_K: 1481
+          bulk_composition: KFCMAS 3 CuS
+          quote: Ex 208  -9  -2.269  30  1481  KFCMAS 3 CuS
+        - exp_number: 209
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 30
+          T_K: 1573
+          bulk_composition: KFCMAS 4
+          quote: Ex 209  -0.68  NA  30  1573  KFCMAS 4
+        - exp_number: 210
+          log10_fO2: -4.8
+          log10_fS2: NA
+          time_min: 30
+          T_K: 1573
+          bulk_composition: KFCMAS 4
+          quote: Ex 210  -4.8  NA  30  1573  KFCMAS 4
+        - exp_number: 212
+          log10_fO2: -7.3
+          log10_fS2: NA
+          time_min: 30
+          T_K: 1573
+          bulk_composition: KFCMAS 4
+          quote: Ex 212  -7.3  NA  30  1573  KFCMAS 4
+        - exp_number: 214
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 976
+          T_K: 1573
+          bulk_composition: KFCMAS 3
+          quote: Ex 214  -0.68  NA  976  1573  KFCMAS 3
+        - exp_number: 215
+          log10_fO2: -0.68
+          log10_fS2: NA
+          time_min: 796
+          T_K: 1683
+          bulk_composition: KFCMAS 3
+          quote: Ex 215  -0.68  NA  796  1683  KFCMAS 3
+        quote_ex126: 126  -0.68  NA  120  1523  KFCMAS 3
+        T_K: 1523
+      uncertainty:
+        note: Table 1 prints no sigma on T, t, or fugacity
+      equipment: *id001
+    - observation_id: heck_2025_t3_initial_cu_ppm
+      type: gibbs_table
+      locator:
+        table: '3'
+        note: Mendeley Data Table_3_initial_MVCE.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: initial_MVCE_concentration_ppm
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Trace element concentration values reported in ppm, MVE O2 has 2 time series
+          since Ge, As, and Ag were added between experiments 24 and 32. KFCMAS 3 S compositions have
+          only a single MVE added to them at relatively high concentrations. KFCMAS 3 was made my mixing
+          KFCMAS 3 S compositions together.
+        table_csv: tables/kems-140-heck-2025/t3.csv
+        initial:
+        - composition: MVE O2
+          T_as_printed: 1673 K
+          ppm: 143.37566
+          sigma_plus_ppm: 4.4408392
+          sigma_minus_ppm: 4.4408392
+          quote: Cu MVE O2 1673 K 143.37566 ppm (+4.4408392/-4.4408392)
+        - composition: MVE O2
+          T_as_printed: 1673 K
+          ppm: 143.37566
+          sigma_plus_ppm: 4.4408392
+          sigma_minus_ppm: 4.4408392
+          quote: Cu MVE O2 1673 K 143.37566 ppm (+4.4408392/-4.4408392)
+        - composition: MVE O2
+          T_as_printed: 1773 K
+          ppm: 115.15462
+          sigma_plus_ppm: 6.8749029
+          sigma_minus_ppm: 6.8749029
+          quote: Cu MVE O2 1773 K 115.15462 ppm (+6.8749029/-6.8749029)
+        - composition: KFCMAS 3
+          T_as_printed: 1481 K
+          ppm: 53.028895
+          sigma_plus_ppm: 2.6918221
+          sigma_minus_ppm: 2.6918221
+          quote: Cu KFCMAS 3 1481 K 53.028895 ppm (+2.6918221/-2.6918221)
+        - composition: KFCMAS 3 S
+          T_as_printed: 1481 K
+          ppm: 418.87364
+          sigma_plus_ppm: 25.01
+          sigma_minus_ppm: 25.01
+          quote: Cu KFCMAS 3 S 1481 K 418.87364 ppm (+25.01/-25.01)
+        ppm: 143.37566
+      uncertainty:
+        note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
+    - observation_id: heck_2025_t5_logKstar_CuOp5_Cug_cu
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: CuO.5(melt)=Cu(g)+.25O2(g)
+        oxygen_stoichiometry_n: 1
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1481
+          log_Kstar: -5.57240534813701
+          sigma_plus: 0.0268679538981171
+          sigma_minus: 0.0292600093144912
+          melt: KFCMAS 3
+          quote: CuO.5(melt)=Cu(g)+.25O2(g) 1481 K log K*=-5.57240534813701 (+0.0268679538981171/-0.0292600093144912)
+            melt KFCMAS 3
+        - T_K: 1673
+          log_Kstar: -4.36705556924292
+          sigma_plus: 0.0243588792930858
+          sigma_minus: 0.0254571306081788
+          melt: MVEO2
+          quote: CuO.5(melt)=Cu(g)+.25O2(g) 1673 K log K*=-4.36705556924292 (+0.0243588792930858/-0.0254571306081788)
+            melt MVEO2
+        - T_K: 1773
+          log_Kstar: -3.7206015552025
+          sigma_plus: 0.0884212227223236
+          sigma_minus: 0.101265528109256
+          melt: MVEO2
+          quote: CuO.5(melt)=Cu(g)+.25O2(g) 1773 K log K*=-3.7206015552025 (+0.0884212227223236/-0.101265528109256)
+            melt MVEO2
+        note: Author-fitted K*, not an instrument reading.
+        log_Kstar: -5.57240534813701
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t6_cuop5_cug_cu_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: CuO.5(melt)=Cu(g)+0.25O2(g)
+        oxygen_stoichiometry_n: 1
+        sample_size_N: 25
+        delta_Hstar_kJ_mol: 355.58214
+        delta_Sstar_J_mol_K: 135.08772
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: CuO.5(melt)=Cu(g)+0.25O2(g) N=25 ΔH*=355.58214 (+19.53748/-42.98246) kJ/mol ΔS*=135.08772
+          (+12.2807/-26.79426) J/mol K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 19.53748
+        delta_Hstar_sigma_minus_kJ_mol: 42.98246
+        delta_Sstar_sigma_plus_J_mol_K: 12.2807
+        delta_Sstar_sigma_minus_J_mol_K: 26.79426
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
+    - observation_id: heck_2025_s1_experimental_conditions_epma
+      type: gibbs_table
+      locator:
+        table: S1
+        note: Elsevier CDN mmc1.xlsx = Mendeley Table_S1_expt_cond.xlsx
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: wt_percent_and_run_metadata
+      values:
+        quantity: run_conditions_and_EPMA_majors
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        table_csv: tables/kems-140-heck-2025/s1.csv
+        n_experiments: 81
+        footnote_as_printed: atm=atmospheric air, flow rates in cubic centimeters per minute, Ex=experiment,
+          0 indicates below detection limit, concentration values reported in wt %, Sp=Spinel, Kspar=K-feldspar,
+          N/A = not applicable, Predicted S concentrations from Boulliung and Wood (2023)
+        bdl_rule: printed 0 in S1 concentration columns is below detection limit, not a measured zero
+        quote_ex7: 7  2020-11-01  -0.68  NA  5  1673  MVE O2  FeO 16.829... SiO2 39.621... wt%
+        predicted_S_column_class: model_comparison_Boulliung_Wood_2023
+      uncertainty:
+        note: S1 (±)σ on EPMA majors as printed
+      equipment: *id001
+    - observation_id: heck_2025_s2_mvce_laicpms_profiles
+      type: gibbs_table
+      locator:
+        table: S2
+        note: Elsevier CDN mmc2.xlsx = Mendeley Table_S2_all_MVCE.xlsx; 401 analyses
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_glass_quenched_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: weight_ppm
+      values:
+        quantity: core_to_rim_MVCE_concentration_profiles
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        table_csv: tables/kems-140-heck-2025/s2.csv
+        n_analyses: 400
+        footnote_as_printed: Trace element values are reported in weight ppm. Italicized values are not
+          included in evaporation models.
+        pin_ex7_analysis1:
+          exp_number: 7
+          analysis_number: 1
+          fO2: 0.20892961308540392
+          time_s: 300
+          T_K: 1673
+          total_radius_m: 0.0013811812907564079
+          r_over_r_tot: 0.0
+          Cu63: 172.8
+          Cu63_sigma: 2.0
+          quote: Ex 7 analysis 1 Cu 63 172.8 ± 2 (weight ppm per S2 footnote)
+        note: Full 401-row grid is in the CSV. Empty isotope columns are true absence for that analysis,
+          not 0. Italicized exclusions cannot be recovered from xlsx (no italic flag in the cell values).
+        Cu63: 172.8
+      uncertainty:
+        note: S2 ±σ columns as printed beside each isotope
+      equipment: *id001
+    - observation_id: heck_2025_s3_kstar_fitting_concentrations
+      type: gibbs_table
+      locator:
+        table: S3
+        note: Elsevier CDN mmc3.xlsx = Mendeley Table_S3_K_fitting.xlsx
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm_and_Pi_over_Pisat
+      values:
+        quantity: Kstar_fitting_input_concentrations
+        method_class: model_derived
+        semantics: fitted_equilibrium_not_measured_rate
+        evidence_class: fitted_evaporation_equilibrium
+        table_csv: tables/kems-140-heck-2025/s3.csv
+        footnote_as_printed: Trace element concentration values in ppm
+        note: Author fitting table (concentrations + Pi/Pisat) used to retrieve K*; not raw LA-ICP-MS
+          counts.
+      uncertainty:
+        note: S3 (+)σ (-)σ as printed
+    - observation_id: heck_2025_s5_3L_inverse_model
+      type: gibbs_table
+      locator:
+        table: S5
+        note: Elsevier CDN mmc5.xlsx = Mendeley Table_S5_3L.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: dimensionless_3L_as_printed
+      values:
+        quantity: three_layer_inverse_model_parameter
+        method_class: model_derived
+        semantics: inverse_model_fit_not_measured_rate
+        evidence_class: layered_inverse_model
+        table_csv: tables/kems-140-heck-2025/s5.csv
+        note: 3L values from the layered inverse model. Printed 0 in a sigma column is retained. Not a
+          measured rate.
+      uncertainty:
+        note: S5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_fig1_printed_bead_radii
+      type: gibbs_table
+      locator:
+        figure: '1'
+        note: Elsevier CDN gr1_lrg.jpg panels d-f printed r_total labels
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: micrometre
+      values:
+        quantity: bead_radius_geometry
+        method_class: measured_direct
+        semantics: method_geometry_reference_not_measured_species_observation
+        r_total_um_panel_d: 1381
+        r_total_um_panel_e:
+        - 1135
+        - 1254
+        r_total_um_panel_f: 1349
+        quote_d: r_total=1381 μm
+        quote_e: r_total=1135 μm / r_total=1254 μm
+        quote_f: r_total=1349 μm
+        note: Geometry labels printed on Fig. 1. Full per-run radii are Table S2 Total radius, m.
+      uncertainty:
+        note: no sigma printed on the figure labels
+    - observation_id: heck_2025_fig2_figure_only
+      type: rate_series
+      locator:
+        figure: '2'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr2_lrg.jpg; no numeric table. Not digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: 'Ex 126: 1523 K, atm gas, 120 minutes; Concentration ppm vs distance from bead center
+          mm. Points not tabulated; not digitised.'
+        semantics: bound_not_point_ordering
+        figure: '2'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr2_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig3_figure_only
+      type: rate_series
+      locator:
+        figure: '3'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr3_lrg.jpg; no numeric table. Not digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Time series at 1523 K in atm gas; log(X_surface) ppm vs time minutes for Zn, Pb, Ag. Model
+          curves + blanks. Figure-only.
+        semantics: bound_not_point_ordering
+        figure: '3'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr3_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig4_figure_only
+      type: rate_series
+      locator:
+        figure: '4'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr4_lrg.jpg; no numeric table. Not digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: X_r/X_central vs r/r_total for Cu 1673 K atm gas and Cd 1523 K atm gas. Figure-only.
+        semantics: bound_not_point_ordering
+        figure: '4'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr4_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig5_figure_only
+      type: rate_series
+      locator:
+        figure: '5'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr5_lrg.jpg; no numeric table. Not digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: log D (m2/s) vs Z^2/r for Pb, Ag, Cd, As. Inverse-model D; figure-only (tabulated in Table
+          4).
+        semantics: bound_not_point_ordering
+        figure: '5'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr5_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig6_figure_only
+      type: rate_series
+      locator:
+        figure: '6'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr6_lrg.jpg; no numeric table. Not digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: mixed_measured_and_model_curves
+        admission_status: figure_only
+        status: typed_refusal
+        reason: X_surface/X_0 vs fO2 with model curves (Cu n=1, Ge n=2, As n=1, Zn n=2). Mixed measured+model;
+          figure-only.
+        semantics: bound_not_point_ordering
+        figure: '6'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr6_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig7_figure_only
+      type: rate_series
+      locator:
+        figure: '7'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr7_lrg.jpg; no numeric table. Not digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: mixed_measured_and_model_curves
+        admission_status: figure_only
+        status: typed_refusal
+        reason: log K* vs 10000/T and vs log K (Sossi). Fitted K*; figure-only (tabulated in Table 5).
+        semantics: bound_not_point_ordering
+        figure: '7'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr7_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig8_figure_only
+      type: rate_series
+      locator:
+        figure: '8'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr8_lrg.jpg; no numeric table. Not digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: mixed_measured_and_model_curves
+        admission_status: figure_only
+        status: typed_refusal
+        reason: log K* vs T compared with Sossi+/Liu+ models. Figure-only.
+        semantics: bound_not_point_ordering
+        figure: '8'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr8_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig9_figure_only
+      type: rate_series
+      locator:
+        figure: '9'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr9_lrg.jpg; no numeric table. Not digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: mixed_measured_and_model_curves
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Modeled vs observed X_surface/X_0 for Ag, As, Pb. Model comparison; figure-only.
+        semantics: bound_not_point_ordering
+        figure: '9'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr9_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig10_figure_only
+      type: rate_series
+      locator:
+        figure: '10'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr10_lrg.jpg; no numeric table. Not
+          digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: mixed_measured_and_model_curves
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Modeled vs observed X_surface/X_0 for Cu and In with/without S; psi contours. Figure-only.
+        semantics: bound_not_point_ordering
+        figure: '10'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr10_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig11_figure_only
+      type: rate_series
+      locator:
+        figure: '11'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr11_lrg.jpg; no numeric table. Not
+          digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_melt_glass_bead
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: mixed_measured_and_model_curves
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Modeled vs observed X_surface/X_0 for Ge and Zn with/without S. Figure-only.
+        semantics: bound_not_point_ordering
+        figure: '11'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr11_lrg.jpg
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: heck_2025_fig12_figure_only
+      type: rate_series
+      locator:
+        figure: '12'
+        note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr12_lrg.jpg; no numeric table. Not
+          digitised.
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: magma_ocean_model
+      regime: open_furnace_1atm_gas_mixing
+      units: as_plotted_not_tabulated
+      values:
+        quantity: figure_only
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Magma-ocean log(mass fraction ATM) vs 50% condensation temperature at IW+1, IW-2, IW-5.
+          MODEL; figure-only.
+        semantics: bound_not_point_ordering
+        figure: '12'
+        cdn_url: https://ars.els-cdn.com/content/image/1-s2.0-S0016703725002406-gr12_lrg.jpg
+        evidence_class: magma_ocean_application
+      uncertainty:
+        note: not applicable; figure not digitised
+  Fe:
+    observations:
+    - observation_id: heck_2025_t2_starting_major_compositions
+      type: gibbs_table
+      locator:
+        table: '2'
+        note: Mendeley Data Table_2_bulk_comps.xlsx
+      T_range_K:
+      - 1480.0
+      - 1773.0
+      phase: silicate_glass_starting_materials
+      regime: analytical_composition
+      units: wt_percent
+      values:
+        quantity: starting_glass_major_element_wt_pct
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Calculated as average of analyses of glass on experiments without any crystallization
+          for each bulk composition
+        table_csv: tables/kems-140-heck-2025/t2.csv
+        MVE_O2:
+          composition: MVE O2
+          quote: MVE O2 SiO2 39.6047345463862(±0.6377123237371) Al2O3 10.0884388476239(±0.100475378033978)
+            FeO 17.2392187112256(±0.442225429032326) CaO 16.1262326853039(±0.141219410621303) MgO 16.8945900859225(±0.355947407938688)
+            K2O 0.0432946471474981(±0.0167530068555758) S 0.00205934705082631(±0.0012401671460977) wt%
+          SiO2_avg_mass_pct: 39.60473454638624
+          SiO2_sigma_mass_pct: 0.6377123237371
+          Al2O3_avg_mass_pct: 10.088438847623879
+          Al2O3_sigma_mass_pct: 0.1004753780339775
+          FeO_avg_mass_pct: 17.239218711225625
+          FeO_sigma_mass_pct: 0.4422254290323261
+          CaO_avg_mass_pct: 16.12623268530385
+          CaO_sigma_mass_pct: 0.1412194106213028
+          MgO_avg_mass_pct: 16.894590085922477
+          MgO_sigma_mass_pct: 0.3559474079386878
+          K2O_avg_mass_pct: 0.043294647147498144
+          K2O_sigma_mass_pct: 0.016753006855575812
+          S_avg_mass_pct: 0.0020593470508263093
+          S_sigma_mass_pct: 0.0012401671460977035
+        KFCMAS_3:
+          composition: KFCMAS 3
+          quote: KFCMAS 3 SiO2 43.1794329448803(±1.41180343859492) Al2O3 8.85732569247471(±0.29855061800147)
+            FeO 22.033419247475(±0.431699690351285) CaO 15.8311939937259(±1.28825236027881) MgO 6.37603135631728(±0.17382634630331)
+            K2O 3.64207151791466(±0.463792473711621) S 0.0768286866726639(±0.0618836195633775) wt%
+          SiO2_avg_mass_pct: 43.17943294488026
+          SiO2_sigma_mass_pct: 1.4118034385949152
+          Al2O3_avg_mass_pct: 8.857325692474708
+          Al2O3_sigma_mass_pct: 0.29855061800147037
+          FeO_avg_mass_pct: 22.033419247475027
+          FeO_sigma_mass_pct: 0.43169969035128547
+          CaO_avg_mass_pct: 15.831193993725861
+          CaO_sigma_mass_pct: 1.2882523602788143
+          MgO_avg_mass_pct: 6.376031356317284
+          MgO_sigma_mass_pct: 0.17382634630331048
+          K2O_avg_mass_pct: 3.6420715179146557
+          K2O_sigma_mass_pct: 0.4637924737116207
+          S_avg_mass_pct: 0.07682868667266386
+          S_sigma_mass_pct: 0.061883619563377526
+        KFCMAS_4:
+          composition: KFCMAS 4
+          quote: KFCMAS 4 SiO2 53.0279230921571(±0.324629557036321) Al2O3 13.246713757914(±0.173022135342014)
+            FeO 6.88076616597562(±0.415598785468799) CaO 16.583048510679(±0.415632693866374) MgO 6.20720777741121(±0.135710301193666)
+            K2O 4.03651968970476(±0.177547942150588) S 0.00808363413722844(±0.0100633994417294) wt%
+          SiO2_avg_mass_pct: 53.027923092157124
+          SiO2_sigma_mass_pct: 0.32462955703632135
+          Al2O3_avg_mass_pct: 13.246713757913952
+          Al2O3_sigma_mass_pct: 0.17302213534201363
+          FeO_avg_mass_pct: 6.88076616597562
+          FeO_sigma_mass_pct: 0.41559878546879936
+          CaO_avg_mass_pct: 16.58304851067899
+          CaO_sigma_mass_pct: 0.4156326938663736
+          MgO_avg_mass_pct: 6.207207777411209
+          MgO_sigma_mass_pct: 0.1357103011936655
+          K2O_avg_mass_pct: 4.036519689704758
+          K2O_sigma_mass_pct: 0.17754794215058814
+          S_avg_mass_pct: 0.008083634137228441
+          S_sigma_mass_pct: 0.010063399441729444
+        SiO2_avg_mass_pct: 39.60473454638624
+      uncertainty:
+        note: Table 2 (±)σ columns as printed
+  Zn:
+    observations:
+    - observation_id: heck_2025_t3_initial_zn_ppm
+      type: gibbs_table
+      locator:
+        table: '3'
+        note: Mendeley Data Table_3_initial_MVCE.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: initial_MVCE_concentration_ppm
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Trace element concentration values reported in ppm, MVE O2 has 2 time series
+          since Ge, As, and Ag were added between experiments 24 and 32. KFCMAS 3 S compositions have
+          only a single MVE added to them at relatively high concentrations. KFCMAS 3 was made my mixing
+          KFCMAS 3 S compositions together.
+        table_csv: tables/kems-140-heck-2025/t3.csv
+        initial:
+        - composition: KFCMAS 3
+          T_as_printed: 1481 K
+          ppm: 18.396029
+          sigma_plus_ppm: 8.7861632
+          sigma_minus_ppm: 9.3352984
+          quote: Zn KFCMAS 3 1481 K 18.396029 ppm (+8.7861632/-9.3352984)
+        - composition: KFCMAS 3 S
+          T_as_printed: 1481 K
+          ppm: 177.77
+          sigma_plus_ppm: 50.79
+          sigma_minus_ppm: 50.79
+          quote: Zn KFCMAS 3 S 1481 K 177.77 ppm (+50.79/-50.79)
+        - composition: KFCMAS 4
+          T_as_printed: 1523 K
+          ppm: 173.11
+          sigma_plus_ppm: 5.38
+          sigma_minus_ppm: 3.59
+          quote: Zn KFCMAS 4 1523 K 173.11 ppm (+5.38/-3.59)
+      uncertainty:
+        note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
+    - observation_id: heck_2025_t4_zn_diffusivity_inverse_model
+      type: gibbs_table
+      locator:
+        table: '4'
+        note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
+      T_range_K:
+      - 1481.0
+      - 1673.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: as_printed_m_per_s2_times_1e-10
+      values:
+        quantity: diffusivity
+        method_class: model_derived
+        semantics: inverse_model_fit_not_measured_rate
+        evidence_class: layered_inverse_model
+        footnote_as_printed: Diffusivity reported in m/s2 *10-10, Sulfur present
+        units_as_printed: m/s2 *10-10
+        unit_note: Stored verbatim. Abstract quotes 6.5e-12 to 1.62e-9 m2/s; 0.065083844 in these units
+          matches 6.5e-12 m2/s if the printed m/s2 is m2/s. Conversion not applied.
+        table_csv: tables/kems-140-heck-2025/t4.csv
+        points:
+        - composition_T_as_printed: KFCMAS 3 1481 K
+          D_as_printed: 6.9049548
+          sigma_plus: 18.1331472
+          sigma_minus: 3.2788483
+          units_as_printed: m/s2 *10-10
+          quote: KFCMAS 3 1481 K Zn 6.9049548 (+18.1331472/-3.2788483) (m/s2 *10-10)
+        Cu_D: absent
+        note: Cu has no Table 4 column (true absence). Inverse-model output; not a measured Hertz-Knudsen
+          rate.
+      uncertainty:
+        note: Table 4 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t5_logKstar_ZnO_Zng_zn
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: ZnO(melt)=Zn(g)+.5O2(g)
+        oxygen_stoichiometry_n: 2
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1481
+          log_Kstar: -6.76838538053916
+          sigma_plus: 0.0826314102275738
+          sigma_minus: 0.12461514970906
+          melt: KFCMAS 3
+          quote: ZnO(melt)=Zn(g)+.5O2(g) 1481 K log K*=-6.76838538053916 (+0.0826314102275738/-0.12461514970906)
+            melt KFCMAS 3
+        - T_K: 1573
+          log_Kstar: -5.77514696896629
+          sigma_plus: 0.0398910626882429
+          sigma_minus: 0.105182366771503
+          melt: KFCMAS 4
+          quote: ZnO(melt)=Zn(g)+.5O2(g) 1573 K log K*=-5.77514696896629 (+0.0398910626882429/-0.105182366771503)
+            melt KFCMAS 4
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t6_zno_zng_zn_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: ZnO(melt)=Zn(g)+0.5O2(g)
+        oxygen_stoichiometry_n: 2
+        sample_size_N: 12
+        delta_Hstar_kJ_mol: 370.17453
+        delta_Sstar_J_mol_K: 126.43441
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: ZnO(melt)=Zn(g)+0.5O2(g) N=12 ΔH*=370.17453 (+39.20154/-58.8023) kJ/mol ΔS*=126.43441 (+26.62681/-38.651822)
+          J/mol K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 39.20154
+        delta_Hstar_sigma_minus_kJ_mol: 58.8023
+        delta_Sstar_sigma_plus_J_mol_K: 26.62681
+        delta_Sstar_sigma_minus_J_mol_K: 38.651822
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
+    - observation_id: heck_2025_s4_metal_wire_mvce
+      type: gibbs_table
+      locator:
+        table: S4
+        note: Elsevier CDN mmc4.xlsx = Mendeley Table_S4_metal.xlsx
+      T_range_K:
+      - 1481.0
+      - 1573.0
+      phase: Pt_or_Re_wire_loop
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: MVCE_in_metal_wires
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        table_csv: tables/kems-140-heck-2025/s4.csv
+        footnote_as_printed: Trace elements reported in ppm, values linearly scaled using silicate glass
+          Ca Counts/S
+        pin_ex114_Zn:
+          exp_number: 114
+          Zn_ppm: 0.194314620441432
+          Zn_sigma: 0.04797820004372465
+          quote: Ex 114 Zn 0.194314620441432 ± 0.0479782000437246 ppm (Table S4)
+        n_rows: 5
+        note: Partitioning into the loop, not melt evaporation rate.
+      uncertainty:
+        note: S4 ±σ as printed
+  Ge:
+    observations:
+    - observation_id: heck_2025_t3_initial_ge_ppm
+      type: gibbs_table
+      locator:
+        table: '3'
+        note: Mendeley Data Table_3_initial_MVCE.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: initial_MVCE_concentration_ppm
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Trace element concentration values reported in ppm, MVE O2 has 2 time series
+          since Ge, As, and Ag were added between experiments 24 and 32. KFCMAS 3 S compositions have
+          only a single MVE added to them at relatively high concentrations. KFCMAS 3 was made my mixing
+          KFCMAS 3 S compositions together.
+        table_csv: tables/kems-140-heck-2025/t3.csv
+        initial:
+        - composition: MVE O2
+          T_as_printed: 1673 K
+          ppm: 152.21426
+          sigma_plus_ppm: 6.8875232
+          sigma_minus_ppm: 6.1987709
+          quote: Ge MVE O2 1673 K 152.21426 ppm (+6.8875232/-6.1987709)
+        - composition: MVE O2
+          T_as_printed: 1673 K
+          ppm: 231.05324
+          sigma_plus_ppm: 10.361132
+          sigma_minus_ppm: 11.397245
+          quote: Ge MVE O2 1673 K 231.05324 ppm (+10.361132/-11.397245)
+        - composition: MVE O2
+          T_as_printed: 1773 K
+          ppm: 153.76805
+          sigma_plus_ppm: 14.172171
+          sigma_minus_ppm: 15.589388
+          quote: Ge MVE O2 1773 K 153.76805 ppm (+14.172171/-15.589388)
+        - composition: KFCMAS 3
+          T_as_printed: 1481 K
+          ppm: 36.09336
+          sigma_plus_ppm: 9.6470733
+          sigma_minus_ppm: 6.8194828
+          quote: Ge KFCMAS 3 1481 K 36.09336 ppm (+9.6470733/-6.8194828)
+        - composition: KFCMAS 3 S
+          T_as_printed: 1481 K
+          ppm: 683.11
+          sigma_plus_ppm: 278.43
+          sigma_minus_ppm: 362.6
+          quote: Ge KFCMAS 3 S 1481 K 683.11 ppm (+278.43/-362.6)
+      uncertainty:
+        note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
+    - observation_id: heck_2025_t4_ge_diffusivity_inverse_model
+      type: gibbs_table
+      locator:
+        table: '4'
+        note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
+      T_range_K:
+      - 1481.0
+      - 1673.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: as_printed_m_per_s2_times_1e-10
+      values:
+        quantity: diffusivity
+        method_class: model_derived
+        semantics: inverse_model_fit_not_measured_rate
+        evidence_class: layered_inverse_model
+        footnote_as_printed: Diffusivity reported in m/s2 *10-10, Sulfur present
+        units_as_printed: m/s2 *10-10
+        unit_note: Stored verbatim. Abstract quotes 6.5e-12 to 1.62e-9 m2/s; 0.065083844 in these units
+          matches 6.5e-12 m2/s if the printed m/s2 is m2/s. Conversion not applied.
+        table_csv: tables/kems-140-heck-2025/t4.csv
+        points:
+        - composition_T_as_printed: KFCMAS 3 1481 K
+          D_as_printed: 15.682514
+          sigma_plus: 10.586932
+          sigma_minus: 9.4859307
+          units_as_printed: m/s2 *10-10
+          quote: KFCMAS 3 1481 K Ge 15.682514 (+10.586932/-9.4859307) (m/s2 *10-10)
+        Cu_D: absent
+        note: Cu has no Table 4 column (true absence). Inverse-model output; not a measured Hertz-Knudsen
+          rate.
+      uncertainty:
+        note: Table 4 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t5_logKstar_GeO2_GeOg_ge
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: GeO2(melt)=GeO(g)+.5O2(g)
+        oxygen_stoichiometry_n: 2
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1481
+          log_Kstar: -6.89612241818183
+          sigma_plus: 0.0763203211979846
+          sigma_minus: 0.088940364125814
+          melt: KFCMAS 3
+          quote: GeO2(melt)=GeO(g)+.5O2(g) 1481 K log K*=-6.89612241818183 (+0.0763203211979846/-0.088940364125814)
+            melt KFCMAS 3
+        - T_K: 1673
+          log_Kstar: -4.33851492757127
+          sigma_plus: 0.0159191632242157
+          sigma_minus: 0.0151726377362111
+          melt: MVEO2
+          quote: GeO2(melt)=GeO(g)+.5O2(g) 1673 K log K*=-4.33851492757127 (+0.0159191632242157/-0.0151726377362111)
+            melt MVEO2
+        - T_K: 1773
+          log_Kstar: -3.42290763890943
+          sigma_plus: 0.0666120981360732
+          sigma_minus: 0.044766302922306
+          melt: MVEO2
+          quote: GeO2(melt)=GeO(g)+.5O2(g) 1773 K log K*=-3.42290763890943 (+0.0666120981360732/-0.044766302922306)
+            melt MVEO2
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t6_geo2_geog_ge_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: GeO2(melt)=GeO(g)+0.5O2(g)
+        oxygen_stoichiometry_n: 2
+        sample_size_N: 19
+        delta_Hstar_kJ_mol: 579.12458
+        delta_Sstar_J_mol_K: 267.23113
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: GeO2(melt)=GeO(g)+0.5O2(g) N=19 ΔH*=579.12458 (+55.45653/-39.6118099999999) kJ/mol ΔS*=267.23113
+          (+32.92732/-24.26223) J/mol K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 55.45653
+        delta_Hstar_sigma_minus_kJ_mol: 39.6118099999999
+        delta_Sstar_sigma_plus_J_mol_K: 32.92732
+        delta_Sstar_sigma_minus_J_mol_K: 24.26223
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
+  As:
+    observations:
+    - observation_id: heck_2025_t3_initial_as_ppm
+      type: gibbs_table
+      locator:
+        table: '3'
+        note: Mendeley Data Table_3_initial_MVCE.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: initial_MVCE_concentration_ppm
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Trace element concentration values reported in ppm, MVE O2 has 2 time series
+          since Ge, As, and Ag were added between experiments 24 and 32. KFCMAS 3 S compositions have
+          only a single MVE added to them at relatively high concentrations. KFCMAS 3 was made my mixing
+          KFCMAS 3 S compositions together.
+        table_csv: tables/kems-140-heck-2025/t3.csv
+        initial:
+        - composition: MVE O2
+          T_as_printed: 1673 K
+          ppm: 122.95826
+          sigma_plus_ppm: 11.761224
+          sigma_minus_ppm: 14.43423
+          quote: As MVE O2 1673 K 122.95826 ppm (+11.761224/-14.43423)
+        - composition: MVE O2
+          T_as_printed: 1673 K
+          ppm: 207.26279
+          sigma_plus_ppm: 47.537338
+          sigma_minus_ppm: 39.931364
+          quote: As MVE O2 1673 K 207.26279 ppm (+47.537338/-39.931364)
+        - composition: KFCMAS 4
+          T_as_printed: 1523 K
+          ppm: 150.7
+          sigma_plus_ppm: 7.75
+          sigma_minus_ppm: 8.61
+          quote: As KFCMAS 4 1523 K 150.7 ppm (+7.75/-8.61)
+      uncertainty:
+        note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
+    - observation_id: heck_2025_t4_as_diffusivity_inverse_model
+      type: gibbs_table
+      locator:
+        table: '4'
+        note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
+      T_range_K:
+      - 1481.0
+      - 1673.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: as_printed_m_per_s2_times_1e-10
+      values:
+        quantity: diffusivity
+        method_class: model_derived
+        semantics: inverse_model_fit_not_measured_rate
+        evidence_class: layered_inverse_model
+        footnote_as_printed: Diffusivity reported in m/s2 *10-10, Sulfur present
+        units_as_printed: m/s2 *10-10
+        unit_note: Stored verbatim. Abstract quotes 6.5e-12 to 1.62e-9 m2/s; 0.065083844 in these units
+          matches 6.5e-12 m2/s if the printed m/s2 is m2/s. Conversion not applied.
+        table_csv: tables/kems-140-heck-2025/t4.csv
+        points:
+        - composition_T_as_printed: MVE O2 1673 K
+          D_as_printed: 12.648552
+          sigma_plus: 34.500112
+          sigma_minus: 6.6849287
+          units_as_printed: m/s2 *10-10
+          quote: MVE O2 1673 K As 12.648552 (+34.500112/-6.6849287) (m/s2 *10-10)
+        - composition_T_as_printed: KFCMAS 4 1523 K
+          D_as_printed: 0.065083844
+          sigma_plus: 0.096445616
+          sigma_minus: 0.038860103
+          units_as_printed: m/s2 *10-10
+          quote: KFCMAS 4 1523 K As 0.065083844 (+0.096445616/-0.038860103) (m/s2 *10-10)
+        Cu_D: absent
+        note: Cu has no Table 4 column (true absence). Inverse-model output; not a measured Hertz-Knudsen
+          rate.
+        D_as_printed: 0.065083844
+      uncertainty:
+        note: Table 4 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t5_logKstar_AsO1p5_AsOg_as
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: AsO1.5(melt)=AsO(g)+.25O2(g)
+        oxygen_stoichiometry_n: 1
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1523
+          log_Kstar: -4.77835709683112
+          sigma_plus: 0.168458154341311
+          sigma_minus: 0.200808317077495
+          melt: KFCMAS 4
+          quote: AsO1.5(melt)=AsO(g)+.25O2(g) 1523 K log K*=-4.77835709683112 (+0.168458154341311/-0.200808317077495)
+            melt KFCMAS 4
+        - T_K: 1573
+          log_Kstar: -4.1926972231361
+          sigma_plus: 0.0583582857249061
+          sigma_minus: 0.0225215842389375
+          melt: KFCMAS 4
+          quote: AsO1.5(melt)=AsO(g)+.25O2(g) 1573 K log K*=-4.1926972231361 (+0.0583582857249061/-0.0225215842389375)
+            melt KFCMAS 4
+        - T_K: 1673
+          log_Kstar: -2.70058079764253
+          sigma_plus: 0.0747537853395599
+          sigma_minus: 0.0695515335199244
+          melt: MVEO2
+          quote: AsO1.5(melt)=AsO(g)+.25O2(g) 1673 K log K*=-2.70058079764253 (+0.0747537853395599/-0.0695515335199244)
+            melt MVEO2
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t6_aso1p5_asog_as_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: AsO1.5(melt)=AsO(g)+0.25O2(g)
+        oxygen_stoichiometry_n: 1
+        sample_size_N: 15
+        delta_Hstar_kJ_mol: 830.0482
+        delta_Sstar_J_mol_K: 449.43083
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: AsO1.5(melt)=AsO(g)+0.25O2(g) N=15 ΔH*=830.0482 (+62.94739/-81.22244) kJ/mol ΔS*=449.43083
+          (+37.65767/-48.73347) J/mol K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 62.94739
+        delta_Hstar_sigma_minus_kJ_mol: 81.22244
+        delta_Sstar_sigma_plus_J_mol_K: 37.65767
+        delta_Sstar_sigma_minus_J_mol_K: 48.73347
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
+  Ag:
+    observations:
+    - observation_id: heck_2025_t3_initial_ag_ppm
+      type: gibbs_table
+      locator:
+        table: '3'
+        note: Mendeley Data Table_3_initial_MVCE.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: initial_MVCE_concentration_ppm
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Trace element concentration values reported in ppm, MVE O2 has 2 time series
+          since Ge, As, and Ag were added between experiments 24 and 32. KFCMAS 3 S compositions have
+          only a single MVE added to them at relatively high concentrations. KFCMAS 3 was made my mixing
+          KFCMAS 3 S compositions together.
+        table_csv: tables/kems-140-heck-2025/t3.csv
+        initial:
+        - composition: MVE O2
+          T_as_printed: 1673 K
+          ppm: 52.234848
+          sigma_plus_ppm: 2.6515152
+          sigma_minus_ppm: 2.6515152
+          quote: Ag MVE O2 1673 K 52.234848 ppm (+2.6515152/-2.6515152)
+        - composition: MVE O2
+          T_as_printed: 1673 K
+          ppm: 62.698232
+          sigma_plus_ppm: 19.934823
+          sigma_minus_ppm: 15.433411
+          quote: Ag MVE O2 1673 K 62.698232 ppm (+19.934823/-15.433411)
+        - composition: KFCMAS 4
+          T_as_printed: 1523 K
+          ppm: 115.3
+          sigma_plus_ppm: 6.2
+          sigma_minus_ppm: 6.72
+          quote: Ag KFCMAS 4 1523 K 115.3 ppm (+6.2/-6.72)
+      uncertainty:
+        note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
+    - observation_id: heck_2025_t4_ag_diffusivity_inverse_model
+      type: gibbs_table
+      locator:
+        table: '4'
+        note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
+      T_range_K:
+      - 1481.0
+      - 1673.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: as_printed_m_per_s2_times_1e-10
+      values:
+        quantity: diffusivity
+        method_class: model_derived
+        semantics: inverse_model_fit_not_measured_rate
+        evidence_class: layered_inverse_model
+        footnote_as_printed: Diffusivity reported in m/s2 *10-10, Sulfur present
+        units_as_printed: m/s2 *10-10
+        unit_note: Stored verbatim. Abstract quotes 6.5e-12 to 1.62e-9 m2/s; 0.065083844 in these units
+          matches 6.5e-12 m2/s if the printed m/s2 is m2/s. Conversion not applied.
+        table_csv: tables/kems-140-heck-2025/t4.csv
+        points:
+        - composition_T_as_printed: MVE O2 1673 K
+          D_as_printed: 16.166824
+          sigma_plus: 16.843366
+          sigma_minus: 6.4577125
+          units_as_printed: m/s2 *10-10
+          quote: MVE O2 1673 K Ag 16.166824 (+16.843366/-6.4577125) (m/s2 *10-10)
+        - composition_T_as_printed: KFCMAS 4 1523 K
+          D_as_printed: 1.3613034
+          sigma_plus: 0.1305886
+          sigma_minus: 0.2278855
+          units_as_printed: m/s2 *10-10
+          quote: KFCMAS 4 1523 K Ag 1.3613034 (+0.1305886/-0.2278855) (m/s2 *10-10)
+        Cu_D: absent
+        note: Cu has no Table 4 column (true absence). Inverse-model output; not a measured Hertz-Knudsen
+          rate.
+      uncertainty:
+        note: Table 4 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t5_logKstar_AgOp5_Agg_ag
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: AgO.5(melt)=Ag(g)+.25O2(g)
+        oxygen_stoichiometry_n: 1
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1523
+          log_Kstar: -3.04630433860259
+          sigma_plus: 0.0382872044873186
+          sigma_minus: 0.02793771816363
+          melt: KFCMAS 4
+          quote: AgO.5(melt)=Ag(g)+.25O2(g) 1523 K log K*=-3.04630433860259 (+0.0382872044873186/-0.02793771816363)
+            melt KFCMAS 4
+        - T_K: 1573
+          log_Kstar: -2.61204021659761
+          sigma_plus: 0.0381215197163498
+          sigma_minus: 0.0701995443821701
+          melt: KFCMAS 4
+          quote: AgO.5(melt)=Ag(g)+.25O2(g) 1573 K log K*=-2.61204021659761 (+0.0381215197163498/-0.0701995443821701)
+            melt KFCMAS 4
+        - T_K: 1673
+          log_Kstar: -2.49747556998347
+          sigma_plus: 0.0479680774800104
+          sigma_minus: 0.0533325532195605
+          melt: MVEO2
+          quote: AgO.5(melt)=Ag(g)+.25O2(g) 1673 K log K*=-2.49747556998347 (+0.0479680774800104/-0.0533325532195605)
+            melt MVEO2
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t6_agop5_agg_ag_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: AgO.5(melt)=Ag(g)+0.25O2(g)
+        oxygen_stoichiometry_n: 1
+        sample_size_N: 11
+        delta_Hstar_kJ_mol: 212.91866
+        delta_Sstar_J_mol_K: 85.326954
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: AgO.5(melt)=Ag(g)+0.25O2(g) N=11 ΔH*=212.91866 (+31.10048/-45.45455) kJ/mol ΔS*=85.326954
+          (+19.138756/-27.910686) J/mol K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 31.10048
+        delta_Hstar_sigma_minus_kJ_mol: 45.45455
+        delta_Sstar_sigma_plus_J_mol_K: 19.138756
+        delta_Sstar_sigma_minus_J_mol_K: 27.910686
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
+  Cd:
+    observations:
+    - observation_id: heck_2025_t3_initial_cd_ppm
+      type: gibbs_table
+      locator:
+        table: '3'
+        note: Mendeley Data Table_3_initial_MVCE.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: initial_MVCE_concentration_ppm
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Trace element concentration values reported in ppm, MVE O2 has 2 time series
+          since Ge, As, and Ag were added between experiments 24 and 32. KFCMAS 3 S compositions have
+          only a single MVE added to them at relatively high concentrations. KFCMAS 3 was made my mixing
+          KFCMAS 3 S compositions together.
+        table_csv: tables/kems-140-heck-2025/t3.csv
+        initial:
+        - composition: KFCMAS 4
+          T_as_printed: 1523 K
+          ppm: 154.47
+          sigma_plus_ppm: 26.93
+          sigma_minus_ppm: 23.76
+          quote: Cd KFCMAS 4 1523 K 154.47 ppm (+26.93/-23.76)
+      uncertainty:
+        note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
+    - observation_id: heck_2025_t4_cd_diffusivity_inverse_model
+      type: gibbs_table
+      locator:
+        table: '4'
+        note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
+      T_range_K:
+      - 1481.0
+      - 1673.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: as_printed_m_per_s2_times_1e-10
+      values:
+        quantity: diffusivity
+        method_class: model_derived
+        semantics: inverse_model_fit_not_measured_rate
+        evidence_class: layered_inverse_model
+        footnote_as_printed: Diffusivity reported in m/s2 *10-10, Sulfur present
+        units_as_printed: m/s2 *10-10
+        unit_note: Stored verbatim. Abstract quotes 6.5e-12 to 1.62e-9 m2/s; 0.065083844 in these units
+          matches 6.5e-12 m2/s if the printed m/s2 is m2/s. Conversion not applied.
+        table_csv: tables/kems-140-heck-2025/t4.csv
+        points:
+        - composition_T_as_printed: KFCMAS 4 1523 K
+          D_as_printed: 0.41135721
+          sigma_plus: 0.25308211
+          sigma_minus: 0.12425142
+          units_as_printed: m/s2 *10-10
+          quote: KFCMAS 4 1523 K Cd 0.41135721 (+0.25308211/-0.12425142) (m/s2 *10-10)
+        Cu_D: absent
+        note: Cu has no Table 4 column (true absence). Inverse-model output; not a measured Hertz-Knudsen
+          rate.
+      uncertainty:
+        note: Table 4 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t5_logKstar_CdO_Cdg_cd
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: CdO(melt)=Cd(g)+.5O2(g)
+        oxygen_stoichiometry_n: 2
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1523
+          log_Kstar: -3.81517265510215
+          sigma_plus: 0.116409923941551
+          sigma_minus: 0.0686250962400683
+          melt: KFCMAS 4
+          quote: CdO(melt)=Cd(g)+.5O2(g) 1523 K log K*=-3.81517265510215 (+0.116409923941551/-0.0686250962400683)
+            melt KFCMAS 4
+        - T_K: 1573
+          log_Kstar: -2.90817813833383
+          sigma_plus: 0.26734286936605
+          sigma_minus: 0.342682460262519
+          melt: KFCMAS 4
+          quote: CdO(melt)=Cd(g)+.5O2(g) 1573 K log K*=-2.90817813833383 (+0.26734286936605/-0.342682460262519)
+            melt KFCMAS 4
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+  In:
+    observations:
+    - observation_id: heck_2025_t3_initial_in_ppm
+      type: gibbs_table
+      locator:
+        table: '3'
+        note: Mendeley Data Table_3_initial_MVCE.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: initial_MVCE_concentration_ppm
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Trace element concentration values reported in ppm, MVE O2 has 2 time series
+          since Ge, As, and Ag were added between experiments 24 and 32. KFCMAS 3 S compositions have
+          only a single MVE added to them at relatively high concentrations. KFCMAS 3 was made my mixing
+          KFCMAS 3 S compositions together.
+        table_csv: tables/kems-140-heck-2025/t3.csv
+        initial:
+        - composition: KFCMAS 3
+          T_as_printed: 1481 K
+          ppm: 39.98537
+          sigma_plus_ppm: 24.908919
+          sigma_minus_ppm: 18.35394
+          quote: In KFCMAS 3 1481 K 39.98537 ppm (+24.908919/-18.35394)
+        - composition: KFCMAS 3 S
+          T_as_printed: 1481 K
+          ppm: 304.79
+          sigma_plus_ppm: 40.23
+          sigma_minus_ppm: 34.04
+          quote: In KFCMAS 3 S 1481 K 304.79 ppm (+40.23/-34.04)
+        - composition: KFCMAS 4
+          T_as_printed: 1523 K
+          ppm: 202.55
+          sigma_plus_ppm: 5.6
+          sigma_minus_ppm: 4.67
+          quote: In KFCMAS 4 1523 K 202.55 ppm (+5.6/-4.67)
+      uncertainty:
+        note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
+    - observation_id: heck_2025_t5_logKstar_InO1p5_InOg_in
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: InO1.5(melt)=InO(g)+.25O2(g)
+        oxygen_stoichiometry_n: 1
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points: []
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t5_logKstar_InO1p5_Ing_in
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: InO1.5(melt)=In(g)+.75O2(g)
+        oxygen_stoichiometry_n: 3
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1481
+          log_Kstar: -9.05847045295097
+          sigma_plus: 0.113140011596782
+          sigma_minus: 0.165562311373259
+          melt: KFCMAS 3
+          quote: InO1.5(melt)=In(g)+.75O2(g) 1481 K log K*=-9.05847045295097 (+0.113140011596782/-0.165562311373259)
+            melt KFCMAS 3
+        - T_K: 1573
+          log_Kstar: -7.67949607658504
+          sigma_plus: 0.0505330999618758
+          sigma_minus: 0.00171412698372375
+          melt: KFCMAS 4
+          quote: InO1.5(melt)=In(g)+.75O2(g) 1573 K log K*=-7.67949607658504 (+0.0505330999618758/-0.00171412698372375)
+            melt KFCMAS 4
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t6_ino1p5_inog_in_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: InO1.5(melt)=InO(g)+0.25O2(g)
+        oxygen_stoichiometry_n: 1
+        sample_size_N: 10
+        delta_Hstar_kJ_mol: 1099.0
+        delta_Sstar_J_mol_K: 621.0
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: InO1.5(melt)=InO(g)+0.25O2(g) N=10 ΔH*=1099 (+95/-499) kJ/mol ΔS*=621 (+52/-322) J/mol
+          K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 95.0
+        delta_Hstar_sigma_minus_kJ_mol: 499.0
+        delta_Sstar_sigma_plus_J_mol_K: 52.0
+        delta_Sstar_sigma_minus_J_mol_K: 322.0
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
+    - observation_id: heck_2025_t6_ino1p5_ing_in_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: InO1.5(melt)=In(g)+0.75O2(g)
+        oxygen_stoichiometry_n: 3
+        sample_size_N: 10
+        delta_Hstar_kJ_mol: 335.0
+        delta_Sstar_J_mol_K: 60.0
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: InO1.5(melt)=In(g)+0.75O2(g) N=10 ΔH*=335 (+44/-22) kJ/mol ΔS*=60 (+23/-3) J/mol K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 44.0
+        delta_Hstar_sigma_minus_kJ_mol: 22.0
+        delta_Sstar_sigma_plus_J_mol_K: 23.0
+        delta_Sstar_sigma_minus_J_mol_K: 3.0
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
+  Pb:
+    observations:
+    - observation_id: heck_2025_t3_initial_pb_ppm
+      type: gibbs_table
+      locator:
+        table: '3'
+        note: Mendeley Data Table_3_initial_MVCE.xlsx
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: ppm
+      values:
+        quantity: initial_MVCE_concentration_ppm
+        method_class: measured_direct
+        semantics: composition_or_run_log_not_measured_rate
+        footnote_as_printed: Trace element concentration values reported in ppm, MVE O2 has 2 time series
+          since Ge, As, and Ag were added between experiments 24 and 32. KFCMAS 3 S compositions have
+          only a single MVE added to them at relatively high concentrations. KFCMAS 3 was made my mixing
+          KFCMAS 3 S compositions together.
+        table_csv: tables/kems-140-heck-2025/t3.csv
+        initial:
+        - composition: KFCMAS 3
+          T_as_printed: 1481 K
+          ppm: 2.0637333
+          sigma_plus_ppm: 0.81386667
+          sigma_minus_ppm: 1.1045333
+          quote: Pb KFCMAS 3 1481 K 2.0637333 ppm (+0.81386667/-1.1045333)
+        - composition: KFCMAS 4
+          T_as_printed: 1523 K
+          ppm: 170.1
+          sigma_plus_ppm: 26.3
+          sigma_minus_ppm: 23.01
+          quote: Pb KFCMAS 4 1523 K 170.1 ppm (+26.3/-23.01)
+      uncertainty:
+        note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
+    - observation_id: heck_2025_t4_pb_diffusivity_inverse_model
+      type: gibbs_table
+      locator:
+        table: '4'
+        note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
+      T_range_K:
+      - 1481.0
+      - 1673.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: as_printed_m_per_s2_times_1e-10
+      values:
+        quantity: diffusivity
+        method_class: model_derived
+        semantics: inverse_model_fit_not_measured_rate
+        evidence_class: layered_inverse_model
+        footnote_as_printed: Diffusivity reported in m/s2 *10-10, Sulfur present
+        units_as_printed: m/s2 *10-10
+        unit_note: Stored verbatim. Abstract quotes 6.5e-12 to 1.62e-9 m2/s; 0.065083844 in these units
+          matches 6.5e-12 m2/s if the printed m/s2 is m2/s. Conversion not applied.
+        table_csv: tables/kems-140-heck-2025/t4.csv
+        points:
+        - composition_T_as_printed: KFCMAS 4 1523 K
+          D_as_printed: 0.20528363
+          sigma_plus: 0.13349385
+          sigma_minus: 0.06429498
+          units_as_printed: m/s2 *10-10
+          quote: KFCMAS 4 1523 K Pb 0.20528363 (+0.13349385/-0.06429498) (m/s2 *10-10)
+        Cu_D: absent
+        note: Cu has no Table 4 column (true absence). Inverse-model output; not a measured Hertz-Knudsen
+          rate.
+      uncertainty:
+        note: Table 4 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t5_logKstar_PbO_PbOg_pb
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: PbO(melt)=PbO(g)
+        oxygen_stoichiometry_n: 0
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1523
+          log_Kstar: -3.6257457237302
+          sigma_plus: 0.0965254404059159
+          sigma_minus: 0.0737917653241564
+          melt: KFCMAS 4
+          quote: PbO(melt)=PbO(g) 1523 K log K*=-3.6257457237302 (+0.0965254404059159/-0.0737917653241564)
+            melt KFCMAS 4
+        - T_K: 1573
+          log_Kstar: -2.71375736845317
+          sigma_plus: 0.161908555056745
+          sigma_minus: 0.170245379039596
+          melt: KFCMAS 4
+          quote: PbO(melt)=PbO(g) 1573 K log K*=-2.71375736845317 (+0.161908555056745/-0.170245379039596)
+            melt KFCMAS 4
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t5_logKstar_PbO_Pbg_pb
+      type: gibbs_table
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: log10_Kstar_as_printed
+      values:
+        quantity: apparent_equilibrium_coefficient_log_Kstar
+        method_class: model_derived
+        evidence_class: fitted_evaporation_equilibrium
+        reaction_as_printed: PbO(melt)=Pb(g)+.5O2(g)
+        oxygen_stoichiometry_n: 2
+        footnote_as_printed: Apparent equilibrium constant values were retrieved using Eq 5.
+        table_csv: tables/kems-140-heck-2025/t5.csv
+        points:
+        - T_K: 1481
+          log_Kstar: -6.60783588829214
+          sigma_plus: 0.047063387284731
+          sigma_minus: 0.103273176525678
+          melt: KFCMAS 3
+          quote: PbO(melt)=Pb(g)+.5O2(g) 1481 K log K*=-6.60783588829214 (+0.047063387284731/-0.103273176525678)
+            melt KFCMAS 3
+        - T_K: 1573
+          log_Kstar: -5.64593421438005
+          sigma_plus: 0.191285772728051
+          sigma_minus: 0.0603573744086079
+          melt: KFCMAS 4
+          quote: PbO(melt)=Pb(g)+.5O2(g) 1573 K log K*=-5.64593421438005 (+0.191285772728051/-0.0603573744086079)
+            melt KFCMAS 4
+        note: Author-fitted K*, not an instrument reading.
+      uncertainty:
+        note: Table 5 (+)σ (-)σ as printed
+    - observation_id: heck_2025_t6_pbo_pbog_pb_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: PbO(melt)=PbO(g)
+        oxygen_stoichiometry_n: 0
+        sample_size_N: 12
+        delta_Hstar_kJ_mol: 375.0
+        delta_Sstar_J_mol_K: 184.0
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: PbO(melt)=PbO(g) N=12 ΔH*=375 (+357/-0) kJ/mol ΔS*=184 (+230/-0) J/mol K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 357.0
+        delta_Hstar_sigma_minus_kJ_mol: 0.0
+        delta_Sstar_sigma_plus_J_mol_K: 230.0
+        delta_Sstar_sigma_minus_J_mol_K: 0.0
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
+    - observation_id: heck_2025_t6_pbo_pbg_pb_HS
+      type: gibbs_table
+      locator:
+        table: '6'
+        note: Mendeley Data Table_6_H_S.xlsx; apparent ΔH* ΔS* from Eqs. 4 and 6
+      T_range_K:
+      - 1481.0
+      - 1773.0
+      phase: silicate_melt
+      regime: open_furnace_1atm_gas_mixing
+      units: kJ/mol and J/mol K as printed
+      values:
+        quantity: apparent_enthalpy_entropy_of_degassing
+        method_class: model_derived
+        evidence_class: second_law_style_fit
+        reaction_as_printed: PbO(melt)=Pb(g)+0.5O2(g)
+        oxygen_stoichiometry_n: 2
+        sample_size_N: 12
+        delta_Hstar_kJ_mol: 335.0
+        delta_Sstar_J_mol_K: 105.0
+        footnote_as_printed: Apparent enthalpy and entropy values were retrieved using Eqs. 4 and 6.
+        table_csv: tables/kems-140-heck-2025/t6.csv
+        quote: PbO(melt)=Pb(g)+0.5O2(g) N=12 ΔH*=335 (+114/-62) kJ/mol ΔS*=105 (+76/-24) J/mol K
+        note: Title misspells enthalpy as enthaly as printed. Fitted, not a calorimetric measurement.
+          Cd has no Table 6 row (true absence).
+      uncertainty:
+        delta_Hstar_sigma_plus_kJ_mol: 114.0
+        delta_Hstar_sigma_minus_kJ_mol: 62.0
+        delta_Sstar_sigma_plus_J_mol_K: 76.0
+        delta_Sstar_sigma_minus_J_mol_K: 24.0
+        note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
