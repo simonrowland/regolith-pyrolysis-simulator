@@ -41,6 +41,7 @@ EXPECTED_SHA256 = "8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4
 # Unary 5.0 has no H, F, Cl, Br, I. Pinned so a later harvest that drops more
 # feedstock elements, or that silently adds guessed records for these five, goes red.
 PINNED_MISSING_FEEDSTOCK_ELEMENTS = ("Br", "Cl", "F", "H", "I")
+SYNTHETIC_SUFFIX_TDB = Path(__file__).resolve().parent / "fixtures" / "sgte_unary_synthetic_suffix.tdb"
 
 
 @pytest.fixture(scope="module")
@@ -306,3 +307,36 @@ def test_published_reversed_mercury_interval_refuses():
 @pytest.mark.parametrize("coefficient", ["1E-3", "1.E-3", ".1E-2"])
 def test_scientific_notation_is_not_a_function_reference(coefficient):
     assert evaluate_expression_string(f"{coefficient}*T", 1000) == pytest.approx(1)
+
+
+def test_synthetic_type_suffix_phase_parses_field_by_field():
+    # unary50.tdb only publishes LIQUID:L; parameter_phase_name strips that
+    # suffix, so a NAME:SUFFIX other than :L is required to cover the
+    # CONSTITUENT name-token split at sgte_unary.py:899.
+    database = load_tdb(SYNTHETIC_SUFFIX_TDB)
+    assert list(database.phases) == ["SPINEL:S"]
+    phase = database.phases["SPINEL:S"]
+    assert phase.name_as_published == "SPINEL:S"
+    assert phase.parameter_name == "SPINEL:S"
+    assert phase.type_code == "%"
+    assert phase.n_sublattices == 2
+    assert phase.sites == ("1", "2")
+    assert phase.constituents == (("FE", "MG"), ("O",))
+    assert database.elements["FE"].reference_phase == "SPINEL:S"
+
+    referenced = database.functions["GHSERFE"]
+    referring = database.functions["GLIQFE"]
+    assert [(interval.t_low, interval.t_high) for interval in referenced.intervals] == [
+        (298.15, 2000.0),
+    ]
+    assert [(interval.t_low, interval.t_high) for interval in referring.intervals] == [
+        (298.15, 1000.0),
+        (1000.0, 2000.0),
+    ]
+    assert referring.intervals[0].expression.function_names == ("GHSERFE",)
+    assert referring.intervals[1].expression.function_names == ("GHSERFE",)
+
+    functions = {name: function.as_dict() for name, function in database.functions.items()}
+    assert evaluate_function("GHSERFE", 500, functions) == -1000.0
+    assert evaluate_function("GLIQFE", 500, functions) == -1000.0
+    assert evaluate_function("GLIQFE", 1500, functions) == -990.0
