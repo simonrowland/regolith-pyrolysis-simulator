@@ -13,7 +13,7 @@ scipy>=1.12
 # Autoreview r5 P1 (2026-05-27): omitting petthermotools here meant the
 # documented installer flow could not stand up the SILICATE_EQUILIBRIUM /
 # AlphaMELTS melt-equilibria path. It IS pip-installable, so it belongs here.
-petthermotools>=0.4.5,<0.5
+petthermotools==0.4.5
 # vaporock (the VAPOR_PRESSURE authority) is deliberately NOT pinned here.
 # `import vaporock` hard-requires `thermoengine` -- a native build (a Cython
 # extension linking system GSL, Objective-C/C dylibs, and the transitive PyPI

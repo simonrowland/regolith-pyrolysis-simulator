@@ -29,7 +29,7 @@ dependencies = [
     # native engine stack numpy-2 compatible.
     "numpy>=1.26,<2",
     "scipy>=1.12",
-    "petthermotools>=0.4.5,<0.5",
+    "petthermotools==0.4.5",
     # vaporock (VAPOR_PRESSURE diagnostic overlay) is intentionally NOT a pip dependency.
     # `import vaporock` hard-requires `thermoengine` -- a native build (a Cython
     # extension linking system GSL, Objective-C/C dylibs, and the transitive
