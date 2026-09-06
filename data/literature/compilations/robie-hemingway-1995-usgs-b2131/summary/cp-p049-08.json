@@ -1,0 +1,135 @@
+{
+  "record_id": "cp-p049-08",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 55,
+  "page": 49,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "BUNSENITE",
+  "formula_candidate": "NiO",
+  "header_and_units_raw": "NAME AND FORIIJLA    ENTROPY            A1            A2            A3            A4            AS     T r.,ge   Tan     A.H·\n                    J•IIOl\"'·K\"'                     (T)          n·2,         (T.o.&)        (T2)       IC       IC     kJ·•r'\n\n\n",
+  "source_text": "BUNSENITE                67.7      -8.776E+OO    4.223E-02     3.607E+06     7.873E+02    -7.526E-06     519\nNiO                       0.5                                                                           1800",
+  "rows": [
+    {
+      "raw": "BUNSENITE                67.7      -8.776E+OO    4.223E-02     3.607E+06     7.873E+02    -7.526E-06     519",
+      "tokens": [
+        {
+          "raw": "BUNSENITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 9
+        },
+        {
+          "raw": "67.7",
+          "value": 67.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 25,
+          "end_offset": 29
+        },
+        {
+          "raw": "-8.776E+OO",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 35,
+          "end_offset": 45
+        },
+        {
+          "raw": "4.223E-02",
+          "value": 0.04223,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 49,
+          "end_offset": 58
+        },
+        {
+          "raw": "3.607E+06",
+          "value": 3607000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 63,
+          "end_offset": 72
+        },
+        {
+          "raw": "7.873E+02",
+          "value": 787.3,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 77,
+          "end_offset": 86
+        },
+        {
+          "raw": "-7.526E-06",
+          "value": -7.526e-06,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 90,
+          "end_offset": 100
+        },
+        {
+          "raw": "519",
+          "value": 519.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 105,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "NiO                       0.5                                                                           1800",
+      "tokens": [
+        {
+          "raw": "NiO",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 3
+        },
+        {
+          "raw": "0.5",
+          "value": 0.5,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 26,
+          "end_offset": 29
+        },
+        {
+          "raw": "1800",
+          "value": 1800.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 104,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A1: unparsed printed OCR token '-8.776E+OO'",
+    "Body label or prose enters numeric region: [('A1', '-8.776E+OO')]",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 34,
+  "source_line_end": 35
+}
