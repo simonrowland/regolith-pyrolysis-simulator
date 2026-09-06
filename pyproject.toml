@@ -10,8 +10,8 @@ requires-python = ">=3.10"
 #     via install-engines.py, NOT pip: it cannot import without the native
 #     thermoengine build (Cython + GSL + Obj-C/C dylibs + sulfLiq). See the
 #     note in [project.dependencies] below.
-#   - petthermotools: provides AlphaMELTS / ThermoEngine path for melt
-#     equilibria (the canonical SILICATE_EQUILIBRIUM authority).
+#   - petthermotools: provides the AlphaMELTS / ThermoEngine path for
+#     melt equilibria; provisioned editable by install-engines.py.
 #   - MAGEMin: required as a compiled C/Fortran binary at
 #     `engines/magemin/bin/MAGEMin` (see comment block below). The
 #     SILICATE_LIQUIDUS shadow + GATE_LIQUID_FRACTION authoritative-fallback.
@@ -29,7 +29,10 @@ dependencies = [
     # native engine stack numpy-2 compatible.
     "numpy>=1.26,<2",
     "scipy>=1.12",
-    "petthermotools==0.4.5",
+    "pandas",  # Used directly by the IMCC gas model.
+    "psutil",  # Used directly by optimizer process identity checks.
+    # PetThermoTools and the other engine distributions are installed
+    # editable by install-engines.py after the base environment sync.
     # vaporock (VAPOR_PRESSURE diagnostic overlay) is intentionally NOT a pip dependency.
     # `import vaporock` hard-requires `thermoengine` -- a native build (a Cython
     # extension linking system GSL, Objective-C/C dylibs, and the transitive
@@ -72,13 +75,9 @@ magemin = [
     # out by default: the supported path is the compiled binary + subprocess.
     # "juliacall>=0.9,<0.10",
 ]
-# PySulfSat (https://github.com/PennyWieser/PySulfSat) is the
-# SULFUR_SATURATION_GATE engine. Pinned at the canonical lowercase PyPI
-# distribution name. The 1.0.x line is the published series at the time
-# of this integration (verified via `pip show PySulfSat` against the
-# editable install from `install-engines.py`, which clones the upstream
-# repository as a sibling and installs it via `pip install -e`).
-sulfur = ["pysulfsat>=1.0,<2"]
+# PySulfSat is provisioned editable by install-engines.py.
+# Retain the extra name as an installer-owned build marker.
+sulfur = []
 # dev includes the pytest plugins the project-level [tool.pytest.ini_options]
 # addopts depends on (`-n auto` needs pytest-xdist; `--timeout=300` needs
 # pytest-timeout). Without these declared, a clean checkout doing

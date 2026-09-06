@@ -1,6 +1,6 @@
 # Melt Chemistry Backends
 
-In the current code path, `engines/builtin/vapor_pressure.py::BuiltinVaporPressureProvider` is the authoritative `VAPOR_PRESSURE` provider (Antoine + Ellingham). VapoRock is retained as a diagnostic-only shadow: it may emit full gas speciation for comparison, but it does not own the pressure dict consumed by evaporation and has no ledger authority. AlphaMELTS and ThermoEngine are peer diagnostic backends for `SILICATE_EQUILIBRIUM`; MAGEMin remains the shadow / narrow-gate engine for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION`. `petthermotools` is a `[project.dependencies]` entry (required), not an optional extra; `vaporock` is required for the diagnostic overlay but is **not** pip-installable and is provisioned by `install-engines.py` (see "Python Packages" below). MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. FactSAGE / ChemApp is archived/removed in this checkout and is not selectable.
+In the current code path, `engines/builtin/vapor_pressure.py::BuiltinVaporPressureProvider` is the authoritative `VAPOR_PRESSURE` provider (Antoine + Ellingham). VapoRock is retained as a diagnostic-only shadow: it may emit full gas speciation for comparison, but it does not own the pressure dict consumed by evaporation and has no ledger authority. AlphaMELTS and ThermoEngine are peer diagnostic backends for `SILICATE_EQUILIBRIUM`; MAGEMin remains the shadow / narrow-gate engine for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION`. `petthermotools` is required for its melt-equilibria path and is provisioned editable by `install-engines.py`; `vaporock` is required for the diagnostic overlay but is **not** pip-installable and is provisioned by `install-engines.py` (see "Python Packages" below). MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. FactSAGE / ChemApp is archived/removed in this checkout and is not selectable.
 
 ## Per-call result status
 
@@ -39,13 +39,13 @@ The `engines/` directory is ignored by git so local licensed or platform-specifi
 
 ## Python Packages
 
-`petthermotools` is declared in `[project.dependencies]` and is installed by the standard `pip install -e .` (and by `install-dependencies.py`).
+`petthermotools`, Thermobar and PySulfSat are installer-owned editable sibling clones. Run `install-engines.py` after base dependency setup; the base manifests/lock do not pin their revisions. An exact `uv sync` removes installer-owned packages, so provision engines again afterward. Use the venv Python or `uv run --no-sync` for tests after provisioning. See README installation instructions for pip bootstrap and import verification.
 
 `vaporock` is deliberately **not** a pip dependency. `import vaporock` hard-requires `thermoengine`, a native build (Cython extension linking system GSL, Objective-C/C dylibs, and the transitive `sulfLiq` dep) that pip cannot compile, so a `git+https` pin in `pyproject.toml` aborted the whole pip batch whenever its ref went stale. VapoRock and ThermoEngine are therefore provisioned by `install-engines.py`, which clones them as siblings of the repo (VapoRock from `https://gitlab.com/ENKI-portal/vaporock.git`) and installs them editable. It tracks the default branch, **not** a tag: VapoRock's only tag (`v0.1`) predates the `src/` restructure and exposes no installable Python project. See the comment block in `pyproject.toml [project.dependencies]` for the authoritative version of this note.
 
 The `numpy>=1.26,<2` upper bound in `[project.dependencies]` is load-bearing for the same stack: VapoRock imports `np.bool8`, removed in numpy 2.0, so an unbounded spec silently breaks `import vaporock`.
 
-The optional extras are `[optimize]` (Optuna, for the recipe optimizer), `[magemin]` (a documented build path — the MAGEMin binary is compiled from source; the only pip-installable piece is the optional `juliacall` bridge, commented out by default), `[sulfur]` (PySulfSat), and `[dev]` (the pytest plugins the project `addopts` depend on). None of these are on the production hot path.
+The optional extras are `[optimize]` (Optuna, for the recipe optimizer), `[magemin]` (a documented build path — the MAGEMin binary is compiled from source; the only pip-installable piece is the optional `juliacall` bridge, commented out by default), `[sulfur]` (a marker for installer-owned PySulfSat), and `[dev]` (the pytest plugins the project `addopts` depend on). None of these are on the production hot path.
 
 ## VapoRock adapter notes
 

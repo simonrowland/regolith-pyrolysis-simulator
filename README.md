@@ -191,9 +191,9 @@ not already inside a virtual environment, it creates `.venv` and installs
 `engines/alphamelts/`. Then run the command it prints and open
 `http://localhost:3000/`.
 
-The remaining thermochemistry engines — ThermoEngine, VapoRock, and MAGEMin — are native
-builds that `pip` cannot compile from a requirements line, so they have a separate
-provisioning script:
+Engine provisioning is a second installation stage: PetThermoTools, Thermobar,
+PySulfSat and VapoRock come from editable sibling clones; ThermoEngine and
+MAGEMin require native builds. Run the provisioning script after base setup:
 
 ```bash
 python3 install-engines.py
@@ -222,8 +222,8 @@ integration rather than exposing the development server.
 - `plotly` — browser-side charts.
 - `numpy` — numerical helpers. Pinned `<2`: VapoRock imports `np.bool8`, removed in NumPy 2.0.
 - `scipy` — scientific calculations.
-- `petthermotools` — the MELTS-family melt-equilibria path. Not optional: without it the
-  documented installer flow cannot stand up the silicate-equilibrium chain.
+- `pandas` — IMCC gas-model tables.
+- `psutil` — optimizer child-process identity checks.
 - `pytest`, `pytest-xdist`, `pytest-timeout` — required by the `addopts` in `pyproject.toml`;
   without them `pytest` aborts during argument parsing before any test runs.
 
@@ -233,11 +233,17 @@ Optional extras declared in `pyproject.toml` (`pip install -e ".[<name>]"`):
 |---|---|
 | `dev` | `pytest`, `pytest-xdist`, `pytest-timeout` |
 | `optimize` | `optuna` (pinned) — the recipe-optimizer strategies |
-| `sulfur` | `pysulfsat` — sulfur saturation models |
+| `sulfur` | marker only; PySulfSat comes from `install-engines.py` |
 | `magemin` | marker only; the MAGEMin binary itself comes from `install-engines.py` |
 
-There is no `melts` extra. PetThermoTools is a core dependency (above), and the alphaMELTS
-binary is installed by `install-dependencies.py`.
+There is no `melts` extra. PetThermoTools is required for its melt-equilibria
+path and comes from `install-engines.py`; the alphaMELTS binary is installed
+by `install-dependencies.py`. The base lock excludes installer-owned engines.
+An exact `uv sync` removes those installations: sync first, then provision
+engines again. After provisioning, use `.venv/bin/python` or `uv run --no-sync`.
+A fresh uv venv needs `.venv/bin/python -m ensurepip --upgrade` before the
+pip-based engine installer. Preserve validated sibling revisions and check
+engine imports explicitly; installer exit status alone does not prove success.
 
 ## Melt Chemistry Backends
 
