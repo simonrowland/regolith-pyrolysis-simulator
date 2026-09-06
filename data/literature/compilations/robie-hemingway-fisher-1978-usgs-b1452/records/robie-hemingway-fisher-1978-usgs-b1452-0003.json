@@ -1,0 +1,95 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0003",
+  "census_id": "thermodynamic-properties-at-298-15-k",
+  "table_number_as_published": null,
+  "name_as_published": "Thermodynamic properties at 298.15 K",
+  "record_kind": "auxiliary_numeric_table",
+  "section_as_published": "Thermodynamic properties at 298.15 K",
+  "formula_as_published": null,
+  "phase_state_as_published": null,
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ],
+    "printed_pages": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "the 18-page summary table has ragged, shifted, omitted, and merged columns in the OCR text layer, including merged formula-weight/entropy tokens; a lossless row transcription is not recoverable"
+  ],
+  "formula_weight": {
+    "as_published": "",
+    "value": null,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "column_ids": [],
+  "column_header_lines_as_published": [],
+  "units_as_published": {},
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 0,
+  "uncertainty_line_as_published": "",
+  "uncertainty_values": [],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "the 18-page summary table has ragged, shifted, omitted, and merged columns in the OCR text layer, including merged formula-weight/entropy tokens; a lossless row transcription is not recoverable",
+      "detector_only": false
+    }
+  ]
+}
