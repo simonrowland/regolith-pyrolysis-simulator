@@ -1,0 +1,143 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0333",
+  "census_id": "high-temperature-printed-page-359",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "TITliiTB ( SPHEIE)",
+  "formula_as_published": "CaTiSiOs",
+  "phase_state_as_published": [
+    "Crystals 298.15 to aelting point 1670 K.                 Liquid 1670 to 1aoo K."
+  ],
+  "description_lines_as_published": [
+    "CaTiSiOs:         Crystals 298.15 to aelting point 1670 K.                 Liquid 1670 to 1aoo K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "196.063",
+    "value": 196.063,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      365
+    ],
+    "printed_pages": [
+      359
+    ],
+    "pdftotext_layout_page_file": "page-365.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 34, 36, 45, 47, 49, 51"
+  ],
+  "title_line_as_published": "TITliiTB ( SPHEIE)                                                                POBBULl WEIGHT    196.063",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "CaTiSiOs:         Crystals 298.15 to aelting point 1670 K.                 Liquid 1670 to 1aoo K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 lOBUTIOI PROS THE ELEIIBIITS",
+    "                                                                                        GIBBS",
+    "TEIIP.     <a;-a; 98 )IT     so      -(G;-a; 98 )/T       cop    EIITHlLPI           PBBB EIIBGY     Log Kf",
+    "                               T",
+    "  K            J/aol•K     J/aol•K     J/aol•K        J/aol•K           ltJ/aol        ltJ/aol",
+    "---------------------------------~---------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "ltJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 22,
+  "uncertainty_line_as_published": "UHCIBT .liJTI                 0.84         0.84                       2.380              2.430         0.426",
+  "uncertainty_values": [
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.380",
+      "value": 2.38,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.430",
+      "value": 2.43,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.426",
+      "value": 0.426,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "CaTiSiOs:         Crystals 298.15 to aelting point 1670 K.                 Liquid 1670 to 1aoo K."
+  ],
+  "auxiliary_lines_as_published": [
+    "BELTING POINT                 1670                    BOILING POINT                                   K",
+    "EIITHALPY OP MELTIWG          123.805 ltJ             ENTHALPY OP V.lPOIIZATION                       ltJ",
+    "                                        ltJ           IIOL.lR VOLUIIE                        5. 5650 J/ba r",
+    "                                                                                            55.650 CIIJ",
+    "TRANSITIONS IN REFERENCE ST.lTE ELEIIENTS",
+    "      CALCIUB •••• ALPHA-BETA 720• II. P. BETA 1112• B. P. 1755 K.",
+    "      TITANIUM ••• ALPHA-BETA 1155• II. P. 1943            K.",
+    "      SILICON •••• II. P. 1685 K.",
+    "HE.lT CAPACITY EQUATION",
+    " c;       1.7673:r.1oz + 2.3852:r.1o-z T - 3.9905:r.10• T-z",
+    "             (EQUATION VALID PBOII 298 - 1670 K)",
+    "RB!'EBEIIICE      132         120                                           93                     COli PILED",
+    "                                                                           253                      7- 9-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 34, 36, 45, 47, 49, 51",
+      "detector_only": false
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0335",
+  "census_id": "high-temperature-printed-page-361",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "FlYAU:TE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "203.778",
+    "value": 203.778,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      367
+    ],
+    "printed_pages": [
+      361
+    ],
+    "pdftotext_layout_page_file": "page-367.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 31, 33, 35, 37, 46, 48"
+  ],
+  "title_line_as_published": "FlYAU:TE                                                                          FOB!ULA WEIGHT       203.778",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                Crrstals 298.15 to           ~ltinq      point 1490 ~.     Liquid 1490 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOR!UTIOI FRO !I THE ELE!IERTS",
+    "                                                                                        GIBBS",
+    "TE!!P.     ( H~-   a; 98 )/T      so",
+    "                                   T     -(G;-a~ 98 );T      cop    EBTBlLPY         FREE EIERGY        Loq Kf",
+    "  ~         J;aol•K            Jjaol•K      J;aol• K      Jjaol•K        kJ/aol        ltJjaol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "~",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "Jjaol•K",
+    "negative_gibbs_function": "J;aol• K",
+    "heat_capacity": "Jjaol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "ltJjaol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 21,
+  "uncertainty_line_as_published": "UNCERTAI IITY                     1.67            1.67                     2.410             2. 470      0.432",
+  "uncertainty_values": [
+    {
+      "as_published": "1.67",
+      "value": 1.67,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.67",
+      "value": 1.67,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.410",
+      "value": 2.41,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2. 470",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.432",
+      "value": 0.432,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POI liT                  1490                    BOILIIIG POIBT",
+    "ERTHALPY OF !!ELTING               92.173 kJ              ENTHALPY OF VAPORIZATION                       ltJ",
+    "                                             kJ           !!OUR VOLU!IE                         4.6390 J/bar",
+    "                                                                                               46.390 ca 3",
+    "TRANSITIORS IH REFEREHCE STATE ELE!!EITS",
+    "      IRON ••••• •• CURIE P. 1042, ALPBA-GA.I!!A 1184, GU!A-DELTA                    1665~",
+    "                    ft. P. DELTA 1809 ~.",
+    "      SILICON •••• ft. P. 1685 K.",
+    "HEAT CAPACITY EQUATIOH",
+    "          1.7276x102- 3.4055:r10-JI T   2.2411%10-s T2",
+    "             (EQUATIOI VALID FROB 298- 1490 1)",
+    "BEPBRERCE          190            251                                        93                       CO!IPIL.BD",
+    "                                  120                                       127                        8-27-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 31, 33, 35, 37, 46, 48",
+      "detector_only": false
+    }
+  ]
+}
