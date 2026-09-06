@@ -1,0 +1,470 @@
+schema_version: literature_extract.v1
+source_id: kems-132-nakajima-2016
+source:
+  citation: 'Nakajima, K. (2016), "Determination of Optimal Vapor Pressure Data by the Second and Third Law Methods", Mass Spectrom. (Tokyo) 5(2):S0055, DOI 10.5702/massspectrometry.S0055'
+  doi: 10.5702/massspectrometry.S0055
+  url: https://www.jstage.jst.go.jp/article/massspectrometry/5/2/5_S0055/_pdf
+  year: 2016
+extraction:
+  method: 'Official J-STAGE VOR PDF (https://www.jstage.jst.go.jp/article/massspectrometry/5/2/5_S0055/_pdf). Born-digital 6-page A4. pdftotext -layout plus visual certification of Tables 1–2 against 300 dpi pdftoppm of PDF pages 3–4. Figures 1–7 listed figure-only; not digitised. No MinerU. No unit conversion. Second-law and third-law enthalpies labelled model (kems-036 convention). Measured Cs+ ion current and this-work CsBO2 Psat exist only as Figs 1–2. Ag Psat is Paule & Mandel 1972 literature, Fig. 5 only.'
+  date: '2026-09-06'
+  worker: wave-W2-kems-132-nakajima-2016
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-132-nakajima-2016/kems-132-nakajima-2016/
+review_status: draft
+fidelity_samples:
+  - species: CsBO2
+    observable: gibbs_table
+    observation_id: nakajima_2016_t1_this_work_second_third_law
+    field: second_cooling_delta_sub_H_2nd_298_kJ_mol
+    value: 278.4
+    locator:
+      table: "1"
+      pdf_page_index: 3
+      published_page: "Page 3 of 6"
+      note: "Nakajima et al.6) (2nd cooling) for CsBO2(s)  278.4  279.9  0.6"
+  - path: species.CsBO2.observations[nakajima_2016_t1_this_work_second_third_law].values.points[0].delta_sub_H_2nd_298_kJ_mol
+    value: 292.8
+    locator:
+      table: "1"
+      pdf_page_index: 3
+      note: "Nakajima et al.6) (1st heating) for CsBO2(s)  292.8  283.2  3.4"
+  - species: Ag
+    observable: gibbs_table
+    observation_id: nakajima_2016_t2_ag_second_third_law
+    field: lab_5_cox_diff_pct
+    value: 0.2
+    locator:
+      table: "2"
+      pdf_page_index: 4
+      published_page: "Page 4 of 6"
+      note: "Lab. No. 5  286.2  285.7  0.2  286.6  285.5  0.4"
+  - species: Ag
+    observable: gibbs_table
+    observation_id: nakajima_2016_t2_ag_second_third_law
+    field: ave_cox_delta_sub_H_3rd_298_kJ_mol
+    value: 284.6
+    locator:
+      table: "2"
+      pdf_page_index: 4
+      note: "Ave.  289.2  284.6  1.6  289.4  284.3  1.8"
+  - species: CsBO2
+    observable: gibbs_table
+    observation_id: nakajima_2016_kems_method_metadata
+    field: electron_impact_eV
+    value: 50
+    locator:
+      pdf_page_index: 3
+      published_page: "Page 3 of 6"
+      paragraph: "So only the ion current of Cs+ ionized under 50 eV electron impact"
+species:
+  CsBO2:
+    observations:
+    - observation_id: nakajima_2016_kems_method_metadata
+      type: gibbs_table
+      locator:
+        pdf_page_index: 3
+        published_page: "Page 3 of 6"
+        paragraph: "APPLICATION TO VAPOR PRESSURE MEASUREMENT OF CESIUM METABORATE"
+        note: "KEMS conditions as printed; orifice area a and Clausing factor L appear only as symbols in Eq. (14); no numeric orifice diameter."
+      phase: CsBO2_prepared_from_Cs2CO3_and_H3BO3
+      condensed_form:
+        state: crystalline
+        polymorph_name: cesium_metaborate
+        metastable: false
+        basis: explicit_author
+        note: "CsBO2 sample used for the KEMS measurement was prepared from Cs2CO3 and H3BO3 mixed powders by heating at 873 K in air."
+      standard_state: "standard-state pressure of 1 bar as printed; θ = 0 or 298.15 K"
+      regime: kems_effusion
+      units: as_printed
+      values:
+        quantity: kems_method_metadata
+        method_class: method_only
+        sample_prep_T_K: 873
+        sample_prep_quote: "prepared from Cs2CO3 and H3BO3 mixed powders by heating at 873 K in air"
+        temperature_step_K: 30
+        temperature_step_quote: "the sample was heated and cooled stepwise in 30 K steps and the heating process was repeated two times"
+        electron_impact_eV: 50
+        electron_impact_quote: "only the ion current of Cs+ ionized under 50 eV electron impact, ICs, was monitored"
+        ion_window: "last one minute before the next heating or cooling step"
+        ion_window_quote: "Ion currents used in conversion into absolute vapor pressures were chosen for the last one minute before the next heating or cooling step."
+        monitored_ion: Cs+
+        ionization_path_quote: "detected Cs+ ion results from the dissociative ionization of CsBO2 molecule"
+        p_conversion_equation: 14
+        orifice_area_numeric: absent
+        clausing_factor_numeric: absent
+        geometry_note: "a cross section of effusion orifice, L the Clausing factor appear in Eq. (14) without printed numeric values; detailed procedures in another paper (ref. 6)."
+        reference_temperature_K:
+        - 0
+        - 298.15
+        reference_temperature_quote: "θ is reference temperature of 0 or 298.15 K"
+        standard_state_pressure: 1 bar
+        standard_state_pressure_quote: "The superscript (°) refers to standard-state pressure of 1 bar."
+        gef_literature_uncertainty_J_K_mol_range:
+        - 0.2
+        - 0.4
+        gef_literature_uncertainty_quote: "~±0.2 to 0.4 J K−1 mol−1"
+        gef_literature_uncertainty_source: "intro; not a measurement in this work"
+      uncertainty:
+        note: "no experimental sigma printed on orifice geometry; GEF literature envelope ~±0.2 to 0.4 J K−1 mol−1 as quoted from ref. 5"
+    - observation_id: nakajima_2016_t1_this_work_second_third_law
+      type: gibbs_table
+      locator:
+        table: "1"
+        pdf_page_index: 3
+        published_page: "Page 3 of 6"
+        note: "Table 1. The second-law and third-law sublimation enthalpies of CsBO2. Nakajima et al.6) rows only."
+      phase: CsBO2_s
+      condensed_form:
+        state: crystalline
+        polymorph_name: cesium_metaborate
+        metastable: false
+        basis: explicit_author
+        note: "for CsBO2(s) as printed on the three Nakajima rows"
+      standard_state: "ΔsubH° at 298 K; standard-state pressure 1 bar"
+      regime: kems_second_third_law
+      units: kJ/mol and % as printed
+      values:
+        quantity: second_and_third_law_sublimation_enthalpy
+        method_class: model_derived
+        evidence_class: second_third_law_fit_not_measurement
+        table_csv: tables/kems-132-nakajima-2016/t1.csv
+        this_work_optimal_stage_as_printed: 2nd cooling
+        this_work_optimal_quote: "the difference between the second-law and third-law values for the 2nd cooling stage of Nakajima et al. is the smallest"
+        second_cooling_delta_sub_H_2nd_298_kJ_mol: 278.4
+        second_cooling_delta_sub_H_3rd_298_kJ_mol: 279.9
+        second_cooling_diff_pct: 0.6
+        points:
+        - stage: 1st_heating
+          condensed_form_as_printed: CsBO2(s)
+          delta_sub_H_2nd_298_kJ_mol: 292.8
+          delta_sub_H_3rd_298_kJ_mol: 283.2
+          diff_pct: 3.4
+          quote: "Nakajima et al.6) (1st heating) for CsBO2(s)  292.8  283.2  3.4"
+        - stage: 2nd_heating
+          condensed_form_as_printed: CsBO2(s)
+          delta_sub_H_2nd_298_kJ_mol: 287.1
+          delta_sub_H_3rd_298_kJ_mol: 282.0
+          diff_pct: 1.8
+          quote: "Nakajima et al.6) (2nd heating) for CsBO2(s)  287.1  282.0  1.8"
+        - stage: 2nd_cooling
+          condensed_form_as_printed: CsBO2(s)
+          delta_sub_H_2nd_298_kJ_mol: 278.4
+          delta_sub_H_3rd_298_kJ_mol: 279.9
+          diff_pct: 0.6
+          quote: "Nakajima et al.6) (2nd cooling) for CsBO2(s)  278.4  279.9  0.6"
+        note: "Second-law and third-law enthalpies fitted from this-work KEMS Psat (Fig. 2) plus GEF of CsBO2(g) from Ezhov and Komarov molecular parameters and CsBO2(s) from Cordfunke and Konings. Not instrument readings."
+      uncertainty:
+        note: "Diff. (%) as printed; no ± on the enthalpy cells"
+    - observation_id: nakajima_2016_t1_literature_second_third_law
+      type: gibbs_table
+      locator:
+        table: "1"
+        pdf_page_index: 3
+        published_page: "Page 3 of 6"
+        note: "Table 1 literature rows: Biswas and Mukerji18); Cordfunke et al.19)"
+      phase: CsBO2_s_and_l_literature
+      standard_state: "ΔsubH° at 298 K; standard-state pressure 1 bar"
+      regime: literature_second_third_law
+      units: kJ/mol and % as printed
+      values:
+        quantity: second_and_third_law_sublimation_enthalpy
+        method_class: model_derived
+        evidence_class: second_third_law_fit_of_literature_psat
+        table_csv: tables/kems-132-nakajima-2016/t1.csv
+        not_this_work: literature_not_this_experiment
+        points:
+        - authors: Biswas and Mukerji
+          condensed_form_as_printed: CsBO2(l)
+          delta_sub_H_2nd_298_kJ_mol: 237.6
+          delta_sub_H_3rd_298_kJ_mol: 284.3
+          diff_pct: 16.4
+          quote: "Biswas and Mukerji18) for CsBO2(l)  237.6  284.3  16.4"
+        - authors: Cordfunke et al.
+          condensed_form_as_printed: CsBO2(l)
+          delta_sub_H_2nd_298_kJ_mol: 286.5
+          delta_sub_H_3rd_298_kJ_mol: 270.2
+          diff_pct: 6.0
+          quote: "Cordfunke et al.19) for CsBO2(l)  286.5  270.2  6.0"
+        - authors: Cordfunke et al.
+          condensed_form_as_printed: CsBO2(s)
+          delta_sub_H_2nd_298_kJ_mol: 289.1
+          delta_sub_H_3rd_298_kJ_mol: 271.9
+          diff_pct: 6.3
+          quote: "Cordfunke et al.19) for CsBO2(s)  289.1  271.9  6.3"
+      uncertainty:
+        note: "Diff. (%) as printed; no ± on the enthalpy cells"
+    - observation_id: nakajima_2016_fig1_cs_ion_current_figure_only
+      type: rate_series
+      locator:
+        figure: "1"
+        pdf_page_index: 3
+        published_page: "Page 3 of 6"
+        note: "Fig. 1. Time and temperature dependences of the ion currents of Cs+."
+      phase: CsBO2_kems_vapor
+      standard_state: "Cs+ ion current from dissociative ionization of CsBO2 under 50 eV"
+      regime: kems_effusion
+      units: A and K as plotted (not tabulated)
+      values:
+        quantity: I_T_vs_time_figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: "I(Cs+) and T vs time exist only as Fig. 1; no numeric table. Not digitised."
+        semantics: bound_not_point_ordering
+        stages_as_printed:
+        - 1st heating
+        - 2nd heating
+        - 2nd cooling
+      uncertainty:
+        note: "not applicable; figure not digitised"
+    - observation_id: nakajima_2016_fig2_csbo2_psat_figure_only
+      type: psat_series
+      locator:
+        figure: "2"
+        pdf_page_index: 3
+        published_page: "Page 3 of 6"
+        note: "Fig. 2. Temperature dependence of the vapor pressures of CsBO2."
+      phase: CsBO2_s
+      standard_state: "p(CsBO2) from I(Cs+) via Eq. (14); Pa as plotted"
+      regime: kems_effusion
+      units: Pa as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: "P(T) of CsBO2 exists only as Fig. 2 Arrhenius plot; no numeric table or printed A,B. Converted from measured I(Cs+) by Eq. (14). Not digitised."
+        semantics: bound_not_point_ordering
+        ordinate_as_printed: log p (Pa)
+        abscissa_as_printed: 10000/T (1/K)
+        axis_labels_printed_K:
+        - 900
+        - 800
+        axis_labels_quote: "top axis labels 900K and 800K as printed on Fig. 2"
+        pressure_order_quote: "the vapor pressures increase in the order of the 1st heating, 2nd heating and 2nd cooling stages"
+      uncertainty:
+        note: "not applicable; figure not digitised"
+    - observation_id: nakajima_2016_fig3_eq12_sigma_plot_figure_only
+      type: gibbs_table
+      locator:
+        figure: "3"
+        pdf_page_index: 4
+        published_page: "Page 4 of 6"
+        equation: "12"
+        note: "Fig. 3. Values derived from the left-hand side of Eq. (12)"
+      phase: CsBO2_second_law_sigma_plot
+      standard_state: "A'' − ΔsubH°2nd(298)/T vs 10000/T"
+      regime: second_law_fit
+      units: J K-1 mol-1 as plotted (not tabulated)
+      values:
+        quantity: second_law_sigma_plot_figure_only
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: "Eq. (12) left-hand side vs 1/T exists only as Fig. 3a–c; regression lines extrapolated toward the origin. Second-law fit, not a measurement. Not digitised."
+        semantics: bound_not_point_ordering
+        panels:
+        - Nakajima et al.
+        - Biswas and Mukerji
+        - Cordfunke et al.
+      uncertainty:
+        note: "not applicable; figure not digitised"
+    - observation_id: nakajima_2016_fig4_third_law_H_vs_T_figure_only
+      type: gibbs_table
+      locator:
+        figure: "4"
+        pdf_page_index: 4
+        published_page: "Page 4 of 6"
+        note: "Fig. 4. Temperature dependence of the third law enthalpy of sublimation of CsBO2."
+      phase: CsBO2_third_law_evaluation
+      standard_state: "ΔsubH°3rd(298) vs T"
+      regime: third_law_fit
+      units: kJ/mol as plotted (not tabulated)
+      values:
+        quantity: third_law_enthalpy_vs_T_figure_only
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: "Third-law ΔsubH°(298) vs T exists only as Fig. 4. Model evaluation of Psat + GEF. Not digitised."
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: "not applicable; figure not digitised"
+  Ag:
+    observations:
+    - observation_id: nakajima_2016_t2_ag_second_third_law
+      type: gibbs_table
+      locator:
+        table: "2"
+        pdf_page_index: 4
+        published_page: "Page 4 of 6"
+        note: "Table 2. The second-law and third-law sublimation enthalpies of Ag."
+      phase: Ag_s_l
+      condensed_form:
+        state: crystalline
+        polymorph_name: silver
+        metastable: false
+        basis: explicit_author
+        note: "Gibbs energy functions of Ag(s, l) and Ag(g) as printed in Table 2 footnotes"
+      standard_state: "ΔsubH° at 298 K; Ag(s,l) = Ag(g); standard-state pressure 1 bar"
+      regime: literature_second_third_law
+      units: kJ/mol and % as printed
+      values:
+        quantity: second_and_third_law_sublimation_enthalpy
+        method_class: model_derived
+        evidence_class: second_third_law_fit_of_literature_psat
+        table_csv: tables/kems-132-nakajima-2016/t2.csv
+        psat_source: "Paule and Mandel 1972 interlaboratory silver vapor pressures (ref. 7); not measured in this paper"
+        gef_star: "Cox et al. (ref. 20) CODATA Key Values for Thermodynamics"
+        gef_hash: "Barin (ref. 21) Thermochemical Data of Pure Substances, 3rd Ed."
+        ave_footnote_quote: "The second law result from laboratory No. 3 and the second and third law results from laboratories Nos. 8 and 9 are discarded."
+        body_labs_1_5_6_quote: "all the third law values of Lab. Nos. 1, 5 and 6, which have no greater than 1% of the difference between the second and third law values, lie between 285 and 286 kJ/mol and are close to the average third law value of 284.6 kJ/mol"
+        lab_5_cox_diff_pct: 0.2
+        ave_cox_delta_sub_H_2nd_298_kJ_mol: 289.2
+        ave_cox_delta_sub_H_3rd_298_kJ_mol: 284.6
+        ave_cox_diff_pct: 1.6
+        ave_barin_delta_sub_H_2nd_298_kJ_mol: 289.4
+        ave_barin_delta_sub_H_3rd_298_kJ_mol: 284.3
+        ave_barin_diff_pct: 1.8
+        labs_1_5_6_third_law_kJ_mol_range:
+        - 285
+        - 286
+        points:
+        - lab_no: 1
+          delta_sub_H_2nd_298_cox_kJ_mol: 287.3
+          delta_sub_H_3rd_298_cox_kJ_mol: 285.1
+          diff_cox_pct: 0.8
+          delta_sub_H_2nd_298_barin_kJ_mol: 287.7
+          delta_sub_H_3rd_298_barin_kJ_mol: 284.9
+          diff_barin_pct: 1.0
+          quote: "1  287.3  285.1  0.8  287.7  284.9  1.0"
+        - lab_no: 2
+          delta_sub_H_2nd_298_cox_kJ_mol: 290.4
+          delta_sub_H_3rd_298_cox_kJ_mol: 281.5
+          diff_cox_pct: 3.2
+          delta_sub_H_2nd_298_barin_kJ_mol: 290.4
+          delta_sub_H_3rd_298_barin_kJ_mol: 281.4
+          diff_barin_pct: 3.2
+          quote: "2  290.4  281.5  3.2  290.4  281.4  3.2"
+        - lab_no: 3
+          delta_sub_H_2nd_298_cox_kJ_mol: 304.0
+          delta_sub_H_3rd_298_cox_kJ_mol: 284.6
+          diff_cox_pct: 6.8
+          delta_sub_H_2nd_298_barin_kJ_mol: 304.4
+          delta_sub_H_3rd_298_barin_kJ_mol: 284.3
+          diff_barin_pct: 7.1
+          quote: "3  304.0  284.6  6.8  304.4  284.3  7.1"
+        - lab_no: 4
+          delta_sub_H_2nd_298_cox_kJ_mol: 293.6
+          delta_sub_H_3rd_298_cox_kJ_mol: 286.6
+          diff_cox_pct: 2.4
+          delta_sub_H_2nd_298_barin_kJ_mol: 293.9
+          delta_sub_H_3rd_298_barin_kJ_mol: 286.3
+          diff_barin_pct: 2.7
+          quote: "4  293.6  286.6  2.4  293.9  286.3  2.7"
+        - lab_no: 5
+          delta_sub_H_2nd_298_cox_kJ_mol: 286.2
+          delta_sub_H_3rd_298_cox_kJ_mol: 285.7
+          diff_cox_pct: 0.2
+          delta_sub_H_2nd_298_barin_kJ_mol: 286.6
+          delta_sub_H_3rd_298_barin_kJ_mol: 285.5
+          diff_barin_pct: 0.4
+          quote: "5  286.2  285.7  0.2  286.6  285.5  0.4"
+        - lab_no: 6
+          delta_sub_H_2nd_298_cox_kJ_mol: 287.4
+          delta_sub_H_3rd_298_cox_kJ_mol: 285.2
+          diff_cox_pct: 0.8
+          delta_sub_H_2nd_298_barin_kJ_mol: 287.8
+          delta_sub_H_3rd_298_barin_kJ_mol: 285.0
+          diff_barin_pct: 1.0
+          quote: "6  287.4  285.2  0.8  287.8  285.0  1.0"
+        - lab_no: 7
+          delta_sub_H_2nd_298_cox_kJ_mol: 290.2
+          delta_sub_H_3rd_298_cox_kJ_mol: 283.2
+          diff_cox_pct: 2.4
+          delta_sub_H_2nd_298_barin_kJ_mol: 290.2
+          delta_sub_H_3rd_298_barin_kJ_mol: 283.1
+          diff_barin_pct: 2.5
+          quote: "7  290.2  283.2  2.4  290.2  283.1  2.5"
+        - lab_no: 8
+          delta_sub_H_2nd_298_cox_kJ_mol: 250.4
+          delta_sub_H_3rd_298_cox_kJ_mol: 285.5
+          diff_cox_pct: 12.3
+          delta_sub_H_2nd_298_barin_kJ_mol: 250.8
+          delta_sub_H_3rd_298_barin_kJ_mol: 285.4
+          diff_barin_pct: 12.1
+          quote: "8  250.4  285.5  12.3  250.8  285.4  12.1"
+        - lab_no: 9
+          delta_sub_H_2nd_298_cox_kJ_mol: 320.4
+          delta_sub_H_3rd_298_cox_kJ_mol: 279.5
+          diff_cox_pct: 14.6
+          delta_sub_H_2nd_298_barin_kJ_mol: 320.8
+          delta_sub_H_3rd_298_barin_kJ_mol: 279.3
+          diff_barin_pct: 14.9
+          quote: "9  320.4  279.5  14.6  320.8  279.3  14.9"
+      uncertainty:
+        note: "Diff. (%) as printed; Ave. after discarding Lab. 3 second-law and Labs 8 and 9 second and third law; no ± on cells"
+    - observation_id: nakajima_2016_fig5_ag_psat_figure_only
+      type: psat_series
+      locator:
+        figure: "5"
+        pdf_page_index: 4
+        published_page: "Page 4 of 6"
+        note: "Fig. 5. Temperature dependence of vapor pressures of silver.7)"
+      phase: Ag_s_l
+      standard_state: "Paule and Mandel 1972 interlaboratory silver Psat; Pa as plotted"
+      regime: literature_compilation
+      units: Pa as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_figure_only
+        method_class: literature_psat_not_this_work
+        admission_status: figure_only
+        status: typed_refusal
+        reason: "Ag P(T) exists only as Fig. 5; source is Paule & Mandel 1972 (ref. 7), not this KEMS. No numeric table. Not digitised."
+        semantics: bound_not_point_ordering
+        axis_labels_printed_K:
+        - 1600
+        - 1400
+        - 1200
+      uncertainty:
+        note: "not applicable; figure not digitised"
+    - observation_id: nakajima_2016_fig6_eq12_ag_figure_only
+      type: gibbs_table
+      locator:
+        figure: "6"
+        pdf_page_index: 5
+        published_page: "Page 5 of 6"
+        equation: "12"
+        note: "Fig. 6. Values derived from the left-hand side of Eq. (12) by using vapor pressures of silver7)"
+      phase: Ag_second_law_sigma_plot
+      standard_state: "A'' − ΔsubH°2nd(298)/T vs 10000/T; Cox et al. GEF"
+      regime: second_law_fit
+      units: J K-1 mol-1 as plotted (not tabulated)
+      values:
+        quantity: second_law_sigma_plot_figure_only
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: "Nine-lab Eq. (12) plots exist only as Fig. 6a–i. Second-law fit of literature Ag Psat. Not digitised."
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: "not applicable; figure not digitised"
+    - observation_id: nakajima_2016_fig7_third_law_H_vs_T_ag_figure_only
+      type: gibbs_table
+      locator:
+        figure: "7"
+        pdf_page_index: 5
+        published_page: "Page 5 of 6"
+        note: "Fig. 7. Temperature dependence of the third law sublimation enthalpy of silver7)"
+      phase: Ag_third_law_evaluation
+      standard_state: "ΔsubH°3rd(298) vs T; Cox et al. GEF"
+      regime: third_law_fit
+      units: kJ/mol as plotted (not tabulated)
+      values:
+        quantity: third_law_enthalpy_vs_T_figure_only
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: "Nine-lab third-law ΔsubH°(298) vs T exists only as Fig. 7a–i. Model evaluation. Not digitised."
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: "not applicable; figure not digitised"
