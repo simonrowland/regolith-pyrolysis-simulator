@@ -52,6 +52,15 @@ fidelity_samples:
       pdf_page_index: 9
       paragraph: "[63]"
       note: "Reference [63] title as printed: Thermodynamics of Na2O-SiO2 melts"
+  - species: SiO
+    observable: alpha
+    observation_id: miller_2013_refractory_oxide_small_alpha_quoted
+    field: statement_as_published
+    value: "Another specific problem for the vaporization investigations of oxide systems is a small vaporization coefficient, particularly for the refractory oxides."
+    locator:
+      page: 6
+      section: "4. OXIDES"
+      quote: "Another specific problem for the vaporization investigations of oxide systems is a small vaporization coefficient, particularly for the refractory oxides."
 species:
   Al:
     observations:
@@ -77,6 +86,24 @@ species:
         cited_primary: Supplementary Tables 4-5 (true-absence from held PDF)
       uncertainty:
         note: none stated; species presence only
+    - observation_id: miller_2013_al2o_major_al_species_quoted
+      supersedes: miller_2013_al2o_major_al_species
+      type: rate_series
+      class: derived
+      locator:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: "4. OXIDES"
+      quote: "The same deals with the aluminate systems, where only minor amounts of CaAlO(g) could be identified in the cited studies. Al2O(g) is a major Al-containing species in all the system containing Al2O3 as one of the oxide components."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "The same deals with the aluminate systems, where only minor amounts of CaAlO(g) could be identified in the cited studies. Al2O(g) is a major Al-containing species in all the system containing Al2O3 as one of the oxide components."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
   Ca:
     observations:
     - observation_id: miller_2013_gaseous_silicates_minor
@@ -123,6 +150,42 @@ species:
         cited_primary: Supplementary material, Table 5 (true-absence from held PDF)
       uncertainty:
         note: none stated; species presence only
+    - observation_id: miller_2013_gaseous_silicates_minor_quoted
+      supersedes: miller_2013_gaseous_silicates_minor
+      type: rate_series
+      class: derived
+      locator:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: "4. OXIDES"
+      quote: "Few gaseous silicates were identified in the multicomponent silicate systems; they can be exemplified by CaSiO3, BaSiO3, SrSiO, and AlSiO all being the minor components of the equilibrium vapours."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Few gaseous silicates were identified in the multicomponent silicate systems; they can be exemplified by CaSiO3, BaSiO3, SrSiO, and AlSiO all being the minor components of the equilibrium vapours."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
+    - observation_id: miller_2013_alkaline_earth_borate_vapour_quoted
+      supersedes: miller_2013_alkaline_earth_borate_vapour
+      type: rate_series
+      class: derived
+      locator:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: "4. OXIDES"
+      quote: "Vapour phase of the boron oxide-containing systems is rather complex due to the vaporization of B2O3 in form of different gaseous species (BO, B2O2, B2O3) as well as due to stability of the gaseous metal borides, as ABO2 (A – alkali metal), Ca(BO2)2, SrBO2, BaBO2. Dimeric borate species A2(BO2)2 were identified as well."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Vapour phase of the boron oxide-containing systems is rather complex due to the vaporization of B2O3 in form of different gaseous species (BO, B2O2, B2O3) as well as due to stability of the gaseous metal borides, as ABO2 (A – alkali metal), Ca(BO2)2, SrBO2, BaBO2. Dimeric borate species A2(BO2)2 were identified as well."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
   Fe:
     observations:
     - observation_id: miller_2013_zaitsev_fe_si_nonmetal
@@ -147,6 +210,24 @@ species:
         cited_primary: Zaitsev et al.; Supplementary material, Table 3 (true-absence)
       uncertainty:
         note: none stated
+    - observation_id: miller_2013_zaitsev_fe_si_nonmetal_quoted
+      supersedes: miller_2013_zaitsev_fe_si_nonmetal
+      type: rate_series
+      class: derived
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 5
+        section: "3.2 Thermodynamic Properties of Condensed Phases"
+      quote: "Extensive investigations of different binary and ternary systems containing non-metal element (B, Si, or P) in addition to Mn, Cr, and Fe were carried out by Zaitsev et al."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Extensive investigations of different binary and ternary systems containing non-metal element (B, Si, or P) in addition to Mn, Cr, and Fe were carried out by Zaitsev et al."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
   K:
     observations:
     - observation_id: miller_2013_alkali_borate_vapour
@@ -170,6 +251,24 @@ species:
         cited_primary: Supplementary material, Table 5 (true-absence)
       uncertainty:
         note: none stated; species presence only
+    - observation_id: miller_2013_alkali_borate_vapour_quoted
+      supersedes: miller_2013_alkali_borate_vapour
+      type: rate_series
+      class: derived
+      locator:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: "4. OXIDES"
+      quote: "Vapour phase of the boron oxide-containing systems is rather complex due to the vaporization of B2O3 in form of different gaseous species (BO, B2O2, B2O3) as well as due to stability of the gaseous metal borides, as ABO2 (A – alkali metal), Ca(BO2)2, SrBO2, BaBO2. Dimeric borate species A2(BO2)2 were identified as well."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Vapour phase of the boron oxide-containing systems is rather complex due to the vaporization of B2O3 in form of different gaseous species (BO, B2O2, B2O3) as well as due to stability of the gaseous metal borides, as ABO2 (A – alkali metal), Ca(BO2)2, SrBO2, BaBO2. Dimeric borate species A2(BO2)2 were identified as well."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
   Na:
     observations:
     - observation_id: miller_2013_zaitsev_na2o_sio2
@@ -195,6 +294,24 @@ species:
         note: "Body cites [63] as an example of slag-model mixed oxide/halide-adjacent studies. Numeric melt thermodynamics are in the primary, not in this review PDF."
       uncertainty:
         note: none stated in this review
+    - observation_id: miller_2013_zaitsev_na2o_sio2_quoted
+      supersedes: miller_2013_zaitsev_na2o_sio2
+      type: rate_series
+      class: derived
+      locator:
+        page: 9
+        published_page: 9
+        pdf_page_index: 9
+        paragraph: "[63]"
+      quote: "Thermodynamics of Na2O-SiO2 melts"
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Thermodynamics of Na2O-SiO2 melts"
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
   SiO:
     observations:
     - observation_id: miller_2013_supp_tables_1_7_true_absence
@@ -393,6 +510,78 @@ species:
           inferred: false
       uncertainty:
         note: none stated
+    - observation_id: miller_2013_silica_vapour_species_quoted
+      supersedes: miller_2013_silica_vapour_species
+      type: rate_series
+      class: derived
+      locator:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: "4. OXIDES"
+      quote: "Silica-containing materials vaporize typically as SiO(g), O2/O(g) and the component metal oxides if their volatility is high enough. High stability of the gaseous silicium monoxide is very well established."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Silica-containing materials vaporize typically as SiO(g), O2/O(g) and the component metal oxides if their volatility is high enough. High stability of the gaseous silicium monoxide is very well established."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
+    - observation_id: miller_2013_chatillon_silica_phosphates_quoted
+      supersedes: miller_2013_chatillon_silica_phosphates
+      type: rate_series
+      class: derived
+      locator:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: "4. OXIDES"
+      quote: "Chatillon et al. studied ternary systems containing silica in addition to the metal phosphates. Determination of the thermodynamic activities of components was the aim of these studies."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Chatillon et al. studied ternary systems containing silica in addition to the metal phosphates. Determination of the thermodynamic activities of components was the aim of these studies."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
+    - observation_id: miller_2013_sio2_steam_hydroxides_quoted
+      supersedes: miller_2013_sio2_steam_hydroxides
+      type: rate_series
+      class: derived
+      locator:
+        page: 6
+        published_page: 6
+        pdf_page_index: 6
+        section: "4. OXIDES"
+      quote: "Vaporisation of SiO2, V2O5, and TcxOy in the H2O atmosphere was also investigated. Gaseous hydroxides and oxyhydroxides were identified in these studies in addition to the vapour species present over respective pure oxides."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Vaporisation of SiO2, V2O5, and TcxOy in the H2O atmosphere was also investigated. Gaseous hydroxides and oxyhydroxides were identified in these studies in addition to the vapour species present over respective pure oxides."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
+    - observation_id: miller_2013_refractory_oxide_small_alpha_quoted
+      supersedes: miller_2013_refractory_oxide_small_alpha
+      type: alpha
+      class: derived
+      locator:
+        page: 6
+        published_page: 6
+        pdf_page_index: 6
+        section: "4. OXIDES"
+      quote: "Another specific problem for the vaporization investigations of oxide systems is a small vaporization coefficient, particularly for the refractory oxides."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: qualitative_vaporization_coefficient
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Another specific problem for the vaporization investigations of oxide systems is a small vaporization coefficient, particularly for the refractory oxides."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
   Ti:
     observations:
     - observation_id: miller_2013_ti_oxides_and_titanates
@@ -438,3 +627,69 @@ species:
         note: "Numeric PZT KEMS data are in the primary, not in this review."
       uncertainty:
         note: none stated in this review
+    - observation_id: miller_2013_ti_oxides_and_titanates_quoted
+      supersedes: miller_2013_ti_oxides_and_titanates
+      type: rate_series
+      class: derived
+      locator:
+        page: 6
+        published_page: 6
+        pdf_page_index: 6
+        section: "4. OXIDES"
+      quote: "Other studies on pure oxides concerned ZnO, PuO2, Ti10O19 and some other compounds (Table 4)."
+      additional_quote: "Titanates, chromates, vanadates, and gallates of the perovskite structure were intensively investigated by different groups."
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Other studies on pure oxides concerned ZnO, PuO2, Ti10O19 and some other compounds (Table 4)."
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
+    - observation_id: miller_2013_popovic_pzt_quoted
+      supersedes: miller_2013_popovic_pzt
+      type: rate_series
+      class: derived
+      locator:
+        page: 9
+        published_page: 9
+        pdf_page_index: 9
+        paragraph: "[55]"
+      quote: "Knudsen cell mass spectrometric investigation of the PbO-ZrO2-TiO2System"
+      regime: kems_effusion
+      units: none (qualitative review; no measured numeric series)
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        semantics: bound_not_point_ordering
+        method_class: qualitative_review_compilation
+        statement_as_published: "Knudsen cell mass spectrometric investigation of the PbO-ZrO2-TiO2System"
+      note: "Derived denotes a secondary qualitative compilation, not a fitted model or directly reduced numeric measurement. Formula subscripts and line-break hyphenation normalized; no numeric value inferred. Parent retained unchanged."
+
+deepening:
+  dispatch_id: deep3-kems-019-miller-armatys-2013
+  date: '2026-09-06'
+  status: unsettled
+  parent_policy: "All original observation objects retained unchanged. Twelve qualitative narrative rows have quoted supersessions; four metadata-only parents are documented below without minting observations."
+  class_policy: "New rows use derived for secondary qualitative review compilation; none is measured, inverse, fitted model output, or digitised figure data."
+  table_completeness: "Tables 1-7: true absence from held article; supplementary cells unseen. No table CSV fabricated."
+  locator: {page: 8, section: SUPPLEMENTARY MATERIAL}
+  quote: "Supplementary material is available on the publisher’s web site along with the published article"
+  historical_metadata:
+    - observation_id: miller_2013_supp_tables_1_7_true_absence
+      role: supplement_inventory
+      locator: {page: 7, section: "6. SUMMARY AND CONCLUSIONS"}
+      quote: "Data to the systems studied, temperature ranges, vapour species identified in the equilibrium vapours and thermodynamic properties obtained in the study are given in Supplementary material, Tables 1-7."
+    - observation_id: miller_2013_borate_silicate_glasses
+      role: literature_inventory_count
+      locator: {page: 7, section: "4. OXIDES"}
+      quote: "Over 30 binary and multicomponent borate or silicate glasses were studied in the reviewed period by the Knudsen effusion mass spectrometry."
+    - observation_id: miller_2013_kems_p_and_t_window
+      role: method_capability_metadata
+      locator: {page: 2, section: "2.1 Principles of the Method"}
+      quote: "generally between 10-5 and 10 Pa"
+      additional_quote: "up to temperatures above 2500 K"
+      note: "10-5 represents printed superscript minus five; retained as text, not a species pressure measurement."
+    - observation_id: miller_2013_ir_cell_2200k
+      role: equipment_capability_metadata
+      locator: {page: 6, section: "4. OXIDES"}
+      quote: "Studies carried out by Hilpert et al. have shown, that use of the effusion cells machined from Ir enable to avoid the most of the quoted effects even upon studying refractory ceramics at temperatures up to 2200 K."
