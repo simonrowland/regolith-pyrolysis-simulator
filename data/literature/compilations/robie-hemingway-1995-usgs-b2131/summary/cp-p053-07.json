@@ -1,0 +1,135 @@
+{
+  "record_id": "cp-p053-07",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 59,
+  "page": 53,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR HALIDE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "MOLYSITE",
+  "formula_candidate": "FeCl 3",
+  "header_and_units_raw": "NAME AND FORIIJLA     ENTROPY          A1            A2              A3           A4            A5     T r.,..   T.          a_H•\n                     J·•r' ·K\"'                     (T)            n-2,        (T-o.&)        (T2)       IC      IC      kJ·•r'\n",
+  "source_text": "MOLYSITE                142.3      -2.56E+02    1.1755E+OO       7.89E+06                 -9.738E-04     298\nFeCl 3                    0.4                                                                            577",
+  "rows": [
+    {
+      "raw": "MOLYSITE                142.3      -2.56E+02    1.1755E+OO       7.89E+06                 -9.738E-04     298",
+      "tokens": [
+        {
+          "raw": "MOLYSITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 8
+        },
+        {
+          "raw": "142.3",
+          "value": 142.3,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 24,
+          "end_offset": 29
+        },
+        {
+          "raw": "-2.56E+02",
+          "value": -256.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 35,
+          "end_offset": 44
+        },
+        {
+          "raw": "1.1755E+OO",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 48,
+          "end_offset": 58
+        },
+        {
+          "raw": "7.89E+06",
+          "value": 7890000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 65,
+          "end_offset": 73
+        },
+        {
+          "raw": "-9.738E-04",
+          "value": -0.0009738,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 90,
+          "end_offset": 100
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 105,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "FeCl 3                    0.4                                                                            577",
+      "tokens": [
+        {
+          "raw": "FeCl",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 4
+        },
+        {
+          "raw": "3",
+          "value": 3.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 5,
+          "end_offset": 6
+        },
+        {
+          "raw": "0.4",
+          "value": 0.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 26,
+          "end_offset": 29
+        },
+        {
+          "raw": "577",
+          "value": 577.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 105,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '1.1755E+OO'",
+    "Body label or prose enters numeric region: [('A2', '1.1755E+OO')]",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 29,
+  "source_line_end": 30
+}
