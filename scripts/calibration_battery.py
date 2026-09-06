@@ -592,8 +592,108 @@ def mark_alpha_rate_twins(rows):
     return rows
 
 
+def physical_point_key(row):
+    """Identity of a measured point, independent of ingest catalogue."""
+    conditions = row.get("conditions") or {}
+    temperature = conditions.get("temperature_K")
+    if temperature is None:
+        temperature = conditions.get("T_K")
+    if finite(temperature):
+        temperature = float(temperature)
+    composition = None
+    for field in ("composition", "composition_wt_pct", "composition_mol"):
+        value = conditions.get(field)
+        if value not in (None, {}, []):
+            composition = json.dumps(clean(value), sort_keys=True, default=str)
+            break
+    return (row.get("rail"), row.get("species"), row.get("observable"), row.get("units"),
+            temperature, row.get("measured"), composition)
+
+
+def scored_value_twins(rows):
+    """Reviewer probe: scored rows that share rail, species, observable, units, T, measured, predicted."""
+    groups = defaultdict(list)
+    for row in rows:
+        if not row.get("score_eligible"):
+            continue
+        conditions = row.get("conditions") or {}
+        temperature = conditions.get("temperature_K")
+        if temperature is None:
+            temperature = conditions.get("T_K")
+        groups[(row.get("rail"), row.get("species"), row.get("observable"), row.get("units"),
+                temperature, row.get("measured"), row.get("predicted"))].append(row)
+    return {key: cohort for key, cohort in groups.items() if len(cohort) > 1}
+
+
+def _kems_compilation(row):
+    for value in (row.get("dataset_id"), row.get("source_id")):
+        if isinstance(value, str) and value.startswith("kems-"):
+            return True
+    return False
+
+
+def _physical_point_rank(row):
+    # Direct experiment beats derived measurement. Other kinds tie on this axis.
+    kind = row.get("measurement_kind")
+    kind_rank = 1 if kind == "derived measurement" else 0
+    return (kind_rank, 1 if _kems_compilation(row) else 0)
+
+
+def _physical_point_choice(winner, loser):
+    if (winner.get("measurement_kind") == "direct experiment"
+            and loser.get("measurement_kind") == "derived measurement"):
+        return "direct experiment beats derived measurement"
+    if not _kems_compilation(winner) and _kems_compilation(loser):
+        return "primary extract beats compilation"
+    return "earlier-ingested wins"
+
+
+def mark_physical_point_twins(rows):
+    """Keep one scored row per physical point across ingest catalogues.
+
+    Key is rail + species + observable + units + T + measured, plus composition
+    when a composition vector exists — not dataset_id or source_id. Precedence:
+    direct experiment beats derived measurement; a primary extract beats a
+    compilation; if equal, the earlier-ingested row wins and the choice is
+    logged. Never average twins into one row.
+    """
+    groups = defaultdict(list)
+    for row in rows:
+        if not (row.get("selected") and row.get("score_eligible")):
+            continue
+        groups[physical_point_key(row)].append(row)
+    for cohort in groups.values():
+        if len({r.get("dataset_id") for r in cohort}) < 2:
+            continue
+        winner = cohort[0]
+        for candidate in cohort[1:]:
+            if _physical_point_rank(candidate) < _physical_point_rank(winner):
+                winner = candidate
+        for row in cohort:
+            if row is winner:
+                continue
+            reason = _physical_point_choice(winner, row)
+            row["duplicate_of"] = winner["observation_id"]
+            row["selected"] = False
+            row["score_eligible"] = False
+            row["score_reason"] = "duplicate physical point"
+            row["notices"] = list(dict.fromkeys(
+                list(row.get("notices") or []) + [
+                    f"duplicate physical point of {winner['observation_id']}; {reason}; "
+                    "retained outside selected denominator"
+                ]))
+            assign_terminal(row)
+        winner["notices"] = list(dict.fromkeys(
+            list(winner.get("notices") or []) + [
+                f"kept as scored physical point over {row['observation_id']}"
+                for row in cohort if row is not winner
+            ]))
+    return rows
+
+
 def finalize_rows(rows):
     mark_alpha_rate_twins(rows)
+    mark_physical_point_twins(rows)
     for row in rows:
         raw = row.get("raw")
         if not row.get("engine") and isinstance(raw, dict) and raw.get("engine"):
@@ -741,6 +841,12 @@ def headline_notes(report):
     if vapour and vapour.get("engines_scored"):
         mix = ", ".join(f"{engine} {n}" for engine, n in sorted(vapour["engines_scored"].items()))
         lines.append(f"Vapour N scored {vapour['N_scored']} mixes engines: {mix}.")
+    lines.append(
+        "Physical-point de-duplication (not ingest identity): one scored row per rail + species + "
+        "observable + units + T + measured (+ composition when present). Direct experiment beats "
+        "derived measurement; a primary extract beats a compilation; if equal, the earlier-ingested "
+        "row wins and the choice is logged. Twins are marked duplicate_of and sit outside the "
+        "selected denominator; they are never averaged.")
     return lines
 
 

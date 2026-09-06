@@ -4,7 +4,8 @@ import json
 import pytest
 
 from scripts.calibration_battery import (
-    CERTIFIED_DERIVABLE, envelope, headline, headline_notes, score_table, summarize,
+    CERTIFIED_DERIVABLE, envelope, headline, headline_notes, score_table,
+    scored_value_twins, summarize,
 )
 
 
@@ -259,7 +260,9 @@ def test_fallback_engine_is_named_on_headline_and_scores(observation):
         "engine": "builtin-antoine",
         "vaporock_error": "VapoRock: No module named 'VapoRock'; LiquidMelts missing",
         "observed_Pa": 100.0}})
-    extract = envelope(**{**observation, "observation_id": "kems-row", "dataset_id": "kems-005-fedkin-2006"})
+    extract = envelope(**{**observation, "observation_id": "kems-row",
+                          "dataset_id": "kems-005-fedkin-2006",
+                          "conditions": {"temperature_K": 1600.0}})
     report = summarize([row, extract])
     vapour = next(r for r in report["coverage"] if r["rail"] == "vapour")
     assert vapour["marker"] == "builtin-antoine fallback"
@@ -274,3 +277,91 @@ def test_fallback_engine_is_named_on_headline_and_scores(observation):
     table = score_table(report)
     assert "builtin-antoine (fallback; VapoRock unavailable)" in table
     assert "extract/KEMS" in table
+
+
+def test_cross_ingest_physical_point_twins_are_not_double_scored(observation):
+    rows = []
+    for temperature, measured in ((1973.0, 0.23), (2273.0, 0.23), (2173.0, 0.24)):
+        shared = dict(species="Fe", observable="evaporation_alpha", units="alpha",
+                      measured=measured, predicted=0.02,
+                      conditions={"temperature_K": temperature})
+        rows.append(envelope(**{**observation, **shared,
+            "observation_id": f"fedkin_2006_table3_fe_hashimoto_langmuir:T={int(temperature)}",
+            "dataset_id": "fedkin-grossman-ghiorso-2006", "evidence": "direct experiment"}))
+        rows.append(envelope(**{**observation, **shared,
+            "observation_id": f"fedkin_2006_fe_hashimoto_langmuir_table3:T={int(temperature)}",
+            "dataset_id": "kems-005-fedkin-2006", "evidence": "derived measurement"}))
+    class_b1 = envelope(**{**observation, "species": "Fe", "observable": "evaporation_alpha",
+        "units": "alpha", "measured": 0.24, "predicted": 0.02,
+        "conditions": {"temperature_K": 2123.0},
+        "observation_id": "fedkin_2006_fe_class_b1:T=2123",
+        "dataset_id": "kems-005-fedkin-2006", "evidence": "derived measurement"})
+    rows.append(class_b1)
+    richter = []
+    for temperature, measured in ((1873.0, 0.060358617843786475), (2023.0, 0.10738819534888526),
+                                  (2173.0, 0.1764531077711509)):
+        shared = dict(species="Mg", observable="evaporation_alpha", units="alpha",
+                      measured=measured, predicted=0.2, evidence="literature correlation",
+                      conditions={"temperature_K": temperature})
+        kems = envelope(**{**observation, **shared,
+            "observation_id": f"richter_2007_mg_cai_langmuir_alpha_arrhenius:T={int(temperature)}",
+            "dataset_id": "kems-010-richter-2007"})
+        extract = envelope(**{**observation, **shared,
+            "observation_id": f"richter_2007_mg_cai_arrhenius_langmuir:T={int(temperature)}",
+            "dataset_id": "richter-et-al-2007"})
+        richter.extend([kems, extract])
+        rows.extend([kems, extract])
+    flux = envelope(**{**observation, "species": "Mg", "observable": "evaporation_rate",
+        "units": "mol m^-2 s^-1", "measured": 1e-4, "predicted": 2e-4,
+        "observation_id": "richter_geometry_flux", "dataset_id": "richter-et-al-2007"})
+    rows.append(flux)
+    sio_extract = envelope(**{**observation, "species": "SiO", "rail": "SiO evolution",
+        "observable": "evaporation_alpha", "units": "alpha", "measured": 0.12, "predicted": 0.08,
+        "conditions": {"temperature_K": 1973.0},
+        "observation_id": "fedkin_2006_table3_sio_hashimoto_langmuir:T=1973",
+        "dataset_id": "fedkin-grossman-ghiorso-2006", "evidence": "direct experiment"})
+    sio_kems = envelope(**{**observation, "species": "SiO", "rail": "SiO evolution",
+        "observable": "evaporation_alpha", "units": "alpha", "measured": 0.12, "predicted": 0.08,
+        "conditions": {"temperature_K": 1973.0},
+        "observation_id": "fedkin_2006_sio_hashimoto_table3_complete_b1:T=1973",
+        "dataset_id": "kems-005-fedkin-2006", "evidence": "derived measurement"})
+    rows.extend([sio_extract, sio_kems])
+
+    report = summarize(rows)
+    assert scored_value_twins(rows) == {}
+    vapour = next(r for r in report["coverage"] if r["rail"] == "vapour")
+    sio = next(r for r in report["coverage"] if r["rail"] == "SiO evolution")
+    assert vapour["N"] == vapour["N_scored"] + vapour["N_refused"] + vapour["N_excluded"]
+    assert sio["N"] == sio["N_scored"] + sio["N_refused"] + sio["N_excluded"]
+    assert vapour["N_scored"] == 8 and sio["N_scored"] == 1
+
+    scored_fe = [r for r in rows if r["score_eligible"] and r["species"] == "Fe"]
+    fe_023 = {(r["conditions"]["temperature_K"], r["dataset_id"]) for r in scored_fe if r["measured"] == 0.23}
+    assert fe_023 == {(1973.0, "fedkin-grossman-ghiorso-2006"), (2273.0, "fedkin-grossman-ghiorso-2006")}
+    assert class_b1["score_eligible"] is True and class_b1["selected"] is True
+    hashimoto_2173 = next(r for r in rows if r["observation_id"].endswith("langmuir:T=2173")
+                          and r["dataset_id"] == "fedkin-grossman-ghiorso-2006")
+    assert hashimoto_2173["score_eligible"] is True
+    kems_hashimoto = [r for r in rows if r["dataset_id"] == "kems-005-fedkin-2006"
+                      and "class_b1" not in r["observation_id"]]
+    assert all(r["selected"] is False and r["duplicate_of"] for r in kems_hashimoto)
+    assert all(r["duplicate_of"].startswith("fedkin_2006_table3_") for r in kems_hashimoto)
+    assert "direct experiment beats derived measurement" in kems_hashimoto[0]["notices"][-1]
+
+    for kems, extract in zip(richter[0::2], richter[1::2]):
+        assert extract["score_eligible"] is True and kems["selected"] is False
+        assert kems["duplicate_of"] == extract["observation_id"]
+        assert "primary extract beats compilation" in kems["notices"][-1]
+    assert flux["score_eligible"] is True
+    assert sio_extract["score_eligible"] is True and sio_kems["selected"] is False
+    assert sio_kems["duplicate_of"] == sio_extract["observation_id"]
+    notes = "\n".join(headline_notes(report))
+    assert "Direct experiment beats derived measurement" in notes
+    assert "primary extract beats a compilation" in notes
+    assert "never averaged" in notes
+    fe_direct = [s for s in report["scores"] if s["species"] == "Fe" and s["measurement_kind"] == "direct experiment"
+                 and s["N_scored"]]
+    fe_derived = [s for s in report["scores"] if s["species"] == "Fe" and s["measurement_kind"] == "derived measurement"
+                  and s["N_scored"]]
+    assert len(fe_direct) == 1 and fe_direct[0]["N_scored"] == 3
+    assert len(fe_derived) == 1 and fe_derived[0]["N_scored"] == 1
