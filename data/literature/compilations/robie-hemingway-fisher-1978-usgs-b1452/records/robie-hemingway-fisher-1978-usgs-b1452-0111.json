@@ -1,0 +1,98 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0111",
+  "census_id": "high-temperature-printed-page-137",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "COBOIIDOI!",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "101.962",
+    "value": 101.962,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      143
+    ],
+    "printed_pages": [
+      137
+    ],
+    "pdftotext_layout_page_file": "page-143.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "3 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 31, 33"
+  ],
+  "title_line_as_published": "COBOIIDOI!                                                                         FOifiULl IIBIGHT    101.962",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                ( Corundua), crystals 298. 1S to aelting point 234S !C.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POBI!ATIOII PBOII THE ELBI!BIITS",
+    "                                                                                         GIBBS",
+    "TEI!P.      <H;-u; 98 )/T      so",
+    "                                T     -(G;-8~ 98 )/T       Co",
+    "                                                            p      EIITHALPY          PBBB EIIEBGI      Log ltf"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "",
+    "entropy": "",
+    "negative_gibbs_function": "",
+    "heat_capacity": "",
+    "formation_enthalpy": "",
+    "formation_gibbs_energy": "",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 18,
+  "uncertainty_line_as_published": "",
+  "uncertainty_values": [],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQOlTIDII",
+    "           1.5736x102 +      7.1899x10-• T      9.8804x102                r-o·s",
+    "                ( EQOlTIOI VALID PRO!   298 - 1800 !C)",
+    "BBFEREIICB         28S         50                                             35                      COIIPILBD",
+    "                    50         66                                            159                       7-21-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 3 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 31, 33",
+      "detector_only": false
+    }
+  ]
+}

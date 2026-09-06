@@ -1,0 +1,134 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0117",
+  "census_id": "high-temperature-printed-page-143",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "BBOI'IBLLITI",
+  "formula_as_published": "BeO",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1800 1."
+  ],
+  "description_lines_as_published": [
+    "BeO:         Crystals 298.15 to 1800 1."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "25.012",
+    "value": 25.012,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      149
+    ],
+    "printed_pages": [
+      143
+    ],
+    "pdftotext_layout_page_file": "page-149.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 35, 37"
+  ],
+  "title_line_as_published": "BBOI'IBLLITI                                                                      POR!ULA lEIGHT       25.012",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "BeO:         Crystals 298.15 to 1800 1.",
+    "--------------------------------------------------------------------------------",
+    "                                                 l'O&IIATIOI FBO!I THE BLBBIITS",
+    "                                                                                       GIBBS",
+    "TEIIP.        <H;-H;98 )/'f     s•T     -c;;-s;98 >1T      cop    BUHlLPI           FBEB EJBBGY        Log Kt",
+    "   K           .l/aol•lt      J/aol•K     .l/aol•K      J/aol•l         k.l/aol        k.l/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": ".l/aol•lt",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": ".l/aol•K",
+    "heat_capacity": "J/aol•l",
+    "formation_enthalpy": "k.l/aol",
+    "formation_gibbs_energy": "k.l/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 17,
+  "uncertainty_line_as_published": "UICDTAIITY                       o.oq        0.04                         2.500           2.500         O.ll38",
+  "uncertainty_values": [
+    {
+      "as_published": "o.oq",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.04",
+      "value": 0.04,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.500",
+      "value": 2.5,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.500",
+      "value": 2.5,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "O.ll38",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "BeO:         Crystals 298.15 to 1800 1."
+  ],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY BQUlTIOI",
+    "             69.936 + 1.8288x10-• T              6.3574x 102 l'-o·s",
+    "                ( BQOlTIOI ULID PRO!         298 - 1800 K)",
+    "BBPEUICB           32           215                                        215                      CO! PILED",
+    "                  261                                                                                6- 8-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 35, 37",
+      "detector_only": false
+    }
+  ]
+}

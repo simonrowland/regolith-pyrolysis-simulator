@@ -1,0 +1,321 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0113",
+  "census_id": "high-temperature-printed-page-139",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "BOEHI!I TE",
+  "formula_as_published": "AlO(OH)",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 500 K.",
+    "                                                                           FOBllATIOIII FBOI! THE ELEI!EHTS",
+    "                                                                                             GIBBS",
+    "                                    T"
+  ],
+  "description_lines_as_published": [
+    "AlO(OH):          Crystals 298.15 to 500 K.",
+    "                                                                           FOBllATIOIII FBOI! THE ELEI!EHTS",
+    "                                                                                             GIBBS",
+    "                                    T"
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "59.989",
+    "value": 59.989,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      145
+    ],
+    "printed_pages": [
+      139
+    ],
+    "pdftotext_layout_page_file": "page-145.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "transcribed",
+  "untranscribed_reasons": [],
+  "title_line_as_published": "BOEHI!I TE                                                                                FOii!ULA WEIGHT     59.989",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "AlO(OH):          Crystals 298.15 to 500 K.",
+    "                                                                           FOBllATIOIII FBOI! THE ELEI!EHTS",
+    "                                                                                             GIBBS",
+    "TEIIP.       ( H;-H~98 )/T         so      -(G~-H~ 98 )/T       cop       EIITHALPY      FBEE EIIEBGY    Log Kf",
+    "                                    T",
+    "   K          J;aol•K         J/aol•K        J/IIIOl•K      J/llol• K            kJ/mol         kJ;aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/IIIOl•K",
+    "heat_capacity": "J/llol• K",
+    "formation_enthalpy": "kJ/mol",
+    "formation_gibbs_energy": "kJ;aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [
+    {
+      "as_published": "298.15",
+      "value": 298.15,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "400",
+      "value": 400.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "500",
+      "value": 500.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "rows": [
+    {
+      "source_text_line": 21,
+      "cells": {
+        "temperature": {
+          "as_published": "298.15",
+          "value": 298.15,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "o.ooo",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "48.45",
+          "value": 48.45,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "48.45",
+          "value": 48.45,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "65.63",
+          "value": 65.63,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "-993.054",
+          "value": -993.054,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_gibbs_energy": {
+          "as_published": "-918.400",
+          "value": -918.4,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "log_kf": {
+          "as_published": "160.900",
+          "value": 160.9,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      },
+      "ocr_suspect": true
+    },
+    {
+      "source_text_line": 24,
+      "cells": {
+        "temperature": {
+          "as_published": "400",
+          "value": 400.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "16.297",
+          "value": 16.297,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "67.19",
+          "value": 67.19,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "50.90",
+          "value": 50.9,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "67.43",
+          "value": 67.43,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "-993.589",
+          "value": -993.589,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_gibbs_energy": {
+          "as_published": "-892.723",
+          "value": -892.723,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "log_kf": {
+          "as_published": "116.583",
+          "value": 116.583,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      },
+      "ocr_suspect": false
+    },
+    {
+      "source_text_line": 25,
+      "cells": {
+        "temperature": {
+          "as_published": "500",
+          "value": 500.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "28.660",
+          "value": 28.66,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "84.54",
+          "value": 84.54,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "55.88",
+          "value": 55.88,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "69.18",
+          "value": 69.18,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "-992.924",
+          "value": -992.924,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_gibbs_energy": {
+          "as_published": "-867.565",
+          "value": -867.565,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "log_kf": {
+          "as_published": "90.640",
+          "value": 90.64,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      },
+      "ocr_suspect": false
+    }
+  ],
+  "row_count": 3,
+  "detected_data_row_count": 3,
+  "uncertainty_line_as_published": "UNCERTAINTY                        0.21            0.21                            2. 110         2.090        0.366",
+  "uncertainty_values": [
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2. 110",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.090",
+      "value": 2.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.366",
+      "value": 0.366,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "AlO(OH):          Crystals 298.15 to 500 K.",
+    "                                                                           FOBllATIOIII FBOI! THE ELEI!EHTS",
+    "                                                                                             GIBBS",
+    "                                    T"
+  ],
+  "auxiliary_lines_as_published": [
+    "IU:LTING POI NT                                             BOILING POINT                                      K",
+    "E liTH ALPY 0 f' I!EL TIIIG                   kJ          ENTHALPY OF VAPORIZATION                             kJ",
+    "                                        8.828 kJ            !lOLA i   VOLU 1!E                       1.9535 J/bar",
+    "                                                                                                    19.535 ca 3",
+    "TRANSITIONS Ill iEFERENCE STATE ELEI!EIIITS",
+    "      ALUI!IIIIUII ••• II.   P.   933 K.",
+    "HEAT CAPACITY EQUATION",
+    " c~        60.396 +   1.7573x1o-z T",
+    "              (EQUATION VALID FBOII                298-   500 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": []
+}

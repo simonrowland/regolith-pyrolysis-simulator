@@ -1,0 +1,134 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0119",
+  "census_id": "high-temperature-printed-page-145",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "BISftiTE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "FORftATION FROft THE ELEftENTS",
+  "formula_weight": {
+    "as_published": "465.959",
+    "value": 465.959,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      151
+    ],
+    "printed_pages": [
+      145
+    ],
+    "pdftotext_layout_page_file": "page-151.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26"
+  ],
+  "title_line_as_published": "BISftiTE                                                                           FORftULA WEIGHT    465.959",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "             crystals 298.15 to •eltioq point 1098 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORftATION FROft THE ELEftENTS",
+    "                                                                                         GIBBS",
+    "TEftP.     < H;-H~ 98 )/T      so      -(G;-a~ 98 )/T      cop    ENTHALPY            FREE EIIERGY     Loq Kf",
+    "                                T",
+    "             J/•ol•K        J/IIOl•K     J/•ol•K        J/•ol•K          kJ/1101         kJ/•ol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J/•ol•K",
+    "entropy": "J/IIOl•K",
+    "negative_gibbs_function": "J/•ol•K",
+    "heat_capacity": "J/•ol•K",
+    "formation_enthalpy": "kJ/1101",
+    "formation_gibbs_energy": "kJ/•ol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 7,
+  "uncertainty_line_as_published": "UIICERTAI IITY                 2.(19           2.09                        1.255           1. 464       0.256",
+  "uncertainty_values": [
+    {
+      "as_published": "2.(19",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.09",
+      "value": 2.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.255",
+      "value": 1.255,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1. 464",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.256",
+      "value": 0.256,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "IIELTI liG POINT               1u98       K             BOlLING POI NT                                  K",
+    "ENTHALPY OF !!ELTING                      kJ            ENTHALPY OF VAPORIZATION                        kJ",
+    "                                          kJ            ftOLAR VOLUIIE                        4.9730 J/bar",
+    "                                                                                             49.7 30 ca 3",
+    "TRANSITIONS IN REFERENCE STATE ELE8ENTS",
+    "      BISIIUTH •••• ft. P. 544.5, B. P. 1835 K.",
+    "HEAT CAPACITY EQUATION",
+    " c;        1.0356x10Z +       3.J360x1o-z       r",
+    "             (EQUATION VALID FRO!!             298 -    800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26",
+      "detector_only": false
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0112",
+  "census_id": "high-temperature-printed-page-138",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "ALUMINUM OXIDE (GAMMA)",
+  "formula_as_published": "Al 2 0 3",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Al 2 0 3 :    Crystals 298.15 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "FORMATION FROM THE ELEMENTS",
+  "formula_weight": {
+    "as_published": "101.962",
+    "value": 101.962,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      144
+    ],
+    "printed_pages": [
+      138
+    ],
+    "pdftotext_layout_page_file": "page-144.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 31, 33"
+  ],
+  "title_line_as_published": "ALUMINUM OXIDE (GAMMA)                                                              FORMULA   WEIGHT    101.962",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Al 2 0 3 :    Crystals 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORMATION FROM THE ELEMENTS",
+    "                                                                                          GIBBS",
+    "TEIIP.       (H~-H~ 98 )/T",
+    "                                  0",
+    "                                 sr      -(G;-H~ 98 )/T      cop      ENTHALPY         FREE ENERGY       Log Kf",
+    "               J/IIIOl•K     J/lllol•K     J/mol• K       J/mol•K        kJ/11101         itJ/11101",
+    "--------------------------------------------------------------------------------",
+    " :.!98.15  0.000     59.83     59.83    79.02    -1653.517   -15&2. 702  273.780",
+    "UNCERTAINTY                     b. 28            &.28                        1.2&0            1. 300      0.228"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J/IIIOl•K",
+    "entropy": "J/lllol•K",
+    "negative_gibbs_function": "J/mol• K",
+    "heat_capacity": "J/mol•K",
+    "formation_enthalpy": "kJ/11101",
+    "formation_gibbs_energy": "itJ/11101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 15,
+  "uncertainty_line_as_published": " 5(J(J          38.406        1(18.43        70.02        1u&. 01      -1653.784        -1500.934       156.802",
+  "uncertainty_values": [
+    {
+      "as_published": "38.406",
+      "value": 38.406,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1(18.43",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "70.02",
+      "value": 70.02,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1u&. 01",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "-1653.784",
+      "value": -1653.784,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "-1500.934",
+      "value": -1500.934,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "156.802",
+      "value": 156.802,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Al 2 0 3 :    Crystals 298.15 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "MELTING POI NT                  2291        K             BOlLING    POINT",
+    "ENTHALPY OP !!ELTING              94. 140 kJ              ENTHALPY OF VAPORIZATION                        kJ",
+    "                                            kJ          IIOLAR VOLUME                                     J/bar",
+    "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
+    "      ALUIIINUM ••• K. P.      933 K.",
+    "HEAT CAPACITY        EQUATION",
+    "             1.5343x10Z +      1.9681x10-:J T             9.u063x10Z T-0·5",
+    "                (EQUATION VALID FROM       298 -        1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 31, 33",
+      "detector_only": false
+    }
+  ]
+}
