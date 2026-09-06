@@ -144,7 +144,8 @@ def test_superseded_extract_is_outside_selected_denominator(extract_comparator, 
 
 @pytest.mark.parametrize("key", ["class", "class_tag", "scientific_class", "evidence_kind",
                                   "admission_status", "measurement_status", "status",
-                                  "alpha_role", "method_class"])
+                                  "alpha_role", "method_class", "evidence_class",
+                                  "semantics", "review_status"])
 @pytest.mark.parametrize("nested", [False, True])
 def test_unknown_evidence_marker_never_scores(extract_comparator, key, nested):
     from scripts.calibration_battery import extract_rows, finalize_rows
@@ -163,6 +164,64 @@ def test_unknown_evidence_marker_never_scores(extract_comparator, key, nested):
     assert rows and all(not r["selected"] and not r["score_eligible"] for r in rows)
     assert all(r["terminal_bucket"] != "scored" for r in rows)
     assert all(set(r["signed_residual"].values()) == {None} for r in rows)
+
+
+def test_every_evidence_marker_reader_has_closed_vocabulary():
+    import ast
+    from pathlib import Path
+    from simulator.diagnostic_helpers import extract_reproduction as e
+
+    root = Path(__file__).resolve().parents[1]
+    # Sample/observable axes are physics, not evidence or admission markers.
+    physical_keys = {"system_class", "property_kind", "alpha_kind", "provenance_class",
+                     "standard_state_kind"}
+    output_keys = {"measurement_kind", "reported_status", "observable_status",
+                   "comparator_status", "provider_status", "antoine_provenance_class",
+                   "observation_system_class", "claim_kind"}
+    readers = []
+    for relative in ("simulator/diagnostic_helpers/extract_reproduction.py",
+                     "simulator/diagnostic_helpers/qualitative_skip.py",
+                     "scripts/calibration_battery.py"):
+        tree = ast.parse((root / relative).read_text())
+        for node in ast.walk(tree):
+            # Scan definitions too: aliases and tuple-driven readers must not
+            # escape merely because get(key) has no literal argument.
+            if not isinstance(node, ast.Constant) or not isinstance(node.value, str):
+                continue
+            key = node.value
+            if not key.isidentifier():
+                continue
+            if key in physical_keys | output_keys:
+                continue
+            if (key in {"class", "class_tag", "status", "semantics"}
+                    or key.startswith("evidence_") or key.endswith(("_class", "_status", "_role", "_kind"))):
+                readers.append((relative, node.lineno, key))
+    assert readers
+    missing = [reader for reader in readers if reader[2] not in e._EVIDENCE_VOCABULARY]
+    assert not missing, f"marker readers missing closed vocabulary: {missing}"
+
+
+def test_unregistered_evidence_reader_is_typed_refusal():
+    from simulator.diagnostic_helpers import extract_reproduction as e
+    with pytest.raises(e.ExtractReproductionError,
+                       match="typed-refusal:unknown_evidence_marker_key:future_evidence_class"):
+        e._evidence_marker({"future_evidence_class": "measured"}, "future_evidence_class")
+
+
+@pytest.mark.parametrize("placement", ["top", "values", "admission_metadata"])
+def test_loader_preserves_unknown_evidence_class_for_refusal(monkeypatch, placement):
+    from simulator.diagnostic_helpers import extract_reproduction as e
+    e._ensure_tools_path()
+    import extract_merge
+
+    row = {"observation_id": "unknown-class", "type": "alpha", "values": {"alpha": 0.02}}
+    container = row if placement == "top" else row.setdefault(placement, {})
+    container["evidence_class"] = "novel_evidence_b481"
+    doc = {"source_id": "kems-fixture", "review_status": "reviewed",
+           "species": {"Fe": {"observations": [row]}}}
+    monkeypatch.setattr(extract_merge, "load_extracts", lambda directory: [doc])
+    obs, = e.load_adopted_observations()
+    assert e.observation_admission_reason(obs) == "unknown_evidence_marker:evidence_class=novel_evidence_b481"
 
 
 def test_equal_measurements_without_supersession_remain_independent(extract_comparator, monkeypatch):

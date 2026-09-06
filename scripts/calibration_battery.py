@@ -218,7 +218,7 @@ def extract_rows():
             kind = "literature correlation"
         if obs.source_id in {"kems-005-fedkin-2006", "kems-008-schaefer-fegley-2004", "kems-041-sossi-fegley-2018"}:
             kind = "literature correlation"
-        method = str(obs.values.get("method_class", ""))
+        method = str(e._evidence_marker(obs.values, "method_class") or "")
         quantity = str(obs.values.get("quantity", ""))
         if obs.values.get("alpha_form") or obs.values.get("fit") or method in {"review_compilation", "secondary_compilation"}:
             kind = "literature correlation"
@@ -228,12 +228,12 @@ def extract_rows():
             kind = "derived measurement"
         if "qualitative" in method or quantity.startswith("qualitative_"):
             kind = "qualitative"
-        if obs.values.get("evidence_class") == "thermodynamic_model_parameter" or quantity in {"SOLGASMIX_alkali_speciation", "equilibrium_molecular_oxygen_yield"}:
+        if e._evidence_marker(obs.values, "evidence_class") == "thermodynamic_model_parameter" or quantity in {"SOLGASMIX_alkali_speciation", "equilibrium_molecular_oxygen_yield"}:
             kind = "model reference"
-        if method == "method_only" or obs.values.get("semantics") == "method_geometry_reference_not_measured_species_observation":
+        if method == "method_only" or e._evidence_marker(obs.values, "semantics") == "method_geometry_reference_not_measured_species_observation":
             selected = False
             notices.append("method metadata; outside quantitative selection")
-        adopted_model = obs.values.get("alpha_role") == "authors_adopted_model_value_not_measurement"
+        adopted_model = e._evidence_marker(obs.values, "alpha_role") == "authors_adopted_model_value_not_measurement"
         if adopted_model:
             kind, selected = "model reference", False
             notices.append("authors-adopted model ceiling; not a measured alpha target")

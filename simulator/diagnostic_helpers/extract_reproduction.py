@@ -302,26 +302,109 @@ def load_vapor_pressure_data(
 
 
 def _refusal_marker_reason(markers: Mapping[str, Any]) -> str | None:
-    # Explicit source roles, not ID/prose substrings or residual-based guesses.
     for key, vocabulary in _EVIDENCE_VOCABULARY.items():
-        token = markers.get(key)
+        try:
+            token = _evidence_marker(markers, key)
+        except ExtractReproductionError as exc:
+            return str(exc).removeprefix("typed-refusal:")
         if token is not None and (not isinstance(token, str) or token not in vocabulary):
             return f"unknown_evidence_marker:{key}={token}"
-    for key in ("class", "class_tag", "scientific_class", "evidence_kind"):
-        role = markers.get(key)
-        if role in _ROLE_REFUSALS:
-            return _ROLE_REFUSALS[role]
-    method = markers.get("method_class")
-    for role, methods in _EXCLUDED_METHOD_ROLES.items():
-        if method in methods:
-            return _ROLE_REFUSALS[role]
-    for key in ("admission_status", "measurement_status", "status", "alpha_role", "evidence_kind"):
-        marker = markers.get(key)
-        if marker in _MARKER_REFUSALS:
-            return _MARKER_REFUSALS[marker]
+    # Validation precedes role refusal so novel tokens cannot hide behind a known role.
+    for key, vocabulary in _EVIDENCE_VOCABULARY.items():
+        reason = vocabulary.get(_evidence_marker(markers, key))
+        if reason:
+            return reason
+    nested = markers.get("admission_metadata")
+    if nested is not None:
+        if not isinstance(nested, Mapping):
+            return "invalid_admission_metadata"
+        return _refusal_marker_reason(nested)
     return None
 
 
+def _evidence_marker(markers: Mapping[str, Any], key: str) -> Any:
+    # Shared by admission and battery readers; an unregistered reader is a
+    # typed failure, never an absent marker that could imply admission.
+    if key not in _EVIDENCE_VOCABULARY:
+        raise ExtractReproductionError(f"typed-refusal:unknown_evidence_marker_key:{key}")
+    return markers.get(key)
+
+
+# Legacy vocabulary provenance (source attestation; aliases share these meanings).
+# CONTESTED: CONTESTED; kems-041-sossi-fegley-2018.
+# author_derived: author derived; kems-093-piacente-1975.
+# author_reported_envelope: author reported envelope; kems-140-heck-2025.
+# authors_adopted_model_value_not_measurement: authors adopted model value not measurement; kems-012-sossi-2019.
+# authors_preferred_average_of_kems_derived_gammas: authors preferred average of kems derived gammas; kems-137-bischof-2023.
+# authors_reduced_from_ion_intensities: authors reduced from ion intensities; kems-189-bischof-2021.
+# bound_not_point: bound not point; kems-114-nichols-1995.
+# competing_compilation: competing compilation; ivtan-cro2-g.
+# compilation_calculated_table: compilation calculated table; ivtan-cro2-g.
+# compilation_citation: compilation citation; kems-050-gorokhov-1977.
+# compilation_derived: compilation derived; kems-020-hastie-1981-nbsir.
+# compilation_foreign: compilation foreign; kems-020-hastie-1981-nbsir.
+# compilation_only: compilation only; legacy refusal control; no corpus extract uses this spelling.
+# compilation_selected_from_measured: compilation selected from measured; ivtan-cro2-g.
+# derived: derived; kems-008-schaefer-fegley-2004.
+# derived_from_figure_8_linear_portion: derived from figure 8 linear portion; kems-015-hashimoto-1983.
+# derived_from_kems_equilibrium_constants: derived from kems equilibrium constants; kems-137-bischof-2023.
+# derived_gibbs_duhem: derived gibbs duhem; ts1985.
+# derived_gibbs_duhem_integration: derived gibbs duhem integration; kems-103-fraser-1983.
+# derived_least_squares: derived least squares; kems-103-fraser-1983.
+# derived_third_law_from_measured_kems_and_janaf_fef: derived third law from measured kems and janaf fef; kems-097-ikeda-1978.
+# directly_reduced_measurement: directly reduced measurement; kems-184-behrens-1979.
+# equipment_metadata: equipment metadata; kems-020-hastie-1981-nbsir.
+# estimated_not_direct: estimated not direct; kems-097-ikeda-1978.
+# figure_only: figure only; kems-017-stolyarova-2013.
+# figure_only_measured_kems: figure only measured kems; kems-017-stolyarova-2013.
+# figure_only_or_proxy: figure only or proxy; kems-020-hastie-1981-nbsir.
+# inadmissible: inadmissible; legacy refusal control; no corpus extract uses this spelling.
+# inverse: inverse; kems-005-fedkin-2006.
+# literature_gamma_inverse_model_not_measurement: literature gamma inverse model not measurement; kems-012-sossi-2019.
+# literature_psat_not_this_work: literature psat not this work; kems-132-nakajima-2016.
+# measured: measured; kems-001-homma-1966.
+# measured KEMS: measured KEMS; kems-137-bischof-2023.
+# measured_LA_ICP_MS: measured LA ICP MS; kems-137-bischof-2023.
+# measured_activity_figure_only: measured activity figure only; kems-017-stolyarova-2013.
+# measured_and_compiled_calorimetry: measured and compiled calorimetry; stebbins-carmichael-weill-1983.
+# measured_direct: measured direct; kems-001-homma-1966.
+# measured_direct_qualitative: measured direct qualitative; kems-010-richter-2007.
+# measured_direct_qualitative_with_thermodynamic_crosscheck: measured direct qualitative with thermodynamic crosscheck; kems-015-hashimoto-1983.
+# measured_dotted_contours_figure_only: measured dotted contours figure only; kems-017-stolyarova-2013.
+# measured_kems: measured kems; kems-137-bischof-2023.
+# method_only: method only; kems-019-miller-armatys-2013.
+# mixed: mixed; kems-021-plante-1992-feo.
+# mixed_measured_and_model_curves: mixed measured and model curves; kems-140-heck-2025.
+# model: model; ivtan-cro2-g.
+# model_derived: model derived; fegley-2023-chemical-equilibrium-calculations-bu.
+# model_derived_and_compiled: model derived and compiled; kems-ms2000-044.
+# model_derived_assumption: model derived assumption; kems-015-hashimoto-1983.
+# model_derived_from_Kstar_and_external_gamma: model derived from K* and external gamma; kems-012-sossi-2019.
+# model_derived_from_Kstar_with_alpha_e_adopted_unity: model derived from K* with alpha e adopted unity; kems-012-sossi-2019.
+# model_derived_inverse_fit: model derived inverse fit; kems-005-fedkin-2006.
+# model_derived_second_law_fit: model derived second law fit; kems-ms2000-044.
+# model_output_not_measurement: model output not measurement; kems-001-homma-1966.
+# model_parameters_not_measured_activity_coefficients: model parameters not measured activity coefficients; kems-016-stolyarova-1992.
+# model_proxy: model proxy; kems-027-plante-hastie-1983.
+# not_observed: not observed; kems-097-ikeda-1978.
+# note_parent_unaltered: note parent unaltered; kems-020-hastie-1981-nbsir.
+# pointer_or_anchor_without_numeric_points: pointer or anchor without numeric points; kems-041-sossi-fegley-2018.
+# proxy: proxy; kems-184-behrens-1979.
+# qualitative_comparison: qualitative comparison; kems-189-bischof-2021.
+# qualitative_review_compilation: qualitative review compilation; kems-019-miller-armatys-2013.
+# rejected: rejected; legacy refusal control; no corpus extract uses this spelling.
+# rejected_model_output: rejected model output; legacy refusal control; no corpus extract uses this spelling.
+# rejected_model_output_not_measurement: rejected model output not measurement; kems-005-fedkin-2006.
+# rejected_no_complete_figure_digitization: rejected no complete figure digitization; kems-017-stolyarova-2013.
+# rejected_no_figure_reading: rejected no figure reading; kems-007-costa-2015.
+# review_compilation: review compilation; ivtan-cro2-g.
+# second_law_kems: second law kems; kems-031-halwax-2024.
+# secondary_compilation: secondary compilation; kems-008-schaefer-fegley-2004.
+# secondary_compilation_reprinted_as_feedstock: secondary compilation reprinted as feedstock; kems-035-sauerborn-2005.
+# third_law_kems: third law kems; kems-031-halwax-2024.
+# true_absence: true absence; kems-027-plante-hastie-1983.
+# typed_refusal: typed refusal; kems-003-pound-1972.
+# withdrawn: withdrawn; legacy refusal control; no corpus extract uses this spelling.
 _ROLE_REFUSALS = {
     "model": "model_output_not_measurement",
     "derived": "derived_quantity_not_measurement",
@@ -376,25 +459,90 @@ _MARKER_REFUSALS = {
 
 # Exact existing source vocabulary. Unknown spellings must not gain admission.
 _EVIDENCE_VOCABULARY = {
-    **{key: set(_ROLE_REFUSALS) | {"measured"}
+    **{key: {**_ROLE_REFUSALS, "measured": None}
        for key in ("class", "class_tag", "scientific_class")},
-    "evidence_kind": set(_ROLE_REFUSALS) | set(_MARKER_REFUSALS),
-    "method_class": set().union(*_EXCLUDED_METHOD_ROLES.values()) | {
+    "evidence_kind": {**_ROLE_REFUSALS, **_MARKER_REFUSALS},
+    "method_class": {**{
+        token: _ROLE_REFUSALS[role]
+        for role, tokens in _EXCLUDED_METHOD_ROLES.items() for token in tokens
+    }, **dict.fromkeys({
         "author_reported_envelope", "authors_reduced_from_ion_intensities",
         "directly_reduced_measurement", "measured", "measured KEMS",
         "measured_LA_ICP_MS", "measured_and_compiled_calorimetry", "measured_direct",
         "measured_direct_qualitative", "measured_direct_qualitative_with_thermodynamic_crosscheck",
         "measured_kems", "method_only", "mixed", "mixed_measured_and_model_curves",
         "proxy", "qualitative_comparison", "second_law_kems", "third_law_kems",
-    },
-    "admission_status": set(_MARKER_REFUSALS) | {
+    })},
+    "admission_status": {**_MARKER_REFUSALS, **dict.fromkeys({
         "bound_not_point", "equipment_metadata", "note_parent_unaltered", "true_absence",
-    },
-    "status": set(_MARKER_REFUSALS) | {
+    })},
+    "status": {**_MARKER_REFUSALS, **dict.fromkeys({
         "CONTESTED", "not_observed", "pointer_or_anchor_without_numeric_points",
+    })},
+    "measurement_status": dict(_MARKER_REFUSALS),
+    "alpha_role": dict(_MARKER_REFUSALS),
+    "review_status": {
+        "draft": None,  # ames-walsh-white-1967: source review pending.
+        "reviewed": None,  # ivtan-mno-coo-thermo: source reviewed.
+        "rejected": "rejected",  # Existing loader exclusion; no active extract introduces this token.
     },
-    "measurement_status": set(_MARKER_REFUSALS),
-    "alpha_role": set(_MARKER_REFUSALS),
+    "evidence_class": {
+        "measured": None,  # kems-012-sossi-2019: measured experimental evidence.
+        "measured_edx": None,  # kems-036-sesko-2024: measured EDX composition.
+        "model": "model_output_not_measurement",  # kems-012-sossi-2019: model output.
+        "derived": "derived_quantity_not_measurement",  # kems-031-halwax-2024: derived quantity.
+        "figure_only": "unsupported_observable:figure_only_not_digitized",  # kems-035-sauerborn-2005: undigitized figure.
+        "thermodynamic_model_parameter": "model_output_not_measurement",  # fegley-2023-chemical-equilibrium-calculations-bu: model parameter.
+        "thermodynamic_model_output": "model_output_not_measurement",  # kems-017-stolyarova-2013: equilibrium model output.
+        "pure_solid_thermochemistry": None,  # kems-031-halwax-2024: solid reference thermochemistry; observable gate applies.
+        "compiled_pure_component_thermochemistry": None,  # kems-190-wu-1993: compiled pure-component reference.
+        "review_table_compilation_not_this_papers_measurement": None,  # robinot-2025-promes-review: review-table provenance.
+        "experimental_open_furnace_second_law": None,  # kems-012-sossi-2019: second-law reduction of open-furnace experiment.
+        "pure_system_literature_reprint": None,  # kems-012-sossi-2019: reprinted pure-system reference.
+        "second_third_law_fit_not_measurement": None,  # kems-132-nakajima-2016: second/third-law fit provenance.
+        "second_third_law_fit_of_literature_psat": None,  # kems-132-nakajima-2016: fit of literature pressures.
+        "activity_slope": None,  # kems-133-costa-2017: activity-slope observable.
+        "fitted_evaporation_equilibrium": None,  # kems-140-heck-2025: fitted equilibrium provenance.
+        "second_law_style_fit": None,  # kems-140-heck-2025: second-law-style fit provenance.
+        "layered_inverse_model": None,  # kems-140-heck-2025: layered inverse model provenance.
+        "magma_ocean_application": None,  # kems-140-heck-2025: magma-ocean application provenance.
+        "authors_third_law_from_this_work_pressures": None,  # kems-097-ikeda-1978: authors' third-law reduction.
+        "directly_reduced_kems_activity_compiled_from_reference_10": None,  # kems-017-stolyarova-2013: activity compiled from reference 10.
+        "directly_reduced_kems_activity_compiled_from_references_27_29_30": None,  # kems-017-stolyarova-2013: compiled KEMS activities.
+        "directly_reduced_kems_thermodynamic_function_compiled_from_references_27_29_30": None,  # kems-017-stolyarova-2013: compiled KEMS thermodynamic functions.
+    },
+    # These payload semantics retain their existing observable-specific handling;
+    # vocabulary validation must not reclassify legitimate corpus measurements.
+    "semantics": dict.fromkeys({
+        "bound_not_point_ordering",  # kems-003-pound-1972: ordering bound, not point value.
+        "Equilibrium composition table retained cell-for-cell in corpus, not a rate time series.",  # kems-027-plante-hastie-1983: equilibrium-table payload.
+        "competing_observation_do_not_average",  # datz-and-smith-1961: conflicting independent observation.
+        "pointer_to_dimer_equilibrium",  # datz-and-smith-1961: dimer-equilibrium pointer.
+        "method_geometry_reference_not_measured_species_observation",  # kems-019-miller-armatys-2013: method metadata; battery excludes.
+        "disagreeing_inferred_evidence_not_physical_alpha_range",  # kems-012-sossi-2019: inferred alpha disagreement.
+        "not_hkl_alpha",  # kems-031-halwax-2024: non-HKL alpha definition.
+        "calibration_metadata_not_measurement",  # kems-031-halwax-2024: calibration metadata.
+        "compiled_composition_not_gibbs_table",  # robinot-2025-promes-review: compiled composition.
+        "compiled_review_table_not_measured_rate",  # robinot-2025-promes-review: review table, not rate measurement.
+        "composition_table_not_species_rate",  # kems-015-hashimoto-1983: composition-table payload.
+        "run_conditions_not_species_rate",  # kems-015-hashimoto-1983: run-condition metadata.
+        "mol_s_rate_not_hkl_area_flux",  # kems-015-hashimoto-1983: molar rate without area normalization.
+        "janaf_enthalpy_compilation_not_species_rate",  # kems-015-hashimoto-1983: JANAF enthalpy reference.
+        "second_law_fit_not_measured_rate",  # kems-015-hashimoto-1983: fitted second-law rate.
+        "assumed_unity_ratio_not_measured_alpha",  # kems-015-hashimoto-1983: assumed unit ratio.
+        "approximate_relative_ratio_not_absolute_rate",  # kems-015-hashimoto-1983: approximate relative ratio.
+        "author_envelope_includes_inverse_model_not_measured_rate",  # kems-140-heck-2025: mixed experimental/inverse envelope.
+        "composition_or_run_log_not_measured_rate",  # kems-140-heck-2025: composition/run-log metadata.
+        "fitted_equilibrium_not_measured_rate",  # kems-140-heck-2025: fitted equilibrium.
+        "inverse_model_fit_not_measured_rate",  # kems-140-heck-2025: inverse model fit.
+        "qualitative_comparison_not_numeric_gamma",  # kems-189-bischof-2021: qualitative activity comparison.
+        "absent_not_published",  # kems-022-demaria-1971: unpublished/absent datum.
+        "partial_ion_current_series_no_time_axis; An-Di and pure-oxide reference readings are distinct",  # kems-137-bischof-2023: partial currents without time axis.
+        "compiled_composition_not_gibbs_energy",  # kems-139-jacobson-2024: compiled composition.
+        "compiled_from_cited_primary_not_this_papers_measurement",  # kems-139-jacobson-2024: cited primary provenance.
+        "second_law_fit_not_measurement",  # kems-139-jacobson-2024: second-law fit provenance.
+        "third_law_derived_from_compiled_primary",  # kems-139-jacobson-2024: third-law reduction of compiled primary data.
+    }),
 }
 
 
@@ -447,13 +595,19 @@ def load_adopted_observations(
                         float(dex) if dex is not None else None
                     )
 
+    # The merge view projects a fixed public field list. Admission must retain
+    # raw markers, including future table entries, without widening that view.
+    raw_observations = {
+        (str(entry.get("source_id") or ""), str(species), str(row.get("observation_id") or "")): row
+        for entry in extracts
+        for species, block in (entry.get("species") or {}).items()
+        for row in block.get("observations") or []
+    }
     # IDs are source-wide: replacement edges can cross species. Removing
     # every parent also resolves A <- B <- C to terminal C.
     superseded = {
-        (str(entry.get("source_id") or ""), str(row["supersedes"]))
-        for entry in extracts
-        for block in (entry.get("species") or {}).values()
-        for row in block.get("observations") or []
+        (source_id, str(row["supersedes"]))
+        for (source_id, _, _), row in raw_observations.items()
         if row.get("supersedes")
     }
     adopted: list[AdoptedObservation] = []
@@ -533,11 +687,14 @@ def load_adopted_observations(
                         else "priority_winner" if is_priority_winner else "mass_spec_extract"
                     ),
                     admission_metadata={
-                        key: obs[key] for key in (
-                            "supersedes", "class", "class_tag", "scientific_class",
-                            "admission_status", "measurement_status", "status",
-                            "evidence_kind", "method_class", "alpha_role",
-                        ) if obs.get(key) is not None
+                        "review_status": _evidence_marker(obs, "review_status"),
+                        **{
+                            key: value for key, value in raw_observations[
+                                (source_id, str(species_id), str(obs.get("observation_id") or ""))
+                            ].items()
+                            if key in {"supersedes", "admission_metadata"}
+                            or key in _EVIDENCE_VOCABULARY
+                        },
                     },
                     condensed_form=condensed_form,
                     source_doi=doi_by_source.get(source_id),
