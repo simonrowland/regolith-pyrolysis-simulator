@@ -1,0 +1,124 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0369",
+  "census_id": "high-temperature-printed-page-395",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "liOBTBITI",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "278.211",
+    "value": 278.211,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      401
+    ],
+    "printed_pages": [
+      395
+    ],
+    "pdftotext_layout_page_file": "page-401.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "11 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27, 30, 32, 36, 38, 44, 46, 48, 50, 79"
+  ],
+  "title_line_as_published": "liOBTBITI                                                                       POBIUL& IIIGHT    278.211",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                    crystals 298.15 to aeltiug poiut 1830 1.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POBIU.'I'lOB PIOI 'I'BI ILBIBI'I'S",
+    "                                                                                      GIBBS",
+    "TEBP.     <a;-a; 98 )IT      so      -(G;-a~ 98 )/T      cop    BftBlLP!           lBBI BIBBG!     Log Kf",
+    "                              T",
+    "  It          J/aol•l     J/aol•lt     .l/aol•lt      J/aol•K      k.J/aol           ltJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "It",
+    "enthalpy_function": "J/aol•l",
+    "entropy": "J/aol•lt",
+    "negative_gibbs_function": ".l/aol•lt",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "k.J/aol",
+    "formation_gibbs_energy": "ltJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 22,
+  "uncertainty_line_as_published": "UIICBRTU liT!                o. 30         0.30                          3. 125         3.145           o. 551",
+  "uncertainty_values": [
+    {
+      "as_published": "o. 30",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.30",
+      "value": 0.3,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3. 125",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.145",
+      "value": 3.145,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 551",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 11 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27, 30, 32, 36, 38, 44, 46, 48, 50, 79",
+      "detector_only": false
+    }
+  ]
+}

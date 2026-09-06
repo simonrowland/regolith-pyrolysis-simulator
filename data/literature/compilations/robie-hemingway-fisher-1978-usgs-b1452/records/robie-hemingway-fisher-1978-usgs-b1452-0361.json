@@ -1,0 +1,142 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0361",
+  "census_id": "high-temperature-printed-page-387",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "CLIIOEIS'l'ATITE",
+  "formula_as_published": "llqSiOJ",
+  "phase_state_as_published": [
+    "Crystals 298.15 to aeltioq point 1830 K."
+  ],
+  "description_lines_as_published": [
+    "llqSiOJ:      Crystals 298.15 to aeltioq point 1830 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "100.389",
+    "value": 100.389,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      393
+    ],
+    "printed_pages": [
+      387
+    ],
+    "pdftotext_layout_page_file": "page-393.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 28, 30, 36, 38"
+  ],
+  "title_line_as_published": "CLIIOEIS'l'ATITE                                                                  POBftULA lEIGHT    100.389",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "llqSiOJ:      Crystals 298.15 to aeltioq point 1830 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POBBATIOI PROII THE ELBIIBITS",
+    "                                                                                        GIBBS",
+    "TEIIP.      <a;-a~98 )/'l     so       -(G;-u~ 98 )/T       cop     EITni.Pf         FREE EIEilGY     Loq ((f",
+    "                                T",
+    "  ((         J/aol•K        J/aol•K      J/aol•K        J/aol•K         kJ/aol          kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "((",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 16,
+  "uncertainty_line_as_published": "OICII'l' liiiTI                0.42           0.42                          1.215         1.225         0.215",
+  "uncertainty_values": [
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.215",
+      "value": 1.215,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.225",
+      "value": 1.225,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.215",
+      "value": 0.215,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "llqSiOJ:      Crystals 298.15 to aeltioq point 1830 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "I!ELTilfG POINT                1830       K             BOlLING POIIT                                   K",
+    "ENTHALPY OP IIELTIJG           61.505 kJ                ENTHALPY Ol VAPORIZATION",
+    "                                12. 113 kJ              I!OL AB VOL Oft E                    3. 1 4 7 0 J /!)a r",
+    "                                                                                            31.470      ca 3",
+    "TRAISI HOIS Il!l llEPEREIICB STATE EI.EIIElfTS",
+    "       !AGNESIOB •• II. P. 922, B. P. 1361 K.",
+    "       SILICON.... II. P. 1685 K.",
+    "HEAT CAPACITY EQUATION",
+    "           2.0556x10Z -       1.2796x1o-z T -  2.2977x10.J T-o·s",
+    "              (EQUATIOlf VALID PBOII     298- 1600 K)",
+    "BEP!RENCE         115          120                                           93                     COIIPILED",
+    "                                                                            254                      8-26-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 28, 30, 36, 38",
+      "detector_only": false
+    }
+  ]
+}
