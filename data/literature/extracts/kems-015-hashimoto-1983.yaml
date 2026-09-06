@@ -2,12 +2,16 @@ schema_version: literature_extract.v1
 source_id: kems-015-hashimoto-1983
 source:
   citation: Hashimoto, A. (1983), "Evaporation metamorphism in the early solar nebula — evaporation experiments
-    on the melt FeO-MgO-SiO2-CaO-Al2O3", Geochem. J. 17:111-145
+    on the melt FeO-MgO-SiO2-CaO-Al2O3 and chemical fractionations of primitive materials", Geochem. J. 17:111-145
+  doi: 10.2343/geochemj.17.111
+  url: https://doi.org/10.2343/geochemj.17.111
   year: 1983
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract
-  date: '2026-08-03'
-  worker: ocr-phase2b-gk
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract; WB-2 2026-09-06 Tables
+    1–7 transcribed from 200 dpi pdftoppm of the J-STAGE PDF (parent observation objects retained; new
+    observation_ids only). Figure "~" grids not used as data.
+  date: '2026-09-06'
+  worker: wave-WB-2
   provenance_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/
 review_status: draft
 species:
@@ -178,6 +182,902 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: vacuum level in the chamber was about 10^-4 Torr during the experiments
             line_range: '160'
+    - observation_id: hashimoto_1983_table1_starting_composition
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 113
+        pdf_page_index: 3
+        note: Chemical composition of the starting material (wt %, 100% normalized)
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Starting material is totally molten at the experimental temperatures.
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: wt % (100% normalized) as published
+      values:
+        quantity: starting_material_composition
+        method_class: measured_direct
+        system_class: silicate_melt
+        starting_Ave_SiO2_wt_pct: 35.43
+        starting_Ave_Al2O3_wt_pct: 3.16
+        starting_Ave_FeO_wt_pct: 35.04
+        starting_Ave_MgO_wt_pct: 23.84
+        starting_Ave_CaO_wt_pct: 2.53
+        starting_sigma_SiO2_wt_pct: 0.12
+        starting_sigma_Al2O3_wt_pct: 0.12
+        starting_sigma_FeO_wt_pct: 0.15
+        starting_sigma_MgO_wt_pct: 0.25
+        starting_sigma_CaO_wt_pct: 0.07
+        prescribed_SiO2_wt_pct: 35.50
+        prescribed_Al2O3_wt_pct: 3.00
+        prescribed_FeO_wt_pct: 35.00
+        prescribed_MgO_wt_pct: 24.00
+        prescribed_CaO_wt_pct: 2.50
+        note: Row (1) Ave. is regarded as the starting composition in the experiments. Full 7-sample
+          EPMA grid in tables/kems-015-hashimoto-1983/t1.csv. T_range is the experimental grid, not a
+          measurement T of the starting powder.
+      equipment:
+        cell_material:
+          value: high-purity graphite crucible (atomic-pile grade block)
+          locator:
+            published_page: 113
+            pdf_page_index: 3
+            figure: '1'
+            paragraph: crucible made of a high purity graphite block commonly used in atomic piles
+        chamber_pressure:
+          value: 0.0001
+          units: Torr
+          note: vacuum level in the chamber was about 10^-4 Torr during the experiments
+          locator:
+            published_page: 118
+            pdf_page_index: 8
+            paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+    - observation_id: hashimoto_1983_table2_run_conditions
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 114
+        pdf_page_index: 4
+        note: Heating conditions and run notations
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: min and deg_C as published
+      values:
+        quantity: run_conditions
+        method_class: measured_direct
+        system_class: silicate_melt
+        T_K_derivation: T_K = T_C + 273.15
+        time_min_axis:
+        - 1.29
+        - 2.15
+        - 3.59
+        - 5.99
+        - 10.0
+        - 16.7
+        - 27.8
+        - 46.4
+        - 77.4
+        - 129.0
+        run_19B8_t_min: 5.99
+        run_19B8_T_C: 1900
+        note: 'A notation such as 19B8 indicates 1,900 C - 5.99 minutes. Symbols B, C, D denote time
+          ranges 1-10, 10-100 and 100-1,000 minutes. Empty printed cells are true absence of a run,
+          not 0. Full grid in tables/kems-015-hashimoto-1983/t2.csv.'
+        initial_sample_mass_mg: 100.0
+        temperature_control_pm_C: 5
+        pyrometer_thermocouple_agreement_pm_C: 10
+    - observation_id: hashimoto_1983_table3_residue_composition_series
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 116
+        pdf_page_index: 6
+        note: Summary of experimental results; residue bulk composition vs VF, T, t
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Residues recovered as single spherules after free evaporation.
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: wt % (100% normalized) and VF wt % as published
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        VF_note: VF wt % is identical with vaporized mass in mg because initial mass is 100.0 mg
+        T_K_derivation: T_K = T_C + 273.15 from Table 2
+        missing_numeric_species_rate: true
+        timed_mg_s_flux: true_absence
+        n_runs_printed: 31
+        pin_17C5_1_FeO_wt_pct: 22.74
+        pin_20B6_VF_wt_pct: 52.5
+        pin_20B6_MgO_wt_pct: 41.10
+        series:
+        - sample: '17C1'
+          run_id: 17C1
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 10.0
+          VF_wt_pct: 8.2
+          splash: 'no'
+          composition_status: n.d.
+          SiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          texture: B
+          minerals: MP+OL+G
+          note: 'composition n.d. as printed (not determined); not 0'
+        - sample: 'C3 (1)'
+          run_id: 17C3
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 16.7
+          VF_wt_pct: 17.0
+          splash: 'yes'
+          composition_status: n.d.
+          SiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          texture: B
+          minerals: MD+OL+G
+          note: 'composition n.d. as printed (not determined); not 0'
+        - sample: 'C3 (2)'
+          run_id: 17C3
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 16.7
+          VF_wt_pct: 10.8
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 39.09
+          Al2O3_wt_pct: 3.57
+          FeO_wt_pct: 27.92
+          MgO_wt_pct: 26.32
+          CaO_wt_pct: 3.09
+          n_analyses: 14
+        - sample: 'C5 (1)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 18.6
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 41.74
+          Al2O3_wt_pct: 4.11
+          FeO_wt_pct: 22.74
+          MgO_wt_pct: 27.88
+          CaO_wt_pct: 3.52
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'C5 (2)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 18.4
+          splash: 'no'
+          composition_status: n.d.
+          SiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          texture: B
+          minerals: MD+OL+G
+          note: 'composition n.d. as printed (not determined); not 0'
+        - sample: 'C5 (3)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 19.7
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 41.74
+          Al2O3_wt_pct: 3.83
+          FeO_wt_pct: 21.81
+          MgO_wt_pct: 29.09
+          CaO_wt_pct: 3.53
+          n_analyses: 16
+        - sample: 'C7'
+          run_id: 17C7
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 46.4
+          VF_wt_pct: 27.2
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 45.24
+          Al2O3_wt_pct: 4.49
+          FeO_wt_pct: 15.53
+          MgO_wt_pct: 30.97
+          CaO_wt_pct: 3.78
+          n_analyses: 30
+          texture: B
+          minerals: OL+G
+        - sample: 'C9 (2)'
+          run_id: 17C9
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 77.4
+          VF_wt_pct: 35.5
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 48.04
+          Al2O3_wt_pct: 4.92
+          FeO_wt_pct: 8.56
+          MgO_wt_pct: 34.34
+          CaO_wt_pct: 4.14
+          n_analyses: 20
+          texture: C
+          minerals: OL+G
+        - sample: 'D2'
+          run_id: 17D2
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 129.0
+          VF_wt_pct: 43.3
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 49.03
+          Al2O3_wt_pct: 5.48
+          FeO_wt_pct: 2.88
+          MgO_wt_pct: 37.81
+          CaO_wt_pct: 4.80
+          n_analyses: 20
+          texture: C&B
+          minerals: OL+G
+        - sample: '18B6 (1)'
+          run_id: 18B6
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 3.59
+          VF_wt_pct: 11.2
+          splash: 'no'
+          composition_status: n.d.
+          SiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          texture: B
+          minerals: MP+OL+G
+          note: 'composition n.d. as printed (not determined); not 0'
+        - sample: 'B6 (2)'
+          run_id: 18B6
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 3.59
+          VF_wt_pct: 12.3
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 38.73
+          Al2O3_wt_pct: 3.55
+          FeO_wt_pct: 28.40
+          MgO_wt_pct: 26.26
+          CaO_wt_pct: 3.07
+          n_analyses: 14
+        - sample: 'B8 (1)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 17.2
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 40.41
+          Al2O3_wt_pct: 3.80
+          FeO_wt_pct: 23.82
+          MgO_wt_pct: 28.56
+          CaO_wt_pct: 3.40
+          n_analyses: 30
+          texture: B
+          minerals: MP+OL+G
+        - sample: 'B8 (2)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 15.8
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 39.55
+          Al2O3_wt_pct: 3.88
+          FeO_wt_pct: 25.78
+          MgO_wt_pct: 27.26
+          CaO_wt_pct: 3.53
+          n_analyses: 24
+        - sample: 'B8 (3)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 20.2
+          splash: 'yes'
+          composition_status: valence_only
+          SiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          note: 'v - sample used for determination of the valence of iron'
+        - sample: 'C1 (1)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 31.3
+          splash: 'yes'
+          composition_status: measured
+          SiO2_wt_pct: 44.22
+          Al2O3_wt_pct: 4.87
+          FeO_wt_pct: 14.39
+          MgO_wt_pct: 32.49
+          CaO_wt_pct: 4.05
+          n_analyses: 30
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1 (2)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 25.0
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 42.84
+          Al2O3_wt_pct: 4.05
+          FeO_wt_pct: 19.10
+          MgO_wt_pct: 30.41
+          CaO_wt_pct: 3.59
+          n_analyses: 16
+        - sample: 'C1 (3)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: null
+          VF_status: true_absence_printed_dash
+          splash: 'no'
+          composition_status: valence_only_VF_absent
+          SiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          note: 'v - sample used for determination of the valence of iron; VF printed as em-dash; true absence, not 0'
+        - sample: 'C3 (1)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 41.1
+          splash: 'yes'
+          composition_status: measured
+          SiO2_wt_pct: 45.60
+          Al2O3_wt_pct: 4.61
+          FeO_wt_pct: 11.84
+          MgO_wt_pct: 33.89
+          CaO_wt_pct: 4.06
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'C3 (2)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 33.1
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 45.30
+          Al2O3_wt_pct: 4.33
+          FeO_wt_pct: 12.87
+          MgO_wt_pct: 33.57
+          CaO_wt_pct: 3.93
+          n_analyses: 16
+        - sample: 'C3 (3)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 42.3
+          splash: 'yes'
+          composition_status: measured
+          SiO2_wt_pct: 46.12
+          Al2O3_wt_pct: 4.99
+          FeO_wt_pct: 9.95
+          MgO_wt_pct: 34.38
+          CaO_wt_pct: 4.55
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C3 (4)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 41.8
+          splash: 'yes'
+          composition_status: valence_only
+          SiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          note: 'v - sample used for determination of the valence of iron'
+        - sample: 'C5 (1)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 45.0
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 47.35
+          Al2O3_wt_pct: 5.33
+          FeO_wt_pct: 4.18
+          MgO_wt_pct: 38.43
+          CaO_wt_pct: 4.70
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: 'C5 (2)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 49.4
+          splash: 'yes'
+          composition_status: measured
+          SiO2_wt_pct: 47.05
+          Al2O3_wt_pct: 5.14
+          FeO_wt_pct: 3.85
+          MgO_wt_pct: 39.14
+          CaO_wt_pct: 4.82
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '19B2'
+          run_id: 19B2
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 1.29
+          VF_wt_pct: 12.2
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 37.94
+          Al2O3_wt_pct: 3.55
+          FeO_wt_pct: 29.14
+          MgO_wt_pct: 26.09
+          CaO_wt_pct: 3.29
+          n_analyses: 20
+        - sample: 'B4'
+          run_id: 19B4
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 2.15
+          VF_wt_pct: 17.2
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 39.64
+          Al2O3_wt_pct: 3.74
+          FeO_wt_pct: 25.60
+          MgO_wt_pct: 27.76
+          CaO_wt_pct: 3.27
+          n_analyses: 14
+        - sample: 'B6'
+          run_id: 19B6
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 3.59
+          VF_wt_pct: 26.3
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 41.09
+          Al2O3_wt_pct: 4.02
+          FeO_wt_pct: 20.59
+          MgO_wt_pct: 30.74
+          CaO_wt_pct: 3.56
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'B8'
+          run_id: 19B8
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 5.99
+          VF_wt_pct: 38.7
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 44.23
+          Al2O3_wt_pct: 5.03
+          FeO_wt_pct: 11.49
+          MgO_wt_pct: 34.77
+          CaO_wt_pct: 4.48
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1'
+          run_id: 19C1
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 10.0
+          VF_wt_pct: 49.3
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 45.56
+          Al2O3_wt_pct: 5.88
+          FeO_wt_pct: 4.55
+          MgO_wt_pct: 38.94
+          CaO_wt_pct: 5.07
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '20B2'
+          run_id: 20B2
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 1.29
+          VF_wt_pct: 27.0
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 40.87
+          Al2O3_wt_pct: 4.14
+          FeO_wt_pct: 20.46
+          MgO_wt_pct: 30.81
+          CaO_wt_pct: 3.72
+          n_analyses: 16
+        - sample: 'B4'
+          run_id: 20B4
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 2.15
+          VF_wt_pct: 40.5
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 43.00
+          Al2O3_wt_pct: 5.40
+          FeO_wt_pct: 12.27
+          MgO_wt_pct: 34.56
+          CaO_wt_pct: 4.76
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'B6'
+          run_id: 20B6
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 3.59
+          VF_wt_pct: 52.5
+          splash: 'no'
+          composition_status: measured
+          SiO2_wt_pct: 43.74
+          Al2O3_wt_pct: 6.24
+          FeO_wt_pct: 3.15
+          MgO_wt_pct: 41.10
+          CaO_wt_pct: 5.77
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+      equipment:
+        cell_material:
+          value: high-purity graphite crucible (atomic-pile grade block)
+          locator:
+            published_page: 113
+            pdf_page_index: 3
+            figure: '1'
+            paragraph: crucible made of a high purity graphite block commonly used in atomic piles
+        chamber_pressure:
+          value: 0.0001
+          units: Torr
+          note: vacuum level in the chamber was about 10^-4 Torr during the experiments
+          locator:
+            published_page: 118
+            pdf_page_index: 8
+            paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+    - observation_id: hashimoto_1983_table4_phase_compositions
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 118
+        pdf_page_index: 8
+        note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+      T_range_K:
+      - 1973.15
+      - 2073.15
+      phase: quench_minerals_in_FCMAS_residue
+      standard_state: vacuum free evaporation residues; quench phases not melt activities
+      regime: langmuir_free_evaporation
+      units: wt % average as published
+      values:
+        quantity: quench_phase_compositions
+        method_class: measured_direct
+        system_class: silicate_melt
+        pin_18B6_magnetite_Fe2O3_wt_pct: 59.94
+        samples:
+        - sample: 18B6(1)
+          T_C: 1800
+          T_K: 2073.15
+          phase: Magnetite
+          SiO2_wt_pct: 1.00
+          Al2O3_wt_pct: 5.23
+          FeO_wt_pct: 29.55
+          Fe2O3_wt_pct: 59.94
+          MgO_wt_pct: 1.85
+          CaO_wt_pct: 0.15
+          Total: 97.72
+          n_analyses: 5
+        - sample: 18B6(1)
+          T_C: 1800
+          T_K: 2073.15
+          phase: Olivine
+          SiO2_wt_pct: 37.71
+          Al2O3_wt_pct: 0.16
+          FeO_wt_pct: 23.68
+          Fe2O3_wt_pct: null
+          MgO_wt_pct: 37.58
+          CaO_wt_pct: 0.24
+          Total: 99.37
+          n_analyses: 26
+        - sample: 18B6(1)
+          T_C: 1800
+          T_K: 2073.15
+          phase: Glass
+          SiO2_wt_pct: 48.84
+          Al2O3_wt_pct: 11.79
+          FeO_wt_pct: 24.01
+          Fe2O3_wt_pct: null
+          MgO_wt_pct: 1.58
+          CaO_wt_pct: 12.20
+          Total: 98.42
+          n_analyses: 5
+        - sample: 17C1
+          T_C: 1700
+          T_K: 1973.15
+          phase: Magnetite
+          SiO2_wt_pct: 0.93
+          Al2O3_wt_pct: 5.07
+          FeO_wt_pct: 29.19
+          Fe2O3_wt_pct: 60.15
+          MgO_wt_pct: 1.93
+          CaO_wt_pct: 0.17
+          Total: 97.44
+          n_analyses: 7
+        - sample: 17C1
+          T_C: 1700
+          T_K: 1973.15
+          phase: Olivine
+          SiO2_wt_pct: 38.91
+          Al2O3_wt_pct: 0.14
+          FeO_wt_pct: 18.89
+          Fe2O3_wt_pct: null
+          MgO_wt_pct: 41.24
+          CaO_wt_pct: 0.23
+          Total: 99.41
+          n_analyses: 7
+        - sample: 17C1
+          T_C: 1700
+          T_K: 1973.15
+          phase: Glass
+          SiO2_wt_pct: 48.45
+          Al2O3_wt_pct: 12.38
+          FeO_wt_pct: 23.47
+          Fe2O3_wt_pct: null
+          MgO_wt_pct: 1.31
+          CaO_wt_pct: 12.78
+          Total: 98.39
+          n_analyses: 7
+        note: Fe2O3 dashes on olivine/glass are true absence, not 0.
+    - observation_id: hashimoto_1983_table5_initial_vaporization_rate_F
+      type: rate_series
+      locator:
+        table: '5'
+        published_page: 122
+        pdf_page_index: 12
+        note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: mol/s as published (not a Hertz-Knudsen area flux)
+      values:
+        quantity: initial_stage_vaporization_rate_F
+        method_class: derived_from_figure_8_linear_portion
+        system_class: silicate_melt
+        derivation: Table 5 F is obtained from eqns (1)' and (2) with the experimental vaporization
+          rate at the initial stage of vaporization (the maximum vaporization rate). That rate is the
+          slope of the linear portion of Fig. 8 (figure-only points not digitised this round). F is
+          mol/s for the ~100 mg spherule, not mol m^-2 s^-1; no area conversion is applied.
+        F_mol_s_at_1800C: 1.6e-6
+        series:
+        - T_C: 1700
+          T_K: 1973.15
+          F_mol_s: 3.9e-7
+          Pb_Torr: 6.6e-3
+          Po_Torr: 7.5e-5
+          Pbar_Torr: 3.3e-3
+          Uk_cm3_s: 7.38e3
+          Uv_cm3_s: 41.0
+          Uk_plus_Uv_cm3_s: 7.42e3
+        - T_C: 1800
+          T_K: 2073.15
+          F_mol_s: 1.6e-6
+          Pb_Torr: 2.6e-2
+          Po_Torr: 3.0e-4
+          Pbar_Torr: 1.3e-2
+          Uk_cm3_s: 7.57e3
+          Uv_cm3_s: 162.0
+          Uk_plus_Uv_cm3_s: 7.73e3
+        - T_C: 1900
+          T_K: 2173.15
+          F_mol_s: 4.6e-6
+          Pb_Torr: 7.7e-2
+          Po_Torr: 8.6e-4
+          Pbar_Torr: 3.9e-2
+          Uk_cm3_s: 7.75e3
+          Uv_cm3_s: 459.0
+          Uk_plus_Uv_cm3_s: 8.21e3
+        - T_C: 2000
+          T_K: 2273.15
+          F_mol_s: 1.0e-5
+          Pb_Torr: 1.6e-1
+          Po_Torr: 1.9e-3
+          Pbar_Torr: 8.2e-2
+          Uk_cm3_s: 7.93e3
+          Uv_cm3_s: 948.0
+          Uk_plus_Uv_cm3_s: 8.88e3
+        note: Printed Uv column is 0.041 x 10^3 cm3/s at 1700 C etc. CSV stores the product.
+          Pbar = (Pb+Po)/2 as printed. Knudsen flow predominates over viscous flow in this range.
+    - observation_id: hashimoto_1983_table6_feo_vaporization_enthalpies
+      type: rate_series
+      locator:
+        table: '6'
+        published_page: 124
+        pdf_page_index: 14
+        note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+      T_range_K:
+      - 2000.0
+      - 2000.0
+      phase: liquid_pure_oxides_JANAF
+      standard_state: reactants liquid, products gas; JANAF 1971 via Hashimoto Table 6
+      regime: thermodynamic_tabulation
+      units: kcal/mol as published at 2000 K
+      values:
+        quantity: vaporization_reaction_enthalpies_JANAF
+        method_class: secondary_compilation
+        system_class: pure_oxide_liquids
+        T_K_as_published: 2000
+        pin_reaction_2_delta_H_over_z_kcal_mol: 100.425
+        reactions:
+        - reaction_no: 1
+          reactant: Fe
+          products: Fe
+          delta_H_kcal_mol: 89.243
+          delta_H_over_z_kcal_mol: 89.243
+        - reaction_no: 2
+          reactant: FeO
+          products: Fe + 1/2 O2
+          delta_H_kcal_mol: 150.637
+          delta_H_over_z_kcal_mol: 100.425
+        - reaction_no: 3
+          reactant: FeO
+          products: Fe + O
+          delta_H_kcal_mol: 211.657
+          delta_H_over_z_kcal_mol: 105.829
+        - reaction_no: 4
+          reactant: FeO
+          products: FeO
+          delta_H_kcal_mol: 109.476
+          delta_H_over_z_kcal_mol: 109.476
+        note: Full 20-row table in tables/kems-015-hashimoto-1983/t6.csv. These are JANAF thermodynamic
+          values, not measured evaporation rates. No kcal-to-kJ conversion.
+    - observation_id: hashimoto_1983_derived_feo_activation_energy
+      type: rate_series
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+        figure: '10'
+        note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: kcal/mol as published
+      values:
+        quantity: activation_energy_of_vaporization
+        method_class: derived_from_arrhenius_slope
+        system_class: silicate_melt
+        E_kcal_mol_range:
+        - 93.7
+        - 107.9
+        derivation: Slope of linear regression on ln J_i vs 1/T at constant C_i (Fig. 10). Endpoints
+          93.7 and 107.9 kcal/mol are printed in the text (p. 123-124). Intermediate printed-on-figure
+          values 97.1 and 100.1 kcal/mol are figure-only and are not transcribed as data this round.
+          Trend - E increases with lowering molar concentration of FeO.
+        figure_10_points: figure-only
+    - observation_id: hashimoto_1983_derived_feo_reaction_order_endpoints
+      type: rate_series
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+        figure: '9'
+        note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: dimensionless reaction order as published
+      values:
+        quantity: surface_reaction_order
+        method_class: derived_from_lnJ_lnC_slope
+        system_class: silicate_melt
+        nu_FeO_at_1700C: 1.204
+        nu_FeO_at_2000C: 0.798
+        derivation: Slope of linear regression on ln J_i vs ln C_i (Fig. 9 / eqn 10). Only the text-printed
+          endpoints 1.204 (1700 C) and 0.798 (2000 C) are stored. Intermediate figure-only slopes are
+          not transcribed this round.
+        figure_9_points: figure-only
+    - observation_id: hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio
+      type: alpha
+      locator:
+        published_page: 126
+        pdf_page_index: 16
+        equation: '14'
+        note: Hertz-Knudsen definition of alpha_i; alpha_i/alpha_j = 1 assumed in eqn 16
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation; Hertz-Knudsen alpha_i of component i
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        quantity: vaporization_coefficient_alpha_i
+        method_class: model_derived_assumption
+        system_class: silicate_melt
+        alpha_i_over_alpha_j_assumed: 1.0
+        measured_alpha_status: absent
+        Hertz_Knudsen_equation: '14'
+        relative_volatility_equation: '16'
+        physical_alpha_upper_bound: 1.0
+        derivation: 'Eqn (14) J_i = alpha_i P_i / sqrt(2 pi M_i R T) with alpha_i <= 1 (Lee and Sata
+          1977). Eqn (16) relative volatility uses alpha_i/alpha_j = 1, stated as assumed at Stage II
+          (MgO/SiO2) and Stage IV (CaO/SiO2). Hashimoto 1983 does not tabulate a measured alpha series.
+          Numeric Fe/Mg/SiO Langmuir alphas used on the rail (e.g. 0.23-0.25 at 1973-2273 K) are Fedkin
+          2006 Table 3 inversions of these experiments, not numbers printed here.'
+        note: Do not promote the assumed unity ratio to a measured alpha. Competing with Fedkin 2006
+          inversions; do not average.
   Ca:
     observations:
     - observation_id: hashimoto_1983_cao_al2o3_residue_enrichment
@@ -243,6 +1143,273 @@ species:
         numeric_rate_status: ratio_only_not_species_rate
         note: The one-third statement constrains CaO relative to SiO2 only; it is not promoted to an
           absolute CaO or SiO2 evaporation rate.
+    - observation_id: hashimoto_1983_table3_cao_residue_series
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 116
+        pdf_page_index: 6
+        note: CaO wt % column of Table 3 (measured rows only)
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: wt % (100% normalized) as published
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        oxide: CaO
+        missing_numeric_species_rate: true
+        series:
+        - sample: 'C3 (2)'
+          run_id: 17C3
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 16.7
+          VF_wt_pct: 10.8
+          splash: 'no'
+          CaO_wt_pct: 3.09
+          n_analyses: 14
+        - sample: 'C5 (1)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 18.6
+          splash: 'no'
+          CaO_wt_pct: 3.52
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'C5 (3)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 19.7
+          splash: 'no'
+          CaO_wt_pct: 3.53
+          n_analyses: 16
+        - sample: 'C7'
+          run_id: 17C7
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 46.4
+          VF_wt_pct: 27.2
+          splash: 'no'
+          CaO_wt_pct: 3.78
+          n_analyses: 30
+          texture: B
+          minerals: OL+G
+        - sample: 'C9 (2)'
+          run_id: 17C9
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 77.4
+          VF_wt_pct: 35.5
+          splash: 'no'
+          CaO_wt_pct: 4.14
+          n_analyses: 20
+          texture: C
+          minerals: OL+G
+        - sample: 'D2'
+          run_id: 17D2
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 129
+          VF_wt_pct: 43.3
+          splash: 'no'
+          CaO_wt_pct: 4.80
+          n_analyses: 20
+          texture: C&B
+          minerals: OL+G
+        - sample: 'B6 (2)'
+          run_id: 18B6
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 3.59
+          VF_wt_pct: 12.3
+          splash: 'no'
+          CaO_wt_pct: 3.07
+          n_analyses: 14
+        - sample: 'B8 (1)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 17.2
+          splash: 'no'
+          CaO_wt_pct: 3.40
+          n_analyses: 30
+          texture: B
+          minerals: MP+OL+G
+        - sample: 'B8 (2)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 15.8
+          splash: 'no'
+          CaO_wt_pct: 3.53
+          n_analyses: 24
+        - sample: 'C1 (1)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 31.3
+          splash: 'yes'
+          CaO_wt_pct: 4.05
+          n_analyses: 30
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1 (2)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 25.0
+          splash: 'no'
+          CaO_wt_pct: 3.59
+          n_analyses: 16
+        - sample: 'C3 (1)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 41.1
+          splash: 'yes'
+          CaO_wt_pct: 4.06
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'C3 (2)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 33.1
+          splash: 'no'
+          CaO_wt_pct: 3.93
+          n_analyses: 16
+        - sample: 'C3 (3)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 42.3
+          splash: 'yes'
+          CaO_wt_pct: 4.55
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C5 (1)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 45.0
+          splash: 'no'
+          CaO_wt_pct: 4.70
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: 'C5 (2)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 49.4
+          splash: 'yes'
+          CaO_wt_pct: 4.82
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '19B2'
+          run_id: 19B2
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 1.29
+          VF_wt_pct: 12.2
+          splash: 'no'
+          CaO_wt_pct: 3.29
+          n_analyses: 20
+        - sample: 'B4'
+          run_id: 19B4
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 2.15
+          VF_wt_pct: 17.2
+          splash: 'no'
+          CaO_wt_pct: 3.27
+          n_analyses: 14
+        - sample: 'B6'
+          run_id: 19B6
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 3.59
+          VF_wt_pct: 26.3
+          splash: 'no'
+          CaO_wt_pct: 3.56
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'B8'
+          run_id: 19B8
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 5.99
+          VF_wt_pct: 38.7
+          splash: 'no'
+          CaO_wt_pct: 4.48
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1'
+          run_id: 19C1
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 10.0
+          VF_wt_pct: 49.3
+          splash: 'no'
+          CaO_wt_pct: 5.07
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '20B2'
+          run_id: 20B2
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 1.29
+          VF_wt_pct: 27.0
+          splash: 'no'
+          CaO_wt_pct: 3.72
+          n_analyses: 16
+        - sample: 'B4'
+          run_id: 20B4
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 2.15
+          VF_wt_pct: 40.5
+          splash: 'no'
+          CaO_wt_pct: 4.76
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'B6'
+          run_id: 20B6
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 3.59
+          VF_wt_pct: 52.5
+          splash: 'no'
+          CaO_wt_pct: 5.77
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
   Mg:
     observations:
     - observation_id: hashimoto_1983_mg_fcmas_free_evap_geometry
@@ -332,6 +1499,330 @@ species:
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
             paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+    - observation_id: hashimoto_1983_table3_mgo_residue_series
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 116
+        pdf_page_index: 6
+        note: MgO wt % column of Table 3 (measured rows only)
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: wt % (100% normalized) as published
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        oxide: MgO
+        pin_20B6_MgO_wt_pct: 41.10
+        missing_numeric_species_rate: true
+        series:
+        - sample: 'C3 (2)'
+          run_id: 17C3
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 16.7
+          VF_wt_pct: 10.8
+          splash: 'no'
+          MgO_wt_pct: 26.32
+          n_analyses: 14
+        - sample: 'C5 (1)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 18.6
+          splash: 'no'
+          MgO_wt_pct: 27.88
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'C5 (3)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 19.7
+          splash: 'no'
+          MgO_wt_pct: 29.09
+          n_analyses: 16
+        - sample: 'C7'
+          run_id: 17C7
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 46.4
+          VF_wt_pct: 27.2
+          splash: 'no'
+          MgO_wt_pct: 30.97
+          n_analyses: 30
+          texture: B
+          minerals: OL+G
+        - sample: 'C9 (2)'
+          run_id: 17C9
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 77.4
+          VF_wt_pct: 35.5
+          splash: 'no'
+          MgO_wt_pct: 34.34
+          n_analyses: 20
+          texture: C
+          minerals: OL+G
+        - sample: 'D2'
+          run_id: 17D2
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 129
+          VF_wt_pct: 43.3
+          splash: 'no'
+          MgO_wt_pct: 37.81
+          n_analyses: 20
+          texture: C&B
+          minerals: OL+G
+        - sample: 'B6 (2)'
+          run_id: 18B6
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 3.59
+          VF_wt_pct: 12.3
+          splash: 'no'
+          MgO_wt_pct: 26.26
+          n_analyses: 14
+        - sample: 'B8 (1)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 17.2
+          splash: 'no'
+          MgO_wt_pct: 28.56
+          n_analyses: 30
+          texture: B
+          minerals: MP+OL+G
+        - sample: 'B8 (2)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 15.8
+          splash: 'no'
+          MgO_wt_pct: 27.26
+          n_analyses: 24
+        - sample: 'C1 (1)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 31.3
+          splash: 'yes'
+          MgO_wt_pct: 32.49
+          n_analyses: 30
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1 (2)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 25.0
+          splash: 'no'
+          MgO_wt_pct: 30.41
+          n_analyses: 16
+        - sample: 'C3 (1)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 41.1
+          splash: 'yes'
+          MgO_wt_pct: 33.89
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'C3 (2)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 33.1
+          splash: 'no'
+          MgO_wt_pct: 33.57
+          n_analyses: 16
+        - sample: 'C3 (3)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 42.3
+          splash: 'yes'
+          MgO_wt_pct: 34.38
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C5 (1)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 45.0
+          splash: 'no'
+          MgO_wt_pct: 38.43
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: 'C5 (2)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 49.4
+          splash: 'yes'
+          MgO_wt_pct: 39.14
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '19B2'
+          run_id: 19B2
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 1.29
+          VF_wt_pct: 12.2
+          splash: 'no'
+          MgO_wt_pct: 26.09
+          n_analyses: 20
+        - sample: 'B4'
+          run_id: 19B4
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 2.15
+          VF_wt_pct: 17.2
+          splash: 'no'
+          MgO_wt_pct: 27.76
+          n_analyses: 14
+        - sample: 'B6'
+          run_id: 19B6
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 3.59
+          VF_wt_pct: 26.3
+          splash: 'no'
+          MgO_wt_pct: 30.74
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'B8'
+          run_id: 19B8
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 5.99
+          VF_wt_pct: 38.7
+          splash: 'no'
+          MgO_wt_pct: 34.77
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1'
+          run_id: 19C1
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 10.0
+          VF_wt_pct: 49.3
+          splash: 'no'
+          MgO_wt_pct: 38.94
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '20B2'
+          run_id: 20B2
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 1.29
+          VF_wt_pct: 27.0
+          splash: 'no'
+          MgO_wt_pct: 30.81
+          n_analyses: 16
+        - sample: 'B4'
+          run_id: 20B4
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 2.15
+          VF_wt_pct: 40.5
+          splash: 'no'
+          MgO_wt_pct: 34.56
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'B6'
+          run_id: 20B6
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 3.59
+          VF_wt_pct: 52.5
+          splash: 'no'
+          MgO_wt_pct: 41.10
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+    - observation_id: hashimoto_1983_derived_mgo_activation_energy
+      type: rate_series
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        paragraph: For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively
+        figure: '10'
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: kcal/mol as published
+      values:
+        quantity: activation_energy_of_vaporization
+        method_class: derived_from_arrhenius_slope
+        system_class: silicate_melt
+        E_kcal_mol: 123.6
+        derivation: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 123.6 kcal/mol is printed
+          in the text (p. 123). Compared by the author to Table 6 reaction (20) Delta H / z = 121.392
+          kcal/mol (MgO(l) -> MgO(g), JANAF 2000 K).
+        figure_10_points: figure-only
+    - observation_id: hashimoto_1983_table6_mgo_vaporization_enthalpies
+      type: rate_series
+      locator:
+        table: '6'
+        published_page: 124
+        pdf_page_index: 14
+        note: JANAF 1971 enthalpies for MgO reactions 18-20
+      T_range_K:
+      - 2000.0
+      - 2000.0
+      phase: liquid_pure_oxides_JANAF
+      standard_state: reactants liquid, products gas; JANAF 1971 via Hashimoto Table 6
+      regime: thermodynamic_tabulation
+      units: kcal/mol as published at 2000 K
+      values:
+        quantity: vaporization_reaction_enthalpies_JANAF
+        method_class: secondary_compilation
+        reactions:
+        - reaction_no: 18
+          reactant: MgO
+          products: Mg + 1/2 O2
+          delta_H_kcal_mol: 156.353
+          delta_H_over_z_kcal_mol: 104.235
+        - reaction_no: 19
+          reactant: MgO
+          products: Mg + O
+          delta_H_kcal_mol: 217.373
+          delta_H_over_z_kcal_mol: 108.687
+        - reaction_no: 20
+          reactant: MgO
+          products: MgO
+          delta_H_kcal_mol: 121.392
+          delta_H_over_z_kcal_mol: 121.392
   SiO:
     observations:
     - observation_id: hashimoto_1983_sio_fcmas_free_evap_geometry
@@ -414,6 +1905,615 @@ species:
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
             paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+    - observation_id: hashimoto_1983_table3_sio2_residue_series
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 116
+        pdf_page_index: 6
+        note: SiO2 wt % column of Table 3 (measured rows only)
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: wt % (100% normalized) as published
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        oxide: SiO2
+        gas_species: SiO(g)
+        missing_numeric_species_rate: true
+        series:
+        - sample: 'C3 (2)'
+          run_id: 17C3
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 16.7
+          VF_wt_pct: 10.8
+          splash: 'no'
+          SiO2_wt_pct: 39.09
+          n_analyses: 14
+        - sample: 'C5 (1)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 18.6
+          splash: 'no'
+          SiO2_wt_pct: 41.74
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'C5 (3)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 19.7
+          splash: 'no'
+          SiO2_wt_pct: 41.74
+          n_analyses: 16
+        - sample: 'C7'
+          run_id: 17C7
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 46.4
+          VF_wt_pct: 27.2
+          splash: 'no'
+          SiO2_wt_pct: 45.24
+          n_analyses: 30
+          texture: B
+          minerals: OL+G
+        - sample: 'C9 (2)'
+          run_id: 17C9
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 77.4
+          VF_wt_pct: 35.5
+          splash: 'no'
+          SiO2_wt_pct: 48.04
+          n_analyses: 20
+          texture: C
+          minerals: OL+G
+        - sample: 'D2'
+          run_id: 17D2
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 129
+          VF_wt_pct: 43.3
+          splash: 'no'
+          SiO2_wt_pct: 49.03
+          n_analyses: 20
+          texture: C&B
+          minerals: OL+G
+        - sample: 'B6 (2)'
+          run_id: 18B6
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 3.59
+          VF_wt_pct: 12.3
+          splash: 'no'
+          SiO2_wt_pct: 38.73
+          n_analyses: 14
+        - sample: 'B8 (1)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 17.2
+          splash: 'no'
+          SiO2_wt_pct: 40.41
+          n_analyses: 30
+          texture: B
+          minerals: MP+OL+G
+        - sample: 'B8 (2)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 15.8
+          splash: 'no'
+          SiO2_wt_pct: 39.55
+          n_analyses: 24
+        - sample: 'C1 (1)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 31.3
+          splash: 'yes'
+          SiO2_wt_pct: 44.22
+          n_analyses: 30
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1 (2)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 25.0
+          splash: 'no'
+          SiO2_wt_pct: 42.84
+          n_analyses: 16
+        - sample: 'C3 (1)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 41.1
+          splash: 'yes'
+          SiO2_wt_pct: 45.60
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'C3 (2)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 33.1
+          splash: 'no'
+          SiO2_wt_pct: 45.30
+          n_analyses: 16
+        - sample: 'C3 (3)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 42.3
+          splash: 'yes'
+          SiO2_wt_pct: 46.12
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C5 (1)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 45.0
+          splash: 'no'
+          SiO2_wt_pct: 47.35
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: 'C5 (2)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 49.4
+          splash: 'yes'
+          SiO2_wt_pct: 47.05
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '19B2'
+          run_id: 19B2
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 1.29
+          VF_wt_pct: 12.2
+          splash: 'no'
+          SiO2_wt_pct: 37.94
+          n_analyses: 20
+        - sample: 'B4'
+          run_id: 19B4
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 2.15
+          VF_wt_pct: 17.2
+          splash: 'no'
+          SiO2_wt_pct: 39.64
+          n_analyses: 14
+        - sample: 'B6'
+          run_id: 19B6
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 3.59
+          VF_wt_pct: 26.3
+          splash: 'no'
+          SiO2_wt_pct: 41.09
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'B8'
+          run_id: 19B8
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 5.99
+          VF_wt_pct: 38.7
+          splash: 'no'
+          SiO2_wt_pct: 44.23
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1'
+          run_id: 19C1
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 10.0
+          VF_wt_pct: 49.3
+          splash: 'no'
+          SiO2_wt_pct: 45.56
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '20B2'
+          run_id: 20B2
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 1.29
+          VF_wt_pct: 27.0
+          splash: 'no'
+          SiO2_wt_pct: 40.87
+          n_analyses: 16
+        - sample: 'B4'
+          run_id: 20B4
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 2.15
+          VF_wt_pct: 40.5
+          splash: 'no'
+          SiO2_wt_pct: 43.00
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'B6'
+          run_id: 20B6
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 3.59
+          VF_wt_pct: 52.5
+          splash: 'no'
+          SiO2_wt_pct: 43.74
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+    - observation_id: hashimoto_1983_derived_sio2_activation_energy
+      type: rate_series
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        paragraph: For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively
+        figure: '10'
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: kcal/mol as published
+      values:
+        quantity: activation_energy_of_vaporization
+        method_class: derived_from_arrhenius_slope
+        system_class: silicate_melt
+        E_kcal_mol: 131.6
+        derivation: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 131.6 kcal/mol is printed
+          in the text (p. 123). Compared by the author to Table 6 reaction (15) Delta H / z = 137.071
+          kcal/mol (SiO2(l) -> SiO2(g), JANAF 2000 K).
+        figure_10_points: figure-only
+    - observation_id: hashimoto_1983_table6_sio2_vaporization_enthalpies
+      type: rate_series
+      locator:
+        table: '6'
+        published_page: 124
+        pdf_page_index: 14
+        note: JANAF 1971 enthalpies for SiO2 reactions 13-17
+      T_range_K:
+      - 2000.0
+      - 2000.0
+      phase: liquid_pure_oxides_JANAF
+      standard_state: reactants liquid, products gas; JANAF 1971 via Hashimoto Table 6
+      regime: thermodynamic_tabulation
+      units: kcal/mol as published at 2000 K
+      values:
+        quantity: vaporization_reaction_enthalpies_JANAF
+        method_class: secondary_compilation
+        pin_reaction_13_delta_H_over_z_kcal_mol: 122.799
+        reactions:
+        - reaction_no: 13
+          reactant: SiO2
+          products: SiO + 1/2 O2
+          delta_H_kcal_mol: 184.198
+          delta_H_over_z_kcal_mol: 122.799
+        - reaction_no: 14
+          reactant: SiO2
+          products: SiO + O
+          delta_H_kcal_mol: 245.218
+          delta_H_over_z_kcal_mol: 122.609
+        - reaction_no: 15
+          reactant: SiO2
+          products: SiO2
+          delta_H_kcal_mol: 137.071
+          delta_H_over_z_kcal_mol: 137.071
+        - reaction_no: 16
+          reactant: SiO2
+          products: Si + O2
+          delta_H_kcal_mol: 317.250
+          delta_H_over_z_kcal_mol: 158.625
+        - reaction_no: 17
+          reactant: SiO2
+          products: Si + 2O
+          delta_H_kcal_mol: 439.290
+          delta_H_over_z_kcal_mol: 146.430
+  Al2O3:
+    observations:
+    - observation_id: hashimoto_1983_table3_al2o3_residue_series
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 116
+        pdf_page_index: 6
+        note: Al2O3 wt % column of Table 3 (measured rows only)
+      T_range_K:
+      - 1973.15
+      - 2273.15
+      phase: silicate_melt_FCMAS_solar_abundance
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Al2O3 is enriched in residues as more volatile components are lost.
+      standard_state: vacuum free evaporation of multicomponent melt
+      regime: langmuir_free_evaporation
+      units: wt % (100% normalized) as published
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        system_class: silicate_melt
+        oxide: Al2O3
+        missing_numeric_species_rate: true
+        series:
+        - sample: 'C3 (2)'
+          run_id: 17C3
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 16.7
+          VF_wt_pct: 10.8
+          splash: 'no'
+          Al2O3_wt_pct: 3.57
+          n_analyses: 14
+        - sample: 'C5 (1)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 18.6
+          splash: 'no'
+          Al2O3_wt_pct: 4.11
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'C5 (3)'
+          run_id: 17C5
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 27.8
+          VF_wt_pct: 19.7
+          splash: 'no'
+          Al2O3_wt_pct: 3.83
+          n_analyses: 16
+        - sample: 'C7'
+          run_id: 17C7
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 46.4
+          VF_wt_pct: 27.2
+          splash: 'no'
+          Al2O3_wt_pct: 4.49
+          n_analyses: 30
+          texture: B
+          minerals: OL+G
+        - sample: 'C9 (2)'
+          run_id: 17C9
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 77.4
+          VF_wt_pct: 35.5
+          splash: 'no'
+          Al2O3_wt_pct: 4.92
+          n_analyses: 20
+          texture: C
+          minerals: OL+G
+        - sample: 'D2'
+          run_id: 17D2
+          T_C: 1700
+          T_K: 1973.15
+          t_min: 129
+          VF_wt_pct: 43.3
+          splash: 'no'
+          Al2O3_wt_pct: 5.48
+          n_analyses: 20
+          texture: C&B
+          minerals: OL+G
+        - sample: 'B6 (2)'
+          run_id: 18B6
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 3.59
+          VF_wt_pct: 12.3
+          splash: 'no'
+          Al2O3_wt_pct: 3.55
+          n_analyses: 14
+        - sample: 'B8 (1)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 17.2
+          splash: 'no'
+          Al2O3_wt_pct: 3.80
+          n_analyses: 30
+          texture: B
+          minerals: MP+OL+G
+        - sample: 'B8 (2)'
+          run_id: 18B8
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 5.99
+          VF_wt_pct: 15.8
+          splash: 'no'
+          Al2O3_wt_pct: 3.88
+          n_analyses: 24
+        - sample: 'C1 (1)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 31.3
+          splash: 'yes'
+          Al2O3_wt_pct: 4.87
+          n_analyses: 30
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1 (2)'
+          run_id: 18C1
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 10.0
+          VF_wt_pct: 25.0
+          splash: 'no'
+          Al2O3_wt_pct: 4.05
+          n_analyses: 16
+        - sample: 'C3 (1)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 41.1
+          splash: 'yes'
+          Al2O3_wt_pct: 4.61
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'C3 (2)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 33.1
+          splash: 'no'
+          Al2O3_wt_pct: 4.33
+          n_analyses: 16
+        - sample: 'C3 (3)'
+          run_id: 18C3
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 16.7
+          VF_wt_pct: 42.3
+          splash: 'yes'
+          Al2O3_wt_pct: 4.99
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C5 (1)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 45.0
+          splash: 'no'
+          Al2O3_wt_pct: 5.33
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: 'C5 (2)'
+          run_id: 18C5
+          T_C: 1800
+          T_K: 2073.15
+          t_min: 27.8
+          VF_wt_pct: 49.4
+          splash: 'yes'
+          Al2O3_wt_pct: 5.14
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '19B2'
+          run_id: 19B2
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 1.29
+          VF_wt_pct: 12.2
+          splash: 'no'
+          Al2O3_wt_pct: 3.55
+          n_analyses: 20
+        - sample: 'B4'
+          run_id: 19B4
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 2.15
+          VF_wt_pct: 17.2
+          splash: 'no'
+          Al2O3_wt_pct: 3.74
+          n_analyses: 14
+        - sample: 'B6'
+          run_id: 19B6
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 3.59
+          VF_wt_pct: 26.3
+          splash: 'no'
+          Al2O3_wt_pct: 4.02
+          n_analyses: 30
+          texture: B
+          minerals: MD+OL+G
+        - sample: 'B8'
+          run_id: 19B8
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 5.99
+          VF_wt_pct: 38.7
+          splash: 'no'
+          Al2O3_wt_pct: 5.03
+          n_analyses: 20
+          texture: B&C
+          minerals: OL+G
+        - sample: 'C1'
+          run_id: 19C1
+          T_C: 1900
+          T_K: 2173.15
+          t_min: 10.0
+          VF_wt_pct: 49.3
+          splash: 'no'
+          Al2O3_wt_pct: 5.88
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
+        - sample: '20B2'
+          run_id: 20B2
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 1.29
+          VF_wt_pct: 27.0
+          splash: 'no'
+          Al2O3_wt_pct: 4.14
+          n_analyses: 16
+        - sample: 'B4'
+          run_id: 20B4
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 2.15
+          VF_wt_pct: 40.5
+          splash: 'no'
+          Al2O3_wt_pct: 5.40
+          n_analyses: 20
+          texture: B
+          minerals: OL+G
+        - sample: 'B6'
+          run_id: 20B6
+          T_C: 2000
+          T_K: 2273.15
+          t_min: 3.59
+          VF_wt_pct: 52.5
+          splash: 'no'
+          Al2O3_wt_pct: 6.24
+          n_analyses: 20
+          texture: C
+          minerals: OL+(G)
 fidelity_samples:
 - species: Fe
   observable: rate_series
@@ -467,3 +2567,113 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
     paragraph: volatility of CaO is about one third of that of SiO2 in Stage IV
     line_range: '931'
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_table1_starting_composition
+  field: starting_Ave_SiO2_wt_pct
+  value: 35.43
+  locator:
+    published_page: 113
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row (1) Ave. SiO2 wt %
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_table2_run_conditions
+  field: run_19B8_t_min
+  value: 5.99
+  locator:
+    published_page: 114
+    pdf_page_index: 4
+    table: '2'
+    note: 19B8 is 1,900 C - 5.99 minutes
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_table3_residue_composition_series
+  field: pin_17C5_1_FeO_wt_pct
+  value: 22.74
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: 17C5 (1) FeO wt % 22.74
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_table3_residue_composition_series
+  field: pin_20B6_VF_wt_pct
+  value: 52.5
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: 20B6 VF wt % 52.5
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_table4_phase_compositions
+  field: pin_18B6_magnetite_Fe2O3_wt_pct
+  value: 59.94
+  locator:
+    published_page: 118
+    pdf_page_index: 8
+    table: '4'
+    note: 18B6(1) magnetite Fe2O3 wt %
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_table5_initial_vaporization_rate_F
+  field: F_mol_s_at_1800C
+  value: 1.6e-6
+  locator:
+    published_page: 122
+    pdf_page_index: 12
+    table: '5'
+    note: F at 1,800 C = 1.6 x 10^-6 mol/s
+- species: Fe
+  observable: alpha
+  observation_id: hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio
+  field: alpha_i_over_alpha_j_assumed
+  value: 1.0
+  locator:
+    published_page: 126
+    pdf_page_index: 16
+    equation: '16'
+    note: alpha_i/alpha_j = 1 is assumed in eqn 16
+- species: Mg
+  observable: rate_series
+  observation_id: hashimoto_1983_table3_mgo_residue_series
+  field: pin_20B6_MgO_wt_pct
+  value: 41.10
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: 20B6 MgO wt % 41.10
+- species: Mg
+  observable: rate_series
+  observation_id: hashimoto_1983_derived_mgo_activation_energy
+  field: E_kcal_mol
+  value: 123.6
+  locator:
+    published_page: 123
+    pdf_page_index: 13
+    figure: '10'
+    note: MgO activation energy 123.6 kcal/mol as printed
+- species: SiO
+  observable: rate_series
+  observation_id: hashimoto_1983_derived_sio2_activation_energy
+  field: E_kcal_mol
+  value: 131.6
+  locator:
+    published_page: 123
+    pdf_page_index: 13
+    figure: '10'
+    note: SiO2 activation energy 131.6 kcal/mol as printed
+- species: SiO
+  observable: rate_series
+  observation_id: hashimoto_1983_table6_sio2_vaporization_enthalpies
+  field: pin_reaction_13_delta_H_over_z_kcal_mol
+  value: 122.799
+  locator:
+    published_page: 124
+    pdf_page_index: 14
+    table: '6'
+    note: Table 6 reaction 13 Delta H / z = 122.799 kcal/mol
