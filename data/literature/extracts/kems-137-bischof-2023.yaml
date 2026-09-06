@@ -2265,14 +2265,18 @@ species:
 corrections:
 - observation_id: bischof_2023_gao15_gamma_preferred_1700k
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: &preferred_quote |-
     Our preferred value is an average of those marked in red in Fig. 5a plus the isotherm value, yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K. The value of γ(InO1.5) is within error for all runs (Fig. 5b), too, giving γ(InO1.5) = 0.017(12) at an average T of 1674 K.
-    The oxygen fugacities under which equilibrium was achieved in the melts studied herein were ΔIW+1.5 to ΔIW+2.5.
-  page: 23
+    [...]
+    Given that the oxygen fugacities under which equilibrium was achieved in the melts studied herein (ΔIW+1.5 to ΔIW+2.5) [...]
+  page: '23, 24'
+  line_range: '593-596; 610-611'
   quote: *preferred_quote
 - observation_id: bischof_2023_table8_x_gao15
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: &table8_quote |-
     Table 8: Run | Protocol | Concentration [ppm] | x(GaO1.5) | Run | Protocol | Concentration [ppm] | x(InO1.5)
@@ -2280,13 +2284,19 @@ corrections:
     1_low | isotherm | 429 | 0.0136(1) | 1_low | isotherm | 0.0065-0.05 | 5.6(6)×10-5
     2_low | polytherm | 695 | 0.0172(4) | 2_low | polytherm | - | -
     3_high | polytherm | 7998 | 0.0589(3) | 3_high | polytherm | 890-1715 | 0.0158(4)
-    *x from run 2_low also used for run 1_low.
-    Table 2: 1_low | 1742 K isotherm | 1585-1695 K polytherm; 2_low | 1400-1730 K polytherm; 3_high | 1540-1640 K polytherm.
-  page: 22
-  table: '8'
+    *x from run 2_low was also used for run 1_low. See text.
+    [...]
+    Table 2: Run | [...] | Isotherm parameters | Polytherm parameters | [...]
+    [...] | T [K] | [...] | T range [K] | [...]
+    1_low, initially [...] | 1742 | [...] | 1585-1695 | [...]
+    2_low, initially [...] | - | [...] | 1400-1730 | [...]
+    3_high, initially [...] | - | [...] | 1540-1640 | [...]
+  page: '22, 6'
+  table: '8 (page 22); 2 (page 6)'
   quote: *table8_quote
 - observation_id: bischof_2023_gao15_gamma_s1_1low_polytherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: &s1_quote |-
     Table S1: T [K] | p(Ga) [Pa] | p(Ga)corr [Pa] | p(In) [Pa] | p(In)corr [Pa] | p(O2)calc [Pa] | K(Ga) | SD | gamma(GaO1.5) | SD | K(In) | SD | gamma(InO1.5) | SD | delta IW
@@ -2306,6 +2316,7 @@ corrections:
   quote: *s1_quote
 - observation_id: bischof_2023_gao15_gamma_s2_1low_isotherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: &s2_quote |-
     Table S2: T [K] | p(Ga) [Pa] | p(Ga)corr [Pa] | p(In) [Pa] | p(In)corr [Pa] | p(O2)calc [Pa] | K(Ga) | SD | gamma(GaO1.5) | SD | K(In) | SD | gamma(InO1.5) | SD | delta IW
@@ -2330,6 +2341,7 @@ corrections:
   quote: *s2_quote
 - observation_id: bischof_2023_gao15_gamma_s3_2low_polytherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: &s3_quote |-
     Table S3 continuation: T [K] | K(Ga) | SD | gamma(GaO1.5) | SD | K(In) | SD | gamma(InO1.5) | SD | delta IW
@@ -2366,6 +2378,7 @@ corrections:
   quote: *s3_quote
 - observation_id: bischof_2023_gao15_gamma_s4_3high_polytherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: &s4_quote |-
     Table S4: T [K] | K(Ga) | SD | gamma(GaO1.5) | SD | K(In) | SD | gamma(InO1.5) | SD | delta IW
@@ -2384,6 +2397,7 @@ corrections:
   quote: *s4_quote
 - observation_id: bischof_2023_ga_psat_s1_1low_polytherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: *s1_quote
   page: 2
@@ -2391,9 +2405,10 @@ corrections:
   quote: *s1_quote
 - observation_id: bischof_2023_ga2o3_henrian_log10_gamma_model
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: &table9_quote |-
-    Table 9: 50 % condensation temperatures of Ga, In, K and Zn above a silicate liquid of anorthite-diopside eutectic composition using the Slag-LiqA model of FactSage 8.2, with Henrian activity coefficients for Ga2O3(l) and In2O3(s) of the form log10(γi) = A/T + B. For Ga2O3(l), A = -4800, B = 0 and for In2O3(s), A = -7230 and B = 0.
+    Table 9: 50 % condensation temperatures of Ga, In, K and Zn above a silicate liquid of anorthite-diopside eutectic composition using the Slag-LiqA model of FactSage 8.2. [...] with Henrian activity coefficients for Ga2O3(l) and In2O3(s) of the form log10(γi) = A/T + B, based on this work. For Ga2O3(l), A = -4800, B = 0 and for In2O3(s), A = -7230 and B = 0.
     Element | delta IW at Tc50, PT=10-6 bar | Tc50 ADeu [K] | delta IW at Tc50, PT=10-4 bar | Tc50 ADeu [K] | delta IW at Tc50, PT=10-2 bar | Tc50 ADeu [K]
     Ga | 1.33 | 1874 | 1.20 | 2197 | 1.08 | 2662
     In | 1.99 | 1781 | 1.55 | 2121 | 1.26 | 2611
@@ -2404,6 +2419,7 @@ corrections:
   quote: *table9_quote
 - observation_id: bischof_2023_t50c_ga_factsage_table9
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: *table9_quote
   page: 30
@@ -2411,12 +2427,15 @@ corrections:
   quote: *table9_quote
 - observation_id: bischof_2023_ino15_gamma_preferred_1674k
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: *preferred_quote
-  page: 23
+  page: '23, 24'
+  line_range: '593-596; 610-611'
   quote: *preferred_quote
 - observation_id: bischof_2023_ino15_gamma_s1_1low_polytherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: *s1_quote
   page: 2
@@ -2424,6 +2443,7 @@ corrections:
   quote: *s1_quote
 - observation_id: bischof_2023_ino15_gamma_s2_1low_isotherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: *s2_quote
   page: 3
@@ -2431,6 +2451,7 @@ corrections:
   quote: *s2_quote
 - observation_id: bischof_2023_ino15_gamma_s3_2low_polytherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: *s3_quote
   page: 5
@@ -2438,6 +2459,7 @@ corrections:
   quote: *s3_quote
 - observation_id: bischof_2023_ino15_gamma_s4_3high_polytherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: *s4_quote
   page: 6
@@ -2445,6 +2467,7 @@ corrections:
   quote: *s4_quote
 - observation_id: bischof_2023_in_psat_s1_1low_polytherm
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
   old: absent
   new: *s1_quote
   page: 2
@@ -2452,6 +2475,7 @@ corrections:
   quote: *s1_quote
 - observation_id: bischof_2023_in2o3_henrian_log10_gamma_model
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: *table9_quote
   page: 30
@@ -2459,6 +2483,7 @@ corrections:
   quote: *table9_quote
 - observation_id: bischof_2023_t50c_in_factsage_table9
   field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: *table9_quote
   page: 30
