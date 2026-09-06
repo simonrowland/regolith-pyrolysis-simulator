@@ -1,0 +1,121 @@
+{
+  "record_id": "cp-p064-09",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 70,
+  "page": 64,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR FRAMEYORK STRUCTURE SILICATE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "NEPHELINE",
+  "formula_candidate": "(Na.7BK. 22 )AlSi04",
+  "header_and_units_raw": "NAME AND FORJIJLA           ENTROPY          A1           A2           A3           A4          A5      T rMge     T...     4...H•\n                           J·•l·1.1(1                    (T)         CT-2)       (T-o.&)       (T2)          IC     K      kJ·•r,\n\n",
+  "source_text": "NEPHELINE                               1.121E+02    6. 711E-02                                              467\n(Na.7BK. 22 )AlSi04                                                                                         1180",
+  "rows": [
+    {
+      "raw": "NEPHELINE                               1.121E+02    6. 711E-02                                              467",
+      "tokens": [
+        {
+          "raw": "NEPHELINE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 9
+        },
+        {
+          "raw": "1.121E+02",
+          "value": 112.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 40,
+          "end_offset": 49
+        },
+        {
+          "raw": "6.",
+          "value": 6.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 53,
+          "end_offset": 55
+        },
+        {
+          "raw": "711E-02",
+          "value": 7.11,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 56,
+          "end_offset": 63
+        },
+        {
+          "raw": "467",
+          "value": 467.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 109,
+          "end_offset": 112
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "(Na.7BK. 22 )AlSi04                                                                                         1180",
+      "tokens": [
+        {
+          "raw": "(Na.7BK.",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 8
+        },
+        {
+          "raw": "22",
+          "value": 22.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 9,
+          "end_offset": 11
+        },
+        {
+          "raw": ")AlSi04",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 12,
+          "end_offset": 19
+        },
+        {
+          "raw": "1180",
+          "value": 1180.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 108,
+          "end_offset": 112
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '6. 711E-02'",
+    "First-row entropy unresolved",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A2', '6. 711E-02')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 36,
+  "source_line_end": 37
+}
