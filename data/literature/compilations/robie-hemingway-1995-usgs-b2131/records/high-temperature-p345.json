@@ -1,0 +1,775 @@
+{
+  "record_id": "high-temperature-p345",
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "table_kind": "high_temperature",
+  "table_number": null,
+  "page": 345,
+  "pdf_page": 351,
+  "name_as_published": "Ca-Al PYRODNB",
+  "formula_as_published": "CaAl2Si06",
+  "phase_as_published": "Monoclinic cryatala 298.15 to 1000 Jt.",
+  "heading_as_published": "Ca-Al PYRODNB                                                                          Pormula wt        218.123\n\n\n\nCaAl2Si06 :     Monoclinic cryatala 298.15 to 1000 Jt.\n\n\n\n\n                                                                      PORMATIOH PROM THE BLBMEHTS\n\n Temp.           cop        ST   (BT-8~ 98 )/T    -(GT-8~ 98 )/T      AfBO              AfGO        Loq Kf\n\n  It                             J•mol-1·Jt-1                         -      kJ•mol-1 - -",
+  "footer_as_published": "Melting T                                                                 Boiling T                 It\n\n                                                                                                kJ\n                       kJ\n                                                                          Molar Vol.       6.357 J•bar·•\n                   24.40 kJ                                                               63.57 cm3\n\n\n                A• -3.303B+03               B•   5.877B-01          C• -1.73B+05\n\n                                                                                                04/30/93",
+  "column_order": [
+    "temperature",
+    "cp",
+    "entropy",
+    "enthalpy_function",
+    "gibbs_function",
+    "formation_enthalpy",
+    "formation_gibbs",
+    "log_kf"
+  ],
+  "units_as_published": [
+    "  It                             J•mol-1·Jt-1                         -      kJ•mol-1 - -"
+  ],
+  "metadata": [
+    {
+      "section": "heading",
+      "raw": "Ca-Al PYRODNB                                                                          Pormula wt        218.123",
+      "raster_reading": "Ca-Al PYROXENE Formula wt 218.123",
+      "tokens": [
+        {
+          "raw": "218.123",
+          "value": 218.123,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": "CaAl2Si06 :     Monoclinic cryatala 298.15 to 1000 Jt.",
+      "raster_reading": "CaAljSi0g: Monoclinic crystals 298.15 to 1000 K.",
+      "tokens": [
+        {
+          "raw": "CaAl2Si06",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "298.15",
+          "value": 298.15,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "1000",
+          "value": 1000.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": " Temp.           cop        ST   (BT-8~ 98 )/T    -(GT-8~ 98 )/T      AfBO              AfGO        Loq Kf",
+      "raster_reading": "Temp. cg 8} (BR-H39g)/T -(G2-H39g)/T AgH® Ags? Log Kg",
+      "tokens": [
+        {
+          "raw": "(BT-8~",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "98",
+          "value": 98.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "-(GT-8~",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "98",
+          "value": 98.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": "  It                             J•mol-1·Jt-1                         -      kJ•mol-1 - -",
+      "raster_reading": "THERMODYNAMIC PROPERTIES AT HIGH TEMPERATURE OF INDIVIDUAL PHASES 345",
+      "tokens": [
+        {
+          "raw": "J•mol-1·Jt-1",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "kJ•mol-1",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                                                                          Molar Vol.       6.357 J•bar·•",
+      "raster_reading": "Molar Vol. 6.357 Jebar\"",
+      "tokens": [
+        {
+          "raw": "6.357",
+          "value": 6.357,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                   24.40 kJ                                                               63.57 cm3",
+      "raster_reading": "H89g-H8 24.40 ks 63.57 cm?",
+      "tokens": [
+        {
+          "raw": "24.40",
+          "value": 24.4,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "63.57",
+          "value": 63.57,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "cm3",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                A• -3.303B+03               B•   5.877B-01          C• -1.73B+05",
+      "raster_reading": "THERMODYNAMIC PROPERTIES AT HIGH TEMPERATURE OF INDIVIDUAL PHASES 345",
+      "tokens": [
+        {
+          "raw": "-3.303B+03",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "5.877B-01",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "-1.73B+05",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        }
+      ]
+    },
+    {
+      "section": "footer",
+      "raw": "                                                                                                04/30/93",
+      "raster_reading": "04/30/93",
+      "tokens": [
+        {
+          "raw": "04/30/93",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "source_line": 22,
+      "raw": " 298.15       164.97    141.00       o.oo            141.00        -3306.3        -3129.6           548.27",
+      "raster_reading": "298.15 164.97 141.00 0.00 141.00 -3306.3 3129.6 548.27",
+      "cells": {
+        "temperature": {
+          "raw": "298.15",
+          "value": 298.15,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "164.97",
+          "value": 164.97,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "141.00",
+          "value": 141.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "o.oo",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "gibbs_function": {
+          "raw": "141.00",
+          "value": 141.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3306.3",
+          "value": -3306.3,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-3129.6",
+          "value": -3129.6,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "548.27",
+          "value": 548.27,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 23,
+      "raw": " 300          165.63    142.02       1.02            141.00        -3306.3        -3128.5           544.70",
+      "raster_reading": "300 165.63 142.02 1.02 141.00 -3306.3 -3128.5 544.70",
+      "cells": {
+        "temperature": {
+          "raw": "300",
+          "value": 300.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "165.63",
+          "value": 165.63,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "142.02",
+          "value": 142.02,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "1.02",
+          "value": 1.02,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "141.00",
+          "value": 141.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3306.3",
+          "value": -3306.3,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-3128.5",
+          "value": -3128.5,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "544.70",
+          "value": 544.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 24,
+      "raw": " 400          194.10    193.89      46.01            147.88        -3306.9        -3069.0           400.77",
+      "raster_reading": "400 194.10 193.89 46.01 147.88 -3306.9 -3069.0 400.77",
+      "cells": {
+        "temperature": {
+          "raw": "400",
+          "value": 400.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "194.10",
+          "value": 194.1,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "193.89",
+          "value": 193.89,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "46.01",
+          "value": 46.01,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "147.88",
+          "value": 147.88,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3306.9",
+          "value": -3306.9,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-3069.0",
+          "value": -3069.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "400.77",
+          "value": 400.77,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 25,
+      "raw": " 500          212.57    239.32      77.59            161.73        -3306.0        -3009.7           314.41",
+      "raster_reading": "500 212.57 239.32 77.59 161.73 -3306.0 -3009.7 314.41",
+      "cells": {
+        "temperature": {
+          "raw": "500",
+          "value": 500.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "212.57",
+          "value": 212.57,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "239.32",
+          "value": 239.32,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "77.59",
+          "value": 77.59,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "161.73",
+          "value": 161.73,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3306.0",
+          "value": -3306.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-3009.7",
+          "value": -3009.7,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "314.41",
+          "value": 314.41,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 26,
+      "raw": " 600          225.29    279.27     101.21            178.06        -3304.3        -2950.5           256.86",
+      "raster_reading": "600 225.29 279.27 101.21 178.06 -3304.3 -2950.5 256.86",
+      "cells": {
+        "temperature": {
+          "raw": "600",
+          "value": 600.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "225.29",
+          "value": 225.29,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "279.27",
+          "value": 279.27,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "101.21",
+          "value": 101.21,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "178.06",
+          "value": 178.06,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3304.3",
+          "value": -3304.3,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-2950.5",
+          "value": -2950.5,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "256.86",
+          "value": 256.86,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 27,
+      "raw": " 700          234.43    314.72     119.62            195.10        -3302.4        -2891.7           215.78",
+      "raster_reading": "700 234.43 314.72 119.62 195.10 -3302.4 2891.7 215.78",
+      "cells": {
+        "temperature": {
+          "raw": "700",
+          "value": 700.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "234.43",
+          "value": 234.43,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "314.72",
+          "value": 314.72,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "119.62",
+          "value": 119.62,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "195.10",
+          "value": 195.1,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3302.4",
+          "value": -3302.4,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-2891.7",
+          "value": -2891.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "215.78",
+          "value": 215.78,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 28,
+      "raw": " 800          241.23    346.49     134.42            212.07        -3301.3        -2833.1           184.98",
+      "raster_reading": "800 241.23 346.49 134.42 212.07 -3301.3 2833.1 184.98",
+      "cells": {
+        "temperature": {
+          "raw": "800",
+          "value": 800.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "241.23",
+          "value": 241.23,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "346.49",
+          "value": 346.49,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "134.42",
+          "value": 134.42,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "212.07",
+          "value": 212.07,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3301.3",
+          "value": -3301.3,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-2833.1",
+          "value": -2833.1,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "184.98",
+          "value": 184.98,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 29,
+      "raw": " 900          246.45    375.22     146.59            228.63        -3299.5        -2774.7           161.04",
+      "raster_reading": "900 246.45 375.22 146.59 228.63 -3299.5 2774.7 161.04",
+      "cells": {
+        "temperature": {
+          "raw": "900",
+          "value": 900.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "246.45",
+          "value": 246.45,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "375.22",
+          "value": 375.22,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "146.59",
+          "value": 146.59,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "228.63",
+          "value": 228.63,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3299.5",
+          "value": -3299.5,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-2774.7",
+          "value": -2774.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        "log_kf": {
+          "raw": "161.04",
+          "value": 161.04,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    },
+    {
+      "source_line": 30,
+      "raw": "1000          250.58    401.40     156.79            244.61        -3319.2        -2715.0           141.81",
+      "raster_reading": "1000 250.58 401.40 156.79 244.61 -3319.2 -2715.0 141.81",
+      "cells": {
+        "temperature": {
+          "raw": "1000",
+          "value": 1000.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "cp": {
+          "raw": "250.58",
+          "value": 250.58,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "entropy": {
+          "raw": "401.40",
+          "value": 401.4,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "enthalpy_function": {
+          "raw": "156.79",
+          "value": 156.79,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "gibbs_function": {
+          "raw": "244.61",
+          "value": 244.61,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_enthalpy": {
+          "raw": "-3319.2",
+          "value": -3319.2,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "formation_gibbs": {
+          "raw": "-2715.0",
+          "value": -2715.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        "log_kf": {
+          "raw": "141.81",
+          "value": 141.81,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      }
+    }
+  ],
+  "ambiguities": [
+    {
+      "kind": "ocr_suspect",
+      "row": 0,
+      "columns": [
+        "enthalpy_function",
+        "formation_gibbs"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 5,
+      "columns": [
+        "formation_gibbs"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 6,
+      "columns": [
+        "formation_gibbs"
+      ]
+    },
+    {
+      "kind": "ocr_suspect",
+      "row": 7,
+      "columns": [
+        "formation_gibbs"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 1,
+      "tokens": [
+        "CaAl2Si06"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 2,
+      "tokens": [
+        "(BT-8~",
+        "98",
+        "-(GT-8~",
+        "98"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 3,
+      "tokens": [
+        "J•mol-1·Jt-1",
+        "kJ•mol-1"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 5,
+      "tokens": [
+        "cm3"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 6,
+      "tokens": [
+        "-3.303B+03",
+        "5.877B-01",
+        "-1.73B+05"
+      ]
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 7,
+      "tokens": [
+        "04/30/93"
+      ]
+    }
+  ],
+  "transcription_status": "transcribed_with_ocr_ambiguities"
+}
