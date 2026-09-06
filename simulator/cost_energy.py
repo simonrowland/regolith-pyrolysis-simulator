@@ -101,15 +101,12 @@ def furnace_thermal_flux_hours(temperature_C: float, duration_h: float) -> float
 class UnavailableQuantity(dict):
     """Typed unavailable energy or money. Never a priced 0.0.
 
-    Falsy so a presence test that does not inspect ``status`` cannot treat a
-    refusal as a present value. Distinct dict subclass so the in-process
-    object is unmistakable; JSON-loaded copies are plain dicts and are
-    recognized via ``status``. ``json.dumps`` keeps the four keys (CPython
-    3.12 C encoder uses size, not truthiness).
+    Distinct dict subclass so the in-process object is unmistakable.
+    JSON-loaded copies are plain dicts. Presence is decided only by
+    ``is_unavailable_quantity`` (``status == unavailable``). Do not
+    override ``__bool__``: CPython's indented / streaming JSON encoder
+    truth-tests mappings and would persist a falsy subclass as ``{}``.
     """
-
-    def __bool__(self) -> bool:
-        return False
 
 
 def unavailable_quantity(*, reason: str, units: str) -> UnavailableQuantity:
@@ -137,23 +134,6 @@ def json_safe_number(value: Any, *, reason: str, units: str) -> Any:
     if math.isfinite(number):
         return float(number)
     return unavailable_quantity(reason=reason, units=units)
-
-
-def as_json_ready(value: Any) -> Any:
-    """Plain JSON tree. Falsy UnavailableQuantity dumps as {} under sort_keys."""
-
-    if isinstance(value, UnavailableQuantity):
-        return {
-            "status": value.get("status"),
-            "reason": value.get("reason"),
-            "value": value.get("value"),
-            "units": value.get("units"),
-        }
-    if isinstance(value, Mapping):
-        return {str(key): as_json_ready(item) for key, item in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [as_json_ready(item) for item in value]
-    return value
 
 
 def is_unavailable_quantity(value: Any) -> bool:

@@ -1,4 +1,4 @@
-"""G6: unavailable quantities are falsy and presence tests inspect status."""
+"""Unavailable quantities are status-bearing; indented JSON keeps the four keys."""
 
 from __future__ import annotations
 
@@ -10,7 +10,6 @@ import pytest
 
 from simulator.cost_energy import (
     UnavailableQuantity,
-    as_json_ready,
     is_unavailable_quantity,
     json_safe_number,
     unavailable_quantity,
@@ -47,6 +46,12 @@ SAFE_CALL_NAMES = frozenset(
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def _json_content(value, *, indent=None):
+    return json.loads(
+        json.dumps(value, indent=indent, sort_keys=True, allow_nan=False)
+    )
+
+
 def test_json_safe_number_replaces_nan_and_inf_with_unavailable() -> None:
     import math
 
@@ -59,16 +64,12 @@ def test_json_safe_number_replaces_nan_and_inf_with_unavailable() -> None:
     assert nan["value"] is None
     assert unavailable_reason_of(nan) == "invalid-offgas-rate"
     json.dumps({"nan": nan, "inf": inf, "finite": finite}, allow_nan=False)
-    dumped = json.dumps(
-        as_json_ready(nan), sort_keys=True, allow_nan=False, indent=2
-    )
+    dumped = json.dumps(nan, sort_keys=True, allow_nan=False, indent=2)
     assert json.loads(dumped)["status"] == "unavailable"
-    # RunArtifactStore.save uses indent=2 + sort_keys; that Python encoder
-    # path treats a falsy dict subclass as {}.
-    assert json.dumps(nan, sort_keys=True, allow_nan=False, indent=2) == "{}"
+    assert json.loads(dumped) == _json_content(nan)
 
 
-def test_unavailable_quantity_is_falsy_and_structurally_unmistakable() -> None:
+def test_unavailable_quantity_is_status_bearing_and_json_stable() -> None:
     value = unavailable_quantity(reason="missing-o2-vented-flow", units="kWh")
     assert type(value) is UnavailableQuantity
     assert isinstance(value, dict)
@@ -76,50 +77,43 @@ def test_unavailable_quantity_is_falsy_and_structurally_unmistakable() -> None:
     assert unavailable_reason_of(value) == "missing-o2-vented-flow"
     assert value["value"] is None
     assert value["units"] == "kWh"
-    assert bool(value) is False
-    assert not value
-    entered = False
-    if value:
-        entered = True
-    assert entered is False
-    assert json.loads(json.dumps(value)) == {
-        "status": "unavailable",
+    assert bool(value) is True
+    expected = {
         "reason": "missing-o2-vented-flow",
-        "value": None,
+        "status": "unavailable",
         "units": "kWh",
+        "value": None,
     }
-    nested = json.loads(json.dumps({"leaf": value}))
+    assert _json_content(value) == expected
+    assert _json_content(value, indent=2) == expected
+    nested = json.loads(json.dumps({"leaf": value}, indent=2))
     assert nested["leaf"]["status"] == "unavailable"
-    loaded = json.loads(json.dumps(value))
+    loaded = json.loads(json.dumps(value, indent=2))
     assert type(loaded) is dict
     assert bool(loaded) is True
     assert is_unavailable_quantity(loaded)
 
 
-def test_unavailable_quantity_truthiness_mutation_fails_then_restores(monkeypatch) -> None:
-    from simulator import cost_energy as cost_energy_mod
+def test_unavailable_quantity_falsy_bool_erases_indented_json(monkeypatch) -> None:
+    value = unavailable_quantity(reason="missing-o2-vented-flow", units="kWh")
+    assert _json_content(value, indent=2) == _json_content(value)
 
-    original = cost_energy_mod.unavailable_quantity
+    def falsy_bool(self) -> bool:
+        return False
 
-    def mutated(*, reason: str, units: str) -> dict:
-        return {
-            "status": "unavailable",
-            "reason": reason,
-            "value": None,
-            "units": units,
-        }
-
-    monkeypatch.setattr(cost_energy_mod, "unavailable_quantity", mutated)
+    monkeypatch.setattr(
+        UnavailableQuantity, "__bool__", falsy_bool, raising=False
+    )
     with pytest.raises(AssertionError):
-        produced = cost_energy_mod.unavailable_quantity(reason="x", units="kWh")
-        assert bool(produced) is False
-        assert type(produced) is UnavailableQuantity
-    monkeypatch.setattr(cost_energy_mod, "unavailable_quantity", original)
-    restored = cost_energy_mod.unavailable_quantity(reason="x", units="kWh")
-    assert bool(restored) is False
+        erased = unavailable_quantity(reason="missing-o2-vented-flow", units="kWh")
+        assert _json_content(erased, indent=2) == _json_content(erased)
+        assert json.loads(json.dumps(erased, indent=2))["status"] == "unavailable"
+    monkeypatch.undo()
+    restored = unavailable_quantity(reason="missing-o2-vented-flow", units="kWh")
     assert type(restored) is UnavailableQuantity
     assert is_unavailable_quantity(restored)
-    assert json.loads(json.dumps(restored))["status"] == "unavailable"
+    assert _json_content(restored, indent=2) == _json_content(restored)
+    assert json.loads(json.dumps(restored, indent=2))["status"] == "unavailable"
 
 
 def _loaded_quantity_field(node: ast.AST) -> str | None:
@@ -218,7 +212,13 @@ def _js_truthiness_violations(path: Path) -> list[str]:
 
 
 def test_quantity_presence_tests_inspect_status_not_truthiness() -> None:
-    """AST walk of simulator/, web/, scripts/: a refusal must not look present."""
+    """AST walk of simulator/, web/, scripts/: no truthiness on quantity leaves.
+
+    Presence is ``is_unavailable_quantity`` (status). A bare ``if energy`` /
+    ``not energy`` / BoolOp / IfExp on these fields is the landmine that
+    made a falsy subclass dump as ``{}`` and would treat a truthy refusal
+    as a present number.
+    """
 
     violations: list[str] = []
     for root_name in ("simulator", "web", "scripts"):

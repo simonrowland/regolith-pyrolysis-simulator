@@ -6,7 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
+from simulator.cost_energy import (
+    UnavailableQuantity,
+    is_unavailable_quantity,
+    unavailable_reason_of,
+)
 from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import (
     PAYLOAD_ABSENT_COST_PROVENANCE,
@@ -605,6 +609,47 @@ def _jsonable(value):
     return json.loads(json.dumps(value))
 
 
+def _json_content(value, *, indent=None):
+    return json.loads(
+        json.dumps(value, indent=indent, sort_keys=True, allow_nan=False)
+    )
+
+
+def _assert_unavailable_leaf_intact(value, *, reason: str, units: str) -> None:
+    assert is_unavailable_quantity(value)
+    assert value["status"] == "unavailable"
+    assert value["reason"] == reason
+    assert value["value"] is None
+    assert value["units"] == units
+    assert _json_content(value, indent=2) == _json_content(value)
+    assert _json_content(value, indent=2) == {
+        "reason": reason,
+        "status": "unavailable",
+        "units": units,
+        "value": None,
+    }
+
+
+def _missing_o2_pumping_context() -> dict:
+    return {
+        "status": "refused",
+        "reason": "missing-o2-vented-flow",
+        "feedstock_id": "mars_basalt",
+        "body": "mars",
+        "ambient_pressure_pa": 610.0,
+        "rows": [],
+    }
+
+
+_LEAF_UNITS = {
+    "pumping_electrical_energy_kWh": "kWh",
+    "pumping_electrical_cost_usd": "USD",
+    "electrical_energy_kWh": "kWh",
+    "electrical_cost_usd": "USD",
+    "total_cost_usd": "USD",
+}
+
+
 def test_refused_pumping_hour_pins_canonical_unavailable_object() -> None:
     artifact = _artifact_from_pumping_context(
         _refused_offgas_pumping_context(),
@@ -662,7 +707,14 @@ def test_refused_pumping_hour_round_trips_through_run_artifact_store(tmp_path) -
         _refused_offgas_pumping_context(),
         "run-refused-pumping-hour-store",
     )
-    json.dumps(artifact, allow_nan=False)
+    produced = artifact["terminal"]["cost_totals"]
+    for leaf in _CANONICAL_UNAVAILABLE_LEAVES:
+        _assert_unavailable_leaf_intact(
+            produced[leaf],
+            reason="invalid-offgas-rate",
+            units=_LEAF_UNITS[leaf],
+        )
+    json.dumps(artifact, indent=2, sort_keys=True, allow_nan=False)
     store = RunArtifactStore(tmp_path / "runs")
     assert store.save("run-refused-pumping-hour-store", artifact) is True
     loaded = store.load("run-refused-pumping-hour-store")
@@ -673,11 +725,87 @@ def test_refused_pumping_hour_round_trips_through_run_artifact_store(tmp_path) -
     observed = {key: totals[key] for key in pinned}
     assert observed == pinned
     for leaf in _CANONICAL_UNAVAILABLE_LEAVES:
-        assert is_unavailable_quantity(totals[leaf])
-        assert totals[leaf]["value"] is None
-        assert unavailable_reason_of(totals[leaf]) == "invalid-offgas-rate"
+        _assert_unavailable_leaf_intact(
+            totals[leaf],
+            reason="invalid-offgas-rate",
+            units=_LEAF_UNITS[leaf],
+        )
         assert type(totals[leaf]) is dict
         assert bool(totals[leaf]) is True
+
+
+def test_unavailable_leaves_survive_indented_run_store_writer(tmp_path) -> None:
+    from web.run_store import RunArtifactStore
+
+    artifact = _artifact_from_pumping_context(
+        _missing_o2_pumping_context(),
+        "run-missing-o2-store",
+    )
+    produced = artifact["terminal"]["cost_totals"]
+    for leaf in _CANONICAL_UNAVAILABLE_LEAVES:
+        _assert_unavailable_leaf_intact(
+            produced[leaf],
+            reason="missing-o2-vented-flow",
+            units=_LEAF_UNITS[leaf],
+        )
+    store = RunArtifactStore(tmp_path / "runs")
+    assert store.save("run-missing-o2-store", artifact) is True
+    loaded = store.load("run-missing-o2-store")
+    assert loaded is not None
+    totals = loaded["terminal"]["cost_totals"]
+    for leaf in _CANONICAL_UNAVAILABLE_LEAVES:
+        _assert_unavailable_leaf_intact(
+            totals[leaf],
+            reason="missing-o2-vented-flow",
+            units=_LEAF_UNITS[leaf],
+        )
+    assert totals["completeness"] == "incomplete"
+
+
+def test_unavailable_store_round_trip_falsy_bool_mutation_fails_then_restores(
+    tmp_path, monkeypatch
+) -> None:
+    from web.run_store import RunArtifactStore
+
+    def _round_trip(run_id: str) -> dict:
+        artifact = _artifact_from_pumping_context(
+            _missing_o2_pumping_context(),
+            run_id,
+        )
+        produced = artifact["terminal"]["cost_totals"]
+        for leaf in _CANONICAL_UNAVAILABLE_LEAVES:
+            _assert_unavailable_leaf_intact(
+                produced[leaf],
+                reason="missing-o2-vented-flow",
+                units=_LEAF_UNITS[leaf],
+            )
+        store = RunArtifactStore(tmp_path / run_id)
+        assert store.save(run_id, artifact) is True
+        loaded = store.load(run_id)
+        assert loaded is not None
+        totals = loaded["terminal"]["cost_totals"]
+        for leaf in _CANONICAL_UNAVAILABLE_LEAVES:
+            _assert_unavailable_leaf_intact(
+                totals[leaf],
+                reason="missing-o2-vented-flow",
+                units=_LEAF_UNITS[leaf],
+            )
+        return totals
+
+    _round_trip("run-missing-o2-store-live")
+
+    def falsy_bool(self) -> bool:
+        return False
+
+    monkeypatch.setattr(
+        UnavailableQuantity, "__bool__", falsy_bool, raising=False
+    )
+    with pytest.raises(AssertionError):
+        _round_trip("run-missing-o2-store-mutated")
+    monkeypatch.undo()
+    restored = _round_trip("run-missing-o2-store-restored")
+    assert is_unavailable_quantity(restored["total_cost_usd"])
+    assert restored["total_cost_usd"]["reason"] == "missing-o2-vented-flow"
 
 
 def test_refused_pumping_hour_store_round_trip_mutation_fails_then_restores(
