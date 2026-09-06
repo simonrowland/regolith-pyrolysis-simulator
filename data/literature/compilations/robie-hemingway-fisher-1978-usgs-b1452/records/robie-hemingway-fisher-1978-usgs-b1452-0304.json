@@ -1,0 +1,154 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0304",
+  "census_id": "high-temperature-printed-page-330",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "ZIHKOSirE",
+  "formula_as_published": "znso.",
+  "phase_state_as_published": [
+    "crystals 298.15 to 1000 K.",
+    "                                                                    PORBUIOIII PRO !I THE ILEIIEIITS",
+    "                                                                                     GIBBS",
+    "TE!P.     ( a;- H~ 98 )/T      sa",
+    "                                T     -( G;-s~ 98 )/T      cop     EHTHlLPY     FREE EHIRGY       Log Kf"
+  ],
+  "description_lines_as_published": [
+    "znso.:       crystals 298.15 to 1000 K.",
+    "                                                                    PORBUIOIII PRO !I THE ILEIIEIITS",
+    "                                                                                     GIBBS",
+    "TE!P.     ( a;- H~ 98 )/T      sa",
+    "                                T     -( G;-s~ 98 )/T      cop     EHTHlLPY     FREE EHIRGY       Log Kf"
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "161.438",
+    "value": 161.438,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      336
+    ],
+    "printed_pages": [
+      330
+    ],
+    "pdftotext_layout_page_file": "page-336.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25, 29, 31, 33, 35"
+  ],
+  "title_line_as_published": "ZIHKOSirE                                                                        FORBULA WEIGHT    161.438",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "znso.:       crystals 298.15 to 1000 K.",
+    "                                                                    PORBUIOIII PRO !I THE ILEIIEIITS",
+    "                                                                                     GIBBS",
+    "TE!P.     ( a;- H~ 98 )/T      sa",
+    "                                T     -( G;-s~ 98 )/T      cop     EHTHlLPY     FREE EHIRGY       Log Kf",
+    "  K          J;aol•K        J/aol•K     J;aol•K         J;aol•K        .kJ/aol         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J;aol•K",
+    "heat_capacity": "J;aol•K",
+    "formation_enthalpy": ".kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 11,
+  "uncertainty_line_as_published": "ONCEI!TliNTY                   1.25             1.25                       0.837         0.962       0.1&9",
+  "uncertainty_values": [
+    {
+      "as_published": "1.25",
+      "value": 1.25,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.25",
+      "value": 1.25,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.837",
+      "value": 0.837,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.962",
+      "value": 0.962,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.1&9",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "znso.:       crystals 298.15 to 1000 K.",
+    "                                                                    PORBUIOIII PRO !I THE ILEIIEIITS",
+    "                                                                                     GIBBS",
+    "TE!P.     ( a;- H~ 98 )/T      sa",
+    "                                T     -( G;-s~ 98 )/T      cop     EHTHlLPY     FREE EHIRGY       Log Kf"
+  ],
+  "auxiliary_lines_as_published": [
+    "IIELTI NG POINT                                        BOlLI IIG POI liT                             K",
+    "ENTHALPY OF BELTIIIG                     lr.J           ENTHALPY OF VlPORIZATIOH                     lr.J",
+    "                                         kJ             !OUR VOLUIIE                       4.1570 J/bar",
+    "                                                                                          41.570 ca 3",
+    "TRANSITIONS Ill REFERENCE STATE ELBaBNTS",
+    "     ZINC •••••••     a. P. 692.7• B. P.         1178 K.",
+    "     SULFUR ••••• OBTHO-ftOHO 368.54 1 a. P. 8010 388.36,",
+    "                      B. P. 716.9 K.",
+    "HilT CAPACITY EQUATION",
+    "c;       40.186 +    o.124J2 T    2.3892x1o• T-z",
+    "             (EQIJUION VALID FROB 298 - 1000 K)",
+    "BEPERIIICE      115           271                                          2b2                    CO!PILED",
+    "                                                                             3                    7-29-7&"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25, 29, 31, 33, 35",
+      "detector_only": false
+    }
+  ]
+}
