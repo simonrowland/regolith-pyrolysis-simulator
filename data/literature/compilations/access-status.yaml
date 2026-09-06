@@ -45,13 +45,19 @@ sources:
     access: open_public_web
     official_url: https://janaf.nist.gov/
     formula_index_url: https://janaf.nist.gov/formula.html
-    local_status: target_first_partial_harvest
+    licence_quoted:
+      srd13_data_nist_gov: These data are public.
+      nist_copyrights: With the exception of material marked as copyrighted, information presented on NIST sites are considered public information and may be distributed or copied.
+    local_status: feedstock_element_complete_harvest
     harvested_path: data/literature/compilations/janaf/
-    harvested_table_count: 380
-    harvested_temperature_row_count: 13833
-    official_index_lines_observed: 1800
-    remaining_action: Run tools/harvest_janaf_compilation.py from a network-enabled host to complete the official index.
-    acquisition_constraint: Direct DNS/networking was unavailable in the managed worker; target and Stage-0 tables were retrieved from official NIST pages through the indexed web surface.
+    harvested_table_count: 1655
+    harvested_temperature_row_count: 73584
+    html_era_table_count: 380
+    txt_era_table_count: 1275
+    official_index_lines_observed: 1796
+    janaf_absent_feedstock_elements: [Ag, As, Au, Bi, Cd, Ce, Dy, Er, Eu, Gd, Ge, In, La, Lu, Nd, Pt, Sb, Sc, Se, Sm, Sn, Te, Th, U, Y, Yb]
+    remaining_action: HTML-era 380 tables diverge from current NIST .txt (missing rows); held in place. Source .txt cache is gitignored; hashes in janaf/source/sidecar.yaml.
+    acquisition_constraint: Source .txt bytes stay in data/literature/compilations/janaf/source-cache/ (gitignored). The 1275 2026-09-06 tables were parsed from those downloads; the 380 2026-08-27 tables were parsed from HTML and were not overwritten.
 
   nist_webbook_srd69:
     citation: P. J. Linstrom and W. G. Mallard, eds., NIST Chemistry WebBook, NIST Standard Reference Database 69.

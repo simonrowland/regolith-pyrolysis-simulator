@@ -26,10 +26,11 @@ table:
   url: https://janaf.nist.gov/tables/H-097.html
   download_url: https://janaf.nist.gov/tables/H-097.txt
   index_entry:
-    formula: H15O10S
-    name: Sulfuric Acid, Hemihexahydrate
-    state: cr,l
-    formula_as_published: H15O10.5S
+    formula: "H15O10.5S"
+    formula_as_published: "H15O10.5S"
+    formula_normalised: "H15O10.5S"
+    name: "Sulfuric Acid, Hemihexahydrate"
+    state: "cr,l"
   title_as_published: Sulfuric Acid, Hemihexahydrate (H2SO4.6.5H2O)  |  H15O10.5S1(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -907,6 +908,11 @@ table:
         row_temperature_as_published: '1000'
         column: log Kf
   parse_ambiguities:
+  - kind: non_stoichiometric_formula_not_rewritten
+    formula_as_published: H15O10.5S
+    formula_normalised: H15O10.5S
+    previous_integerised_formula: H15O10S
+    reason: Printed formula has non-integer subscripts; formula_as_published retained verbatim. formula_normalised keeps decimal coefficients; integer rewrite forbidden.
   - line_number: 6
     raw_line: "220.300\t261.042\t266.230\t616.234\t-77.106\tCRYSTAL <--> LIQUID"
     reason: expected 8 tab-separated values; found 6

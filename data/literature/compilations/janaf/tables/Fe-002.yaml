@@ -26,10 +26,11 @@ table:
   url: https://janaf.nist.gov/tables/Fe-002.html
   download_url: https://janaf.nist.gov/tables/Fe-002.txt
   index_entry:
-    formula: FeS
-    name: Iron Sulfide, Pyrrhotite
-    state: cr
-    formula_as_published: Fe0.877S
+    formula: "Fe0.877S"
+    formula_as_published: "Fe0.877S"
+    formula_normalised: "Fe0.877S"
+    name: "Iron Sulfide, Pyrrhotite"
+    state: "cr"
   title_as_published: Iron Sulfide, Pyrrhotite (Fe0.877S)  |  Fe0.877S1(cr)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1483,6 +1484,11 @@ table:
         row_temperature_as_published: '1800'
         column: log Kf
   parse_ambiguities:
+  - kind: non_stoichiometric_formula_not_rewritten
+    formula_as_published: Fe0.877S
+    formula_normalised: Fe0.877S
+    previous_integerised_formula: FeS
+    reason: Printed formula has non-integer subscripts; formula_as_published retained verbatim. formula_normalised keeps decimal coefficients; integer rewrite forbidden.
   - line_number: 10
     raw_line: "598.000\t68.563\t101.232\t71.565\t17.741\tBETA <--> GAMMA"
     reason: expected 8 tab-separated values; found 6

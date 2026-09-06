@@ -45,8 +45,17 @@ stanzas). See `burcat/README.md`.
 
 ## Status of what we actually hold
 
-`janaf/` is a target-first partial harvest of NIST-JANAF 4th edition HTML tables (380 species).
-See `janaf/manifest.yaml`.
+`../extracts/janaf-4th.yaml` is **not JANAF**. It is a `review_status: draft` manual
+transcription of a few phosphorus carriers, pointing at `janaf.nist.gov` table URLs. It
+remains a battery extract (b-481 / t-850 structural exclusion) and was **not** deleted
+in this compilation ingest.
+
+The NIST-JANAF 4th edition compilation now lives here:
+
+`janaf/` — 1655 feedstock-element tables (380 HTML-era 2026-08-27 + 1275 NIST `.txt`
+2026-09-06). Loader: `simulator/reference_data/janaf.py`. This compilation produces
+**no** battery scoring rows. JANAF itself has no tables for 26 feedstock elements
+(Ag As Au Bi Cd Ce Dy Er Eu Gd Ge In La Lu Nd Pt Sb Sc Se Sm Sn Te Th U Y Yb).
 
 `sgte-unary/` is a complete ingest of the SGTE free pure-elements database unary50.tdb v5.0
 (Thermo-Calc TDB: ELEMENT / FUNCTION / PHASE / PARAMETER G, TC, BM, BMAGN). Licence quote
@@ -55,10 +64,6 @@ and coverage are in `sgte-unary/README.md`. Compilations still produce no scorin
 `hemingway-haas-robinson-1982-usgs-b1544/` is a complete transcription of USGS Bulletin 1544
 (Hemingway, Haas & Robinson 1982): TABLE 1 plus every per-substance T-grid. Public-domain
 US government work. Loader refuses any T not on the printed grid. No battery scoring rows.
-
-`janaf-4th.yaml` (still under `../extracts/`) is **not JANAF**. It is a `review_status: draft` manual transcription of a few
-phosphorus carriers, pointing at `janaf.nist.gov` table URLs. The full NIST-JANAF 4th edition is
-~1,800 species tables and is freely available. Completing the JANAF harvest is an open task.
 
 `nasa-glenn/` is the complete CEA `thermo.inp` compilation (products + reactants,
 ions and condensed phases included). See `nasa-glenn/README.md`.

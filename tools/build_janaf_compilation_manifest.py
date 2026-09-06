@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,8 +12,26 @@ from typing import Any
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from simulator.reference_data.janaf import (  # noqa: E402
+    COMPILATION_ROLE,
+    COMPILATION_SOURCE,
+    FORMULA_NORMALISED_RULE,
+    NON_STOICHIOMETRIC_TABLES,
+    PINNED_JANAF_ABSENT_ELEMENTS,
+    coverage_by_element,
+    feedstock_element_symbols,
+    formula_composition,
+    formula_normalised,
+    harvest_era,
+    load_table_document,
+    non_stoich_ambiguity,
+    table_formula_as_published,
+)
+
 JANAF_ROOT = ROOT / "data" / "literature" / "compilations" / "janaf"
 TABLES = JANAF_ROOT / "tables"
 MANIFEST = JANAF_ROOT / "manifest.yaml"
@@ -24,38 +43,8 @@ TARGET_FORMULAS = (
 )
 
 
-def plain_formula(value: str) -> str:
-    value = re.sub(r"_\{([^}]*)\}", r"\1", value)
-    value = value.replace("{", "").replace("}", "").replace(" ", "")
-    return re.sub(r"([A-Z][a-z]?)1(?=[A-Z]|$)", r"\1", value)
-
-
-def formula_composition(value: str) -> tuple[tuple[str, int], ...]:
-    tokens = re.findall(r"([A-Z][a-z]?)(\d*)", value)
-    if not tokens or "".join(element + count for element, count in tokens) != value:
-        raise ValueError(f"cannot parse formula {value!r}")
-    counts: dict[str, int] = defaultdict(int)
-    for element, count in tokens:
-        counts[element] += int(count or "1")
-    return tuple(sorted(counts.items()))
-
-
 def table_formula(table: dict[str, Any]) -> str:
-    index_formula = (table.get("index_entry") or {}).get("formula")
-    if index_formula:
-        return str(index_formula)
-    title = str(table.get("title_as_published") or "")
-    segments = [segment.strip() for segment in title.split("|") if segment.strip()]
-    if len(segments) >= 2:
-        candidate = re.sub(r"\((?:ref|cr|l|cr,l|g|l,g|fl)\)$", "", segments[-1])
-        formula = plain_formula(candidate)
-        if re.fullmatch(r"(?:[A-Z][a-z]?\d*)+", formula):
-            return formula
-    for candidate in re.findall(r"\(([^()]*)\)", title):
-        formula = plain_formula(candidate)
-        if re.fullmatch(r"(?:[A-Z][a-z]?\d*)+(?:[+-])?", formula):
-            return formula
-    raise ValueError(f"cannot identify formula from title {title!r}")
+    return table_formula_as_published(table)
 
 
 def table_phase(table: dict[str, Any]) -> str:
@@ -69,12 +58,16 @@ def table_phase(table: dict[str, Any]) -> str:
 
 def main() -> int:
     entries: list[dict[str, Any]] = []
+    documents: list[dict[str, Any]] = []
     by_formula: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    by_composition: dict[tuple[tuple[str, int], ...], list[dict[str, Any]]] = defaultdict(list)
+    by_composition: dict[Any, list[dict[str, Any]]] = defaultdict(list)
     row_count = 0
     ambiguity_count = 0
+    html_era = 0
+    txt_era = 0
     for path in sorted(TABLES.glob("*.yaml")):
-        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        document = load_table_document(path)
+        documents.append(document)
         if document.get("schema_version") != "literature_compilation.v1":
             raise ValueError(f"{path}: wrong schema_version")
         role = document.get("compilation_role") or {}
@@ -95,55 +88,95 @@ def main() -> int:
                     raise ValueError(f"{path}: {property_name} missing exact table locator")
                 if "as_published" not in value:
                     raise ValueError(f"{path}: {property_name} missing published token")
-        formula = table_formula(table)
+        published = table_formula(table)
+        normalised = formula_normalised(published)
         phase = table_phase(table)
-        ambiguities = table.get("parse_ambiguities") or []
+        ambiguities = list(table.get("parse_ambiguities") or [])
+        era = harvest_era(document)
+        if era == "html":
+            html_era += 1
+        elif era == "txt":
+            txt_era += 1
+        source_sha = (document.get("extraction") or {}).get("source_sha256")
+        composition = formula_composition(published)
         entry = {
             "table_id": table_id,
-            "formula": formula,
+            "formula": published,
+            "formula_as_published": published,
+            "formula_normalised": normalised,
             "phase": phase,
             "title_as_published": table.get("title_as_published"),
             "url": url,
             "download_url": table.get("download_url"),
             "row_count": len(rows),
             "ambiguity_count": len(ambiguities),
+            "harvest_era": era,
             "path": path.relative_to(ROOT).as_posix(),
         }
+        if source_sha:
+            entry["source_sha256"] = source_sha
         entries.append(entry)
-        by_formula[formula].append(entry)
-        by_composition[formula_composition(formula)].append(entry)
+        by_formula[published].append(entry)
+        if composition is not None:
+            by_composition[composition].append(entry)
         row_count += len(rows)
         ambiguity_count += len(ambiguities)
     coverage = {}
     for formula in TARGET_FORMULAS:
-        matches = by_composition.get(formula_composition(formula), [])
+        composition = formula_composition(formula)
+        matches = by_composition.get(composition, []) if composition is not None else []
         coverage[formula] = {
             "janaf_table_available": bool(matches),
             "table_count": len(matches),
             "phases": sorted({entry["phase"] for entry in matches}),
             "table_ids": [entry["table_id"] for entry in matches],
         }
+    feedstock_elements = feedstock_element_symbols()
+    feedstock_coverage = coverage_by_element(documents, feedstock_elements)
+    missing = [element for element, row in feedstock_coverage.items() if not row["has_record"]]
+    non_stoich = []
+    for table_id, meta in NON_STOICHIOMETRIC_TABLES.items():
+        non_stoich.append(
+            {
+                "table_id": table_id,
+                **non_stoich_ambiguity(table_id),
+                "previous_integerised_formula": meta["previous_integerised_formula"],
+            }
+        )
     manifest = {
         "schema_version": "literature_compilation_manifest.v1",
         "source_id": "nist-janaf-4th",
         "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source": dict(COMPILATION_SOURCE),
         "corpus_status": {
-            "scope": "target-first partial harvest",
-            "full_formula_index_status": "harvester implemented; full run blocked by managed worker network isolation",
+            "scope": "feedstock-element complete harvest",
+            "full_formula_index_status": (
+                "harvested every official-index table whose formula uses only "
+                "the feedstock element set; HTML-era held tables were not "
+                "overwritten by the 2026-09-06 .txt harvest"
+            ),
             "official_formula_index_url": "https://janaf.nist.gov/formula.html",
-            "official_formula_index_total_lines_observed": 1800,
+            "official_formula_index_total_lines_observed": 1796,
+            "html_era_table_count": html_era,
+            "txt_era_table_count": txt_era,
         },
-        "compilation_role": {
-            "engine_reference_input": True,
-            "validation_measurement": False,
-            "scoring_eligible": False,
-            "battery_refusal": "gibbs_table_not_runtime_observable",
-        },
+        "compilation_role": dict(COMPILATION_ROLE),
+        "formula_normalised_rule": FORMULA_NORMALISED_RULE,
         "summary": {
             "table_count": len(entries),
             "thermodynamic_row_count": row_count,
             "parse_ambiguity_count": ambiguity_count,
             "formula_count": len(by_formula),
+        },
+        "non_stoichiometric_formulas": non_stoich,
+        "feedstock_element_coverage": {
+            "elements": feedstock_elements,
+            "covered_elements": [
+                element for element, row in feedstock_coverage.items() if row["has_record"]
+            ],
+            "uncovered_elements": missing,
+            "janaf_absent_elements": list(PINNED_JANAF_ABSENT_ELEMENTS),
+            "by_element": feedstock_coverage,
         },
         "target_coverage": coverage,
         "entries": entries,
