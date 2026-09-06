@@ -125,6 +125,37 @@ def unavailable_quantity(*, reason: str, units: str) -> UnavailableQuantity:
     )
 
 
+def json_safe_number(value: Any, *, reason: str, units: str) -> Any:
+    """Finite float, or a typed unavailable object. Never a bare NaN/Inf."""
+
+    if isinstance(value, bool) or value is None:
+        return unavailable_quantity(reason=reason, units=units)
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return unavailable_quantity(reason=reason, units=units)
+    if math.isfinite(number):
+        return float(number)
+    return unavailable_quantity(reason=reason, units=units)
+
+
+def as_json_ready(value: Any) -> Any:
+    """Plain JSON tree. Falsy UnavailableQuantity dumps as {} under sort_keys."""
+
+    if isinstance(value, UnavailableQuantity):
+        return {
+            "status": value.get("status"),
+            "reason": value.get("reason"),
+            "value": value.get("value"),
+            "units": value.get("units"),
+        }
+    if isinstance(value, Mapping):
+        return {str(key): as_json_ready(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [as_json_ready(item) for item in value]
+    return value
+
+
 def is_unavailable_quantity(value: Any) -> bool:
     return isinstance(value, Mapping) and str(value.get("status", "")) == UNAVAILABLE_STATUS
 

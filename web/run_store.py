@@ -20,6 +20,7 @@ from typing import Any
 from flask import current_app
 
 from simulator.accounting.run_artifact import build_run_artifact
+from simulator.cost_energy import as_json_ready
 from simulator.melt_backend.melt_envelope import (
     MeltEnvelopeValidationError,
     consume_melt_extrapolation_envelope,
@@ -131,7 +132,7 @@ class RunArtifactStore:
                     temp_path = Path(raw_temp_path)
                     with os.fdopen(fd, "w", encoding="utf-8") as handle:
                         json.dump(
-                            artifact,
+                            as_json_ready(artifact),
                             handle,
                             indent=2,
                             sort_keys=True,

@@ -63,8 +63,22 @@
     effective_speed_ceiling_m3_s: "Effective speed ceiling",
     feasible: "Feasible",
     units: "Units",
-    ticket: "Ticket"
+    ticket: "Ticket",
+    notice: "Notice",
+    authority: "Authority",
+    characterised_envelope: "Characterised envelope",
+    envelope_floor_pa: "Envelope floor"
   });
+
+  const EXTRAPOLATED_NUMBER_KEYS = new Set([
+    "pumping_electrical_energy_kWh",
+    "pumping_electrical_cost_usd",
+    "electrical_energy_kWh",
+    "electrical_cost_usd",
+    "total_cost_usd",
+    "pumping_electrical_kWh",
+    "energy_kWh"
+  ]);
 
   const LEAF_UNITS = Object.freeze({
     owner_ratify_money_projection: "USD",
@@ -91,6 +105,13 @@
 
   function isUnavailableQuantity(value) {
     return isRecord(value) && value.status === "unavailable";
+  }
+
+  function extrapolatedFlag(record, key) {
+    if (!EXTRAPOLATED_NUMBER_KEYS.has(key) || !isRecord(record)) return "";
+    const notice = record.notice;
+    if (!isRecord(notice) || notice.authority !== "extrapolated") return "";
+    return ` <span class="sec-p8-inline-pending">extrapolated</span>`;
   }
 
   function formatUnavailable(value) {
@@ -179,9 +200,12 @@
       if (!entries.length) return pending(path, `${path} was emitted with no rows; zero is not inferred.`);
       return `<dl class="sec-p8-tree">${entries.map(([childKey, child]) => {
         const childPath = `${path}.${childKey}`;
+        const flag = isRecord(child) || Array.isArray(child)
+          ? ""
+          : extrapolatedFlag(value, childKey);
         return `<div><dt>${esc(readableKey(childKey))}</dt><dd>${isRecord(child) || Array.isArray(child)
           ? renderTree(child, childPath, childKey)
-          : formatLeaf(child, childKey, childPath)}</dd></div>`;
+          : formatLeaf(child, childKey, childPath)}${flag}</dd></div>`;
       }).join("")}</dl>`;
     }
     return formatLeaf(value, key, path);
@@ -192,7 +216,7 @@
     if (!hasOwn(record, key)) return pendingInline(valuePath);
     if (isUnavailableQuantity(record[key])) return formatUnavailable(record[key]);
     return typeof record[key] === "number" && Number.isFinite(record[key])
-      ? `<span class="mono">${esc(fmtNum(record[key], unit))}</span>`
+      ? `<span class="mono">${esc(fmtNum(record[key], unit))}</span>${extrapolatedFlag(record, key)}`
       : malformedInline(valuePath, "a finite number");
   }
 

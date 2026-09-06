@@ -889,6 +889,66 @@ def test_same_species_oxygen_dual_bins_remain_distinct() -> None:
     assert 'title="terminal.oxygen_melt_offgas_stored:O2"' in products
 
 
+def test_extrapolated_pumping_number_shows_flag_beside_the_value() -> None:
+    artifact = _full_artifact()
+    notice = {
+        "kind": "out-of-domain-physics",
+        "authority": "extrapolated",
+        "reason": "target below the characterised speed floor",
+        "envelope_floor_pa": 1.0,
+        "characterised_envelope": {
+            "compression_model": "intercooled-staged-adiabatic",
+            "target_pressure_pa": 0.01,
+            "envelope_floor_pa": 1.0,
+        },
+    }
+    totals = artifact["terminal"]["cost_totals"]
+    totals["notice"] = notice
+    pumping = artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["pumping_diagnostic"]
+    pumping["notice"] = notice
+    pumping["pumping_electrical_kWh"] = 0.5345562989417003
+    pumping["rows"] = [
+        {
+            "hour": 1,
+            "energy_kWh": 0.5345562989417003,
+            "notice": notice,
+        }
+    ]
+
+    html = _render_panel(artifact)["html"]
+    totals_region = html.split('<div class="card sec-p8-price-card">', 1)[0]
+    pumping_region = _between(
+        html, "<summary>Pumping diagnostic</summary>", "<summary>Warnings</summary>"
+    )
+
+    def metric(label: str) -> str:
+        return totals_region.split(
+            f'<div class="k">{label}</div><div class="v">', 1
+        )[1].split("</div>", 1)[0]
+
+    assert "extrapolated" in metric("Pumping electrical energy")
+    assert "extrapolated" in metric("Total electrical energy")
+    assert "extrapolated" in metric("Canonical energy cost total")
+    assert "extrapolated" not in metric("Process electrical energy")
+    assert "3 kWh" in metric("Pumping electrical energy")
+    assert "extrapolated" in _field_value(
+        pumping_region, "Emitted pumping diagnostic energy"
+    )
+
+
+def test_unflagged_pumping_number_does_not_show_extrapolated() -> None:
+    html = _render_panel(_full_artifact())["html"]
+    totals_region = html.split('<div class="card sec-p8-price-card">', 1)[0]
+    pumping_metric = totals_region.split(
+        '<div class="k">Pumping electrical energy</div><div class="v">', 1
+    )[1].split("</div>", 1)[0]
+    total_metric = totals_region.split(
+        '<div class="k">Canonical energy cost total</div><div class="v">', 1
+    )[1].split("</div>", 1)[0]
+    assert "extrapolated" not in pumping_metric
+    assert "extrapolated" not in total_metric
+
+
 def test_pumping_volumetric_fields_use_cubic_metres_per_second() -> None:
     """Emitter pumping rows use *_m3_s volumetric speed/conductance (pumping_cost.py).
 

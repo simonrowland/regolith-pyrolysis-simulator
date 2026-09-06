@@ -16,12 +16,17 @@ from simulator.accounting.queries import is_reagent_bookkeeping_product
 from simulator.cost_energy import (
     furnace_thermal_flux_hours,
     is_unavailable_quantity,
+    json_safe_number,
     owner_ratify_cost_placeholders,
     project_owner_ratify_money,
     unavailable_quantity,
     unavailable_reason_of,
 )
-from simulator.pumping_cost import estimate_subambient_pump_cost, pumping_cost_parameters
+from simulator.pumping_cost import (
+    EXTRAPOLATED_AUTHORITY,
+    estimate_subambient_pump_cost,
+    pumping_cost_parameters,
+)
 from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -1163,6 +1168,21 @@ def _canonical_auxiliary_electrical_components(
     return components
 
 
+def _lift_pumping_notice(
+    notices: list[Mapping[str, Any]],
+    *,
+    unavailable: bool,
+) -> Mapping[str, Any] | None:
+    if not notices:
+        return None
+    if unavailable:
+        return notices[0]
+    for notice in notices:
+        if str(notice.get("authority", "")) == EXTRAPOLATED_AUTHORITY:
+            return notice
+    return None
+
+
 def _pumping_unavailable_reason(
     pumping_input: CostVector | None,
     pumping_diagnostic: Mapping[str, Any],
@@ -1228,9 +1248,10 @@ def run_pumping_input_cost(
             "reason": reason,
             "feedstock_id": str(pumping_context.get("feedstock_id", "")),
             "body": str(pumping_context.get("body", "")),
-            "ambient_pressure_pa": _finite(
+            "ambient_pressure_pa": json_safe_number(
                 pumping_context.get("ambient_pressure_pa"),
-                default=math.nan,
+                reason=reason,
+                units="Pa",
             ),
             "ambient_pressure_source": str(
                 pumping_context.get("ambient_pressure_source", "")
@@ -1251,6 +1272,7 @@ def run_pumping_input_cost(
     any_infeasible = False
     any_unresolved = False
     unavailable_reason: str | None = None
+    row_notices: list[Mapping[str, Any]] = []
     for raw_row in pumping_context.get("rows", ()) or ():
         if not isinstance(raw_row, Mapping):
             continue
@@ -1276,15 +1298,22 @@ def run_pumping_input_cost(
             any_unresolved = True
         elif not result.feasible:
             any_infeasible = True
+        row_reason = str(result.status or "unspecified")
+        if result.notice:
+            row_notices.append(result.notice)
         rows.append({
             "hour": int(_finite(raw_row.get("hour"), len(rows))),
-            "target_pressure_pa": _finite(
-                raw_row.get("target_pressure_pa"), math.nan
+            "target_pressure_pa": json_safe_number(
+                raw_row.get("target_pressure_pa"), reason=row_reason, units="Pa"
             ),
-            "offgas_mol_per_s": _finite(raw_row.get("offgas_mol_per_s"), math.nan),
-            "duration_s": _finite(raw_row.get("duration_s"), math.nan),
-            "gas_temperature_K": _finite(
-                raw_row.get("gas_temperature_K"), math.nan
+            "offgas_mol_per_s": json_safe_number(
+                raw_row.get("offgas_mol_per_s"), reason=row_reason, units="mol/s"
+            ),
+            "duration_s": json_safe_number(
+                raw_row.get("duration_s"), reason=row_reason, units="s"
+            ),
+            "gas_temperature_K": json_safe_number(
+                raw_row.get("gas_temperature_K"), reason=row_reason, units="K"
             ),
             **result.to_json(),
         })
@@ -1313,7 +1342,11 @@ def run_pumping_input_cost(
         "status": status,
         "feedstock_id": str(pumping_context.get("feedstock_id", "")),
         "body": str(pumping_context.get("body", "")),
-        "ambient_pressure_pa": ambient_pressure_pa,
+        "ambient_pressure_pa": json_safe_number(
+            ambient_pressure_pa,
+            reason=str(unavailable_reason or status or "unspecified"),
+            units="Pa",
+        ),
         "ambient_pressure_source": str(
             pumping_context.get("ambient_pressure_source", "")
         ),
@@ -1324,6 +1357,11 @@ def run_pumping_input_cost(
     }
     if unavailable_reason is not None:
         diagnostic["reason"] = unavailable_reason
+    lifted_notice = _lift_pumping_notice(
+        row_notices, unavailable=unavailable_reason is not None
+    )
+    if lifted_notice is not None:
+        diagnostic["notice"] = dict(lifted_notice)
     return cost, diagnostic
 
 

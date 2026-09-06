@@ -810,6 +810,59 @@ def test_measured_zero_offgas_row_stays_numeric_zero() -> None:
     assert not is_unavailable_quantity(money)
 
 
+def test_below_envelope_pumping_is_priced_with_extrapolation_flag() -> None:
+    from simulator.pumping_cost import (
+        EXTRAPOLATED_AUTHORITY,
+        OUT_OF_DOMAIN_PHYSICS_KIND,
+        TARGET_BELOW_SPEED_FLOOR_REASON,
+    )
+
+    context = {
+        "status": "ok",
+        "feedstock_id": "mars_basalt",
+        "body": "mars",
+        "ambient_pressure_pa": 610.0,
+        "rows": [
+            {
+                "hour": 1,
+                "target_pressure_pa": 0.01,
+                "offgas_mol_per_s": 0.01,
+                "duration_s": 3600.0,
+                "gas_temperature_K": 300.0,
+                "validated_line_conductance_m3_s": 1.0,
+            }
+        ],
+    }
+    cost, diagnostic = run_pumping_input_cost(context)
+    assert cost is not None
+    assert cost.electrical_kWh == pytest.approx(0.5345562989417003)
+    assert diagnostic["notice"]["kind"] == OUT_OF_DOMAIN_PHYSICS_KIND
+    assert diagnostic["notice"]["authority"] == EXTRAPOLATED_AUTHORITY
+    assert diagnostic["notice"]["reason"] == TARGET_BELOW_SPEED_FLOOR_REASON
+    json.dumps(diagnostic, allow_nan=False)
+
+    inside = {
+        "status": "ok",
+        "feedstock_id": "mars_basalt",
+        "body": "mars",
+        "ambient_pressure_pa": 610.0,
+        "rows": [
+            {
+                "hour": 1,
+                "target_pressure_pa": 500.0,
+                "offgas_mol_per_s": 0.01,
+                "duration_s": 3600.0,
+                "gas_temperature_K": 300.0,
+                "validated_line_conductance_m3_s": 1.0,
+            }
+        ],
+    }
+    inside_cost, inside_diagnostic = run_pumping_input_cost(inside)
+    assert inside_cost.electrical_kWh == pytest.approx(0.008100986135507747)
+    assert "notice" not in inside_diagnostic
+    assert inside_diagnostic["rows"][0].get("notice") is None
+
+
 def test_refused_context_money_is_unavailable_not_silently_short() -> None:
     rollup = build_cost_rollup_diagnostic(
         cost_ledger=CostLedger(),

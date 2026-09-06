@@ -655,6 +655,165 @@ def test_refused_pumping_hour_fixture_mutation_fails_then_restores(monkeypatch) 
     assert restored["completeness"] == "incomplete"
 
 
+def test_refused_pumping_hour_round_trips_through_run_artifact_store(tmp_path) -> None:
+    from web.run_store import RunArtifactStore
+
+    artifact = _artifact_from_pumping_context(
+        _refused_offgas_pumping_context(),
+        "run-refused-pumping-hour-store",
+    )
+    json.dumps(artifact, allow_nan=False)
+    store = RunArtifactStore(tmp_path / "runs")
+    assert store.save("run-refused-pumping-hour-store", artifact) is True
+    loaded = store.load("run-refused-pumping-hour-store")
+    assert loaded is not None
+    totals = loaded["terminal"]["cost_totals"]
+    expected = json.loads(_REFUSED_PUMPING_HOUR_FIXTURE.read_text(encoding="utf-8"))
+    pinned = expected["terminal.cost_totals"]
+    observed = {key: totals[key] for key in pinned}
+    assert observed == pinned
+    for leaf in _CANONICAL_UNAVAILABLE_LEAVES:
+        assert is_unavailable_quantity(totals[leaf])
+        assert totals[leaf]["value"] is None
+        assert unavailable_reason_of(totals[leaf]) == "invalid-offgas-rate"
+        assert type(totals[leaf]) is dict
+        assert bool(totals[leaf]) is True
+
+
+def test_refused_pumping_hour_store_round_trip_mutation_fails_then_restores(
+    tmp_path, monkeypatch
+) -> None:
+    from simulator import pumping_cost as pumping_mod
+    from web.run_store import RunArtifactStore
+
+    original = pumping_mod.SubambientPumpCost.to_json
+
+    def mutated(self):
+        payload = original(self)
+        payload["required_pump_speed_m3_s"] = math.nan
+        payload["compression_ratio"] = math.inf
+        return payload
+
+    monkeypatch.setattr(pumping_mod.SubambientPumpCost, "to_json", mutated)
+    store = RunArtifactStore(tmp_path / "runs-mutated")
+    with pytest.raises((ValueError, TypeError, OSError)):
+        artifact = _artifact_from_pumping_context(
+            _refused_offgas_pumping_context(),
+            "run-refused-pumping-hour-mutated-store",
+        )
+        json.dumps(artifact, allow_nan=False)
+        store.save("run-refused-pumping-hour-mutated-store", artifact)
+    monkeypatch.setattr(pumping_mod.SubambientPumpCost, "to_json", original)
+    restored_store = RunArtifactStore(tmp_path / "runs-restored")
+    restored = _artifact_from_pumping_context(
+        _refused_offgas_pumping_context(),
+        "run-refused-pumping-hour-restored-store",
+    )
+    assert restored_store.save(
+        "run-refused-pumping-hour-restored-store", restored
+    ) is True
+    loaded = restored_store.load("run-refused-pumping-hour-restored-store")
+    assert is_unavailable_quantity(
+        loaded["terminal"]["cost_totals"]["total_cost_usd"]
+    )
+
+
+def _below_envelope_pumping_context() -> dict:
+    return {
+        "status": "ok",
+        "feedstock_id": "mars_basalt",
+        "body": "mars",
+        "ambient_pressure_pa": 610.0,
+        "rows": [
+            {
+                "hour": 1,
+                "target_pressure_pa": 0.01,
+                "offgas_mol_per_s": 0.01,
+                "duration_s": 3600.0,
+                "gas_temperature_K": 300.0,
+                "validated_line_conductance_m3_s": 1.0,
+            }
+        ],
+    }
+
+
+def _inside_envelope_pumping_context() -> dict:
+    return {
+        "status": "ok",
+        "feedstock_id": "mars_basalt",
+        "body": "mars",
+        "ambient_pressure_pa": 610.0,
+        "rows": [
+            {
+                "hour": 1,
+                "target_pressure_pa": 500.0,
+                "offgas_mol_per_s": 0.01,
+                "duration_s": 3600.0,
+                "gas_temperature_K": 300.0,
+                "validated_line_conductance_m3_s": 1.0,
+            }
+        ],
+    }
+
+
+def test_below_envelope_pumping_prices_flagged_number_on_canonical_totals() -> None:
+    from simulator.pumping_cost import (
+        EXTRAPOLATED_AUTHORITY,
+        OUT_OF_DOMAIN_PHYSICS_KIND,
+        TARGET_BELOW_SPEED_FLOOR_REASON,
+    )
+
+    artifact = _artifact_from_pumping_context(
+        _below_envelope_pumping_context(),
+        "run-below-envelope-pumping",
+    )
+    totals = artifact["terminal"]["cost_totals"]
+    assert totals["pumping_electrical_energy_kWh"] == pytest.approx(0.5345562989417003)
+    assert totals["notice"]["kind"] == OUT_OF_DOMAIN_PHYSICS_KIND
+    assert totals["notice"]["authority"] == EXTRAPOLATED_AUTHORITY
+    assert totals["notice"]["reason"] == TARGET_BELOW_SPEED_FLOOR_REASON
+    assert totals["notice"]["envelope_floor_pa"] == pytest.approx(0.49886775708000003)
+    assert totals["electrical_energy_kWh"] == pytest.approx(2.0 + 0.5345562989417003)
+    assert "completeness" not in totals
+    assert not is_unavailable_quantity(totals["total_cost_usd"])
+
+
+def test_inside_envelope_canonical_totals_stay_unflagged() -> None:
+    artifact = _artifact_from_pumping_context(
+        _inside_envelope_pumping_context(),
+        "run-inside-envelope-pumping",
+    )
+    totals = artifact["terminal"]["cost_totals"]
+    assert totals["pumping_electrical_energy_kWh"] == pytest.approx(0.008100986135507747)
+    assert "notice" not in totals
+    assert totals["electrical_energy_kWh"] == pytest.approx(2.0 + 0.008100986135507747)
+
+
+def test_below_envelope_canonical_notice_mutation_fails_then_restores(monkeypatch) -> None:
+    from simulator import pumping_cost as pumping_mod
+    from simulator.pumping_cost import EXTRAPOLATED_AUTHORITY
+
+    original = pumping_mod._extrapolated_below_speed_floor_notice
+
+    def mutated(**_kwargs):
+        return None
+
+    monkeypatch.setattr(pumping_mod, "_extrapolated_below_speed_floor_notice", mutated)
+    with pytest.raises(AssertionError):
+        billed = _artifact_from_pumping_context(
+            _below_envelope_pumping_context(),
+            "run-below-envelope-mutated",
+        )["terminal"]["cost_totals"]
+        assert billed.get("notice", {}).get("authority") == EXTRAPOLATED_AUTHORITY
+    monkeypatch.setattr(pumping_mod, "_extrapolated_below_speed_floor_notice", original)
+    restored = _artifact_from_pumping_context(
+        _below_envelope_pumping_context(),
+        "run-below-envelope-restored",
+    )["terminal"]["cost_totals"]
+    assert restored["notice"]["authority"] == EXTRAPOLATED_AUTHORITY
+    assert restored["pumping_electrical_energy_kWh"] == pytest.approx(0.5345562989417003)
+
+
 def test_cost_totals_omit_when_canonical_usage_is_incomplete() -> None:
     payload = _runner_payload(
         per_hour_summary=[

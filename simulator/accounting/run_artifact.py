@@ -14,6 +14,7 @@ from simulator.cost_energy import (
     unavailable_quantity,
     unavailable_reason_of,
 )
+from simulator.pumping_cost import EXTRAPOLATED_AUTHORITY
 from simulator.cost_parameters import canonical_energy_cost_block
 from simulator.engine_local_config import cache_version_for
 
@@ -107,12 +108,18 @@ def _canonical_energy_cost_totals(
     pumping_electrical_kWh = None
     pumping_status = None
     pumping_unavailable_reason = None
+    pumping_notice: Mapping[str, Any] | None = None
     if isinstance(pumping_diagnostic, Mapping):
         raw_status = pumping_diagnostic.get("status")
         pumping_status = (
             str(raw_status).strip() if raw_status is not None else "missing"
         ) or "missing"
         candidate = pumping_diagnostic.get("pumping_electrical_kWh")
+        notice = pumping_diagnostic.get("notice")
+        extrapolated = (
+            isinstance(notice, Mapping)
+            and str(notice.get("authority", "")) == EXTRAPOLATED_AUTHORITY
+        )
         if is_unavailable_quantity(candidate) or pumping_status == "refused":
             pumping_unavailable_reason = unavailable_reason_of(
                 candidate,
@@ -120,7 +127,7 @@ def _canonical_energy_cost_totals(
                     pumping_diagnostic.get("reason") or pumping_status
                 ),
             )
-        elif pumping_status in {"ok", "resolved"}:
+        elif pumping_status in {"ok", "resolved"} or extrapolated:
             if (
                 isinstance(candidate, bool)
                 or not isinstance(candidate, Real)
@@ -129,6 +136,8 @@ def _canonical_energy_cost_totals(
             ):
                 return None
             pumping_electrical_kWh = float(candidate)
+            if extrapolated:
+                pumping_notice = dict(notice)
 
     total_electrical_kWh = process_electrical_kWh
     result: dict[str, Any] = {
@@ -188,6 +197,8 @@ def _canonical_energy_cost_totals(
         "electrical_cost_usd": electrical,
         "total_cost_usd": electrical + solar_heat,
     })
+    if pumping_notice is not None:
+        result["notice"] = dict(pumping_notice)
     return result
 
 

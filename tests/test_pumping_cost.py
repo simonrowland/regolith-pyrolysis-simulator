@@ -1,5 +1,6 @@
 """Unit tests for the rough sub-ambient pumping-cost helper (#52 KNOB-COST-PRESSURE)."""
 
+import json
 import math
 from types import SimpleNamespace
 
@@ -292,6 +293,8 @@ def test_perfect_vacuum_target_is_fail_soft_infeasible():
     assert math.isinf(r.required_pump_speed_m3_s)
     assert math.isinf(r.compression_ratio)
     assert r.notice is not None
+    assert r.notice["kind"] == "invalid-input"
+    assert r.notice["kind"] != "out-of-domain-physics"
     assert r.notice["reason"] == NO_EXTRAPOLATION_AVAILABLE
     assert r.notice["authority"] == "none"
     envelope = r.notice["characterised_envelope"]
@@ -930,6 +933,8 @@ def test_vacuum_target_is_out_of_domain_not_missing_telemetry() -> None:
     assert vacuum.energy_kWh is None
     assert vacuum.energy_kWh != 0.0
     assert vacuum.notice is not None
+    assert vacuum.notice["kind"] == "invalid-input"
+    assert vacuum.notice["kind"] != "out-of-domain-physics"
     envelope = vacuum.notice["characterised_envelope"]
     assert envelope["target_pressure_pa"] == 0.0
     assert envelope["ambient_pressure_pa"] == pytest.approx(610.0)
@@ -1011,3 +1016,188 @@ def test_vacuum_path_ignores_missing_input_helper_zeroing(monkeypatch) -> None:
     monkeypatch.setattr(pumping_mod, "_infeasible_degenerate", original)
     assert vacuum.energy_kWh is None
     assert vacuum.status == NO_EXTRAPOLATION_AVAILABLE
+    assert vacuum.notice["kind"] == "invalid-input"
+
+
+def _speed_floor_kwargs(*, target_pressure_pa: float, floor_pa: float = 1.0) -> dict:
+    from simulator.pumping_cost import _R_J_PER_MOL_K
+
+    offgas_mol_per_s = 0.01
+    gas_temperature_K = 300.0
+    speed = offgas_mol_per_s * _R_J_PER_MOL_K * gas_temperature_K / floor_pa
+    return dict(
+        target_pressure_pa=target_pressure_pa,
+        offgas_mol_per_s=offgas_mol_per_s,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=gas_temperature_K,
+        max_pump_speed_m3_s=speed,
+        validated_line_conductance_m3_s=1e9,
+    )
+
+
+def test_finite_target_below_speed_floor_predicts_and_flags() -> None:
+    from simulator.pumping_cost import (
+        EXTRAPOLATED_AUTHORITY,
+        OUT_OF_DOMAIN_PHYSICS_KIND,
+        TARGET_BELOW_SPEED_FLOOR_REASON,
+    )
+
+    below = estimate_subambient_pump_cost(**_speed_floor_kwargs(target_pressure_pa=0.01))
+    assert below.energy_kWh == pytest.approx(0.5345562989417003)
+    assert below.notice is not None
+    assert below.notice["kind"] == OUT_OF_DOMAIN_PHYSICS_KIND
+    assert below.notice["authority"] == EXTRAPOLATED_AUTHORITY
+    assert below.notice["reason"] == TARGET_BELOW_SPEED_FLOOR_REASON
+    assert below.notice["envelope_floor_pa"] == pytest.approx(1.0)
+    envelope = below.notice["characterised_envelope"]
+    assert envelope["envelope_floor_pa"] == pytest.approx(1.0)
+    assert envelope["target_pressure_pa"] == pytest.approx(0.01)
+    json.dumps(below.to_json(), allow_nan=False)
+
+    inside = estimate_subambient_pump_cost(**_speed_floor_kwargs(target_pressure_pa=1.01))
+    assert inside.energy_kWh == pytest.approx(0.30613322179486274)
+    assert inside.notice is None
+    assert inside.status == "ok"
+    json.dumps(inside.to_json(), allow_nan=False)
+
+    cost, diagnostic = run_pumping_input_cost(
+        {
+            "status": "ok",
+            "feedstock_id": "mars_basalt",
+            "body": "mars",
+            "ambient_pressure_pa": 610.0,
+            "rows": [
+                {
+                    "hour": 1,
+                    "target_pressure_pa": 0.01,
+                    "offgas_mol_per_s": 0.01,
+                    "duration_s": 3600.0,
+                    "gas_temperature_K": 300.0,
+                    "validated_line_conductance_m3_s": 1.0,
+                }
+            ],
+        }
+    )
+    assert cost is not None
+    assert cost.electrical_kWh == pytest.approx(0.5345562989417003)
+    assert diagnostic["notice"]["authority"] == EXTRAPOLATED_AUTHORITY
+    assert diagnostic["notice"]["kind"] == OUT_OF_DOMAIN_PHYSICS_KIND
+    assert diagnostic["notice"]["reason"] == TARGET_BELOW_SPEED_FLOOR_REASON
+    assert diagnostic["pumping_electrical_kWh"] == pytest.approx(0.5345562989417003)
+    assert not isinstance(diagnostic["pumping_electrical_kWh"], dict)
+
+
+def test_inside_envelope_target_stays_unflagged_and_bit_identical() -> None:
+    inside = estimate_subambient_pump_cost(**_speed_floor_kwargs(target_pressure_pa=1.01))
+    assert inside.notice is None
+    assert inside.energy_kWh == pytest.approx(0.30613322179486274)
+    rh84 = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    assert rh84.notice is None
+    assert rh84.status == "ok"
+    assert rh84.energy_kWh == pytest.approx(0.008100986135507747)
+
+
+def test_below_speed_floor_notice_mutation_fails_then_restores(monkeypatch) -> None:
+    from simulator import pumping_cost as pumping_mod
+    from simulator.pumping_cost import EXTRAPOLATED_AUTHORITY
+
+    original = pumping_mod._extrapolated_below_speed_floor_notice
+
+    def mutated(**_kwargs):
+        return None
+
+    kwargs = _speed_floor_kwargs(target_pressure_pa=0.01)
+    monkeypatch.setattr(pumping_mod, "_extrapolated_below_speed_floor_notice", mutated)
+    with pytest.raises(AssertionError):
+        dropped = pumping_mod.estimate_subambient_pump_cost(**kwargs)
+        assert dropped.notice is not None
+        assert dropped.notice["authority"] == EXTRAPOLATED_AUTHORITY
+    monkeypatch.setattr(pumping_mod, "_extrapolated_below_speed_floor_notice", original)
+    restored = pumping_mod.estimate_subambient_pump_cost(**kwargs)
+    assert restored.notice is not None
+    assert restored.notice["authority"] == EXTRAPOLATED_AUTHORITY
+    assert restored.energy_kWh == pytest.approx(0.5345562989417003)
+
+
+def test_absolute_vacuum_kind_is_invalid_input_not_out_of_domain() -> None:
+    from simulator.pumping_cost import INVALID_INPUT_KIND, NO_EXTRAPOLATION_AVAILABLE
+
+    vacuum = estimate_subambient_pump_cost(
+        target_pressure_pa=0.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    missing = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=math.nan,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    assert vacuum.notice["kind"] == INVALID_INPUT_KIND
+    assert vacuum.notice["reason"] == NO_EXTRAPOLATION_AVAILABLE
+    assert vacuum.notice["original_status"] == "unreachable-absolute-vacuum-target"
+    assert missing.notice is None
+    assert missing.status == "invalid-offgas-rate"
+
+
+def test_vacuum_kind_mutation_fails_then_restores(monkeypatch) -> None:
+    from dataclasses import replace
+
+    from simulator import pumping_cost as pumping_mod
+    from simulator.pumping_cost import INVALID_INPUT_KIND, OUT_OF_DOMAIN_PHYSICS_KIND
+
+    original = pumping_mod._out_of_domain_vacuum_target
+
+    def mutated(**kwargs):
+        result = original(**kwargs)
+        notice = dict(result.notice)
+        notice["kind"] = OUT_OF_DOMAIN_PHYSICS_KIND
+        return replace(result, notice=notice)
+
+    kwargs = dict(
+        target_pressure_pa=0.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+    )
+    monkeypatch.setattr(pumping_mod, "_out_of_domain_vacuum_target", mutated)
+    with pytest.raises(AssertionError):
+        relabelled = pumping_mod.estimate_subambient_pump_cost(**kwargs)
+        assert relabelled.notice["kind"] == INVALID_INPUT_KIND
+        assert relabelled.notice["kind"] != OUT_OF_DOMAIN_PHYSICS_KIND
+    monkeypatch.setattr(pumping_mod, "_out_of_domain_vacuum_target", original)
+    restored = pumping_mod.estimate_subambient_pump_cost(**kwargs)
+    assert restored.notice["kind"] == INVALID_INPUT_KIND
+    assert restored.energy_kWh is None
+
+
+def test_degenerate_pump_json_is_allow_nan_false_safe() -> None:
+    missing = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=math.nan,
+        duration_s=3600.0,
+        ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+    payload = missing.to_json()
+    json.dumps(payload, allow_nan=False)
+    from simulator.cost_energy import is_unavailable_quantity
+
+    assert is_unavailable_quantity(payload["required_pump_speed_m3_s"])
+    assert is_unavailable_quantity(payload["compression_ratio"])
+    assert is_unavailable_quantity(payload["energy_kWh"])

@@ -10,7 +10,9 @@ import pytest
 
 from simulator.cost_energy import (
     UnavailableQuantity,
+    as_json_ready,
     is_unavailable_quantity,
+    json_safe_number,
     unavailable_quantity,
     unavailable_reason_of,
 )
@@ -43,6 +45,27 @@ SAFE_CALL_NAMES = frozenset(
     }
 )
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def test_json_safe_number_replaces_nan_and_inf_with_unavailable() -> None:
+    import math
+
+    finite = json_safe_number(1.25, reason="invalid-offgas-rate", units="mol/s")
+    assert finite == 1.25
+    nan = json_safe_number(math.nan, reason="invalid-offgas-rate", units="mol/s")
+    inf = json_safe_number(math.inf, reason="invalid-offgas-rate", units="m^3/s")
+    assert is_unavailable_quantity(nan)
+    assert is_unavailable_quantity(inf)
+    assert nan["value"] is None
+    assert unavailable_reason_of(nan) == "invalid-offgas-rate"
+    json.dumps({"nan": nan, "inf": inf, "finite": finite}, allow_nan=False)
+    dumped = json.dumps(
+        as_json_ready(nan), sort_keys=True, allow_nan=False, indent=2
+    )
+    assert json.loads(dumped)["status"] == "unavailable"
+    # RunArtifactStore.save uses indent=2 + sort_keys; that Python encoder
+    # path treats a falsy dict subclass as {}.
+    assert json.dumps(nan, sort_keys=True, allow_nan=False, indent=2) == "{}"
 
 
 def test_unavailable_quantity_is_falsy_and_structurally_unmistakable() -> None:

@@ -24,11 +24,12 @@ condenser-exit gas temperature) are noted inline as follow-ups.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 import math
 from typing import Any
 
-from simulator.cost_energy import unavailable_quantity
+from simulator.cost_energy import json_safe_number, unavailable_quantity
 from simulator.environment import (
     ASTEROID_VACUUM_FLOOR_BAR,
     MARS_DATUM_PRESSURE_BAR,
@@ -248,24 +249,33 @@ class SubambientPumpCost:
         else:
             energy = float(self.energy_kWh)
             power = float(self.mean_power_W if self.mean_power_W is not None else 0.0)
+        reason = str(self.status or "unspecified")
         payload: dict[str, Any] = {
             "regime": self.regime,
             "energy_kWh": energy,
             "mean_power_W": power,
-            "required_pump_speed_m3_s": float(self.required_pump_speed_m3_s),
-            "compression_ratio": float(self.compression_ratio),
+            "required_pump_speed_m3_s": json_safe_number(
+                self.required_pump_speed_m3_s, reason=reason, units="m^3/s"
+            ),
+            "compression_ratio": json_safe_number(
+                self.compression_ratio, reason=reason, units="ratio"
+            ),
             "feasible": self.feasible,
             "compression_model": self.compression_model,
             "compression_stages": int(self.compression_stages),
-            "stage_pressure_ratio": float(self.stage_pressure_ratio),
+            "stage_pressure_ratio": json_safe_number(
+                self.stage_pressure_ratio, reason=reason, units="ratio"
+            ),
             "status": self.status,
-            "line_conductance_m3_s": float(self.line_conductance_m3_s),
-            "effective_speed_ceiling_m3_s": float(
-                self.effective_speed_ceiling_m3_s
+            "line_conductance_m3_s": json_safe_number(
+                self.line_conductance_m3_s, reason=reason, units="m^3/s"
+            ),
+            "effective_speed_ceiling_m3_s": json_safe_number(
+                self.effective_speed_ceiling_m3_s, reason=reason, units="m^3/s"
             ),
         }
         if self.notice:
-            payload["notice"] = dict(self.notice)
+            payload["notice"] = _json_safe_notice(self.notice, reason=reason)
         return payload
 
 
@@ -379,10 +389,10 @@ def estimate_subambient_pump_cost(
         return SubambientPumpCost("vent-free", 0.0, 0.0, 0.0, 1.0, True)
 
     if target_pressure_pa == 0.0:
-        # Reached only when ambient > 0 (ambient == 0 vented free above). This is
-        # out-of-domain physics, not missing telemetry: ln(P_amb/P_target)
-        # diverges as P_target -> 0, so the characterised staged-adiabatic
-        # model has no finite continuation to attach as a priced number.
+        # Reached only when ambient > 0 (ambient == 0 vented free above).
+        # Absolute vacuum is invalid/unreachable input, not a point outside a
+        # characterised envelope: ln(P_amb/P_target) diverges as P_target -> 0,
+        # so there is no finite continuation to price.
         return _out_of_domain_vacuum_target(
             ambient_pressure_pa=ambient_pressure_pa,
             offgas_mol_per_s=offgas_mol_per_s,
@@ -481,6 +491,14 @@ def estimate_subambient_pump_cost(
         )
         status = "ok" if feasible else "pump-speed-limit-exceeded"
     compression_ratio = _exp_or_inf(log_ratio)
+    notice = _extrapolated_below_speed_floor_notice(
+        target_pressure_pa=target_pressure_pa,
+        ambient_pressure_pa=ambient_pressure_pa,
+        offgas_mol_per_s=offgas_mol_per_s,
+        gas_temperature_K=gas_temperature_K,
+        max_pump_speed_m3_s=speed_ceiling,
+        max_stage_pressure_ratio=stage_ratio_ceiling,
+    )
     return SubambientPumpCost(
         "pump",
         energy_kWh,
@@ -494,6 +512,7 @@ def estimate_subambient_pump_cost(
         status=status,
         line_conductance_m3_s=line_conductance_m3_s,
         effective_speed_ceiling_m3_s=effective_speed_ceiling_m3_s,
+        notice=notice,
     )
 
 
@@ -691,6 +710,120 @@ def _pumping_context_refusal(
 
 NO_EXTRAPOLATION_AVAILABLE = "no extrapolation available"
 _UNREACHABLE_ABSOLUTE_VACUUM = "unreachable-absolute-vacuum-target"
+OUT_OF_DOMAIN_PHYSICS_KIND = "out-of-domain-physics"
+INVALID_INPUT_KIND = "invalid-input"
+EXTRAPOLATED_AUTHORITY = "extrapolated"
+TARGET_BELOW_SPEED_FLOOR_REASON = "target below the characterised speed floor"
+
+_NOTICE_NUMBER_UNITS = {
+    "target_pressure_pa": "Pa",
+    "ambient_pressure_pa": "Pa",
+    "max_pump_speed_m3_s": "m^3/s",
+    "max_stage_pressure_ratio": "ratio",
+    "envelope_floor_pa": "Pa",
+}
+
+
+def _characterised_speed_floor_pa(
+    *,
+    offgas_mol_per_s: float,
+    gas_temperature_K: float,
+    max_pump_speed_m3_s: float,
+) -> float:
+    speed_ceiling = _positive_or_default(
+        max_pump_speed_m3_s,
+        DEFAULT_MAX_PUMP_SPEED_M3_S.value,
+    )
+    if (
+        speed_ceiling > 0.0
+        and math.isfinite(offgas_mol_per_s)
+        and offgas_mol_per_s > 0.0
+        and math.isfinite(gas_temperature_K)
+        and gas_temperature_K > 0.0
+    ):
+        return offgas_mol_per_s * _R_J_PER_MOL_K * gas_temperature_K / speed_ceiling
+    return math.nan
+
+
+def _characterised_envelope(
+    *,
+    target_pressure_pa: float,
+    ambient_pressure_pa: float,
+    offgas_mol_per_s: float,
+    gas_temperature_K: float,
+    max_pump_speed_m3_s: float,
+    max_stage_pressure_ratio: float,
+) -> tuple[dict[str, Any], float, float]:
+    speed_ceiling = _positive_or_default(
+        max_pump_speed_m3_s,
+        DEFAULT_MAX_PUMP_SPEED_M3_S.value,
+    )
+    stage_ratio_ceiling = _float_or_nan(max_stage_pressure_ratio)
+    if not math.isfinite(stage_ratio_ceiling) or stage_ratio_ceiling <= 1.0:
+        stage_ratio_ceiling = DEFAULT_MAX_STAGE_PRESSURE_RATIO.value
+    envelope_floor_pa = _characterised_speed_floor_pa(
+        offgas_mol_per_s=offgas_mol_per_s,
+        gas_temperature_K=gas_temperature_K,
+        max_pump_speed_m3_s=speed_ceiling,
+    )
+    envelope = {
+        "compression_model": "intercooled-staged-adiabatic",
+        "target_pressure_pa": float(target_pressure_pa),
+        "ambient_pressure_pa": float(ambient_pressure_pa),
+        "max_pump_speed_m3_s": float(speed_ceiling),
+        "max_stage_pressure_ratio": float(stage_ratio_ceiling),
+        "envelope_floor_pa": json_safe_number(
+            envelope_floor_pa, reason="unspecified", units="Pa"
+        ),
+    }
+    return envelope, speed_ceiling, envelope_floor_pa
+
+
+def _extrapolated_below_speed_floor_notice(
+    *,
+    target_pressure_pa: float,
+    ambient_pressure_pa: float,
+    offgas_mol_per_s: float,
+    gas_temperature_K: float,
+    max_pump_speed_m3_s: float,
+    max_stage_pressure_ratio: float,
+) -> dict[str, Any] | None:
+    envelope, _speed_ceiling, envelope_floor_pa = _characterised_envelope(
+        target_pressure_pa=target_pressure_pa,
+        ambient_pressure_pa=ambient_pressure_pa,
+        offgas_mol_per_s=offgas_mol_per_s,
+        gas_temperature_K=gas_temperature_K,
+        max_pump_speed_m3_s=max_pump_speed_m3_s,
+        max_stage_pressure_ratio=max_stage_pressure_ratio,
+    )
+    if not (
+        math.isfinite(envelope_floor_pa)
+        and math.isfinite(target_pressure_pa)
+        and 0.0 < target_pressure_pa < envelope_floor_pa
+    ):
+        return None
+    return {
+        "kind": OUT_OF_DOMAIN_PHYSICS_KIND,
+        "authority": EXTRAPOLATED_AUTHORITY,
+        "reason": TARGET_BELOW_SPEED_FLOOR_REASON,
+        "characterised_envelope": envelope,
+        "envelope_floor_pa": float(envelope_floor_pa),
+    }
+
+
+def _json_safe_notice(notice: Mapping[str, Any], *, reason: str) -> dict[str, Any]:
+    safe: dict[str, Any] = {}
+    for key, item in dict(notice).items():
+        if isinstance(item, Mapping):
+            safe[key] = _json_safe_notice(item, reason=reason)
+        elif isinstance(item, bool) or item is None or isinstance(item, str):
+            safe[key] = item
+        elif isinstance(item, (int, float)):
+            units = _NOTICE_NUMBER_UNITS.get(str(key), "")
+            safe[key] = json_safe_number(item, reason=reason, units=units)
+        else:
+            safe[key] = item
+    return safe
 
 
 def _out_of_domain_vacuum_target(
@@ -701,43 +834,30 @@ def _out_of_domain_vacuum_target(
     max_pump_speed_m3_s: float,
     max_stage_pressure_ratio: float,
 ) -> SubambientPumpCost:
-    """Absolute vacuum against a real atmosphere is out-of-domain physics.
+    """Absolute vacuum against a real atmosphere is invalid/unreachable input.
 
     The staged-adiabatic / isothermal work scales as ln(P_amb/P_target) and
     has no finite value at P_target = 0. Substituting the speed-envelope floor
     would price a different (higher) pressure and understate the load. Energy
     stays unavailable with an explicit no-extrapolation reason rather than
-    sharing the missing-telemetry helper.
+    sharing the missing-telemetry helper. P=0 is not a point on a characterised
+    curve; it is a target no pump can hold against an atmosphere.
     """
-    speed_ceiling = _positive_or_default(
-        max_pump_speed_m3_s,
-        DEFAULT_MAX_PUMP_SPEED_M3_S.value,
+    envelope, _speed_ceiling, _envelope_floor_pa = _characterised_envelope(
+        target_pressure_pa=0.0,
+        ambient_pressure_pa=ambient_pressure_pa,
+        offgas_mol_per_s=offgas_mol_per_s,
+        gas_temperature_K=gas_temperature_K,
+        max_pump_speed_m3_s=max_pump_speed_m3_s,
+        max_stage_pressure_ratio=max_stage_pressure_ratio,
     )
-    stage_ratio_ceiling = _float_or_nan(max_stage_pressure_ratio)
-    if not math.isfinite(stage_ratio_ceiling) or stage_ratio_ceiling <= 1.0:
-        stage_ratio_ceiling = DEFAULT_MAX_STAGE_PRESSURE_RATIO.value
-    if speed_ceiling > 0.0 and math.isfinite(offgas_mol_per_s) and math.isfinite(
-        gas_temperature_K
-    ):
-        envelope_floor_pa = (
-            offgas_mol_per_s * _R_J_PER_MOL_K * gas_temperature_K / speed_ceiling
-        )
-    else:
-        envelope_floor_pa = math.nan
+    envelope["divergence"] = "ln(P_ambient/P_target) as P_target -> 0"
     notice = {
-        "kind": "out-of-domain-physics",
+        "kind": INVALID_INPUT_KIND,
         "authority": "none",
         "reason": NO_EXTRAPOLATION_AVAILABLE,
         "original_status": _UNREACHABLE_ABSOLUTE_VACUUM,
-        "characterised_envelope": {
-            "compression_model": "intercooled-staged-adiabatic",
-            "target_pressure_pa": 0.0,
-            "ambient_pressure_pa": float(ambient_pressure_pa),
-            "max_pump_speed_m3_s": float(speed_ceiling),
-            "max_stage_pressure_ratio": float(stage_ratio_ceiling),
-            "envelope_floor_pa": float(envelope_floor_pa),
-            "divergence": "ln(P_ambient/P_target) as P_target -> 0",
-        },
+        "characterised_envelope": envelope,
     }
     return SubambientPumpCost(
         _UNREACHABLE_ABSOLUTE_VACUUM,
