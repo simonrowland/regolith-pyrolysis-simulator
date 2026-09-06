@@ -2,15 +2,55 @@ schema_version: literature_extract.v1
 source_id: kems-003-pound-1972
 source:
   citation: Pound, G. M. (1972), "Selected values of evaporation and condensation coefficients for simple
-    substances", J. Phys. Chem. Ref. Data 1:135-146, DOI 10.1063/1.3253096 (review compilation; Table
-    1)
+    substances", J. Phys. Chem. Ref. Data 1:135-146, DOI 10.1063/1.3253096 (review compilation; Tables
+    1-3)
+  doi: 10.1063/1.3253096
+  url: https://doi.org/10.1063/1.3253096
   year: 1972
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 alpha/Clausing review extract
-  date: '2026-08-03'
-  worker: ocr-phase2b-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/
+  method: RH-67 r2. Parent observation objects restored from 655f3db3 except PDF-proven McCabe Fe corrections
+    (T_range_K[0] 1350.0->1358.0; locator.page 142->141; authors 1950->1956) via top-level corrections.
+    Merged locators/vacuum/T_uncertainty/bibliography split to pound_1972_fe_parent_row_complements and
+    pound_1972_cr_parent_row_complements. Ten r1 Table 1-3 compilation rows kept. 300 dpi pdftoppm rotate-90
+    of Tables 1-3 (printed pp. 141-146 / PDF pp. 7-12).
+  date: '2026-09-06'
+  worker: hunt-RH-67-r2
+  provenance_path: docs-private/research/2026-09-06-hunts/RH-67/kems-003-pound-1972/
 review_status: draft
+corrections:
+- observation_id: pound_1972_fe_solid_alpha_mccabe
+  field: T_range_K[0]
+  old: 1350.0
+  new: 1358.0
+  page: 141
+  quote: 1358–1520 K ±3° | Langmuir-Knudsen | 0.9 ± 0.1 | McCabe et al. [1956]
+- observation_id: pound_1972_fe_solid_alpha_mccabe
+  field: locator.page
+  old: 142
+  new: 141
+  page: 141
+  quote: Table 1. Selected values of measured evaporation coefficients, α_v, for solids (printed page
+    141, right margin)
+- observation_id: pound_1972_fe_solid_alpha_mccabe
+  field: locator.paragraph
+  old: Iron, solid; McCabe et al. 1950
+  new: Iron, solid; McCabe et al. [1956]
+  page: 141
+  quote: McCabe et al. [1956]
+- observation_id: pound_1972_fe_solid_alpha_mccabe
+  field: values.authors
+  old: McCabe et al. [1950]
+  new: McCabe et al. [1956]
+  page: 141
+  quote: McCabe et al. [1956]
+- observation_id: pound_1972_fe_solid_alpha_mccabe
+  field: values.note
+  old: Repaired Table 1 row for iron, solid; α_v = 0.9±0.1; McCabe et al. [1950]. Separate Table 1 row
+    from chromium (1318–1563 K, same α_v=0.9±0.1) — both rows are in the source (not a Fe/Cr misread).
+  new: Repaired Table 1 row for iron, solid; α_v = 0.9±0.1; McCabe et al. [1956]. Separate Table 1 row
+    from chromium (1318–1563 K, same α_v=0.9±0.1) — both rows are in the source (not a Fe/Cr misread).
+  page: 141
+  quote: McCabe et al. [1956]
 species:
   Fe:
     observations:
@@ -55,10 +95,10 @@ species:
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-003-pound-1972/tables.md
         table: '1'
-        page: 142
-        paragraph: Iron, solid; McCabe et al. 1950
+        page: 141
+        paragraph: Iron, solid; McCabe et al. [1956]
       T_range_K:
-      - 1350.0
+      - 1358.0
       - 1520.0
       phase: solid_polycrystalline
       condensed_form:
@@ -77,10 +117,10 @@ species:
         gas_species: Fe(g)
         material: Fisher_Electrolytic_Fe_solid
         technique: Langmuir-Knudsen
-        authors: McCabe et al. [1950]
-        note: Repaired Table 1 row for iron, solid; α_v = 0.9±0.1; McCabe et al. [1950].
-          Separate Table 1 row from chromium (1318–1563 K, same α_v=0.9±0.1) — both
-          rows are in the source (not a Fe/Cr misread).
+        authors: McCabe et al. [1956]
+        note: Repaired Table 1 row for iron, solid; α_v = 0.9±0.1; McCabe et al. [1956]. Separate Table
+          1 row from chromium (1318–1563 K, same α_v=0.9±0.1) — both rows are in the source (not a Fe/Cr
+          misread).
       uncertainty:
         alpha_range:
         - 0.8
@@ -148,6 +188,134 @@ species:
         interfacial_reaction: Fe(s) -> Fe(g)
         semantics: competing_observation_do_not_average
         note: Solid metal α; pure_element_condensed. Cr is rail's only tier-1 α (solid Cr).
+    - observation_id: pound_1972_fe_1600_1800_not_a_printed_band
+      type: rate_series
+      locator:
+        table: '1'
+        page: 141
+        published_page: 141
+        pdf_page_index: 7
+        note: Full Table 1 Fe rows on printed p. 141; no 1600-1800 K cell
+      T_range_K:
+      - 1600.0
+      - 1800.0
+      phase: method_review
+      regime: review_compilation
+      units: none
+      values:
+        quantity: indexed_T_band_not_printed
+        status: typed_refusal
+        semantics: bound_not_point_ordering
+        printed_Fe_T_bands_K:
+        - - 1540.0
+          - 1740.0
+        - - 1358.0
+          - 1520.0
+        indexed_but_not_printed_K:
+        - 1600.0
+        - 1800.0
+        note: Hunt-indexed 1600-1800 K band is not a Table 1 Fe temperature. True absence of that printed
+          interval, not unseen.
+      uncertainty:
+        note: not applicable
+    - observation_id: pound_1972_completeness_ledger
+      type: rate_series
+      locator:
+        page: 141
+        published_page: 141
+        pdf_page_index: 7
+        note: Tables 1-3 occupy printed pp. 141-146 (PDF pp. 7-12). No numbered figures in the 12-page
+          article. No supplement identified (Crossref/Unpaywall/HAL/NIST).
+      phase: method_review
+      regime: review_compilation
+      units: none
+      values:
+        quantity: completeness_ledger
+        status: typed_refusal
+        semantics: bound_not_point_ordering
+        paper_pages_printed: 135-146
+        pdf_pages: 12
+        tables:
+          '1':
+            pages_printed: 141-142
+            identity: selected evaporation coefficients alpha_v of solids
+            status: transcribed
+            role: compilation_selected_alpha
+          '2':
+            pages_printed: 143-144
+            identity: selected evaporation coefficients alpha_v of liquids
+            status: transcribed
+            role: compilation_selected_alpha
+          '3':
+            pages_printed: 145-146
+            identity: selected condensation coefficients of solids at high supersaturation
+            status: transcribed
+            role: compilation_selected_alpha
+        numbered_figures: true_absence
+        supplement: no_record_identified
+        species_resolved_partial_pressure_Pa: true_absence
+        activity_gamma: true_absence
+        residue_composition: true_absence
+        time_mass_loss_series: true_absence
+        kinetic_alpha: present_as_selected_compilation_tables_1_2_3
+        improves_empirical_melt_pT_gamma_alpha_battery: false
+        note: Review compilation of selected alpha_v/alpha_c for simple substances. No p_i(T), gamma,
+          residue, or mg/s series. Fe/Cr rows are solid polycrystalline metal, wrong phase for melt. Table
+          2 K liquid is 66.7-119.3 C (339.85-392.45 K), far below 1200 K. Table 3 is condensation at high
+          supersaturation, not melt evaporation.
+      uncertainty:
+        note: not applicable
+    - observation_id: pound_1972_fe_parent_row_complements
+      type: rate_series
+      locator:
+        table: '1'
+        page: 141
+        published_page: 141
+        pdf_page_index: 7
+        note: Complements for parent Fe rows; not a rewrite of those objects. Clausing locators from printed
+          pp. 135 and 137.
+      phase: method_review
+      regime: review_compilation
+      units: none
+      values:
+        quantity: parent_row_complements
+        status: typed_refusal
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        note: Facts merged into parent Fe objects at 4bf142b4, split out so parents match 655f3db3 (McCabe
+          T/page/authors corrected via top-level corrections).
+        rows:
+          pound_1972_fe_solid_alpha_wessel:
+            page: 141
+            published_page: 141
+            pdf_page_index: 7
+            T_uncertainty_K: 15.0
+            vacuum_as_printed: 10^-5 torr
+            vacuum_parent_unaltered: ~1e-5 torr
+            method_class: review_compilation
+          pound_1972_fe_solid_alpha_mccabe:
+            page: 141
+            published_page: 141
+            pdf_page_index: 7
+            T_uncertainty_K: 3.0
+            vacuum_as_printed: Unstated; probably <10^-7 torr
+            bibliography_lists: McCabe, Hudson and Paxton, Trans. AIME 212, 102 (1958); McCabe and Birchenall,
+              Trans. AIME 197, 707 (1953)
+            method_class: review_compilation
+          pound_1972_clausing_method_discussion:
+            page: 135
+            published_page: 135
+            pdf_page_index: 1
+            equipment_clausing_factor_page: 137
+            equipment_clausing_factor_published_page: 137
+            equipment_clausing_factor_pdf_page_index: 3
+          pound_1972_fe_solid_class_b1:
+            page: 141
+            published_page: 141
+            pdf_page_index: 7
+            note: 1600-1800 K band is not a printed Table 1 interval; see pound_1972_fe_1600_1800_not_a_printed_band.
+      uncertainty:
+        note: not applicable
   Cr:
     observations:
     - observation_id: pound_1972_cr_solid_alpha_mccabe
@@ -215,6 +383,358 @@ species:
         interfacial_reaction: Cr(s) -> Cr(g)
         semantics: competing_observation_do_not_average
         note: Solid metal α; pure_element_condensed. Cr is rail's only tier-1 α (solid Cr).
+    - observation_id: pound_1972_cr_parent_row_complements
+      type: rate_series
+      locator:
+        table: '1'
+        page: 141
+        published_page: 141
+        pdf_page_index: 7
+        note: Complements for parent Cr rows; not a rewrite of those objects.
+      phase: method_review
+      regime: review_compilation
+      units: none
+      values:
+        quantity: parent_row_complements
+        status: typed_refusal
+        semantics: bound_not_point_ordering
+        method_class: review_compilation
+        note: Facts merged into parent Cr objects at 4bf142b4, split out so parents match 655f3db3.
+        rows:
+          pound_1972_cr_solid_alpha_mccabe:
+            page: 141
+            published_page: 141
+            pdf_page_index: 7
+            T_uncertainty_K: 3.0
+            vacuum_as_printed: Unstated; probably <10^-7 torr
+            bibliography_lists: McCabe, Hudson and Paxton, Trans. AIME 212, 102 (1958)
+            authors_as_printed: McCabe et al. [1956]
+            method_class: review_compilation
+          pound_1972_cr_solid_class_b1:
+            page: 141
+            published_page: 141
+            pdf_page_index: 7
+      uncertainty:
+        note: not applicable
+  Be:
+    observations:
+    - observation_id: pound_1972_be_solid_alpha_holden
+      type: alpha
+      locator:
+        table: '1'
+        page: 141
+        published_page: 141
+        pdf_page_index: 7
+        note: Table 1 Beryllium, solid; Holden et al. [1948]
+      T_range_K:
+      - 1171.0
+      - 1552.0
+      phase: solid_polycrystalline
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Pure-element solid polycrystalline metal alpha; class-incomparable
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 1.0
+        alpha_range:
+        - 0.98
+        - 1.02
+        gas_species: Be(g)
+        material: vacuum_cast_sintered_Be
+        technique: Langmuir-Knudsen torsion balance
+        vacuum: unstated; probably 1e-6 torr
+        T_uncertainty_K: 1.0
+        authors: Holden et al. [1948]
+        method_class: review_compilation
+        note: Table 1 selected alpha_v = 1.0 plus or minus 0.02. Overlaps 1200 K at the low end. Compilation
+          / solid metal; not melt.
+      uncertainty:
+        note: plus or minus 0.02 as tabulated; T plus or minus 1 K as tabulated
+        alpha_range:
+        - 0.98
+        - 1.02
+  B:
+    observations:
+    - observation_id: pound_1972_b_mp_alpha_burns
+      type: alpha
+      locator:
+        table: '1'
+        page: 141
+        published_page: 141
+        pdf_page_index: 7
+        note: Table 1 Boron, solid; liquid (also repeated as Table 2 first row)
+      T_range_K:
+      - 2403.0
+      - 2403.0
+      phase: solid_and_liquid_at_melting_point
+      condensed_form:
+        state: mixed_solid_and_liquid_as_tabulated
+        metastable: false
+        basis: explicit_author
+        note: Row labelled 'Boron, solid; liquid'; technique 'Mass spec. Langmuir-Knudsen on liq.'
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 0.98
+        alpha_range:
+        - 0.96
+        - 1.0
+        gas_species: B(g)
+        material: boron_solid_and_liquid
+        technique: Mass spec. Langmuir-Knudsen on liq.
+        vacuum: unstated; probably <1e-8 torr
+        melting_point_K: 2403.0
+        melting_point_uncertainty_K: 40.0
+        authors: Burns et al. [1967]
+        method_class: review_compilation
+        note: Selected alpha_v at the melting point 2403 plus or minus 40 K. Same row appears in Table
+          2.
+      uncertainty:
+        note: plus or minus 0.02 as tabulated; melting point plus or minus 40 K as tabulated
+        alpha_range:
+        - 0.96
+        - 1.0
+  C:
+    observations:
+    - observation_id: pound_1972_c_graphite_alpha_marshall_norton
+      type: alpha
+      locator:
+        table: '1'
+        page: 141
+        published_page: 141
+        pdf_page_index: 7
+        note: Table 1 Carbon; Acheson graphite; Marshall and Norton [1950]
+      T_range_K:
+      - 2357.0
+      - 2870.0
+      phase: solid_polycrystalline
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Acheson graphite polycrystalline carbon
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 1.0
+        alpha_range:
+        - 0.9
+        - 1.1
+        gas_species: C(g)
+        material: Acheson_graphite
+        technique: Langmuir-Knudsen
+        vacuum: 1e-8 torr
+        T_uncertainty_K: 10.0
+        authors: Marshall and Norton [1950]
+        method_class: review_compilation
+        note: Table 1 selected alpha_v = 1 plus or minus 0.1. Band overlaps 2473.15 K. Solid graphite,
+          not melt.
+      uncertainty:
+        note: plus or minus 0.1 as tabulated; T plus or minus 10 K as tabulated
+        alpha_range:
+        - 0.9
+        - 1.1
+  Ag:
+    observations:
+    - observation_id: pound_1972_ag_solid_alpha_wessel_mp
+      type: alpha
+      locator:
+        table: '1'
+        page: 142
+        published_page: 142
+        pdf_page_index: 8
+        note: Table 1 Silver, solid; just below mp 1234 plus or minus 3 K; Wessel [1951]
+      T_range_K:
+      - 1234.0
+      - 1234.0
+      phase: solid_polycrystalline
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Pure-element solid polycrystalline metal alpha
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha_lower_bound: 0.92
+        printed: '>0.92'
+        semantics: bound_not_point_ordering
+        gas_species: Ag(g)
+        material: solid_Ag_polycrystalline
+        technique: Torsion balance
+        vacuum: 1e-5 torr
+        T_uncertainty_K: 3.0
+        authors: Wessel [1951]
+        method_class: review_compilation
+        note: Bound-not-point selected alpha_v just below the melting point. Compilation / solid metal.
+      uncertainty:
+        note: lower bound as tabulated; T plus or minus 3 K as tabulated
+  K:
+    observations:
+    - observation_id: pound_1972_k_liquid_alpha_neumann
+      type: alpha
+      locator:
+        table: '2'
+        page: 143
+        published_page: 143
+        pdf_page_index: 9
+        note: Table 2 Potassium, liquid; Neumann [1954]
+      T_range_K:
+      - 339.85
+      - 392.45
+      phase: liquid
+      condensed_form:
+        state: liquid
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Pure liquid potassium; surface condition Still
+      regime: langmuir_knudsen_comparison_review
+      units: dimensionless
+      values:
+        alpha: 0.95
+        alpha_range:
+        - 0.9
+        - 1.0
+        gas_species: K(g)
+        material: liquid_K
+        surface_condition: Still
+        technique: Langmuir-Knudsen
+        vacuum: unstated; probably 1e-6 torr
+        T_C_as_printed: 66.7-119.3
+        T_C_uncertainty: 0.1
+        T_K_derivation: T_K = t_C + 273.15; 66.7 + 273.15 = 339.85; 119.3 + 273.15 = 392.45
+        authors: Neumann [1954]
+        method_class: review_compilation
+        note: Only rail-species liquid alpha in this paper. Far below the 1200-2473.15 K refinery window.
+      uncertainty:
+        note: plus or minus 0.05 as tabulated; T plus or minus 0.1 C as tabulated
+        alpha_range:
+        - 0.9
+        - 1.0
+  Pt:
+    observations:
+    - observation_id: pound_1972_pt_condensation_alpha_chupka_1500k
+      type: alpha
+      locator:
+        table: '3'
+        page: 145
+        published_page: 145
+        pdf_page_index: 11
+        note: Table 3 Platinum condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
+      T_range_K:
+      - 1500.0
+      - 1500.0
+      phase: solid_polycrystalline
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Condensation coefficient on polycrystalline Pt at high supersaturation
+      regime: condensation_high_supersaturation_review
+      units: dimensionless
+      values:
+        alpha_lower_bound: 0.998
+        printed: '>0.998'
+        semantics: bound_not_point_ordering
+        quantity: condensation_coefficient
+        gas_species: Pt(g)
+        substrate: polycrystalline_Pt
+        technique: Mass spectrometry
+        vacuum: 1.0e-6 torr
+        T_uncertainty_K: 20.0
+        supersaturation_ratio: ~1e4
+        authors: Chupka et al. [1963]
+        method_class: review_compilation
+        note: Table 3 selected alpha_c, not evaporation alpha_v and not melt.
+      uncertainty:
+        note: lower bound as tabulated; T plus or minus 20 K as tabulated
+  Rh:
+    observations:
+    - observation_id: pound_1972_rh_condensation_alpha_chupka_1500k
+      type: alpha
+      locator:
+        table: '3'
+        page: 145
+        published_page: 145
+        pdf_page_index: 11
+        note: Table 3 Rhodium condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
+      T_range_K:
+      - 1500.0
+      - 1500.0
+      phase: solid_polycrystalline
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Condensation coefficient on polycrystalline Rh at high supersaturation
+      regime: condensation_high_supersaturation_review
+      units: dimensionless
+      values:
+        alpha_lower_bound: 0.99
+        printed: '>0.99'
+        semantics: bound_not_point_ordering
+        quantity: condensation_coefficient
+        gas_species: Rh(g)
+        substrate: polycrystalline_Rh
+        technique: Mass spectrometry
+        vacuum: 1.0e-6 torr
+        T_uncertainty_K: 20.0
+        authors: Chupka et al. [1963]
+        method_class: review_compilation
+        note: Table 3 selected alpha_c, not evaporation alpha_v and not melt.
+      uncertainty:
+        note: lower bound as tabulated; T plus or minus 20 K as tabulated
+  W:
+    observations:
+    - observation_id: pound_1972_w_condensation_alpha_chupka_2200k
+      type: alpha
+      locator:
+        table: '3'
+        page: 146
+        published_page: 146
+        pdf_page_index: 12
+        note: Table 3 Tungsten condensation; Chupka et al. [1963]; substrate 2200 plus or minus 20 K
+      T_range_K:
+      - 2200.0
+      - 2200.0
+      phase: solid_polycrystalline
+      condensed_form:
+        state: crystalline
+        metastable: false
+        solution_character: stoichiometric
+        basis: explicit_author
+        note: Condensation coefficient on polycrystalline W at high supersaturation
+      regime: condensation_high_supersaturation_review
+      units: dimensionless
+      values:
+        alpha: 0.998
+        alpha_range:
+        - 0.9975
+        - 0.9985
+        quantity: condensation_coefficient
+        gas_species: W(g)
+        substrate: polycrystalline_W
+        technique: Mass spectrometry
+        vacuum: 1.0e-6 torr
+        T_uncertainty_K: 20.0
+        authors: Chupka et al. [1963]
+        method_class: review_compilation
+        note: Table 3 selected alpha_c = 0.998 plus or minus 0.0005 at 2200 K. Condensation, not melt
+          evaporation.
+      uncertainty:
+        note: plus or minus 0.0005 as tabulated; T plus or minus 20 K as tabulated
+        alpha_range:
+        - 0.9975
+        - 0.9985
 fidelity_samples:
 - species: Fe
   observable: alpha
@@ -224,41 +744,68 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
     table: '1'
-    paragraph: Iron solid Langmuir-Knudsen α_v = 1±0.2 (Wessel)
-    line_range: '281'
+    page: 141
+    paragraph: Iron solid Langmuir-Knudsen alpha_v = 1 plus or minus 0.2 (Wessel)
 - species: Fe
   observable: alpha
   observation_id: pound_1972_fe_solid_alpha_mccabe
   field: alpha
   value: 0.9
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
     table: '1'
-    paragraph: Iron solid McCabe α_v = 0.9±0.1
-    line_range: '281'
+    page: 141
+    pdf_page_index: 7
+    note: Table 1 Fisher Electrolytic iron; printed 1358-1520 K; alpha_v = 0.9 plus or minus 0.1
 - species: Cr
   observable: alpha
   observation_id: pound_1972_cr_solid_alpha_mccabe
   field: alpha
   value: 0.9
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
     table: '1'
-    paragraph: Chromium solid McCabe α_v = 0.9±0.1 (1318–1563 K)
-    line_range: '281'
+    page: 141
+    pdf_page_index: 7
+    paragraph: Chromium solid McCabe alpha_v = 0.9 plus or minus 0.1 (1318-1563 K)
 - species: Cr
   observable: alpha
   observation_id: pound_1972_cr_solid_class_b1
   field: alpha
   value: 0.9
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
     table: '1'
+    page: 141
 - species: Fe
   observable: alpha
   observation_id: pound_1972_fe_solid_class_b1
   field: alpha
   value: 1.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
     table: '1'
+    page: 141
+- species: Be
+  observable: alpha
+  observation_id: pound_1972_be_solid_alpha_holden
+  field: alpha
+  value: 1.0
+  locator:
+    table: '1'
+    page: 141
+    note: Table 1 Beryllium, solid; 1.0 plus or minus 0.02; Holden et al. [1948]
+- species: K
+  observable: alpha
+  observation_id: pound_1972_k_liquid_alpha_neumann
+  field: alpha
+  value: 0.95
+  locator:
+    table: '2'
+    page: 143
+    note: Table 2 Potassium, liquid; 0.95 plus or minus 0.05; Neumann [1954]
+- species: W
+  observable: alpha
+  observation_id: pound_1972_w_condensation_alpha_chupka_2200k
+  field: alpha
+  value: 0.998
+  locator:
+    table: '3'
+    page: 146
+    note: Table 3 Tungsten; 0.998 plus or minus 0.0005 at 2200 plus or minus 20 K
