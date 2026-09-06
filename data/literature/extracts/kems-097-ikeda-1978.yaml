@@ -1,0 +1,604 @@
+schema_version: literature_extract.v1
+source_id: kems-097-ikeda-1978
+source:
+  citation: Ikeda, Y., Tamaki, M. & Matsumoto, G. (1978), "A Mass Spectrometric Study of Vaporization
+    of Refractory Metal-Al2O3 Systems in Elevated Temperature", J. Mass Spectrom. Soc. Jpn. 26(2):159–169,
+    DOI 10.5702/massspec1953.26.159
+  doi: 10.5702/massspec1953.26.159
+  url: https://doi.org/10.5702/massspec1953.26.159
+  year: 1978
+extraction:
+  method: Official J-STAGE VOR PDF (https://www.jstage.jst.go.jp/article/massspec1953/26/2/26_2_159/_pdf).
+    Scanned CCITT pages; pdftotext -layout is a noisy OCR layer, not used as data. Table 1 transcribed
+    from a 400 dpi pdftoppm render of PDF page 9 (published p. 167). Figs 1–7 listed figure-only; Clausius–Clapeyron
+    grids were not digitised. Measured KEMS third-law Table 1 kept distinct from Farber/Drowart comparison
+    values, from JANAF-fef-derived gas equilibria (2)–(3), and from the authors' estimated p(O2).
+    r2 wave-W2-ikeda-1978-r2. T_range_K min 1850.0 replaced with Table 1 lowest printed T 2248.
+    Geometry retyped as method metadata (not a measured rate). Estimated p(O2) and Fig. 7
+    correlation labelled model_derived.
+  date: '2026-09-06'
+  worker: wave-W2-ikeda-1978-r2
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-097-ikeda-1978/
+review_status: draft
+corrections:
+- observation_id: ikeda_1978_kems_geometry_and_calibration
+  field: T_range_K[0]
+  old: 1850.0
+  new: 2248.0
+  page: 167
+  quote: Table 1 last data row T = 2248 (columns T, -log Kp, -Delta-fef, Delta-H-298 =
+    2248, 31.13, 180.38, 725.7). 1850 K is not printed in the VOR.
+- observation_id: ikeda_1978_kems_geometry_and_calibration
+  field: type
+  old: rate_series
+  new: gibbs_table
+  page: 160
+  quote: apparatus / 30 eV / Ag calibration / appearance potentials; no flux series
+    (SCHEMA has no metadata type; parked as gibbs_table with method_class method_only)
+- observation_id: ikeda_1978_o2_estimated_one_order_below_o
+  field: T_range_K
+  old: [2200.0, 2400.0]
+  new: omitted
+  page: 161
+  quote: From the estimated decomposition equilibrium constant, the partial pressures
+    of O2 were about one order smaller than those of O atom. No temperature is printed
+    with this estimate.
+- observation_id: ikeda_1978_o2_estimated_one_order_below_o
+  field: values.method_class
+  old: derived_from_decomposition_equilibrium_constant
+  new: model_derived
+  page: 161
+  quote: From the estimated decomposition equilibrium constant, the partial pressures
+    of O2 were about one order smaller than those of O atom.
+- observation_id: ikeda_1978_al_p_vs_dgf_fig7_figure_only
+  field: values.method_class
+  old: derived_correlation_from_this_work_pressures
+  new: model_derived
+  page: 168
+  quote: The dotted line is a rough approximation.
+fidelity_samples:
+- species: Al2O3
+  observable: gibbs_table
+  observation_id: ikeda_1978_al2o3_third_law_table1_rxn1
+  field: delta_H_298_kcal_mol_average
+  value: 732.9
+  locator:
+    table: '1'
+    published_page: 167
+    pdf_page_index: 9
+    note: Table 1 Average row Delta-H-298 = 732.9 Kcal mole-1
+- path: species.Al2O3.observations[ikeda_1978_al2o3_third_law_table1_rxn1].values.points[0].minus_log10_Kp
+  value: 26.93
+  locator:
+    table: '1'
+    published_page: 167
+    pdf_page_index: 9
+    note: Table 1 first data row T=2413, -log Kp=26.93
+- species: AlO
+  observable: gibbs_table
+  observation_id: ikeda_1978_alo_third_law_rxn2_average
+  field: delta_H_298_kcal_mol
+  value: -111.9
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    paragraph: for the reaction(2) the Delta-H298 obtained is -111.9 +/- 6 Kcal/mole
+- path: species.Al.observations[ikeda_1978_kems_geometry_and_calibration].values.appearance_potential_eV.Al
+  value: 6.0
+  locator:
+    published_page: 161
+    pdf_page_index: 3
+    paragraph: 6.0 +/- 0.5 eV for Al
+species:
+  Al2O3:
+    observations:
+    - observation_id: ikeda_1978_al2o3_third_law_table1_rxn1
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 167
+        pdf_page_index: 9
+        note: Third-law reaction enthalpy for reaction (1)
+      T_range_K:
+      - 2248.0
+      - 2433.0
+      phase: recrystallized_Al2O3_in_tungsten_Knudsen_cell
+      condensed_form:
+        state: crystalline
+        polymorph_name: recrystallized_alumina
+        metastable: false
+        basis: explicit_author
+        note: Recrystalized Al2O3 from NIPPON CHEMICAL CERAMICS Co.; impurities Mg and Ca less than 0.5 percent
+      standard_state: Al2O3(c) = 2 Al(g) + 3 O(g); third-law Delta-H at 298 K using JANAF free-energy functions
+      regime: kems_third_law_thermochemistry
+      units: Kcal mole-1 as printed (cal K-1 mole-1 for -Delta-fef); no conversion
+      uncertainty:
+        delta_H_298_kcal_mol: 10.0
+        as_printed: 732.9 +/- 10 Kcal/mole
+        note: authors average +/- 10 Kcal/mole for reaction (1)
+      values:
+        quantity: third_law_reaction_enthalpy_298K
+        reaction_as_printed: Al2O3(c) = 2 Al(g) + 3 O(g)
+        reaction_number: 1
+        method_class: derived_third_law_from_measured_kems_and_janaf_fef
+        evidence_class: authors_third_law_from_this_work_pressures
+        Kp_source: partial pressures over W-Al2O3 combined with JANAF free energy function change (ref 8)
+        delta_H_298_kcal_mol_average: 732.9
+        n_points: 9
+        literature_comparison_farber_1972_kcal_mol: 739.2
+        literature_comparison_note: Farber, Srivastava and Uy (1972) reference value 739.2 Kcal/mole; not this work
+        points:
+        - T_K: 2413.0
+          minus_log10_Kp: 26.93
+          minus_delta_fef_cal_K_mol: 180.15
+          delta_H_298_kcal_mol: 732.1
+        - T_K: 2413.0
+          minus_log10_Kp: 27.91
+          minus_delta_fef_cal_K_mol: 180.15
+          delta_H_298_kcal_mol: 742.9
+        - T_K: 2433.0
+          minus_log10_Kp: 27.02
+          minus_delta_fef_cal_K_mol: 180.12
+          delta_H_298_kcal_mol: 739.1
+        - T_K: 2388.0
+          minus_log10_Kp: 26.99
+          minus_delta_fef_cal_K_mol: 180.18
+          delta_H_298_kcal_mol: 725.2
+        - T_K: 2363.0
+          minus_log10_Kp: 27.92
+          minus_delta_fef_cal_K_mol: 180.22
+          delta_H_298_kcal_mol: 727.8
+        - T_K: 2333.0
+          minus_log10_Kp: 28.96
+          minus_delta_fef_cal_K_mol: 180.27
+          delta_H_298_kcal_mol: 729.7
+        - T_K: 2313.0
+          minus_log10_Kp: 30.24
+          minus_delta_fef_cal_K_mol: 180.30
+          delta_H_298_kcal_mol: 737.1
+        - T_K: 2283.0
+          minus_log10_Kp: 31.09
+          minus_delta_fef_cal_K_mol: 180.36
+          delta_H_298_kcal_mol: 736.6
+        - T_K: 2248.0
+          minus_log10_Kp: 31.13
+          minus_delta_fef_cal_K_mol: 180.38
+          delta_H_298_kcal_mol: 725.7
+      equipment:
+        cell_material:
+          value: tungsten inner Knudsen cell (sintered W rod, NIPPON TUNGSTEN Co.); outer cell supporter tungsten block
+          locator:
+            published_page: 160
+            pdf_page_index: 2
+            paragraph: sintered tungsten rod used as Knudsen cell material; outer cell supporter machined from tungsten block
+  Al:
+    observations:
+    - observation_id: ikeda_1978_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 160
+        pdf_page_index: 2
+        section: 2. Experimental
+        note: apparatus and calibration from §2 (p. 160–161); T_range_K from Table 1
+          printed T cells 2248 (last data row) and 2433 (third data row) on published p. 167.
+          1850 K is not printed.
+      T_range_K:
+      - 2248.0
+      - 2433.0
+      phase: recrystallized_Al2O3_in_refractory_metal_Knudsen_cell
+      standard_state: silver-calibrated KEMS absolute partial pressures (atm)
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: HITACHI sector-type single-focussing mass spectrometer
+        ionizing_electron_energy_eV: 30.0
+        detector: dinode-type SEM; gains vs Faraday cup
+        SEM_gains_Al_and_Al2O: measured directly
+        SEM_gains_weaker_peaks: interpolated vs square-root molecular weight
+        ionization_cross_sections: Mann 1970; assumed additive for polyatomic molecules
+        absolute_pressure_method: silver calibration (known amount of silver vaporized prior to measurement)
+        heating: electron bombardment of Knudsen-cell assembly
+        temperature_method: optical pyrometer sighting black-body holes in the tungsten supporter
+        al2o3_source: NIPPON CHEMICAL CERAMICS Co. recrystallized alumina
+        al2o3_impurities_as_printed: Mg and Ca less than 0.5 percent
+        inner_cell_metals:
+        - W
+        - Mo
+        - Ta
+        - Nb
+        outer_supporter: tungsten block
+        shutter_vertical_hole_diameter_mm: 2.0
+        shutter_horizontal_hole_diameter_mm: 4.0
+        shutter_clearance_mm_less_than: 0.1
+        shutter_note: Fig. 2 collimator/shutter between ion-source and cell chambers; these diameters are not the Knudsen effusion orifice
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+        appearance_potential_eV:
+          Al: 6.0
+          AlO: 9.5
+          Al2O: 8.7
+        appearance_potential_uncertainty_eV: 0.5
+        O_plus_appearance_potential: not_measured_with_sufficient_accuracy
+        O_plus_AP_reason: background pressure, probably CH4+
+        search_upper_mass: 300
+        error_silver_calibration_percent: 20
+        error_temperature_distribution_percent: 20
+        error_ion_currents_percent: 10
+        error_total_percent: 50
+        error_bar_figure: '3'
+        Po_over_PAl_tungsten_cell: 1.0
+        Po_over_PAl_note: ratios of Po to PAl were about 1.0 over tungsten cell; congruent-neutral estimate 1.15; Paule non-eq 1.4; prior equilibrium work similar to this work had ratio smaller than 1.0
+      uncertainty:
+        note: authors estimate silver calibration within +/-20 percent, temperature distribution +/-20 percent, ion currents +/-10 percent; total within 50 percent (Fig. 3 error bar)
+      equipment:
+        cell_material:
+          value: inner effusion cell of W, Mo, Ta or Nb; outer supporter tungsten
+          locator:
+            published_page: 160
+            pdf_page_index: 2
+            paragraph: inner effusion cell fabricated from various refractory metals and outer cell supporter machined from tungsten block
+    - observation_id: ikeda_1978_al_w_al2o3_psat_fig3_figure_only
+      type: psat_series
+      locator:
+        figure: '3'
+        published_page: 162
+        pdf_page_index: 4
+        note: Partial pressures (atm) vs 1/T in the W-Al2O3 system
+      T_range_K:
+      - 2200.0
+      - 2400.0
+      phase: recrystallized_Al2O3_in_tungsten_Knudsen_cell
+      standard_state: partial pressure over Al2O3 in a W cell; silver-calibrated; units atm as printed
+      regime: kems_effusion
+      units: atm as published (-log P, atm)
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: minus_log10_P_atm vs 1e4_over_T_K
+        labeled_T_K:
+        - 2200.0
+        - 2400.0
+        co_species_this_work:
+        - Al
+        - O
+        - AlO
+        - Al2O
+        - WO
+        - WO2
+        - WO3
+        overlays_not_this_work:
+        - Farber_et_al_dashed
+        - Drowart_et_al_dash_dot
+        authors_text: slightly higher P(Al) and P(O) than previous work; AlO rather low; Clausius-Clapeyron slopes in rough agreement; WO/WO2/WO3 fairly in agreement with Drowart et al.; reduction of Al2O3 by W not remarkable
+      uncertainty:
+        note: total within 50 percent, shown as error bar on Fig. 3; scatter not digitised
+    - observation_id: ikeda_1978_al_mo_al2o3_psat_fig4_figure_only
+      type: psat_series
+      locator:
+        figure: '4'
+        published_page: 163
+        pdf_page_index: 5
+        note: Partial pressures (atm) vs 1/T in the Mo-Al2O3 system
+      T_range_K:
+      - 2200.0
+      - 2400.0
+      phase: recrystallized_Al2O3_in_molybdenum_Knudsen_cell
+      standard_state: partial pressure over Al2O3 in a Mo cell; atm as printed
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        co_species_this_work:
+        - Al
+        - O
+        - AlO
+        - Al2O
+        - Mo
+        - MoO
+        - MoO2
+        overlay_not_this_work: Drowart_et_al_dashed
+        authors_text: P(Al), P(AlO), P(Al2O) lower than Drowart et al.; P(O) and Mo-oxide pressures higher; P(Al) and P(O) slightly higher than in the tungsten cell; reduction of Al2O3 by Mo more appreciable than by W
+      uncertainty:
+        note: same calibration envelope as Fig. 3; scatter not digitised
+    - observation_id: ikeda_1978_al_ta_al2o3_psat_fig5_figure_only
+      type: psat_series
+      locator:
+        figure: '5'
+        published_page: 164
+        pdf_page_index: 6
+        note: Partial pressures (atm) vs 1/T in the Ta-Al2O3 system; reaction region marked
+      T_range_K:
+      - 2000.0
+      - 2200.0
+      phase: recrystallized_Al2O3_in_tantalum_Knudsen_cell
+      standard_state: partial pressure over Al2O3 in a Ta cell; atm as printed
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        major_species:
+        - Al
+        - Al2O
+        minor_species:
+        - AlO
+        cell_metal_species:
+        - Ta
+        - TaO
+        - TaO2
+        O_and_O2: not_observed
+        reaction_onset_T_K: 1950.0
+        hold_until_stable_T_K: 2083.0
+        hold_duration_as_printed: about two hours
+        low_T_note: P(Al) and P(Al2O) about one order higher than in W or Mo cells; ion intensities fairly stable with time
+        reaction_region: maximum pressures plotted in the reaction region of Fig. 5, connected with broken lines; decrease shown with arrow marks
+      uncertainty:
+        note: time-dependent reaction region; not a single equilibrium Clausius-Clapeyron; scatter not digitised
+    - observation_id: ikeda_1978_al_nb_al2o3_psat_fig6_figure_only
+      type: psat_series
+      locator:
+        figure: '6'
+        published_page: 165
+        pdf_page_index: 7
+        note: Partial pressures (atm) vs 1/T in the Nb-Al2O3 system; reaction region marked
+      T_range_K:
+      - 2000.0
+      - 2200.0
+      phase: recrystallized_Al2O3_in_niobium_Knudsen_cell
+      standard_state: partial pressure over Al2O3 in a Nb cell; atm as printed
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        major_species:
+        - Al
+        - Al2O
+        minor_species:
+        - AlO
+        cell_metal_species:
+        - Nb
+        - NbO
+        - NbO2
+        O_and_O2: not_observed
+        reaction_onset_T_K: 2000.0
+        hold_until_stable_T_K: 2045.0
+        second_rapid_increase_T_K: 2155.0
+        second_rapid_increase_note: vapor species of niobium oxides unchanged but partial pressures increased rapidly; not observed for Ta in the corresponding range
+      uncertainty:
+        note: time-dependent reaction region; scatter not digitised
+    - observation_id: ikeda_1978_al_p_vs_dgf_fig7_figure_only
+      type: psat_series
+      locator:
+        figure: '7'
+        published_page: 168
+        pdf_page_index: 10
+        note: P(Al) at 1920 K versus free energy of formation of presumed cell-metal oxides
+      T_range_K:
+      - 1920.0
+      - 1920.0
+      phase: recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells
+      standard_state: P(Al) atm at 1920 K vs Delta-Gf of presumed oxides (KCAL/g-atom of oxygen)
+      regime: kems_effusion
+      units: atm as published (ordinate -log P_Al)
+      values:
+        quantity: partial_pressure_Al_vs_oxide_formation_energy
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_K: 1920.0
+        fit:
+          form: dotted_line_rough_approximation
+          as_printed: The dotted line is a rough approximation
+          T_K: 1920.0
+        presumed_oxides_speculative:
+          W: WO3
+          Mo: MoO2
+          Ta: Ta2O5
+          Nb: NbO
+        authors_note: selections of oxide composition are speculative; dotted line is a rough approximation; Farber et al. marked at the neutral-condition intercept
+      uncertainty:
+        note: correlation figure; not a tabulated P(Al) series; not digitised
+  AlO:
+    observations:
+    - observation_id: ikeda_1978_alo_third_law_rxn2_average
+      type: gibbs_table
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        paragraph: for the reaction(2) the Delta-H298 obtained is -111.9 +/- 6 Kcal/mole
+        equation: '2'
+      T_range_K:
+      - 2248.0
+      - 2433.0
+      phase: gas_phase_over_Al2O3_in_tungsten_cell
+      standard_state: Al(g) + O(g) = AlO(g)
+      regime: kems_third_law_thermochemistry
+      units: Kcal mole-1 as printed
+      uncertainty:
+        delta_H_298_kcal_mol: 6.0
+        as_printed: -111.9 +/- 6 Kcal/mole
+      values:
+        quantity: third_law_reaction_enthalpy_298K
+        reaction_as_printed: Al(g) + O(g) = AlO(g)
+        reaction_number: 2
+        method_class: derived_third_law_from_measured_kems_and_janaf_fef
+        delta_H_298_kcal_mol: -111.9
+        literature_comparison_farber_1972_kcal_mol: -121.1
+        discrepancy_note: authors attribute discrepancies mainly to difference between AlO partial pressure data
+    - observation_id: ikeda_1978_alo_psat_figs3to6_figure_only
+      type: psat_series
+      locator:
+        figure: '3'
+        published_page: 162
+        pdf_page_index: 4
+        note: also Figs 4–6; AlO is the lowest of the Al-bearing series on the W and Mo plots
+      T_range_K:
+      - 2000.0
+      - 2400.0
+      phase: recrystallized_Al2O3_in_refractory_metal_Knudsen_cell
+      standard_state: partial pressure of AlO(g); atm as printed
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: AlO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        W_cell: rather low vs Farber; in good agreement with Drowart et al.
+        Mo_cell: lower than Drowart et al.
+        Ta_Nb_cells: AlO ion rather small; Al and Al2O are the major components
+      uncertainty:
+        note: figure-only; AlO values are the source of the reaction-(2) discrepancy vs Farber
+  Al2O:
+    observations:
+    - observation_id: ikeda_1978_al2o_third_law_rxn3_average
+      type: gibbs_table
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        paragraph: for the reaction (3) the Delta-H298 = 134.4 +/- 6 Kcal/mole
+        equation: '3'
+      T_range_K:
+      - 2248.0
+      - 2433.0
+      phase: gas_phase_over_Al2O3_in_tungsten_cell
+      standard_state: Al2O(g) = Al(g) + AlO(g)
+      regime: kems_third_law_thermochemistry
+      units: Kcal mole-1 as printed
+      uncertainty:
+        delta_H_298_kcal_mol: 6.0
+        as_printed: 134.4 +/- 6 Kcal/mole
+      values:
+        quantity: third_law_reaction_enthalpy_298K
+        reaction_as_printed: Al2O(g) = Al(g) + AlO(g)
+        reaction_number: 3
+        method_class: derived_third_law_from_measured_kems_and_janaf_fef
+        delta_H_298_kcal_mol: 134.4
+        literature_comparison_farber_1972_kcal_mol: 128.2
+    - observation_id: ikeda_1978_al2o_psat_figs3to6_figure_only
+      type: psat_series
+      locator:
+        figure: '3'
+        published_page: 162
+        pdf_page_index: 4
+        note: also Figs 4–6; Al2O is a major species in Ta and Nb cells
+      T_range_K:
+      - 2000.0
+      - 2400.0
+      phase: recrystallized_Al2O3_in_refractory_metal_Knudsen_cell
+      standard_state: partial pressure of Al2O(g); atm as printed
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: Al2O(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        W_Mo_cells: in good agreement with Drowart et al.
+        Ta_Nb_cells: major component together with Al; about one order higher than W/Mo at lower T
+        Al2O2_and_AlO2: not_detected
+        Al2O2_AlO2_note: reported by previous experiments (Drowart; Farber) but not detected here; authors say they may be hidden by background ions; reported partials were quite small
+      uncertainty:
+        note: figure-only; not digitised
+  O:
+    observations:
+    - observation_id: ikeda_1978_o_w_mo_psat_figs3_4_figure_only
+      type: psat_series
+      locator:
+        figure: '3'
+        published_page: 162
+        pdf_page_index: 4
+        note: also Fig. 4; O is a major vapor in W- and Mo-Al2O3
+      T_range_K:
+      - 2200.0
+      - 2400.0
+      phase: recrystallized_Al2O3_in_W_or_Mo_Knudsen_cell
+      standard_state: partial pressure of O(g); atm as printed
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        W_cell: slightly higher than previous work; Po/PAl about 1.0
+        Mo_cell: higher than Drowart et al.; slightly higher than the tungsten cell
+        ionizing_energy_eV: 30.0
+        ionizing_energy_note: 30 eV used to detect O+ effectively
+      uncertainty:
+        note: figure-only; O+ AP not measured with sufficient accuracy because of CH4+ background
+    - observation_id: ikeda_1978_o_ta_nb_true_absence
+      type: psat_series
+      locator:
+        published_page: 161
+        pdf_page_index: 3
+        paragraph: O and O2 vapor species could not be observed in these cases
+        note: tantalum and niobium cells
+      T_range_K:
+      - 2000.0
+      - 2200.0
+      phase: recrystallized_Al2O3_in_Ta_or_Nb_Knudsen_cell
+      standard_state: O(g) over Al2O3 in Ta or Nb cells
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: measured_direct
+        admission_status: true_absence
+        semantics: bound_not_point_ordering
+        status: not_observed
+        systems:
+        - Ta-Al2O3
+        - Nb-Al2O3
+      uncertainty:
+        note: authors report O and O2 could not be observed in Ta and Nb cells
+  O2:
+    observations:
+    - observation_id: ikeda_1978_o2_estimated_one_order_below_o
+      type: psat_series
+      locator:
+        published_page: 161
+        pdf_page_index: 3
+        paragraph: From the estimated decomposition equilibrium constant, the partial pressures of O2 were about one order smaller than those of O atom
+      phase: recrystallized_Al2O3_in_W_or_Mo_Knudsen_cell
+      standard_state: estimated p(O2) relative to measured p(O); not a direct ion-intensity calibration
+      regime: kems_effusion
+      units: order-of-magnitude relative to p(O) as printed
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: model_derived
+        admission_status: estimated_not_direct
+        semantics: bound_not_point_ordering
+        as_printed: about one order smaller than those of O atom
+        derivation: From the estimated decomposition equilibrium constant, the partial
+          pressures of O2 were about one order smaller than those of O atom (published
+          p. 161). No numeric p(O2) or T is printed with this estimate.
+        O2_plus_observation: scarcely observed due to rather high background
+        Ta_Nb_cells: not_observed
+      uncertainty:
+        note: estimate from decomposition K, not a tabulated p(O2) series; O2+ scarcely observed
