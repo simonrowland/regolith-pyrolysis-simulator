@@ -1,0 +1,156 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0101",
+  "census_id": "high-temperature-printed-page-127",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "lllRCAHTE",
+  "formula_as_published": "FeS 2",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 700 K.",
+    "                                                                    FORftlTIOIII FROft THE ELEIIEIIITS",
+    "                                                                                      GIBBS",
+    "TEftP.      <a;-H~98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY       FREE EIIIERGY     Log Kf",
+    "                               T"
+  ],
+  "description_lines_as_published": [
+    "FeS 2 :    Crystals 298.15 to 700 K.",
+    "                                                                    FORftlTIOIII FROft THE ELEIIEIIITS",
+    "                                                                                      GIBBS",
+    "TEftP.      <a;-H~98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY       FREE EIIIERGY     Log Kf",
+    "                               T"
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "119.967",
+    "value": 119.967,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      133
+    ],
+    "printed_pages": [
+      127
+    ],
+    "pdftotext_layout_page_file": "page-133.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27"
+  ],
+  "title_line_as_published": "lllRCAHTE                                                                           FORftULl WEIGHT    119.967",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "FeS 2 :    Crystals 298.15 to 700 K.",
+    "                                                                    FORftlTIOIII FROft THE ELEIIEIIITS",
+    "                                                                                      GIBBS",
+    "TEftP.      <a;-H~98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY       FREE EIIIERGY     Log Kf",
+    "                               T",
+    "   K         J/•ol•K       J/•ol•K      J/•ol•K        J/•ol•K            kJ/1101         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/•ol•K",
+    "entropy": "J/•ol•K",
+    "negative_gibbs_function": "J/•ol•K",
+    "heat_capacity": "J/•ol•K",
+    "formation_enthalpy": "kJ/1101",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 6,
+  "uncertainty_line_as_published": "UNCEBT lilT I                 0.11            o. 11                         2.090           2.090        0.366",
+  "uncertainty_values": [
+    {
+      "as_published": "0.11",
+      "value": 0.11,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 11",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.090",
+      "value": 2.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.090",
+      "value": 2.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.366",
+      "value": 0.366,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "FeS 2 :    Crystals 298.15 to 700 K.",
+    "                                                                    FORftlTIOIII FROft THE ELEIIEIIITS",
+    "                                                                                      GIBBS",
+    "TEftP.      <a;-H~98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY       FREE EIIIERGY     Log Kf",
+    "                               T"
+  ],
+  "auxiliary_lines_as_published": [
+    "ftELTING POIIIIT                                        BOILING POINT                                    K",
+    "ENTHALPY OF f!ELTIIIG                    kJ             ENTHALPY OF VAPORIZATION",
+    "                                         kJ            !lOLl R VOLU liE                         2.4580 Jjbar",
+    "                                                                                               24.580 c• 3",
+    "TRANSITIOIIIS IN REFERENCE STATE ELEliEIIITS",
+    "     IRON •••••••   CURIE P. 1042 1 lLPHA-GAftiU 1184 1 GAlllll-DELTl 1665 1",
+    "                    ft. P. DELTA 1809 K.",
+    "       SUL PUR..... OBTH0-110 NO 368. 54 1 II. P. 1101110 388.36,",
+    "                    B. P. 716.9 K.",
+    "HEAT CAPACITY EQUATIOIII",
+    "          -3.346h102 +       39.069    ro·s           1.1236 T",
+    "           8. 9245x 10 l T-1",
+    "               (EQUATION VALID FROII          298 -    700 K)",
+    "BEPBREIIICE        81          81                                             81                      COIIPILED",
+    "                                                                                                       7-24-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27",
+      "detector_only": false
+    }
+  ]
+}

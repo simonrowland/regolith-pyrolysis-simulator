@@ -1,0 +1,144 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0110",
+  "census_id": "high-temperature-printed-page-136",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "WU RTZITE",
+  "formula_as_published": "zns",
+  "phase_state_as_published": [
+    "crystals 298.15 to 1300 K."
+  ],
+  "description_lines_as_published": [
+    "zns:      crystals 298.15 to 1300 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "97.440",
+    "value": 97.44,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      142
+    ],
+    "printed_pages": [
+      136
+    ],
+    "pdftotext_layout_page_file": "page-142.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 30, 32, 34, 36, 42, 44"
+  ],
+  "title_line_as_published": "WU RTZITE                                                                          FORftO L1 WEIGHT     97.440",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "============================================s==============================•====",
+    "zns:      crystals 298.15 to 1300 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBftlTIOII FBOII THE ELEIIEIITS",
+    "                                                                                         GIBBS",
+    "TEftP.      (a;-a~ 98 )/T      so",
+    "                                 T      -(~-H~ 98 )/T",
+    "                                                              0",
+    "                                                             Cp     EliTHlLPY         FlEE EliEBGY      Log Kf",
+    "  K          J/aol• K       J/aol• K      J/aol•K        J/aol•K          kJ/aol          kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol• K",
+    "entropy": "J/aol• K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 15,
+  "uncertainty_line_as_published": "UNCERTAINTY                    0.12             o. 12                       1. 500          1. 5.20      0.266",
+  "uncertainty_values": [
+    {
+      "as_published": "0.12",
+      "value": 0.12,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 12",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1. 500",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1. 5.20",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.266",
+      "value": 0.266,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "zns:      crystals 298.15 to 1300 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                                           BOILI RG POINT",
+    "ENTHALPY OF I!ELTING                       kJ            EliTHALPY OF VAPORIZATION                       kJ",
+    "                                           kJ            llOLlB VOLUftE                        2.3846 J/bar",
+    "                                                                                              23.846 c11 3",
+    "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
+    "   ZINC ••••••• 1!. P. 692.7, B. P. 1178 K.",
+    "      SULFUR ••••• ORTHO-I!ONO 368.54, 1!. P. IIONO 388.36,",
+    "                   B. P. 716.9 K.",
+    "HEAT CAPACITY EQUATION",
+    "          41.906 + 7.6193x1o-:s T                   1. 5767x 11.12 T-o· s",
+    "             ( i:XlOATION VALID FRO!!           298 - 1300 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 30, 32, 34, 36, 42, 44",
+      "detector_only": false
+    }
+  ]
+}

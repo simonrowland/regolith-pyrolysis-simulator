@@ -1,0 +1,143 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0105",
+  "census_id": "high-temperature-printed-page-131",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "IIILLEBITI",
+  "formula_as_published": "lliS",
+  "phase_state_as_published": [
+    "crystals 298.15 to 600 K.",
+    "                                                                                            GIBBS",
+    "TIIIP.     ( H;-8; 98 )/T      so       -(G;-8~ 98 )/T           cop     EIITHlLPY     PBEE EIIIEBGY     Log Kf",
+    "                                 T"
+  ],
+  "description_lines_as_published": [
+    "lliS:     crystals 298.15 to 600 K.",
+    "                                                                                            GIBBS",
+    "TIIIP.     ( H;-8; 98 )/T      so       -(G;-8~ 98 )/T           cop     EIITHlLPY     PBEE EIIIEBGY     Log Kf",
+    "                                 T"
+  ],
+  "formation_basis_header_as_published": "POBIIATIOII FRO II THE ELBIIEIITS",
+  "formula_weight": {
+    "as_published": "90.760",
+    "value": 90.76,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      137
+    ],
+    "printed_pages": [
+      131
+    ],
+    "pdftotext_layout_page_file": "page-137.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25"
+  ],
+  "title_line_as_published": "IIILLEBITI                                                                              POBIIULA lEIGHT     90.760",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "lliS:     crystals 298.15 to 600 K.",
+    "                                                                          POBIIATIOII FRO II THE ELBIIEIITS",
+    "                                                                                            GIBBS",
+    "TIIIP.     ( H;-8; 98 )/T      so       -(G;-8~ 98 )/T           cop     EIITHlLPY     PBEE EIIIEBGY     Log Kf",
+    "                                 T",
+    "  K            J/aol•K      Jtaol• K      Jtaol• K           J/aol• K        kJ/mol           kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "Jtaol• K",
+    "negative_gibbs_function": "Jtaol• K",
+    "heat_capacity": "J/aol• K",
+    "formation_enthalpy": "kJ/mol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 5,
+  "uncertainty_line_as_published": "UIICIITAIIITY                  4. 18               4.18                          4.184          4.393         0.710",
+  "uncertainty_values": [
+    {
+      "as_published": "4. 18",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.18",
+      "value": 4.18,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.184",
+      "value": 4.184,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.393",
+      "value": 4.393,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.710",
+      "value": 0.71,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "lliS:     crystals 298.15 to 600 K.",
+    "                                                                                            GIBBS",
+    "TIIIP.     ( H;-8; 98 )/T      so       -(G;-8~ 98 )/T           cop     EIITHlLPY     PBEE EIIIEBGY     Log Kf",
+    "                                 T"
+  ],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQUATION",
+    " c;       38.702 +        2.6778x1o-z T",
+    "                ( .EQUAT lOll VALID FRO II         298 -     600 K)",
+    "REFIRE liCE       115           80                                                231                     COli PILED",
+    "                               274                                                                         7-24-7b"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25",
+      "detector_only": false
+    }
+  ]
+}
