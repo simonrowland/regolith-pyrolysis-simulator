@@ -2,16 +2,102 @@ schema_version: literature_extract.v1
 source_id: kems-027-plante-hastie-1983
 source:
   citation: >-
-    Plante, E. R., Hastie, J. W. & Bonnell, D. W. (1983), NBSIR 83-2731,
-    "Experimental and Theoretical Models for Transpiration Mass Spectrometry"
-    (alkali-bearing glass KMS/TMS vaporization methods)
+    Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1983), NBSIR 83-2731,
+    "Vaporization of Simulated Nuclear Waste Glass", National Bureau of
+    Standards, June 1983 (interim report). Hunt alias: alkali-bearing glass
+    KMS/TMS vaporization methods.
+  doi: null
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nbsir83-2731.pdf
   year: 1983
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry extract
-  date: '2026-08-03'
-  worker: ocr-phase2b-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/
+  method: >-
+    pdftotext -layout of NIST nvlpubs OA PDF; 250 dpi pdftoppm of Tables 1–4
+    (Table 3 rotated); 200 dpi renders of Figs 5–10 and 16–21. Table cells
+    from the render, not MinerU "~" grids. Fig. 19 log10 P(atm)=A−B/T
+    coefficients taken from the printed caption and evaluated on the
+    experimental T grid (p_Pa = p_atm × 101325). Geometry observation from
+    the 2026-08-03 OCR extract retained without rewriting values. Printed
+    plate numbers for Figs 5 and 7 are swapped vs §8 captions (noted on
+    locators).
+  date: '2026-09-06'
+  worker: hunt-RH-48
+  provenance_path: docs-private/research/2026-09-06-hunts/RH-48/kems-027-plante-hastie-1983/
 review_status: draft
+fidelity_samples:
+- path: species.Na.observations[plante_hastie_1983_kms_pt_cell_geometry].equipment.orifice_area.value
+  value: 1.963495e-05
+  note: inferred from 0.5 cm effusion orifice diameter
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+    paragraph: An effusion orifice diameter of 0.5 cm was used
+    line_range: '163'
+- species: Na
+  observable: rate_series
+  observation_id: plante_hastie_1983_kms_pt_cell_geometry
+  field: cell_od_cm
+  value: 0.80
+  locator:
+    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+    paragraph: 0.80 cm o.d. by 1.90 cm high
+    line_range: '163'
+- species: Na
+  observable: psat_series
+  observation_id: plante_hastie_1983_fig19_nabo2_logP_ls
+  field: A
+  value: 4.09
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Fig. 19 caption log P(atm) {NaBO2} = (4.09 ± 0.2) - (1.190 ± 0.02)×10^4/T
+- species: Na
+  observable: psat_series
+  observation_id: plante_hastie_1983_fig19_nabo2_logP_ls
+  field: B
+  value: 11900.0
+  locator:
+    published_page: 45
+    figure: '19'
+    note: Fig. 19 caption B = (1.190 ± 0.02)×10^4 K
+- species: Na
+  observable: rate_series
+  observation_id: plante_hastie_1983_table1_snw_glass_composition
+  field: analytical_Na2O_wt_pct
+  value: 8.59
+  locator:
+    published_page: 3
+    pdf_page_index: 9
+    table: '1'
+    note: Table 1 analytical Na2O weight percent as printed
+- species: Na
+  observable: rate_series
+  observation_id: plante_hastie_1983_table3_mass_loss
+  field: series_I_initial_sample_mg
+  value: 263.1
+  locator:
+    published_page: 15
+    pdf_page_index: 21
+    table: '3'
+    note: Series I initial sample weight 263.1 mg
+- species: Cs
+  observable: activity_coefficient
+  observation_id: plante_hastie_1983_csbo2_activity_1200K
+  field: activity
+  value: 4.0e-6
+  locator:
+    published_page: 36
+    pdf_page_index: 42
+    note: a(CsBO2)_obs = 4e-6 at 1200 K (section 4.1.1)
+- species: Li
+  observable: psat_series
+  observation_id: plante_hastie_1983_fig19_libo2_logP_ls
+  field: A
+  value: 4.73
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Fig. 19 caption log P(atm) {LiBO2} = (4.73 ± 0.2) - (1.292 ± 0.02)×10^4/T
 species:
   Na:
     observations:
@@ -73,20 +159,603 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
             paragraph: Knudsen cell was made of 0.025 cm Pt sheet
             line_range: '163'
-fidelity_samples:
-- path: species.Na.observations[plante_hastie_1983_kms_pt_cell_geometry].equipment.orifice_area.value
-  value: 1.963495e-05
-  note: inferred from 0.5 cm effusion orifice diameter
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-    paragraph: An effusion orifice diameter of 0.5 cm was used
-    line_range: '163'
-- species: Na
-  observable: rate_series
-  observation_id: plante_hastie_1983_kms_pt_cell_geometry
-  field: cell_od_cm
-  value: 0.80
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-    paragraph: 0.80 cm o.d. by 1.90 cm high
-    line_range: '163'
+    - observation_id: plante_hastie_1983_table1_snw_glass_composition
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 3
+        pdf_page_index: 9
+        note: SNW glass nominal vs analytical composition (Soper 1982)
+      T_range_K: [1123.15, 1423.15]
+      phase: SNW_alkali_bearing_glass
+      standard_state: condensed glass as analysed; nominal used for thermo estimates
+      regime: kems_effusion
+      units: wt% and mol% as published
+      values:
+        quantity: condensed_composition
+        method_class: measured_direct
+        system: SNW_borosilicate_glass
+        system_class: silicate_melt
+        sample: DuPont-Savannah_River_SNW_glass
+        T_molten_C_as_published: [850, 1150]
+        analytical_Na2O_wt_pct: 8.59
+        analytical_Na2O_mol_pct: 9.20
+        nominal_Na2O_wt_pct: 10.13
+        nominal_Na2O_mol_pct: 10.76
+        composition_nominal_wt_pct:
+          SiO2: 52.00
+          Fe2O3: 12.96
+          Al2O3: 4.86
+          B2O3: 7.29
+          Li2O: 5.10
+          Na2O: 10.13
+          MnO2: 3.25
+          NiO: 1.05
+          CaO: 1.59
+          MgO: 0.68
+          ZrO2: 0.70
+          SrO: 0.09
+          Cs2O: 0.10
+          RuO2: 0.09
+          Re2O7: 0.10
+        composition_analytical_wt_pct:
+          SiO2: 53.76
+          Fe2O3: 11.49
+          Al2O3: 4.75
+          B2O3: 6.49
+          Li2O: 3.96
+          Na2O: 8.59
+          MnO2: 3.57
+          NiO: 1.80
+          CaO: 1.01
+          MgO: 0.54
+          ZrO2: 3.79
+          SrO: 0.05
+          Cs2O: 0.07
+          RuO2: 0.11
+          Re2O7: 0.03
+        footnote_a: Soper 1982
+        footnote_b: see text for selection; nominal used for thermodynamic estimates
+      uncertainty:
+        note: unreported for the ICP/NAA analyses
+    - observation_id: plante_hastie_1983_table3_mass_loss
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 15
+        pdf_page_index: 21
+        note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
+      T_range_K: [1073.15, 1423.15]
+      phase: SNW_alkali_bearing_glass
+      standard_state: evolving residue after KMS Series I/II
+      regime: kems_effusion
+      units: mg as published
+      values:
+        quantity: calculated_oxide_equivalent_mass_loss
+        method_class: measured_direct
+        series_I_initial_sample_mg: 263.1
+        series_II_initial_sample_mg: 418.4
+        B2O3_borate_loss_cells: true_absence_printed_dashes_not_zero
+        series_I:
+          Na2O_oxide_equivalent_total_loss_mg: 5.3
+          Na2O_total_oxide_present_mg: 26.1
+          Li2O_oxide_equivalent_total_loss_mg: 2.0
+          Li2O_total_oxide_present_mg: 13.4
+          Cs2O_oxide_equivalent_total_loss_mg: 0.08
+          Cs2O_total_oxide_present_mg: 0.26
+          B2O3_oxide_equivalent_total_loss_mg: 10.5
+          B2O3_total_oxide_present_mg: 19.2
+          O2_total_loss_mg: 2.43
+          O2_total_present_mg: 1.1
+        series_II:
+          Na2O_oxide_equivalent_mg: 5.82
+          Na2O_total_oxide_present_mg: 42.3
+          Li2O_oxide_equivalent_mg: 1.72
+          Li2O_total_oxide_present_mg: 21.3
+          Cs2O_oxide_equivalent_mg: 0.50
+          Cs2O_total_oxide_present_mg: 0.42
+          B2O3_oxide_equivalent_mg: 10.69
+          B2O3_total_oxide_present_mg: 30.5
+          O2_loss_mg: 3.39
+          O2_present_mg: 1.81
+        timed_mg_s_series: true_absence
+        series_II_Cs2O_note: >-
+          Calculated Cs2O loss 0.50 mg exceeds inventory 0.42 mg; authors treat
+          Series II CsBO2 pressures as anomalously high.
+      uncertainty:
+        note: >-
+          Authors: ionization-cross-section and composition uncertainties;
+          agreement of calculated vs inventory losses is "satisfactory" except O2
+          (secondary O2 source) and Series II CsBO2.
+    - observation_id: plante_hastie_1983_fig19_nabo2_logP_ls
+      type: psat_series
+      locator:
+        figure: '19'
+        published_page: 45
+        pdf_page_index: 51
+        note: >-
+          Printed least-squares coefficients in Fig. 19 caption (report p. 45).
+          Plate is PDF p. 70 / report p. 64. TMS+KMS equal-weight ensemble.
+          Scatter on plates 7/8 (caption 5 / Series II) is the input, not a
+          second independent fit.
+      T_range_K: [1000.0, 1600.0]
+      phase: SNW_alkali_bearing_glass
+      standard_state: >-
+        P(NaBO2,g) over SNW borosilicate melt; not pure NaBO2. Authors compare
+        to JANAF P°(NaBO2,l) for activity.
+      regime: mixed_kms_tms
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        quantity: partial_pressure_NaBO2
+        gas_species: NaBO2
+        method_class: measured_direct
+        system: SNW_borosilicate_glass
+        system_class: silicate_melt
+        equation_as_printed: log P (atm) {NaBO2} = (4.09 ± 0.2) - (1.190 ± 0.02)×10^4/T
+        A: 4.09
+        B: 11900.0
+        A_sigma: 0.2
+        B_sigma: 200.0
+        log10_base: 10
+        pO2_as_published: not_tabulated_on_this_fit
+        pO2_note: >-
+          KMS O2 from Fe2O3 reduction is Fig. 5 plate (caption 7), figure-only.
+          Combined metaborate LS does not carry a pO2 column.
+        composition_analytical_Na2O_wt_pct: 8.59
+        tms_carrier: N2
+        tms_total_pressure_atm: 0.3
+        tms_flow_sccm: 6
+        points:
+        - T_K: 1000.0
+          invT_times_1e4_K_inv: 10.0
+          log10_P_atm: -7.81
+          p_atm: 1.548817e-08
+          p_Pa: 0.001569338
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1100.0
+          invT_times_1e4_K_inv: 9.090909
+          log10_P_atm: -6.728182
+          p_atm: 1.869899e-07
+          p_Pa: 0.01894675
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1200.0
+          invT_times_1e4_K_inv: 8.333333
+          log10_P_atm: -5.826667
+          p_atm: 1.490505e-06
+          p_Pa: 0.1510254
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1250.0
+          invT_times_1e4_K_inv: 8.0
+          log10_P_atm: -5.43
+          p_atm: 3.715352e-06
+          p_Pa: 0.3764581
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1300.0
+          invT_times_1e4_K_inv: 7.692308
+          log10_P_atm: -5.063846
+          p_atm: 8.632843e-06
+          p_Pa: 0.8747228
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1400.0
+          invT_times_1e4_K_inv: 7.142857
+          log10_P_atm: -4.41
+          p_atm: 3.890451e-05
+          p_Pa: 3.942
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1423.15
+          invT_times_1e4_K_inv: 7.026666
+          log10_P_atm: -4.271733
+          p_atm: 5.348934e-05
+          p_Pa: 5.419807
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1500.0
+          invT_times_1e4_K_inv: 6.666667
+          log10_P_atm: -3.843333
+          p_atm: 0.0001434388
+          p_Pa: 14.53394
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1600.0
+          invT_times_1e4_K_inv: 6.25
+          log10_P_atm: -3.3475
+          p_atm: 0.0004492623
+          p_Pa: 45.52151
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        domain_note: >-
+          Points are evaluations of the printed LS, not a T-grid invented by
+          the extractor. Fig. 19 axis is 10^4/T = 6–10 (1667–1000 K). Do not
+          evaluate above 1600 K; 2473.15 K is outside the source domain.
+      uncertainty:
+        note: >-
+          Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility
+          ca. 20% (section 3.6). No per-point sigma tabulated. Digitisation of
+          the scatter is not required for the coefficients (they are printed).
+      equipment:
+        cell_material:
+          value: Pt Knudsen cell (KMS) and Pt transpiration boat/capillary (TMS)
+          locator:
+            published_page: 7
+            pdf_page_index: 13
+            figure: '2'
+            paragraph: Knudsen cell was made of 0.025 cm Pt sheet
+        chamber_pressure:
+          value: 0.3
+          units: atm
+          note: TMS N2 carrier ~0.3 atm (Fig. 17 caption). KMS is vacuum effusion.
+          locator:
+            published_page: 45
+            figure: '17'
+    - observation_id: plante_hastie_1983_nabo2_activity_approx
+      type: activity_coefficient
+      locator:
+        published_page: 16
+        pdf_page_index: 22
+        figure: '7'
+        note: >-
+          Prose after Table 2: activity of NaBO2 in SNW glass is approximately
+          0.01 with a slight T dependence, from P/P°(JANAF NaBO2,l) on the
+          NaBO2 plot. Printed plate is Figure 7; §8 caption 5.
+      T_range_K: [1073.15, 1423.15]
+      phase: SNW_alkali_bearing_glass
+      standard_state: >-
+        a(NaBO2) = P(NaBO2)/P°(NaBO2,l) with P° from JANAF 1971. Not a
+        Raoultian Na2O activity.
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: activity_NaBO2
+        oxide_formula_as_published: NaBO2
+        method_class: measured_direct
+        activity: 0.01
+        activity_qualifier: approximately
+        temperature_dependence: slight
+        P_ref: JANAF_1971_NaBO2_liquid
+      uncertainty:
+        note: authors say approximately; no numeric sigma
+    - observation_id: plante_hastie_1983_alpha_true_absence
+      type: alpha
+      locator:
+        published_page: 44
+        pdf_page_index: 50
+        note: §8 figure captions and all numbered tables; no evaporation/condensation coefficient
+      T_range_K: [1073.15, 1600.0]
+      phase: SNW_alkali_bearing_glass
+      regime: mixed_kms_tms
+      units: dimensionless
+      values:
+        quantity: kinetic_alpha
+        status: typed_refusal
+        admission_status: true_absence
+        reason: >-
+          NBSIR 83-2731 reports KMS/TMS equilibrium partial pressures and
+          activities of alkali metaborates. No evaporation or condensation
+          coefficient α is tabulated or plotted.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+    - observation_id: plante_hastie_1983_ru_re_sr_undetected
+      type: psat_series
+      locator:
+        published_page: 18
+        pdf_page_index: 24
+        paragraph: Search for Ru, Re, and Sr-containing Species
+      T_range_K: [1073.15, 1773.15]
+      phase: SNW_alkali_bearing_glass
+      standard_state: KMS vacuum detection limits, not a measured p_i
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: undetected_radionuclide_simulant_partial_pressure
+        method_class: measured_direct
+        semantics: bound_not_point_ordering
+        ions_sought:
+          - Ru+
+          - RuO+
+          - RuO3+
+          - RuO4+
+          - Re+
+          - ReO+
+          - ReO2+
+          - ReO3+
+          - Re2O7+
+        Sr_search: no_attempt_thermodynamic_argument
+        detected: false
+        T_max_C_as_published: 1500
+        P_upper_atm_inert: 1.0e-7
+        P_upper_atm_H2O_or_reactive: 1.0e-6
+        P_upper_Pa_inert: 0.0101325
+        p_Pa_arithmetic: p_Pa = p_atm * 101325
+        NaReO4_fragmentation_note: >-
+          NaReO4 predicted as Re carrier but fragments to Na+; parent ~0.1%
+          of ions. Masked by NaBO2 Na+.
+      uncertainty:
+        note: detection limits as stated; not a measured point
+  Li:
+    observations:
+    - observation_id: plante_hastie_1983_fig19_libo2_logP_ls
+      type: psat_series
+      locator:
+        figure: '19'
+        published_page: 45
+        pdf_page_index: 51
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+      T_range_K: [1000.0, 1600.0]
+      phase: SNW_alkali_bearing_glass
+      standard_state: P(LiBO2,g) over SNW melt; P° from JANAF 1971 LiBO2(l) used for activity
+      regime: mixed_kms_tms
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        quantity: partial_pressure_LiBO2
+        gas_species: LiBO2
+        method_class: measured_direct
+        system: SNW_borosilicate_glass
+        equation_as_printed: log P (atm) {LiBO2} = (4.73 ± 0.2) - (1.292 ± 0.02)×10^4/T
+        A: 4.73
+        B: 12920.0
+        A_sigma: 0.2
+        B_sigma: 200.0
+        points:
+        - T_K: 1000.0
+          invT_times_1e4_K_inv: 10.0
+          log10_P_atm: -8.19
+          p_atm: 6.456542e-09
+          p_Pa: 0.0006542091
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1100.0
+          invT_times_1e4_K_inv: 9.090909
+          log10_P_atm: -7.015455
+          p_atm: 9.650403e-08
+          p_Pa: 0.009778271
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1200.0
+          invT_times_1e4_K_inv: 8.333333
+          log10_P_atm: -6.036667
+          p_atm: 9.190377e-07
+          p_Pa: 0.0931215
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1250.0
+          invT_times_1e4_K_inv: 8.0
+          log10_P_atm: -5.606
+          p_atm: 2.477422e-06
+          p_Pa: 0.2510248
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1300.0
+          invT_times_1e4_K_inv: 7.692308
+          log10_P_atm: -5.208462
+          p_atm: 6.187831e-06
+          p_Pa: 0.626982
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1400.0
+          invT_times_1e4_K_inv: 7.142857
+          log10_P_atm: -4.498571
+          p_atm: 3.172697e-05
+          p_Pa: 3.214735
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1423.15
+          invT_times_1e4_K_inv: 7.026666
+          log10_P_atm: -4.348453
+          p_atm: 4.482778e-05
+          p_Pa: 4.542175
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1500.0
+          invT_times_1e4_K_inv: 6.666667
+          log10_P_atm: -3.883333
+          p_atm: 0.0001308177
+          p_Pa: 13.25511
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1600.0
+          invT_times_1e4_K_inv: 6.25
+          log10_P_atm: -3.345
+          p_atm: 0.0004518559
+          p_Pa: 45.7843
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+      uncertainty:
+        note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+    - observation_id: plante_hastie_1983_libo2_activity_approx
+      type: activity_coefficient
+      locator:
+        published_page: 16
+        pdf_page_index: 22
+        figure: '6'
+        note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
+      T_range_K: [1073.15, 1423.15]
+      phase: SNW_alkali_bearing_glass
+      standard_state: a(LiBO2)=P/P°(JANAF 1971 LiBO2,l)
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: activity_LiBO2
+        method_class: measured_direct
+        activity: 0.1
+        activity_qualifier: about
+        temperature_dependence: some
+        P_ref: JANAF_1971_LiBO2_liquid
+      uncertainty:
+        note: authors say about; no numeric sigma
+  Cs:
+    observations:
+    - observation_id: plante_hastie_1983_fig19_csbo2_logP_ls
+      type: psat_series
+      locator:
+        figure: '19'
+        published_page: 45
+        pdf_page_index: 51
+        note: >-
+          First five KMS and four TMS points selected as most representative.
+          KMS CsBO2 from Series I multiplied by two (average of Series I and II).
+      T_range_K: [1100.0, 1600.0]
+      phase: SNW_alkali_bearing_glass
+      standard_state: P(CsBO2,g) over SNW melt; P° from Gurvich and Veits 1983
+      regime: mixed_kms_tms
+      units: atm as published (p_Pa = p_atm × 101325)
+      values:
+        quantity: partial_pressure_CsBO2
+        gas_species: CsBO2
+        method_class: measured_direct
+        system: SNW_borosilicate_glass
+        equation_as_printed: log P (atm) {CsBO2} = (3.45 ± 0.3) - (1.288 ± 0.04)×10^4/T
+        A: 3.45
+        B: 12880.0
+        A_sigma: 0.3
+        B_sigma: 400.0
+        series_I_II_averaging_note: KMS Series I ×2 to average with Series II
+        points:
+        - T_K: 1100.0
+          invT_times_1e4_K_inv: 9.090909
+          log10_P_atm: -8.259091
+          p_atm: 5.506924e-09
+          p_Pa: 0.0005579891
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1200.0
+          invT_times_1e4_K_inv: 8.333333
+          log10_P_atm: -7.283333
+          p_atm: 5.207948e-08
+          p_Pa: 0.005276954
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1250.0
+          invT_times_1e4_K_inv: 8.0
+          log10_P_atm: -6.854
+          p_atm: 1.399587e-07
+          p_Pa: 0.01418132
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1300.0
+          invT_times_1e4_K_inv: 7.692308
+          log10_P_atm: -6.457692
+          p_atm: 3.485842e-07
+          p_Pa: 0.03532029
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1400.0
+          invT_times_1e4_K_inv: 7.142857
+          log10_P_atm: -5.75
+          p_atm: 1.778279e-06
+          p_Pa: 0.1801842
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1500.0
+          invT_times_1e4_K_inv: 6.666667
+          log10_P_atm: -5.136667
+          p_atm: 7.300176e-06
+          p_Pa: 0.7396903
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+        - T_K: 1600.0
+          invT_times_1e4_K_inv: 6.25
+          log10_P_atm: -4.6
+          p_atm: 2.511886e-05
+          p_Pa: 2.545169
+          p_Pa_arithmetic: p_Pa = p_atm * 101325
+      uncertainty:
+        note: printed ±0.3 on A and ±0.04×10^4 on B; Series I vs II disagreed by ~×4 before averaging
+    - observation_id: plante_hastie_1983_csbo2_activity_1200K
+      type: activity_coefficient
+      locator:
+        published_page: 36
+        pdf_page_index: 42
+        paragraph: section 4.1.1 Cs
+        note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
+      T_range_K: [1200.0, 1200.0]
+      phase: SNW_alkali_bearing_glass
+      standard_state: a(CsBO2)=P/P° with P° from Gurvich and Veits 1983; not ideal CsBO2(l) mixing
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: activity_CsBO2
+        method_class: measured_direct
+        activity: 4.0e-6
+        T_K: 1200.0
+        P_obs_atm_order: 1.0e-8
+        a_ideal_mixing_from_table1: 4.0e-4
+        P_calc_ideal_atm_order: 1.0e-6
+        P_ref: Gurvich_Veits_1983_CsBO2
+      uncertainty:
+        note: authors print 4×10^-6; no extra sigma. Ideal-mixing estimate is two orders higher.
+  O2:
+    observations:
+    - observation_id: plante_hastie_1983_o2_kms_figure_only
+      type: psat_series
+      locator:
+        figure: '5'
+        published_page: 50
+        pdf_page_index: 56
+        note: >-
+          Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed
+          LS coefficients. Five lowest-T points rejected in the authors' LS.
+          Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
+      T_range_K: [1073.15, 1423.15]
+      phase: SNW_alkali_bearing_glass
+      standard_state: P(O2) over SNW melt; attributed mainly to Fe2O3→Fe3O4 in solution
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure_O2
+        gas_species: O2
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: >-
+          O2 P(T) exists only as Fig. 5 plate scatter plus an unpublished LS
+          (five lowest-T points rejected). No numeric table or printed A,B.
+        semantics: bound_not_point_ordering
+        janaf_overlay: Fe2O3_c_to_Fe3O4_c
+      uncertainty:
+        note: not applicable to unpublished LS; scatter not digitised this hunt
+    - observation_id: plante_hastie_1983_table4_offgas_cec_model
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 33
+        pdf_page_index: 39
+        note: NASA CEC 76 model of industrial off-gas at 1 atm; not a glass measurement
+      T_range_K: [333.0, 2500.0]
+      phase: industrial_offgas_model
+      standard_state: 1 atm total; NASA CEC 76 (Gordon and McBride 1971)
+      regime: transpiration_mass_spectrometry
+      units: mole fraction as published
+      values:
+        quantity: model_offgas_mole_fraction
+        method_class: model
+        total_pressure_atm: 1.0
+        input_moles:
+          H2O: 0.8555
+          N2: 0.09023
+          CO2: 0.01244
+          O2: 0.02378
+          CO: 0.008359
+          H2: 0.007588
+        O2_mole_fraction:
+          T_2500K: 2.56e-2
+          T_2000K: 1.67e-2
+          T_1500K: 1.68e-2
+          T_1250K: 1.69e-2
+          T_1000K: 1.69e-2
+          T_333K: 1.68e-2
+        tms_reactive_mix_used:
+          N2: 0.67
+          O2: 0.18
+          CO2: 0.15
+          H2O: 0.1
+        printed_zeros_are_model_output: true
+      uncertainty:
+        note: compilation/model; no experimental sigma
+    - observation_id: plante_hastie_1983_fig20_21_model_proxy
+      type: psat_series
+      locator:
+        figure: '20'
+        published_page: 45
+        pdf_page_index: 71
+        note: Figs 20–21 thermodynamic estimates; a=x; pO2=0.02 atm. Not measurements.
+      T_range_K: [1073.15, 1373.15]
+      phase: SNW_alkali_bearing_glass
+      standard_state: oxide mole-fraction activities; pO2=0.02 atm as assigned
+      regime: thermodynamic_estimate
+      units: atm as published
+      values:
+        quantity: estimated_radionuclide_partial_pressures
+        method_class: model
+        admission_status: model_proxy
+        status: typed_refusal
+        reason: >-
+          Fig. 20 compares experimental metaborate LS with calculated NaReO4,
+          RuO3, SrO×10^10 at pO2=0.02 atm and a=x. Fig. 21 is calculated
+          hydroxides. Neither is a measured p_i table.
+        semantics: bound_not_point_ordering
+        assigned_pO2_atm: 0.02
+      uncertainty:
+        note: not applicable
