@@ -7,10 +7,10 @@ source:
   doi: 10.1007/s11663-024-02995-6
   year: 2024
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry extract
-  date: '2026-08-03'
-  worker: ocr-phase2b-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/
+  method: deepening DEEP-kems-031-halwax-2024 from PDF on disk (pdftotext -layout + pdftoppm 150 dpi renders). Parent observation objects preserved bit-identical. Tables I-VII transcribed cell-for-cell into corpus tables/kems-031-halwax-2024/. Quotes on existing rows added by superseding rows (new observation_id), not by editing parents. No MinerU jobs. No unit conversion without a derivation comment.
+  date: '2026-09-06'
+  worker: DEEP-kems-031-halwax-2024
+  provenance_path: docs-private/research/2026-09-06-deepening/DEEP-kems-031-halwax-2024/kems-031-halwax-2024/
 review_status: draft
 species:
   MgO:
@@ -151,6 +151,323 @@ species:
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
             paragraph: Ir cell
+    - observation_id: halwax_2024_table_i_mgo_sample_masses
+      supersedes: halwax_2024_mgo_kems_geometry_psat_package
+      type: rate_series
+      class: measured
+      locator:
+        page: 825
+        published_page: 825
+        pdf_page_index: 5
+        table: I
+        source_path: tables/kems-031-halwax-2024/t1.csv
+      quote: '1st measurement | 53.67 | 49.25
+
+        2nd measurement | 51.58 | 48.28'
+      T_range_K:
+      - 1675.0
+      - 2075.0
+      phase: pure_solid_MgO
+      standard_state: pure MgO(s); Ir Knudsen cell; masses by differential weighing
+      regime: kems_effusion
+      units: mg
+      values:
+        method_class: measured
+        quantity: sample_mass_before_after_weight_loss
+        evidence_class: measured
+        source_table: I
+        printed_1st_initial_mass_mg: 53.67
+        header_note: fourth column header is printed Mass After Experiment CaO; values are the MgO after-masses paired with Initial Mass MgO
+        series:
+        - measurement: 1st measurement
+          initial_mass_mg: 53.67
+          mass_after_experiment_mg: 49.25
+          quote: '1st measurement | Initial Mass MgO [mg] 53.67 | Mass After Experiment CaO [mg] 49.25'
+          locator: {page: 825, table: I, pdf_page_index: 5}
+        - measurement: 2nd measurement
+          initial_mass_mg: 51.58
+          mass_after_experiment_mg: 48.28
+          quote: '2nd measurement | Initial Mass MgO [mg] 51.58 | Mass After Experiment CaO [mg] 48.28'
+          locator: {page: 825, table: I, pdf_page_index: 5}
+        T_range_as_published: ~ 1675 K to ~ 2075 K for MgO
+        T_range_quote: from ~ 1825 K to ~ 2125 K for CaO and ~ 1675 K to ~ 2075 K for MgO
+        T_range_locator: {page: 826, published_page: 826, paragraph: experimental temperature ranges}
+        gas_species_observed:
+        - Mg(g)
+        - O(g)
+        - O2(g)
+        gas_species_quote: 'For MgO, 24Mg+, 16O+, and 16O2+ were detected as the main ions.'
+      uncertainty:
+        note: no printed uncertainty on Table I mass cells
+      equipment:
+        orifice_area:
+          value: 7.068583e-08
+          units: m2
+          diameter_m: 0.0003
+          orifice_shape: lid_orifice
+          inferred: true
+          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
+          locator:
+            page: 825
+            paragraph: experimental
+            quote: The orifice in the lid of the cell had a diameter of 0.3 mm
+        cell_material:
+          value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater wire
+          locator:
+            page: 825
+            paragraph: experimental
+            quote: To prevent reactions between the Knudsen cell and the sample, an iridium cell was used.
+        chamber_pressure:
+          value: 1.0e-05
+          units: mbar
+          converted_value_Pa: 0.001
+          conversion: 1.0e-5 mbar * 100 Pa/mbar = 1.0e-3 Pa
+          note: heating started after chamber pressure decreased below 10^-5 mbar (threshold, not a point measurement)
+          locator:
+            page: 825
+            paragraph: experimental
+            quote: As soon as the pressure decreased below 10-5 mbar, heating could be started.
+    - observation_id: halwax_2024_table_iv_mgo_1st_measurement
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        row: 1st measurement
+        source_path: tables/kems-031-halwax-2024/t4.csv
+      quote: '−604 ± 4 | 1st measurement'
+      phase: pure_solid_MgO
+      standard_state: pure MgO(s), standard formation enthalpy at 298 K
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol
+      values:
+        method_class: third_law_kems
+        quantity: standard_formation_enthalpy_298K
+        evidence_class: derived
+        source_table: IV
+        source_row: 1st measurement
+        reaction: Mg(s) + 0.5O2(g) = MgO(s)
+        delta_f_H_kJ_mol: -604.0
+        reference_temperature_K: 298
+        reference_temperature_quote: ΔfH°298 [kJ/mol]
+        cell_quote: −604 ± 4
+      uncertainty:
+        delta_f_H_kJ_mol: 4.0
+        quote: −604 ± 4
+        locator: {page: 830, table: IV}
+        basis: author_reported
+    - observation_id: halwax_2024_table_iv_mgo_2nd_measurement
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        row: 2nd measurement
+        source_path: tables/kems-031-halwax-2024/t4.csv
+      quote: '−592 ± 4 | 2nd measurement'
+      phase: pure_solid_MgO
+      standard_state: pure MgO(s), standard formation enthalpy at 298 K
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol
+      values:
+        method_class: third_law_kems
+        quantity: standard_formation_enthalpy_298K
+        evidence_class: derived
+        source_table: IV
+        source_row: 2nd measurement
+        reaction: Mg(s) + 0.5O2(g) = MgO(s)
+        delta_f_H_kJ_mol: -592.0
+        reference_temperature_K: 298
+        reference_temperature_quote: ΔfH°298 [kJ/mol]
+        cell_quote: −592 ± 4
+      uncertainty:
+        delta_f_H_kJ_mol: 4.0
+        quote: −592 ± 4
+        locator: {page: 830, table: IV}
+        basis: author_reported
+    - observation_id: halwax_2024_table_iv_mgo_mean
+      supersedes: halwax_2024_mgo_third_law_formation_enthalpy
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        row: mean
+        source_path: tables/kems-031-halwax-2024/t4.csv
+      quote: '−598 ± 10 | mean'
+      phase: pure_solid_MgO
+      condensed_form:
+        state: crystalline
+        polymorph: periclase
+        metastable: false
+        basis: explicit_author
+        note: Pure MgO powder in the Ir Knudsen cell; thermochemical result is for MgO(s).
+      standard_state: pure MgO(s), standard formation enthalpy at 298 K
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol
+      values:
+        method_class: third_law_kems
+        quantity: standard_formation_enthalpy_298K
+        evidence_class: derived
+        source_table: IV
+        source_row: mean
+        reaction: Mg(s) + 0.5O2(g) = MgO(s)
+        delta_f_H_kJ_mol: -598.0
+        reference_temperature_K: 298
+        reference_temperature_quote: ΔfH°298 [kJ/mol]
+        cell_quote: −598 ± 10
+        mean_bold_as_published: true
+        footnote_quote: The mean values of the two measurements are written bold.
+        abstract_quote: 'Df H298 = − 598 ± 10 kJ/mol for MgO(s) based on the third law method'
+        melt_activity_applicability: excluded
+        activity_pin_eligible: false
+        consumer_policy: thermochemistry_only_not_melt_activity
+      uncertainty:
+        delta_f_H_kJ_mol: 10.0
+        quote: −598 ± 10
+        locator: {page: 830, table: IV}
+        basis: author_reported
+        text_quote: Standard deviations of the determined values for Df H298 are obtained considering the statistical deviation of the experimental data.
+    - observation_id: halwax_2024_table_iv_mgo_literature_and_factps
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        source_path: tables/kems-031-halwax-2024/t4.csv
+      quote: '−635 ± 10 | 9
+
+        −589 ± 15 | 15
+
+        −601 ± 1 | 1
+
+        −601 ± 0.5 | 13
+
+        −602 ± 0.2 | 14
+
+        −602 | 4
+
+        −601 | FactPS'
+      phase: pure_solid_MgO
+      standard_state: literature comparison of DfH298 MgO(s)
+      regime: literature_compilation
+      units: kJ/mol
+      values:
+        method_class: secondary_compilation
+        quantity: literature_formation_enthalpy_comparison
+        evidence_class: derived
+        source_table: IV
+        reaction: Mg(s) + 0.5O2(g) = MgO(s)
+        cells:
+        - {source: '9', delta_f_H_kJ_mol: -635.0, uncertainty_kJ_mol: 10.0, class: derived, quote: '−635 ± 10 | 9'}
+        - {source: '15', delta_f_H_kJ_mol: -589.0, uncertainty_kJ_mol: 15.0, class: derived, quote: '−589 ± 15 | 15'}
+        - {source: '1', delta_f_H_kJ_mol: -601.0, uncertainty_kJ_mol: 1.0, class: derived, quote: '−601 ± 1 | 1'}
+        - {source: '13', delta_f_H_kJ_mol: -601.0, uncertainty_kJ_mol: 0.5, class: derived, quote: '−601 ± 0.5 | 13'}
+        - {source: '14', delta_f_H_kJ_mol: -602.0, uncertainty_kJ_mol: 0.2, class: derived, quote: '−602 ± 0.2 | 14'}
+        - {source: '4', delta_f_H_kJ_mol: -602.0, class: derived, quote: '−602 | 4'}
+        - {source: FactPS, delta_f_H_kJ_mol: -601.0, class: model, quote: '−601 | FactPS'}
+        note: Source numbers are the paper's numbered references. FactPS is a database calculation (class model). Uncertainty omitted where no ± was printed.
+      uncertainty:
+        cells:
+        - {source: '9', delta_f_H_kJ_mol: 10.0, quote: '−635 ± 10 | 9'}
+        - {source: '15', delta_f_H_kJ_mol: 15.0, quote: '−589 ± 15 | 15'}
+        - {source: '1', delta_f_H_kJ_mol: 1.0, quote: '−601 ± 1 | 1'}
+        - {source: '13', delta_f_H_kJ_mol: 0.5, quote: '−601 ± 0.5 | 13'}
+        - {source: '14', delta_f_H_kJ_mol: 0.2, quote: '−602 ± 0.2 | 14'}
+        locator: {page: 830, table: IV}
+        note: FactPS and source 4 have no printed ±
+    - observation_id: halwax_2024_table_vii_shomate_huffman_reactions
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 833
+        published_page: 833
+        pdf_page_index: 13
+        table: VII
+        source_path: tables/kems-031-halwax-2024/t7.csv
+      quote: 'Table VII. Reactions with Corresponding Reaction Enthalpies Taken from Ref. [14]
+
+        1 | Mg(s) + 2HCl(aq) = MgCl2(aq) + H2(g) | −465.77 ± 0.17
+
+        2 | CaO(s) + 2HCl(aq) = MgCl2(aq) + H2O(l) | −149.78 ± 0.09
+
+        3 | H2(g) + 0.5O2(g) = H2O(l) | −285.84 ± 0.04
+
+        4 | Mg(s) + 0.5O2(g) = MgO(s) | −601.83 ± 0.21'
+      phase: pure_solid_MgO
+      standard_state: solution-calorimetry cycle reprinted from Shomate and Huffman Ref. [14]
+      regime: literature_reprint
+      units: kJ/mol
+      values:
+        method_class: secondary_compilation
+        quantity: literature_reaction_enthalpies_reprint
+        evidence_class: derived
+        source_table: VII
+        source_as_published: Taken from Ref. [14]
+        printed_total_delta_r_H_kJ_mol: -601.83
+        reactions:
+        - {number: 1, kind: single, reaction: 'Mg(s) + 2HCl(aq) = MgCl2(aq) + H2(g)', delta_r_H_kJ_mol: -465.77, uncertainty_kJ_mol: 0.17, quote: '−465.77 ± 0.17'}
+        - {number: 2, kind: single, reaction: 'CaO(s) + 2HCl(aq) = MgCl2(aq) + H2O(l)', delta_r_H_kJ_mol: -149.78, uncertainty_kJ_mol: 0.09, quote: '−149.78 ± 0.09', printed_reactant_as_published: CaO(s), note: 'Reaction 2 is printed with reactant CaO(s) and product MgCl2(aq); quoted as printed.'}
+        - {number: 3, kind: single, reaction: 'H2(g) + 0.5O2(g) = H2O(l)', delta_r_H_kJ_mol: -285.84, uncertainty_kJ_mol: 0.04, quote: '−285.84 ± 0.04'}
+        - {number: 4, kind: total, reaction: 'Mg(s) + 0.5O2(g) = MgO(s)', delta_r_H_kJ_mol: -601.83, uncertainty_kJ_mol: 0.21, quote: '−601.83 ± 0.21'}
+      uncertainty:
+        note: printed ± retained per cell
+        quote: −465.77 ± 0.17; −149.78 ± 0.09; −285.84 ± 0.04; −601.83 ± 0.21
+        locator: {page: 833, table: VII}
+    - observation_id: halwax_2024_geometry_not_alpha_quoted
+      supersedes: halwax_2024_geometry_not_alpha_b1
+      type: psat_series
+      class: derived
+      locator:
+        page: 825
+        published_page: 825
+        pdf_page_index: 5
+        paragraph: experimental
+        quote: To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in the lid of the cell had a diameter of 0.3 mm.
+      phase: pure_MgO_CaO
+      standard_state: pure MgO(s) / CaO(s) in Ir Knudsen cell (geometry package; not a numeric Psat series)
+      regime: kems_effusion
+      units: as published
+      values:
+        method_class: method_only
+        quantity: kems_geometry_package
+        evidence_class: derived
+        system_class: pure_oxide_condensed
+        semantics: not_hkl_alpha
+        note: Paper measures equilibrium formation enthalpies and KEMS partial pressures in an Ir cell; it is not an HKL alpha measurement. Numeric Psat points live on Figs 8-13 (figure-only, not digitised) and FactSage curves on Figs 14-15 (model, figure-only).
+        numeric_psat_transcription_status: figure_only
+        figs_8_13_quote: The determined pressures of the respective species are shown as an Arrhenius plot in Figures 8, 9, 10, 11, 12, and 13.
+        figs_14_15_quote: In Figure 14 and Figure 15, the results were obtained in this way, using the FactPS database
+      uncertainty:
+        temperature_systematic_K: 5.0
+        quote: a systematic error of ± 5 K is estimated
+        locator: {page: 825, paragraph: experimental}
+      equipment:
+        orifice_area:
+          value: 7.068583e-08
+          units: m2
+          diameter_m: 0.0003
+          inferred: true
+          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
+          locator:
+            page: 825
+            paragraph: experimental
+            quote: The orifice in the lid of the cell had a diameter of 0.3 mm
+        cell_material:
+          value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater
+          locator:
+            page: 825
+            paragraph: experimental
+            quote: To prevent reactions between the Knudsen cell and the sample, an iridium cell was used.
+
   CaO:
     observations:
     - observation_id: halwax_2024_cao_kems_geometry_package
@@ -232,6 +549,422 @@ species:
       uncertainty:
         delta_f_H_kJ_mol: 3.5
         basis: author_reported
+    - observation_id: halwax_2024_table_i_cao_sample_masses
+      supersedes: halwax_2024_cao_kems_geometry_package
+      type: rate_series
+      class: measured
+      locator:
+        page: 825
+        published_page: 825
+        pdf_page_index: 5
+        table: I
+        source_path: tables/kems-031-halwax-2024/t1.csv
+      quote: '1st measurement | 53.93 | 45.06
+
+        2nd measurement | 49.51 | 45.72'
+      T_range_K:
+      - 1825.0
+      - 2125.0
+      phase: pure_solid_CaO
+      standard_state: pure CaO(s); Ir Knudsen cell; masses by differential weighing
+      regime: kems_effusion
+      units: mg
+      values:
+        method_class: measured
+        quantity: sample_mass_before_after_weight_loss
+        evidence_class: measured
+        source_table: I
+        printed_1st_initial_mass_mg: 53.93
+        series:
+        - measurement: 1st measurement
+          initial_mass_mg: 53.93
+          mass_after_experiment_mg: 45.06
+          quote: '1st measurement | Initial Mass CaO [mg] 53.93 | Mass After Experiment CaO [mg] 45.06'
+          locator: {page: 825, table: I, pdf_page_index: 5}
+        - measurement: 2nd measurement
+          initial_mass_mg: 49.51
+          mass_after_experiment_mg: 45.72
+          quote: '2nd measurement | Initial Mass CaO [mg] 49.51 | Mass After Experiment CaO [mg] 45.72'
+          locator: {page: 825, table: I, pdf_page_index: 5}
+        T_range_as_published: ~ 1825 K to ~ 2125 K for CaO
+        T_range_quote: from ~ 1825 K to ~ 2125 K for CaO and ~ 1675 K to ~ 2075 K for MgO
+        T_range_locator: {page: 826, published_page: 826, paragraph: experimental temperature ranges}
+        gas_species_observed:
+        - Ca(g)
+        - O(g)
+        - O2(g)
+        gas_species_quote: 'For CaO, these mass scans detected 40Ca+, 16O+, and 16O2+ as the main ions.'
+      uncertainty:
+        note: no printed uncertainty on Table I mass cells
+      equipment:
+        orifice_area:
+          value: 7.068583e-08
+          units: m2
+          diameter_m: 0.0003
+          inferred: true
+          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm (same cell)
+          locator:
+            page: 825
+            paragraph: experimental
+            quote: The orifice in the lid of the cell had a diameter of 0.3 mm
+        cell_material:
+          value: Ir Knudsen cell in Mo container; Ta radiation shields
+          locator:
+            page: 825
+            paragraph: experimental
+            quote: To prevent reactions between the Knudsen cell and the sample, an iridium cell was used.
+        chamber_pressure:
+          value: 1.0e-05
+          units: mbar
+          converted_value_Pa: 0.001
+          conversion: 1.0e-5 mbar * 100 Pa/mbar = 1.0e-3 Pa
+          note: heating started after chamber pressure decreased below 10^-5 mbar (threshold, not a point measurement)
+          locator:
+            page: 825
+            paragraph: experimental
+            quote: As soon as the pressure decreased below 10-5 mbar, heating could be started.
+    - observation_id: halwax_2024_table_iii_ionization_cross_sections
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 6
+        table: III
+        source_path: tables/kems-031-halwax-2024/t3.csv
+      quote: 'Species/Isotope | σi [10^-16 cm2] | ni
+
+        40Ca | 9.0534 | 0.96941
+
+        16O | 1.2677 | 0.99757
+
+        16O2 | 1.9016 | 0.99515
+
+        24Mg | 4.6574 | 0.78990'
+      phase: calibration_constants
+      standard_state: ionization cross sections and isotopic abundances used to convert ion intensities to partial pressures
+      regime: kems_calibration
+      units: '10^-16 cm2 (sigma_i); dimensionless (n_i)'
+      values:
+        method_class: secondary_compilation
+        quantity: ionization_cross_sections_and_isotopic_abundances
+        evidence_class: derived
+        source_table: III
+        semantics: calibration_metadata_not_measurement
+        electron_ionization_energy_eV: 70
+        electron_energy_quote: at an electron ionization energy of 70 eV
+        taken_from_quote: The used ionization cross sections (σi) at an electron ionization energy of 70 eV as well as the isotopic abundance (ni) of the different elements were taken from References 38 and 39, respectively.
+        cells:
+        - {species_isotope: 40Ca, sigma_i: 9.0534, n_i: 0.96941, quote: '40Ca | 9.0534 | 0.96941'}
+        - {species_isotope: 16O, sigma_i: 1.2677, n_i: 0.99757, quote: '16O | 1.2677 | 0.99757'}
+        - {species_isotope: 16O2, sigma_i: 1.9016, n_i: 0.99515, quote: '16O2 | 1.9016 | 0.99515'}
+        - {species_isotope: 24Mg, sigma_i: 4.6574, n_i: 0.78990, quote: '24Mg | 4.6574 | 0.78990'}
+      uncertainty:
+        note: no printed uncertainty on Table III cells
+    - observation_id: halwax_2024_table_iv_cao_1st_measurement
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        row: 1st measurement
+        source_path: tables/kems-031-halwax-2024/t4.csv
+      quote: '−624 ± 3 | 1st measurement'
+      phase: pure_solid_CaO
+      standard_state: pure CaO(s), standard formation enthalpy at 298 K
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol
+      values:
+        method_class: third_law_kems
+        quantity: standard_formation_enthalpy_298K
+        evidence_class: derived
+        source_table: IV
+        source_row: 1st measurement
+        reaction: Ca(s) + 0.5O2(g) = CaO(s)
+        delta_f_H_kJ_mol: -624.0
+        reference_temperature_K: 298
+        reference_temperature_quote: ΔfH°298 [kJ/mol]
+        cell_quote: −624 ± 3
+      uncertainty:
+        delta_f_H_kJ_mol: 3.0
+        quote: −624 ± 3
+        locator: {page: 830, table: IV}
+        basis: author_reported
+    - observation_id: halwax_2024_table_iv_cao_2nd_measurement
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        row: 2nd measurement
+        source_path: tables/kems-031-halwax-2024/t4.csv
+      quote: '−625 ± 3 | 2nd measurement'
+      phase: pure_solid_CaO
+      standard_state: pure CaO(s), standard formation enthalpy at 298 K
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol
+      values:
+        method_class: third_law_kems
+        quantity: standard_formation_enthalpy_298K
+        evidence_class: derived
+        source_table: IV
+        source_row: 2nd measurement
+        reaction: Ca(s) + 0.5O2(g) = CaO(s)
+        delta_f_H_kJ_mol: -625.0
+        reference_temperature_K: 298
+        reference_temperature_quote: ΔfH°298 [kJ/mol]
+        cell_quote: −625 ± 3
+      uncertainty:
+        delta_f_H_kJ_mol: 3.0
+        quote: −625 ± 3
+        locator: {page: 830, table: IV}
+        basis: author_reported
+    - observation_id: halwax_2024_table_iv_cao_mean
+      supersedes: halwax_2024_cao_third_law_formation_enthalpy
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        row: mean
+        source_path: tables/kems-031-halwax-2024/t4.csv
+      quote: '−624.5 ± 3.5 | mean'
+      phase: pure_solid_CaO
+      condensed_form:
+        state: crystalline
+        polymorph: lime
+        metastable: false
+        basis: explicit_author
+        note: Pure CaO powder in the Ir Knudsen cell; thermochemical result is for CaO(s).
+      standard_state: pure CaO(s), standard formation enthalpy at 298 K
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol
+      values:
+        method_class: third_law_kems
+        quantity: standard_formation_enthalpy_298K
+        evidence_class: derived
+        source_table: IV
+        source_row: mean
+        reaction: Ca(s) + 0.5O2(g) = CaO(s)
+        delta_f_H_kJ_mol: -624.5
+        reference_temperature_K: 298
+        reference_temperature_quote: ΔfH°298 [kJ/mol]
+        cell_quote: −624.5 ± 3.5
+        mean_bold_as_published: true
+        footnote_quote: The mean values of the two measurements are written bold.
+        abstract_quote: 'an average formation enthalpy of Df H298 = − 624.5 ± 3.5 kJ/mol for CaO(s)'
+        melt_activity_applicability: excluded
+        activity_pin_eligible: false
+        consumer_policy: thermochemistry_only_not_melt_activity
+      uncertainty:
+        delta_f_H_kJ_mol: 3.5
+        quote: −624.5 ± 3.5
+        locator: {page: 830, table: IV}
+        basis: author_reported
+    - observation_id: halwax_2024_table_iv_cao_literature_and_factps
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        source_path: tables/kems-031-halwax-2024/t4.csv
+      quote: '−602 ± 3 | 9
+
+        −610 ± 4 | 3
+
+        −634 ± 1.5 | 4
+
+        −635 ± 1 | 1
+
+        −635 ± 1 | 11
+
+        −636 | 12
+
+        −635 | FactPS'
+      phase: pure_solid_CaO
+      standard_state: literature comparison of DfH298 CaO(s)
+      regime: literature_compilation
+      units: kJ/mol
+      values:
+        method_class: secondary_compilation
+        quantity: literature_formation_enthalpy_comparison
+        evidence_class: derived
+        source_table: IV
+        reaction: Ca(s) + 0.5O2(g) = CaO(s)
+        cells:
+        - {source: '9', delta_f_H_kJ_mol: -602.0, uncertainty_kJ_mol: 3.0, class: derived, quote: '−602 ± 3 | 9'}
+        - {source: '3', delta_f_H_kJ_mol: -610.0, uncertainty_kJ_mol: 4.0, class: derived, quote: '−610 ± 4 | 3'}
+        - {source: '4', delta_f_H_kJ_mol: -634.0, uncertainty_kJ_mol: 1.5, class: derived, quote: '−634 ± 1.5 | 4'}
+        - {source: '1', delta_f_H_kJ_mol: -635.0, uncertainty_kJ_mol: 1.0, class: derived, quote: '−635 ± 1 | 1'}
+        - {source: '11', delta_f_H_kJ_mol: -635.0, uncertainty_kJ_mol: 1.0, class: derived, quote: '−635 ± 1 | 11'}
+        - {source: '12', delta_f_H_kJ_mol: -636.0, class: derived, quote: '−636 | 12'}
+        - {source: FactPS, delta_f_H_kJ_mol: -635.0, class: model, quote: '−635 | FactPS'}
+        note: Source numbers are the paper's numbered references. FactPS is a database calculation (class model). Uncertainty omitted where no ± was printed.
+      uncertainty:
+        cells:
+        - {source: '9', delta_f_H_kJ_mol: 3.0, quote: '−602 ± 3 | 9'}
+        - {source: '3', delta_f_H_kJ_mol: 4.0, quote: '−610 ± 4 | 3'}
+        - {source: '4', delta_f_H_kJ_mol: 1.5, quote: '−634 ± 1.5 | 4'}
+        - {source: '1', delta_f_H_kJ_mol: 1.0, quote: '−635 ± 1 | 1'}
+        - {source: '11', delta_f_H_kJ_mol: 1.0, quote: '−635 ± 1 | 11'}
+        locator: {page: 830, table: IV}
+        note: FactPS and source 12 have no printed ±
+    - observation_id: halwax_2024_table_v_huber_holley_ca_composition
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: V
+        source_path: tables/kems-031-halwax-2024/t5.csv
+      quote: 'Table V. Composition of the Ca Sample and Heats of Combustion of the Different Species Taken from Ref. [11]
+
+        CaC2 | 0.029 | 26970
+
+        CaH2 | 0.52 | 18880
+
+        CaO | 0.07 | —
+
+        Mg | 0.01 | 24670
+
+        Ca | 99.37 | ?'
+      phase: Ca_metal_sample_ref_11
+      standard_state: reprint of Huber and Holley Ref. [11] sample composition
+      regime: literature_reprint
+      units: wt pct; J/g
+      values:
+        method_class: secondary_compilation
+        quantity: literature_sample_composition_and_heats_of_combustion
+        evidence_class: derived
+        source_table: V
+        source_as_published: Taken from Ref. [11]
+        cells:
+        - {species: CaC2, content_wt_pct: 0.029, Qi_J_g: 26970, quote: 'CaC2 | 0.029 | 26970'}
+        - {species: CaH2, content_wt_pct: 0.52, Qi_J_g: 18880, quote: 'CaH2 | 0.52 | 18880'}
+        - {species: CaO, content_wt_pct: 0.07, Qi_J_g: '—', quote: 'CaO | 0.07 | —'}
+        - {species: Mg, content_wt_pct: 0.01, Qi_J_g: 24670, quote: 'Mg | 0.01 | 24670'}
+        - {species: Ca, content_wt_pct: 99.37, Qi_J_g: '?', quote: 'Ca | 99.37 | ?'}
+        note: Em-dash and question mark stored as printed, never 0.
+      uncertainty:
+        note: no printed ± on Table V cells
+    - observation_id: halwax_2024_table_vi_liang_cao_solution_reactions
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 831
+        published_page: 831
+        pdf_page_index: 11
+        table: VI
+        source_path: tables/kems-031-halwax-2024/t6.csv
+      quote: 'Table VI. Reactions with Corresponding Reaction Enthalpies Taken from Ref. [4]
+
+        1 | Ca(s) + 2HCl(aq) = CaCl2(aq) + H2(g) | −542.77
+
+        2 | CaO(s) + 2HCl(aq) = CaCl2(aq) + H2O(l) | −197.50
+
+        3 | H2(g) + 0.5O2(g) = H2O(l) | −285.83
+
+        4 | Ca(s) + 0.5O2(g) = CaO(s) | −631.10'
+      phase: pure_solid_CaO
+      standard_state: solution-calorimetry cycle reprinted from Liang et al. Ref. [4]
+      regime: literature_reprint
+      units: kJ/mol
+      values:
+        method_class: secondary_compilation
+        quantity: literature_reaction_enthalpies_reprint
+        evidence_class: derived
+        source_table: VI
+        source_as_published: Taken from Ref. [4]
+        printed_total_delta_r_H_kJ_mol: -631.10
+        reactions:
+        - {number: 1, kind: single, reaction: 'Ca(s) + 2HCl(aq) = CaCl2(aq) + H2(g)', delta_r_H_kJ_mol: -542.77, quote: '−542.77'}
+        - {number: 2, kind: single, reaction: 'CaO(s) + 2HCl(aq) = CaCl2(aq) + H2O(l)', delta_r_H_kJ_mol: -197.50, quote: '−197.50'}
+        - {number: 3, kind: single, reaction: 'H2(g) + 0.5O2(g) = H2O(l)', delta_r_H_kJ_mol: -285.83, quote: '−285.83'}
+        - {number: 4, kind: total, reaction: 'Ca(s) + 0.5O2(g) = CaO(s)', delta_r_H_kJ_mol: -631.10, quote: '−631.10'}
+      uncertainty:
+        note: no printed ± on Table VI cells
+  Ni:
+    observations:
+    - observation_id: halwax_2024_table_ii_ni_sublimation_this_study
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 6
+        table: II
+        row: This Study
+        source_path: tables/kems-031-halwax-2024/t2.csv
+      quote: 'This Study | 422 ± 4'
+      T_range_K:
+      - 1650.0
+      - 1800.0
+      phase: pure_Ni
+      standard_state: enthalpy of sublimation of pure Ni at the mean temperature of the calibration measurements
+      regime: kems_second_law_calibration
+      units: kJ/mol
+      values:
+        method_class: second_law_kems
+        quantity: enthalpy_of_sublimation
+        evidence_class: derived
+        source_table: II
+        source_row: This Study
+        delta_H_sub_kJ_mol: 422.0
+        mean_temperature_K: 1727.0
+        cell_quote: 422 ± 4
+        text_quote: The result was an enthalpy of 422 ± 4 kJ/mol at a temperature of 1727 K.
+        T_range_quote: the change of the vapor pressure of Ni was recorded in a temperature range from about 1650 K to 1800 K
+        pressure_calibration_factor: 7.6414e-9
+        pressure_calibration_quote: a pressure calibration factor of 7.6414·10-9 was determined
+      uncertainty:
+        delta_H_sub_kJ_mol: 4.0
+        quote: 422 ± 4
+        locator: {page: 826, table: II}
+        basis: author_reported
+    - observation_id: halwax_2024_table_ii_ni_sublimation_literature
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 6
+        table: II
+        source_path: tables/kems-031-halwax-2024/t2.csv
+      quote: 'NIST-JANAF Tables[1] | 418 ± 8.4
+
+        Alcock et al.[48] | 421 ± 5
+
+        FactSageTM | 417'
+      phase: pure_Ni
+      standard_state: literature and FactSage comparison of Ni sublimation enthalpy
+      regime: literature_compilation
+      units: kJ/mol
+      values:
+        method_class: secondary_compilation
+        quantity: literature_sublimation_enthalpy_comparison
+        evidence_class: derived
+        source_table: II
+        cells:
+        - {source: 'NIST-JANAF Tables[1]', delta_H_sub_kJ_mol: 418.0, uncertainty_kJ_mol: 8.4, class: model, quote: '418 ± 8.4'}
+        - {source: 'Alcock et al.[48]', delta_H_sub_kJ_mol: 421.0, uncertainty_kJ_mol: 5.0, class: derived, quote: '421 ± 5'}
+        - {source: FactSageTM, delta_H_sub_kJ_mol: 417.0, class: model, quote: '417'}
+        note: FactSageTM 417 has no printed ±; stored absent, never 0.
+      uncertainty:
+        cells:
+        - {source: 'NIST-JANAF Tables[1]', delta_H_sub_kJ_mol: 8.4, quote: '418 ± 8.4'}
+        - {source: 'Alcock et al.[48]', delta_H_sub_kJ_mol: 5.0, quote: '421 ± 5'}
+        locator: {page: 826, table: II}
+        note: FactSageTM has no printed ±
+
 fidelity_samples:
 - path: species.MgO.observations[halwax_2024_mgo_kems_geometry_psat_package].equipment.orifice_area.value
   value: 7.068583e-08
@@ -271,3 +1004,73 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
     table: IV
     line_range: '603'
+- species: CaO
+  observable: rate_series
+  observation_id: halwax_2024_table_i_cao_sample_masses
+  field: printed_1st_initial_mass_mg
+  value: 53.93
+  locator:
+    page: 825
+    table: I
+    pdf_page_index: 5
+    note: Table I 1st measurement CaO initial mass 53.93 mg
+- species: MgO
+  observable: rate_series
+  observation_id: halwax_2024_table_i_mgo_sample_masses
+  field: printed_1st_initial_mass_mg
+  value: 53.67
+  locator:
+    page: 825
+    table: I
+    pdf_page_index: 5
+    note: Table I 1st measurement MgO initial mass 53.67 mg
+- species: MgO
+  observable: gibbs_table
+  observation_id: halwax_2024_table_iv_mgo_mean
+  field: delta_f_H_kJ_mol
+  value: -598.0
+  locator:
+    page: 830
+    table: IV
+    pdf_page_index: 10
+    note: 'Table IV mean MgO DfH298 −598 ± 10 kJ/mol'
+- species: CaO
+  observable: gibbs_table
+  observation_id: halwax_2024_table_iv_cao_mean
+  field: delta_f_H_kJ_mol
+  value: -624.5
+  locator:
+    page: 830
+    table: IV
+    pdf_page_index: 10
+    note: 'Table IV mean CaO DfH298 −624.5 ± 3.5 kJ/mol'
+- species: CaO
+  observable: gibbs_table
+  observation_id: halwax_2024_table_vi_liang_cao_solution_reactions
+  field: printed_total_delta_r_H_kJ_mol
+  value: -631.10
+  locator:
+    page: 831
+    table: VI
+    pdf_page_index: 11
+    note: 'Table VI total reaction 4 ΔrH −631.10 kJ/mol'
+- species: MgO
+  observable: gibbs_table
+  observation_id: halwax_2024_table_vii_shomate_huffman_reactions
+  field: printed_total_delta_r_H_kJ_mol
+  value: -601.83
+  locator:
+    page: 833
+    table: VII
+    pdf_page_index: 13
+    note: 'Table VII total reaction 4 ΔrH −601.83 ± 0.21 kJ/mol'
+- species: Ni
+  observable: gibbs_table
+  observation_id: halwax_2024_table_ii_ni_sublimation_this_study
+  field: delta_H_sub_kJ_mol
+  value: 422.0
+  locator:
+    page: 826
+    table: II
+    pdf_page_index: 6
+    note: 'Table II This Study ΔHsub 422 ± 4 kJ/mol'
