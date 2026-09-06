@@ -1,0 +1,128 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0379",
+  "census_id": "high-temperature-printed-page-405",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "I&LIOPBILLIU",
+  "formula_as_published": "Kl1Si0 4",
+  "phase_state_as_published": [
+    "Lov taliophillite 298.15 to 810 ~.                   High taliophillite 810 to 1800 ~."
+  ],
+  "description_lines_as_published": [
+    "Kl1Si0 4 :     Lov taliophillite 298.15 to 810 ~.                   High taliophillite 810 to 1800 ~."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "158.164",
+    "value": 158.164,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      411
+    ],
+    "printed_pages": [
+      405
+    ],
+    "pdftotext_layout_page_file": "page-411.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "9 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 34, 36, 39, 41, 48, 50, 80"
+  ],
+  "title_line_as_published": "I&LIOPBILLIU                                                                      POIIULl lEIGHT      158.164",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Kl1Si0 4 :     Lov taliophillite 298.15 to 810 ~.                   High taliophillite 810 to 1800 ~.",
+    "--------------------------------------------------------------------------------",
+    "                                                 l0Bil1'IOI PIOII TBB .BLBIIBITS",
+    "                                                                                        GIBBS",
+    "TBIP.        <u;-&; 98 )/T     soT      -<co;-a; 98 )/T      cop      Bl'lBlLPJ      l'IBB BIIBIGJ     Log It",
+    "  ~           J/aol·~        J/aol•K      J/aol•K      J/aol•~           kJ/aol         k.l/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "~",
+    "enthalpy_function": "J/aol·~",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•~",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "k.l/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 23,
+  "uncertainty_line_as_published": "OICEIT lll TJ                   1.25            1.25                         1.435         1.450        0.254",
+  "uncertainty_values": [
+    {
+      "as_published": "1.25",
+      "value": 1.25,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.25",
+      "value": 1.25,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.435",
+      "value": 1.435,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.450",
+      "value": 1.45,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.254",
+      "value": 0.254,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Kl1Si0 4 :     Lov taliophillite 298.15 to 810 ~.                   High taliophillite 810 to 1800 ~."
+  ],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "9 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 34, 36, 39, 41, 48, 50, 80",
+      "detector_only": false
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0378",
+  "census_id": "high-temperature-printed-page-404",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "Kl1Si 3 0e",
+  "formula_as_published": "KllSi 3 o.",
+  "phase_state_as_published": [
+    "Glass 298.15 to 1300 K."
+  ],
+  "description_lines_as_published": [
+    "KllSi 3 o.:     Glass 298.15 to 1300 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "278.333",
+    "value": 278.333,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      410
+    ],
+    "printed_pages": [
+      404
+    ],
+    "pdftotext_layout_page_file": "page-410.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "10 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 22, 23, 24, 27, 28, 30, 33, 37, 40"
+  ],
+  "title_line_as_published": "Kl1Si 3 0e     GLASS                                                              PORIIOLl IIIGBT    278.333",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "KllSi 3 o.:     Glass 298.15 to 1300 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                  FORUTIOI FROB THE OIIDBS",
+    "                                                                                        GIBBS",
+    "TEIIP.       <H;-a~98 )/T      so",
+    "                                T      -(G;-u~ 98 )/T     cop     EITBlLPY           FBBE BIBRGY       Log Kf",
+    "  K           J/•ol•IC      J/•ol•IC     J/aol•K        J/aol•K         ltJ/801         ltJjaol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/•ol•IC",
+    "entropy": "J/•ol•IC",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "ltJ/801",
+    "formation_gibbs_energy": "ltJjaol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 11,
+  "uncertainty_line_as_published": "UIC.ER Tl i liT I         1.78   1.78                1.970       2.000",
+  "uncertainty_values": [
+    {
+      "as_published": "1.78",
+      "value": 1.78,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.78",
+      "value": 1.78,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.970",
+      "value": 1.97,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.000",
+      "value": 2.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "KllSi 3 o.:     Glass 298.15 to 1300 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY      ~UATIOII",
+    "         6.8469z10Z -        0. 14814 T",
+    "              3.5271z10• r-z",
+    "              ( BQU1TIOI VALID PROf!            298 - 1300 K)",
+    "BEFEREICE        152           227                                          93                      COli PILED",
+    "                  56                                                       269                      12- 3-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "10 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 22, 23, 24, 27, 28, 30, 33, 37, 40",
+      "detector_only": false
+    }
+  ]
+}
