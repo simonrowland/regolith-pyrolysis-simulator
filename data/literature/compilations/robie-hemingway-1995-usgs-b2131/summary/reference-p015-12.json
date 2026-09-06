@@ -1,0 +1,186 @@
+{
+  "record_id": "reference-p015-12",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 21,
+  "page": 15,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF OKIDE AND HYDROXIDE MINERALS AT 298.15 K",
+  "name_as_published": "CARBON DIOXIDE",
+  "formula_as_published": "COz",
+  "phase_as_published": [
+    "(IDEAL GAS)"
+  ],
+  "header_and_units_raw": "NAME AND FORMULA                   WEIGHT      ENTROPY       VOLl.IE   ENTHALPY     FREE        LOG(K)    REFERENCES\n                                                                                   EtiERGY\n\n                                    I\n                                                   s•\n                                            J •IIDl\"' •I('\n                                                               v•\n                                                              a}\n                                                                        a.•·\n                                                                       kJ·•l\"'\n                                                                                     j\"'•\n                                                                                  kJ .. .,l\"'            s    H/G    c\n",
+  "source_text": "CARBON DIOXIDE                     44.010         213.8 24789.70         -393.5     -394.4      69.09 67 67 67\nCOz (IDEAL GAS)                                     0.0     0.20            0.1        0.2       0.03 117 117 117",
+  "rows": [
+    {
+      "label_raw": "CARBON DIOXIDE",
+      "cells": {
+        "weight": {
+          "raw": "44.010",
+          "value": 44.01,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 35,
+          "end_offset": 41
+        },
+        "entropy": {
+          "raw": "213.8",
+          "value": 213.8,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 50,
+          "end_offset": 55
+        },
+        "volume": {
+          "raw": "24789.70",
+          "value": 24789.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 56,
+          "end_offset": 64
+        },
+        "formation_enthalpy": {
+          "raw": "-393.5",
+          "value": -393.5,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 73,
+          "end_offset": 79
+        },
+        "formation_gibbs": {
+          "raw": "-394.4",
+          "value": -394.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 84,
+          "end_offset": 90
+        },
+        "log_kf": {
+          "raw": "69.09",
+          "value": 69.09,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 96,
+          "end_offset": 101
+        },
+        "references_unresolved": {
+          "raw": "67 67 67",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 102,
+          "end_offset": 110,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "COz (IDEAL GAS)",
+      "cells": {
+        "weight": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "entropy": {
+          "raw": "0.0",
+          "value": 0.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 52,
+          "end_offset": 55
+        },
+        "volume": {
+          "raw": "0.20",
+          "value": 0.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 60,
+          "end_offset": 64
+        },
+        "formation_enthalpy": {
+          "raw": "0.1",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 76,
+          "end_offset": 79
+        },
+        "formation_gibbs": {
+          "raw": "0.2",
+          "value": 0.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 87,
+          "end_offset": 90
+        },
+        "log_kf": {
+          "raw": "0.03",
+          "value": 0.03,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 97,
+          "end_offset": 101
+        },
+        "references_unresolved": {
+          "raw": "117 117 117",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 102,
+          "end_offset": 113,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [
+    {
+      "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
+      "residual_kJ_per_mol": -0.03362346983897169,
+      "rounding_tolerance_kJ_per_mol": 0.08854004751267629,
+      "disagreement": false
+    }
+  ],
+  "ambiguities": [
+    "reference_entropy: unparsed printed OCR token '67 67'",
+    "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
+    "reference_entropy: unparsed printed OCR token '117 117'",
+    "Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_token_agreement_row_unverified"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 52,
+  "source_line_end": 53
+}
