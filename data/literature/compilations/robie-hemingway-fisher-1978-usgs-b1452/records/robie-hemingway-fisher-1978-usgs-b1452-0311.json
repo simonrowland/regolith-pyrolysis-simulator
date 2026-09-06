@@ -1,0 +1,96 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0311",
+  "census_id": "high-temperature-printed-page-337",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "D.ISODIO! UBUUB ( lJ.PBl)",
+  "formula_as_published": "Ja 1 00 4",
+  "phase_state_as_published": [
+    "crystals 298.15 to 1100 1."
+  ],
+  "description_lines_as_published": [
+    "Ja 1 00 4 :    crystals 298.15 to 1100 1."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "348.006",
+    "value": 348.006,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      343
+    ],
+    "printed_pages": [
+      337
+    ],
+    "pdftotext_layout_page_file": "page-343.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 16, 22, 24, 31, 33, 36, 38, 64"
+  ],
+  "title_line_as_published": "D.ISODIO! UBUUB ( lJ.PBl)                                                              POB!OLl IIIGBT    348.006",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Ja 1 00 4 :    crystals 298.15 to 1100 1.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POB!lTIOI PBO! TBE BLE!BITS",
+    "                                                                                            GIBBS",
+    "TBBP.         (H;-a~ 9 a)/T      so       -(G;-&~ 98 )/T      cop    EITBlLPY            PRBB EIUGY       Loq If",
+    "                                   T"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "",
+    "entropy": "",
+    "negative_gibbs_function": "",
+    "heat_capacity": "",
+    "formation_enthalpy": "",
+    "formation_gibbs_energy": "",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 13,
+  "uncertainty_line_as_published": "",
+  "uncertainty_values": [],
+  "reference_state_notes_as_published": [
+    "Ja 1 00 4 :    crystals 298.15 to 1100 1."
+  ],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 16, 22, 24, 31, 33, 36, 38, 64",
+      "detector_only": false
+    }
+  ]
+}

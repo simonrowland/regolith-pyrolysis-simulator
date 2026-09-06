@@ -1,0 +1,137 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0319",
+  "census_id": "high-temperature-printed-page-345",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "f!ULLITE ( 3-2)",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "426.(156",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      351
+    ],
+    "printed_pages": [
+      345
+    ],
+    "pdftotext_layout_page_file": "page-351.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 29, 31, 40, 42"
+  ],
+  "title_line_as_published": "f!ULLITE ( 3-2)                                                                     FOIISULA IIBIGHT    426.(156",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                       cr ysta1s 2 98.15 to ae1t ing point 2133 1.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORIIlTIOI FROB THE ELEIIEITS",
+    "                                                                                          GIBBS",
+    "TEIIP.     ( H;-n~ 98 }/T       so      -(G;-H~ 98 )/T      cop      EIITHlLPJ         FREE EIIEBGY      Log Kf",
+    "                                 T",
+    "  K         Jtao1•1         Jtao1•1       J/1101•1       J/1101•1         ltJ/aol          ltJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jtao1•1",
+    "entropy": "Jtao1•1",
+    "negative_gibbs_function": "J/1101•1",
+    "heat_capacity": "J/1101•1",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "ltJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 18,
+  "uncertainty_line_as_published": "OIICBRTliHTY                    4. 18           4. 18                       2.200            2.220        0.389",
+  "uncertainty_values": [
+    {
+      "as_published": "4. 18",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4. 18",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.200",
+      "value": 2.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.220",
+      "value": 2.22,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.389",
+      "value": 0.389,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "f!EL!I IG POI IT                2133       K             BOIL I IG POIIIT                                 K",
+    "EIITHlLPI OF IIELTIIG                                    EIITHALPY OF flPOBIZlTIOI                        ltJ",
+    "                                           kJ            !lOLli YOLOIIB                         13.4550 J/bar",
+    "                                                                                               134.550 cal",
+    "TBliSITIOIS II BEFERBICE STATE EL!BEITS",
+    "      lLOIIIIUB ••• B. P. 933 I.",
+    "      SILICOI.... II.    P.    1685 I.",
+    "H!lT ClPlCITJ EQOATIOI",
+    "          7.5455x10Z -   2.9426x1o-z T     6.5757x10~ T-o·s",
+    "             (BQOATIOII VALID FIOII 298 - 1800 I)",
+    "IBl'!IBIC!      213              99                                           99                       COIIPILBD",
+    "                                21l                                          267                        7- 9-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 29, 31, 40, 42",
+      "detector_only": false
+    }
+  ]
+}
