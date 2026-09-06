@@ -1,0 +1,1271 @@
+schema_version: literature_extract.v1
+source_id: robinot-2025-promes-review
+source:
+  citation: Robinot, J., Rodat, S., Abanades, S., Paillet, A. & Cowley, A. (2025), "Review of in-situ
+    oxygen extraction from lunar regolith with focus on solar thermal and laser vacuum pyrolysis", Acta
+    Astronautica 234:242–259, DOI 10.1016/j.actaastro.2025.05.008. HAL hal-05061241, CC BY-NC-ND 4.0.
+  doi: 10.1016/j.actaastro.2025.05.008
+  url: https://hal.science/hal-05061241/document
+  year: 2025
+extraction:
+  method: official HAL OA PDF (https://hal.science/hal-05061241/document, HTTP 200 application/pdf); pdftotext
+    -layout for Tables 1, 3, 4; Table 2 digitised from 300 dpi pdftoppm render of published p.247 (PDF
+    p.7). MinerU table HTML used only as a hint and rejected where it would replace the render. ScienceDirect
+    PII/PDF HTTP 403 Cloudflare not bypassed.
+  date: '2026-09-06'
+  worker: wave-WB-1
+  provenance_path: docs-private/research/2026-09-06-wave-B/WB-1/robinot-2025-promes-review/
+review_status: draft
+fidelity_samples:
+- species: SiO2
+  observable: gibbs_table
+  observation_id: robinot_2025_t1_lunar_oxide_minmax_avg
+  field: SiO2_average_wt_pct
+  value: 44.59
+  locator:
+    page: 243
+    table: '1'
+    note: Table 1 SiO2 Average 44.59 as printed
+- species: O2
+  observable: rate_series
+  observation_id: robinot_2025_t2_steurer_1985_sio2
+  field: T_min_C_as_printed
+  value: 2375
+  locator:
+    page: 247
+    table: '2'
+    note: Table 2 Steurer SiO2 Temperature Min 2375 C from 300 dpi render
+- species: O2
+  observable: rate_series
+  observation_id: robinot_2025_t3_li_2023_fe2o3
+  field: power_density_W_cm2_as_printed
+  value: 5969
+  locator:
+    page: 249
+    table: '3'
+    note: Table 3 Fe2O3 Power density 5969 W/cm2 as printed
+- species: O2
+  observable: rate_series
+  observation_id: robinot_2025_t4_li_2023_fe2o3
+  field: fe_content_deposited_wt_pct_as_printed
+  value: 27.1 %
+  locator:
+    page: 250
+    table: '4'
+    note: Table 4 Fe2O3 Fe content in deposited materials 27.1 % as printed
+species:
+  SiO2:
+    observations:
+    - observation_id: robinot_2025_t1_lunar_oxide_minmax_avg
+      type: gibbs_table
+      locator:
+        page: 243
+        published_page: 243
+        pdf_page_index: 3
+        table: '1'
+        note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+      phase: lunar_regolith_oxide_compilation
+      regime: compiled_composition
+      units: wt_percent
+      T_range_K: null
+      values:
+        quantity: bulk_oxide_wt_pct_min_max_average
+        method_class: secondary_compilation
+        caption_as_published: Oxide composition in weight percentage of samples taken on the Moon during
+          Apollo, Luna and Chang’e mission [3–5].
+        headers_as_published: Oxide | Min | Max | Average
+        P2O3_as_printed: P2O3 (not P2O5)
+        cited_primaries:
+        - bib: '[3]'
+          citation: McKay et al. Lunar Sourcebook Chapter 07 (1991)
+          doi: absent
+          url: https://courses.ess.washington.edu/ess-306/links/Lunar-Sourcebook-Chapter07-Regolith.pdf
+        - bib: '[4]'
+          citation: Ling et al. Nat. Commun. 6 (2015) 8880
+          doi: 10.1038/ncomms9880
+          doi_resolver: HTTP 302 www.nature.com/articles/ncomms9880
+        - bib: '[5]'
+          citation: Chen et al. TIG 1 (2023) 100014
+          doi: 10.59717/j.xinn-geo.2023.100014
+          doi_resolver: HTTP 302 www.the-innovation.org/article/doi/10.59717/j.xinn-geo.2023.100014
+        rows:
+        - oxide: SiO2
+          min_wt_pct: 40.6
+          max_wt_pct: 48.1
+          average_wt_pct: 44.59
+        - oxide: TiO2
+          min_wt_pct: 0.47
+          max_wt_pct: 8.4
+          average_wt_pct: 2.58
+        - oxide: Al2O3
+          min_wt_pct: 9.7
+          max_wt_pct: 28.0
+          average_wt_pct: 17.82
+        - oxide: Cr2O3
+          min_wt_pct: 0.11
+          max_wt_pct: 0.54
+          average_wt_pct: 0.32
+        - oxide: FeO
+          min_wt_pct: 4.7
+          max_wt_pct: 22.8
+          average_wt_pct: 12.28
+        - oxide: MnO
+          min_wt_pct: 0.0
+          max_wt_pct: 0.41
+          average_wt_pct: 0.2
+        - oxide: MgO
+          min_wt_pct: 5.6
+          max_wt_pct: 13.0
+          average_wt_pct: 9.16
+        - oxide: CaO
+          min_wt_pct: 10.3
+          max_wt_pct: 15.8
+          average_wt_pct: 12.51
+        - oxide: Na2O
+          min_wt_pct: 0.3
+          max_wt_pct: 0.7
+          average_wt_pct: 0.43
+        - oxide: K2O
+          min_wt_pct: 0.04
+          max_wt_pct: 0.55
+          average_wt_pct: 0.18
+        - oxide: P2O3
+          min_wt_pct: 0.05
+          max_wt_pct: 0.51
+          average_wt_pct: 0.16
+        SiO2_average_wt_pct: 44.59
+      uncertainty:
+        note: compilation min/max/average; no sigma printed
+  O2:
+    observations:
+    - observation_id: robinot_2025_t2_steurer_1985_sio2
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_SiO2
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Steurer
+        year_as_printed: 1985
+        institution_as_printed: NASA
+        country_as_printed: USA
+        heating_mode_as_printed: Induction
+        power_density_W_cm2_as_printed: Irrelevant
+        power_density_extrapolated: false
+        feedstock_species_as_printed: SiO2
+        T_min_C_as_printed: 2375
+        T_max_C_as_printed: 2375
+        P_min_bar_as_printed: Unknown
+        P_max_bar_as_printed: Unknown
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[37]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: none_in_bibliography
+        cited_primary_url: https://smad.com/wp-content/uploads/2023/01/VOL.05-STEURER.pdf
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: Steurer 1985 vapor-phase pyrolysis; no DOI in ref [37]
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 2648.15
+      - 2648.15
+    - observation_id: robinot_2025_t2_senior_1991_fetio3
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_FeTiO3
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Senior
+        year_as_printed: 1991
+        institution_as_printed: Physical Science (NASA Contractor)
+        country_as_printed: USA
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '338'
+        power_density_extrapolated: false
+        feedstock_species_as_printed: FeTiO3
+        T_min_C_as_printed: 1926
+        T_max_C_as_printed: 2126
+        P_min_bar_as_printed: '5.30E-04'
+        P_max_bar_as_printed: '2.00E-04'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[46]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: none_in_bibliography; doi.org/10.1016/j.jbis.1991.44.579 HTTP 404
+        cited_primary_url: NTRS 19920033574; JBIS 44:579-588 ISSN 0007-094X
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: printed P min 5.30E-04 > P max 2.00E-04 retained
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 2199.15
+      - 2399.15
+    - observation_id: robinot_2025_t2_senior_1991_caal2sio8
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_CaAl2SiO8
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Senior
+        year_as_printed: 1991
+        institution_as_printed: Physical Science (NASA Contractor)
+        country_as_printed: USA
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '338'
+        power_density_extrapolated: false
+        feedstock_species_as_printed: CaAl2SiO8
+        T_min_C_as_printed: 1566
+        T_max_C_as_printed: 1766
+        P_min_bar_as_printed: '4.00E-04'
+        P_max_bar_as_printed: '2.00E-04'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[46]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: none_in_bibliography; doi.org/10.1016/j.jbis.1991.44.579 HTTP 404
+        cited_primary_url: NTRS 19920033574; JBIS 44:579-588 ISSN 0007-094X
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: species as printed CaAl2SiO8 (prose uses CaAl2Si2O8)
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1839.15
+      - 2039.15
+    - observation_id: robinot_2025_t2_sauerborn_2005_cao
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_CaO
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Sauerborn
+        year_as_printed: 2005
+        institution_as_printed: DLR
+        country_as_printed: Germany
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '165'
+        power_density_extrapolated: true
+        feedstock_species_as_printed: CaO
+        T_min_C_as_printed: 1640
+        T_max_C_as_printed: 1640
+        P_min_bar_as_printed: '6.10E-05'
+        P_max_bar_as_printed: '1.40E-07'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[48]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: handle_not_doi
+        cited_primary_url: https://hdl.handle.net/20.500.11811/2298
+        existing_corpus_source_id: kems-035-sauerborn-2005
+        footnote_star: Value extrapolated from the data available in the original communication.
+        transcription_note: '* power density extrapolated'
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1913.15
+      - 1913.15
+    - observation_id: robinot_2025_t2_sauerborn_2005_sio2
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_SiO2
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Sauerborn
+        year_as_printed: 2005
+        institution_as_printed: DLR
+        country_as_printed: Germany
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '165'
+        power_density_extrapolated: true
+        feedstock_species_as_printed: SiO2
+        T_min_C_as_printed: 1440
+        T_max_C_as_printed: 1440
+        P_min_bar_as_printed: '3.50E-05'
+        P_max_bar_as_printed: '9.70E-08'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[48]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: handle_not_doi
+        cited_primary_url: https://hdl.handle.net/20.500.11811/2298
+        existing_corpus_source_id: kems-035-sauerborn-2005
+        footnote_star: Value extrapolated from the data available in the original communication.
+        transcription_note: '* power density extrapolated'
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1713.15
+      - 1713.15
+    - observation_id: robinot_2025_t2_sauerborn_2005_zno
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_ZnO
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Sauerborn
+        year_as_printed: 2005
+        institution_as_printed: DLR
+        country_as_printed: Germany
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '165'
+        power_density_extrapolated: true
+        feedstock_species_as_printed: ZnO
+        T_min_C_as_printed: 1190
+        T_max_C_as_printed: 1190
+        P_min_bar_as_printed: '2.70E-05'
+        P_max_bar_as_printed: '1.70E-07'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[48]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: handle_not_doi
+        cited_primary_url: https://hdl.handle.net/20.500.11811/2298
+        existing_corpus_source_id: kems-035-sauerborn-2005
+        footnote_star: Value extrapolated from the data available in the original communication.
+        transcription_note: '* power density extrapolated'
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1463.15
+      - 1463.15
+    - observation_id: robinot_2025_t2_sauerborn_2005_ms1
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_MS1
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Sauerborn
+        year_as_printed: 2005
+        institution_as_printed: DLR
+        country_as_printed: Germany
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '165'
+        power_density_extrapolated: true
+        feedstock_species_as_printed: MS1
+        T_min_C_as_printed: 1550
+        T_max_C_as_printed: 1550
+        P_min_bar_as_printed: '8.50E-05'
+        P_max_bar_as_printed: '9.10E-06'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[48]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: handle_not_doi
+        cited_primary_url: https://hdl.handle.net/20.500.11811/2298
+        existing_corpus_source_id: kems-035-sauerborn-2005
+        footnote_star: Value extrapolated from the data available in the original communication.
+        transcription_note: MS1 is Sauerborn JSC-1 run; T 1550 C is the review table value
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1823.15
+      - 1823.15
+    - observation_id: robinot_2025_t2_matchett_2006_fetio3
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_FeTiO3
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Matchett
+        year_as_printed: 2006
+        institution_as_printed: NASA
+        country_as_printed: USA
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '365'
+        power_density_extrapolated: true
+        feedstock_species_as_printed: FeTiO3
+        T_min_C_as_printed: 1436
+        T_max_C_as_printed: 1867
+        P_min_bar_as_printed: '9.30E-05'
+        P_max_bar_as_printed: '1.30E-03'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[34]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: report_ADA443950
+        cited_primary_url: https://apps.dtic.mil/sti/pdfs/ADA443950.pdf
+        existing_corpus_source_id: kems-038-matchett-2006
+        footnote_star: Value extrapolated from the data available in the original communication.
+        transcription_note: '* power density extrapolated'
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1709.15
+      - 2140.15
+    - observation_id: robinot_2025_t2_matchett_2006_mgsio3
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_MgSiO3
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Matchett
+        year_as_printed: 2006
+        institution_as_printed: NASA
+        country_as_printed: USA
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '365'
+        power_density_extrapolated: true
+        feedstock_species_as_printed: MgSiO3
+        T_min_C_as_printed: 1072
+        T_max_C_as_printed: 1100
+        P_min_bar_as_printed: '1.33E-05'
+        P_max_bar_as_printed: '3.10E-04'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[34]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: report_ADA443950
+        cited_primary_url: https://apps.dtic.mil/sti/pdfs/ADA443950.pdf
+        existing_corpus_source_id: kems-038-matchett-2006
+        footnote_star: Value extrapolated from the data available in the original communication.
+        transcription_note: '* power density extrapolated'
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1345.15
+      - 1373.15
+    - observation_id: robinot_2025_t2_matchett_2006_al2o3
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_Al2O3
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Matchett
+        year_as_printed: 2006
+        institution_as_printed: NASA
+        country_as_printed: USA
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '365'
+        power_density_extrapolated: true
+        feedstock_species_as_printed: Al2O3
+        T_min_C_as_printed: 1800
+        T_max_C_as_printed: 1800
+        P_min_bar_as_printed: '4.00E-04'
+        P_max_bar_as_printed: '4.10E-03'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[34]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: report_ADA443950
+        cited_primary_url: https://apps.dtic.mil/sti/pdfs/ADA443950.pdf
+        existing_corpus_source_id: kems-038-matchett-2006
+        footnote_star: Value extrapolated from the data available in the original communication.
+        transcription_note: '* power density extrapolated'
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 2073.15
+      - 2073.15
+    - observation_id: robinot_2025_t2_matchett_2006_mls1a
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_MLS-1a
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Matchett
+        year_as_printed: 2006
+        institution_as_printed: NASA
+        country_as_printed: USA
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: '365'
+        power_density_extrapolated: true
+        feedstock_species_as_printed: MLS-1a
+        T_min_C_as_printed: 1474
+        T_max_C_as_printed: 1474
+        P_min_bar_as_printed: '1.87E-04'
+        P_max_bar_as_printed: '1.87E-04'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[34]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: report_ADA443950
+        cited_primary_url: https://apps.dtic.mil/sti/pdfs/ADA443950.pdf
+        existing_corpus_source_id: kems-038-matchett-2006
+        footnote_star: Value extrapolated from the data available in the original communication.
+        transcription_note: '* power density extrapolated'
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1747.15
+      - 1747.15
+    - observation_id: robinot_2025_t2_tanaka_2019_al2o3
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_Al2O3
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Tanaka
+        year_as_printed: 2019
+        institution_as_printed: University of Tokyo
+        country_as_printed: Japan
+        heating_mode_as_printed: Laser
+        power_density_W_cm2_as_printed: 51-260
+        power_density_extrapolated: false
+        feedstock_species_as_printed: Al2O3
+        T_min_C_as_printed: 2826
+        T_max_C_as_printed: 3426
+        P_min_bar_as_printed: '1.22E+00'
+        P_max_bar_as_printed: '4.05E-01'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[38]'
+        cited_primary_doi: 10.1016/j.vacuum.2018.07.054
+        cited_primary_doi_resolver: HTTP 302 linkinghub.elsevier.com/retrieve/pii/S0042207X17315713
+        cited_primary_url: https://doi.org/10.1016/j.vacuum.2018.07.054
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: P min 1.22E+00 > P max 4.05E-01 as printed (prose lists 0.405, 0.659, 1.22
+          bar)
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 3099.15
+      - 3699.15
+    - observation_id: robinot_2025_t2_shaw_2022_feo_fe2o3
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_FeO_Fe2O3
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Shaw
+        year_as_printed: 2022
+        institution_as_printed: CISRO
+        country_as_printed: Australia
+        heating_mode_as_printed: Solar simulator Furnace
+        power_density_W_cm2_as_printed: '132'
+        power_density_extrapolated: false
+        feedstock_species_as_printed: FeO/Fe2O3
+        T_min_C_as_printed: 1025
+        T_max_C_as_printed: 1127
+        P_min_bar_as_printed: '3.47E-05'
+        P_max_bar_as_printed: '2.77E-07'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[50]/[51]'
+        cited_primary_doi: 10.1016/j.pss.2021.105272
+        cited_primary_doi_resolver: HTTP 302 linkinghub.elsevier.com/retrieve/pii/S0032063321001112
+        cited_primary_url: '[50] DOI 10.1016/j.pss.2021.105272; [51] figshare.swinburne.edu.au/articles/thesis/26297335
+          (no DOI)'
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: institution as printed CISRO; table year 2022 vs bib [50] 2021 / [51] 2023
+          thesis
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1298.15
+      - 1400.15
+    - observation_id: robinot_2025_t2_shaw_2022_fetio3
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_FeTiO3
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Shaw
+        year_as_printed: 2022
+        institution_as_printed: CISRO
+        country_as_printed: Australia
+        heating_mode_as_printed: Solar simulator Furnace
+        power_density_W_cm2_as_printed: '132'
+        power_density_extrapolated: false
+        feedstock_species_as_printed: FeTiO3
+        T_min_C_as_printed: 1116
+        T_max_C_as_printed: 1116
+        P_min_bar_as_printed: '2.50E-05'
+        P_max_bar_as_printed: '2.50E-08'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[50]/[51]'
+        cited_primary_doi: 10.1016/j.pss.2021.105272
+        cited_primary_doi_resolver: HTTP 302 linkinghub.elsevier.com/retrieve/pii/S0032063321001112
+        cited_primary_url: '[50] DOI 10.1016/j.pss.2021.105272; [51] figshare thesis (no DOI)'
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: institution as printed CISRO
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1389.15
+      - 1389.15
+    - observation_id: robinot_2025_t2_shaw_2022_lms1
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_LMS-1
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Shaw
+        year_as_printed: 2022
+        institution_as_printed: CISRO
+        country_as_printed: Australia
+        heating_mode_as_printed: Solar simulator Furnace
+        power_density_W_cm2_as_printed: '132'
+        power_density_extrapolated: false
+        feedstock_species_as_printed: LMS-1
+        T_min_C_as_printed: 1121
+        T_max_C_as_printed: 1151
+        P_min_bar_as_printed: '8.96E-05'
+        P_max_bar_as_printed: '3.88E-08'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[50]/[51]'
+        cited_primary_doi: 10.1016/j.pss.2021.105272
+        cited_primary_doi_resolver: HTTP 302 linkinghub.elsevier.com/retrieve/pii/S0032063321001112
+        cited_primary_url: '[50] DOI 10.1016/j.pss.2021.105272; [51] figshare thesis (no DOI)'
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: institution as printed CISRO
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1394.15
+      - 1424.15
+    - observation_id: robinot_2025_t2_li_2022_sio2
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_SiO2
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Li
+        year_as_printed: 2022
+        institution_as_printed: Kunming University
+        country_as_printed: China
+        heating_mode_as_printed: Laser
+        power_density_W_cm2_as_printed: Not reported
+        power_density_extrapolated: false
+        feedstock_species_as_printed: SiO2
+        T_min_C_as_printed: 4700
+        T_max_C_as_printed: 4700
+        P_min_bar_as_printed: '1.00E-08'
+        P_max_bar_as_printed: '1.00E-07'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[43]'
+        cited_primary_doi: 10.1016/j.vacuum.2022.111162
+        cited_primary_doi_resolver: HTTP 302 linkinghub.elsevier.com/retrieve/pii/S0042207X22002901
+        cited_primary_url: https://doi.org/10.1016/j.vacuum.2022.111162
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: prose quotes COMSOL focal T 4626 C; table prints 4700 C
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 4973.15
+      - 4973.15
+    - observation_id: robinot_2025_t2_zhao_2023_tio2
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_TiO2
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Zhao
+        year_as_printed: 2023
+        institution_as_printed: Shanghai University
+        country_as_printed: China
+        heating_mode_as_printed: Laser
+        power_density_W_cm2_as_printed: 1240-3100
+        power_density_extrapolated: false
+        feedstock_species_as_printed: TiO2
+        T_min_C_as_printed: 1948
+        T_max_C_as_printed: 2278
+        P_min_bar_as_printed: '1.00E-08'
+        P_max_bar_as_printed: '1.00E-08'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[42]'
+        cited_primary_doi: 10.1016/j.vacuum.2023.112628
+        cited_primary_doi_resolver: HTTP 302 linkinghub.elsevier.com/retrieve/pii/S0042207X23008254
+        cited_primary_url: https://doi.org/10.1016/j.vacuum.2023.112628
+        existing_corpus_source_id: absent
+        footnote_star: absent
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 2221.15
+      - 2551.15
+    - observation_id: robinot_2025_t2_li_2023_fe2o3
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_Fe2O3
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Li
+        year_as_printed: 2023
+        institution_as_printed: Shanghai University
+        country_as_printed: China
+        heating_mode_as_printed: Laser
+        power_density_W_cm2_as_printed: '5969'
+        power_density_extrapolated: false
+        feedstock_species_as_printed: Fe2O3
+        T_min_C_as_printed: Unknown
+        T_max_C_as_printed: Unknown
+        P_min_bar_as_printed: '1.00E-08'
+        P_max_bar_as_printed: '1.00E-08'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+        existing_corpus_source_id: absent
+        footnote_star: absent
+        transcription_note: same rows as Table 3; T unknown as printed
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+    - observation_id: robinot_2025_t2_li_2023_fetio3_fe2o3_sio2
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_FeTiO3_Fe2O3_SiO2
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Li
+        year_as_printed: 2023
+        institution_as_printed: Shanghai University
+        country_as_printed: China
+        heating_mode_as_printed: Laser
+        power_density_W_cm2_as_printed: '3979'
+        power_density_extrapolated: false
+        feedstock_species_as_printed: FeTiO3/Fe2O3/SiO2
+        T_min_C_as_printed: Unknown
+        T_max_C_as_printed: Unknown
+        P_min_bar_as_printed: '1.00E-08'
+        P_max_bar_as_printed: '1.00E-08'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+        existing_corpus_source_id: absent
+        footnote_star: absent
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+    - observation_id: robinot_2025_t2_li_2023_regolith_simulant
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_Regolith_Simulant
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Li
+        year_as_printed: 2023
+        institution_as_printed: Shanghai University
+        country_as_printed: China
+        heating_mode_as_printed: Laser
+        power_density_W_cm2_as_printed: '9948'
+        power_density_extrapolated: false
+        feedstock_species_as_printed: Regolith Simulant
+        T_min_C_as_printed: Unknown
+        T_max_C_as_printed: Unknown
+        P_min_bar_as_printed: '1.00E-09'
+        P_max_bar_as_printed: '1.00E-09'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+        existing_corpus_source_id: absent
+        footnote_star: absent
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+    - observation_id: robinot_2025_t2_sesko_2024_eac1
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_EAC-1
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Šeško
+        year_as_printed: 2024
+        institution_as_printed: ESA
+        country_as_printed: Germany
+        heating_mode_as_printed: Solar
+        power_density_W_cm2_as_printed: Not reported
+        power_density_extrapolated: false
+        feedstock_species_as_printed: EAC-1
+        T_min_C_as_printed: 1476
+        T_max_C_as_printed: 1626
+        P_min_bar_as_printed: '1.00E-10'
+        P_max_bar_as_printed: '1.00E-05'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[52]'
+        cited_primary_doi: 10.1016/j.actaastro.2024.08.009
+        cited_primary_doi_resolver: HTTP 302 linkinghub.elsevier.com/retrieve/pii/S0094576524004399
+        cited_primary_url: https://doi.org/10.1016/j.actaastro.2024.08.009
+        existing_corpus_source_id: kems-036-sesko-2024
+        footnote_star: absent
+        transcription_note: species header EAC-1 as printed
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1749.15
+      - 1899.15
+    - observation_id: robinot_2025_t2_li_2024_feo
+      type: rate_series
+      locator:
+        page: 247
+        published_page: 247
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 image on published p.247; HAL cover is PDF p.1
+      phase: compiled_vacuum_pyrolysis_feedstock_FeO
+      regime: review_compilation_vacuum_pyrolysis
+      units: as_published
+      values:
+        quantity: compiled_vacuum_pyrolysis_experiment_row
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        reference_as_printed: Li
+        year_as_printed: 2024
+        institution_as_printed: Shanghai University
+        country_as_printed: China
+        heating_mode_as_printed: Laser
+        power_density_W_cm2_as_printed: Not reported
+        power_density_extrapolated: false
+        feedstock_species_as_printed: FeO
+        T_min_C_as_printed: 1726
+        T_max_C_as_printed: 2176
+        P_min_bar_as_printed: '1.00E-08'
+        P_max_bar_as_printed: '1.00E-08'
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        time: absent_from_table
+        cited_primary_bibliography: '[45]'
+        cited_primary_doi: 10.1016/j.vacuum.2024.113690
+        cited_primary_doi_resolver: HTTP 302 linkinghub.elsevier.com/retrieve/pii/S0042207X2400736X
+        cited_primary_url: https://doi.org/10.1016/j.vacuum.2024.113690
+        existing_corpus_source_id: absent
+        footnote_star: absent
+      uncertainty:
+        note: no uncertainty printed on Table 2 cells; * marks extrapolated power density only
+      T_range_K:
+      - 1999.15
+      - 2449.15
+    - observation_id: robinot_2025_t3_li_2023_fe2o3
+      type: rate_series
+      locator:
+        page: 249
+        published_page: 249
+        pdf_page_index: 9
+        table: '3'
+        note: Li et al. patent [44] conditions; power density calculated by Robinot from available data
+      phase: laser_vacuum_pyrolysis_Fe2O3
+      regime: review_compilation_laser_pyrolysis
+      units: as_published
+      T_range_K: null
+      values:
+        quantity: compiled_laser_pyrolysis_experimental_conditions
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        samples_as_printed: Fe2O3
+        collector_distance_mm_as_printed: 50
+        exposure_angle_deg_as_printed: Unreported
+        pressure_bar_as_printed: 10^-8
+        preheating_power_W_as_printed: 300
+        preheating_duration_s_as_printed: 60
+        heating_power_W_as_printed: 3000
+        power_density_W_cm2_as_printed: 5969
+        heating_duration_s_as_printed: 20
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+        caption_note_as_printed: power density was calculated according to available data
+      uncertainty:
+        note: no uncertainty printed on Table 3; power density is review-calculated
+    - observation_id: robinot_2025_t3_li_2023_fetio3_fe2o3_sio2
+      type: rate_series
+      locator:
+        page: 249
+        published_page: 249
+        pdf_page_index: 9
+        table: '3'
+        note: Li et al. patent [44] conditions; power density calculated by Robinot from available data
+      phase: laser_vacuum_pyrolysis_FeTiO3_Fe2O3_SiO2
+      regime: review_compilation_laser_pyrolysis
+      units: as_published
+      T_range_K: null
+      values:
+        quantity: compiled_laser_pyrolysis_experimental_conditions
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        samples_as_printed: FeTiO3, Fe2O3, SiO2
+        collector_distance_mm_as_printed: 30
+        exposure_angle_deg_as_printed: '45'
+        pressure_bar_as_printed: 10^-8
+        preheating_power_W_as_printed: 500
+        preheating_duration_s_as_printed: 20
+        heating_power_W_as_printed: 2000
+        power_density_W_cm2_as_printed: 3979
+        heating_duration_s_as_printed: 10
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+        caption_note_as_printed: power density was calculated according to available data
+      uncertainty:
+        note: no uncertainty printed on Table 3; power density is review-calculated
+    - observation_id: robinot_2025_t3_li_2023_regolith_simulant
+      type: rate_series
+      locator:
+        page: 249
+        published_page: 249
+        pdf_page_index: 9
+        table: '3'
+        note: Li et al. patent [44] conditions; power density calculated by Robinot from available data
+      phase: laser_vacuum_pyrolysis_Regolith_Simulant
+      regime: review_compilation_laser_pyrolysis
+      units: as_published
+      T_range_K: null
+      values:
+        quantity: compiled_laser_pyrolysis_experimental_conditions
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        samples_as_printed: Regolith Simulant
+        collector_distance_mm_as_printed: 30
+        exposure_angle_deg_as_printed: '60'
+        pressure_bar_as_printed: 10^-9
+        preheating_power_W_as_printed: 500
+        preheating_duration_s_as_printed: 20
+        heating_power_W_as_printed: 5000
+        power_density_W_cm2_as_printed: 9948
+        heating_duration_s_as_printed: 5
+        mass_loss: absent_from_table
+        O2_yield: absent_from_table
+        condensate: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+        caption_note_as_printed: power density was calculated according to available data
+      uncertainty:
+        note: no uncertainty printed on Table 3; power density is review-calculated
+    - observation_id: robinot_2025_t4_li_2023_fe2o3
+      type: rate_series
+      locator:
+        page: 250
+        published_page: 250
+        pdf_page_index: 10
+        table: '4'
+        note: Li et al. patent [44] pyrolyzed-sample analysis
+      phase: laser_vacuum_pyrolysis_deposit_Fe2O3
+      regime: review_compilation_laser_pyrolysis
+      units: as_published
+      T_range_K: null
+      values:
+        quantity: compiled_laser_pyrolysis_deposit_and_oxygen_purity
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        samples_as_printed: Fe2O3
+        fe_content_deposited_wt_pct_as_printed: 27.1 %
+        fe_particles_composition_mol_pct_as_printed: Fe 98.5 %, O 1.5 %
+        oxygen_purity_as_printed: 99.5 %
+        iron_powder_purity_after_separation_as_printed: 90 %
+        mass_loss: absent_from_table
+        O2_yield_mass: absent_from_table
+        condensate_mass: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+      uncertainty:
+        note: no uncertainty printed on Table 4
+    - observation_id: robinot_2025_t4_li_2023_fetio3_fe2o3_sio2
+      type: rate_series
+      locator:
+        page: 250
+        published_page: 250
+        pdf_page_index: 10
+        table: '4'
+        note: Li et al. patent [44] pyrolyzed-sample analysis
+      phase: laser_vacuum_pyrolysis_deposit_FeTiO3_Fe2O3_SiO2
+      regime: review_compilation_laser_pyrolysis
+      units: as_published
+      T_range_K: null
+      values:
+        quantity: compiled_laser_pyrolysis_deposit_and_oxygen_purity
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        samples_as_printed: FeTiO3, Fe2O3, SiO2
+        fe_content_deposited_wt_pct_as_printed: 30 %
+        fe_particles_composition_mol_pct_as_printed: Fe 90.5 %, O 7.2 %, Si 1.3 %, Ti 1.0 %
+        oxygen_purity_as_printed: 99.0 %
+        iron_powder_purity_after_separation_as_printed: 85 %
+        mass_loss: absent_from_table
+        O2_yield_mass: absent_from_table
+        condensate_mass: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+      uncertainty:
+        note: no uncertainty printed on Table 4
+    - observation_id: robinot_2025_t4_li_2023_regolith_simulant
+      type: rate_series
+      locator:
+        page: 250
+        published_page: 250
+        pdf_page_index: 10
+        table: '4'
+        note: Li et al. patent [44] pyrolyzed-sample analysis
+      phase: laser_vacuum_pyrolysis_deposit_Regolith_Simulant
+      regime: review_compilation_laser_pyrolysis
+      units: as_published
+      T_range_K: null
+      values:
+        quantity: compiled_laser_pyrolysis_deposit_and_oxygen_purity
+        method_class: secondary_compilation
+        evidence_class: review_table_compilation_not_this_papers_measurement
+        samples_as_printed: Regolith Simulant
+        fe_content_deposited_wt_pct_as_printed: Unreported
+        fe_particles_composition_mol_pct_as_printed: Fe 92.2 %, O 2.4 %, Si 3.9 %, Ti 1.5 %
+        oxygen_purity_as_printed: 98.5 %
+        iron_powder_purity_after_separation_as_printed: 45 %
+        mass_loss: absent_from_table
+        O2_yield_mass: absent_from_table
+        condensate_mass: absent_from_table
+        cited_primary_bibliography: '[44]'
+        cited_primary_doi: absent
+        cited_primary_doi_resolver: patent_WO2023040660A1
+        cited_primary_url: https://patents.google.com/patent/WO2023040660A1
+      uncertainty:
+        note: no uncertainty printed on Table 4
