@@ -1,0 +1,134 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0262",
+  "census_id": "high-temperature-printed-page-288",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "VANADIUB DICHLORIDE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "121.847",
+    "value": 121.847,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      294
+    ],
+    "printed_pages": [
+      288
+    ],
+    "pdftotext_layout_page_file": "page-294.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer"
+  ],
+  "title_line_as_published": "VANADIUB DICHLORIDE                                                                POB!OLA WEIGHT     121.847",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "           Crystals 298.15 to 1300 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POBIIlTIOIII !'BOB THE ELE!EHTS",
+    "                                                                                         GIBBS",
+    "TE!P.      (H;-H~ 98 )/T      so",
+    "                               T       -(G;-H~ 9 a)/T      cop      EliTHALPI         PBEB EIIERGY     Log Kf",
+    "   K        J/mol•K        J/aol•K       J/aol•P.:      J/aol• K        k.J/aol          kJ/11101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/mol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•P.:",
+    "heat_capacity": "J/aol• K",
+    "formation_enthalpy": "k.J/aol",
+    "formation_gibbs_energy": "kJ/11101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 10,
+  "uncertainty_line_as_published": "UNCERTAINTY                   1.26              1.26                        8.500          8. 500       1.489",
+  "uncertainty_values": [
+    {
+      "as_published": "1.26",
+      "value": 1.26,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.26",
+      "value": 1.26,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "8.500",
+      "value": 8.5,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "8. 500",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.489",
+      "value": 1.489,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "BELTING POIHT                             K             BOILING POINT                                   K",
+    "ENTHALPY OF BELTING                       kJ            ENTHALPY OF VAPORIZATION                        kJ",
+    "H~98 - H~                                 k.J           !lOLA R VOL Ull E                               Jjbar",
+    "TRANSITIONS IN REFERENCE STATE ELEftEHTS",
+    "      VlHADIUII ••• !. P. 2175 K.",
+    "HEAT CAPACITY EQUlTIOH",
+    " c~ ..    66.755 +     1.3045z1o-z T               1.2465z10Z T-O•S",
+    "             ( BQUAUOH Y ALID FROB              298 - 1300 K)",
+    "BEPBBBHCE      125             120                                           264                     COIIPILED",
+    "                                                                                                      5-28-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer",
+      "detector_only": false
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0266",
+  "census_id": "high-temperature-printed-page-292",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "SELLllTE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "62.302",
+    "value": 62.302,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      298
+    ],
+    "printed_pages": [
+      292
+    ],
+    "pdftotext_layout_page_file": "page-298.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 29, 31, 37, 39"
+  ],
+  "title_line_as_published": "SELLllTE                                                                          FOB!ULl lEIGHT     62.302",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "           Crystals 298.15 to •elting point 1536 K.                  Liquid 1536 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOIUTIOI FlO! THE ELE!ERTS",
+    "                                                                                        GIBBS",
+    "TEftP.     ( a;-a~ 98 )/T      soT     -(G;-a~ 98 )/T      cop     EJTHALPI          FlEE EIEIGI     Log Kf",
+    "  K         J/•ol•K         J/•ol•K      J/•ol•K        Jt•ol•K         ltJ/•ol         ltJ/•ol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/•ol•K",
+    "entropy": "J/•ol•K",
+    "negative_gibbs_function": "J/•ol•K",
+    "heat_capacity": "Jt•ol•K",
+    "formation_enthalpy": "ltJ/•ol",
+    "formation_gibbs_energy": "ltJ/•ol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 20,
+  "uncertainty_line_as_published": "UMCERTliiCTI                   (1.42          0.42                         1.200          1. 200      0.210",
+  "uncertainty_values": [
+    {
+      "as_published": "(1.42",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.200",
+      "value": 1.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1. 200",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.210",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "llELTIMG POINT                 1536       K             BOIL.IIG POI!IIT                    2630      K",
+    "EMTHALPI OF llELTIMG            58.158 kJ               EITHALPY OF YlPOBIZATIOB            240.162 kJ",
+    "                                 9.983 ltJ              KOLlll YOLO!!                        1.9610 J/bar",
+    "                                                                                            19.610 c• 3",
+    "TIIAMSITIOMS IM REFEIIEMCE STATE ELE!EITS",
+    "      ftAGBESIOil •• ft. P. 922, B. P. 1361 K.",
+    "HEAT CAPACITY EQUATION",
+    " c;       72.887 +   9.1200z1Q-3 T            -  1.2460z10• T-z",
+    "             (EQUATION YlLID FRO It           298 - 1536 K)",
+    "REFERERC!       175            247                                         215                     CO!PILBD",
+    "                                                                                                    6- 9-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 29, 31, 37, 39",
+      "detector_only": false
+    }
+  ]
+}

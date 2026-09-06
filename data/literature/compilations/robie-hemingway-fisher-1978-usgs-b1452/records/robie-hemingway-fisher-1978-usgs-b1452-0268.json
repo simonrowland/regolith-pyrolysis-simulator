@@ -1,0 +1,139 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0268",
+  "census_id": "high-temperature-printed-page-294",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "CRYOLITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "209.942",
+    "value": 209.942,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      300
+    ],
+    "printed_pages": [
+      294
+    ],
+    "pdftotext_layout_page_file": "page-300.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 34, 36, 40, 42"
+  ],
+  "title_line_as_published": "CRYOLITE                                                                         FORMULA WEIGHT    209.942",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                Crystals 298.15 to 1500 K.              Cryolite dissociates above 1279 K",
+    "                presuaably by the reaction la.lll 6 = laAll• + 21al.",
+    "                                                                     FOB!AUOI FRO! THE ELE!ENTS",
+    "                                                                                  GIBBS",
+    "TE!P.       ( a;-H~ 98 )/T      so     -(G;-H~ 98 )/T        cop    EITHALPY   FREE ENERGY   Log [(f",
+    "                                 T",
+    "             J;aol•K         J/aol•l     Jjaol•K        J/aol•K         kJ/aol        kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J/aol•l",
+    "negative_gibbs_function": "Jjaol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 23,
+  "uncertainty_line_as_published": "UNCERTUNTY                      1.67           1.67                       4.180          4.]00       0.753",
+  "uncertainty_values": [
+    {
+      "as_published": "1.67",
+      "value": 1.67,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.67",
+      "value": 1.67,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.180",
+      "value": 4.18,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.]00",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.753",
+      "value": 0.753,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                  1285      [(            BOILING POIIIT                               K",
+    "ENTHALPY OF !!ELTING            111.755 kJ              EIITHALPY OF VAPOBIZATIOII                   kJ",
+    "                                 38.100 kJ              !OLAB VOLUIIE                      7.0810 J/bar",
+    "                                                                                          70.810 ca 3",
+    "TBAISITIOIIS IN REFERENCE STATE ELEBENTS",
+    "       SODIUII ••••• 1!. P. 370.98, B. P.         1175 I(.",
+    "       ALU!INUI! ••• 1!. P. 933 K.",
+    "HEAT CAPACITY EQUATIONS",
+    " cop       1.8277x102 + 13.542 T                 1.96931:1011 T-2",
+    "              (EQUATION VALID FRO!             298 -   838 K)",
+    " cop       1.3331x102 + 0.15471 T",
+    "              (EQUATION VALID FRO!             838- 1285 K)",
+    "REl'ERENCE       181            247                                       247                     COI!PILED",
+    "                                                                                                   8-11-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 34, 36, 40, 42",
+      "detector_only": false
+    }
+  ]
+}
