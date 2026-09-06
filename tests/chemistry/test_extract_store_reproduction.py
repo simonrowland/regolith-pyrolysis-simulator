@@ -137,7 +137,8 @@ def test_store_yields_adopted_target_type_observations(
     # 2026-08-27 harvest + d-006 gate: KEMS observations/sources are the
     # live studio battery after snapshot regen.
     assert len(kems) == 450
-    assert len({obs.source_id for obs in kems}) == 30
+    # b-480: 15 added KEMS sources; coverage includes typed-skipped evidence.
+    assert len({obs.source_id for obs in kems}) == 45
     for obs in adopted_observations:
         assert obs.is_priority_winner or obs.adoption_basis == "mass_spec_extract"
         assert obs.source_id
@@ -1329,7 +1330,8 @@ def test_transition_point_is_an_adopted_target_type(
 ) -> None:
     assert "transition_point" in TARGET_TYPES
     rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"]
-    assert len(rows) == 65
+    # b-480: nine added transition rows; all remain typed coverage refusals.
+    assert len(rows) == 74
     # NIST NBP/melting rows are priority winners; kems-020 Hastie Na2SO4
     # second-law prose is extract-adopted (mass_spec_extract).
     assert all(
@@ -1580,7 +1582,7 @@ def test_coverage_ledger_is_observation_first_and_exact(
         "gibbs_table": (33, 0, 33, 0),
         "psat_series": (23, 1, 22, 2),
         "rate_series": (75, 7, 68, 16),
-        "transition_point": (65, 15, 50, 15),
+        "transition_point": (74, 15, 59, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
@@ -1597,7 +1599,7 @@ def test_coverage_ledger_is_observation_first_and_exact(
         "psat_series": (23, 1, 2),
         "rate_hkl": (45, 0, 0),
         "relative_volatility": (1, 0, 0),
-        "transition_point": (65, 15, 15),
+        "transition_point": (74, 15, 15),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations
