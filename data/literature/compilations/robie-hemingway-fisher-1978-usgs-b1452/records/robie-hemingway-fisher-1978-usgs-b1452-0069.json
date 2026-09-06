@@ -1,0 +1,142 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0069",
+  "census_id": "high-temperature-printed-page-095",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "OCTA-ATOftlC SULFUR",
+  "formula_as_published": "S1",
+  "phase_state_as_published": [
+    "Ideal octatomic gas 298.15 to 1800 IC."
+  ],
+  "description_lines_as_published": [
+    "S1 :      Ideal octatomic gas 298.15 to 1800 IC."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "256.480",
+    "value": 256.48,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      101
+    ],
+    "printed_pages": [
+      95
+    ],
+    "pdftotext_layout_page_file": "page-101.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 33, 35"
+  ],
+  "title_line_as_published": "OCTA-ATOftlC SULFUR                                                                 FORftULA iiEIGHT    256.480",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "S1 :      Ideal octatomic gas 298.15 to 1800 IC.",
+    "--·------------------------------------------------------------------------------",
+    "                                                            FROll THE .ELEftEHTS",
+    "                                                                       FORftATIO~",
+    "                                                                                          GIBBS",
+    "TEftP.      ( H~-H;9 8 }/T      so       -(G;-H~ 98 }/T       cop     ENTHALPY         FREE E!IEIGY      Log Kf",
+    "                                 T",
+    "             J/mol•K         J/mol•K       J/mol•K         J/mol•K         kJ/mol         kJ/mol",
+    "--·------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J/mol•K",
+    "entropy": "J/mol•K",
+    "negative_gibbs_function": "J/mol•K",
+    "heat_capacity": "J/mol•K",
+    "formation_enthalpy": "kJ/mol",
+    "formation_gibbs_energy": "kJ/mol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 18,
+  "uncertainty_line_as_published": "UNCERTAINTY                     1.67             1. 67                        0.628          0.920        0.161",
+  "uncertainty_values": [
+    {
+      "as_published": "1.67",
+      "value": 1.67,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1. 67",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.628",
+      "value": 0.628,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.920",
+      "value": 0.92,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.161",
+      "value": 0.161,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "S1 :      Ideal octatomic gas 298.15 to 1800 IC."
+  ],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                                             BOILING POINT",
+    "ENTHALPY OF ftELTING                        kJ             ENTHALPY OF VA PORI ZAT ION                    kJ",
+    "                                 31.33(J kJ                KOLAR VOLUftE                     2478.9200 J/bar",
+    "                                                                                            24789.200 cm 3",
+    "TRANSITIONS IN REFERENCE STATE ELEI!ENTS",
+    "       SULFUR •••••     ORTH0-110110 368.54 1      II.   P. IIONO 388.36 1",
+    "                        B. P. 716.9 K.",
+    "HEAT CAPACITY EQUATION",
+    "           2.0004x10Z -        6.4724x1Q-l T                1.1897x1o-• TZ",
+    "          -1.6260x 106 T-Z",
+    "              (EQUATION VALID FROII              298 -    1800 K}"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 33, 35",
+      "detector_only": false
+    }
+  ]
+}

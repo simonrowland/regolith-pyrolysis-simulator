@@ -1,0 +1,141 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0068",
+  "census_id": "high-temperature-printed-page-094",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "Dll TOll IC SULFUR",
+  "formula_as_published": "S2",
+  "phase_state_as_published": [
+    "Ideal diatoaic gas 298.15 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "S2 :      Ideal diatoaic gas 298.15 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "64.120",
+    "value": 64.12,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      100
+    ],
+    "printed_pages": [
+      94
+    ],
+    "pdftotext_layout_page_file": "page-100.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27, 32, 34"
+  ],
+  "title_line_as_published": "Dll TOll IC SULFUR                                                                   FOBIIU LA II EIGHT     64.120",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "S2 :      Ideal diatoaic gas 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 I!'OBIIATIOII FBOII THE ELEIIEIITS",
+    "                                                                                           GIBBS",
+    "TEIIP.      ( H;-H~ 98 )/T      so      -(~-H~ 98 )/T         cop     EIITHALPY         FREE EIIEBGY        Log Kf",
+    "                                 T",
+    "   K         J/aol•K         J/llol•K     J/aol•K          J;aol•K          kJ/aol          kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/llol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J;aol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 18,
+  "uncertainty_line_as_published": "UNCERTAINTY                     0.05             0.05                         0.500            0.669         0.117",
+  "uncertainty_values": [
+    {
+      "as_published": "0.05",
+      "value": 0.05,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.05",
+      "value": 0.05,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.500",
+      "value": 0.5,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.669",
+      "value": 0.669,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.117",
+      "value": 0.117,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "S2 :      Ideal diatoaic gas 298.15 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                                             BOIL IMG PO lilT                                  K",
+    "ENTHALPY OF IIELTING                       kJ              ENTHALPY OF VAPORIZATION                          kJ",
+    "                                     9. 131 kJ             IIOLAB VOLUIIE                     2478.9200 J/bar",
+    "                                                                                             24789.200 c11 3",
+    "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
+    "       SULFUR ••••• ORTHO-IIONO 368.54,            II.   P. IIONO 388.36 1",
+    "                    B. P. 7 16. 9 K.",
+    "HEAT CAPACITY EQUATION",
+    "           47.069 -    3.4459x10-3 T",
+    "          -2 .2639x10\" T-z",
+    "               (EQUATION VALID FRO!!             298 -    1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27, 32, 34",
+      "detector_only": false
+    }
+  ]
+}
