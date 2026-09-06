@@ -35,15 +35,24 @@
     "heat_capacity": "J/mol·K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/mol",
-    "log_kf": "dimensionless"
+    "log_kf": "dimensionless",
+    "enthalpy_298_minus_0": "kJ"
   },
   "compiled_as_published": "9-30-79",
   "molar_volume_J_per_bar_as_published": "7.2742",
   "molar_volume_cm3_as_published": "72.742",
   "melting_point_as_published": "MELTING POINT K BOILING POINT K",
+  "enthalpy_298_minus_0": null,
   "heat_capacity_equations_as_published": [
-    "co = 333.920- 2.32529x10- 3 T- 2.76608x10 3 T- 0 · 5 6.52597x10 4 T- 2",
-    "p (EQUATION VALID FROM 200 1800 K)"
+    {
+      "as_published": "C_p° = 333.920 - 2.32529x10^-3 T - 2.76608x10^3 T^-0.5 - 6.52597x10^4 T^-2",
+      "validity_as_published": "(EQUATION VALID FROM 200 - 1800 K)",
+      "ocr_suspect": false,
+      "source_pdf_pages": [
+        37,
+        38
+      ]
+    }
   ],
   "reference_state_notes_as_published": [
     "TRANSITIONS IN REFERENCE STATE ELEMENTS",
@@ -192,19 +201,13 @@
             "as_published": "-117.156",
             "value": "-117.156",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-120.985",
             "value": "-120.985",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "21.196",
@@ -214,6 +217,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -292,19 +307,13 @@
             "as_published": "-117.085",
             "value": "-117.085",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-122.301",
             "value": "-122.301",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "15.971",
@@ -314,6 +323,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -392,19 +413,13 @@
             "as_published": "-116.945",
             "value": "-116.945",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-123.621",
             "value": "-123.621",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "12.915",
@@ -414,6 +429,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -492,10 +519,7 @@
             "as_published": "-116.754",
             "value": "-116.754",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-124.973",
@@ -511,6 +535,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -589,10 +625,7 @@
             "as_published": "-116.554",
             "value": "-116.554",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-126.357",
@@ -608,6 +641,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -688,19 +733,13 @@
             "as_published": "-116.384",
             "value": "-116.384",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-127.770",
             "value": "-127.770",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "8.343",
@@ -710,6 +749,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -788,19 +839,13 @@
             "as_published": "-116.571",
             "value": "-116.571",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-129.168",
             "value": "-129.168",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "7.497",
@@ -810,6 +855,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -888,19 +945,13 @@
             "as_published": "-115.512",
             "value": "-115.512",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-130.618",
             "value": "-130.618",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "6.823",
@@ -910,6 +961,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -988,19 +1051,13 @@
             "as_published": "-114.334",
             "value": "-114.334",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-132.187",
             "value": "-132.187",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "6.277",
@@ -1010,6 +1067,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1088,19 +1157,13 @@
             "as_published": "-113.073",
             "value": "-113.073",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-133.867",
             "value": "-133.867",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "5.827",
@@ -1110,6 +1173,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1190,19 +1265,13 @@
             "ocr_suspect": true,
             "flags": [
               "ocr_substitution_candidate_not_a_correction"
-            ],
-            "footnote_markers": [
-              "*"
             ]
           },
           "gibbs_energy": {
             "as_published": "-135.647",
             "value": "-135.647",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "5.450",
@@ -1212,6 +1281,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1296,10 +1377,7 @@
             "as_published": "-137.538",
             "value": "-137.538",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "5.132",
@@ -1309,6 +1387,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1393,10 +1483,7 @@
             "as_published": "-139.510",
             "value": "-139.510",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "4.858",
@@ -1406,6 +1493,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1484,19 +1583,13 @@
             "as_published": "-107.873",
             "value": "-107.873",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-141.581",
             "value": "-141.581",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "4.622",
@@ -1506,6 +1599,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1584,19 +1689,13 @@
             "as_published": "-106.679",
             "value": "-106.679",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-143.732",
             "value": "-143.732",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "4.416",
@@ -1606,6 +1705,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1684,19 +1795,13 @@
             "as_published": "-105.563",
             "value": "-105.563",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "gibbs_energy": {
             "as_published": "-145.939",
             "value": "-145.939",
             "ocr_suspect": false,
-            "flags": [],
-            "footnote_markers": [
-              "*"
-            ]
+            "flags": []
           },
           "log_kf": {
             "as_published": "4.235",
@@ -1706,6 +1811,18 @@
           }
         }
       },
+      "marks": [
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_enthalpy",
+          "as_published": "*"
+        },
+        {
+          "formation_basis": "from_the_oxides",
+          "column": "formation_gibbs_energy",
+          "as_published": "*"
+        }
+      ],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,

@@ -32,19 +32,36 @@
     "heat_capacity": "J/mol·K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/mol",
-    "log_kf": "dimensionless"
+    "log_kf": "dimensionless",
+    "enthalpy_298_minus_0": "kJ"
   },
   "compiled_as_published": "9-30-79",
   "molar_volume_J_per_bar_as_published": "1.8069",
   "molar_volume_cm3_as_published": "18.069",
   "melting_point_as_published": "MELTING POINT 273.15 K BOILING POINT 372.8 K",
+  "enthalpy_298_minus_0": {
+    "as_published": "13.293",
+    "value": "13.293",
+    "ocr_suspect": false,
+    "flags": []
+  },
   "heat_capacity_equations_as_published": [
-    "42.0228 + 3.49132x10 2 T + 1.10338x10 6 T- 2",
-    "(EQUATION VALID FROM 273 425 K, liquid)",
-    "c• m 10.4381 + 1.29775x1o- 2 T- 4.46885x10- 6 T 2 + 2.99188x10 2 T-o.s",
-    "p",
-    "1.31077x10 5 T- 2",
-    "(EQUATION VALID FROM 298 1800 K, gas)"
+    {
+      "as_published": "C_p° = 42.0228 + 3.49132x10^-2 T + 1.10338x10^6 T^-2",
+      "validity_as_published": "(EQUATION VALID FROM 273 - 425 K, liquid)",
+      "ocr_suspect": false,
+      "source_pdf_pages": [
+        27
+      ]
+    },
+    {
+      "as_published": "C_p° = 10.4381 + 1.29775x10^-2 T - 4.46885x10^-6 T^2 + 2.99188x10^2 T^-0.5 - 1.31077x10^5 T^-2",
+      "validity_as_published": "(EQUATION VALID FROM 298 - 1800 K, gas)",
+      "ocr_suspect": false,
+      "source_pdf_pages": [
+        27
+      ]
+    }
   ],
   "reference_state_notes_as_published": [
     "TRANSITIONS IN REFERENCE STATE ELEMENTS"
@@ -147,6 +164,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -215,6 +233,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -283,6 +302,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -351,6 +371,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -419,6 +440,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -487,6 +509,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -555,6 +578,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -625,6 +649,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -693,6 +718,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -761,6 +787,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -829,6 +856,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -897,6 +925,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -965,6 +994,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1033,6 +1063,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1101,6 +1132,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1169,6 +1201,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1237,6 +1270,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1305,6 +1339,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,

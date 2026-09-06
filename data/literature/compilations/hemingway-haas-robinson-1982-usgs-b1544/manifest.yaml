@@ -26,17 +26,19 @@ source_files:
   sha256: 638d0c1c901ec0519752d4efb34688711e9374be03a5d50b4f4b1d964590ea6b
 corpus_status:
   scope: every numeric table in USGS Bulletin 1544 (TABLE 1 plus per-substance T-grid tables)
-  extraction: pdftotext -bbox of the OCR text layer; page images used only where the OCR layer omitted a title
+  extraction: pdftotext -bbox for T-grid cells; page-image transcription for TABLE 1, printed formulas, Cp equations, H°298-H°0
+    metadata, and qualification marks
   census_table_count: 33
   transcribed_table_count: 33
   untranscribed: []
   ambiguities:
   - OCR text layer, not a typeset source; ocr_suspect tokens retained raw and not corrected
   - identity G=H-TS and delta-f G vs log Kf used as detectors only
+  - page-image transcriptions are limited to fields named in extraction; no identity-derived corrections
 summary:
   record_count: 33
   record_ambiguity_count: 34
-  ocr_suspect_row_count: 90
+  ocr_suspect_row_count: 41
   identity_disagreement_count: 2
   untranscribed_count: 0
 census:
@@ -388,7 +390,7 @@ census:
   transcribed: true
 feedstock_element_coverage:
   Ag: 0
-  Al: 9
+  Al: 20
   As: 0
   Au: 0
   B: 0
@@ -396,7 +398,7 @@ feedstock_element_coverage:
   Bi: 0
   Br: 0
   C: 0
-  Ca: 5
+  Ca: 17
   Cd: 0
   Ce: 0
   Cl: 0
@@ -412,7 +414,7 @@ feedstock_element_coverage:
   Ga: 0
   Gd: 0
   Ge: 0
-  H: 5
+  H: 12
   Hf: 0
   Ho: 0
   I: 0
@@ -430,7 +432,7 @@ feedstock_element_coverage:
   Nb: 0
   Nd: 0
   Ni: 0
-  O: 14
+  O: 32
   Os: 0
   P: 0
   Pb: 0
@@ -441,7 +443,7 @@ feedstock_element_coverage:
   Sb: 0
   Sc: 0
   Se: 0
-  Si: 9
+  Si: 25
   Sm: 0
   Sn: 0
   Sr: 0
@@ -474,11 +476,10 @@ entries:
   path: records/usgs-b1544-table-1.json
   row_count: 20
   ambiguities:
-  - table_1_header_prints_Hass (Haas) as OCR/typeset token; retained as published
-  - column_4_heading_token Remley/Hemley retained from OCR layer; not corrected
-  - blank cells retained as null; '-' means value not given as printed in the table headnote
-  ambiguity_count: 3
-  ocr_suspect_row_count: 49
+  - table_1_header prints Hass as published; it is not silently changed to Haas
+  - blank cells retained as null; '-' means value not given as printed in the headnote
+  ambiguity_count: 2
+  ocr_suspect_row_count: 0
   printed_pages: *id002
   pdf_pages: *id003
 - record_id: usgs-b1544-corundum
@@ -494,7 +495,7 @@ entries:
   path: records/usgs-b1544-corundum.json
   row_count: 16
   ambiguities:
-  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 2
   printed_pages: *id005
@@ -615,7 +616,7 @@ entries:
   path: records/usgs-b1544-quartz.json
   row_count: 18
   ambiguities:
-  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id019
@@ -634,9 +635,8 @@ entries:
   row_count: 20
   ambiguities:
   - title_omitted_from_ocr_layer; transcribed from page image as a second reading
-  - oxides_page_row_count_3_!=_elements_20; not aligned by guess
   - title_omitted_from_ocr_layer; transcribed from page image as a second reading
-  ambiguity_count: 3
+  ambiguity_count: 2
   ocr_suspect_row_count: 1
   printed_pages: *id021
   pdf_pages: *id020
@@ -653,7 +653,7 @@ entries:
   path: records/usgs-b1544-kyanite.json
   row_count: 14
   ambiguities:
-  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id023
@@ -671,7 +671,7 @@ entries:
   path: records/usgs-b1544-andalusite.json
   row_count: 16
   ambiguities:
-  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 2
   printed_pages: *id025
@@ -689,7 +689,7 @@ entries:
   path: records/usgs-b1544-sillimanite.json
   row_count: 16
   ambiguities:
-  - formula_omitted_from_ocr_layer; transcribed from page image as a second reading
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 2
   printed_pages: *id027
@@ -714,7 +714,7 @@ entries:
   printed_pages: *id029
   pdf_pages: *id028
 - record_id: usgs-b1544-larnite-reference
-  formula: null
+  formula: Ca2SiO4
   phase: to 1710 K. Alpha crystals 1710 to 1800 K. GIBBS
   name_as_published: Larnite Reference
   source: *id001
@@ -726,13 +726,13 @@ entries:
   path: records/usgs-b1544-larnite-reference.json
   row_count: 20
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 0
   printed_pages: *id031
   pdf_pages: *id030
 - record_id: usgs-b1544-larnite
-  formula: null
+  formula: Ca2SiO4
   phase: GIBBS
   name_as_published: Larnite
   source: *id001
@@ -744,13 +744,13 @@ entries:
   path: records/usgs-b1544-larnite.json
   row_count: 9
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id033
   pdf_pages: *id032
 - record_id: usgs-b1544-calcium-olivine-reference
-  formula: null
+  formula: Ca2SiO4
   phase: to 1710 K. Alpha crystals 1710 to 1800 K.
   name_as_published: Calcium olivine Reference
   source: *id001
@@ -762,13 +762,13 @@ entries:
   path: records/usgs-b1544-calcium-olivine-reference.json
   row_count: 20
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id035
   pdf_pages: *id034
 - record_id: usgs-b1544-calcium-olivine
-  formula: null
+  formula: Ca2SiO4
   phase: Crystals 298.15 to 1200 K. See Calcium olivine reference table.
   name_as_published: Calcium olivine
   source: *id001
@@ -780,13 +780,13 @@ entries:
   path: records/usgs-b1544-calcium-olivine.json
   row_count: 10
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id037
   pdf_pages: *id036
 - record_id: usgs-b1544-rankinite
-  formula: null
+  formula: Ca3Si2O7
   phase: ''
   name_as_published: Rankinite
   source: *id001
@@ -798,13 +798,13 @@ entries:
   path: records/usgs-b1544-rankinite.json
   row_count: 12
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 3
   printed_pages: *id039
   pdf_pages: *id038
 - record_id: usgs-b1544-gehlenite
-  formula: null
+  formula: Ca2Al2SiO7
   phase: Crystals 298.15 to melting point 1863 K.
   name_as_published: Gehlenite
   source: *id001
@@ -816,13 +816,13 @@ entries:
   path: records/usgs-b1544-gehlenite.json
   row_count: 16
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id041
   pdf_pages: *id040
 - record_id: usgs-b1544-grossulsr
-  formula: null
+  formula: Ca3Al2Si3O12
   phase: Crystals 298.15 to 1400 K.
   name_as_published: Grossulsr
   source: *id001
@@ -834,13 +834,13 @@ entries:
   path: records/usgs-b1544-grossulsr.json
   row_count: 12
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id043
   pdf_pages: *id042
 - record_id: usgs-b1544-zoisite
-  formula: null
+  formula: Ca2Al3Si3O12(OH)
   phase: ''
   name_as_published: Zoisite
   source: *id001
@@ -852,7 +852,7 @@ entries:
   path: records/usgs-b1544-zoisite.json
   row_count: 7
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id045
@@ -877,7 +877,7 @@ entries:
   printed_pages: *id047
   pdf_pages: *id046
 - record_id: usgs-b1544-wollastonite
-  formula: CaSi03
+  formula: CaSiO3
   phase: 'CaSi0 3 : Crystals 298.15 to 1500 K. See CaSi0 reference table. 3'
   name_as_published: Wollastonite
   source: *id001
@@ -888,13 +888,14 @@ entries:
   sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
   path: records/usgs-b1544-wollastonite.json
   row_count: 13
-  ambiguities: []
-  ambiguity_count: 0
+  ambiguities:
+  - formula_corrupted_in_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id049
   pdf_pages: *id048
 - record_id: usgs-b1544-cyclowollastonite-pseudowollastonite
-  formula: CaSi03
+  formula: CaSiO3
   phase: 'CaSi0 3 : Crystals 298.15 to 1800 K. See CaSi0 3 reference table.'
   name_as_published: Cyclowollastonite (Pseudowollastonite)
   source: *id001
@@ -905,13 +906,14 @@ entries:
   sha256: 11a8781587745ea67de0cbb03947fcebf5cec2070e2d6dbe92129d536e94c17f
   path: records/usgs-b1544-cyclowollastonite-pseudowollastonite.json
   row_count: 16
-  ambiguities: []
-  ambiguity_count: 0
+  ambiguities:
+  - formula_corrupted_in_ocr_layer; transcribed from page image as a second reading
+  ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id051
   pdf_pages: *id050
 - record_id: usgs-b1544-ca-al-pyroxene
-  formula: null
+  formula: CaAl2SiO6
   phase: Crystals 298.15 to 1800 K.
   name_as_published: Ca-Al pyroxene
   source: *id001
@@ -923,13 +925,13 @@ entries:
   path: records/usgs-b1544-ca-al-pyroxene.json
   row_count: 16
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id053
   pdf_pages: *id052
 - record_id: usgs-b1544-anorthite
-  formula: null
+  formula: CaAl2Si2O8
   phase: Crystals 298.15 to melting point 1830 K.
   name_as_published: Anorthite
   source: *id001
@@ -941,13 +943,13 @@ entries:
   path: records/usgs-b1544-anorthite.json
   row_count: 16
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 0
   printed_pages: *id055
   pdf_pages: *id054
 - record_id: usgs-b1544-kaolinite
-  formula: null
+  formula: Al2Si2O5(OH)4
   phase: Crystals 298.15 to 1000 K. -~~------------------------------------------------------------------------------
   name_as_published: Kaolinite
   source: *id001
@@ -959,14 +961,14 @@ entries:
   path: records/usgs-b1544-kaolinite.json
   row_count: 8
   ambiguities:
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   - identity_disagreement logKf_vs_dG_from_the_elements T=:198.15 delta=335.942596643552255586118319
-  - formula_as_published_not_recovered_from_ocr; not inferred
   ambiguity_count: 2
   ocr_suspect_row_count: 4
   printed_pages: *id057
   pdf_pages: *id056
 - record_id: usgs-b1544-dickite
-  formula: null
+  formula: Al2Si2O5(OH)4
   phase: Crystals 298.15 to 900 K. -~~------------------------------------------------------------------------------
   name_as_published: Dickite
   source: *id001
@@ -978,14 +980,14 @@ entries:
   path: records/usgs-b1544-dickite.json
   row_count: 7
   ambiguities:
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   - identity_disagreement logKf_vs_dG_from_the_elements T=1100 delta=-306.2571875656077083895696869
-  - formula_as_published_not_recovered_from_ocr; not inferred
   ambiguity_count: 2
   ocr_suspect_row_count: 1
   printed_pages: *id059
   pdf_pages: *id058
 - record_id: usgs-b1544-halloysite
-  formula: null
+  formula: Al2Si2O5(OH)4
   phase: Crystals 298.15 to 900 K.
   name_as_published: Halloysite
   source: *id001
@@ -997,13 +999,13 @@ entries:
   path: records/usgs-b1544-halloysite.json
   row_count: 7
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 0
   printed_pages: *id061
   pdf_pages: *id060
 - record_id: usgs-b1544-pyrophyllite
-  formula: null
+  formula: Al2Si4O10(OH)2
   phase: '-------------------------------------------------·-------------------------------'
   name_as_published: Pyrophyllite
   source: *id001
@@ -1015,13 +1017,13 @@ entries:
   path: records/usgs-b1544-pyrophyllite.json
   row_count: 10
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id063
   pdf_pages: *id062
 - record_id: usgs-b1544-margarite
-  formula: null
+  formula: CaAl4Si2O10(OH)2
   phase: ''
   name_as_published: Margarite
   source: *id001
@@ -1033,13 +1035,13 @@ entries:
   path: records/usgs-b1544-margarite.json
   row_count: 10
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id065
   pdf_pages: *id064
 - record_id: usgs-b1544-prehnite
-  formula: null
+  formula: Ca2Al2Si3O10(OH)2
   phase: ''
   name_as_published: Prehnite
   source: *id001
@@ -1051,7 +1053,7 @@ entries:
   path: records/usgs-b1544-prehnite.json
   row_count: 10
   ambiguities:
-  - formula_as_published_not_recovered_from_ocr; not inferred
+  - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
   ambiguity_count: 1
   ocr_suspect_row_count: 1
   printed_pages: *id067

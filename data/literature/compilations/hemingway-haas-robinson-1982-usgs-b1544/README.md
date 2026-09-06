@@ -17,9 +17,11 @@ and produce no battery scoring rows (`gibbs_table_not_runtime_observable`).
 - Retrieved 2026-09-06 from pubs.usgs.gov (corpus sidecar)
 
 The PDF is an Adobe Paper Capture scan with an OCR text layer. Harvest uses
-`pdftotext -bbox` of that layer. Page images are a second reading only where
-the OCR layer omitted a title or formula. Tokens with plausible OCR confusions
-are flagged `ocr_suspect` and are not corrected.
+`pdftotext -bbox` for T-grid cells. TABLE 1, printed formulas, Cp equations,
+H°298−H°0 metadata, and qualification marks are transcribed from page
+images because positioned OCR loses signs, columns, or tokens in those fields.
+Other tokens with plausible OCR confusions remain raw, are flagged
+`ocr_suspect`, and are not corrected from thermodynamic identities.
 
 ## Native structure
 
@@ -31,6 +33,8 @@ are flagged `ocr_suspect` and are not corrected.
   from the elements; even pages, when present, are formation from the oxides.
   Shared columns: T, (H°_T−H°_298)/T, S°_T, −(G°_T−H°_298)/T, C°_p. Formation
   columns: ΔfH, ΔfG, log Kf.
+- `marks` on each T-grid row locates every printed `*` by formation basis and
+  column. Cp equations carry an equation-level `ocr_suspect` flag.
 
 No unit conversion, no interpolation, no gap filling. Duplicate printed
 temperatures at phase changes are kept as two rows.
@@ -41,7 +45,8 @@ temperatures at phase changes are kept as two rows.
 
 - `load_records()` — manifest-indexed native files
 - `lookup(record_id, T, column)` — exact printed-grid node only
-- `TemperatureNotOnPrintedGrid` / `AmbiguousPrintedTemperature` / `UnparsedPrintedToken`
+- `TemperatureNotOnPrintedGrid` / `AmbiguousPrintedGridNode` /
+  `AmbiguousPrintedTemperature` / `UnparsedPrintedToken`
 
 The engine may consume these tables as assessed Cp/S/G functions on the printed
 T nodes. It must not treat them as validation measurements.

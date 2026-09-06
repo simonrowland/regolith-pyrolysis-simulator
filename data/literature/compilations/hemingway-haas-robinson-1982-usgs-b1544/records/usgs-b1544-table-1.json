@@ -14,7 +14,7 @@
   "name_as_published": "Enthalpies of formation from the elements at 298.15 K for selected phases taken from several literature references",
   "formula_as_published": null,
   "phase_as_published": null,
-  "title_as_published": "TABLE1.-Enthalpiesofformationfromtheelementsat298.15Kforselectedphasestaken from severalliteraturereferences [-,valuenotgiven]",
+  "title_as_published": "Enthalpies of formation from the elements at 298.15 K for selected phases taken from several literature references",
   "headnote_as_published": "[-,value not given]",
   "printed_pages": [
     9
@@ -30,16 +30,16 @@
     "Hass and others (1979)",
     "Robie and others (1979)",
     "Helgeson and others (1978)*",
-    "Remley/Hemley and others (1980)"
+    "Remley and others (1980)"
   ],
-  "footnote_as_published": "*ThevaluesinparenthesesrepresentthevaluederivedbyHelgesonandothersplusacorrectionof-6.5kJpermole ofaluminum. Weshalldiscussthedifferencesinthetabulatedthermodynamicdata in terms of the reported differences in the enthalpy of formation, rather than in terms ofdifferences in the Gibbs free energy offorma- tion, because (1) all the tabulations use essentially the same values for the entropy of the condensed phases, (2) the standard reference",
+  "footnote_as_published": "*The values in parentheses represent the value derived by Helgeson and others plus a correction of -6.5 kJ per mole of aluminum.",
   "rows": [
     {
-      "phase_as_published": "CorundumAlzOs",
+      "phase_as_published": "Corundum Al2O3",
       "values": {
         "haas_1979": {
-          "as_published": "1675.711",
-          "value": "1675.711",
+          "as_published": "-1675.711",
+          "value": "-1675.711",
           "ocr_suspect": false,
           "flags": []
         },
@@ -65,33 +65,40 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±1.000",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.000",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±1.300",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.300",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±6.0",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "6.0",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-1674.7)"
+      "helgeson_corrected": {
+        "as_published": "(-1674.7)",
+        "value": "-1674.7",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "QuartzSi02",
+      "phase_as_published": "Quartz SiO2",
       "values": {
         "haas_1979": {
           "as_published": "-910.699",
@@ -121,33 +128,33 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±.900",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "0.900",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±1.000",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.000",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±1.00",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.00",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": null
+      "helgeson_corrected": null
     },
     {
-      "phase_as_published": "WaterHzO",
+      "phase_as_published": "Water H2O",
       "values": {
         "haas_1979": {
           "as_published": "-285.808",
@@ -176,34 +183,34 @@
       },
       "uncertainties": {
         "haas_1979": {
-          "as_published": "±-042",
-          "value": null,
-          "ocr_suspect": true,
+          "as_published": "±.042",
+          "value": "0.042",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±.042",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "0.042",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±.04",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "0.04",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": null
+      "helgeson_corrected": null
     },
     {
-      "phase_as_published": "LimeCaO",
+      "phase_as_published": "Lime CaO",
       "values": {
         "haas_1979": {
           "as_published": "-635.094",
@@ -228,29 +235,29 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±1.30",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.30",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±.879",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "0.879",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": null
+      "helgeson_corrected": null
     },
     {
-      "phase_as_published": "DiasporeAlO(OH)",
+      "phase_as_published": "Diaspore AlO(OH)",
       "values": {
         "haas_1979": {
-          "as_published": "999.456",
-          "value": "999.456",
+          "as_published": "-999.456",
+          "value": "-999.456",
           "ocr_suspect": false,
           "flags": []
         },
@@ -276,33 +283,40 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±.366",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "0.366",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±5.000",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "5.000",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±3.8",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "3.8",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-998.8)"
+      "helgeson_corrected": {
+        "as_published": "(-998.8)",
+        "value": "-998.8",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "BoehmiteAIO(OH)",
+      "phase_as_published": "Boehmite AlO(OH)",
       "values": {
         "haas_1979": {
           "as_published": "-990.424",
@@ -332,33 +346,40 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±.725",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "0.725",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±2.110",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "2.110",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±3.9",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "3.9",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-989.1)"
+      "helgeson_corrected": {
+        "as_published": "(-989.1)",
+        "value": "-989.1",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "GibbsiteAl(OH)s",
+      "phase_as_published": "Gibbsite Al(OH)3",
       "values": {
         "haas_1979": {
           "as_published": "-1293.334",
@@ -382,26 +403,26 @@
       },
       "uncertainties": {
         "haas_1979": {
-          "as_published": "±-628",
-          "value": null,
-          "ocr_suspect": true,
+          "as_published": "±.628",
+          "value": "0.628",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±1.192",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.192",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": null
+      "helgeson_corrected": null
     },
     {
-      "phase_as_published": "KaoliniteAl2Si206(0H)4",
+      "phase_as_published": "Kaolinite Al2Si2O5(OH)4",
       "values": {
         "haas_1979": {
           "as_published": "-4119.780",
@@ -431,33 +452,40 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±1.065",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.065",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±3.975",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "3.975",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±2.6",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "2.6",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-4122.6)"
+      "helgeson_corrected": {
+        "as_published": "(-4122.6)",
+        "value": "-4122.6",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "PyrophylliteAl2Si.010(0Hh",
+      "phase_as_published": "Pyrophyllite Al2Si4O10(OH)2",
       "values": {
         "haas_1979": {
           "as_published": "-5642.023",
@@ -487,33 +515,40 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±1.158",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.158",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±3.950",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "3.950",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±4.5",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "4.5",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-5641.8)"
+      "helgeson_corrected": {
+        "as_published": "(-5641.8)",
+        "value": "-5641.8",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "KyaniteAlzSiOs",
+      "phase_as_published": "Kyanite Al2SiO5",
       "values": {
         "haas_1979": {
           "as_published": "-2594.269",
@@ -522,8 +557,8 @@
           "flags": []
         },
         "robie_1979": {
-          "as_published": "0",
-          "value": "0",
+          "as_published": "-2591.730",
+          "value": "-2591.730",
           "ocr_suspect": false,
           "flags": []
         },
@@ -542,34 +577,41 @@
       },
       "uncertainties": {
         "haas_1979": {
-          "as_published": "±-433",
-          "value": null,
-          "ocr_suspect": true,
+          "as_published": "±.433",
+          "value": "0.433",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±1.900",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.900",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±5.8",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "5.8",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-2594.1)"
+      "helgeson_corrected": {
+        "as_published": "(-2594.1)",
+        "value": "-2594.1",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "AndalusiteAl2Si05",
+      "phase_as_published": "Andalusite Al2SiO5",
       "values": {
         "haas_1979": {
           "as_published": "-2590.270",
@@ -598,34 +640,41 @@
       },
       "uncertainties": {
         "haas_1979": {
-          "as_published": "±-641",
-          "value": null,
-          "ocr_suspect": true,
+          "as_published": "±.641",
+          "value": "0.641",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±2.100",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "2.100",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±5.7",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "5.7",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-2589.8)"
+      "helgeson_corrected": {
+        "as_published": "(-2589.8)",
+        "value": "-2589.8",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "SillimaniteAl2Si06",
+      "phase_as_published": "Sillimanite Al2SiO5",
       "values": {
         "haas_1979": {
           "as_published": "-2587.774",
@@ -655,41 +704,46 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±.537",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "0.537",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±1.740",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.740",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "hemley_1980": {
           "as_published": "±5.8",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "5.8",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-2586.6)"
+      "helgeson_corrected": {
+        "as_published": "(-2586.6)",
+        "value": "-2586.6",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "AnorthiteCaA12Si20s",
+      "phase_as_published": "Anorthite CaAl2Si2O8",
       "values": {
         "haas_1979": {
-          "as_published": "-·4227.833",
-          "value": null,
-          "ocr_suspect": true,
-          "flags": [
-            "unparsed_printed_token"
-          ]
+          "as_published": "-4227.833",
+          "value": "-4227.833",
+          "ocr_suspect": false,
+          "flags": []
         },
         "robie_1979": {
           "as_published": "-4229.100",
@@ -708,25 +762,32 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±1.118",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.118",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±3.125",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "3.125",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-4229.5)"
+      "helgeson_corrected": {
+        "as_published": "(-4229.5)",
+        "value": "-4229.5",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "Gehlenite Ca2Al2Si01",
+      "phase_as_published": "Gehlenite Ca2Al2SiO7",
       "values": {
         "haas_1979": {
           "as_published": "-3981.707",
@@ -751,33 +812,38 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±2.458",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "2.458",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±2.820",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "2.820",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-3994.8)"
+      "helgeson_corrected": {
+        "as_published": "(-3994.8)",
+        "value": "-3994.8",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "GrossularCasAlzSis01z",
+      "phase_as_published": "Grossular Ca3Al2Si3O12",
       "values": {
         "haas_1979": {
-          "as_published": "--6636.338",
-          "value": null,
-          "ocr_suspect": true,
-          "flags": [
-            "unparsed_printed_token"
-          ]
+          "as_published": "-6636.338",
+          "value": "-6636.338",
+          "ocr_suspect": false,
+          "flags": []
         },
         "robie_1979": {
           "as_published": "-6643.140",
@@ -796,25 +862,32 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±3.220",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "3.220",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±6.000",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "6.000",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-6637.9)"
+      "helgeson_corrected": {
+        "as_published": "(-6637.9)",
+        "value": "-6637.9",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "Ca-AlpyroxeneCaAlzSi06",
+      "phase_as_published": "Ca-Al pyroxene CaAl2SiO6",
       "values": {
         "haas_1979": {
           "as_published": "-3298.956",
@@ -839,25 +912,32 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±1.912",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.912",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±2.761",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "2.761",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-3293.3)"
+      "helgeson_corrected": {
+        "as_published": "(-3293.3)",
+        "value": "-3293.3",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "MargariteCaAI4SizOlo(OHh",
+      "phase_as_published": "Margarite CaAl4Si2O10(OH)2",
       "values": {
         "haas_1979": {
           "as_published": "-6240.601",
@@ -877,17 +957,24 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±1.954",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.954",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-6243.5)"
+      "helgeson_corrected": {
+        "as_published": "(-6243.5)",
+        "value": "-6243.5",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "PrehniteCa2Al2Sis01o(OH)2",
+      "phase_as_published": "Prehnite Ca2Al2Si3O10(OH)2",
       "values": {
         "haas_1979": {
           "as_published": "-6193.631",
@@ -907,17 +994,24 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±1.699",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.699",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-6214.1)"
+      "helgeson_corrected": {
+        "as_published": "(-6214.1)",
+        "value": "-6214.1",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "ZoisiteCa2Al2Sis012(0H)",
+      "phase_as_published": "Zoisite Ca2Al3Si3O12(OH)",
       "values": {
         "haas_1979": {
           "as_published": "-6891.147",
@@ -937,17 +1031,24 @@
       "uncertainties": {
         "haas_1979": {
           "as_published": "±2.080",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "2.080",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": "(-6892.0)"
+      "helgeson_corrected": {
+        "as_published": "(-6892.0)",
+        "value": "-6892.0",
+        "ocr_suspect": false,
+        "flags": [
+          "parenthetical_as_published"
+        ]
+      }
     },
     {
-      "phase_as_published": "Wo!lastoniteCaSiOs",
+      "phase_as_published": "Wollastonite CaSiO3",
       "values": {
         "haas_1979": {
           "as_published": "-1634.766",
@@ -971,32 +1072,31 @@
       },
       "uncertainties": {
         "haas_1979": {
-          "as_published": "±-702",
-          "value": null,
-          "ocr_suspect": true,
+          "as_published": "±.702",
+          "value": "0.702",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         },
         "robie_1979": {
           "as_published": "±1.435",
-          "value": null,
-          "ocr_suspect": true,
+          "value": "1.435",
+          "ocr_suspect": false,
           "flags": [
-            "unparsed_printed_token"
+            "uncertainty_as_published"
           ]
         }
       },
-      "helgeson_corrected_as_published": null
+      "helgeson_corrected": null
     }
   ],
   "row_count": 20,
-  "ocr_suspect_row_count": 49,
+  "ocr_suspect_row_count": 0,
   "identity_disagreements": [],
   "ambiguities": [
-    "table_1_header_prints_Hass (Haas) as OCR/typeset token; retained as published",
-    "column_4_heading_token Remley/Hemley retained from OCR layer; not corrected",
-    "blank cells retained as null; '-' means value not given as printed in the table headnote"
+    "table_1_header prints Hass as published; it is not silently changed to Haas",
+    "blank cells retained as null; '-' means value not given as printed in the headnote"
   ],
   "source_locator": {
     "pdf": "source/hemingway-haas-robinson-1982-usgs-b1544.pdf",

@@ -32,19 +32,31 @@
     "heat_capacity": "J/mol·K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/mol",
-    "log_kf": "dimensionless"
+    "log_kf": "dimensionless",
+    "enthalpy_298_minus_0": "kJ"
   },
   "compiled_as_published": "9-30-79",
   "molar_volume_J_per_bar_as_published": "1.7760",
   "molar_volume_cm3_as_published": "17.760",
   "melting_point_as_published": null,
+  "enthalpy_298_minus_0": null,
   "heat_capacity_equations_as_published": [
-    "c• 150.556 1.73002x10 3 T-0.5 5 T-2",
-    "p + 2.43069x10",
-    "(EQUATION VALID FROM 200 800 K, diaspore)",
-    "c• 206.903 2.59274x10 3 T-0.5 7.77112x10 5 T-2",
-    "p +",
-    "(EQUATION VALID FROM 200 800 K, boehmite)"
+    {
+      "as_published": "C_p° = 150.556 - 1.73002x10^3 T^-0.5 + 2.43069x10^5 T^-2",
+      "validity_as_published": "(EQUATION VALID FROM 200 - 800 K, diaspore)",
+      "ocr_suspect": false,
+      "source_pdf_pages": [
+        22
+      ]
+    },
+    {
+      "as_published": "C_p° = 206.903 - 2.59274x10^3 T^-0.5 + 7.77112x10^5 T^-2",
+      "validity_as_published": "(EQUATION VALID FROM 200 - 800 K, boehmite)",
+      "ocr_suspect": false,
+      "source_pdf_pages": [
+        22
+      ]
+    }
   ],
   "reference_state_notes_as_published": [
     "TRANSITIONS IN REFERENCE STATE ELEMENTS",
@@ -150,6 +162,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -218,6 +231,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -286,6 +300,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -356,6 +371,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -424,6 +440,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -492,6 +509,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -560,6 +578,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -628,6 +647,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,

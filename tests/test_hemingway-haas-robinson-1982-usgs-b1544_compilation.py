@@ -1,5 +1,6 @@
 """Lossless checks against the USGS B1544 OCR layer, not simulator predictions."""
 
+import copy
 from decimal import Decimal
 from pathlib import Path
 
@@ -11,11 +12,14 @@ from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader imp
     EXPECTED_PDF_SHA256,
     ROLE,
     SOURCE_PDF_NAME,
+    AmbiguousPrintedGridNode,
     AmbiguousPrintedTemperature,
     TemperatureNotOnPrintedGrid,
     census_from_records,
+    feedstock_coverage,
     load_records,
     lookup,
+    parse_number_token,
     parse_source,
     sha256_file,
 )
@@ -53,26 +57,61 @@ def test_source_hash_and_role(corpus):
         assert record["schema_version"] == "literature_compilation.v1"
 
 
-def test_round_trip_parsed_values(corpus):
+def assert_nested_equal(loaded, fresh, path="record"):
+    assert type(loaded) is type(fresh), f"{path}: type differs"
+    if isinstance(loaded, dict):
+        assert loaded.keys() == fresh.keys(), f"{path}: keys differ"
+        for key in loaded:
+            assert_nested_equal(loaded[key], fresh[key], f"{path}.{key}")
+    elif isinstance(loaded, list):
+        assert len(loaded) == len(fresh), f"{path}: length differs"
+        for index, (left, right) in enumerate(zip(loaded, fresh, strict=True)):
+            assert_nested_equal(left, right, f"{path}[{index}]")
+    else:
+        assert loaded == fresh, f"{path}: {loaded!r} != {fresh!r}"
+
+
+def numeric_cells(value, path="record"):
+    if isinstance(value, dict):
+        if "as_published" in value and "value" in value:
+            yield path, value
+        for key, child in value.items():
+            yield from numeric_cells(child, f"{path}.{key}")
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            yield from numeric_cells(child, f"{path}[{index}]")
+
+
+def test_round_trip_every_stored_field(corpus):
     _, records = corpus
     parsed = parse_source(PDF, verbose=False)
-    assert [r["record_id"] for r in parsed] == [r["record_id"] for r in records]
     for loaded, fresh in zip(records, parsed, strict=True):
-        assert loaded["record_id"] == fresh["record_id"]
-        assert loaded["row_count"] == fresh["row_count"]
-        if loaded["record_id"] == "usgs-b1544-table-1":
-            assert [row["phase_as_published"] for row in loaded["rows"]] == [
-                row["phase_as_published"] for row in fresh["rows"]
-            ]
-            continue
-        for a, b in zip(loaded["rows"], fresh["rows"], strict=True):
-            assert (a.get("temperature") or {}).get("as_published") == (
-                b.get("temperature") or {}
-            ).get("as_published")
-            assert (a.get("entropy") or {}).get("value") == (b.get("entropy") or {}).get("value")
-            left = ((a.get("formation") or {}).get("from_the_elements") or {}).get("enthalpy") or {}
-            right = ((b.get("formation") or {}).get("from_the_elements") or {}).get("enthalpy") or {}
-            assert left.get("as_published") == right.get("as_published")
+        path = loaded["record_id"]
+        assert_nested_equal(loaded, fresh, path)
+        for cell_path, cell in numeric_cells(loaded, path):
+            reparsed = parse_number_token(cell["as_published"])
+            assert cell["value"] == reparsed["value"], f"{cell_path}: raw token does not parse back"
+
+
+@pytest.mark.parametrize(
+    ("record_id", "row_index", "field"),
+    [
+        ("usgs-b1544-corundum", 1, "heat_capacity"),
+        ("usgs-b1544-prehnite", 4, "planck_function"),
+        ("usgs-b1544-table-1", 9, "values.robie_1979"),
+    ],
+)
+def test_round_trip_mutation_probe_rejects_any_nested_field(corpus, record_id, row_index, field):
+    _, records = corpus
+    fresh = next(record for record in parse_source(PDF) if record["record_id"] == record_id)
+    mutated = copy.deepcopy(next(record for record in records if record["record_id"] == record_id))
+    cell = mutated["rows"][row_index]
+    for part in field.split("."):
+        cell = cell[part]
+    cell["as_published"] = "999.99"
+    cell["value"] = "999.99"
+    with pytest.raises(AssertionError, match=field.replace(".", r"\.")):
+        assert_nested_equal(mutated, fresh, record_id)
 
 
 def test_corundum_printed_298_nodes():
@@ -101,6 +140,95 @@ def test_lookup_refuses_off_grid_and_duplicates():
         lookup("usgs-b1544-corundum", "2500", "entropy")
     with pytest.raises(AmbiguousPrintedTemperature, match="occurs 2 times"):
         lookup("usgs-b1544-quartz", "844", "entropy")
+    with pytest.raises(AmbiguousPrintedGridNode, match="ocr_suspect"):
+        lookup("usgs-b1544-kaolinite", "198.15", "entropy")
+    with pytest.raises(AmbiguousPrintedGridNode, match="identity check"):
+        lookup("usgs-b1544-dickite", "1100", "entropy")
+
+
+def test_every_ambiguous_grid_node_is_a_typed_refusal(corpus):
+    _, records = corpus
+    ambiguous_row_count = 0
+    ambiguous_node_count = 0
+    for record in records[1:]:
+        rows_by_temperature = {}
+        for row in record["rows"]:
+            checks = row.get("identity_checks") or {}
+            is_ambiguous = (row.get("temperature") or {}).get("ocr_suspect") or any(
+                check.get("ok") is False for check in checks.values()
+            )
+            ambiguous_row_count += bool(is_ambiguous)
+            value = (row.get("temperature") or {}).get("value")
+            if value is not None:
+                rows_by_temperature.setdefault(value, []).append(row)
+
+        for temperature, matching_rows in rows_by_temperature.items():
+            if not any(
+                (row.get("temperature") or {}).get("ocr_suspect")
+                or any(
+                    check.get("ok") is False
+                    for check in (row.get("identity_checks") or {}).values()
+                )
+                for row in matching_rows
+            ):
+                continue
+            ambiguous_node_count += 1
+            with pytest.raises(AmbiguousPrintedGridNode):
+                lookup(record["record_id"], temperature, "entropy")
+
+    assert ambiguous_row_count == 11
+    assert ambiguous_node_count == 9
+
+
+def test_table1_image_transcription_and_column_alignment(corpus):
+    _, records = corpus
+    table1 = next(record for record in records if record["record_id"] == "usgs-b1544-table-1")
+    assert len(table1["rows"]) == 20
+    assert table1["headnote_as_published"] == "[-,value not given]"
+    assert table1["columns_as_published"][-1] == "Remley and others (1980)"
+    corundum = table1["rows"][0]
+    assert corundum["values"]["haas_1979"]["as_published"] == "-1675.711"
+    assert corundum["values"]["haas_1979"]["value"] == "-1675.711"
+    quartz = table1["rows"][1]
+    assert "helgeson_1978" not in quartz["uncertainties"]
+    assert quartz["uncertainties"]["hemley_1980"]["as_published"] == "±1.00"
+    assert table1["rows"][4]["values"]["haas_1979"]["value"] == "-999.456"
+    assert table1["rows"][9]["values"]["robie_1979"]["value"] == "-2591.730"
+
+
+def test_marks_equations_metadata_and_formula_coverage(corpus):
+    manifest, records = corpus
+    substances = records[1:]
+    assert all(record["formula_as_published"] for record in substances)
+    coverage = feedstock_coverage(records)
+    assert {element: coverage[element] for element in ("Al", "Ca", "H", "O", "Si")} == {
+        "Al": 20,
+        "Ca": 17,
+        "H": 12,
+        "O": 32,
+        "Si": 25,
+    }
+    assert manifest["feedstock_element_coverage"] == coverage
+
+    equations = [
+        equation
+        for record in substances
+        for equation in record["heat_capacity_equations_as_published"]
+    ]
+    assert len(equations) == 42
+    assert all(equation["ocr_suspect"] is False for equation in equations)
+    assert sum(record["enthalpy_298_minus_0"] is not None for record in substances) == 13
+    corundum = next(record for record in substances if record["record_id"] == "usgs-b1544-corundum")
+    assert "- 2.46518x10^3 T^-0.5" in corundum["heat_capacity_equations_as_published"][0]["as_published"]
+    assert corundum["enthalpy_298_minus_0"]["as_published"] == "10.016"
+
+    oxide_records = [record for record in substances if "from_the_oxides" in record["formation_bases"]]
+    assert len(oxide_records) == 24
+    assert sum(record["row_count"] for record in oxide_records) == 319
+    marks = [mark for record in oxide_records for row in record["rows"] for mark in row["marks"]]
+    assert len(marks) == 638
+    assert all(mark["formation_basis"] == "from_the_oxides" for mark in marks)
+    assert all(mark["as_published"] == "*" for mark in marks)
 
 
 def test_ocr_suspect_keeps_raw_token():

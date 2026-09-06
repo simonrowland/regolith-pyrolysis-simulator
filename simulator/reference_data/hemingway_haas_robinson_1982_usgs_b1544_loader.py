@@ -63,22 +63,182 @@ OCR_SUBS = str.maketrans({
     "•": ".", "·": ".",
 })
 
-# Titles the OCR layer dropped entirely; recovered from the page image (second reading).
-# Formulas recovered from the page image where the OCR layer dropped the formula cell.
-IMAGE_FORMULAS_BY_NAME = {
-    "Corundum": "Al2O3",
-    "Gibbsite": "Al(OH)3",
-    "Lime": "CaO",
-    "Quartz": "SiO2",
-    "Kyanite": "Al2SiO5",
-    "Andalusite": "Al2SiO5",
-    "Sillimanite": "Al2SiO5",
-    "Diaspore": "AlO(OH)",
-    "Boehmite": "AlO(OH)",
-    "Wollastonite": "CaSiO3",
-    "Cyclowollastonite (Pseudowollastonite)": "CaSiO3",
-    "Cyc1owo11astonite (Pseudowollastonite)": "CaSiO3",
+# Printed headers and equation blocks transcribed from the page images.  These
+# constants replace text-layer fields only where positioned OCR dropped or
+# corrupted the printed tokens.
+IMAGE_FORMULAS_BY_RECORD_ID = {
+    "usgs-b1544-corundum": "Al2O3",
+    "usgs-b1544-quartz": "SiO2",
+    "usgs-b1544-kyanite": "Al2SiO5",
+    "usgs-b1544-andalusite": "Al2SiO5",
+    "usgs-b1544-sillimanite": "Al2SiO5",
+    "usgs-b1544-larnite-reference": "Ca2SiO4",
+    "usgs-b1544-larnite": "Ca2SiO4",
+    "usgs-b1544-calcium-olivine-reference": "Ca2SiO4",
+    "usgs-b1544-calcium-olivine": "Ca2SiO4",
+    "usgs-b1544-rankinite": "Ca3Si2O7",
+    "usgs-b1544-gehlenite": "Ca2Al2SiO7",
+    "usgs-b1544-grossulsr": "Ca3Al2Si3O12",
+    "usgs-b1544-zoisite": "Ca2Al3Si3O12(OH)",
+    "usgs-b1544-wollastonite": "CaSiO3",
+    "usgs-b1544-cyclowollastonite-pseudowollastonite": "CaSiO3",
+    "usgs-b1544-ca-al-pyroxene": "CaAl2SiO6",
+    "usgs-b1544-anorthite": "CaAl2Si2O8",
+    "usgs-b1544-kaolinite": "Al2Si2O5(OH)4",
+    "usgs-b1544-dickite": "Al2Si2O5(OH)4",
+    "usgs-b1544-halloysite": "Al2Si2O5(OH)4",
+    "usgs-b1544-pyrophyllite": "Al2Si4O10(OH)2",
+    "usgs-b1544-margarite": "CaAl4Si2O10(OH)2",
+    "usgs-b1544-prehnite": "Ca2Al2Si3O10(OH)2",
 }
+
+IMAGE_H298_MINUS_H0_BY_RECORD_ID = {
+    "usgs-b1544-corundum": "10.016",
+    "usgs-b1544-boehmite": "8.828",
+    "usgs-b1544-gibbsite": "12.719",
+    "usgs-b1544-lime": "6.749",
+    "usgs-b1544-h2o-reference": "13.293",
+    "usgs-b1544-quartz": "6.916",
+    "usgs-b1544-al2sio5-reference": "16.041",
+    "usgs-b1544-kyanite": "16.041",
+    "usgs-b1544-andalusite": "17.096",
+    "usgs-b1544-sillimanite": "17.414",
+    "usgs-b1544-grossulsr": "47.047",
+    "usgs-b1544-anorthite": "33.333",
+    "usgs-b1544-pyrophyllite": "42.695",
+}
+
+IMAGE_CP_EQUATIONS_BY_RECORD_ID = {
+    "usgs-b1544-corundum": (
+        ("C_p° = 233.004 - 1.95913x10^-2 T + 9.44410x10^-6 T^2 - 2.46518x10^3 T^-0.5", "200 - 1800 K"),
+    ),
+    "usgs-b1544-alooh-reference": (
+        ("C_p° = 150.556 - 1.73002x10^3 T^-0.5 + 2.43069x10^5 T^-2", "200 - 800 K, diaspore"),
+        ("C_p° = 206.903 - 2.59274x10^3 T^-0.5 + 7.77112x10^5 T^-2", "200 - 800 K, boehmite"),
+    ),
+    "usgs-b1544-diaspore": (
+        ("C_p° = 150.556 - 1.73002x10^3 T^-0.5 + 2.43069x10^5 T^-2", "200 - 800 K"),
+    ),
+    "usgs-b1544-boehmite": (
+        ("C_p° = 206.903 - 2.59274x10^3 T^-0.5 + 7.77112x10^5 T^-2", "200 - 800 K"),
+    ),
+    "usgs-b1544-gibbsite": (
+        ("C_p° = 220.851 + 3.00646x10^-2 T - 2.66764x10^3 T^-0.5 + 6.61704x10^5 T^-2", "200 - 800 K"),
+    ),
+    "usgs-b1544-lime": (
+        ("C_p° = 71.6851 - 3.08248x10^-3 T + 2.23862x10^-6 T^2 - 4.31990x10^2 T^-0.5 - 2.55577x10^5 T^-2", "200 - 1800 K"),
+    ),
+    "usgs-b1544-h2o-reference": (
+        ("C_p° = 42.0228 + 3.49132x10^-2 T + 1.10338x10^6 T^-2", "273 - 425 K, liquid"),
+        ("C_p° = 10.4381 + 1.29775x10^-2 T - 4.46885x10^-6 T^2 + 2.99188x10^2 T^-0.5 - 1.31077x10^5 T^-2", "298 - 1800 K, gas"),
+    ),
+    "usgs-b1544-quartz": (
+        ("C_p° = 83.2101 + 1.09962x10^-2 T - 7.77338x10^2 T^-0.5", "200 - 844 K"),
+        ("C_p° = 58.9107 + 5.02080x10^-3 T", "844 - 1800 K"),
+    ),
+    "usgs-b1544-al2sio5-reference": (
+        ("C_p° = 336.114 - 1.29800x10^-2 T - 3.55746x10^3 T^-0.5", "200 - 1600 K, kyanite"),
+        ("C_p° = 543.227 - 0.103545 T + 6.68935x10^-5 T^2 - 6.75436x10^3 T^-0.5 + 2.28751x10^6 T^-2", "200 - 1800 K, andalusite"),
+        ("C_p° = 313.470 - 9.47081x10^-3 T - 3.16487x10^3 T^-0.5", "200 - 1800 K, sillimanite"),
+    ),
+    "usgs-b1544-kyanite": (
+        ("C_p° = 336.114 - 1.29800x10^-2 T - 3.55746x10^3 T^-0.5", "200 - 1600 K"),
+    ),
+    "usgs-b1544-andalusite": (
+        ("C_p° = 543.227 - 0.103545 T + 6.68935x10^-5 T^2 - 6.75436x10^3 T^-0.5 + 2.28751x10^6 T^-2", "200 - 1800 K"),
+    ),
+    "usgs-b1544-sillimanite": (
+        ("C_p° = 313.470 - 9.47081x10^-3 T - 3.16487x10^3 T^-0.5", "200 - 1800 K"),
+    ),
+    "usgs-b1544-ca3sio5-reference": (
+        ("C_p° = 333.920 - 2.32529x10^-3 T - 2.76608x10^3 T^-0.5 - 6.52597x10^4 T^-2", "200 - 1800 K"),
+    ),
+    "usgs-b1544-larnite-reference": (
+        ("C_p° = 249.689 - 2.09429x10^3 T^-0.5", "200 - 1100 K, larnite"),
+        ("C_p° = 161.620 + 1.88970x10^-5 T^2", "800 - 1800 K, alpha'"),
+        ("C_p° = 199.600", "1700 - 1800 K, alpha"),
+    ),
+    "usgs-b1544-larnite": (
+        ("C_p° = 249.689 - 2.09429x10^3 T^-0.5", "200 - 1100 K"),
+    ),
+    "usgs-b1544-calcium-olivine-reference": (
+        ("C_p° = 0.106586 T - 8.15012x10^-5 T^2 + 1.65638x10^3 T^-0.5 - 2.36007x10^6 T^-2", "200 - 1200 K, calcium olivine"),
+        ("C_p° = 161.620 + 1.88970x10^-5 T^2", "800 - 1800 K, alpha'"),
+        ("C_p° = 199.600", "1700 - 1800 K, alpha"),
+    ),
+    "usgs-b1544-calcium-olivine": (
+        ("C_p° = 0.106586 T - 8.15012x10^-5 T^2 + 1.65638x10^3 T^-0.5 - 2.36007x10^6 T^-2", "200 - 1200 K"),
+    ),
+    "usgs-b1544-rankinite": (
+        ("C_p° = 473.209 - 2.10355x10^-2 T - 4.31880x10^3 T^-0.5 + 3.39720x10^5 T^-2", "200 - 1400 K"),
+    ),
+    "usgs-b1544-gehlenite": (
+        ("C_p° = 588.351 - 6.71533x10^-2 T + 3.89086x10^-5 T^2 - 6.27433x10^3 T^-0.5 + 1.51047x10^6 T^-2", "200 - 1800 K"),
+    ),
+    "usgs-b1544-grossulsr": (
+        ("C_p° = 985.362 - 9.66435x10^-2 T + 3.35314x10^-5 T^2 - 1.07077x10^4 T^-0.5 + 1.77080x10^6 T^-2", "200 - 1400 K"),
+    ),
+    "usgs-b1544-zoisite": (
+        ("C_p° = 834.622 - 1.98447x10^-2 T - 8.14875x10^3 T^-0.5", "200 - 900 K"),
+    ),
+    "usgs-b1544-casio3-reference": (
+        ("C_p° = 192.773 - 9.11511x10^-3 T + 4.41319x10^-6 T^2 - 1.72960x10^3 T^-0.5", "200 - 1500 K, wollastonite"),
+        ("C_p° = 167.255 - 3.62159x10^-4 T - 1.37237x10^3 T^-0.5 - 9.73908x10^3 T^-2", "200 - 1800 K, cyclowollastonite"),
+    ),
+    "usgs-b1544-wollastonite": (
+        ("C_p° = 192.773 - 9.11511x10^-3 T + 4.41319x10^-6 T^2 - 1.72960x10^3 T^-0.5", "200 - 1500 K"),
+    ),
+    "usgs-b1544-cyclowollastonite-pseudowollastonite": (
+        ("C_p° = 167.255 - 3.62159x10^-4 T - 1.37237x10^3 T^-0.5 - 9.73908x10^3 T^-2", "200 - 1800 K"),
+    ),
+    "usgs-b1544-ca-al-pyroxene": (
+        ("C_p° = 322.848 - 2.18582x10^3 T^-0.5 - 2.72024x10^6 T^-2", "200 - 1800 K"),
+    ),
+    "usgs-b1544-anorthite": (
+        ("C_p° = 800.971 - 0.146450 T + 1.05663x10^-4 T^2 - 9.44981x10^3 T^-0.5 + 3.18591x10^6 T^-2", "200 - 1800 K"),
+    ),
+    "usgs-b1544-kaolinite": (
+        ("C_p° = 749.175 - 6.77102x10^-2 T - 8.27864x10^3 T^-0.5 + 1.49195x10^6 T^-2", "200 - 1000 K"),
+    ),
+    "usgs-b1544-dickite": (
+        ("C_p° = 908.360 - 0.105663 T - 1.11953x10^4 T^-0.5 + 3.80445x10^6 T^-2", "200 - 900 K"),
+    ),
+    "usgs-b1544-halloysite": (
+        ("C_p° = 772.300 - 7.25884x10^-2 T - 8.72948x10^3 T^-0.5 + 1.93671x10^6 T^-2", "200 - 900 K"),
+    ),
+    "usgs-b1544-pyrophyllite": (
+        ("C_p° = 1454.51 - 0.396093 T + 3.97189x10^-4 T^2 - 1.77428x10^4 T^-0.5 + 6.06936x10^6 T^-2", "200 - 1200 K"),
+    ),
+    "usgs-b1544-margarite": (
+        ("C_p° = 826.504 - 2.51455x10^-2 T - 8.42744x10^3 T^-0.5", "200 - 1200 K"),
+    ),
+    "usgs-b1544-prehnite": (
+        ("C_p° = 946.022 - 5.75327x10^-2 T - 1.05605x10^4 T^-0.5 + 2.75523x10^6 T^-2", "200 - 1200 K"),
+    ),
+}
+
+TABLE1_IMAGE_ROWS = (
+    ("Corundum Al2O3", ("-1675.711", "-1675.700", "-1661.655", "-1672.600"), ("±1.000", "±1.300", None, "±6.0"), "(-1674.7)"),
+    ("Quartz SiO2", ("-910.699", "-910.700", "-910.648", "-910.700"), ("±.900", "±1.000", None, "±1.00"), None),
+    ("Water H2O", ("-285.808", "-285.830", "-285.830", "-285.830"), ("±.042", "±.042", None, "±.04"), None),
+    ("Lime CaO", ("-635.094", "-635.089", "-635.089", None), ("±1.30", "±.879", None, None), None),
+    ("Diaspore AlO(OH)", ("-999.456", "-1000.585", "-992.319", "-998.825"), ("±.366", "±5.000", None, "±3.8"), "(-998.8)"),
+    ("Boehmite AlO(OH)", ("-990.424", "-993.054", "-983.566", "-990.608"), ("±.725", "±2.110", None, "±3.9"), "(-989.1)"),
+    ("Gibbsite Al(OH)3", ("-1293.334", "-1293.128", "-1293.128", None), ("±.628", "±1.192", None, None), None),
+    ("Kaolinite Al2Si2O5(OH)4", ("-4119.780", "-4120.114", "-4109.613", "-4120.114"), ("±1.065", "±3.975", None, "±2.6"), "(-4122.6)"),
+    ("Pyrophyllite Al2Si4O10(OH)2", ("-5642.023", "-5639.800", "-5628.790", "-5640.415"), ("±1.158", "±3.950", None, "±4.5"), "(-5641.8)"),
+    ("Kyanite Al2SiO5", ("-2594.269", "-2591.730", "-2581.097", "-2593.063"), ("±.433", "±1.900", None, "±5.8"), "(-2594.1)"),
+    ("Andalusite Al2SiO5", ("-2590.270", "-2587.525", "-2576.783", "-2588.663"), ("±.641", "±2.100", None, "±5.7"), "(-2589.8)"),
+    ("Sillimanite Al2SiO5", ("-2587.774", "-2585.760", "-2573.574", "-2585.341"), ("±.537", "±1.740", None, "±5.8"), "(-2586.6)"),
+    ("Anorthite CaAl2Si2O8", ("-4227.833", "-4229.100", "-4216.518", None), ("±1.118", "±3.125", None, None), "(-4229.5)"),
+    ("Gehlenite Ca2Al2SiO7", ("-3981.707", "-4007.570", "-3981.766", None), ("±2.458", "±2.820", None, None), "(-3994.8)"),
+    ("Grossular Ca3Al2Si3O12", ("-6636.338", "-6643.140", "-6624.933", None), ("±3.220", "±6.000", None, None), "(-6637.9)"),
+    ("Ca-Al pyroxene CaAl2SiO6", ("-3298.956", "-3275.680", "-3280.310", None), ("±1.912", "±2.761", None, None), "(-3293.3)"),
+    ("Margarite CaAl4Si2O10(OH)2", ("-6240.601", None, "-6217.520", None), ("±1.954", None, None, None), "(-6243.5)"),
+    ("Prehnite Ca2Al2Si3O10(OH)2", ("-6193.631", None, "-6201.060", None), ("±1.699", None, None, None), "(-6214.1)"),
+    ("Zoisite Ca2Al3Si3O12(OH)", ("-6891.147", None, "-6879.044", None), ("±2.080", None, None, None), "(-6892.0)"),
+    ("Wollastonite CaSiO3", ("-1634.766", "-1635.200", "-1630.965", None), ("±.702", "±1.435", None, None), None),
+)
 
 OCR_DROPPED_HEADERS = {
     27: {
@@ -142,6 +302,7 @@ UNITS_AS_PUBLISHED = {
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/mol",
     "log_kf": "dimensionless",
+    "enthalpy_298_minus_0": "kJ",
 }
 
 CENSUS_KIND = {
@@ -159,6 +320,10 @@ class TemperatureNotOnPrintedGrid(HemingwayHaasRobinsonLookupError):
 
 class AmbiguousPrintedTemperature(HemingwayHaasRobinsonLookupError):
     """T occurs more than once on the printed grid (phase-change duplicate)."""
+
+
+class AmbiguousPrintedGridNode(HemingwayHaasRobinsonLookupError):
+    """The candidate T token is OCR-suspect or disagrees with an identity check."""
 
 
 class UnparsedPrintedToken(HemingwayHaasRobinsonLookupError):
@@ -266,6 +431,10 @@ def parse_number_token(token: str) -> dict[str, Any]:
     flags: list[str] = []
     if parens:
         flags.append("parenthetical_as_published")
+    uncertainty = core.startswith("±")
+    if uncertainty:
+        core = core[1:]
+        flags.append("uncertainty_as_published")
     suspect, candidate = token_ocr_flags(core)
     stripped = re.sub(r"^[:·~.•]+", "", candidate)
     stripped = re.sub(r"[:·~.•]+$", "", stripped)
@@ -287,7 +456,10 @@ def parse_number_token(token: str) -> dict[str, Any]:
     else:
         suspect = True
         flags.append("unparsed_printed_token")
-    if re.search(r"[oOlISB•·:~]", core) or core != raw.replace("(", "").replace(")", ""):
+    normalized_raw = raw.replace("(", "").replace(")", "").replace(" ", "")
+    if uncertainty:
+        normalized_raw = normalized_raw[1:]
+    if re.search(r"[oOlISB•·:~]", core) or core != normalized_raw:
         suspect = True
     return {
         "as_published": raw,
@@ -369,6 +541,10 @@ def row_text(tokens: list[dict[str, Any]]) -> str:
     return " ".join(tok["t"] for tok in tokens)
 
 
+def is_divider_row(tokens: list[dict[str, Any]]) -> bool:
+    return bool(tokens) and set(row_text(tokens)) <= set("-_=—~·.• ")
+
+
 def parse_header(rows: list[list[dict[str, Any]]], pdf_page: int) -> dict[str, Any]:
     name_parts: list[str] = []
     formula_weight = None
@@ -378,12 +554,10 @@ def parse_header(rows: list[list[dict[str, Any]]], pdf_page: int) -> dict[str, A
     printed_page = pdf_page - PDF_TO_PRINTED
     molar_volume_jbar = None
     molar_volume_cm3 = None
-    h298_h0 = None
     melting_point = None
     boiling_point = None
     enthalpy_of_melting = None
     enthalpy_of_vaporization = None
-    cp_equations: list[str] = []
     notes: list[str] = []
     saw_data = False
     in_cp = False
@@ -455,8 +629,7 @@ def parse_header(rows: list[list[dict[str, Any]]], pdf_page: int) -> dict[str, A
             in_cp = True
             in_notes = False
             continue
-        if in_cp and y > 430:
-            cp_equations.append(text)
+        if in_cp:
             continue
         if "TRANSITIONS IN REFERENCE" in upper:
             in_notes = True
@@ -508,7 +681,6 @@ def parse_header(rows: list[list[dict[str, Any]]], pdf_page: int) -> dict[str, A
         "boiling_point_as_published": boiling_point,
         "enthalpy_of_melting_as_published": enthalpy_of_melting,
         "enthalpy_of_vaporization_as_published": enthalpy_of_vaporization,
-        "heat_capacity_equations_as_published": cp_equations,
         "reference_state_notes_as_published": notes,
         "header_ambiguities": ambiguities,
         "saw_data": saw_data,
@@ -518,12 +690,13 @@ def parse_header(rows: list[list[dict[str, Any]]], pdf_page: int) -> dict[str, A
 def assign_columns(tokens: list[dict[str, Any]], bands: tuple = DEFAULT_COLUMN_BANDS) -> dict[str, Any]:
     assigned: dict[str, dict[str, Any]] = {}
     extras: list[str] = []
+    marks: list[dict[str, str]] = []
     last_numeric: str | None = None
     for tok in tokens:
         text = tok["t"]
         if text in {"*", "x", "X"}:
-            if last_numeric and last_numeric in assigned:
-                assigned[last_numeric].setdefault("footnote_markers", []).append(text)
+            if last_numeric:
+                marks.append({"column": last_numeric, "as_published": text})
             else:
                 extras.append(text)
             continue
@@ -539,11 +712,11 @@ def assign_columns(tokens: list[dict[str, Any]], bands: tuple = DEFAULT_COLUMN_B
             assigned[col] = parse_number_token(joined)
             assigned[col]["ocr_suspect"] = True
             assigned[col]["flags"] = list(assigned[col].get("flags", [])) + ["merged_split_token_in_column"]
-            if prev.get("footnote_markers"):
-                assigned[col]["footnote_markers"] = prev["footnote_markers"]
         else:
             assigned[col] = parsed
         last_numeric = col
+    if marks:
+        assigned["_marks"] = marks
     if extras:
         assigned["_extras"] = extras
     return assigned
@@ -590,6 +763,8 @@ def parse_data_rows(rows: list[list[dict[str, Any]]]) -> tuple[list[dict[str, An
     for raw_row in rows:
         tokens = merge_tokens(raw_row)
         if not tokens:
+            continue
+        if is_divider_row(tokens):
             continue
         kind = is_t_grid_row(tokens)
         blob = row_text(tokens).upper()
@@ -664,9 +839,28 @@ def build_grid_row(assigned: dict[str, Any], basis: str) -> dict[str, Any]:
     suspect = any(cell_ocr_suspect(cell) for cell in list(thermo.values()) + list(formation.values()))
     if planck_id.get("ok") is False or logk_id.get("ok") is False:
         suspect = True
+    marks = [
+        {
+            "formation_basis": basis,
+            "column": mark["column"],
+            "as_published": mark["as_published"],
+        }
+        for mark in assigned.get("_marks") or []
+    ]
+    if basis == "from_the_oxides":
+        for column in ("formation_enthalpy", "formation_gibbs_energy"):
+            if assigned.get(column) and not any(
+                mark["column"] == column and mark["as_published"] == "*" for mark in marks
+            ):
+                marks.append({
+                    "formation_basis": basis,
+                    "column": column,
+                    "as_published": "*",
+                })
     row = {
         **thermo,
         "formation": {basis: formation},
+        "marks": marks,
         "identity_checks": {
             "planck_vs_S_minus_HHT": planck_id,
             f"logKf_vs_dG_{basis}": logk_id,
@@ -698,17 +892,11 @@ def merge_pair(left: dict[str, Any], right: dict[str, Any] | None) -> dict[str, 
         # Pair by order: same T-grid length, zip.
         if len(right["rows"]) == len(rows):
             for idx, assigned in enumerate(right["rows"]):
-                formed = {
-                    "enthalpy": assigned.get("formation_enthalpy"),
-                    "gibbs_energy": assigned.get("formation_gibbs_energy"),
-                    "log_kf": assigned.get("log_kf"),
-                }
+                right_row = build_grid_row(assigned, right_basis)
+                formed = right_row["formation"][right_basis]
                 rows[idx]["formation"][right_basis] = formed
-                logk_id = identity_logkf(
-                    assigned.get("temperature") or {},
-                    assigned.get("formation_gibbs_energy") or {},
-                    assigned.get("log_kf") or {},
-                )
+                rows[idx]["marks"].extend(right_row["marks"])
+                logk_id = right_row["identity_checks"][f"logKf_vs_dG_{right_basis}"]
                 rows[idx]["identity_checks"][f"logKf_vs_dG_{right_basis}"] = logk_id
                 if logk_id.get("ok") is False or any(cell_ocr_suspect(v) for v in formed.values()):
                     rows[idx]["ocr_suspect"] = True
@@ -732,12 +920,25 @@ def merge_pair(left: dict[str, Any], right: dict[str, Any] | None) -> dict[str, 
         )
 
     name = header.get("name_as_published") or f"pdf-{pdf_pages[0]}"
-    if not header.get("formula_as_published") and name in IMAGE_FORMULAS_BY_NAME:
-        header["formula_as_published"] = IMAGE_FORMULAS_BY_NAME[name]
-        header.setdefault("header_ambiguities", []).append(
-            "formula_omitted_from_ocr_layer; transcribed from page image as a second reading"
-        )
     record_id = "usgs-b1544-" + slugify(name)
+    image_formula = IMAGE_FORMULAS_BY_RECORD_ID.get(record_id)
+    if image_formula and header.get("formula_as_published") != image_formula:
+        reason = "omitted" if not header.get("formula_as_published") else "corrupted"
+        header["formula_as_published"] = image_formula
+        header.setdefault("header_ambiguities", []).append(
+            f"formula_{reason}_in_ocr_layer; transcribed from page image as a second reading"
+        )
+    equations = [
+        {
+            "as_published": equation,
+            "validity_as_published": f"(EQUATION VALID FROM {validity})",
+            "ocr_suspect": False,
+            "source_pdf_pages": pdf_pages,
+        }
+        for equation, validity in IMAGE_CP_EQUATIONS_BY_RECORD_ID.get(record_id, ())
+    ]
+    h298_minus_h0_token = IMAGE_H298_MINUS_H0_BY_RECORD_ID.get(record_id)
+    h298_minus_h0 = parse_number_token(h298_minus_h0_token) if h298_minus_h0_token else None
     ambiguities = list(header.get("header_ambiguities") or [])
     identity_disagreements = []
     ocr_suspect_count = 0
@@ -776,7 +977,8 @@ def merge_pair(left: dict[str, Any], right: dict[str, Any] | None) -> dict[str, 
         "molar_volume_J_per_bar_as_published": header.get("molar_volume_J_per_bar_as_published"),
         "molar_volume_cm3_as_published": header.get("molar_volume_cm3_as_published"),
         "melting_point_as_published": header.get("melting_point_as_published"),
-        "heat_capacity_equations_as_published": header.get("heat_capacity_equations_as_published") or [],
+        "enthalpy_298_minus_0": h298_minus_h0,
+        "heat_capacity_equations_as_published": equations,
         "reference_state_notes_as_published": header.get("reference_state_notes_as_published") or [],
         "uncertainty": {k: v for k, v in uncertainties.items() if v},
         "rows": rows,
@@ -793,84 +995,25 @@ def merge_pair(left: dict[str, Any], right: dict[str, Any] | None) -> dict[str, 
 
 
 def parse_table1(pdf: Path, cache_dir: Path) -> dict[str, Any]:
-    words = extract_bbox_words(pdf, TABLE1_PDF_PAGE, cache_dir)
-    rows = cluster_rows(words, tol=3.2)
-    entries: list[dict[str, Any]] = []
-    pending = None
-    title_parts: list[str] = []
-    note_parts: list[str] = []
-    for raw in rows:
-        tokens = merge_tokens(raw)
-        if not tokens:
-            continue
-        y = tokens[0]["yc"]
-        text = row_text(tokens)
-        if 170 < y < 200:
-            title_parts.append(text)
-            continue
-        if y > 505:
-            note_parts.append(text)
-            continue
-        if y < 230 or y > 505:
-            continue
-        lead = tokens[0]
-        if lead["x0"] < 80 and not tokens[0]["t"].startswith("±") and not tokens[0]["t"].startswith("("):
-            if pending:
-                entries.append(pending)
-            phase_toks = [t["t"] for t in tokens if t["xc"] < 155]
-            values = {"haas_1979": None, "robie_1979": None, "helgeson_1978": None, "hemley_1980": None}
-            for tok in tokens:
-                if tok["xc"] < 155:
-                    continue
-                parsed = parse_number_token(tok["t"])
-                if 155 <= tok["xc"] < 205:
-                    values["haas_1979"] = parsed
-                elif 205 <= tok["xc"] < 252:
-                    values["robie_1979"] = parsed
-                elif 252 <= tok["xc"] < 300:
-                    values["helgeson_1978"] = parsed
-                elif tok["xc"] >= 300:
-                    values["hemley_1980"] = parsed
-            pending = {
-                "phase_as_published": " ".join(phase_toks),
-                "values": values,
-                "uncertainties": {},
-                "helgeson_corrected_as_published": None,
-            }
-        elif pending is not None:
-            for tok in tokens:
-                parsed = parse_number_token(tok["t"])
-                raw = tok["t"]
-                if raw.startswith("(") or (parsed.get("flags") and "parenthetical" in "".join(parsed.get("flags", []))):
-                    pending["helgeson_corrected_as_published"] = raw
-                    continue
-                if 155 <= tok["xc"] < 205:
-                    pending["uncertainties"]["haas_1979"] = parsed
-                elif 205 <= tok["xc"] < 252:
-                    pending["uncertainties"]["robie_1979"] = parsed
-                elif 252 <= tok["xc"] < 300:
-                    pending["uncertainties"]["helgeson_1978"] = parsed
-                elif tok["xc"] >= 300:
-                    pending["uncertainties"]["hemley_1980"] = parsed
-    if pending:
-        entries.append(pending)
-
-    ambiguities = [
-        "table_1_header_prints_Hass (Haas) as OCR/typeset token; retained as published",
-        "column_4_heading_token Remley/Hemley retained from OCR layer; not corrected",
-        "blank cells retained as null; '-' means value not given as printed in the table headnote",
-    ]
-    ocr_suspect_count = 0
-    for entry in entries:
-        for bucket in (entry["values"], entry["uncertainties"]):
-            for cell in bucket.values():
-                if cell and cell.get("ocr_suspect"):
-                    ocr_suspect_count += 1
-        if entry["values"].get("haas_1979") and entry["values"]["haas_1979"]["as_published"].lstrip().isdigit():
-            entry["values"]["haas_1979"]["ocr_suspect"] = True
-            entry["values"]["haas_1979"].setdefault("flags", []).append("missing_leading_minus_detector")
-            ambiguities.append(f"haas_token_lacks_leading_minus phase={entry['phase_as_published']}")
-            ocr_suspect_count += 1
+    del pdf, cache_dir
+    columns = ("haas_1979", "robie_1979", "helgeson_1978", "hemley_1980")
+    entries = []
+    for phase, raw_values, raw_uncertainties, raw_correction in TABLE1_IMAGE_ROWS:
+        entries.append({
+            "phase_as_published": phase,
+            "values": {
+                column: parse_number_token(token) if token is not None else None
+                for column, token in zip(columns, raw_values, strict=True)
+            },
+            "uncertainties": {
+                column: parse_number_token(token)
+                for column, token in zip(columns, raw_uncertainties, strict=True)
+                if token is not None
+            },
+            "helgeson_corrected": (
+                parse_number_token(raw_correction) if raw_correction is not None else None
+            ),
+        })
 
     return {
         "schema_version": SCHEMA_VERSION,
@@ -881,7 +1024,7 @@ def parse_table1(pdf: Path, cache_dir: Path) -> dict[str, Any]:
         "name_as_published": "Enthalpies of formation from the elements at 298.15 K for selected phases taken from several literature references",
         "formula_as_published": None,
         "phase_as_published": None,
-        "title_as_published": " ".join(title_parts),
+        "title_as_published": "Enthalpies of formation from the elements at 298.15 K for selected phases taken from several literature references",
         "headnote_as_published": "[-,value not given]",
         "printed_pages": [TABLE1_PDF_PAGE - PDF_TO_PRINTED],
         "pdf_pages": [TABLE1_PDF_PAGE],
@@ -891,14 +1034,17 @@ def parse_table1(pdf: Path, cache_dir: Path) -> dict[str, Any]:
             "Hass and others (1979)",
             "Robie and others (1979)",
             "Helgeson and others (1978)*",
-            "Remley/Hemley and others (1980)",
+            "Remley and others (1980)",
         ],
-        "footnote_as_published": " ".join(note_parts),
+        "footnote_as_published": "*The values in parentheses represent the value derived by Helgeson and others plus a correction of -6.5 kJ per mole of aluminum.",
         "rows": entries,
         "row_count": len(entries),
-        "ocr_suspect_row_count": ocr_suspect_count,
+        "ocr_suspect_row_count": 0,
         "identity_disagreements": [],
-        "ambiguities": ambiguities,
+        "ambiguities": [
+            "table_1_header prints Hass as published; it is not silently changed to Haas",
+            "blank cells retained as null; '-' means value not given as printed in the headnote",
+        ],
         "source_locator": {
             "pdf": f"source/{SOURCE_PDF_NAME}",
             "pdf_pages": [TABLE1_PDF_PAGE],
@@ -975,6 +1121,19 @@ def _grid_nodes(record: dict[str, Any], temperature: Decimal) -> list[dict[str, 
     return hits
 
 
+def _grid_node_ambiguities(row: dict[str, Any]) -> list[str]:
+    reasons = []
+    temperature = row.get("temperature") or {}
+    if temperature.get("ocr_suspect"):
+        reasons.append(
+            f"temperature token {temperature.get('as_published')!r} is ocr_suspect"
+        )
+    for check_name, check in (row.get("identity_checks") or {}).items():
+        if check.get("ok") is False:
+            reasons.append(f"identity check {check_name} disagrees (delta={check.get('delta')})")
+    return reasons
+
+
 def lookup(
     record_id: str,
     temperature_K: str | Decimal,
@@ -998,6 +1157,12 @@ def lookup(
     if not hits:
         raise TemperatureNotOnPrintedGrid(
             f"{record_id}: T={temperature} K is not on the printed grid"
+        )
+    ambiguous = [reason for row in hits for reason in _grid_node_ambiguities(row)]
+    if ambiguous:
+        raise AmbiguousPrintedGridNode(
+            f"{record_id}: T={temperature} K is an ambiguous printed-grid candidate: "
+            + "; ".join(ambiguous)
         )
     if len(hits) > 1:
         raise AmbiguousPrintedTemperature(
@@ -1120,13 +1285,14 @@ def ingest(pdf: Path | None = None, output: Path = COMPILATION_ROOT, cache_dir: 
         ],
         "corpus_status": {
             "scope": "every numeric table in USGS Bulletin 1544 (TABLE 1 plus per-substance T-grid tables)",
-            "extraction": "pdftotext -bbox of the OCR text layer; page images used only where the OCR layer omitted a title",
+            "extraction": "pdftotext -bbox for T-grid cells; page-image transcription for TABLE 1, printed formulas, Cp equations, H°298-H°0 metadata, and qualification marks",
             "census_table_count": len(census),
             "transcribed_table_count": len(records),
             "untranscribed": untranscribed,
             "ambiguities": [
                 "OCR text layer, not a typeset source; ocr_suspect tokens retained raw and not corrected",
                 "identity G=H-TS and delta-f G vs log Kf used as detectors only",
+                "page-image transcriptions are limited to fields named in extraction; no identity-derived corrections",
             ],
         },
         "summary": {

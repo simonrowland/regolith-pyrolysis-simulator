@@ -32,19 +32,36 @@
     "heat_capacity": "J/mol·K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/mol",
-    "log_kf": "dimensionless"
+    "log_kf": "dimensionless",
+    "enthalpy_298_minus_0": "kJ"
   },
   "compiled_as_published": "9-30-79",
   "molar_volume_J_per_bar_as_published": "2.2688",
   "molar_volume_cm3_as_published": "22.688",
   "melting_point_as_published": "MELTING POINT K BOILING POINT K",
+  "enthalpy_298_minus_0": {
+    "as_published": "6.916",
+    "value": "6.916",
+    "ocr_suspect": false,
+    "flags": []
+  },
   "heat_capacity_equations_as_published": [
-    "c 83.2101 + 1.09962x10- 2 T- 7.77338x1o 2 T-O.S",
-    "p 0",
-    "(EQUATION VALID FROM 200 844 K)",
-    "c 58.9107 + 5.02080x10- 3 T",
-    "p 0",
-    "(EQUATION VALID FROM 844 1800 K)"
+    {
+      "as_published": "C_p° = 83.2101 + 1.09962x10^-2 T - 7.77338x10^2 T^-0.5",
+      "validity_as_published": "(EQUATION VALID FROM 200 - 844 K)",
+      "ocr_suspect": false,
+      "source_pdf_pages": [
+        28
+      ]
+    },
+    {
+      "as_published": "C_p° = 58.9107 + 5.02080x10^-3 T",
+      "validity_as_published": "(EQUATION VALID FROM 844 - 1800 K)",
+      "ocr_suspect": false,
+      "source_pdf_pages": [
+        28
+      ]
+    }
   ],
   "reference_state_notes_as_published": [
     "TRANSITIONS IN REFERENCE STATE ELEMENTS",
@@ -146,6 +163,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -214,6 +232,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -282,6 +301,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -350,6 +370,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -418,6 +439,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -486,6 +508,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -554,6 +577,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -622,6 +646,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -690,6 +715,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -758,6 +784,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -826,6 +853,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -894,6 +922,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -962,6 +991,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1030,6 +1060,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1098,6 +1129,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1166,6 +1198,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1234,6 +1267,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1302,6 +1336,7 @@
           }
         }
       },
+      "marks": [],
       "identity_checks": {
         "planck_vs_S_minus_HHT": {
           "ok": true,
@@ -1322,7 +1357,7 @@
   "ocr_suspect_row_count": 1,
   "identity_disagreements": [],
   "ambiguities": [
-    "formula_omitted_from_ocr_layer; transcribed from page image as a second reading"
+    "formula_omitted_in_ocr_layer; transcribed from page image as a second reading"
   ],
   "source_locator": {
     "pdf": "source/hemingway-haas-robinson-1982-usgs-b1544.pdf",
