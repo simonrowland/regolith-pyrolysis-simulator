@@ -1,0 +1,144 @@
+{
+  "record_id": "cp-p047-05",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 53,
+  "page": 47,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "DIBORON TRIOXIDE",
+  "formula_candidate": "B2~",
+  "header_and_units_raw": "NAME AND FORMULA       ENTROPY            A1           A2           A3\n                                                                  n·2,\n                                                                                 A4\n                                                                              (T..o.&)\n                                                                                              A5      T rMge   T.     '-\"0\n                      J·mor' ·IC\"1                    (T)                                    (T2)       IC     IC     kJ·•r1\n",
+  "source_text": "DIBORON TRIOXIDE           54.0      1.847E+02    7. 108E-03   6.441E+05    -2.270E+03                  298\nB2~                         0.3                                                                         723",
+  "rows": [
+    {
+      "raw": "DIBORON TRIOXIDE           54.0      1.847E+02    7. 108E-03   6.441E+05    -2.270E+03                  298",
+      "tokens": [
+        {
+          "raw": "DIBORON",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 7
+        },
+        {
+          "raw": "TRIOXIDE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 8,
+          "end_offset": 16
+        },
+        {
+          "raw": "54.0",
+          "value": 54.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 27,
+          "end_offset": 31
+        },
+        {
+          "raw": "1.847E+02",
+          "value": 184.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 37,
+          "end_offset": 46
+        },
+        {
+          "raw": "7.",
+          "value": 7.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 50,
+          "end_offset": 52
+        },
+        {
+          "raw": "108E-03",
+          "value": 0.108,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 53,
+          "end_offset": 60
+        },
+        {
+          "raw": "6.441E+05",
+          "value": 644100.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 63,
+          "end_offset": 72
+        },
+        {
+          "raw": "-2.270E+03",
+          "value": -2270.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 76,
+          "end_offset": 86
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 104,
+          "end_offset": 107
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "B2~                         0.3                                                                         723",
+      "tokens": [
+        {
+          "raw": "B2~",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 3
+        },
+        {
+          "raw": "0.3",
+          "value": 0.3,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 28,
+          "end_offset": 31
+        },
+        {
+          "raw": "723",
+          "value": 723.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 104,
+          "end_offset": 107
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '7. 108E-03'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A2', '7. 108E-03')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 27,
+  "source_line_end": 28
+}
