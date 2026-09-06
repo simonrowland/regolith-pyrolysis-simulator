@@ -1,0 +1,134 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0213",
+  "census_id": "high-temperature-printed-page-239",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "URANIUK TRIOXIDE (GAftftA}",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "FORftATION FROK THE BLEftEJTS",
+  "formula_weight": {
+    "as_published": "286.027",
+    "value": 286.027,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      245
+    ],
+    "printed_pages": [
+      239
+    ],
+    "pdftotext_layout_page_file": "page-245.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer"
+  ],
+  "title_line_as_published": "URANIUK TRIOXIDE (GAftftA}                                                      FORKULA WEIGHT     286.027",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "             Crystals 298.15 to         900 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORftATION FROK THE BLEftEJTS",
+    "                                                                                      GIBBS",
+    "TEftP.   ( a;-H~ 98 );T",
+    "                              0",
+    "                             ST      -< G;-H~ 98 };r      cop    EJTHALPY          FREE EJERGY      Log Kf",
+    "  K         J/aol•K       J/aol•K      Jjaol•K         Jjaol•K         kJ/aol         kJ/aol",
+    "---------------------------------------·-----------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "Jjaol•K",
+    "heat_capacity": "Jjaol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 7,
+  "uncertainty_line_as_published": "UNCERTll IITY                0.25             0.25                       0.800          1.000        0.175",
+  "uncertainty_values": [
+    {
+      "as_published": "0.25",
+      "value": 0.25,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.25",
+      "value": 0.25,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.800",
+      "value": 0.8,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.000",
+      "value": 1.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.175",
+      "value": 0.175,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "!ELTING POUlT                           K              BOILING POINT",
+    "ENTHALPY OF MELTING                      kJ            EHTHALPY OF VAPORIZATION                      kJ",
+    "                                        kJ             KOLAR VOLUftE                        3.5560 Jjbar",
+    "                                                                                           35.560 ca 3",
+    "TRANSITIONS IN REFERENCE STATE ELEKENTS",
+    "    URANIUK •••• ALPHA-BETA 941, BETA-GAKKA 1048, ft. P. 1405 K.",
+    "HEAT CAPACITY EQUATIOH",
+    "         2.1500x1oz-        J.8496x1o-z T              2.5272x1(J:J T-o·s",
+    "             (EQUATION VALID FROM      298-            90(1 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer",
+      "detector_only": false
+    }
+  ]
+}
