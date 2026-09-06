@@ -1,0 +1,137 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0137",
+  "census_id": "high-temperature-printed-page-163",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "IIUSTITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "68.887",
+    "value": 68.887,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      169
+    ],
+    "printed_pages": [
+      163
+    ],
+    "pdftotext_layout_page_file": "page-169.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 30, 32, 34, 36, 45, 47"
+  ],
+  "title_line_as_published": "IIUSTITE                                                                           FOBIIULA II E.IGHT     68.887",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                Crystals 298.15 to 11elting point 1652 K.                   Liquid 1652 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBIIATIOIII FBOII THE ELEIIENTS",
+    "                                                                                         GIBBS",
+    "TEIIP.     ( a;-H~ 98 )/T      so      -(G;-H~g 8 )/T       cop     EIIITHALPY        FREE EIIIEBG!       Log Kf",
+    "                                T",
+    "   K         J/IIOl•K       J/llol•K      J/IIOl•K       J/IIOl•K         kJ/mol          kJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/IIOl•K",
+    "entropy": "J/llol•K",
+    "negative_gibbs_function": "J/IIOl•K",
+    "heat_capacity": "J/IIOl•K",
+    "formation_enthalpy": "kJ/mol",
+    "formation_gibbs_energy": "kJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 21,
+  "uncertainty_line_as_published": "UNCEBTliiiiTY                  0.112             0.112                     0.837             0.879         0.1511",
+  "uncertainty_values": [
+    {
+      "as_published": "0.112",
+      "value": 0.112,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.112",
+      "value": 0.112,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.837",
+      "value": 0.837,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.879",
+      "value": 0.879,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.1511",
+      "value": 0.1511,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "IIELTIIIIG POIIIIT             1652        K             BOILING POINT                                     K",
+    "ENTHALP! OF !!ELTING            31.338 kJ                ENTHALPY OF VAPORIZATION                          kJ",
+    "                                    9.11611 kJ           IIOLAB VOLUIIE                          1. 20ij0 J/bar",
+    "                                                                                                12.0110 cm 3",
+    "TBAIIISITIONS IN REFERENCE STATE ELEIIENTS",
+    "    IROIII ••••••• CURIE P. 1042, ALPHl-GliiiiA 1184, GAIIIIA-DELTA 1665,",
+    "                   II. P. DELTA 1809 K.",
+    "HEAT CAPACITY EQUATION",
+    "             19.296 + 3.u165x10-2 T      1.50Q9x103 T-o·s                          2.5333x10• T-2",
+    "              (EQUATION VALID FBOII 298 - 1652 K)",
+    "IIEFERENCE           44        120                                          109                         COIIPILED",
+    "                               2ij7                                         2117                         6-11-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 30, 32, 34, 36, 45, 47",
+      "detector_only": false
+    }
+  ]
+}

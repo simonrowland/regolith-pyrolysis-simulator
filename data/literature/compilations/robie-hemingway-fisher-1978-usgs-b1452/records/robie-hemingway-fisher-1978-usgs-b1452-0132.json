@@ -1,0 +1,141 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0132",
+  "census_id": "high-temperature-printed-page-158",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "DYSPROSIUM SESQUIOXIDE (CUBIC)",
+  "formula_as_published": "Dy 2 0 3",
+  "phase_state_as_published": [
+    "Alpha crystals 298.15 to 1590              ~.   Beta crystals        15~0    to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Dy 2 0 3 :    Alpha crystals 298.15 to 1590              ~.   Beta crystals        15~0    to 1800 K."
+  ],
+  "formation_basis_header_as_published": "FOBI!ATION FROM THE ELEMENTS",
+  "formula_weight": {
+    "as_published": "372.998",
+    "value": 372.998,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      164
+    ],
+    "printed_pages": [
+      158
+    ],
+    "pdftotext_layout_page_file": "page-164.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 36, 37"
+  ],
+  "title_line_as_published": "DYSPROSIUM SESQUIOXIDE (CUBIC)                                                         FORMULA WEIGHT     372.998",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Dy 2 0 3 :    Alpha crystals 298.15 to 1590              ~.   Beta crystals        15~0    to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBI!ATION FROM THE ELEMENTS",
+    "                                                                                             GIBBS",
+    "TEftP.        ( H~-H~ 98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY           FREE EIIEBGY     Log Kf",
+    "                                   T",
+    "               Jtmol•K         J/aol•K      Jtaol•K        J/mol•K           kJ/1101         kJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "Jtmol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "Jtaol•K",
+    "heat_capacity": "J/mol•K",
+    "formation_enthalpy": "kJ/1101",
+    "formation_gibbs_energy": "kJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 17,
+  "uncertainty_line_as_published": "UNCERTAINTY                       u.85            0.85                         3.930           4.000        o.7u1",
+  "uncertainty_values": [
+    {
+      "as_published": "u.85",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.85",
+      "value": 0.85,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.930",
+      "value": 3.93,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.000",
+      "value": 4.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o.7u1",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Dy 2 0 3 :    Alpha crystals 298.15 to 1590              ~.   Beta crystals        15~0    to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "KELTING POINT                                K             BOILING POINT",
+    "ENTHALPY OF MELTING                          kJ            ENTHALPY OF VAPORIZATION                         kJ",
+    "                                   21.087 kJ               MOLAR VOLUftE                          4.5683 J/bar",
+    "                                                                                                 45.btl3 c11 3",
+    "TRANSITIONS Ill DEFERENCE STATE ELEftENTS",
+    "      DYSP&OSIUft. ALPHA-BETA 1657, M. P. 1682 K.",
+    "HEAT CAPACITY EQUATION",
+    "             38.243 + 3.7210x1o-z T                 2.u124x1uJI      r-o·s",
+    "                (EQUATION VALID FROI!             298- 1590 K)",
+    "BEFEI!EIICE        202            235                                           235                      COMPILED",
+    "                                                                                103                       5-18-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 36, 37",
+      "detector_only": false
+    }
+  ]
+}
