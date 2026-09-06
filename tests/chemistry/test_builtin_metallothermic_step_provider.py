@@ -66,8 +66,10 @@ from simulator.chemistry.kernel import (
     IntentRequest,
     IntentResult,
     LedgerTransitionProposal,
+    ProviderUnavailableError,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.state import (
     MOLAR_MASS,
@@ -2548,11 +2550,32 @@ def test_c6_ci_empty_window_refusal_precedes_zero_mg_noop(
     ]
 
 
+# A_staged+MAGEMin composition wall-clock: mass-balance class measured
+# 1027 s on compose-0.6.3 (docs-private/research/2026-07-20-pool-diagnosis/report.md);
+# raise per-test ceiling to measured × 1.5 headroom (not global --timeout).
+# Derived warm-pool ceiling: mass-balance class (n0 measured ~867 s).
+# Nightly (2026-08-02 CI tiering): long InternalAnalytical C6 CI empty (~134 s).
+@pytest.mark.nightly
+@pytest.mark.xdist_group("magemin_fullrun_b")
+@pytest.mark.timeout(1800)
 def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    monkeypatch,
 ):
+    """Exercise C0-to-C6 routing under an explicitly unavailable liquidus gate."""
+    # C3 source capacity is C_m_full * LF. A real residual-liquid curve
+    # can keep it nonzero at 1150 C, unlike the flagged Kress-floor fallback,
+    # changing Mg evolution enough to refuse C4 before C6 is offered.
+    # Pin the fallback authority for this routing test; optional host engines
+    # must not silently choose its reachability premise (b-475).
+    def unavailable_liquidus_curve(self):
+        raise ProviderUnavailableError("C6 routing fixture: liquidus unavailable")
+
+    monkeypatch.setattr(
+        PyrolysisSimulator, "_freeze_gate_curve", unavailable_liquidus_curve
+    )
     patched_setpoints = _hkl_only_setpoints(setpoints_data)
     sim = _build_sim(
         "ci_carbonaceous_chondrite",
@@ -2561,19 +2584,40 @@ def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
         patched_setpoints,
         additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
     )
-    # C4 can terminal-refuse before offering C6 when MAGEMin diagnostics change
-    # the upstream trajectory. Exercise the C6 contract through its decision API.
-    al2o3_mol_before_c6 = sim.atom_ledger.mol_by_account(
-        "process.cleaned_melt"
-    ).get("Al2O3", 0.0)
-    sim.apply_decision(DecisionType.C6_PROCEED, "yes")
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A_staged",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
     steps = 0
+    al2o3_mol_before_c6 = None
     while not sim.is_complete() and steps < 5000:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            if decision.decision_type == DecisionType.C6_PROCEED:
+                al2o3_mol_before_c6 = sim.atom_ledger.mol_by_account(
+                    "process.cleaned_melt"
+                ).get("Al2O3", 0.0)
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
         sim.step()
         steps += 1
 
     assert sim.is_complete()
     assert (DecisionType.C6_PROCEED, "yes") in sim.record.decisions
+    fallback = sim._melt_redox_liquidus_gate_fallback_summary()
+    assert fallback["engaged"] is True
+    assert fallback["total_count"] > 0
+    assert all(
+        item["source"] == "none:liquidus_unavailable"
+        and item["status"] == "liquidus_unavailable_floor_fallback"
+        for item in fallback["recent"]
+    )
     refusal = sim._last_c6_refusal_diagnostic
     assert refusal["status"] == "refused"
     assert refusal["campaign"] == CampaignPhase.C6.name
