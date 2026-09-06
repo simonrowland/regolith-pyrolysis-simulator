@@ -8,12 +8,12 @@ scan:
   notes:
   - hunt_ids column empty; --hunt-json not provided
 counts:
-  sources: 105
-  extracts: 104
+  sources: 104
+  extracts: 103
   pdfs_present_in_worktree: 26
   pdfs_tracked_99_kems_langmuir: 25
   pdfs_without_extract: 1
-  extracts_without_pdf: 79
+  extracts_without_pdf: 78
   alias_groups_needing_resolution: 26
 gaps:
   pdfs_without_extract:
@@ -95,7 +95,6 @@ gaps:
   - safarian-engh-2013-si-pure-langmuir
   - sf04-magma-companion-workbook
   - sossi-et-al-2019
-  - sossi-fegley-2018
   - span-wagner-1996-co2-psat
   - wetzel-gail-2013-sio-arrhenius
   untracked_files: []
@@ -497,7 +496,6 @@ gaps:
     source_ids:
     - kems-041-sossi-fegley-2018
     - kems-045-sossi-2018-pnas-cr
-    - sossi-fegley-2018
     resolution: owner/controller
   - type: source_id_alias
     key: wetzel-2013
@@ -2771,28 +2769,6 @@ sources:
   access_status: unknown
   extracts:
   - path: data/literature/extracts/sossi-et-al-2019.yaml
-    review_status: draft
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-- source_id: sossi-fegley-2018
-  aliases: []
-  citation: Sossi, P. A. & Fegley, B. Jr., Thermodynamics of Element Volatility and its Application to
-    Planetary Processes, Reviews in Mineralogy and Geochemistry 84 (2018) 393–459
-  doi: 10.2138/rmg.2018.84.11
-  report_number: null
-  identifier: 10.2138/rmg.2018.84.11
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields: []
-  access_status: unknown
-  extracts:
-  - path: data/literature/extracts/sossi-fegley-2018.yaml
     review_status: draft
   battery_datasets: []
   hunt_ids: []

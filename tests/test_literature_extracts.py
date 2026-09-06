@@ -941,6 +941,24 @@ def test_merge_refuses_invalid_extracts(tmp_extracts: Path):
         em.load_extracts(tmp_extracts, require_valid=True)
 
 
+def _corpus_stems_including_aliases() -> set[str]:
+    """Extract filename stems plus ``aliases:`` recorded on canonical extracts.
+
+    One DOI = one source_id: a merged alias file is git-rm'd, but the pilot
+    stem remains present as an alias on the surviving canonical extract.
+    """
+    present: set[str] = set()
+    for path in vle.discover_extracts():
+        present.add(path.stem)
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict):
+            continue
+        aliases = doc.get("aliases") or []
+        if isinstance(aliases, list):
+            present.update(a for a in aliases if isinstance(a, str) and a)
+    return present
+
+
 def test_pilot_extract_count_exact_and_merge_smoke():
     """Pilot census (68) remains; live corpus may grow with post-policy extracts.
 
@@ -949,9 +967,9 @@ def test_pilot_extract_count_exact_and_merge_smoke():
     files = vle.discover_extracts()
     policy = _fidelity_policy_doc()
     closed = set(policy["closed_set_source_ids"])
-    stems = {p.stem for p in files}
+    present = _corpus_stems_including_aliases()
     assert len(closed) == 68  # frozen pilot census
-    assert closed <= stems  # pilot files still present
+    assert closed <= present  # pilot files still present (or recorded as aliases)
     assert len(files) >= 68  # live corpus may include t-509 OCR extracts
     extracts = em.load_extracts(require_valid=True)
     assert len(extracts) == len(files)
@@ -1309,8 +1327,9 @@ def test_fidelity_allowlist_covers_pilot_census():
     closed = set(policy["closed_set_source_ids"])
     active = set(policy["active_pre_policy_source_ids"])
     stems = {p.stem for p in vle.discover_extracts()}
-    # Frozen pilot set still present in the live corpus.
-    assert closed <= stems, f"missing pilot extracts: {sorted(closed - stems)}"
+    present = _corpus_stems_including_aliases()
+    # Frozen pilot set still present in the live corpus (file stem or extract alias).
+    assert closed <= present, f"missing pilot extracts: {sorted(closed - present)}"
     assert active <= closed
     # New (post-policy) stems are allowed and must not be on the active allowlist.
     new_stems = stems - closed

@@ -13,12 +13,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 105
-- Extracts (`literature_extract.v1`): 104
+- Sources: 104
+- Extracts (`literature_extract.v1`): 103
 - PDFs present in this worktree: 26
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 25
 - PDFs with no extract: 1
-- Extracts with no PDF: 79
+- Extracts with no PDF: 78
 - Alias groups needing owner/controller resolution: 26
 
 ## Sources
@@ -125,7 +125,6 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `sf04-magma-companion-workbook` | `ref-016-sio-kems-1700-2000k` | Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vapor... | 10.1016/j.icarus.2003.08.023 | ABSENT | `` | unknown | `data/literature/extracts/sf04-magma-companion-workbook.yaml` (reviewed) | — | — |
 | `smales-1971-lpsc-12022` | — | Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)"... |  | `docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf` | `7af2b6b0f870` | held | `data/literature/extracts/smales-1971-lpsc-12022.yaml` (draft) | — | — |
 | `sossi-et-al-2019` | `kems-012-sossi-2019` | Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.201... | 10.1016/j.gca.2019.06.021 | ABSENT | `` | unknown | `data/literature/extracts/sossi-et-al-2019.yaml` (draft) | — | — |
-| `sossi-fegley-2018` | — | Sossi, P. A. & Fegley, B. Jr., Thermodynamics of Element Volatility and its Application... | 10.2138/rmg.2018.84.11 | ABSENT | `` | unknown | `data/literature/extracts/sossi-fegley-2018.yaml` (draft) | — | — |
 | `span-wagner-1996-co2-psat` | — | Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the ... | 10.1063/1.555991 | ABSENT | `` | unknown | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` (draft) | — | — |
 | `stebbins-carmichael-weill-1983` | — | Stebbins, J. F., Carmichael, I. S. E. & Weill, D. E. (1983), "The high temperature liqu... |  | `docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.pdf` | `5246cf5b6bfd` | held | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` (draft) | — | — |
 | `ts1985` | — | Tsukihashi, F. & Sano, N. (1985), "Measurement of the Activity of Na2O in Na2O-SiO2 Mel... | 10.2355/tetsutohagane1955.71.7_815 | `docs/references/pdfs/99-kems-langmuir/ts1985.pdf` | `8345faa48d38` | held | `data/literature/extracts/ts1985.yaml` (draft) | — | — |
@@ -214,7 +213,6 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `safarian-engh-2013-si-pure-langmuir`
 - `sf04-magma-companion-workbook`
 - `sossi-et-al-2019`
-- `sossi-fegley-2018`
 - `span-wagner-1996-co2-psat`
 - `wetzel-gail-2013-sio-arrhenius`
 
@@ -281,5 +279,5 @@ The builder does not pick a winner.
 - source_id_alias `safarian-2013`: `kems-009-safarian-2013`, `safarian-engh-2013-si-pure-langmuir` — needs owner/controller resolution
 - source_id_alias `schaefer-2004`: `kems-008-schaefer-fegley-2004`, `sf04-magma-companion-workbook` — needs owner/controller resolution
 - source_id_alias `sesko-2024`: `kems-036-sesko-2024`, `sesko_2024`, `sesko_2024_vapor_phase_pyrolysis` — needs owner/controller resolution
-- source_id_alias `sossi-2018`: `kems-041-sossi-fegley-2018`, `kems-045-sossi-2018-pnas-cr`, `sossi-fegley-2018` — needs owner/controller resolution
+- source_id_alias `sossi-2018`: `kems-041-sossi-fegley-2018`, `kems-045-sossi-2018-pnas-cr` — needs owner/controller resolution
 - source_id_alias `wetzel-2013`: `kems-011-wetzel-gail-2013`, `wetzel-gail-2013-sio-arrhenius` — needs owner/controller resolution
