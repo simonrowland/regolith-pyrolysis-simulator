@@ -46,3 +46,25 @@ Ambiguities are fields, not guesses:
 ## Engine use
 
 Consume as CALPHAD unary reference functions (Dinsdale 1991 lattice stabilities, SGTE 5.0 coefficients). Do not score the battery against these tables.
+
+`expression_from_interval_dict(interval).evaluate(T, reference_values)` retains
+the chosen interval's closed `[T_low, T_high]` band. Outside that band it raises
+`TemperatureOutOfIntervalError`, carrying `temperature_K` and `certified_band`.
+Missing or invalid bounds refuse with `SgteUnaryError`.
+The published GHCPHG first band is reversed (298.15–234.32 K): its
+expression always raises `TemperatureOutOfIntervalError`. The source bounds
+remain unchanged; later valid intervals remain selectable. Round-trip checks
+verify refusal for that empty band rather than inventing a midpoint value.
+
+`evaluate_function(name, T, functions)` accepts a mapping of FUNCTION names to
+their loaded record dictionaries, selects the first published interval containing
+T (including shared endpoints), and recursively resolves referenced FUNCTIONs.
+Temperatures outside the published interval union refuse; no extrapolation or
+bridge is supplied. Missing definitions or explicit reference values raise
+`UnresolvedFunctionError`, carrying the unresolved `symbol`; neither evaluator
+substitutes zero. The expression-string arithmetic helper requires explicit
+reference values and is only a round-trip oracle, not an interval selector.
+
+`LIQUID:L` remains the published phase identity; `LIQUID` is its PARAMETER name.
+The suffix is not a constituent group. All 78 liquid records declare one
+sublattice and one group containing the 78 published constituents.

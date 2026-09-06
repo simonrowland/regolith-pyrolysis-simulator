@@ -11,12 +11,18 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
+import pytest
 
 from simulator.chemistry.sgte_unary import (
     COMPILATION_ROOT,
     RECORDS_DIR,
     SOURCE_TDB,
     ROUND_TRIP_REL_TOL,
+    SgteUnaryError,
+    TemperatureOutOfIntervalError,
+    UnresolvedFunctionError,
+    evaluate_function,
+    evaluate_expression_string,
     expression_from_interval_dict,
     feedstock_elements,
     function_round_trip_failures,
@@ -36,6 +42,12 @@ EXPECTED_SHA256 = "8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4
 PINNED_MISSING_FEEDSTOCK_ELEMENTS = ("Br", "Cl", "F", "H", "I")
 
 
+@pytest.fixture(scope="module")
+def record_functions():
+    return {fn["name"]: fn for path in iter_record_paths()
+            for fn in load_record_yaml(path).get("functions", [])}
+
+
 def test_source_tdb_sha256_matches_sidecar_and_corpus():
     assert SOURCE_TDB.is_file()
     digest = sha256_file(SOURCE_TDB)
@@ -48,19 +60,24 @@ def test_source_tdb_sha256_matches_sidecar_and_corpus():
 def test_every_function_interval_midpoint_round_trips_to_expression_string():
     database = load_tdb()
     assert database.functions, "unary50.tdb published FUNCTION statements"
+    assert [(fn.name, i.t_low, i.t_high) for fn in database.functions.values()
+            for i in fn.intervals if i.t_low > i.t_high] == [("GHCPHG", 298.15, 234.32)]
     failures = function_round_trip_failures(database)
     assert failures == []
     # Spot-check a GHSER interval that includes T**(-9) and T*LN(T).
     ghserag = database.functions["GHSERAG"]
     for interval in ghserag.intervals:
-        ok, parsed, string = function_round_trip_ok(interval.expression, interval.midpoint_K())
+        ok, parsed, string = function_round_trip_ok(
+            interval.expression, interval.midpoint_K(),
+            {name: fn.as_dict() for name, fn in database.functions.items()},
+        )
         assert ok
         scale = max(abs(parsed), abs(string))
         if scale:
             assert abs(parsed - string) <= ROUND_TRIP_REL_TOL * scale
 
 
-def test_manifest_records_parse_back_to_tdb_numbers():
+def test_manifest_records_parse_back_to_tdb_numbers(record_functions):
     database = load_tdb()
     parsed_records = {record.record_id: record for record in build_records(database)}
     manifest = load_manifest()
@@ -109,7 +126,7 @@ def test_manifest_records_parse_back_to_tdb_numbers():
                     assert loaded_term.lnT_power == parsed_term.lnT_power
                     assert loaded_term.function == parsed_term.function
                     assert loaded_term.coefficient == parsed_term.coefficient
-                ok, _, _ = function_round_trip_ok(loaded_expr, parsed_interval.midpoint_K())
+                ok, _, _ = function_round_trip_ok(loaded_expr, parsed_interval.midpoint_K(), record_functions)
                 assert ok
 
         if parsed.functions:
@@ -200,3 +217,89 @@ def test_nothing_is_typed_measured():
         assert "provenance_class: measured" not in text
         payload = yaml.safe_load(text)
         assert payload["compilation_role"]["validation_measurement"] is False
+
+
+def test_liquid_suffix_is_not_a_sublattice():
+    database = load_tdb()
+    suffixes = {phase.name_as_published.split(":", 1)[1]
+                for phase in database.phases.values() if ":" in phase.name_as_published}
+    assert suffixes == {"L"}
+    liquids = []
+    for path in iter_record_paths():
+        record = load_record_yaml(path)
+        phase = record.get("phase_declaration")
+        if phase is None:
+            continue
+        assert len(phase["constituents"]) == phase["n_sublattices"]
+        assert all(group != [suffix] for group in phase["constituents"] for suffix in suffixes)
+        if record["phase"] == "LIQUID":
+            liquids.append(record["record_id"])
+            assert phase["name_as_published"] == "LIQUID:L"
+            assert phase["n_sublattices"] == 1
+            assert "AG" in phase["constituents"][0]
+            assert "FE" in phase["constituents"][0]
+    assert len(liquids) == 78
+    assert {"AG-LIQUID", "FE-LIQUID"} <= set(liquids)
+
+
+@pytest.mark.parametrize("temperature", [100, 2000, 10000])
+def test_chosen_interval_refuses_extrapolation(record_functions, temperature):
+    interval = record_functions["GHSERFE"]["intervals"][0]
+    assert {"T_low", "T_high"} <= interval.keys()
+    expression = expression_from_interval_dict(interval)
+    assert expression.evaluate(1000) == pytest.approx(-41450.417956569676, rel=1e-9)
+    with pytest.raises(TemperatureOutOfIntervalError) as caught:
+        expression.evaluate(temperature)
+    assert caught.value.temperature_K == temperature
+    assert caught.value.certified_band == ((298.15, 1811.0),)
+
+
+def test_function_selects_interval_and_refuses_outside_union(record_functions):
+    for temperature in (100, 10000):
+        with pytest.raises(TemperatureOutOfIntervalError) as caught:
+            evaluate_function("GHSERFE", temperature, record_functions)
+        assert caught.value.temperature_K == temperature
+        assert caught.value.certified_band == ((298.15, 1811.0), (1811.0, 6000.0))
+    second = expression_from_interval_dict(record_functions["GHSERFE"]["intervals"][1])
+    assert evaluate_function("GHSERFE", 2000, record_functions) == second.evaluate(2000)
+
+
+def test_unresolved_reference_refuses_and_records_resolve(record_functions):
+    record = load_record_yaml(RECORDS_DIR / "FE-BCC_A2.yaml")
+    interval = record["g_parameter"]["intervals"][0]
+    expression = expression_from_interval_dict(interval)
+    for evaluate in (lambda: expression.evaluate(1000),
+                     lambda: evaluate_expression_string(expression.text, 1000)):
+        with pytest.raises(UnresolvedFunctionError) as caught:
+            evaluate()
+        assert caught.value.symbol == "GHSERFE"
+    assert evaluate_function("GHSERFE", 1000, record_functions) == pytest.approx(-41450.417956569676, rel=1e-9)
+    values = {name: evaluate_function(name, 1000, record_functions) for name in expression.function_names}
+    assert expression.evaluate(1000, values) == pytest.approx(-41450.417956569676, rel=1e-9)
+    # GLIQFE itself references GHSERFE; a missing dependency must refuse recursively.
+    incomplete = dict(record_functions)
+    del incomplete["GHSERFE"]
+    with pytest.raises(UnresolvedFunctionError) as caught:
+        evaluate_function("GLIQFE", 1000, incomplete)
+    assert caught.value.symbol == "GHSERFE"
+
+
+def test_missing_interval_bound_refuses(record_functions):
+    interval = dict(record_functions["GHSERFE"]["intervals"][0])
+    del interval["T_high"]
+    with pytest.raises(SgteUnaryError, match="certified temperature bounds"):
+        expression_from_interval_dict(interval)
+
+
+def test_published_reversed_mercury_interval_refuses(record_functions):
+    interval = record_functions["GHCPHG"]["intervals"][0]
+    expression = expression_from_interval_dict(interval)
+    with pytest.raises(TemperatureOutOfIntervalError):
+        expression.evaluate((298.15 + 234.32) / 2)
+    assert evaluate_function("GHCPHG", 300, record_functions) == expression_from_interval_dict(
+        record_functions["GHCPHG"]["intervals"][1]).evaluate(300)
+
+
+@pytest.mark.parametrize("coefficient", ["1E-3", "1.E-3", ".1E-2"])
+def test_scientific_notation_is_not_a_function_reference(coefficient):
+    assert evaluate_expression_string(f"{coefficient}*T", 1000) == pytest.approx(1)

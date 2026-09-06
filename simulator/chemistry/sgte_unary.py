@@ -13,7 +13,7 @@ import hashlib
 import math
 import re
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
@@ -54,6 +54,23 @@ _COMMENTED_PARAM_RE = re.compile(r"PARAMETER\s+((?:G|TC|BM|BMAGN)\([^)]+\))")
 
 class SgteUnaryError(ValueError):
     """Published TDB text could not be parsed without guessing."""
+
+
+class TemperatureOutOfIntervalError(SgteUnaryError):
+    """Requested temperature is outside the published interval union."""
+
+    def __init__(self, temperature_K: float, certified_band: tuple[tuple[float, float], ...]):
+        self.temperature_K = temperature_K
+        self.certified_band = certified_band
+        super().__init__(f"T={temperature_K} K outside certified band {certified_band}")
+
+
+class UnresolvedFunctionError(SgteUnaryError):
+    """A required FUNCTION value or definition is missing."""
+
+    def __init__(self, symbol: str):
+        self.symbol = symbol
+        super().__init__(f"unresolved FUNCTION {symbol}")
 
 
 @dataclass(frozen=True)
@@ -101,11 +118,17 @@ class ParsedExpression:
     text: str
     terms: tuple[PolynomialTerm, ...]
     function_names: tuple[str, ...]
+    certified_band: tuple[float, float] | None = None
 
     def evaluate(self, temperature_K: float, functions: Mapping[str, float] | None = None) -> float:
+        if self.certified_band is None:
+            raise SgteUnaryError("missing certified temperature bounds")
+        if not self.certified_band[0] <= temperature_K <= self.certified_band[1]:
+            raise TemperatureOutOfIntervalError(temperature_K, (self.certified_band,))
         env = dict(functions or {})
         for name in self.function_names:
-            env.setdefault(name, 0.0)
+            if name not in env:
+                raise UnresolvedFunctionError(name)
         return sum(term.evaluate(temperature_K, env) for term in self.terms)
 
     def as_dict(self) -> dict[str, Any]:
@@ -667,10 +690,13 @@ def evaluate_expression_string(
 
     compact = " ".join(text.split())
     python_src = re.sub(r"\bLN\s*\(", "log(", compact)
-    names = sorted({match.group(0) for match in _IDENT_RE.finditer(python_src)} - {"T", "log", "LN"})
+    names = sorted({match.group(4) for match in _TOKEN_RE.finditer(compact)
+                    if match.group(4) is not None} - {"T", "LN"})
     env: dict[str, Any] = {"T": float(temperature_K), "log": math.log}
     for name in names:
-        env[name] = 0.0 if functions is None else float(functions.get(name, 0.0))
+        if functions is None or name not in functions:
+            raise UnresolvedFunctionError(name)
+        env[name] = float(functions[name])
     try:
         value = eval(python_src, {"__builtins__": {}}, env)  # noqa: S307 — closed env, TDB arithmetic only
     except Exception as exc:  # pragma: no cover - parse failures surface as ambiguities
@@ -678,10 +704,25 @@ def evaluate_expression_string(
     return float(value)
 
 
-def function_round_trip_ok(expression: ParsedExpression, temperature_K: float) -> tuple[bool, float, float]:
-    sentinels = {name: 1.0e6 * (index + 1) + 0.123456789 for index, name in enumerate(expression.function_names)}
-    parsed_value = expression.evaluate(temperature_K, sentinels)
-    string_value = evaluate_expression_string(expression.text, temperature_K, sentinels)
+def evaluate_function(name: str, temperature_K: float, functions: Mapping[str, Mapping[str, Any]]) -> float:
+    """Select the first published interval containing T and resolve dependencies."""
+    if name not in functions:
+        raise UnresolvedFunctionError(name)
+    expressions = [expression_from_interval_dict(interval) for interval in functions[name]["intervals"]]
+    for expression in expressions:
+        low, high = expression.certified_band
+        if low <= temperature_K <= high:
+            values = {ref: evaluate_function(ref, temperature_K, functions) for ref in expression.function_names}
+            return expression.evaluate(temperature_K, values)
+    raise TemperatureOutOfIntervalError(temperature_K, tuple(expr.certified_band for expr in expressions))
+
+
+def function_round_trip_ok(
+    expression: ParsedExpression, temperature_K: float, functions: Mapping[str, Mapping[str, Any]],
+) -> tuple[bool, float, float]:
+    values = {name: evaluate_function(name, temperature_K, functions) for name in expression.function_names}
+    parsed_value = expression.evaluate(temperature_K, values)
+    string_value = evaluate_expression_string(expression.text, temperature_K, values)
     scale = max(abs(parsed_value), abs(string_value))
     if scale == 0.0:
         return True, parsed_value, string_value
@@ -702,7 +743,7 @@ def _parse_intervals(t_low_token: str, body: str, locator: str) -> tuple[Tempera
         t_high_as_published = match.group(1)
         continuation = match.group(2).upper()
         t_high = float(t_high_as_published)
-        expression = parse_tdb_expression(expr_text)
+        expression = replace(parse_tdb_expression(expr_text), certified_band=(t_low, t_high))
         intervals.append(
             TemperatureInterval(
                 t_low_as_published=t_low_as_published,
@@ -746,7 +787,7 @@ def _parse_function_or_parameter_body(head: str, locator: str) -> tuple[str, str
 
 def _parse_constituents(body: str) -> tuple[tuple[str, ...], ...]:
     # CONSTITUENT NAME : a,b : c : !
-    _, _, rest = body.partition(":")
+    _, rest = body.split(None, 1)
     slots = [slot.strip() for slot in rest.split(":")]
     slots = [slot for slot in slots if slot != ""]
     sublattices: list[tuple[str, ...]] = []
@@ -855,7 +896,7 @@ def parse_tdb(text: str, *, source_path: str, source_sha256: str) -> ParsedDatab
                 constituent_lines=(start, end),
             )
         elif keyword == "CONSTITUENT":
-            name_token = rest.split(":", 1)[0].strip()
+            name_token = rest.split(None, 1)[0]
             phase_key = parameter_phase_name(name_token)
             constituents = _parse_constituents(rest)
             pending_constituent[phase_key] = (constituents, (start, end))
@@ -903,6 +944,10 @@ def parse_tdb(text: str, *, source_path: str, source_sha256: str) -> ParsedDatab
                     locator={"lines": [start, end], "statement": statement[:120]},
                 )
             )
+
+    for phase in phases.values():
+        if len(phase.constituents) != phase.n_sublattices:
+            raise SgteUnaryError(f"{phase.name_as_published}: constituent group count differs from PHASE declaration")
 
     for item in commented_parameters:
         ambiguities.append(
@@ -1331,10 +1376,16 @@ def iter_record_paths(records_dir: Path | None = None) -> list[Path]:
 
 
 def expression_from_interval_dict(payload: Mapping[str, Any]) -> ParsedExpression:
+    try:
+        band = (float(payload["T_low"]["value"]), float(payload["T_high"]["value"]))
+    except (KeyError, TypeError, ValueError) as exc:
+        raise SgteUnaryError("missing or invalid certified temperature bounds") from exc
+    if not all(math.isfinite(value) and value > 0 for value in band):
+        raise SgteUnaryError(f"invalid certified temperature bounds {band}")
     terms = tuple(PolynomialTerm.from_dict(term) for term in (payload.get("polynomial") or {}).get("terms") or [])
     text = str(payload.get("expression_as_published") or "")
     names = tuple(sorted({term.function for term in terms if term.function}))
-    return ParsedExpression(text=text, terms=terms, function_names=names)
+    return ParsedExpression(text=text, terms=terms, function_names=names, certified_band=band)
 
 
 def feedstock_elements(feedstocks_path: Path | None = None) -> tuple[str, ...]:
@@ -1420,10 +1471,18 @@ def coverage_table(
 
 def function_round_trip_failures(database: ParsedDatabase) -> list[dict[str, Any]]:
     failures: list[dict[str, Any]] = []
+    functions = {name: function.as_dict() for name, function in database.functions.items()}
     for function in database.functions.values():
         for index, interval in enumerate(function.intervals):
             temperature = interval.midpoint_K()
-            ok, parsed_value, string_value = function_round_trip_ok(interval.expression, temperature)
+            if interval.t_low > interval.t_high:
+                try:
+                    interval.expression.evaluate(temperature)
+                except TemperatureOutOfIntervalError:
+                    continue
+                failures.append({"function": function.name, "interval_index": index, "error": "reversed band evaluated"})
+                continue
+            ok, parsed_value, string_value = function_round_trip_ok(interval.expression, temperature, functions)
             if not ok:
                 failures.append(
                     {
@@ -1439,7 +1498,7 @@ def function_round_trip_failures(database: ParsedDatabase) -> list[dict[str, Any
             continue
         for index, interval in enumerate(parameter.intervals):
             temperature = interval.midpoint_K()
-            ok, parsed_value, string_value = function_round_trip_ok(interval.expression, temperature)
+            ok, parsed_value, string_value = function_round_trip_ok(interval.expression, temperature, functions)
             if not ok:
                 failures.append(
                     {
