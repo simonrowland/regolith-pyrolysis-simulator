@@ -19,9 +19,12 @@ Printed Arabic page numbers are PDF leaf numbers minus six.
 ## Native records and completeness
 
 `census.json` enumerates source sections and per-page substance blocks.
-`manifest.yaml` indexes every record, including explicitly untranscribed
-records with page ranges and reasons. A counted placeholder does not mean a
-table was successfully transcribed. The manifest summary separates those totals.
+The census is 1,277 substance-table records: 494 reference-state, 357
+heat-capacity coefficient, 330 high-temperature, 95 atomic-weight, and 1
+constants listing. `manifest.yaml` indexes every record, including explicitly
+untranscribed records with page ranges and reasons. A counted placeholder does
+not mean a table was successfully transcribed. The manifest summary separates
+those totals.
 
 - `auxiliary/`: Table 1 atomic weights and the symbols/constants listing.
 - `summary/`: per-substance reference-state and heat-capacity coefficient

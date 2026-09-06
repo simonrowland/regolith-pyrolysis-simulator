@@ -48,6 +48,48 @@ def test_round_trip_every_record_and_numeric_token():
                 assert cell["ocr_suspect"]
 
 
+_PRINTED_SUBSTANCE_NAME = re.compile(
+    r"^[A-Z][A-Z'·.\-]{4,}(?:\s+[A-Z][A-Z'·.\-]+)*(?:\s*\([^)]*\))?\s*$"
+)
+
+
+def merged_neighbour_markers(record):
+    """A second substance table absorbed into this record: T-grid restart or an in-row header."""
+    markers = []
+    rows = record.get("rows") or []
+    kind = record.get("table_kind")
+    name = (record.get("name_as_published") or "").strip()
+    record_id = record.get("record_id")
+    if kind == "high_temperature":
+        n298 = 0
+        for row in rows:
+            raw = str(((row.get("cells") or {}).get("temperature") or {}).get("raw") or "").strip()
+            if re.fullmatch(r"298[.,]15", raw):
+                n298 += 1
+        if n298 > 1:
+            markers.append(f"{record_id}: T grid restarts ({n298} printed 298.15 rows)")
+        return markers
+    if kind == "reference_state_298K":
+        weights = []
+        for row in rows:
+            value = ((row.get("cells") or {}).get("weight") or {}).get("value")
+            if isinstance(value, (int, float)) and value > 10:
+                weights.append(value)
+        if len(set(weights)) > 1:
+            markers.append(f"{record_id}: multiple formula weights {weights}")
+    for index, row in enumerate(rows):
+        if index < 2:
+            continue
+        label = (row.get("label_raw") or "").strip()
+        if not label or label == name or re.search(r"\d", label):
+            continue
+        if "STD" in label and "STATE" in label:
+            continue
+        if _PRINTED_SUBSTANCE_NAME.match(label):
+            markers.append(f"{record_id}: substance header {label!r} inside rows at index {index}")
+    return markers
+
+
 def test_census_coverage_includes_explicit_untranscribed_tables():
     manifest = load_manifest()
     records = list(load_records())
@@ -63,6 +105,67 @@ def test_census_coverage_includes_explicit_untranscribed_tables():
     assert sum(record.get("transcription_status") == "untranscribed" for record in records) == manifest["summary"]["untranscribed_record_count"]
     assert manifest["compilation_role"]["scoring_eligible"] is False
     assert manifest["compilation_role"]["validation_measurement"] is False
+
+
+def test_records_do_not_merge_neighbouring_substances():
+    markers = []
+    for record in load_records():
+        markers.extend(merged_neighbour_markers(record))
+    assert markers == []
+
+
+def test_remerged_pair_fails_substance_boundary_census():
+    records = {record["record_id"]: record for record in load_records()}
+    parent = json.loads(json.dumps(records["reference-p029-03"]))
+    child = json.loads(json.dumps(records["reference-p029-04"]))
+    merged = json.loads(json.dumps(parent))
+    merged["source_text"] = parent["source_text"] + "\n\n" + child["source_text"]
+    offset = len(parent["source_text"].splitlines()) + 1
+    extra = []
+    for row in child["rows"]:
+        row = dict(row)
+        row["source_line_index"] = row["source_line_index"] + offset
+        extra.append(row)
+    merged["rows"] = list(parent["rows"]) + extra
+    markers = merged_neighbour_markers(merged)
+    with pytest.raises(AssertionError):
+        assert markers == []
+
+
+def test_page_29_thenardite_and_anglesite_are_separate_records():
+    by_name = {record.get("name_as_published"): record for record in load_records() if record.get("page") == 29}
+    thenardite = by_name["THENARDITE"]
+    anglesite = by_name["ANGLESITE"]
+    mascagnite = by_name["MASCAGNITE"]
+    morenosite = by_name["MORENOSITE"]
+    assert thenardite["formula_as_published"] == "Na2S04"
+    assert anglesite["formula_as_published"] == "PbS04"
+    assert thenardite["record_id"] != mascagnite["record_id"]
+    assert anglesite["record_id"] != morenosite["record_id"]
+    thenardite_weights = {
+        row["cells"]["weight"]["value"]
+        for row in lookup_temperature(thenardite["record_id"], 298.15)
+        if row["cells"]["weight"]["value"] is not None
+    }
+    mascagnite_weights = {
+        row["cells"]["weight"]["value"]
+        for row in lookup_temperature(mascagnite["record_id"], 298.15)
+        if row["cells"]["weight"]["value"] is not None
+    }
+    anglesite_weights = {
+        row["cells"]["weight"]["value"]
+        for row in lookup_temperature(anglesite["record_id"], 298.15)
+        if row["cells"]["weight"]["value"] is not None
+    }
+    morenosite_weights = {
+        row["cells"]["weight"]["value"]
+        for row in lookup_temperature(morenosite["record_id"], 298.15)
+        if row["cells"]["weight"]["value"] is not None
+    }
+    assert thenardite_weights == {142.043}
+    assert mascagnite_weights == {132.141}
+    assert anglesite_weights == {303.264}
+    assert morenosite_weights == {280.861}
 
 
 def test_feedstock_element_coverage_matches_existing_coverage_helper():

@@ -26,7 +26,7 @@ census:
   basis: Printed contents/list of tables plus independent per-page numeric-body and prefix audits; record units are substance-table
     blocks, not table groups.
   table_group_count: 355
-  record_count: 1275
+  record_count: 1277
   record_ids:
   - symbols-constants
   - atomic-weight-001
@@ -463,6 +463,8 @@ census:
   - reference-p029-10
   - reference-p029-11
   - reference-p029-12
+  - reference-p029-13
+  - reference-p029-14
   - reference-p030-01
   - reference-p030-02
   - reference-p030-03
@@ -1378,7 +1380,7 @@ census:
     record_count: 16
   - pdf_page: 35
     printed_page: 29
-    record_count: 12
+    record_count: 14
   - pdf_page: 36
     printed_page: 30
     record_count: 12
@@ -1588,14 +1590,14 @@ census:
     - 461
     reason: Names/formula index; integers are bibliographic page locators
 summary:
-  numeric_cell_count: 57677
-  parsed_value_count: 46355
-  ocr_suspect_count: 20128
+  numeric_cell_count: 57679
+  parsed_value_count: 46357
+  ocr_suspect_count: 20130
   untranscribed_record_count: 111
   identity_check_disagreement_count: 86
-  record_count: 1275
-  transcribed_record_count: 1164
-  record_ambiguity_count: 7288
+  record_count: 1277
+  transcribed_record_count: 1166
+  record_ambiguity_count: 7290
 ocr_suspect_examples:
 - record_id: symbols-constants
   tokens:
@@ -1715,18 +1717,18 @@ feedstock_element_coverage:
   Mn: 34
   Mo: 11
   N: 35
-  Na: 80
+  Na: 81
   Nb: 1
   Nd: 1
   Ni: 21
   O: 124
   Os: 8
   P: 18
-  Pb: 26
+  Pb: 27
   Pr: 1
   Pt: 3
   Rb: 1
-  S: 122
+  S: 124
   Sb: 11
   Sc: 1
   Se: 4
@@ -10788,7 +10790,7 @@ entries:
     printed_page: 61
     table_number: null
   original_record_text_location: summary/cp-p061-11.json
-  row_count: 3
+  row_count: 2
   ocr_suspect_count: 7
   transcription_status: transcribed_ocr_suspect
   ambiguity_count: 1
@@ -10798,7 +10800,7 @@ entries:
 - record_id: cp-p061-12
   formula: LiAlSi 2o6
   phase: []
-  name_as_published: Cl·
+  name_as_published: SPOOUMENE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p061-12.json
@@ -10807,7 +10809,7 @@ entries:
     printed_page: 61
     table_number: null
   original_record_text_location: summary/cp-p061-12.json
-  row_count: 2
+  row_count: 3
   ocr_suspect_count: 8
   transcription_status: transcribed_ocr_suspect
   ambiguity_count: 1
@@ -18704,21 +18706,17 @@ entries:
     printed_page: 29
     table_number: null
   original_record_text_location: summary/reference-p029-03.json
-  row_count: 16
-  ocr_suspect_count: 30
+  row_count: 2
+  ocr_suspect_count: 16
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 5
+  ambiguity_count: 1
   ambiguities:
-  - 'reference_entropy: unparsed printed OCR token ''• •'''
-  - Reference columns collapsed by OCR at source line 15; preserve raw span without assigning reference IDs to S/HG/C
-  - 'reference_entropy: unparsed printed OCR token ''419 419'''
-  - Reference columns collapsed by OCR at source line 16; preserve raw span without assigning reference IDs to S/HG/C
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-04
-  formula: Na2so4·10H2o
+  formula: Na2S04
   phase: []
-  name_as_published: MIRABILITE
+  name_as_published: THENARDITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-04.json
@@ -18727,17 +18725,21 @@ entries:
     printed_page: 29
     table_number: null
   original_record_text_location: summary/reference-p029-04.json
-  row_count: 2
+  row_count: 14
   ocr_suspect_count: 15
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 1
+  ambiguity_count: 5
   ambiguities:
+  - 'reference_entropy: unparsed printed OCR token ''• •'''
+  - Reference columns collapsed by OCR at source line 12; preserve raw span without assigning reference IDs to S/HG/C
+  - 'reference_entropy: unparsed printed OCR token ''419 419'''
+  - Reference columns collapsed by OCR at source line 13; preserve raw span without assigning reference IDs to S/HG/C
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-05
-  formula: tuso4
+  formula: Na2so4·10H2o
   phase: []
-  name_as_published: NICKELOUS SULFATE
+  name_as_published: MIRABILITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-05.json
@@ -18747,18 +18749,16 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p029-05.json
   row_count: 2
-  ocr_suspect_count: 13
+  ocr_suspect_count: 15
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 3
+  ambiguity_count: 1
   ambiguities:
-  - 'reference_entropy: unparsed printed OCR token ''401 401'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-06
-  formula: NiS04 •6H?.'»
+  formula: tuso4
   phase: []
-  name_as_published: RETGERSITE (ALPHA, GREEN)
+  name_as_published: NICKELOUS SULFATE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-06.json
@@ -18768,16 +18768,18 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p029-06.json
   row_count: 2
-  ocr_suspect_count: 15
+  ocr_suspect_count: 13
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 1
+  ambiguity_count: 3
   ambiguities:
+  - 'reference_entropy: unparsed printed OCR token ''401 401'''
+  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-07
-  formula: NiS04 ·7H~
+  formula: NiS04 •6H?.'»
   phase: []
-  name_as_published: MORENOSITE
+  name_as_published: RETGERSITE (ALPHA, GREEN)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-07.json
@@ -18786,18 +18788,17 @@ entries:
     printed_page: 29
     table_number: null
   original_record_text_location: summary/reference-p029-07.json
-  row_count: 16
-  ocr_suspect_count: 29
+  row_count: 2
+  ocr_suspect_count: 15
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 2
+  ambiguity_count: 1
   ambiguities:
-  - 'reference_heat_capacity: unparsed printed OCR token ''•'''
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-08
-  formula: srso4
+  formula: NiS04 ·7H~
   phase: []
-  name_as_published: CELESTITE
+  name_as_published: MORENOSITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-08.json
@@ -18807,18 +18808,16 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p029-08.json
   row_count: 2
-  ocr_suspect_count: 14
+  ocr_suspect_count: 15
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 3
+  ambiguity_count: 1
   ambiguities:
-  - 'reference_entropy: unparsed printed OCR token ''419 419'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-09
-  formula: ZnS04
+  formula: PbS04
   phase: []
-  name_as_published: ZINKOSITE
+  name_as_published: ANGLESITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-09.json
@@ -18827,19 +18826,18 @@ entries:
     printed_page: 29
     table_number: null
   original_record_text_location: summary/reference-p029-09.json
-  row_count: 2
+  row_count: 14
   ocr_suspect_count: 15
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 3
+  ambiguity_count: 2
   ambiguities:
-  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''87 87'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
+  - 'reference_heat_capacity: unparsed printed OCR token ''•'''
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-10
-  formula: ZnS04·6H~
+  formula: srso4
   phase: []
-  name_as_published: BIANCHITE
+  name_as_published: CELESTITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-10.json
@@ -18849,17 +18847,18 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p029-10.json
   row_count: 2
-  ocr_suspect_count: 15
+  ocr_suspect_count: 14
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 2
+  ambiguity_count: 3
   ambiguities:
-  - 'formation_enthalpy: unparsed printed OCR token ''-2m.8'''
+  - 'reference_entropy: unparsed printed OCR token ''419 419'''
+  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-11
-  formula: ZnS0,·7H~
+  formula: ZnS04
   phase: []
-  name_as_published: GOSLARITE
+  name_as_published: ZINKOSITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-11.json
@@ -18871,14 +18870,16 @@ entries:
   row_count: 2
   ocr_suspect_count: 15
   transcription_status: transcribed_ocr_suspect
-  ambiguity_count: 1
+  ambiguity_count: 3
   ambiguities:
+  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''87 87'''
+  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p029-12
-  formula: Naz&40.,·10H~
+  formula: ZnS04·6H~
   phase: []
-  name_as_published: BORAX
+  name_as_published: BIANCHITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p029-12.json
@@ -18887,6 +18888,45 @@ entries:
     printed_page: 29
     table_number: null
   original_record_text_location: summary/reference-p029-12.json
+  row_count: 2
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - 'formation_enthalpy: unparsed printed OCR token ''-2m.8'''
+  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
+    No OCR repair.
+- record_id: reference-p029-13
+  formula: ZnS0,·7H~
+  phase: []
+  name_as_published: GOSLARITE
+  source: *id001
+  sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
+  path: summary/reference-p029-13.json
+  source_locator:
+    pdf_page: 35
+    printed_page: 29
+    table_number: null
+  original_record_text_location: summary/reference-p029-13.json
+  row_count: 2
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
+    No OCR repair.
+- record_id: reference-p029-14
+  formula: Naz&40.,·10H~
+  phase: []
+  name_as_published: BORAX
+  source: *id001
+  sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
+  path: summary/reference-p029-14.json
+  source_locator:
+    pdf_page: 35
+    printed_page: 29
+    table_number: null
+  original_record_text_location: summary/reference-p029-14.json
   row_count: 2
   ocr_suspect_count: 13
   transcription_status: transcribed_ocr_suspect

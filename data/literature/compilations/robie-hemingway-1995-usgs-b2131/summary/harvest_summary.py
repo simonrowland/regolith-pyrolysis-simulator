@@ -14,6 +14,79 @@ ROOT = Path(__file__).resolve().parent
 SOURCE = Path('/Users/simonrowland/Repos/regolith-corpus-ctl/raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf')
 TMP = Path('/private/tmp/b2131-summary-raster')
 NUMBER = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\Z')
+# Mineral names occupying their own OCR line, with the numeric row below.
+# Formulas, wrapped fragments, and STD. STATE notes are not names.
+SUBSTANCE_NAME_HEADER = re.compile(
+    r"^[A-Z][A-Z'·.\-]{4,}(?:\s+[A-Z][A-Z'·.\-]+)*(?:\s*\([^)]*\))?\s*$"
+)
+
+
+def _left_label(line, first_numeric):
+    return line[:max(1, first_numeric - 2)].strip()
+
+
+def _aligned_number(line, first_numeric, lo, hi):
+    match = re.search(r'\s{2,}([0-9]+\.[0-9]+)', line)
+    if match and first_numeric - lo <= match.start(1) <= first_numeric + hi:
+        return match
+    return None
+
+
+def _is_printed_name_header(left):
+    if not left or re.search(r'\d', left):
+        return False
+    if 'STD' in left and 'STATE' in left:
+        return False
+    if re.search(r'J\s*[•·]|kJ|mol|mor|\(T|NAME AND', left):
+        return False
+    return bool(SUBSTANCE_NAME_HEADER.match(left))
+
+
+def _letter_count(left):
+    return len(re.sub(r'[^A-Za-z]', '', left or ''))
+
+
+def attach_detached_name_headers(lines, header_idx, first_numeric, cp, starts):
+    """Treat a name printed above its numbers as a new-substance boundary.
+
+    Short OCR fragments immediately after such a name (Cl· after SPOOUMENE)
+    belong to that block. Later named substances keep their own starts.
+    """
+    lo, hi = (3, 10) if cp else (6, 7)
+    name_headers = []
+    for i in range(header_idx + 1, len(lines)):
+        left = _left_label(lines[i], first_numeric)
+        if not _is_printed_name_header(left):
+            continue
+        if _aligned_number(lines[i], first_numeric, lo, hi):
+            continue
+        for j in range(i + 1, min(i + 12, len(lines))):
+            nxt = lines[j]
+            if not nxt.strip():
+                continue
+            nxt_left = _left_label(nxt, first_numeric)
+            if _aligned_number(nxt, first_numeric, lo, hi):
+                if _is_printed_name_header(nxt_left) and nxt_left != left:
+                    break
+                name_headers.append(i)
+                break
+            if _is_printed_name_header(nxt_left) and nxt_left != left:
+                break
+    starts = sorted(set(starts) | set(name_headers))
+    coalesced = []
+    for start in starts:
+        left = _left_label(lines[start], first_numeric)
+        prev_headers = [n for n in name_headers if n < start]
+        if prev_headers and _letter_count(left) < 4 and start - prev_headers[-1] <= 4:
+            intervening = [
+                k for k in range(prev_headers[-1] + 1, start)
+                if _is_printed_name_header(_left_label(lines[k], first_numeric))
+                or _letter_count(_left_label(lines[k], first_numeric)) >= 4
+            ]
+            if not intervening:
+                continue
+        coalesced.append(start)
+    return coalesced
 
 
 def raster(page):
@@ -69,6 +142,7 @@ def harvest(page, raster_text):
             if match and first_numeric-3 <= match.start(1) <= first_numeric+10 and re.search(r'[Ee£][+·-][0-9]',line) and line[:match.start()].strip():
                 starts.append(i)
         starts=sorted(set(starts))
+    starts = attach_detached_name_headers(lines, header_idx, first_numeric, cp, starts)
     header = '\n'.join(lines[header_idx:starts[0]])
     title=next(l.strip() for l in lines if ('COEFFICIENTS FOR' if cp else 'THERMODYNAMIC PROPERTIES O') in l and ('MINERALS AND RELATED' not in l))
     printed_temperature=re.search(r'AT\s+(\S+)\s+K',title) if not cp else None

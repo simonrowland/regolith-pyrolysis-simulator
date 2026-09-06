@@ -5,82 +5,92 @@
   "page": 29,
   "table_number": null,
   "table_title_raw": "THERMODYNAMIC PROPERTIES OF SULFATE AND BORATE MINERALS AT 298.15 K",
-  "name_as_published": "NICKELOUS SULFATE",
-  "formula_as_published": "tuso4",
+  "name_as_published": "MIRABILITE",
+  "formula_as_published": "Na2so4·10H2o",
   "phase_as_published": [],
   "header_and_units_raw": "NAME AND FORMULA                 WEIGHT     ENTROPY    VOLUME   ENTHALPY    FREE      LOG(K)      REFERENCES\n                                                                           ENERGY\n                                               s•        v•      4,H•       A,G·\n                                  I       J·•l\"'·K\"'    cri5    kJ·•l\"'    kJ·•l\"'               s    H/G   c\n\n\n\n                                                                                                       • •",
-  "source_text": "NICKELOUS SULFATE               154.754       101.3    38.57     -873.2     -762.7    133.61 401 401 401\ntuso4                                           0.3     0.03        1.0        1.0                 4",
+  "source_text": "MIRABILITE                      322.196       591.9    219.80    -4327.3   -3645.8    638.71     47   47\nNa2so4·10H2o                                    0.6      0.40        4.0       3.4      0.59          81",
   "rows": [
     {
-      "label_raw": "NICKELOUS SULFATE",
+      "label_raw": "MIRABILITE",
       "cells": {
         "weight": {
-          "raw": "154.754",
-          "value": 154.754,
+          "raw": "322.196",
+          "value": 322.196,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
+          "ocr_check": "machine_token_agreement_row_unverified",
           "start_offset": 32,
           "end_offset": 39
         },
         "entropy": {
-          "raw": "101.3",
-          "value": 101.3,
+          "raw": "591.9",
+          "value": 591.9,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
           "start_offset": 46,
           "end_offset": 51
         },
         "volume": {
-          "raw": "38.57",
-          "value": 38.57,
+          "raw": "219.80",
+          "value": 219.8,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
           "start_offset": 55,
-          "end_offset": 60
+          "end_offset": 61
         },
         "formation_enthalpy": {
-          "raw": "-873.2",
-          "value": -873.2,
+          "raw": "-4327.3",
+          "value": -4327.3,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
+          "ocr_check": "machine_disagreement",
           "start_offset": 65,
-          "end_offset": 71
+          "end_offset": 72
         },
         "formation_gibbs": {
-          "raw": "-762.7",
-          "value": -762.7,
+          "raw": "-3645.8",
+          "value": -3645.8,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 76,
+          "start_offset": 75,
           "end_offset": 82
         },
         "log_kf": {
-          "raw": "133.61",
-          "value": 133.61,
+          "raw": "638.71",
+          "value": 638.71,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
           "start_offset": 86,
           "end_offset": 92
         },
-        "references_unresolved": {
-          "raw": "401 401 401",
-          "value": null,
+        "reference_entropy": {
+          "raw": "47",
+          "value": 47.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 93,
-          "end_offset": 104,
-          "spans_columns": [
-            "reference_entropy",
-            "reference_enthalpy_gibbs",
-            "reference_heat_capacity"
-          ],
-          "column_assignment": "unresolved OCR column collapse"
+          "ocr_check": "machine_disagreement",
+          "start_offset": 97,
+          "end_offset": 99
+        },
+        "reference_enthalpy_gibbs": {
+          "raw": "47",
+          "value": 47.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 102,
+          "end_offset": 104
+        },
+        "reference_heat_capacity": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
       },
       "source_line_index": 0
     },
     {
-      "label_raw": "tuso4",
+      "label_raw": "Na2so4·10H2o",
       "cells": {
         "weight": {
           "raw": "",
@@ -91,60 +101,60 @@
           "end_offset": null
         },
         "entropy": {
-          "raw": "0.3",
-          "value": 0.3,
+          "raw": "0.6",
+          "value": 0.6,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
           "start_offset": 48,
           "end_offset": 51
         },
         "volume": {
-          "raw": "0.03",
-          "value": 0.03,
+          "raw": "0.40",
+          "value": 0.4,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 56,
-          "end_offset": 60
+          "start_offset": 57,
+          "end_offset": 61
         },
         "formation_enthalpy": {
-          "raw": "1.0",
-          "value": 1.0,
+          "raw": "4.0",
+          "value": 4.0,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 68,
-          "end_offset": 71
+          "start_offset": 69,
+          "end_offset": 72
         },
         "formation_gibbs": {
-          "raw": "1.0",
-          "value": 1.0,
+          "raw": "3.4",
+          "value": 3.4,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
           "start_offset": 79,
           "end_offset": 82
         },
         "log_kf": {
-          "raw": "",
-          "value": null,
-          "ocr_suspect": false,
-          "ocr_check": "blank",
-          "start_offset": null,
-          "end_offset": null
-        },
-        "reference_entropy": {
-          "raw": "4",
-          "value": 4.0,
+          "raw": "0.59",
+          "value": 0.59,
           "ocr_suspect": true,
           "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 99,
-          "end_offset": 100
+          "start_offset": 88,
+          "end_offset": 92
         },
-        "reference_enthalpy_gibbs": {
+        "reference_entropy": {
           "raw": "",
           "value": null,
           "ocr_suspect": false,
           "ocr_check": "blank",
           "start_offset": null,
           "end_offset": null
+        },
+        "reference_enthalpy_gibbs": {
+          "raw": "81",
+          "value": 81.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 102,
+          "end_offset": 104
         },
         "reference_heat_capacity": {
           "raw": "",
@@ -162,14 +172,12 @@
   "identity_checks": [
     {
       "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
-      "residual_kJ_per_mol": -0.052850366264124204,
+      "residual_kJ_per_mol": -0.03725063570527709,
       "rounding_tolerance_kJ_per_mol": 0.08854004751267629,
       "disagreement": false
     }
   ],
   "ambiguities": [
-    "reference_entropy: unparsed printed OCR token '401 401'",
-    "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
     "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
   ],
   "temperature_grid": [
@@ -187,6 +195,6 @@
     "scoring_eligible": false,
     "battery_refusal": "gibbs_table_not_runtime_observable"
   },
-  "source_line_start": 45,
-  "source_line_end": 46
+  "source_line_start": 42,
+  "source_line_end": 43
 }
