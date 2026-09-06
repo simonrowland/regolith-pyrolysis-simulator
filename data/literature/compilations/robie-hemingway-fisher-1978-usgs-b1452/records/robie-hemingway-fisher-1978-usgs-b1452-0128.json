@@ -1,0 +1,103 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0128",
+  "census_id": "high-temperature-printed-page-154",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "ESKOLAITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "FORMATION FROM THE ELEMENTS",
+  "formula_weight": {
+    "as_published": "151.99u",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      160
+    ],
+    "printed_pages": [
+      154
+    ],
+    "pdftotext_layout_page_file": "page-160.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer"
+  ],
+  "title_line_as_published": "ESKOLAITE                                                                        FORIIULA WEIGHT      151.99u",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "            Beta crystals Z98.15 to melting point Z603 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORMATION FROM THE ELEMENTS",
+    "                                                                                       GIBBS",
+    "TEMP.    ( H~-H~ 98 )/T       s~      -{G;-H~ 98 )/T       cop      ENTHALPY        FREE ENERGY        Log Kf",
+    "            J/mol•K       J/IIIOl•K     J;mol•K        J/IIOl•K        kJ/1101          kJ/11101",
+    "--------------------------------------------------------------------------------",
+    " Z98.15    o.uoo     1:!1.17   il1.17  101.34    -1134.700   -1(153.(!56 184.492",
+    "UNCERTAINTY                   1.25            1.25                       8.370            8.400          1.47Z"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J/mol•K",
+    "entropy": "J/IIIOl•K",
+    "negative_gibbs_function": "J;mol•K",
+    "heat_capacity": "J/IIOl•K",
+    "formation_enthalpy": "kJ/1101",
+    "formation_gibbs_energy": "kJ/11101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 14,
+  "uncertainty_line_as_published": "",
+  "uncertainty_values": [],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                2603                     BOILING POI NT",
+    "ENTHALPY OF !!ELTING                     kJ            ENTHALPY OF VAPORIZATION                         k.J",
+    "                                         kJ            KOLAR VOLUME                           2. 9090 J/bar",
+    "                                                                                             29.090 c11 3",
+    "TRANSITIONS IN REFERENCE STATE ELEMENTS",
+    "   CHROIIIUII ••• M. P • .2130 K.",
+    "HEAT CAPACITY      E~UATION",
+    "        1.1902x102            9.4964x10-3 T     3.4045 T-o·s",
+    "             {EQUATION VALID FBOII      .298- 1800 K}"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer",
+      "detector_only": false
+    }
+  ]
+}
