@@ -31,6 +31,7 @@ from simulator.chemistry.sgte_unary import (
     load_manifest,
     load_record_yaml,
     load_tdb,
+    parse_tdb,
     build_records,
     coverage_table,
     sha256_file,
@@ -78,74 +79,54 @@ def test_every_function_interval_midpoint_round_trips_to_expression_string():
 
 
 def test_manifest_records_parse_back_to_tdb_numbers(record_functions):
-    database = load_tdb()
+    database = load_tdb(SOURCE_TDB)
     parsed_records = {record.record_id: record for record in build_records(database)}
     manifest = load_manifest()
     entries = manifest["entries"]
-    assert len(entries) == len(parsed_records)
-    assert len(iter_record_paths()) == len(entries)
-
+    entry_ids = [entry["record_id"] for entry in entries]
+    root = Path(__file__).resolve().parents[1]
+    entry_paths = []
     for entry in entries:
-        record_id = entry["record_id"]
         path = Path(entry["path"])
-        if not path.is_absolute():
-            path = Path(__file__).resolve().parents[1] / path
+        entry_paths.append((path if path.is_absolute() else root / path).resolve())
+    record_paths = [path.resolve() for path in iter_record_paths()]
+
+    assert len(entries) == len(parsed_records)
+    assert len(entry_ids) == len(set(entry_ids))
+    assert set(entry_ids) == set(parsed_records)
+    assert len(entry_paths) == len(set(entry_paths))
+    assert set(entry_paths) == set(record_paths)
+
+    for entry, path in zip(entries, entry_paths, strict=True):
+        record_id = entry["record_id"]
         loaded = load_record_yaml(path)
         parsed = parsed_records[record_id]
-        assert loaded["record_id"] == record_id
-        assert loaded["formula"] == parsed.formula
-        assert loaded["phase"] == parsed.phase
+        expected = parsed.as_dict()
+        assert loaded.keys() == expected.keys()
+        for field, value in expected.items():
+            assert loaded[field] == value, f"{record_id}.{field}"
         assert loaded["source"]["sha256"] == EXPECTED_SHA256
         assert entry["sha256"] == EXPECTED_SHA256
         assert entry["coefficient_count"] == parsed.coefficient_count()
         assert loaded["coefficient_count"] == parsed.coefficient_count()
         assert entry["ambiguity_count"] == len(parsed.ambiguities)
-
-        if parsed.element is not None:
-            element = loaded["element"]
-            assert element["mass"]["as_published"] == parsed.element.mass_as_published
-            assert element["mass"]["value"] == parsed.element.mass
-            assert element["H298_minus_H0"]["as_published"] == parsed.element.h298_minus_h0_as_published
-            assert element["H298_minus_H0"]["value"] == parsed.element.h298_minus_h0
-            assert element["S298"]["as_published"] == parsed.element.s298_as_published
-            assert element["S298"]["value"] == parsed.element.s298
-
         if parsed.g_parameter is not None:
-            loaded_intervals = loaded["g_parameter"]["intervals"]
-            assert len(loaded_intervals) == len(parsed.g_parameter.intervals)
-            for loaded_interval, parsed_interval in zip(loaded_intervals, parsed.g_parameter.intervals, strict=True):
-                assert loaded_interval["expression_as_published"] == parsed_interval.expression.text
-                assert loaded_interval["T_low"]["as_published"] == parsed_interval.t_low_as_published
-                assert loaded_interval["T_high"]["as_published"] == parsed_interval.t_high_as_published
-                assert loaded_interval["T_low"]["value"] == parsed_interval.t_low
-                assert loaded_interval["T_high"]["value"] == parsed_interval.t_high
-                loaded_expr = expression_from_interval_dict(loaded_interval)
-                assert len(loaded_expr.terms) == len(parsed_interval.expression.terms)
-                for loaded_term, parsed_term in zip(loaded_expr.terms, parsed_interval.expression.terms, strict=True):
-                    assert loaded_term.t_exponent == parsed_term.t_exponent
-                    assert loaded_term.lnT_power == parsed_term.lnT_power
-                    assert loaded_term.function == parsed_term.function
-                    assert loaded_term.coefficient == parsed_term.coefficient
-                ok, _, _ = function_round_trip_ok(loaded_expr, parsed_interval.midpoint_K(), record_functions)
+            for loaded_interval, parsed_interval in zip(
+                loaded["g_parameter"]["intervals"], parsed.g_parameter.intervals, strict=True
+            ):
+                loaded_expression = expression_from_interval_dict(loaded_interval)
+                assert loaded_expression == parsed_interval.expression
+                ok, _, _ = function_round_trip_ok(
+                    loaded_expression, parsed_interval.midpoint_K(), record_functions
+                )
                 assert ok
-
-        if parsed.functions:
-            assert len(loaded["functions"]) == len(parsed.functions)
-            for loaded_fn, parsed_fn in zip(loaded["functions"], parsed.functions, strict=True):
-                assert loaded_fn["name"] == parsed_fn.name
-                assert len(loaded_fn["intervals"]) == len(parsed_fn.intervals)
-                for loaded_interval, parsed_interval in zip(
-                    loaded_fn["intervals"], parsed_fn.intervals, strict=True
-                ):
-                    loaded_expr = expression_from_interval_dict(loaded_interval)
-                    assert loaded_expr.text == parsed_interval.expression.text
-                    for loaded_term, parsed_term in zip(
-                        loaded_expr.terms, parsed_interval.expression.terms, strict=True
-                    ):
-                        assert loaded_term.coefficient == parsed_term.coefficient
-                        assert loaded_term.t_exponent == parsed_term.t_exponent
-                        assert loaded_term.lnT_power == parsed_term.lnT_power
-                        assert loaded_term.function == parsed_term.function
+        for loaded_function, parsed_function in zip(
+            loaded.get("functions", []), parsed.functions, strict=True
+        ):
+            for loaded_interval, parsed_interval in zip(
+                loaded_function["intervals"], parsed_function.intervals, strict=True
+            ):
+                assert expression_from_interval_dict(loaded_interval) == parsed_interval.expression
 
 
 def test_feedstock_element_coverage_is_complete_except_pinned_halogens_and_hydrogen():
@@ -220,33 +201,52 @@ def test_nothing_is_typed_measured():
 
 
 def test_liquid_suffix_is_not_a_sublattice():
-    database = load_tdb()
+    database = load_tdb(SOURCE_TDB)
     suffixes = {phase.name_as_published.split(":", 1)[1]
                 for phase in database.phases.values() if ":" in phase.name_as_published}
     assert suffixes == {"L"}
-    liquids = []
-    for path in iter_record_paths():
-        record = load_record_yaml(path)
-        phase = record.get("phase_declaration")
-        if phase is None:
-            continue
-        assert len(phase["constituents"]) == phase["n_sublattices"]
-        assert all(group != [suffix] for group in phase["constituents"] for suffix in suffixes)
-        if record["phase"] == "LIQUID":
-            liquids.append(record["record_id"])
-            assert phase["name_as_published"] == "LIQUID:L"
-            assert phase["n_sublattices"] == 1
-            assert "AG" in phase["constituents"][0]
-            assert "FE" in phase["constituents"][0]
+    for phase in database.phases.values():
+        assert len(phase.constituents) == phase.n_sublattices
+        assert all(group != (suffix,) for group in phase.constituents for suffix in suffixes)
+    liquid = database.phases["LIQUID"]
+    assert liquid.name_as_published == "LIQUID:L"
+    assert liquid.n_sublattices == 1
+    assert len(liquid.constituents) == 1
+    assert len(liquid.constituents[0]) == 78
+    assert liquid.constituents[0][0] == "AG"
+    assert liquid.constituents[0][-1] == "ZR"
+    assert "FE" in liquid.constituents[0]
+    records = build_records(database)
+    liquids = [record.record_id for record in records if record.phase == "LIQUID"]
     assert len(liquids) == 78
     assert {"AG-LIQUID", "FE-LIQUID"} <= set(liquids)
 
 
+def test_source_phase_sublattice_count_mismatch_refuses():
+    source = SOURCE_TDB.read_text(encoding="utf-8")
+    declaration = "PHASE LIQUID:L % 1 1 !"
+    malformed = source.replace(declaration, "PHASE LIQUID:L % 2 1 1 !", 1)
+    assert malformed != source
+    with pytest.raises(SgteUnaryError, match="LIQUID:L: constituent group count"):
+        parse_tdb(malformed, source_path=SOURCE_TDB.as_posix(), source_sha256=EXPECTED_SHA256)
+
+
+def test_source_function_intervals_and_element_reference_phase_are_structural():
+    database = load_tdb(SOURCE_TDB)
+    ghserfe = database.functions["GHSERFE"]
+    assert len(ghserfe.intervals) == 2
+    assert [(interval.t_low, interval.t_high) for interval in ghserfe.intervals] == [
+        (298.15, 1811.0),
+        (1811.0, 6000.0),
+    ]
+    assert database.elements["FE"].reference_phase == "BCC_A2"
+    assert database.elements["AG"].reference_phase == "FCC_A1"
+
+
 @pytest.mark.parametrize("temperature", [100, 2000, 10000])
-def test_chosen_interval_refuses_extrapolation(record_functions, temperature):
-    interval = record_functions["GHSERFE"]["intervals"][0]
-    assert {"T_low", "T_high"} <= interval.keys()
-    expression = expression_from_interval_dict(interval)
+def test_chosen_interval_refuses_extrapolation(temperature):
+    database = load_tdb(SOURCE_TDB)
+    expression = database.functions["GHSERFE"].intervals[0].expression
     assert expression.evaluate(1000) == pytest.approx(-41450.417956569676, rel=1e-9)
     with pytest.raises(TemperatureOutOfIntervalError) as caught:
         expression.evaluate(temperature)
@@ -254,14 +254,16 @@ def test_chosen_interval_refuses_extrapolation(record_functions, temperature):
     assert caught.value.certified_band == ((298.15, 1811.0),)
 
 
-def test_function_selects_interval_and_refuses_outside_union(record_functions):
+def test_function_selects_interval_and_refuses_outside_union():
+    database = load_tdb(SOURCE_TDB)
+    functions = {name: function.as_dict() for name, function in database.functions.items()}
     for temperature in (100, 10000):
         with pytest.raises(TemperatureOutOfIntervalError) as caught:
-            evaluate_function("GHSERFE", temperature, record_functions)
+            evaluate_function("GHSERFE", temperature, functions)
         assert caught.value.temperature_K == temperature
         assert caught.value.certified_band == ((298.15, 1811.0), (1811.0, 6000.0))
-    second = expression_from_interval_dict(record_functions["GHSERFE"]["intervals"][1])
-    assert evaluate_function("GHSERFE", 2000, record_functions) == second.evaluate(2000)
+    second = database.functions["GHSERFE"].intervals[1].expression
+    assert evaluate_function("GHSERFE", 2000, functions) == second.evaluate(2000)
 
 
 def test_unresolved_reference_refuses_and_records_resolve(record_functions):
@@ -291,13 +293,14 @@ def test_missing_interval_bound_refuses(record_functions):
         expression_from_interval_dict(interval)
 
 
-def test_published_reversed_mercury_interval_refuses(record_functions):
-    interval = record_functions["GHCPHG"]["intervals"][0]
-    expression = expression_from_interval_dict(interval)
+def test_published_reversed_mercury_interval_refuses():
+    database = load_tdb(SOURCE_TDB)
+    function = database.functions["GHCPHG"]
+    expression = function.intervals[0].expression
     with pytest.raises(TemperatureOutOfIntervalError):
         expression.evaluate((298.15 + 234.32) / 2)
-    assert evaluate_function("GHCPHG", 300, record_functions) == expression_from_interval_dict(
-        record_functions["GHCPHG"]["intervals"][1]).evaluate(300)
+    functions = {name: parsed.as_dict() for name, parsed in database.functions.items()}
+    assert evaluate_function("GHCPHG", 300, functions) == function.intervals[1].expression.evaluate(300)
 
 
 @pytest.mark.parametrize("coefficient", ["1E-3", "1.E-3", ".1E-2"])
