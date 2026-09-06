@@ -22,10 +22,10 @@
   "name_as_published": "MgCL2(cr)",
   "cas_as_published": "7786-30-3",
   "formula": "MgCl2",
-  "phase": "S/cr",
+  "phase": "cr",
   "phase_as_published": "cr",
   "phase_card_as_published": "S",
-  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
+  "phase_normalization_rule": "G or CEA flag 0 maps to gas. Otherwise a recognized terminal state suffix keeps its published label; without one, NASA-7 S/L/C maps to cr/L/condensed and a positive CEA flag maps to condensed. Unrecognized suffixes stay verbatim in phase_as_published and are listed as ambiguities; card/suffix conflicts retain both published tokens. phase_ordinal is present only when same-formula non-gas records would otherwise share a phase label.",
   "date_as_published": "T10/13",
   "calc_quality_as_published": "C",
   "composition": [
@@ -181,5 +181,6 @@
       " 0.00000000E+00 0.00000000E+00 6.75490938E+00 9.88824307E-03-1.33945043E-05    3",
       " 9.65605536E-09-2.68358487E-12-7.98521092E+04-3.01648240E+01-7.74910368E+04    4"
     ]
-  }
+  },
+  "phase_ordinal": 2
 }

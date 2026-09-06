@@ -127,34 +127,35 @@ def build_manifest(
             poly_count += 1
         else:
             comment_only += 1
-        entries.append(
-            {
-                "record_id": rec.record_id,
-                "formula": rec.formula,
-                "phase": rec.phase,
-                "name_as_published": rec.name_as_published,
-                "cas_as_published": rec.cas_as_published,
-                "record_kind": rec.record_kind,
-                "source": {
-                    **COMPILATION_SOURCE,
-                    "official_url": OFFICIAL_URL,
-                    "sha256": source_sha256,
-                    "path": SOURCE_REL,
-                },
-                "original_record_text_location": {
-                    "path": SOURCE_REL,
-                    "cas_line": rec.cas_line_number,
-                    "header_line": rec.header_line_number,
-                    "end_line": rec.end_line_number,
-                },
-                "coefficient_count": rec.coefficient_count,
-                "interval_count": len(rec.intervals),
-                "ambiguity_count": len(rec.ambiguities),
-                "ambiguities": list(rec.ambiguities),
-                "sha256_source_file": source_sha256,
-                "path": rel,
-            }
-        )
+        entry = {
+            "record_id": rec.record_id,
+            "formula": rec.formula,
+            "phase": rec.phase,
+            "name_as_published": rec.name_as_published,
+            "cas_as_published": rec.cas_as_published,
+            "record_kind": rec.record_kind,
+            "source": {
+                **COMPILATION_SOURCE,
+                "official_url": OFFICIAL_URL,
+                "sha256": source_sha256,
+                "path": SOURCE_REL,
+            },
+            "original_record_text_location": {
+                "path": SOURCE_REL,
+                "cas_line": rec.cas_line_number,
+                "header_line": rec.header_line_number,
+                "end_line": rec.end_line_number,
+            },
+            "coefficient_count": rec.coefficient_count,
+            "interval_count": len(rec.intervals),
+            "ambiguity_count": len(rec.ambiguities),
+            "ambiguities": list(rec.ambiguities),
+            "sha256_source_file": source_sha256,
+            "path": rel,
+        }
+        if rec.phase_ordinal is not None:
+            entry["phase_ordinal"] = rec.phase_ordinal
+        entries.append(entry)
     covered = [el for el, row in coverage.items() if row["has_record"]]
     uncovered = [el for el, row in coverage.items() if not row["has_record"]]
     return {

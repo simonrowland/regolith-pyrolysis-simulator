@@ -21,11 +21,11 @@
   "citation_as_published": "Below lambda. Chase,1998 pp1486-8.",
   "cea_section": "products",
   "formula": "K2S",
-  "phase": "CEA:1/cr",
+  "phase": "cr",
   "phase_as_published": "cr",
   "phase_flag": 1,
   "phase_flag_as_published": " 1",
-  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
+  "phase_normalization_rule": "G or CEA flag 0 maps to gas. Otherwise a recognized terminal state suffix keeps its published label; without one, NASA-7 S/L/C maps to cr/L/condensed and a positive CEA flag maps to condensed. Unrecognized suffixes stay verbatim in phase_as_published and are listed as ambiguities; card/suffix conflicts retain both published tokens. phase_ordinal is present only when same-formula non-gas records would otherwise share a phase label.",
   "n_intervals_declared": 2,
   "source_ref_code": "j 3/78",
   "composition": [
@@ -303,5 +303,6 @@
       " 1.237549376D+09-7.863379810D+06 1.968151557D+04-2.415909047D+01 1.451020806D-02",
       "-3.388041040D-06 0.000000000D+00                 4.392639800D+07-1.251401185D+05"
     ]
-  }
+  },
+  "phase_ordinal": 1
 }

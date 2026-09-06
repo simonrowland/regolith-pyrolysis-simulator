@@ -84,23 +84,23 @@ _PHASE_TAGS = frozenset(
         "liq",
         "ref",
         "am",
-        "solid", "liquid", "Cr", "I'", "I-y", "II-r", "III,II",
-        "V", "a'", "a-qz", "an", "b-crt", "b-qz", "crI", "crII",
     }
 )
 _GAS_PHASE_TAGS = frozenset({"g", "G", "gas"})
+_NASA7_STATE_WORDS = frozenset({"solid", "liquid"})
 NASA7_PHASE_CHAR_NORMALIZED = {
     "G": "gas",
-    "S": "solid",
+    "S": "cr",
     "L": "L",
-    "C": "C",
+    "C": "condensed",
 }
 PHASE_NORMALIZATION_RULE = (
-    "Native card/flag is primary: G or CEA 0 means gas. Recognized state "
-    "suffixes refine compatible non-gas cards and retain polymorph identity. "
-    "Other parentheses are nomenclature. phase_as_published preserves a state "
-    "suffix or the native token; conflicting state suffixes are recorded as "
-    "ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>."
+    "G or CEA flag 0 maps to gas. Otherwise a recognized terminal state suffix "
+    "keeps its published label; without one, NASA-7 S/L/C maps to cr/L/condensed "
+    "and a positive CEA flag maps to condensed. Unrecognized suffixes stay "
+    "verbatim in phase_as_published and are listed as ambiguities; card/suffix "
+    "conflicts retain both published tokens. phase_ordinal is present only when "
+    "same-formula non-gas records would otherwise share a phase label."
 )
 
 COMPILATION_SOURCE = {
@@ -219,6 +219,7 @@ class SpeciesRecord:
     phase_flag_as_published: str
     phase_as_published: str
     phase: str
+    phase_ordinal: int | None
     molecular_weight: PublishedNumber
     delta_f_H_298_15: PublishedNumber
     intervals: list[IntervalRecord]
@@ -248,7 +249,7 @@ class SpeciesRecord:
         return tuple(seen)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload = {
             "schema_version": SCHEMA_VERSION,
             "source_id": SOURCE_ID,
             "source": dict(COMPILATION_SOURCE),
@@ -288,6 +289,9 @@ class SpeciesRecord:
                 "interval_lines": _interval_source_lines(self.intervals),
             },
         }
+        if self.phase_ordinal is not None:
+            payload["phase_ordinal"] = self.phase_ordinal
+        return payload
 
 
 @dataclass
@@ -403,24 +407,25 @@ def resolve_phase(
     phase_flag_as_published: str = "",
     phase_char: str | None = None,
 ) -> tuple[str, str, list[dict[str, Any]]]:
-    """Keep the native phase primary and refine it only with known state words."""
+    """Keep existing published phase labels and let native gas cards win."""
     ambiguities: list[dict[str, Any]] = []
     suffix = published_name_phase_suffix(name)
-    if suffix not in _PHASE_TAGS | _GAS_PHASE_TAGS:
-        suffix = None
     native = phase_char or phase_flag_as_published.strip()
     if phase_char:
-        phase = NASA7_PHASE_CHAR_NORMALIZED.get(phase_char, phase_char)
+        native_phase = NASA7_PHASE_CHAR_NORMALIZED.get(phase_char, "condensed")
     elif phase_flag == 0:
-        phase = "gas"
+        native_phase = "gas"
     elif phase_flag is not None:
-        phase = f"CEA:{phase_flag}"
+        native_phase = "condensed"
     else:
-        phase = "not_parsed"
+        native_phase = "not_parsed"
     liquid = {"L", "l", "liq", "liquid"}
-    conflict = suffix is not None and (
-        (phase == "gas" and suffix not in _GAS_PHASE_TAGS)
-        or (phase != "gas" and suffix in _GAS_PHASE_TAGS)
+    state_tags = _PHASE_TAGS | (_NASA7_STATE_WORDS if phase_char else frozenset())
+    recognized_tags = state_tags | _GAS_PHASE_TAGS
+    state_suffix = suffix if suffix in recognized_tags else None
+    conflict = state_suffix is not None and (
+        (native_phase == "gas" and state_suffix not in _GAS_PHASE_TAGS)
+        or (native_phase != "gas" and state_suffix in _GAS_PHASE_TAGS)
         or (phase_char == "S" and suffix in liquid)
         or (phase_char == "L" and suffix not in liquid)
     )
@@ -429,13 +434,32 @@ def resolve_phase(
             {
                 "kind": "phase_card_suffix_conflict",
                 "phase_card_as_published": native,
-                "phase_as_published": suffix,
-                "note": "Native phase takes precedence; conflicting suffix retained verbatim.",
+                "phase_as_published": state_suffix,
+                "note": "Conflicting published card and state suffix are both retained verbatim.",
             }
         )
-    if suffix is not None and phase != "gas":
-        phase = f"{phase_char or f'CEA:{phase_flag}'}/{suffix}"
-    return suffix or native, phase, ambiguities
+    if native_phase == "gas":
+        return state_suffix or native, "gas", ambiguities
+    if suffix is None:
+        return native, native_phase, ambiguities
+    if suffix in _GAS_PHASE_TAGS:
+        return suffix, "gas", ambiguities
+    if suffix in recognized_tags:
+        return suffix, suffix, ambiguities
+    ambiguities.append(
+        {
+            "kind": "phase_suffix_normalized_to_condensed",
+            "phase_as_published": suffix,
+            "phase_normalized": "condensed",
+            "note": (
+                "Parenthetical suffix kept verbatim in phase_as_published. "
+                "Normalized phase is 'condensed' because the suffix is outside "
+                f"the closed allow-list {sorted(state_tags)}. "
+                "Records are not merged."
+            ),
+        }
+    )
+    return suffix, "condensed", ambiguities
 
 
 def _phase_label(name: str, phase_flag: int | None) -> str:
@@ -1085,6 +1109,7 @@ def parse_thermo_inp(
             phase_flag_as_published=str(header["phase_flag_as_published"]),
             phase_as_published=phase_as_published,
             phase=phase_normalized,
+            phase_ordinal=None,
             molecular_weight=header["molecular_weight"],
             delta_f_H_298_15=header["delta_f_H_298_15"],
             intervals=intervals,
@@ -1104,6 +1129,17 @@ def parse_thermo_inp(
     for index, rec in enumerate(records):
         rec.record_id = f"NG-{index + 1:04d}"
         by_name[rec.name_as_published].append(index)
+    by_phase: dict[tuple[str, str], list[int]] = defaultdict(list)
+    for index, rec in enumerate(records):
+        by_phase[(rec.formula, rec.phase)].append(index)
+    for indices in by_phase.values():
+        flags = {records[j].phase_flag for j in indices}
+        if len(indices) < 2 or len(flags) < 2 or not all(
+            isinstance(flag, int) and flag > 0 for flag in flags
+        ):
+            continue
+        for j in indices:
+            records[j].phase_ordinal = records[j].phase_flag
     for name, indices in by_name.items():
         if len(indices) < 2:
             continue

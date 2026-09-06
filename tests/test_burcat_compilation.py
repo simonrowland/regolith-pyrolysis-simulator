@@ -79,6 +79,7 @@ def test_manifest_lists_every_record_file_and_no_orphans(manifest, record_docs) 
         assert name in files
         doc = docs[entry["record_id"]]
         assert doc["name_as_published"] == entry["name_as_published"]
+        assert doc.get("phase_ordinal") == entry.get("phase_ordinal")
         assert doc["compilation_role"]["scoring_eligible"] is False
         assert doc["compilation_role"]["validation_measurement"] is False
         assert doc["schema_version"] == "literature_compilation.v1"
@@ -145,8 +146,8 @@ def test_complete_ingest_keeps_ions_condensed_comment_only_and_na_hf(
     ag_solid = by_name["Ag (solid)"][0]
     assert ag_solid["phase_as_published"] == "solid"
     assert ag_solid["phase_card_as_published"] == "S"
-    assert ag_solid["phase"] == "S/solid"
-    assert by_name["Ag (liquid)"][0]["phase"] == "L/liquid"
+    assert ag_solid["phase"] == "solid"
+    assert by_name["Ag (liquid)"][0]["phase"] == "liquid"
     assert ag_solid["comment_block"]
     assert any("CODATA" in line for line in ag_solid["comment_block"])
     ions = [doc for doc in docs if doc["name_as_published"].endswith(("+", "-"))]
@@ -216,31 +217,51 @@ def test_formulas_absent_from_janaf_and_nasa_glenn(manifest, record_docs) -> Non
 
 
 def test_same_formula_distinct_phase_census(record_docs) -> None:
-    import re
     from collections import defaultdict
 
-    groups = defaultdict(dict)
+    groups = defaultdict(list)
     gas_count = 0
     for doc in record_docs:
         if doc["record_kind"] != "nasa7_polynomial":
             continue
         card = doc["source_text"]["header_line"][44]
-        suffix = re.search(r"\(([^)]+)\)(?:,.*)?$", doc["name_as_published"])
         if card == "G":
             gas_count += 1
             assert doc["phase"] == "gas", doc["record_id"]
-            if suffix and suffix[1] in {"s", "cr"}:
+            assert "phase_ordinal" not in doc
+            if doc["record_id"] in {"BU-2494", "BU-2629"}:
                 assert any(a["kind"] == "phase_card_suffix_conflict" for a in doc["ambiguities"])
-            identity = (card, None)
-        else:
-            identity = (card, suffix[1] if suffix else None)
-            if suffix:
-                assert doc["phase"] == f"{card}/{suffix[1]}", doc["record_id"]
-        groups[doc["formula"]][identity] = doc["phase"]
+        elif doc["phase"] != "not_parsed":
+            groups[(doc["formula"], doc["phase"])].append(doc)
     assert gas_count == 3051
-    assert all(doc["phase"] != "condensed" for doc in record_docs)
-    for formula, phases in groups.items():
-        assert len(set(phases.values())) == len(phases), (formula, phases)
+
+    collision_groups = []
+    collision_records = []
+    for identity, docs in groups.items():
+        if len(docs) > 1:
+            collision_groups.append(identity)
+            collision_records.extend(doc["record_id"] for doc in docs)
+            assert [doc["phase_ordinal"] for doc in docs] == list(
+                range(1, len(docs) + 1)
+            )
+        else:
+            assert "phase_ordinal" not in docs[0]
+    assert len(collision_groups) == 36
+    assert len(collision_records) == 79
+
+    by_id = {doc["record_id"]: doc for doc in record_docs}
+    assert by_id["BU-2293"]["phase"] == by_id["BU-2294"]["phase"] == "b"
+    assert [by_id[record_id]["phase_ordinal"] for record_id in (
+        "BU-2293", "BU-2294"
+    )] == [1, 2]
+    assert by_id["BU-3262"]["phase"] == by_id["BU-3263"]["phase"] == "condensed"
+    assert [by_id[record_id]["phase_ordinal"] for record_id in (
+        "BU-3262", "BU-3263"
+    )] == [1, 2]
+    assert by_id["BU-3217"]["phase"] == "L"
+    assert "phase_ordinal" not in by_id["BU-3217"]
+    assert by_id["BU-2930"]["phase"] == "liq"
+    assert by_id["BU-3385"]["phase"] == "III"
 
 
 def test_fifteen_printed_padded_zero_coefficients_are_values(record_docs) -> None:

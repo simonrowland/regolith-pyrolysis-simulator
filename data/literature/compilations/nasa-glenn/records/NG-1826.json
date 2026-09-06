@@ -21,11 +21,11 @@
   "citation_as_published": "Hexagonal. Gurvich,1982 pt1 p455 pt2 p479.",
   "cea_section": "products",
   "formula": "RbNO3",
-  "phase": "CEA:3/II",
+  "phase": "II",
   "phase_as_published": "II",
   "phase_flag": 3,
   "phase_flag_as_published": " 3",
-  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
+  "phase_normalization_rule": "G or CEA flag 0 maps to gas. Otherwise a recognized terminal state suffix keeps its published label; without one, NASA-7 S/L/C maps to cr/L/condensed and a positive CEA flag maps to condensed. Unrecognized suffixes stay verbatim in phase_as_published and are listed as ambiguities; card/suffix conflicts retain both published tokens. phase_ordinal is present only when same-formula non-gas records would otherwise share a phase label.",
   "n_intervals_declared": 1,
   "source_ref_code": "tpis82",
   "composition": [

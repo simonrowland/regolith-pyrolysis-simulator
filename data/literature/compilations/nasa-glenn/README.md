@@ -76,12 +76,14 @@ Air, InertAir, B2H6(L), B5H9(L), (CH2)x(cr), CH3NO2(L), CH4(L), CH3OH(L), CH6N2(
 
 ## Known gaps and recorded ambiguities
 
-- Phase flag 0 maps to `gas`. Positive flags retain their published ordinal:
-  `CEA:<flag>/<state suffix>`, or `CEA:<flag>` without a state suffix.
-  The closed suffix set includes the published polymorphs (`an`, `I'`,
-  `crI`, `crII`, `V`, `II-r`, `I-y`, `a-qz`, `b-qz`, `b-crt`, `III,II`, `a'`).
-  `phase_as_published` preserves the suffix verbatim. Both the flag and suffix
-  distinguish records, including Co(b) with flags 2 and 3; no `condensed` collapse.
+- Phase flag 0 maps to `gas`. Otherwise a recognized terminal state suffix
+  keeps its published label (`cr`, `L`, `a`, `b`, etc.); a positive flag with
+  no recognized suffix maps to `condensed`. Unrecognized suffixes remain
+  verbatim in `phase_as_published` and are listed as ambiguities. A separate
+  `phase_ordinal` carries the printed positive flag only in the 14
+  same-formula/non-gas phase-label collision groups (30 records), including
+  Co(b), the InCl/InI2 `crII`/`crI` pairs and the SiO2 polymorphs. It is absent
+  from records whose `(formula, phase)` label is already distinct.
 - 11 inverted or zero-width polynomial T intervals (Snyder 2021 floor
   artifact), including `Br2(cr)` whose only interval is inverted. Kept.
 - 54 `nint=0` assigned-enthalpy dummy T-lines (`T_max=0`, no coefficients).

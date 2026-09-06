@@ -22,10 +22,10 @@
   "name_as_published": "C<GR> REF ELEMENT",
   "cas_as_published": "7782-42-5",
   "formula": "C",
-  "phase": "solid",
+  "phase": "cr",
   "phase_as_published": "S",
   "phase_card_as_published": "S",
-  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
+  "phase_normalization_rule": "G or CEA flag 0 maps to gas. Otherwise a recognized terminal state suffix keeps its published label; without one, NASA-7 S/L/C maps to cr/L/condensed and a positive CEA flag maps to condensed. Unrecognized suffixes stay verbatim in phase_as_published and are listed as ambiguities; card/suffix conflicts retain both published tokens. phase_ordinal is present only when same-formula non-gas records would otherwise share a phase label.",
   "date_as_published": "T 3/10",
   "calc_quality_as_published": "B",
   "composition": [
@@ -169,5 +169,6 @@
       "-7.45940284E+02-9.30332005E+00-3.03744539E-01 4.36036227E-03 1.98268825E-06    3",
       "-6.43472598E-09 2.99601320E-12-1.09458288E+02 1.08301475E+00 0.00000000E+00    4"
     ]
-  }
+  },
+  "phase_ordinal": 1
 }

@@ -147,34 +147,35 @@ def build_manifest(
         total_coeff += rec.coefficient_count
         total_amb += len(rec.ambiguities)
         by_formula[rec.formula].append(rec.record_id)
-        entries.append(
-            {
-                "record_id": rec.record_id,
-                "formula": rec.formula,
-                "phase": rec.phase,
-                "name_as_published": rec.name_as_published,
-                "source": {
-                    **COMPILATION_SOURCE,
-                    "official_url": CEA_DOWNLOAD_URL,
-                    "sha256": source_sha256,
-                    "path": SOURCE_REL,
-                },
-                "original_record_text_location": {
-                    "path": SOURCE_REL,
-                    "name_line": rec.name_line_number,
-                    "header_line": rec.header_line_number,
-                    "end_line": rec.end_line_number,
-                    "cea_section": rec.cea_section,
-                },
-                "coefficient_count": rec.coefficient_count,
-                "interval_count": rec.interval_count,
-                "n_intervals_declared": rec.n_intervals_declared,
-                "ambiguity_count": len(rec.ambiguities),
-                "ambiguities": list(rec.ambiguities),
-                "sha256_source_file": source_sha256,
-                "path": rel,
-            }
-        )
+        entry = {
+            "record_id": rec.record_id,
+            "formula": rec.formula,
+            "phase": rec.phase,
+            "name_as_published": rec.name_as_published,
+            "source": {
+                **COMPILATION_SOURCE,
+                "official_url": CEA_DOWNLOAD_URL,
+                "sha256": source_sha256,
+                "path": SOURCE_REL,
+            },
+            "original_record_text_location": {
+                "path": SOURCE_REL,
+                "name_line": rec.name_line_number,
+                "header_line": rec.header_line_number,
+                "end_line": rec.end_line_number,
+                "cea_section": rec.cea_section,
+            },
+            "coefficient_count": rec.coefficient_count,
+            "interval_count": rec.interval_count,
+            "n_intervals_declared": rec.n_intervals_declared,
+            "ambiguity_count": len(rec.ambiguities),
+            "ambiguities": list(rec.ambiguities),
+            "sha256_source_file": source_sha256,
+            "path": rel,
+        }
+        if rec.phase_ordinal is not None:
+            entry["phase_ordinal"] = rec.phase_ordinal
+        entries.append(entry)
     covered = [el for el, row in coverage.items() if row["has_record"]]
     uncovered = [el for el, row in coverage.items() if not row["has_record"]]
     return {

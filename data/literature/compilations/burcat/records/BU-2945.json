@@ -22,10 +22,10 @@
   "name_as_published": "Ni(cr)",
   "cas_as_published": "7440-02-0",
   "formula": "Ni",
-  "phase": "C/cr",
+  "phase": "cr",
   "phase_as_published": "cr",
   "phase_card_as_published": "C",
-  "phase_normalization_rule": "Native card/flag is primary: G or CEA 0 means gas. Recognized state suffixes refine compatible non-gas cards and retain polymorph identity. Other parentheses are nomenclature. phase_as_published preserves a state suffix or the native token; conflicting state suffixes are recorded as ambiguities. Unsuffixed C and positive CEA flags remain C and CEA:<flag>.",
+  "phase_normalization_rule": "G or CEA flag 0 maps to gas. Otherwise a recognized terminal state suffix keeps its published label; without one, NASA-7 S/L/C maps to cr/L/condensed and a positive CEA flag maps to condensed. Unrecognized suffixes stay verbatim in phase_as_published and are listed as ambiguities; card/suffix conflicts retain both published tokens. phase_ordinal is present only when same-formula non-gas records would otherwise share a phase label.",
   "date_as_published": "J12/76",
   "calc_quality_as_published": "",
   "composition": [
@@ -179,5 +179,6 @@
       "-2.61782185E+03-4.74612393E+01 4.85484877E+02-2.30395380E+00 4.10622634E-03    3",
       "-3.23350101E-06 9.49617381E-10-8.11709085E+04-2.25428960E+03 0.00000000E+00    4"
     ]
-  }
+  },
+  "phase_ordinal": 2
 }

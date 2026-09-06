@@ -74,6 +74,7 @@ def test_manifest_lists_every_record_file_and_no_orphans(manifest, record_docs) 
         assert name in files
         doc = docs[entry["record_id"]]
         assert doc["name_as_published"] == entry["name_as_published"]
+        assert doc.get("phase_ordinal") == entry.get("phase_ordinal")
         assert doc["compilation_role"]["scoring_eligible"] is False
         assert doc["compilation_role"]["validation_measurement"] is False
         assert doc["schema_version"] == "literature_compilation.v1"
@@ -147,8 +148,12 @@ def test_complete_ingest_keeps_inverted_ions_reactants_and_assigned_enthalpy(
     assert electron["phase_as_published"] == "0"
     sio2_aqz = by_name["SiO2(a-qz)"][0]
     assert sio2_aqz["phase_as_published"] == "a-qz"
-    assert sio2_aqz["phase"] == "CEA:1/a-qz"
-    assert all(doc["phase"] != "condensed" for doc in docs)
+    assert sio2_aqz["phase"] == "condensed"
+    assert sio2_aqz["phase_ordinal"] == 1
+    assert any(
+        item["kind"] == "phase_suffix_normalized_to_condensed"
+        for item in sio2_aqz["ambiguities"]
+    )
     assert "Air" in by_name
     assert by_name["Air"][0]["cea_section"] == "reactants"
     assigned = [
@@ -244,22 +249,46 @@ def test_nasa7_four_line_variant_parses_burcat_header_and_fifteen_coeffs() -> No
 
 
 def test_same_formula_distinct_phase_census(record_docs) -> None:
-    import re
     from collections import defaultdict
 
-    groups = defaultdict(dict)
+    groups = defaultdict(list)
     for doc in record_docs:
         header = doc["source_text"]["header_line"]
         flag = int(header[50:52])
-        suffix = re.search(r"\(([^)]+)\)(?:,.*)?$", doc["name_as_published"])
         if flag == 0:
             assert doc["phase"] == "gas"
-        elif suffix:
-            assert doc["phase"] == f"CEA:{flag}/{suffix[1]}"
-        identity = (flag, suffix[1] if suffix and flag else None)
-        groups[doc["formula"]][identity] = doc["phase"]
-    for formula, phases in groups.items():
-        assert len(set(phases.values())) == len(phases), (formula, phases)
+            assert "phase_ordinal" not in doc
+        groups[(doc["formula"], doc["phase"])].append(doc)
+
+    collision_groups = []
+    collision_records = []
+    for (formula, phase), docs in groups.items():
+        flags = {doc["phase_flag"] for doc in docs}
+        is_phase_collision = (
+            len(docs) > 1
+            and len(flags) > 1
+            and all(isinstance(flag, int) and flag > 0 for flag in flags)
+        )
+        if is_phase_collision:
+            collision_groups.append((formula, phase))
+            collision_records.extend(doc["record_id"] for doc in docs)
+            assert {doc["phase_ordinal"] for doc in docs} == flags
+            assert len({(doc["phase"], doc["phase_ordinal"]) for doc in docs}) == len(docs)
+        else:
+            assert all("phase_ordinal" not in doc for doc in docs)
+
+    assert len(collision_groups) == 14
+    assert len(collision_records) == 30
+    by_name = defaultdict(list)
+    for doc in record_docs:
+        by_name[doc["name_as_published"]].append(doc)
+    assert by_name["Ag(cr)"][0]["phase"] == "cr"
+    assert by_name["Ag(L)"][0]["phase"] == "L"
+    assert "phase_ordinal" not in by_name["Ag(cr)"][0]
+    assert [doc["phase_ordinal"] for doc in by_name["Co(b)"]] == [2, 3]
+    assert [by_name[name][0]["phase_ordinal"] for name in (
+        "InCL(crII)", "InCL(crI)"
+    )] == [1, 2]
 
 
 def test_round_trip_rejects_format_only_coefficient_mutation(manifest, record_docs) -> None:

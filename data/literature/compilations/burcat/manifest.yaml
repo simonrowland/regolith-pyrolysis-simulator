@@ -1,6 +1,6 @@
 schema_version: literature_compilation_manifest.v1
 source_id: burcat
-generated_at: '2026-09-06T23:17:06.368856+00:00'
+generated_at: '2026-09-06T23:48:44.355323+00:00'
 compilation_role:
   kind: assessed_thermodynamic_functions
   engine_reference_input: true
@@ -43,8 +43,8 @@ summary:
   polynomial_record_count: 3407
   comment_only_record_count: 39
   coefficient_count: 51105
-  parse_ambiguity_count: 613
-  records_with_ambiguity_count: 502
+  parse_ambiguity_count: 618
+  records_with_ambiguity_count: 507
   formula_count: 2262
   source_schema_version: literature_compilation.v1
 xml_crosscheck:
@@ -11000,7 +11000,7 @@ formulas_absent_from_janaf_and_nasa_glenn:
 entries:
 - record_id: BU-0001
   formula: Ag
-  phase: S/solid
+  phase: solid
   name_as_published: Ag (solid)
   cas_as_published: 7440-22-4
   record_kind: nasa7_polynomial
@@ -11035,7 +11035,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0001.json
 - record_id: BU-0002
   formula: Ag
-  phase: L/liquid
+  phase: liquid
   name_as_published: Ag (liquid)
   cas_as_published: 7440-22-4
   record_kind: nasa7_polynomial
@@ -11260,7 +11260,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0007.json
 - record_id: BU-0008
   formula: Al
-  phase: solid
+  phase: cr
   name_as_published: AL(cr) REF ELEME
   cas_as_published: 7429-90-5
   record_kind: nasa7_polynomial
@@ -11370,7 +11370,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0010.json
 - record_id: BU-0011
   formula: AlB2
-  phase: S/cr
+  phase: cr
   name_as_published: AlB2 (cr)
   cas_as_published: 12041-50-8
   record_kind: nasa7_polynomial
@@ -11930,7 +11930,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0026.json
 - record_id: BU-0027
   formula: AlH3
-  phase: S/a
+  phase: a
   name_as_published: ALH3(a)
   cas_as_published: 7784-21-6
   record_kind: nasa7_polynomial
@@ -12525,7 +12525,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0043.json
 - record_id: BU-0044
   formula: Al2O3
-  phase: S/a
+  phase: a
   name_as_published: AL2O3(a)
   cas_as_published: 1344-28-1
   record_kind: nasa7_polynomial
@@ -12560,7 +12560,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0044.json
 - record_id: BU-0045
   formula: Al2O3
-  phase: S/b
+  phase: b
   name_as_published: AL2O3(b)
   cas_as_published: 1344-28-1
   record_kind: nasa7_polynomial
@@ -12595,7 +12595,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0045.json
 - record_id: BU-0046
   formula: Al2O3
-  phase: C/L
+  phase: L
   name_as_published: AL2O3(L)
   cas_as_published: 1344-28-1
   record_kind: nasa7_polynomial
@@ -12845,7 +12845,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0052.json
 - record_id: BU-0053
   formula: Au
-  phase: solid
+  phase: cr
   name_as_published: Au (cr) Aurum
   cas_as_published: 7440-57-5
   record_kind: nasa7_polynomial
@@ -12884,9 +12884,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-0053.json
+  phase_ordinal: 1
 - record_id: BU-0054
   formula: Au
-  phase: solid
+  phase: cr
   name_as_published: Au (cr) Aurum
   cas_as_published: 7440-57-5
   record_kind: nasa7_polynomial
@@ -12923,6 +12924,7 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-0054.json
+  phase_ordinal: 2
 - record_id: BU-0055
   formula: Au
   phase: L
@@ -13065,7 +13067,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0058.json
 - record_id: BU-0059
   formula: B
-  phase: S/S
+  phase: S
   name_as_published: B(S)
   cas_as_published: 7440-42-8
   record_kind: nasa7_polynomial
@@ -13100,7 +13102,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0059.json
 - record_id: BU-0060
   formula: B
-  phase: L/L
+  phase: L
   name_as_published: B(L)
   cas_as_published: 7440-42-8
   record_kind: nasa7_polynomial
@@ -14015,7 +14017,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0085.json
 - record_id: BU-0086
   formula: NaBH4
-  phase: S/S
+  phase: S
   name_as_published: NaBH4 (S)
   cas_as_published: 16940-66-2
   record_kind: nasa7_polynomial
@@ -14762,7 +14764,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0106.json
 - record_id: BU-0107
   formula: B2O3
-  phase: S/cr
+  phase: cr
   name_as_published: B2O3(cr)
   cas_as_published: 1303-86-2
   record_kind: nasa7_polynomial
@@ -15007,7 +15009,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0113.json
 - record_id: BU-0114
   formula: Bi
-  phase: solid
+  phase: cr
   name_as_published: Bi(S) REF ELEME
   cas_as_published: 7440-69-9
   record_kind: nasa7_polynomial
@@ -15081,6 +15083,7 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-0115.json
+  phase_ordinal: 1
 - record_id: BU-0116
   formula: Bi
   phase: L
@@ -15120,6 +15123,7 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-0116.json
+  phase_ordinal: 2
 - record_id: BU-0117
   formula: Bi
   phase: gas
@@ -16577,7 +16581,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0157.json
 - record_id: BU-0158
   formula: Br2
-  phase: C/cr
+  phase: cr
   name_as_published: Br2(cr)
   cas_as_published: 7726-95-6
   record_kind: nasa7_polynomial
@@ -16612,7 +16616,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0158.json
 - record_id: BU-0159
   formula: Br2
-  phase: L/L
+  phase: L
   name_as_published: Br2(L)
   cas_as_published: 7726-95-6
   record_kind: nasa7_polynomial
@@ -17055,7 +17059,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0170.json
 - record_id: BU-0171
   formula: C
-  phase: solid
+  phase: cr
   name_as_published: C<GR> REF ELEMENT
   cas_as_published: 7782-42-5
   record_kind: nasa7_polynomial
@@ -17088,9 +17092,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-0171.json
+  phase_ordinal: 1
 - record_id: BU-0172
   formula: C
-  phase: solid
+  phase: cr
   name_as_published: C(cr) Diamond
   cas_as_published: 7782-40-3
   record_kind: nasa7_polynomial
@@ -17123,6 +17128,7 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-0172.json
+  phase_ordinal: 2
 - record_id: BU-0173
   formula: C
   phase: gas
@@ -28291,7 +28297,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0482.json
 - record_id: BU-0483
   formula: CH4O
-  phase: L/L
+  phase: L
   name_as_published: CH3OH(L)
   cas_as_published: 67-56-1
   record_kind: nasa7_polynomial
@@ -30967,7 +30973,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0558.json
 - record_id: BU-0559
   formula: NaCN
-  phase: C/III
+  phase: III
   name_as_published: NaCN(III)
   cas_as_published: 143-33-9
   record_kind: nasa7_polynomial
@@ -31002,7 +31008,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0559.json
 - record_id: BU-0560
   formula: NaCN
-  phase: C/L
+  phase: L
   name_as_published: NaCN(L)
   cas_as_published: 143-33-9
   record_kind: nasa7_polynomial
@@ -31862,7 +31868,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0583.json
 - record_id: BU-0584
   formula: WC
-  phase: C/cr
+  phase: cr
   name_as_published: WC(cr)
   cas_as_published: 12070-12-1
   record_kind: nasa7_polynomial
@@ -31897,7 +31903,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0584.json
 - record_id: BU-0585
   formula: ZrC
-  phase: C/cr
+  phase: cr
   name_as_published: ZrC(cr)
   cas_as_published: 12070-14-3
   record_kind: nasa7_polynomial
@@ -31932,7 +31938,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0585.json
 - record_id: BU-0586
   formula: ZrC
-  phase: C/L
+  phase: L
   name_as_published: ZrC(L)
   cas_as_published: 12070-14-3
   record_kind: nasa7_polynomial
@@ -33454,7 +33460,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0628.json
 - record_id: BU-0629
   formula: C2F4
-  phase: C
+  phase: condensed
   name_as_published: C2F4(s)   PTFE
   cas_as_published: 9002-84-0
   record_kind: nasa7_polynomial
@@ -42097,7 +42103,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-0870.json
 - record_id: BU-0871
   formula: C2H6O
-  phase: C/L
+  phase: L
   name_as_published: C2H5OH(L)
   cas_as_published: 64-17-5
   record_kind: nasa7_polynomial
@@ -49771,7 +49777,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1086.json
 - record_id: BU-1087
   formula: C3H6N6O6
-  phase: solid
+  phase: cr
   name_as_published: RDX Solid 293-47
   cas_as_published: 121-82-4
   record_kind: nasa7_polynomial
@@ -57371,7 +57377,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1297.json
 - record_id: BU-1298
   formula: C4H8N8O8
-  phase: solid
+  phase: cr
   name_as_published: beta HMX  198-54
   cas_as_published: 2691-41-0
   record_kind: nasa7_polynomial
@@ -63211,7 +63217,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1459.json
 - record_id: BU-1460
   formula: C5H8N4O12
-  phase: solid
+  phase: cr
   name_as_published: PETN   Solid
   cas_as_published: 78-11-5
   record_kind: nasa7_polynomial
@@ -68621,7 +68627,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1610.json
 - record_id: BU-1611
   formula: C6H6
-  phase: L/L
+  phase: L
   name_as_published: C6H6(L)
   cas_as_published: 71-43-2
   record_kind: nasa7_polynomial
@@ -69927,7 +69933,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1647.json
 - record_id: BU-1648
   formula: C6H7N
-  phase: C
+  phase: condensed
   name_as_published: C6H5NH2(L) anilin
   cas_as_published: 62-53-3
   record_kind: nasa7_polynomial
@@ -71235,7 +71241,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1683.json
 - record_id: BU-1684
   formula: C6H10O5
-  phase: solid
+  phase: cr
   name_as_published: C6H10O5 Starch cr
   cas_as_published: 9005-25-8
   record_kind: nasa7_polynomial
@@ -72111,6 +72117,7 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-1708.json
+  phase_ordinal: 1
 - record_id: BU-1709
   formula: C6H12
   phase: gas
@@ -72184,6 +72191,7 @@ entries:
     note: NASA-7 name field is cols 1-18; no trailing pad in this record.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-1710.json
+  phase_ordinal: 2
 - record_id: BU-1711
   formula: C6H12
   phase: gas
@@ -72507,7 +72515,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1719.json
 - record_id: BU-1720
   formula: C6H12O6
-  phase: solid
+  phase: cr
   name_as_published: C6H12O6 Glucose cr
   cas_as_published: 50-99-7
   record_kind: nasa7_polynomial
@@ -74186,7 +74194,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1766.json
 - record_id: BU-1767
   formula: C7H5N3O6
-  phase: solid
+  phase: cr
   name_as_published: TNT    Solid Yin
   cas_as_published: 118-96-7
   record_kind: nasa7_polynomial
@@ -74296,7 +74304,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1769.json
 - record_id: BU-1770
   formula: C7H5N5O8
-  phase: solid
+  phase: cr
   name_as_published: Tetryl Solid Yin
   cas_as_published: 479-45-8
   record_kind: nasa7_polynomial
@@ -75152,7 +75160,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1793.json
 - record_id: BU-1794
   formula: C7H8
-  phase: L/L
+  phase: L
   name_as_published: TOLUENE(L)
   cas_as_published: 108-88-3
   record_kind: nasa7_polynomial
@@ -76556,7 +76564,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1832.json
 - record_id: BU-1833
   formula: C7H16
-  phase: C
+  phase: condensed
   name_as_published: C7H16(L) n-hept
   cas_as_published: 142-82-5
   record_kind: nasa7_polynomial
@@ -78606,7 +78614,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1890.json
 - record_id: BU-1891
   formula: C8H18
-  phase: C/L
+  phase: L
   name_as_published: C8H18(L),n-octan
   cas_as_published: 111-65-9
   record_kind: nasa7_polynomial
@@ -78676,7 +78684,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1892.json
 - record_id: BU-1893
   formula: C8H18
-  phase: C
+  phase: condensed
   name_as_published: C8H18(L) isooct
   cas_as_published: 540-84-1
   record_kind: nasa7_polynomial
@@ -80265,7 +80273,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-1937.json
 - record_id: BU-1938
   formula: C9H20
-  phase: L/L
+  phase: L
   name_as_published: C9H20(L)
   cas_as_published: 111-84-2
   record_kind: nasa7_polynomial
@@ -82578,7 +82586,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2002.json
 - record_id: BU-2003
   formula: C10H22
-  phase: L/L
+  phase: L
   name_as_published: C10H22(L)
   cas_as_published: 124-18-5
   record_kind: nasa7_polynomial
@@ -90694,7 +90702,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2230.json
 - record_id: BU-2231
   formula: C60
-  phase: solid
+  phase: cr
   name_as_published: C60(cr) Buckmins
   cas_as_published: 99685-96-8
   record_kind: nasa7_polynomial
@@ -90802,7 +90810,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2233.json
 - record_id: BU-2234
   formula: C70
-  phase: solid
+  phase: cr
   name_as_published: C70(cr) Football
   cas_as_published: 115383-22-7
   record_kind: nasa7_polynomial
@@ -90872,7 +90880,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2235.json
 - record_id: BU-2236
   formula: C12H23
-  phase: C
+  phase: condensed
   name_as_published: Jet-A(L) C12H23
   cas_as_published: N/A
   record_kind: nasa7_polynomial
@@ -90942,7 +90950,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2237.json
 - record_id: BU-2238
   formula: Ca
-  phase: C
+  phase: condensed
   name_as_published: Ca(a) REF ELEMENT
   cas_as_published: 7440-70-2
   record_kind: nasa7_polynomial
@@ -90977,7 +90985,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2238.json
 - record_id: BU-2239
   formula: Ca
-  phase: C/b
+  phase: b
   name_as_published: Ca(b)
   cas_as_published: 7440-70-2
   record_kind: nasa7_polynomial
@@ -91012,7 +91020,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2239.json
 - record_id: BU-2240
   formula: Ca
-  phase: L/L
+  phase: L
   name_as_published: Ca(L)
   cas_as_published: 7440-70-2
   record_kind: nasa7_polynomial
@@ -91117,7 +91125,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2242.json
 - record_id: BU-2243
   formula: CaCO3
-  phase: S/s
+  phase: s
   name_as_published: CaCO3(s)
   cas_as_published: 471-34-1
   record_kind: nasa7_polynomial
@@ -91152,7 +91160,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2243.json
 - record_id: BU-2244
   formula: CaCO3
-  phase: L/liq
+  phase: liq
   name_as_published: CaCO3(liq)
   cas_as_published: 471-34-1
   record_kind: nasa7_polynomial
@@ -91187,7 +91195,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2244.json
 - record_id: BU-2245
   formula: CaO
-  phase: S/cr
+  phase: cr
   name_as_published: CaO(cr)
   cas_as_published: 1305-78-8
   record_kind: nasa7_polynomial
@@ -91222,7 +91230,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2245.json
 - record_id: BU-2246
   formula: CaO
-  phase: S/S
+  phase: S
   name_as_published: CaO(S)
   cas_as_published: 1305-78-8
   record_kind: nasa7_polynomial
@@ -91257,7 +91265,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2246.json
 - record_id: BU-2247
   formula: CaO
-  phase: L/L
+  phase: L
   name_as_published: CaO(L)
   cas_as_published: 1305-78-8
   record_kind: nasa7_polynomial
@@ -91362,7 +91370,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2249.json
 - record_id: BU-2250
   formula: Cd
-  phase: C/cr
+  phase: cr
   name_as_published: Cd(cr)
   cas_as_published: 7440-43-9
   record_kind: nasa7_polynomial
@@ -91397,7 +91405,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2250.json
 - record_id: BU-2251
   formula: Cd
-  phase: C/L
+  phase: L
   name_as_published: Cd(L)
   cas_as_published: 7440-43-9
   record_kind: nasa7_polynomial
@@ -92866,7 +92874,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2291.json
 - record_id: BU-2292
   formula: Co
-  phase: C/a
+  phase: a
   name_as_published: Co(a)
   cas_as_published: 7440-48-4
   record_kind: nasa7_polynomial
@@ -92901,7 +92909,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2292.json
 - record_id: BU-2293
   formula: Co
-  phase: C/b
+  phase: b
   name_as_published: Co(b)
   cas_as_published: 7440-48-4
   record_kind: nasa7_polynomial
@@ -92940,9 +92948,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2293.json
+  phase_ordinal: 1
 - record_id: BU-2294
   formula: Co
-  phase: C/b
+  phase: b
   name_as_published: Co(b)
   cas_as_published: 7440-48-4
   record_kind: nasa7_polynomial
@@ -92979,9 +92988,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2294.json
+  phase_ordinal: 2
 - record_id: BU-2295
   formula: Co
-  phase: L/L
+  phase: L
   name_as_published: Co(L)
   cas_as_published: 7440-48-4
   record_kind: nasa7_polynomial
@@ -93121,7 +93131,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2298.json
 - record_id: BU-2299
   formula: Cr
-  phase: solid
+  phase: cr
   name_as_published: Cr(cr)REF ELEMENT
   cas_as_published: 7440-47-3
   record_kind: nasa7_polynomial
@@ -93165,9 +93175,10 @@ entries:
       retained.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2299.json
+  phase_ordinal: 1
 - record_id: BU-2300
   formula: Cr
-  phase: solid
+  phase: cr
   name_as_published: Cr(cr)REF ELEMENT
   cas_as_published: 7440-47-3
   record_kind: nasa7_polynomial
@@ -93204,6 +93215,7 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2300.json
+  phase_ordinal: 2
 - record_id: BU-2301
   formula: Cr
   phase: L
@@ -93535,7 +93547,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2309.json
 - record_id: BU-2310
   formula: CrCl3
-  phase: S/S
+  phase: S
   name_as_published: CrCl3(S)
   cas_as_published: 10025-73-7
   record_kind: nasa7_polynomial
@@ -93783,7 +93795,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2316.json
 - record_id: BU-2317
   formula: CrN
-  phase: S/S
+  phase: S
   name_as_published: CrN(S)
   cas_as_published: 24094-93-7
   record_kind: nasa7_polynomial
@@ -93823,9 +93835,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2317.json
+  phase_ordinal: 1
 - record_id: BU-2318
   formula: CrN
-  phase: S/S
+  phase: S
   name_as_published: CrN(S)
   cas_as_published: 24094-93-7
   record_kind: nasa7_polynomial
@@ -93862,9 +93875,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2318.json
+  phase_ordinal: 2
 - record_id: BU-2319
   formula: CrN
-  phase: S/S
+  phase: S
   name_as_published: CrN(S)
   cas_as_published: 24094-93-7
   record_kind: nasa7_polynomial
@@ -93901,6 +93915,7 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2319.json
+  phase_ordinal: 3
 - record_id: BU-2320
   formula: CrN
   phase: gas
@@ -94113,7 +94128,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2325.json
 - record_id: BU-2326
   formula: Cr2N
-  phase: S/S
+  phase: S
   name_as_published: Cr2N(S)
   cas_as_published: 12053-27-9
   record_kind: nasa7_polynomial
@@ -94148,7 +94163,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2326.json
 - record_id: BU-2327
   formula: Cr2O3
-  phase: S/I'
+  phase: condensed
   name_as_published: Cr2O3(I')
   cas_as_published: 1308-38-9
   record_kind: nasa7_polynomial
@@ -94177,13 +94192,20 @@ entries:
     end_line: 26602
   coefficient_count: 15
   interval_count: 2
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: I'
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'liquid', 'ref', 's', 'solid']. Records
+      are not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2327.json
 - record_id: BU-2328
   formula: Cr2O3
-  phase: S/I
+  phase: I
   name_as_published: Cr2O3(I)
   cas_as_published: 1308-38-9
   record_kind: nasa7_polynomial
@@ -94223,9 +94245,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2328.json
+  phase_ordinal: 1
 - record_id: BU-2329
   formula: Cr2O3
-  phase: S/I
+  phase: I
   name_as_published: Cr2O3(I)
   cas_as_published: 1308-38-9
   record_kind: nasa7_polynomial
@@ -94262,9 +94285,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2329.json
+  phase_ordinal: 2
 - record_id: BU-2330
   formula: Cr2O3
-  phase: S/I
+  phase: I
   name_as_published: Cr2O3(I)
   cas_as_published: 1308-38-9
   record_kind: nasa7_polynomial
@@ -94301,9 +94325,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2330.json
+  phase_ordinal: 3
 - record_id: BU-2331
   formula: Cr2O3
-  phase: L/L
+  phase: L
   name_as_published: Cr2O3(L)
   cas_as_published: 1308-38-9
   record_kind: nasa7_polynomial
@@ -94338,7 +94363,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2331.json
 - record_id: BU-2332
   formula: Cr2FeO4
-  phase: solid
+  phase: cr
   name_as_published: Cr2FeO4
   cas_as_published: 12068-77-8
   record_kind: nasa7_polynomial
@@ -94373,7 +94398,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2332.json
 - record_id: BU-2333
   formula: C2Cr3
-  phase: S/S
+  phase: S
   name_as_published: Cr3C2(S)
   cas_as_published: 12012-35-0
   record_kind: nasa7_polynomial
@@ -94408,7 +94433,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2333.json
 - record_id: BU-2334
   formula: C3Cr7
-  phase: S/S
+  phase: S
   name_as_published: Cr7C3(S)
   cas_as_published: 12075-40-0
   record_kind: nasa7_polynomial
@@ -94443,7 +94468,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2334.json
 - record_id: BU-2335
   formula: C6Cr23
-  phase: solid
+  phase: cr
   name_as_published: C6Cr23
   cas_as_published: 12105-81-6
   record_kind: nasa7_polynomial
@@ -94478,7 +94503,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2335.json
 - record_id: BU-2336
   formula: Cu
-  phase: C/cr
+  phase: cr
   name_as_published: Cu(cr)
   cas_as_published: 7440-50-8
   record_kind: nasa7_polynomial
@@ -94513,7 +94538,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2336.json
 - record_id: BU-2337
   formula: Cu
-  phase: C/L
+  phase: L
   name_as_published: Cu(L)
   cas_as_published: 7440-50-8
   record_kind: nasa7_polynomial
@@ -94688,7 +94713,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2341.json
 - record_id: BU-2342
   formula: CuCl2
-  phase: S/cr
+  phase: cr
   name_as_published: CuCL2(cr)
   cas_as_published: 7447-39-4
   record_kind: nasa7_polynomial
@@ -94723,7 +94748,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2342.json
 - record_id: BU-2343
   formula: CuCl2
-  phase: L/L
+  phase: L
   name_as_published: CuCL2(L)
   cas_as_published: 7447-39-4
   record_kind: nasa7_polynomial
@@ -97711,7 +97736,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2427.json
 - record_id: BU-2428
   formula: Fe
-  phase: C/a
+  phase: a
   name_as_published: Fe(a)
   cas_as_published: 7439-89-6
   record_kind: nasa7_polynomial
@@ -97750,9 +97775,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2428.json
+  phase_ordinal: 1
 - record_id: BU-2429
   formula: Fe
-  phase: C/a
+  phase: a
   name_as_published: Fe(a)
   cas_as_published: 7439-89-6
   record_kind: nasa7_polynomial
@@ -97789,9 +97815,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2429.json
+  phase_ordinal: 2
 - record_id: BU-2430
   formula: Fe
-  phase: C/c
+  phase: c
   name_as_published: Fe(c)
   cas_as_published: 7439-89-6
   record_kind: nasa7_polynomial
@@ -97826,7 +97853,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2430.json
 - record_id: BU-2431
   formula: Fe
-  phase: C/d
+  phase: d
   name_as_published: Fe(d)
   cas_as_published: 7439-89-6
   record_kind: nasa7_polynomial
@@ -97861,7 +97888,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2431.json
 - record_id: BU-2432
   formula: Fe
-  phase: C/L
+  phase: L
   name_as_published: Fe(L)
   cas_as_published: 7439-89-6
   record_kind: nasa7_polynomial
@@ -98001,7 +98028,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2435.json
 - record_id: BU-2436
   formula: FeC5O5
-  phase: L/L
+  phase: L
   name_as_published: Fe(CO)5(L)
   cas_as_published: 13463-40-6
   record_kind: nasa7_polynomial
@@ -98106,7 +98133,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2438.json
 - record_id: BU-2439
   formula: FeCl2
-  phase: S/S
+  phase: S
   name_as_published: FeCL2(S)
   cas_as_published: 7758-94-3
   record_kind: nasa7_polynomial
@@ -98141,7 +98168,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2439.json
 - record_id: BU-2440
   formula: FeCl2
-  phase: L/L
+  phase: L
   name_as_published: FeCL2(L)
   cas_as_published: 7758-94-3
   record_kind: nasa7_polynomial
@@ -98211,7 +98238,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2441.json
 - record_id: BU-2442
   formula: FeCl3
-  phase: S/s
+  phase: s
   name_as_published: FeCL3(s)
   cas_as_published: 7705-08-0
   record_kind: nasa7_polynomial
@@ -98251,7 +98278,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2442.json
 - record_id: BU-2443
   formula: FeCl3
-  phase: L/L
+  phase: L
   name_as_published: FeCL3(L)
   cas_as_published: 7705-08-0
   record_kind: nasa7_polynomial
@@ -98326,7 +98353,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2444.json
 - record_id: BU-2445
   formula: Fe.95O
-  phase: S/S
+  phase: S
   name_as_published: Fe.947O(S)
   cas_as_published: 1345-25-1
   record_kind: nasa7_polynomial
@@ -98365,7 +98392,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2445.json
 - record_id: BU-2446
   formula: Fe.95O
-  phase: L/L
+  phase: L
   name_as_published: Fe.947O(L)
   cas_as_published: 1345-25-1
   record_kind: nasa7_polynomial
@@ -98439,7 +98466,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2447.json
 - record_id: BU-2448
   formula: FeOCl
-  phase: S/cr
+  phase: cr
   name_as_published: FeOCL(cr)
   cas_as_published: 13870-10-5
   record_kind: nasa7_polynomial
@@ -98509,7 +98536,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2449.json
 - record_id: BU-2450
   formula: FeO2H2
-  phase: S/S
+  phase: S
   name_as_published: Fe(OH)2(S)
   cas_as_published: 18624-44-7
   record_kind: nasa7_polynomial
@@ -98584,7 +98611,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2451.json
 - record_id: BU-2452
   formula: FeO3H3
-  phase: S/S
+  phase: S
   name_as_published: Fe(OH)3(S)
   cas_as_published: 1309-33-7
   record_kind: nasa7_polynomial
@@ -98619,7 +98646,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2452.json
 - record_id: BU-2453
   formula: FeS
-  phase: S/a
+  phase: a
   name_as_published: FeS(a)
   cas_as_published: 1317-96-0
   record_kind: nasa7_polynomial
@@ -98654,7 +98681,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2453.json
 - record_id: BU-2454
   formula: FeS
-  phase: S/b
+  phase: b
   name_as_published: FeS(b)
   cas_as_published: 1317-96-0
   record_kind: nasa7_polynomial
@@ -98694,7 +98721,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2454.json
 - record_id: BU-2455
   formula: FeS
-  phase: S/c
+  phase: c
   name_as_published: FeS(c)
   cas_as_published: 1317-96-0
   record_kind: nasa7_polynomial
@@ -98729,7 +98756,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2455.json
 - record_id: BU-2456
   formula: FeS
-  phase: L/L
+  phase: L
   name_as_published: FeS(L)
   cas_as_published: 1317-96-0
   record_kind: nasa7_polynomial
@@ -98799,7 +98826,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2457.json
 - record_id: BU-2458
   formula: FeSO4
-  phase: S/S
+  phase: S
   name_as_published: FeSO4(S)
   cas_as_published: 7720-78-7
   record_kind: nasa7_polynomial
@@ -98834,7 +98861,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2458.json
 - record_id: BU-2459
   formula: FeS2
-  phase: S/S
+  phase: S
   name_as_published: FeS2(S)
   cas_as_published: 1309-36-0
   record_kind: nasa7_polynomial
@@ -98939,7 +98966,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2461.json
 - record_id: BU-2462
   formula: Fe2O3
-  phase: solid
+  phase: cr
   name_as_published: Fe2O3(S) Solid-A
   cas_as_published: 1317-60-8
   record_kind: nasa7_polynomial
@@ -98972,9 +98999,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2462.json
+  phase_ordinal: 1
 - record_id: BU-2463
   formula: Fe2O3
-  phase: solid
+  phase: cr
   name_as_published: Fe2O3(S) Solid-B
   cas_as_published: 1317-60-8
   record_kind: nasa7_polynomial
@@ -99007,9 +99035,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2463.json
+  phase_ordinal: 2
 - record_id: BU-2464
   formula: Fe2O3
-  phase: solid
+  phase: cr
   name_as_published: Fe2O3(S) Solid-C
   cas_as_published: 1317-60-8
   record_kind: nasa7_polynomial
@@ -99042,9 +99071,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2464.json
+  phase_ordinal: 3
 - record_id: BU-2465
   formula: Fe2S3O12
-  phase: S/S
+  phase: S
   name_as_published: Fe2(SO4)3(S)
   cas_as_published: 10028-22-5
   record_kind: nasa7_polynomial
@@ -99079,7 +99109,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2465.json
 - record_id: BU-2466
   formula: CFe3
-  phase: solid
+  phase: cr
   name_as_published: Fe3C (S) Solid-A
   cas_as_published: 12011-67-5 or 12169-32-3 or 61027-57-4
   record_kind: nasa7_polynomial
@@ -99112,9 +99142,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2466.json
+  phase_ordinal: 1
 - record_id: BU-2467
   formula: CFe3
-  phase: solid
+  phase: cr
   name_as_published: Fe3C (S) Solid-B
   cas_as_published: 12011-67-5 or 12169-32-3 or 61027-57-4
   record_kind: nasa7_polynomial
@@ -99147,6 +99178,7 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2467.json
+  phase_ordinal: 2
 - record_id: BU-2468
   formula: CFe3
   phase: L
@@ -99184,7 +99216,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2468.json
 - record_id: BU-2469
   formula: Fe3O4
-  phase: solid
+  phase: cr
   name_as_published: Fe3O4(S) Solid-A
   cas_as_published: 1309-38-2
   record_kind: nasa7_polynomial
@@ -99217,9 +99249,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2469.json
+  phase_ordinal: 1
 - record_id: BU-2470
   formula: Fe3O4
-  phase: solid
+  phase: cr
   name_as_published: Fe3O4(S) Solid-B
   cas_as_published: 1309-38-2
   record_kind: nasa7_polynomial
@@ -99257,6 +99290,7 @@ entries:
       retained.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2470.json
+  phase_ordinal: 2
 - record_id: BU-2471
   formula: Fe3O4
   phase: L
@@ -99294,7 +99328,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2471.json
 - record_id: BU-2472
   formula: Ga
-  phase: solid
+  phase: cr
   name_as_published: Ga Reference Ele
   cas_as_published: 7440-55-3
   record_kind: nasa7_polynomial
@@ -99447,7 +99481,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2475.json
 - record_id: BU-2476
   formula: Ge
-  phase: solid
+  phase: cr
   name_as_published: Ge(cr) REF ELEMEN
   cas_as_published: 7440-56-4
   record_kind: nasa7_polynomial
@@ -99482,7 +99516,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2476.json
 - record_id: BU-2477
   formula: Ge
-  phase: C
+  phase: condensed
   name_as_published: Ge(cr) Ref Elemen
   cas_as_published: 7440-56-4
   record_kind: nasa7_polynomial
@@ -100114,7 +100148,7 @@ entries:
   - kind: phase_card_suffix_conflict
     phase_card_as_published: G
     phase_as_published: s
-    note: Native phase takes precedence; conflicting suffix retained verbatim.
+    note: Conflicting published card and state suffix are both retained verbatim.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2494.json
 - record_id: BU-2495
@@ -100154,7 +100188,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2495.json
 - record_id: BU-2496
   formula: GeS2
-  phase: S/s
+  phase: s
   name_as_published: GeS2(II)(s)
   cas_as_published: 12025-34-2
   record_kind: nasa7_polynomial
@@ -100193,9 +100227,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2496.json
+  phase_ordinal: 1
 - record_id: BU-2497
   formula: GeS2
-  phase: S/s
+  phase: s
   name_as_published: GeS2(II)(s)
   cas_as_published: 12025-34-2
   record_kind: nasa7_polynomial
@@ -100232,9 +100267,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2497.json
+  phase_ordinal: 2
 - record_id: BU-2498
   formula: GeS2
-  phase: L/L
+  phase: L
   name_as_published: GeS2(L)
   cas_as_published: 12025-34-2
   record_kind: nasa7_polynomial
@@ -102015,7 +102051,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2547.json
 - record_id: BU-2548
   formula: HT
-  phase: C
+  phase: condensed
   name_as_published: HT   Tritium Hydri
   cas_as_published: 14885-60-0
   record_kind: nasa7_polynomial
@@ -102166,7 +102202,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2551.json
 - record_id: BU-2552
   formula: H2O
-  phase: C/cr
+  phase: cr
   name_as_published: H2O(cr)
   cas_as_published: 7732-18-5
   record_kind: nasa7_polynomial
@@ -102201,7 +102237,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2552.json
 - record_id: BU-2553
   formula: H2O
-  phase: L/L
+  phase: L
   name_as_published: H2O(L)
   cas_as_published: 7732-18-5
   record_kind: nasa7_polynomial
@@ -102341,7 +102377,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2556.json
 - record_id: BU-2557
   formula: H2O2
-  phase: L/L
+  phase: L
   name_as_published: H2O2(L)
   cas_as_published: 7722-84-1
   record_kind: nasa7_polynomial
@@ -102691,7 +102727,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2566.json
 - record_id: BU-2567
   formula: H2SO4
-  phase: C/L
+  phase: L
   name_as_published: H2SO4(L)
   cas_as_published: 7664-93-9
   record_kind: nasa7_polynomial
@@ -103046,7 +103082,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2576.json
 - record_id: BU-2577
   formula: H3PO4
-  phase: S/cr
+  phase: cr
   name_as_published: H3PO4(cr)
   cas_as_published: 7664-38-2
   record_kind: nasa7_polynomial
@@ -103081,7 +103117,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2577.json
 - record_id: BU-2578
   formula: H3PO4
-  phase: L/L
+  phase: L
   name_as_published: H3PO4(L)
   cas_as_published: 7664-38-2
   record_kind: nasa7_polynomial
@@ -103332,7 +103368,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2584.json
 - record_id: BU-2585
   formula: Hg
-  phase: C/cr
+  phase: cr
   name_as_published: Hg(cr)
   cas_as_published: 7349-97-6
   record_kind: nasa7_polynomial
@@ -103367,7 +103403,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2585.json
 - record_id: BU-2586
   formula: Hg
-  phase: C/liq
+  phase: liq
   name_as_published: Hg(liq)
   cas_as_published: 7349-97-6
   record_kind: nasa7_polynomial
@@ -103472,7 +103508,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2588.json
 - record_id: BU-2589
   formula: HgBr2
-  phase: S/cr
+  phase: cr
   name_as_published: HgBr2(cr)
   cas_as_published: 7789-47-1
   record_kind: nasa7_polynomial
@@ -103507,7 +103543,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2589.json
 - record_id: BU-2590
   formula: HgBr2
-  phase: L/L
+  phase: L
   name_as_published: HgBr2(L)
   cas_as_published: 7789-47-1
   record_kind: nasa7_polynomial
@@ -103647,7 +103683,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2593.json
 - record_id: BU-2594
   formula: HgO
-  phase: C/cr
+  phase: cr
   name_as_published: HgO(cr)
   cas_as_published: 21908-53-2
   record_kind: nasa7_polynomial
@@ -104049,7 +104085,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2604.json
 - record_id: BU-2605
   formula: I2
-  phase: S/cr
+  phase: cr
   name_as_published: I2(cr)
   cas_as_published: 7553-56-2
   record_kind: nasa7_polynomial
@@ -104084,7 +104120,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2605.json
 - record_id: BU-2606
   formula: I2
-  phase: L/L
+  phase: L
   name_as_published: I2(L)
   cas_as_published: 7553-56-2
   record_kind: nasa7_polynomial
@@ -104264,7 +104300,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2610.json
 - record_id: BU-2611
   formula: Ir
-  phase: solid
+  phase: cr
   name_as_published: IR (cr) Iridium
   cas_as_published: 7439-88-5
   record_kind: nasa7_polynomial
@@ -104369,7 +104405,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2613.json
 - record_id: BU-2614
   formula: K
-  phase: C
+  phase: condensed
   name_as_published: K(cr) REF ELEMENT
   cas_as_published: 7440-09-7
   record_kind: nasa7_polynomial
@@ -104514,7 +104550,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2617.json
 - record_id: BU-2618
   formula: KNO3
-  phase: C
+  phase: condensed
   name_as_published: KNO3(a) Rhombic
   cas_as_published: 7757-79-1
   record_kind: nasa7_polynomial
@@ -104547,9 +104583,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2618.json
+  phase_ordinal: 1
 - record_id: BU-2619
   formula: KNO3
-  phase: C
+  phase: condensed
   name_as_published: KNO3(b) Hexagonal
   cas_as_published: 7757-79-1
   record_kind: nasa7_polynomial
@@ -104582,9 +104619,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2619.json
+  phase_ordinal: 2
 - record_id: BU-2620
   formula: KNO3
-  phase: L/L
+  phase: L
   name_as_published: KNO3(L)
   cas_as_published: 7757-79-1
   record_kind: nasa7_polynomial
@@ -104943,7 +104981,7 @@ entries:
   - kind: phase_card_suffix_conflict
     phase_card_as_published: G
     phase_as_published: cr
-    note: Native phase takes precedence; conflicting suffix retained verbatim.
+    note: Conflicting published card and state suffix are both retained verbatim.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2629.json
 - record_id: BU-2630
@@ -105158,7 +105196,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2635.json
 - record_id: BU-2636
   formula: LiI
-  phase: S/cr
+  phase: cr
   name_as_published: LiI(cr)
   cas_as_published: 10377-51-2,
   record_kind: nasa7_polynomial
@@ -105195,7 +105233,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2636.json
 - record_id: BU-2637
   formula: LiI
-  phase: L/L
+  phase: L
   name_as_published: LiI(L)
   cas_as_published: 10377-51-2,
   record_kind: nasa7_polynomial
@@ -105267,7 +105305,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2638.json
 - record_id: BU-2639
   formula: LiH
-  phase: S/cr
+  phase: cr
   name_as_published: LiH(cr)
   cas_as_published: 7580-67-8
   record_kind: nasa7_polynomial
@@ -105302,7 +105340,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2639.json
 - record_id: BU-2640
   formula: LiH
-  phase: L/L
+  phase: L
   name_as_published: LiH(L)
   cas_as_published: 7580-67-8
   record_kind: nasa7_polynomial
@@ -105407,7 +105445,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2642.json
 - record_id: BU-2643
   formula: LiNO2
-  phase: S/II
+  phase: II
   name_as_published: LiNO2(II)
   cas_as_published: 13568-33-7
   record_kind: nasa7_polynomial
@@ -105442,7 +105480,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2643.json
 - record_id: BU-2644
   formula: LiNO2
-  phase: S/I
+  phase: I
   name_as_published: LiNO2(I)
   cas_as_published: 13568-33-7
   record_kind: nasa7_polynomial
@@ -105477,7 +105515,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2644.json
 - record_id: BU-2645
   formula: LiNO2
-  phase: L/L
+  phase: L
   name_as_published: LiNO2(L)
   cas_as_published: 13568-33-7
   record_kind: nasa7_polynomial
@@ -105652,7 +105690,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2649.json
 - record_id: BU-2650
   formula: LiOH
-  phase: C/cr
+  phase: cr
   name_as_published: LiOH(cr)
   cas_as_published: 1310-65-2
   record_kind: nasa7_polynomial
@@ -105687,7 +105725,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2650.json
 - record_id: BU-2651
   formula: LiOH
-  phase: C/L
+  phase: L
   name_as_published: LiOH(L)
   cas_as_published: 1310-65-2
   record_kind: nasa7_polynomial
@@ -106072,7 +106110,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2661.json
 - record_id: BU-2662
   formula: Li2O2
-  phase: S/cr
+  phase: cr
   name_as_published: Li2O2(cr)
   cas_as_published: 12031-80-0
   record_kind: nasa7_polynomial
@@ -106399,7 +106437,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2670.json
 - record_id: BU-2671
   formula: Mg
-  phase: S/cr
+  phase: cr
   name_as_published: Mg(cr)
   cas_as_published: 7439-95-4
   record_kind: nasa7_polynomial
@@ -106434,7 +106472,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2671.json
 - record_id: BU-2672
   formula: Mg
-  phase: L/L
+  phase: L
   name_as_published: Mg(L)
   cas_as_published: 7439-95-4
   record_kind: nasa7_polynomial
@@ -106544,7 +106582,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2674.json
 - record_id: BU-2675
   formula: MgAl2O4
-  phase: S/cr
+  phase: cr
   name_as_published: MgAL2O4(cr)
   cas_as_published: 12068-51-8
   record_kind: nasa7_polynomial
@@ -106579,7 +106617,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2675.json
 - record_id: BU-2676
   formula: MgAl2O4
-  phase: L/L
+  phase: L
   name_as_published: MgAL2O4(L)
   cas_as_published: 12068-51-8
   record_kind: nasa7_polynomial
@@ -106614,7 +106652,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2676.json
 - record_id: BU-2677
   formula: MgB2
-  phase: S/cr
+  phase: cr
   name_as_published: MgB2 (cr)
   cas_as_published: 12007-25-9
   record_kind: nasa7_polynomial
@@ -106719,7 +106757,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2679.json
 - record_id: BU-2680
   formula: MgBr2
-  phase: S/cr
+  phase: cr
   name_as_published: MgBr2(cr)
   cas_as_published: 7789-48-2
   record_kind: nasa7_polynomial
@@ -106754,7 +106792,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2680.json
 - record_id: BU-2681
   formula: MgBr2
-  phase: L/L
+  phase: L
   name_as_published: MgBr2(L)
   cas_as_published: 7789-48-2
   record_kind: nasa7_polynomial
@@ -106824,7 +106862,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2682.json
 - record_id: BU-2683
   formula: MgCO3
-  phase: S/cr
+  phase: cr
   name_as_published: MgCO3(cr)
   cas_as_published: 546-93-0
   record_kind: nasa7_polynomial
@@ -106863,9 +106901,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2683.json
+  phase_ordinal: 1
 - record_id: BU-2684
   formula: MgCO3
-  phase: C/cr
+  phase: cr
   name_as_published: MgCO3(cr)
   cas_as_published: 546-93-0
   record_kind: nasa7_polynomial
@@ -106902,9 +106941,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2684.json
+  phase_ordinal: 2
 - record_id: BU-2685
   formula: MgCO3
-  phase: L/L
+  phase: L
   name_as_published: MgCO3(L)
   cas_as_published: 546-93-0
   record_kind: nasa7_polynomial
@@ -107044,7 +107084,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2688.json
 - record_id: BU-2689
   formula: MgCl2
-  phase: S/cr
+  phase: cr
   name_as_published: MgCL2(cr)
   cas_as_published: 7786-30-3
   record_kind: nasa7_polynomial
@@ -107083,9 +107123,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2689.json
+  phase_ordinal: 1
 - record_id: BU-2690
   formula: MgCl2
-  phase: S/cr
+  phase: cr
   name_as_published: MgCL2(cr)
   cas_as_published: 7786-30-3
   record_kind: nasa7_polynomial
@@ -107122,9 +107163,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2690.json
+  phase_ordinal: 2
 - record_id: BU-2691
   formula: MgCl2
-  phase: L/L
+  phase: L
   name_as_published: MgCL2(L)
   cas_as_published: 7786-30-3
   record_kind: nasa7_polynomial
@@ -107163,9 +107205,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2691.json
+  phase_ordinal: 1
 - record_id: BU-2692
   formula: MgCl2
-  phase: L/L
+  phase: L
   name_as_published: MgCL2(L)
   cas_as_published: 7786-30-3
   record_kind: nasa7_polynomial
@@ -107202,6 +107245,7 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2692.json
+  phase_ordinal: 2
 - record_id: BU-2693
   formula: MgCl2
   phase: gas
@@ -107309,7 +107353,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2695.json
 - record_id: BU-2696
   formula: MgF2
-  phase: solid
+  phase: cr
   name_as_published: MgF2(cr)I
   cas_as_published: 7783-40-6
   record_kind: nasa7_polynomial
@@ -107344,7 +107388,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2696.json
 - record_id: BU-2697
   formula: MgF2
-  phase: C
+  phase: condensed
   name_as_published: MgF2(cr)II
   cas_as_published: 7783-40-6
   record_kind: nasa7_polynomial
@@ -107379,7 +107423,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2697.json
 - record_id: BU-2698
   formula: MgF2
-  phase: L/L
+  phase: L
   name_as_published: MgF2(L)
   cas_as_published: 7783-40-6
   record_kind: nasa7_polynomial
@@ -107589,7 +107633,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2703.json
 - record_id: BU-2704
   formula: MgH2
-  phase: S/b
+  phase: b
   name_as_published: MgH2(b)
   cas_as_published: 7693-27-8
   record_kind: nasa7_polynomial
@@ -107624,7 +107668,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2704.json
 - record_id: BU-2705
   formula: MgH2
-  phase: L/L
+  phase: L
   name_as_published: MgH2(L)
   cas_as_published: 7693-27-8
   record_kind: nasa7_polynomial
@@ -107659,7 +107703,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2705.json
 - record_id: BU-2706
   formula: MgO2H2
-  phase: C/cr
+  phase: cr
   name_as_published: Mg(OH)2(cr)
   cas_as_published: 1309-42-8
   record_kind: nasa7_polynomial
@@ -107694,7 +107738,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2706.json
 - record_id: BU-2707
   formula: MgO2H2
-  phase: L/L
+  phase: L
   name_as_published: Mg(OH)2(L)
   cas_as_published: 1309-42-8
   record_kind: nasa7_polynomial
@@ -107804,7 +107848,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2709.json
 - record_id: BU-2710
   formula: MgI2
-  phase: C/S
+  phase: S
   name_as_published: MgI2(S)
   cas_as_published: 10377-58-9
   record_kind: nasa7_polynomial
@@ -107839,7 +107883,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2710.json
 - record_id: BU-2711
   formula: MgI2
-  phase: C/L
+  phase: L
   name_as_published: MgI2(L)
   cas_as_published: 10377-58-9
   record_kind: nasa7_polynomial
@@ -107944,7 +107988,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2713.json
 - record_id: BU-2714
   formula: MgO
-  phase: S/cr
+  phase: cr
   name_as_published: MgO(cr)
   cas_as_published: 1309-48-4
   record_kind: nasa7_polynomial
@@ -107979,7 +108023,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2714.json
 - record_id: BU-2715
   formula: MgO
-  phase: S/s
+  phase: s
   name_as_published: MgO(s)
   cas_as_published: 1309-48-4
   record_kind: nasa7_polynomial
@@ -108014,7 +108058,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2715.json
 - record_id: BU-2716
   formula: MgO
-  phase: L/L
+  phase: L
   name_as_published: MgO(L)
   cas_as_published: 1309-48-4
   record_kind: nasa7_polynomial
@@ -108084,7 +108128,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2717.json
 - record_id: BU-2718
   formula: MgS
-  phase: S/cr
+  phase: cr
   name_as_published: MgS(cr)
   cas_as_published: 12032-36-9
   record_kind: nasa7_polynomial
@@ -108119,7 +108163,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2718.json
 - record_id: BU-2719
   formula: MgS
-  phase: L/L
+  phase: L
   name_as_published: MgS(L)
   cas_as_published: 12032-36-9
   record_kind: nasa7_polynomial
@@ -108189,7 +108233,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2720.json
 - record_id: BU-2721
   formula: MgSO4
-  phase: S/II
+  phase: II
   name_as_published: MgSO4(II)
   cas_as_published: 748-88-9
   record_kind: nasa7_polynomial
@@ -108230,7 +108274,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2721.json
 - record_id: BU-2722
   formula: MgO4S
-  phase: C/II
+  phase: II
   name_as_published: MgSO4(II)
   cas_as_published: 748-88-9
   record_kind: nasa7_polynomial
@@ -108269,7 +108313,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2722.json
 - record_id: BU-2723
   formula: MgSO4
-  phase: S/I
+  phase: I
   name_as_published: MgSO4(I)
   cas_as_published: 748-88-9
   record_kind: nasa7_polynomial
@@ -108304,7 +108348,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2723.json
 - record_id: BU-2724
   formula: MgSO4
-  phase: L/L
+  phase: L
   name_as_published: MgSO4(L)
   cas_as_published: 748-88-9
   record_kind: nasa7_polynomial
@@ -108339,7 +108383,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2724.json
 - record_id: BU-2725
   formula: MgSiO3
-  phase: S/I
+  phase: I
   name_as_published: MgSiO3(I)
   cas_as_published: 13776-74-4
   record_kind: nasa7_polynomial
@@ -108374,7 +108418,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2725.json
 - record_id: BU-2726
   formula: MgSiO3
-  phase: S/II
+  phase: II
   name_as_published: MgSiO3(II)
   cas_as_published: 13776-74-4
   record_kind: nasa7_polynomial
@@ -108414,7 +108458,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2726.json
 - record_id: BU-2727
   formula: MgSiO3
-  phase: S/III
+  phase: III
   name_as_published: MgSiO3(III)
   cas_as_published: 13776-74-4
   record_kind: nasa7_polynomial
@@ -108454,7 +108498,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2727.json
 - record_id: BU-2728
   formula: MgSiO3
-  phase: L/L
+  phase: L
   name_as_published: MgSiO3(L)
   cas_as_published: 13776-74-4
   record_kind: nasa7_polynomial
@@ -108489,7 +108533,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2728.json
 - record_id: BU-2729
   formula: MgTiO3
-  phase: S/cr
+  phase: cr
   name_as_published: MgTiO3(cr)
   cas_as_published: 12032-30-3
   record_kind: nasa7_polynomial
@@ -108544,9 +108588,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2729.json
+  phase_ordinal: 1
 - record_id: BU-2730
   formula: MgTiO3
-  phase: S/cr
+  phase: cr
   name_as_published: MgTiO3(cr)
   cas_as_published: 12032-30-3
   record_kind: nasa7_polynomial
@@ -108583,9 +108628,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2730.json
+  phase_ordinal: 2
 - record_id: BU-2731
   formula: MgTiO3
-  phase: L/L
+  phase: L
   name_as_published: MgTiO3(L)
   cas_as_published: 12032-30-3
   record_kind: nasa7_polynomial
@@ -108620,7 +108666,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2731.json
 - record_id: BU-2732
   formula: MgTi2O5
-  phase: C/cr
+  phase: cr
   name_as_published: MgTi2O5(cr)
   cas_as_published: 12032-35-8
   record_kind: nasa7_polynomial
@@ -108659,9 +108705,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2732.json
+  phase_ordinal: 1
 - record_id: BU-2733
   formula: MgTi2O5
-  phase: C/cr
+  phase: cr
   name_as_published: MgTi2O5(cr)
   cas_as_published: 12032-35-8
   record_kind: nasa7_polynomial
@@ -108698,9 +108745,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2733.json
+  phase_ordinal: 2
 - record_id: BU-2734
   formula: MgTi2O5
-  phase: C/L
+  phase: L
   name_as_published: MgTi2O5(L)
   cas_as_published: 12032-35-8
   record_kind: nasa7_polynomial
@@ -108810,7 +108858,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2736.json
 - record_id: BU-2737
   formula: Mg2SiO4
-  phase: C/cr
+  phase: cr
   name_as_published: Mg2SiO4(cr)
   cas_as_published: 10034-94-3
   record_kind: nasa7_polynomial
@@ -108849,9 +108897,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2737.json
+  phase_ordinal: 1
 - record_id: BU-2738
   formula: Mg2SiO4
-  phase: C/cr
+  phase: cr
   name_as_published: Mg2SiO4(cr)
   cas_as_published: 10034-94-3
   record_kind: nasa7_polynomial
@@ -108888,9 +108937,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2738.json
+  phase_ordinal: 2
 - record_id: BU-2739
   formula: Mg2SiO4
-  phase: C/L
+  phase: L
   name_as_published: Mg2SiO4(L)
   cas_as_published: 10034-94-3
   record_kind: nasa7_polynomial
@@ -108925,7 +108975,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2739.json
 - record_id: BU-2740
   formula: Mg2TiO4
-  phase: C/cr
+  phase: cr
   name_as_published: Mg2TiO4(cr)
   cas_as_published: 12032-52-9
   record_kind: nasa7_polynomial
@@ -108964,9 +109014,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2740.json
+  phase_ordinal: 1
 - record_id: BU-2741
   formula: Mg2TiO4
-  phase: C/cr
+  phase: cr
   name_as_published: Mg2TiO4(cr)
   cas_as_published: 12032-52-9
   record_kind: nasa7_polynomial
@@ -109003,9 +109054,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2741.json
+  phase_ordinal: 2
 - record_id: BU-2742
   formula: Mg2TiO4
-  phase: C/L
+  phase: L
   name_as_published: Mg2TiO4(L)
   cas_as_published: 12032-52-9
   record_kind: nasa7_polynomial
@@ -109040,7 +109092,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2742.json
 - record_id: BU-2743
   formula: Mg3N2
-  phase: S/cr
+  phase: cr
   name_as_published: Mg3N2(cr)
   cas_as_published: 12057-71-5
   record_kind: nasa7_polynomial
@@ -109110,7 +109162,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2744.json
 - record_id: BU-2745
   formula: MnO
-  phase: S/S
+  phase: S
   name_as_published: MnO (S)
   cas_as_published: 1344-43-0
   record_kind: nasa7_polynomial
@@ -109145,7 +109197,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2745.json
 - record_id: BU-2746
   formula: MnO
-  phase: L/L
+  phase: L
   name_as_published: MnO (L)
   cas_as_published: 1344-43-0
   record_kind: nasa7_polynomial
@@ -109180,7 +109232,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2746.json
 - record_id: BU-2747
   formula: MnO2
-  phase: S/S
+  phase: S
   name_as_published: MnO2(S)
   cas_as_published: 1313-13-9
   record_kind: nasa7_polynomial
@@ -109215,7 +109267,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2747.json
 - record_id: BU-2748
   formula: Mn2O3
-  phase: S/S
+  phase: S
   name_as_published: Mn2O3 (S)
   cas_as_published: 1317-34-6
   record_kind: nasa7_polynomial
@@ -109250,7 +109302,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2748.json
 - record_id: BU-2749
   formula: Mn3O4
-  phase: solid
+  phase: cr
   name_as_published: Mn3O4  Solid-A
   cas_as_published: 1317-35-7
   record_kind: nasa7_polynomial
@@ -109283,9 +109335,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2749.json
+  phase_ordinal: 1
 - record_id: BU-2750
   formula: Mn3O4
-  phase: solid
+  phase: cr
   name_as_published: Mn3O4  Solid-B
   cas_as_published: 1317-35-7
   record_kind: nasa7_polynomial
@@ -109318,9 +109371,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2750.json
+  phase_ordinal: 2
 - record_id: BU-2751
   formula: Mn5N2
-  phase: S/S
+  phase: S
   name_as_published: Mn5N2(S)
   cas_as_published: 12033-08-8
   record_kind: nasa7_polynomial
@@ -109355,7 +109409,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2751.json
 - record_id: BU-2752
   formula: MnS
-  phase: solid
+  phase: cr
   name_as_published: MnS   Solid
   cas_as_published: 18820-29-6
   record_kind: nasa7_polynomial
@@ -109425,7 +109479,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2753.json
 - record_id: BU-2754
   formula: MnS2
-  phase: S/S
+  phase: S
   name_as_published: MnS2 (S)
   cas_as_published: 12125-23-4
   record_kind: nasa7_polynomial
@@ -109460,7 +109514,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2754.json
 - record_id: BU-2755
   formula: Mo
-  phase: solid
+  phase: cr
   name_as_published: Mo(cr) REF ELEMENT
   cas_as_published: 7439-98-7
   record_kind: nasa7_polynomial
@@ -109496,9 +109550,10 @@ entries:
     note: NASA-7 name field is cols 1-18; no trailing pad in this record.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2755.json
+  phase_ordinal: 1
 - record_id: BU-2756
   formula: Mo
-  phase: solid
+  phase: cr
   name_as_published: Mo(s) REF ELEMENT
   cas_as_published: 7439-98-7
   record_kind: nasa7_polynomial
@@ -109531,6 +109586,7 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2756.json
+  phase_ordinal: 2
 - record_id: BU-2757
   formula: Mo
   phase: L
@@ -109603,7 +109659,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2758.json
 - record_id: BU-2759
   formula: CMo
-  phase: solid
+  phase: cr
   name_as_published: MoC  Solid-C
   cas_as_published: 12011-97-1
   record_kind: nasa7_polynomial
@@ -109638,7 +109694,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2759.json
 - record_id: BU-2760
   formula: MoO2
-  phase: solid
+  phase: cr
   name_as_published: MoO2  Solid
   cas_as_published: 18868-43-4
   record_kind: nasa7_polynomial
@@ -109708,7 +109764,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2761.json
 - record_id: BU-2762
   formula: Mo2C
-  phase: S/S
+  phase: S
   name_as_published: Mo2C(S)
   cas_as_published: 12069-89-5
   record_kind: nasa7_polynomial
@@ -111439,7 +111495,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2810.json
 - record_id: BU-2811
   formula: NH4Br
-  phase: S/cr
+  phase: cr
   name_as_published: NH4Br(cr)
   cas_as_published: 12124-97-9
   record_kind: nasa7_polynomial
@@ -111478,9 +111534,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2811.json
+  phase_ordinal: 1
 - record_id: BU-2812
   formula: NH4Br
-  phase: S/cr
+  phase: cr
   name_as_published: NH4Br(cr)
   cas_as_published: 12124-97-9
   record_kind: nasa7_polynomial
@@ -111517,9 +111574,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2812.json
+  phase_ordinal: 2
 - record_id: BU-2813
   formula: NH4Cl
-  phase: C/II
+  phase: II
   name_as_published: NH4CL(II)
   cas_as_published: 12125-02-9
   record_kind: nasa7_polynomial
@@ -111554,7 +111612,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2813.json
 - record_id: BU-2814
   formula: NH4Cl
-  phase: C/III
+  phase: III
   name_as_published: NH4CL(III)
   cas_as_published: 12125-02-9
   record_kind: nasa7_polynomial
@@ -111589,7 +111647,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2814.json
 - record_id: BU-2815
   formula: NH4ClO4
-  phase: C/I
+  phase: I
   name_as_published: NH4CLO4(I)
   cas_as_published: 7790-98-9
   record_kind: nasa7_polynomial
@@ -111624,7 +111682,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2815.json
 - record_id: BU-2816
   formula: NH4ClO4
-  phase: C/II
+  phase: II
   name_as_published: NH4CLO4(II)
   cas_as_published: 7790-98-9
   record_kind: nasa7_polynomial
@@ -113560,7 +113618,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2869.json
 - record_id: BU-2870
   formula: N2H4O3
-  phase: C/IV
+  phase: IV
   name_as_published: NH4NO3(IV)
   cas_as_published: 6484-52-2
   record_kind: nasa7_polynomial
@@ -113599,9 +113657,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2870.json
+  phase_ordinal: 1
 - record_id: BU-2871
   formula: N2H4O3
-  phase: C/IV
+  phase: IV
   name_as_published: NH4NO3(IV)
   cas_as_published: 6484-52-2
   record_kind: nasa7_polynomial
@@ -113638,9 +113697,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2871.json
+  phase_ordinal: 2
 - record_id: BU-2872
   formula: N2H4O3
-  phase: C/III
+  phase: III
   name_as_published: NH4NO3(III)
   cas_as_published: 6484-52-2
   record_kind: nasa7_polynomial
@@ -113675,7 +113735,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2872.json
 - record_id: BU-2873
   formula: N2H4O3
-  phase: C/II
+  phase: II
   name_as_published: NH4NO3(II)
   cas_as_published: 6484-52-2
   record_kind: nasa7_polynomial
@@ -113710,7 +113770,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2873.json
 - record_id: BU-2874
   formula: N2H4O3
-  phase: C/I
+  phase: I
   name_as_published: NH4NO3(I)
   cas_as_published: 6484-52-2
   record_kind: nasa7_polynomial
@@ -113745,7 +113805,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2874.json
 - record_id: BU-2875
   formula: N2H4O3
-  phase: L/L
+  phase: L
   name_as_published: NH4NO3(L)
   cas_as_published: 6484-52-2
   record_kind: nasa7_polynomial
@@ -114936,7 +114996,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2907.json
 - record_id: BU-2908
   formula: Na
-  phase: C/cr
+  phase: cr
   name_as_published: Na(cr)
   cas_as_published: 7440-23-5
   record_kind: nasa7_polynomial
@@ -114971,7 +115031,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2908.json
 - record_id: BU-2909
   formula: Na
-  phase: C/L
+  phase: L
   name_as_published: Na(L)
   cas_as_published: 7440-23-5
   record_kind: nasa7_polynomial
@@ -115086,7 +115146,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2911.json
 - record_id: BU-2912
   formula: NaCl
-  phase: C/cr
+  phase: cr
   name_as_published: NaCL(cr)
   cas_as_published: 7647-14-5
   record_kind: nasa7_polynomial
@@ -115137,7 +115197,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2912.json
 - record_id: BU-2913
   formula: NaCl
-  phase: C/L
+  phase: L
   name_as_published: NaCL(L)
   cas_as_published: 7647-14-5
   record_kind: nasa7_polynomial
@@ -115392,7 +115452,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2919.json
 - record_id: BU-2920
   formula: NaNO3
-  phase: C/a
+  phase: a
   name_as_published: NaNO3(a)
   cas_as_published: 7631-99-4
   record_kind: nasa7_polynomial
@@ -115427,7 +115487,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2920.json
 - record_id: BU-2921
   formula: NaNO3
-  phase: C/b
+  phase: b
   name_as_published: NaNO3(b)
   cas_as_published: 7631-99-4
   record_kind: nasa7_polynomial
@@ -115462,7 +115522,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2921.json
 - record_id: BU-2922
   formula: NaNO3
-  phase: C/c
+  phase: c
   name_as_published: NaNO3(c)
   cas_as_published: 7631-99-4
   record_kind: nasa7_polynomial
@@ -115497,7 +115557,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2922.json
 - record_id: BU-2923
   formula: NaNO3
-  phase: L/L
+  phase: L
   name_as_published: NaNO3(L)
   cas_as_published: 7631-99-4
   record_kind: nasa7_polynomial
@@ -115567,7 +115627,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2924.json
 - record_id: BU-2925
   formula: NaO2
-  phase: C/cr
+  phase: cr
   name_as_published: NaO2(cr)
   cas_as_published: 12034-12-7
   record_kind: nasa7_polynomial
@@ -115602,7 +115662,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2925.json
 - record_id: BU-2926
   formula: NaO2
-  phase: L/L
+  phase: L
   name_as_published: NaO2(L)
   cas_as_published: 12034-12-7
   record_kind: nasa7_polynomial
@@ -115637,7 +115697,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2926.json
 - record_id: BU-2927
   formula: Na2CO3
-  phase: S/s
+  phase: s
   name_as_published: Na2CO3(s)
   cas_as_published: 497-19-8
   record_kind: nasa7_polynomial
@@ -115677,9 +115737,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2927.json
+  phase_ordinal: 1
 - record_id: BU-2928
   formula: Na2CO3
-  phase: S/s
+  phase: s
   name_as_published: Na2CO3(s)
   cas_as_published: 497-19-8
   record_kind: nasa7_polynomial
@@ -115716,9 +115777,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2928.json
+  phase_ordinal: 2
 - record_id: BU-2929
   formula: Na2CO3
-  phase: S/s
+  phase: s
   name_as_published: Na2CO3(s)
   cas_as_published: 497-19-8
   record_kind: nasa7_polynomial
@@ -115755,9 +115817,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2929.json
+  phase_ordinal: 3
 - record_id: BU-2930
   formula: Na2CO3
-  phase: S/liq
+  phase: liq
   name_as_published: Na2CO3(liq)
   cas_as_published: 497-19-8
   record_kind: nasa7_polynomial
@@ -115791,12 +115854,12 @@ entries:
   - kind: phase_card_suffix_conflict
     phase_card_as_published: S
     phase_as_published: liq
-    note: Native phase takes precedence; conflicting suffix retained verbatim.
+    note: Conflicting published card and state suffix are both retained verbatim.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2930.json
 - record_id: BU-2931
   formula: Na2O
-  phase: S/c
+  phase: c
   name_as_published: Na2O(c)
   cas_as_published: 1313-59-3
   record_kind: nasa7_polynomial
@@ -115831,7 +115894,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2931.json
 - record_id: BU-2932
   formula: Na2O
-  phase: S/b
+  phase: b
   name_as_published: Na2O(b)
   cas_as_published: 1313-59-3
   record_kind: nasa7_polynomial
@@ -115866,7 +115929,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2932.json
 - record_id: BU-2933
   formula: Na2O
-  phase: S/a
+  phase: a
   name_as_published: Na2O(a)
   cas_as_published: 1313-59-3
   record_kind: nasa7_polynomial
@@ -115901,7 +115964,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2933.json
 - record_id: BU-2934
   formula: Na2O
-  phase: L/L
+  phase: L
   name_as_published: Na2O(L)
   cas_as_published: 1313-59-3
   record_kind: nasa7_polynomial
@@ -115971,7 +116034,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2935.json
 - record_id: BU-2936
   formula: Na2O2
-  phase: S/b
+  phase: b
   name_as_published: Na2O2(b)
   cas_as_published: 1313-60-6
   record_kind: nasa7_polynomial
@@ -116006,7 +116069,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2936.json
 - record_id: BU-2937
   formula: Na2O2
-  phase: S/a
+  phase: a
   name_as_published: Na2O2(a)
   cas_as_published: 1313-60-6
   record_kind: nasa7_polynomial
@@ -116041,7 +116104,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2937.json
 - record_id: BU-2938
   formula: Na2O2
-  phase: L/L
+  phase: L
   name_as_published: Na2O2(L)
   cas_as_published: 1313-60-6
   record_kind: nasa7_polynomial
@@ -116251,7 +116314,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2943.json
 - record_id: BU-2944
   formula: Ni
-  phase: S/cr
+  phase: cr
   name_as_published: Ni(cr)
   cas_as_published: 7440-02-0
   record_kind: nasa7_polynomial
@@ -116290,9 +116353,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2944.json
+  phase_ordinal: 1
 - record_id: BU-2945
   formula: Ni
-  phase: C/cr
+  phase: cr
   name_as_published: Ni(cr)
   cas_as_published: 7440-02-0
   record_kind: nasa7_polynomial
@@ -116329,9 +116393,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2945.json
+  phase_ordinal: 2
 - record_id: BU-2946
   formula: Ni
-  phase: L/L
+  phase: L
   name_as_published: Ni(L)
   cas_as_published: 7440-02-0
   record_kind: nasa7_polynomial
@@ -116476,7 +116541,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2949.json
 - record_id: BU-2950
   formula: NiO
-  phase: C
+  phase: condensed
   name_as_published: NiO(cr)A
   cas_as_published: 1313-99-1
   record_kind: nasa7_polynomial
@@ -116509,9 +116574,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2950.json
+  phase_ordinal: 1
 - record_id: BU-2951
   formula: NiO
-  phase: C
+  phase: condensed
   name_as_published: NiO(cr)B
   cas_as_published: 1313-99-1
   record_kind: nasa7_polynomial
@@ -116544,9 +116610,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2951.json
+  phase_ordinal: 2
 - record_id: BU-2952
   formula: NiO
-  phase: C
+  phase: condensed
   name_as_published: NiO(cr)C
   cas_as_published: 1313-99-1
   record_kind: nasa7_polynomial
@@ -116579,9 +116646,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-2952.json
+  phase_ordinal: 3
 - record_id: BU-2953
   formula: NiO
-  phase: L/L
+  phase: L
   name_as_published: NiO(L)
   cas_as_published: 1313-99-1
   record_kind: nasa7_polynomial
@@ -116616,7 +116684,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2953.json
 - record_id: BU-2954
   formula: NiS
-  phase: S/b
+  phase: b
   name_as_published: NiS(b)
   cas_as_published: 16812-54-7
   record_kind: nasa7_polynomial
@@ -116651,7 +116719,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2954.json
 - record_id: BU-2955
   formula: NiS
-  phase: S/a
+  phase: a
   name_as_published: NiS(a)
   cas_as_published: 16812-54-7
   record_kind: nasa7_polynomial
@@ -116686,7 +116754,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2955.json
 - record_id: BU-2956
   formula: NiS
-  phase: L/L
+  phase: L
   name_as_published: NiS(L)
   cas_as_published: 16812-54-7
   record_kind: nasa7_polynomial
@@ -116721,7 +116789,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2956.json
 - record_id: BU-2957
   formula: NiS2
-  phase: S/cr
+  phase: cr
   name_as_published: NiS2(cr)
   cas_as_published: 12035-51-7
   record_kind: nasa7_polynomial
@@ -116756,7 +116824,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2957.json
 - record_id: BU-2958
   formula: NiS2
-  phase: L/L
+  phase: L
   name_as_published: NiS2(L)
   cas_as_published: 12035-51-7
   record_kind: nasa7_polynomial
@@ -116791,7 +116859,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2958.json
 - record_id: BU-2959
   formula: Ni3S2
-  phase: S/a
+  phase: a
   name_as_published: Ni3S2(a)
   cas_as_published: 12035-72-2
   record_kind: nasa7_polynomial
@@ -116826,7 +116894,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2959.json
 - record_id: BU-2960
   formula: Ni3S2
-  phase: S/b
+  phase: b
   name_as_published: Ni3S2(b)
   cas_as_published: 12035-72-2
   record_kind: nasa7_polynomial
@@ -116861,7 +116929,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2960.json
 - record_id: BU-2961
   formula: Ni3S2
-  phase: L/L
+  phase: L
   name_as_published: Ni3S2(L)
   cas_as_published: 12035-72-2
   record_kind: nasa7_polynomial
@@ -116896,7 +116964,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2961.json
 - record_id: BU-2962
   formula: Ni3S4
-  phase: C/cr
+  phase: cr
   name_as_published: Ni3S4(cr)
   cas_as_published: 12137-12-1
   record_kind: nasa7_polynomial
@@ -117641,7 +117709,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2982.json
 - record_id: BU-2983
   formula: Os
-  phase: solid
+  phase: cr
   name_as_published: OS(cr) REF ELEMEN
   cas_as_published: 7440-04-2
   record_kind: nasa7_polynomial
@@ -117746,7 +117814,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2985.json
 - record_id: BU-2986
   formula: P
-  phase: S/cr
+  phase: cr
   name_as_published: P(cr)
   cas_as_published: 7723-14-0
   record_kind: nasa7_polynomial
@@ -117781,7 +117849,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-2986.json
 - record_id: BU-2987
   formula: P
-  phase: L/L
+  phase: L
   name_as_published: P(L)
   cas_as_published: 7723-14-0
   record_kind: nasa7_polynomial
@@ -120813,7 +120881,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3072.json
 - record_id: BU-3073
   formula: P4O10
-  phase: C/cr
+  phase: cr
   name_as_published: P4O10(cr)
   cas_as_published: 16752-60-6
   record_kind: nasa7_polynomial
@@ -120852,9 +120920,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3073.json
+  phase_ordinal: 1
 - record_id: BU-3074
   formula: P4O10
-  phase: C/cr
+  phase: cr
   name_as_published: P4O10(cr)
   cas_as_published: 16752-60-6
   record_kind: nasa7_polynomial
@@ -120891,9 +120960,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3074.json
+  phase_ordinal: 2
 - record_id: BU-3075
   formula: P4O10
-  phase: C/L
+  phase: L
   name_as_published: P4O10(L)
   cas_as_published: 16752-60-6
   record_kind: nasa7_polynomial
@@ -120963,7 +121033,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3076.json
 - record_id: BU-3077
   formula: Pb
-  phase: C/cr
+  phase: cr
   name_as_published: Pb(cr)
   cas_as_published: 7439-92-1
   record_kind: nasa7_polynomial
@@ -120998,7 +121068,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3077.json
 - record_id: BU-3078
   formula: Pb
-  phase: L/L
+  phase: L
   name_as_published: Pb(L)
   cas_as_published: 7439-92-1
   record_kind: nasa7_polynomial
@@ -121841,7 +121911,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3101.json
 - record_id: BU-3102
   formula: PbS
-  phase: S/cr
+  phase: cr
   name_as_published: PbS(cr)
   cas_as_published: 1314-87-0
   record_kind: nasa7_polynomial
@@ -121874,9 +121944,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3102.json
+  phase_ordinal: 1
 - record_id: BU-3103
   formula: PbS
-  phase: solid
+  phase: cr
   name_as_published: PBS(cr)  GALENA
   cas_as_published: 1314-87-0
   record_kind: nasa7_polynomial
@@ -121909,9 +121980,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3103.json
+  phase_ordinal: 2
 - record_id: BU-3104
   formula: PbS
-  phase: L/L
+  phase: L
   name_as_published: PbS(L)
   cas_as_published: 1314-87-0
   record_kind: nasa7_polynomial
@@ -122016,7 +122088,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3106.json
 - record_id: BU-3107
   formula: PbTe
-  phase: solid
+  phase: cr
   name_as_published: PbTe Solid
   cas_as_published: 1314-91-6
   record_kind: nasa7_polynomial
@@ -122121,7 +122193,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3109.json
 - record_id: BU-3110
   formula: Pd
-  phase: solid
+  phase: cr
   name_as_published: PD(cr)  REF ELEM
   cas_as_published: 7440-05-3
   record_kind: nasa7_polynomial
@@ -122261,7 +122333,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3113.json
 - record_id: BU-3114
   formula: Po
-  phase: S/cr
+  phase: cr
   name_as_published: PO Polonium (cr)
   cas_as_published: 7440-08-6
   record_kind: nasa7_polynomial
@@ -122296,7 +122368,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3114.json
 - record_id: BU-3115
   formula: Po
-  phase: L/L
+  phase: L
   name_as_published: PO Polonium (L)
   cas_as_published: 7440-08-6
   record_kind: nasa7_polynomial
@@ -122471,7 +122543,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3119.json
 - record_id: BU-3120
   formula: Pt
-  phase: solid
+  phase: cr
   name_as_published: Pt(cr) REF ELEMEN
   cas_as_published: 7440-06-4
   record_kind: nasa7_polynomial
@@ -122789,7 +122861,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3128.json
 - record_id: BU-3129
   formula: Ra
-  phase: solid
+  phase: cr
   name_as_published: Ra(cr) Radium
   cas_as_published: 7440-14-4
   record_kind: nasa7_polynomial
@@ -122999,7 +123071,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3134.json
 - record_id: BU-3135
   formula: S
-  phase: C/a
+  phase: a
   name_as_published: S(a)
   cas_as_published: 7704-34-9
   record_kind: nasa7_polynomial
@@ -123034,7 +123106,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3135.json
 - record_id: BU-3136
   formula: S
-  phase: C/b
+  phase: b
   name_as_published: S(b)
   cas_as_published: 7704-34-9
   record_kind: nasa7_polynomial
@@ -125249,7 +125321,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3198.json
 - record_id: BU-3199
   formula: Sb
-  phase: solid
+  phase: cr
   name_as_published: SB(cr) REF ELEME
   cas_as_published: 7440-36-0
   record_kind: nasa7_polynomial
@@ -125844,7 +125916,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3215.json
 - record_id: BU-3216
   formula: Si
-  phase: solid
+  phase: cr
   name_as_published: Si(cr) REF ELEMEN
   cas_as_published: 7440-21-3
   record_kind: nasa7_polynomial
@@ -125879,7 +125951,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3216.json
 - record_id: BU-3217
   formula: Si
-  phase: L/L
+  phase: L
   name_as_published: Si(L)
   cas_as_published: 7440-21-3
   record_kind: nasa7_polynomial
@@ -127461,7 +127533,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3261.json
 - record_id: BU-3262
   formula: SiO2
-  phase: C/a-qz
+  phase: condensed
   name_as_published: SiO2(a-qz)
   cas_as_published: 7631-86-9
   record_kind: nasa7_polynomial
@@ -127490,13 +127562,21 @@ entries:
     end_line: 34639
   coefficient_count: 15
   interval_count: 2
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: a-qz
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'liquid', 'ref', 's', 'solid']. Records
+      are not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3262.json
+  phase_ordinal: 1
 - record_id: BU-3263
   formula: SiO2
-  phase: C/b-crt
+  phase: condensed
   name_as_published: SiO2(b-crt)
   cas_as_published: 7631-86-9
   record_kind: nasa7_polynomial
@@ -127525,13 +127605,21 @@ entries:
     end_line: 34643
   coefficient_count: 15
   interval_count: 2
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: b-crt
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'liquid', 'ref', 's', 'solid']. Records
+      are not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3263.json
+  phase_ordinal: 2
 - record_id: BU-3264
   formula: SiO2
-  phase: L/L
+  phase: L
   name_as_published: SiO2(L)
   cas_as_published: 7631-86-9
   record_kind: nasa7_polynomial
@@ -127636,7 +127724,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3266.json
 - record_id: BU-3267
   formula: SiS2
-  phase: solid
+  phase: cr
   name_as_published: SiS2  Solid
   cas_as_published: 13759-10-9
   record_kind: nasa7_polynomial
@@ -128441,7 +128529,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3289.json
 - record_id: BU-3290
   formula: Si2N2O
-  phase: S/cr
+  phase: cr
   name_as_published: Si2N2O(cr)
   cas_as_published: 12033-76-0 or 12163-95-0
   record_kind: nasa7_polynomial
@@ -129080,7 +129168,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3307.json
 - record_id: BU-3308
   formula: Si3N4
-  phase: S/cr
+  phase: cr
   name_as_published: Si3N4(cr)
   cas_as_published: 12033-89-5
   record_kind: nasa7_polynomial
@@ -129119,9 +129207,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3308.json
+  phase_ordinal: 1
 - record_id: BU-3309
   formula: Si3N4
-  phase: S/cr
+  phase: cr
   name_as_published: Si3N4(cr)
   cas_as_published: 12033-89-5
   record_kind: nasa7_polynomial
@@ -129158,6 +129247,7 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3309.json
+  phase_ordinal: 2
 - record_id: BU-3310
   formula: Si4H7
   phase: gas
@@ -130528,7 +130618,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3348.json
 - record_id: BU-3349
   formula: Tc
-  phase: solid
+  phase: cr
   name_as_published: Tc (cr)  REFER ELE
   cas_as_published: 7440-26-8
   record_kind: nasa7_polynomial
@@ -130671,7 +130761,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3352.json
 - record_id: BU-3353
   formula: Te
-  phase: solid
+  phase: cr
   name_as_published: Te(s) REF ELEMENT
   cas_as_published: 13494-80-9
   record_kind: nasa7_polynomial
@@ -130846,7 +130936,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3357.json
 - record_id: BU-3358
   formula: Th
-  phase: solid
+  phase: cr
   name_as_published: Th(a) Ref Element
   cas_as_published: 7440-29-1
   record_kind: nasa7_polynomial
@@ -130881,7 +130971,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3358.json
 - record_id: BU-3359
   formula: Th
-  phase: S/b
+  phase: b
   name_as_published: Th(b)
   cas_as_published: 7440-29-1
   record_kind: nasa7_polynomial
@@ -130916,7 +131006,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3359.json
 - record_id: BU-3360
   formula: Th
-  phase: L/l
+  phase: l
   name_as_published: Th(l)
   cas_as_published: 7440-29-1
   record_kind: nasa7_polynomial
@@ -131059,7 +131149,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3363.json
 - record_id: BU-3364
   formula: ThO2
-  phase: solid
+  phase: cr
   name_as_published: ThO2  cr Thorium
   cas_as_published: 1314-20-1
   record_kind: nasa7_polynomial
@@ -131164,7 +131254,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3366.json
 - record_id: BU-3367
   formula: W
-  phase: solid
+  phase: cr
   name_as_published: W(cr) REF ELEMENT
   cas_as_published: 7440-33-7
   record_kind: nasa7_polynomial
@@ -131197,9 +131287,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3367.json
+  phase_ordinal: 1
 - record_id: BU-3368
   formula: W
-  phase: C/cr
+  phase: cr
   name_as_published: W(cr)
   cas_as_published: 7440-33-7
   record_kind: nasa7_polynomial
@@ -131238,9 +131329,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3368.json
+  phase_ordinal: 2
 - record_id: BU-3369
   formula: W
-  phase: C/cr
+  phase: cr
   name_as_published: W(cr)
   cas_as_published: 7440-33-7
   record_kind: nasa7_polynomial
@@ -131277,9 +131369,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3369.json
+  phase_ordinal: 3
 - record_id: BU-3370
   formula: W
-  phase: L/L
+  phase: L
   name_as_published: W(L)
   cas_as_published: 7440-33-7
   record_kind: nasa7_polynomial
@@ -131567,7 +131660,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3377.json
 - record_id: BU-3378
   formula: WO2Cl2
-  phase: S/cr
+  phase: cr
   name_as_published: WO2CL2(cr)
   cas_as_published: 13520-76-8
   record_kind: nasa7_polynomial
@@ -131637,7 +131730,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3379.json
 - record_id: BU-3380
   formula: WOCl4
-  phase: S/Cr
+  phase: condensed
   name_as_published: WOCl4(Cr)
   cas_as_published: 13520-78-0
   record_kind: nasa7_polynomial
@@ -131666,13 +131759,20 @@ entries:
     end_line: 35765
   coefficient_count: 15
   interval_count: 2
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: Cr
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'liquid', 'ref', 's', 'solid']. Records
+      are not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3380.json
 - record_id: BU-3381
   formula: WOCl4
-  phase: L/L
+  phase: L
   name_as_published: WOCL4(L)
   cas_as_published: 13520-78-0
   record_kind: nasa7_polynomial
@@ -131742,7 +131842,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3382.json
 - record_id: BU-3383
   formula: WCl6
-  phase: S/I
+  phase: I
   name_as_published: WCL6(I)
   cas_as_published: 13283-01-7
   record_kind: nasa7_polynomial
@@ -131777,7 +131877,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3383.json
 - record_id: BU-3384
   formula: WCl6
-  phase: S/II
+  phase: II
   name_as_published: WCL6(II)
   cas_as_published: 13283-01-7
   record_kind: nasa7_polynomial
@@ -131812,7 +131912,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3384.json
 - record_id: BU-3385
   formula: WCl6
-  phase: L/III
+  phase: III
   name_as_published: WCL6(III)
   cas_as_published: 13283-01-7
   record_kind: nasa7_polynomial
@@ -131846,7 +131946,7 @@ entries:
   - kind: phase_card_suffix_conflict
     phase_card_as_published: L
     phase_as_published: III
-    note: Native phase takes precedence; conflicting suffix retained verbatim.
+    note: Conflicting published card and state suffix are both retained verbatim.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3385.json
 - record_id: BU-3386
@@ -132563,7 +132663,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3405.json
 - record_id: BU-3406
   formula: Zn
-  phase: solid
+  phase: cr
   name_as_published: Zn(cr) REF ELEMENT
   cas_as_published: 7440-66-6
   record_kind: nasa7_polynomial
@@ -132601,7 +132701,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3406.json
 - record_id: BU-3407
   formula: Zn
-  phase: L/L
+  phase: L
   name_as_published: Zn(L)
   cas_as_published: 7440-66-6
   record_kind: nasa7_polynomial
@@ -132814,7 +132914,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3412.json
 - record_id: BU-3413
   formula: ZnO
-  phase: C
+  phase: condensed
   name_as_published: ZnO cr
   cas_as_published: 1314-13-2
   record_kind: nasa7_polynomial
@@ -132847,9 +132947,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3413.json
+  phase_ordinal: 1
 - record_id: BU-3414
   formula: ZnO
-  phase: C
+  phase: condensed
   name_as_published: ZnO liq
   cas_as_published: 1314-13-2
   record_kind: nasa7_polynomial
@@ -132882,6 +132983,7 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3414.json
+  phase_ordinal: 2
 - record_id: BU-3415
   formula: ZnO
   phase: gas
@@ -132964,7 +133066,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3416.json
 - record_id: BU-3417
   formula: ZnS
-  phase: C
+  phase: condensed
   name_as_published: ZnS(cr) Wurzite
   cas_as_published: 12138-06-6
   record_kind: nasa7_polynomial
@@ -132997,9 +133099,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3417.json
+  phase_ordinal: 1
 - record_id: BU-3418
   formula: ZnS
-  phase: C
+  phase: condensed
   name_as_published: ZnS cr
   cas_as_published: 1314-98-3
   record_kind: nasa7_polynomial
@@ -133032,9 +133135,10 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3418.json
+  phase_ordinal: 2
 - record_id: BU-3419
   formula: ZnS
-  phase: C
+  phase: condensed
   name_as_published: ZnS liq
   cas_as_published: 1314-98-3
   record_kind: nasa7_polynomial
@@ -133067,6 +133171,7 @@ entries:
   ambiguities: []
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3419.json
+  phase_ordinal: 3
 - record_id: BU-3420
   formula: ZnS
   phase: gas
@@ -133149,7 +133254,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3421.json
 - record_id: BU-3422
   formula: ZnSO4
-  phase: S/a
+  phase: a
   name_as_published: ZnSO4(a)
   cas_as_published: 7733-02-0
   record_kind: nasa7_polynomial
@@ -133184,7 +133289,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3422.json
 - record_id: BU-3423
   formula: ZnSO4
-  phase: S/a'
+  phase: condensed
   name_as_published: ZnSO4(a')
   cas_as_published: 7733-02-0
   record_kind: nasa7_polynomial
@@ -133213,13 +133318,20 @@ entries:
     end_line: 36095
   coefficient_count: 15
   interval_count: 2
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: a'
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'liquid', 'ref', 's', 'solid']. Records
+      are not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3423.json
 - record_id: BU-3424
   formula: ZnSO4
-  phase: S/b
+  phase: b
   name_as_published: ZnSO4(b)
   cas_as_published: 7733-02-0
   record_kind: nasa7_polynomial
@@ -133254,7 +133366,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3424.json
 - record_id: BU-3425
   formula: Zn3N2
-  phase: solid
+  phase: cr
   name_as_published: Zn3N2 solid
   cas_as_published: 1313-49-1
   record_kind: nasa7_polynomial
@@ -133289,7 +133401,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3425.json
 - record_id: BU-3426
   formula: Zr
-  phase: C/a
+  phase: a
   name_as_published: Zr(a)
   cas_as_published: 7440-67-7
   record_kind: nasa7_polynomial
@@ -133324,7 +133436,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3426.json
 - record_id: BU-3427
   formula: Zr
-  phase: C/b
+  phase: b
   name_as_published: Zr(b)
   cas_as_published: 7440-67-7
   record_kind: nasa7_polynomial
@@ -133359,7 +133471,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3427.json
 - record_id: BU-3428
   formula: Zr
-  phase: C/L
+  phase: L
   name_as_published: Zr(L)
   cas_as_published: 7440-67-7
   record_kind: nasa7_polynomial
@@ -133684,7 +133796,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3436.json
 - record_id: BU-3437
   formula: ZrN
-  phase: C/cr
+  phase: cr
   name_as_published: ZrN(cr)
   cas_as_published: 25658-42-8
   record_kind: nasa7_polynomial
@@ -133719,7 +133831,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3437.json
 - record_id: BU-3438
   formula: ZrN
-  phase: C/L
+  phase: L
   name_as_published: ZrN(L)
   cas_as_published: 25658-42-8
   record_kind: nasa7_polynomial
@@ -133824,7 +133936,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3440.json
 - record_id: BU-3441
   formula: ZrO2
-  phase: C/III
+  phase: III
   name_as_published: ZrO2(III)
   cas_as_published: 1314-23-4
   record_kind: nasa7_polynomial
@@ -133863,9 +133975,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3441.json
+  phase_ordinal: 1
 - record_id: BU-3442
   formula: ZrO2
-  phase: C/III
+  phase: III
   name_as_published: ZrO2(III)
   cas_as_published: 1314-23-4
   record_kind: nasa7_polynomial
@@ -133902,9 +134015,10 @@ entries:
     note: Distinct BURCAT.THR 4-line records; not merged.
   sha256_source_file: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
   path: data/literature/compilations/burcat/records/BU-3442.json
+  phase_ordinal: 2
 - record_id: BU-3443
   formula: ZrO2
-  phase: C/II
+  phase: II
   name_as_published: ZrO2(II)
   cas_as_published: 1314-23-4
   record_kind: nasa7_polynomial
@@ -133939,7 +134053,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3443.json
 - record_id: BU-3444
   formula: ZrO2
-  phase: C/I
+  phase: I
   name_as_published: ZrO2(I)
   cas_as_published: 1314-23-4
   record_kind: nasa7_polynomial
@@ -133974,7 +134088,7 @@ entries:
   path: data/literature/compilations/burcat/records/BU-3444.json
 - record_id: BU-3445
   formula: ZrO2
-  phase: C/L
+  phase: L
   name_as_published: ZrO2(L)
   cas_as_published: 1314-23-4
   record_kind: nasa7_polynomial

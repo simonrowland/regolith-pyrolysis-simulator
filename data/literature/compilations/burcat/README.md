@@ -61,13 +61,15 @@ Do not score this compilation in the measurement battery.
 
 ## Known gaps and recorded ambiguities
 
-- Phase labels use the NASA-7 card first: `G` maps to `gas`; non-gas states
-  retain `<card>/<state suffix>` (e.g. `S/solid`, `L/liquid`, `C/a-qz`).
-  Without a state suffix, S/L/C map to solid/L/C. Chemical parentheses such
-  as `(OO)` and `(E)` remain nomenclature in the name. `phase_as_published`
-  holds a recognized state suffix or the native card; `phase_card_as_published`
-  always preserves the card. Four genuine card/suffix conflicts are listed
-  as `phase_card_suffix_conflict`; neither token is discarded.
+- `G` cards map to `gas`, regardless of chemical/isomer parentheses. Otherwise
+  a recognized terminal state suffix keeps its published label (`cr`, `L`,
+  `s`, `solid`, `liquid`, etc.); without one, S/L/C maps to
+  `cr`/`L`/`condensed`. `phase_as_published` and
+  `phase_card_as_published` retain the printed tokens, and the four genuine
+  card/suffix conflicts are listed as `phase_card_suffix_conflict`. A derived
+  `phase_ordinal` appears only in the 36 same-formula/non-gas label collision
+  groups (79 records), in source order; gas records and already-distinct phase
+  labels do not receive one.
 - 39 comment-only CAS stanzas (no polynomial). Kept.
 - 5 records with `N/A` in H298/R remain null. Fifteen printed padded zeros
   parse as zero. Li3+ card 4 is shifted; complete tokens before its terminal

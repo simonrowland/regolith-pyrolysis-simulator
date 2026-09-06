@@ -124,6 +124,7 @@ class BurcatRecord:
     cas_as_published: str
     formula: str
     phase: str
+    phase_ordinal: int | None
     phase_as_published: str
     phase_card_as_published: str
     date_as_published: str
@@ -171,7 +172,7 @@ class BurcatRecord:
                 **self.hf298_div_r.to_dict(),
                 "units_as_published": "H298/R (dimensionless, as printed)",
             }
-        return {
+        payload = {
             "schema_version": SCHEMA_VERSION,
             "source_id": SOURCE_ID,
             "source": dict(COMPILATION_SOURCE),
@@ -209,6 +210,9 @@ class BurcatRecord:
                 "coeff_lines": list(self.raw_coeff_lines),
             },
         }
+        if self.phase_ordinal is not None:
+            payload["phase_ordinal"] = self.phase_ordinal
+        return payload
 
 
 @dataclass
@@ -287,6 +291,7 @@ def parse_burcat_thr(
                 cas_as_published=current_cas,
                 formula="",
                 phase="not_parsed",
+                phase_ordinal=None,
                 phase_as_published="",
                 phase_card_as_published="",
                 date_as_published="",
@@ -381,6 +386,7 @@ def parse_burcat_thr(
                     cas_as_published=current_cas,
                     formula=str(parsed["formula"]),
                     phase=phase_normalized,
+                    phase_ordinal=None,
                     phase_as_published=phase_as_published,
                     phase_card_as_published=phase_char,
                     date_as_published=str(parsed["date_as_published"]),
@@ -437,6 +443,15 @@ def parse_burcat_thr(
         rec.record_id = f"BU-{index + 1:04d}"
         if rec.record_kind == "nasa7_polynomial":
             by_name[rec.name_as_published].append(index)
+    by_phase: dict[tuple[str, str], list[int]] = defaultdict(list)
+    for index, rec in enumerate(records):
+        if rec.record_kind == "nasa7_polynomial" and rec.phase != "gas":
+            by_phase[(rec.formula, rec.phase)].append(index)
+    for indices in by_phase.values():
+        if len(indices) < 2:
+            continue
+        for ordinal, j in enumerate(indices, start=1):
+            records[j].phase_ordinal = ordinal
     for name, indices in by_name.items():
         if len(indices) < 2:
             continue
