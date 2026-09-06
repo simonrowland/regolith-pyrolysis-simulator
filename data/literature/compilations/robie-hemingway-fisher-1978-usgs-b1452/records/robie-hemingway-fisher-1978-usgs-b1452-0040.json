@@ -1,0 +1,152 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0040",
+  "census_id": "high-temperature-printed-page-066",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "POTASSIUM (REFERENCE STATE)",
+  "formula_as_published": "K",
+  "phase_state_as_published": [
+    "Body-centered cubic crystals 298.15 to melting paint 336.4 K.   L~quid",
+    "         336.4 to boiling point 1030 K.  Ideal monatomic gas 1030 to 18110 K."
+  ],
+  "description_lines_as_published": [
+    "K:       Body-centered cubic crystals 298.15 to melting paint 336.4 K.   L~quid",
+    "         336.4 to boiling point 1030 K.  Ideal monatomic gas 1030 to 18110 K."
+  ],
+  "formation_basis_header_as_published": "FORMATION FRUit THE ELEI!ENTS",
+  "formula_weight": {
+    "as_published": "39.098",
+    "value": 39.098,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      72
+    ],
+    "printed_pages": [
+      66
+    ],
+    "pdftotext_layout_page_file": "page-072.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 14"
+  ],
+  "title_line_as_published": "POTASSIUM (REFERENCE STATE)                                                       FORI!ULA WEIGHT       39.098",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "K:       Body-centered cubic crystals 298.15 to melting paint 336.4 K.   L~quid",
+    "         336.4 to boiling point 1030 K.  Ideal monatomic gas 1030 to 18110 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORMATION FRUit THE ELEI!ENTS",
+    "                                                                                        GIBBS"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "",
+    "entropy": "",
+    "negative_gibbs_function": "",
+    "heat_capacity": "",
+    "formation_enthalpy": "",
+    "formation_gibbs_energy": "",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 20,
+  "uncertainty_line_as_published": "TEIIP.     ( HT-H298)/T      sr       -(G;-H~ 9 a)/T      Cp      ENTHALPY           FREE ENERGY       Log Kf",
+  "uncertainty_values": [
+    {
+      "as_published": "( HT-H298)/T",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "sr",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "-(G;-H~ 9 a)/T",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "Cp",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "ENTHALPY",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "FREE ENERGY",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "Log Kf",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "K:       Body-centered cubic crystals 298.15 to melting paint 336.4 K.   L~quid",
+    "         336.4 to boiling point 1030 K.  Ideal monatomic gas 1030 to 18110 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                 336.35 K                BOILING   ~OINT                       1030",
+    "ENTHALPY OF !!ELTING               2. 334 k.J          ENTHALPY OF VAPORIZATION               79.918 ltJ",
+    "                                   7. 088 ltJ          MOLAR VOLU liE                         4.53611 J/bar",
+    "                                                                                             45.360 cm 3",
+    "TRANSITIONS IN REFERENCE STATE ELEI!ENTS",
+    "HEAT CAPACITY EQUATIONS",
+    "         -8.9054 + 1.5236x1o-z T       7.t!457x10Z T-o·s",
+    "             (EQUATION VALID FBOII 336.4- 1030 K)",
+    "c~        20.801 -  5.1832x10 -s T        3. 5737x 10 a TZ",
+    "             (EQUATION VALID FRO II 1UJII - 1 diiO K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 14",
+      "detector_only": false
+    }
+  ]
+}
