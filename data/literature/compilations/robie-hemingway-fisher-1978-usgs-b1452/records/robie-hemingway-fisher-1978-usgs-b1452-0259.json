@@ -1,0 +1,133 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0259",
+  "census_id": "high-temperature-printed-page-285",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "TI!liiU! TRICHLORIDE",
+  "formula_as_published": "TiC1 3",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1200 K.            The free energy for the reaction TiC1 3 (c)",
+    "           = TiC1 3 (q) approaches zero at 1104.1 K."
+  ],
+  "description_lines_as_published": [
+    "TiC1 3 :   Crystals 298.15 to 1200 K.            The free energy for the reaction TiC1 3 (c)",
+    "           = TiC1 3 (q) approaches zero at 1104.1 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "154.259",
+    "value": 154.259,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      291
+    ],
+    "printed_pages": [
+      285
+    ],
+    "pdftotext_layout_page_file": "page-291.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "3 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 30, 32, 42"
+  ],
+  "title_line_as_published": "TI!liiU! TRICHLORIDE                                                          FOR!ULA lEIGHT      154.259",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "TiC1 3 :   Crystals 298.15 to 1200 K.            The free energy for the reaction TiC1 3 (c)",
+    "           = TiC1 3 (q) approaches zero at 1104.1 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBUTIOII FRO! THE ELB!EIITS",
+    "                                                                                    GIBBS",
+    "TB!P.      <a;-a~ 98 )/T      so      -(G;-a~ 98 )/T     cop     EIIITHlLPI      FREE BIJEBGI     Loq Kf",
+    "                               T",
+    "  K          Jfaol•K       Jtaol•K      J/aol•K        Jtaol•K       kJ;aol         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jfaol•K",
+    "entropy": "Jtaol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "Jtaol•K",
+    "formation_enthalpy": "kJ;aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 12,
+  "uncertainty_line_as_published": "UICEBTll HTI                  1.26            1.26                     4.180          5.020        0.879",
+  "uncertainty_values": [
+    {
+      "as_published": "1.26",
+      "value": 1.26,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.26",
+      "value": 1.26,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.180",
+      "value": 4.18,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "5.020",
+      "value": 5.02,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.879",
+      "value": 0.879,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "TiC1 3 :   Crystals 298.15 to 1200 K.            The free energy for the reaction TiC1 3 (c)",
+    "           = TiC1 3 (q) approaches zero at 1104.1 K."
+  ],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "3 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 30, 32, 42",
+      "detector_only": false
+    }
+  ]
+}

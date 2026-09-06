@@ -1,0 +1,132 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0253",
+  "census_id": "high-temperature-printed-page-279",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "CHLOBOBlGI!SU'!",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "95.211",
+    "value": 95.211,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      285
+    ],
+    "printed_pages": [
+      279
+    ],
+    "pdftotext_layout_page_file": "page-285.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 30, 33, 42, 44"
+  ],
+  "title_line_as_published": "CHLOBOBlGI!SU'!                                                                    POiBOLl IIBIGHT      95.211",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "               crystals 298.15 to aelting point 987 K.                Liquid 987 to boiling point",
+    "               1710 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POBBlTIOI PBOJI TB! !L!JIEIJTS",
+    "                                                                                         GIBBS",
+    "TEIIP.     ( a;-a~ 98 )/T      so",
+    "                                T     -< G;-a~ 98 )/T      co",
+    "                                                             p     !IJTBlLPY          PBEB EIIIEBGY     Log Kf",
+    "  K            J;aol•K      J/aol•K     Jjaol•K         Jjaol• K          kJ/aol         ltJjaol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "Jjaol•K",
+    "heat_capacity": "Jjaol• K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "ltJjaol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 19,
+  "uncertainty_line_as_published": "UICEBTliHTY                    0.84           0.84                          0.460          o. 544        0.095",
+  "uncertainty_values": [
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.460",
+      "value": 0.46,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 544",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.095",
+      "value": 0.095,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQUATIOH",
+    "         76.903          8.4955x10- J T",
+    "                (EQUATION VALID FRO!          298-      987 K)",
+    ".li.EPEBEHCE      169          120                                          214                       COitPILED",
+    "                               247                                          247                        6- 9-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 30, 33, 42, 44",
+      "detector_only": false
+    }
+  ]
+}

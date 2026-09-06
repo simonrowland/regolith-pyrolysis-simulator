@@ -1,0 +1,137 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0258",
+  "census_id": "high-temperature-printed-page-284",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "COTUINITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "278.106",
+    "value": 278.106,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      290
+    ],
+    "printed_pages": [
+      284
+    ],
+    "pdftotext_layout_page_file": "page-290.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26"
+  ],
+  "title_line_as_published": "COTUINITE                                                                            FOR!ULA WEIGHT    278.106",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "================================================================================",
+    "             crystals 298.15 to aelting point 768 K.                    Liquid 768 to 1000 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 PORftlTION FRO! THE !LEft BITS",
+    "                                                                                           GIBBS",
+    "TE!P.       ( a;-a~ 98 ).1T      so     -< G;-a~98 ).IT      cop     BITBlLPY           FREE BURGY      Log ltf",
+    "                                  T",
+    "  K          J/aol•K          J/aol•K     J/aol•lt        Jfaol•lt          kJ/aol         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•lt",
+    "heat_capacity": "Jfaol•lt",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 11,
+  "uncertainty_line_as_published": "UNCERTAINTY                      2.09          2.09                          0.293           0.711       0.125",
+  "uncertainty_values": [
+    {
+      "as_published": "2.09",
+      "value": 2.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.09",
+      "value": 2.09,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.293",
+      "value": 0.293,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.711",
+      "value": 0.711,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.125",
+      "value": 0.125,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "KELTING POINT                    768       K              BOILIIG POINT",
+    "ENTHALPY OF !tELTIIG              23.849 kJ               EHTHALPI OP YAPOBIZATIOH                       kJ",
+    "                                  16. 941 kJ              ftOLlB YOL UIIE                       4.7090 J/bar",
+    "                                                                                               117.090 cal",
+    "TBAHSITIOIS II BEPEBEICB STATE ELB!EJTS",
+    "       LEAD ••••••• ft. P. 600.6 9 B. P. 2021 K.",
+    "HEAT CAPACITY EQUATION",
+    " c;        1.2287x10Z - 8.5847x10Z r-o·s",
+    "              (EQUATIOJ YALID PIOII 298 -                 768 lt)",
+    "BIPEBEICE        115             120                                          247                     CO!PI.LBD",
+    "                                 215                                          215                      6- 9-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26",
+      "detector_only": false
+    }
+  ]
+}

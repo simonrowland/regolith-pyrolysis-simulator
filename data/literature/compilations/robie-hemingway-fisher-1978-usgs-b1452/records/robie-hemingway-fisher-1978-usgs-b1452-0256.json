@@ -1,0 +1,145 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0256",
+  "census_id": "high-temperature-printed-page-282",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "HALITE",
+  "formula_as_published": "NaCl",
+  "phase_state_as_published": [
+    "Crystals 298.15 to melting point 1073.8 K.                   Liquid 1073.8 to fictive",
+    "           boiling point 1791 K."
+  ],
+  "description_lines_as_published": [
+    "NaCl:      Crystals 298.15 to melting point 1073.8 K.                   Liquid 1073.8 to fictive",
+    "           boiling point 1791 K."
+  ],
+  "formation_basis_header_as_published": "FORIIATION FRO II THE ELEMENTS",
+  "formula_weight": {
+    "as_published": "58.443",
+    "value": 58.443,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      288
+    ],
+    "printed_pages": [
+      282
+    ],
+    "pdftotext_layout_page_file": "page-288.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 37, 39"
+  ],
+  "title_line_as_published": "HALITE                                                                           FORIIOLA WEIGHT      58.443",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "NaCl:      Crystals 298.15 to melting point 1073.8 K.                   Liquid 1073.8 to fictive",
+    "           boiling point 1791 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORIIATION FRO II THE ELEMENTS",
+    "                                                                                       GIBBS",
+    "TEMP.      {H;-H~ 98 )/T      so      -(G;-H~g 8 }/T      cop      ENTHALPY         FREE ENERGY      Log Kf",
+    "                               T",
+    "  K         J;aol•K        J/11ol•K     J/11ol•K       J/llol• K       kJ/1101         kJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J/11ol•K",
+    "negative_gibbs_function": "J/11ol•K",
+    "heat_capacity": "J/llol• K",
+    "formation_enthalpy": "kJ/1101",
+    "formation_gibbs_energy": "kJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 19,
+  "uncertainty_line_as_published": "ONCERTAIIITY                  0.21           0.21                        o. 110          0.110        0.019",
+  "uncertainty_values": [
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 110",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.110",
+      "value": 0.11,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.019",
+      "value": 0.019,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "NaCl:      Crystals 298.15 to melting point 1073.8 K.                   Liquid 1073.8 to fictive",
+    "           boiling point 1791 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "IIELTIIiG POINT               1073. 8    K             BOILING POIIIT                      1791",
+    "ENTHALPY OF !!ELTING           28.158 kJ               ENTHALPY OF VAPORIZATION            164.787 kJ",
+    "                               10.611 kJ               IIOLAR VOLU8E                        2.7015 Jjbar",
+    "                                                                                           27.015 c11 3",
+    "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
+    "     SODIUII ••••• II. P.    370.98, B. P.      1175 K.",
+    "HEAT CAPACITY EQUATIONS",
+    "c~        45.151+ 1.7974x1o-zT",
+    "             (EQUATION VALID FROft           298- 1073.8 K)",
+    "c~        72.008 -  3.2228x10-;J T",
+    "             {EQUATION VALID FROft 1073.8           -    1791 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 37, 39",
+      "detector_only": false
+    }
+  ]
+}
