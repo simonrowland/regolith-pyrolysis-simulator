@@ -1,0 +1,128 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0295",
+  "census_id": "high-temperature-printed-page-321",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "PUBIC SOLPU'B",
+  "formula_as_published": "Pe 2 (S0 4 ) 3",
+  "phase_state_as_published": [
+    "Crystals 298.15 to             800 1."
+  ],
+  "description_lines_as_published": [
+    "Pe 2 (S0 4 ) 3 :   Crystals 298.15 to             800 1."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "399.867",
+    "value": 399.867,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      327
+    ],
+    "printed_pages": [
+      321
+    ],
+    "pdftotext_layout_page_file": "page-327.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 21, 23, 28, 30"
+  ],
+  "title_line_as_published": "PUBIC SOLPU'B                                                                        POI!OLI IIIGB!    399.867",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Pe 2 (S0 4 ) 3 :   Crystals 298.15 to             800 1.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POB!lTIOI PBO! THB BLB!BftS",
+    "                                                                                          GIBBS",
+    "!B!P.        <H;-a298 )/1'      so1'     -< G;-a298)/T        CDp     EITHILPY         PRBB BIBIGY      Log    If",
+    "   It          J/aol•lt      J/aol•K       J/aol•lt        J/aol•lt        ltJ/aol        kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "It",
+    "enthalpy_function": "J/aol•lt",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•lt",
+    "heat_capacity": "J/aol•lt",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 7,
+  "uncertainty_line_as_published": "OICBITIIITY                     o.85              0.85                       2.930           3.010       0.527",
+  "uncertainty_values": [
+    {
+      "as_published": "o.85",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.85",
+      "value": 0.85,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.930",
+      "value": 2.93,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "3.010",
+      "value": 3.01,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.527",
+      "value": 0.527,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Pe 2 (S0 4 ) 3 :   Crystals 298.15 to             800 1."
+  ],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 21, 23, 28, 30",
+      "detector_only": false
+    }
+  ]
+}

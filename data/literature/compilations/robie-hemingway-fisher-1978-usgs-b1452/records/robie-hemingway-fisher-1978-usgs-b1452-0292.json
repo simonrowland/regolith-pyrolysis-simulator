@@ -1,0 +1,140 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0292",
+  "census_id": "high-temperature-printed-page-318",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "ALUIUNUll SULFATE",
+  "formula_as_published": "Al 2 (S0 4 ) 3",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1100 K."
+  ],
+  "description_lines_as_published": [
+    "Al 2 (S0 4 ) 3 : Crystals 298.15 to 1100 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "342.137",
+    "value": 342.137,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      324
+    ],
+    "printed_pages": [
+      318
+    ],
+    "pdftotext_layout_page_file": "page-324.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25, 30, 35, 37"
+  ],
+  "title_line_as_published": "ALUIUNUll SULFATE                                                                 FOR!ULA WEIGHT    342.137",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Al 2 (S0 4 ) 3 : Crystals 298.15 to 1100 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORIUTIOII FROM THE ELEIIENTS",
+    "                                                                                        GIBBS",
+    "TEMP.      ( H~-H~ 98 )/T      so",
+    "                                T      -( G;-H~ 98 )/T      cop    ENTHALPY          FREE ENERGY     Log Kf",
+    "  K         J/aol•K         J/aol•K      J/aol•K         J/aol•K         kJ/aol         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 10,
+  "uncertainty_line_as_published": "UNCERTAINTY                    1.2CJ           1.20                        1.8CJ(J        1.88u       0.329",
+  "uncertainty_values": [
+    {
+      "as_published": "1.2CJ",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.20",
+      "value": 1.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.8CJ(J",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.88u",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.329",
+      "value": 0.329,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Al 2 (S0 4 ) 3 : Crystals 298.15 to 1100 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "KELTING POINT                             K              BOILING POUlT",
+    "ENTHALPY OF liELTING                      kJ             ENTHALPY OF VAPORIZATION                     kJ",
+    "                                          kJ             KOLAR VOLUIIE                                J/bar",
+    "TRANSITIONS IN BEFEBENCE STATE ELE!EHTS",
+    "      ALU!INUII ••• 11. P. 933 K.",
+    "      SULFUR ••••• ORTHQ-KONO 368.54, ft. P. MOllO 388.36,",
+    "                      B. P. 716.9 K.",
+    "HEA~-CAPACITY     EQUATION",
+    "          2.8769x10Z +  0.15871 T                 2. 0037x10• T-3",
+    "             (EQUATION VALID FRO!              298 -   850 IC)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25, 30, 35, 37",
+      "detector_only": false
+    }
+  ]
+}
