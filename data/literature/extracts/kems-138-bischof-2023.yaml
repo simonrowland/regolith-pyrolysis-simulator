@@ -346,6 +346,32 @@ species:
         semantics: bound_not_point_ordering
       uncertainty:
         note: not applicable; figure not digitised
+    - observation_id: bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
+      type: psat_series
+      locator:
+        published_page: 9
+        pdf_page_index: 9
+        figure: '5'
+        quote: Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
+      T_range_K:
+      - 1510.0
+      - 1752.0
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_figure_only
+        method_class: figure_only
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Full P(T) series exists only as Fig. 5; not digitised this round. Printed 1752 K points are in bischof_2023_psat_ga_1752k
+          / _gao_ / _ga2o_.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable; figure not digitised
+      supersedes: bischof_2023_fig5_ga_psat_figure_only
+      class: figure_only
     - observation_id: bischof_2023_table8_ga_3rd_law_this_work
       type: gibbs_table
       locator:
@@ -459,6 +485,31 @@ species:
           delta_f_H_J_mol: "129404"
       uncertainty:
         note: none printed on the Pets04/FACTSAGE cell
+    - observation_id: bischof_2023_table10_gao_ab_initio_deep4_quoted
+      type: gibbs_table
+      locator:
+        published_page: 14
+        pdf_page_index: 14
+        table: '10'
+        quote: '129404'
+        note: Pets04, FACTSG column; GaO(g) = Ga(g) + O(g) row
+      phase: gas
+      regime: thermochemical_equilibrium_model
+      units: J mol-1 as printed
+      values:
+        quantity: ab_initio_enthalpy_of_formation
+        method_class: model
+        semantics: bound_not_point_ordering
+        model: Petsalakis et al. (2004) bonding energy 4.06 eV via FACTSAGE elements
+        delta_f_H_J_mol: 129404
+        as_printed:
+          delta_f_H_J_mol: '129404'
+      uncertainty:
+        note: none printed on the Pets04/FACTSAGE cell
+      supersedes: bischof_2023_table10_gao_ab_initio
+      class: model
+      note: 'Supersedes unsupported 298.15 K range: the paper labels the reference enthalpy 298 K; no measurement-temperature
+        interval is supplied for this model cell.'
   Ga2O:
     observations:
     - observation_id: bischof_2023_psat_ga2o_1752k
@@ -654,6 +705,31 @@ species:
         semantics: bound_not_point_ordering
       uncertainty:
         note: not applicable; figure not digitised
+    - observation_id: bischof_2023_fig6_in_psat_figure_only_deep4_quoted
+      type: psat_series
+      locator:
+        published_page: 9
+        pdf_page_index: 9
+        figure: '6'
+        quote: Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
+          within a temperature range of 1210–1611 K.
+      T_range_K:
+      - 1210.0
+      - 1611.0
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_figure_only
+        method_class: figure_only
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Full P(T) series exists only as Fig. 6; not digitised this round.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable; figure not digitised
+      supersedes: bischof_2023_fig6_in_psat_figure_only
+      class: figure_only
     - observation_id: bischof_2023_table9_in_3rd_law_this_work
       type: gibbs_table
       locator:
@@ -957,3 +1033,1230 @@ species:
         figures: ["7", "8", "9", "10", "11"]
       uncertainty:
         note: not applicable; figure not digitised
+
+deepening_provenance:
+  dispatch_id: deep4-kems-138-bischof-2023
+  date: '2026-09-06'
+  parent_policy: All original observation objects and their order are unchanged. Classification and numeric provenance
+    below are keyed supplements. Superseding rows supply the missing figure quotes and omit an unprinted model-temperature
+    range.
+  page_convention: New locators use zero-based PDF indices and printed page numbers. An unnumbered repository cover
+    is PDF index 0, so published page N is PDF index N. Legacy pdf_page_index values are one-based and retained
+    unchanged.
+  quote_convention: Numeric-provenance quotes retain complete pdftotext lines, including neighbouring columns; locator
+    and field path disambiguate the cell. Printed numeric tokens, signs and units are verified against the VOR.
+    Geometry conversion derives from the stated diameter; no chemistry refits.
+  observation_classification:
+    bischof_2023_kems_ir_cell_geometry:
+      class: metadata
+      effective_observation_id: bischof_2023_kems_ir_cell_geometry
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+      note: Legacy method-only object retained unchanged; equipment/calibration, not a species measurement.
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: 1200 and 1750 K above Ga2O3 and In2O3. Owing to the fact that these pi                     effusing
+          out of the KC passes an aperture and enters the ion source,
+      - fields:
+        - values.crucible_height_mm
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: sample to be analysed and is composed of a crucible 8.5 mm high with                       ionisation
+          energy E(e− ) of 60 eV or 70 eV at a constant electron emission
+      - fields:
+        - values.crucible_outer_diameter_mm
+        - values.wall_thickness_mm
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: an outer diameter of 7.8 mm and 0.2 mm wall thickness, and a lid with a                    i(em)
+          of 0.468 mA. Each species was measured over a 1% mass window of
+      - fields:
+        - values.orifice_diameter_mm
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: 0.4 mm orifice at its centre. A tungsten container directly encases the                    its nominal
+          mass, with a scan consisting of 301 steps and a counting time
+      - fields:
+        - values.bakeout_T_K
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: at 1930 K to vaporise any impurities in the system and to anneal the
+      - fields:
+        - values.bakeout_t_h
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: Prior to sample loading, empty Knudsen cells were baked out for 12 h at 1930 K to vaporise any impurities
+          in the system and to anneal the iridium.
+      - fields:
+        - values.electron_energy_eV_range[0]
+        - values.electron_energy_eV_range[1]
+        - values.emission_current_mA
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: 'robust comparison. Subsequently, the enthalpy Δr HoT, 2nd and entropy                      (electron
+          energy between 60 and 70 eV; emission current: 0.468 mA),'
+      - fields:
+        - values.sample_mass_mg_approx
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: 2. Methods                                                                                 iridium.
+          Approximately 40 mg of pure (>99.9%) Ga2O3 or In2O3
+      - fields:
+        - equipment.orifice_area.value
+        - equipment.orifice_area.diameter_m
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: a lid with a 0.4 mm orifice at its centre
+        derivation: d = 0.4 mm × 0.001 m/mm = 0.0004 m; A = pi × (d/2)^2 = 1.256637e-7 m2 (rounded).
+      - fields:
+        - equipment.chamber_pressure.value
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: evacuated through a turbo molecular pump to ~10−6 mbar
+        derivation: Printed ~10^-6 mbar represented as approximate 1.0e-6 mbar; no unit conversion.
+    bischof_2023_fragmentation_f_i:
+      class: metadata
+      effective_observation_id: bischof_2023_fragmentation_f_i
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+      note: Legacy method-only object retained unchanged; equipment/calibration, not a species measurement.
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: 1200 and 1750 K above Ga2O3 and In2O3. Owing to the fact that these pi                     effusing
+          out of the KC passes an aperture and enters the ion source,
+      - fields:
+        - values.fragmentation_f_i_Ga_plus
+        - values.fragmentation_f_i_In_plus
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+        quote: correction factor fi of 0.14 for Ga+ and of 0.19 for In+. The intensity                 the different
+          M-bearing species (eq. (16)).
+    bischof_2023_table3_ga2o3_runs:
+      class: measured
+      effective_observation_id: bischof_2023_table3_ga2o3_runs
+      locator:
+        published_page: 3
+        pdf_page_index: 3
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.initial_weight_mg_2019
+        - values.final_weight_mg_2019
+        - values.isotherm_T_K_2019
+        - values.isotherm_t_h_2019
+        locator:
+          published_page: 3
+          pdf_page_index: 3
+          table: '3'
+        quote: α-Ga2O3 (s)         2019   41.4            39.2             1622       12             1510–1750                       10       5              up/down            Ga+
+          , Ga2+ , Ga3+ ;
+      - fields:
+        - values.initial_weight_mg_2021
+        locator:
+          published_page: 3
+          pdf_page_index: 3
+          table: '3'
+        quote: α-Ga2O3 (s)         2021   46.7            n.d.             –          –              1540–1644 (run
+          1);              10       5              up (run 1);        Ga+ , GaO+ , Ga+    2,
+    bischof_2023_table7_ga_isotherm_intensities:
+      class: measured
+      effective_observation_id: bischof_2023_table7_ga_isotherm_intensities
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.T_K
+        - values.duration_h
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '7'
+        quote: At equilibrium for a reaction, Gibbs energy functions of reaction                    ions at 1622
+          K for 12 h.
+      - fields:
+        - values.Ga_plus_cps
+        - uncertainty.Ga_plus_cps
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '7'
+        quote: One then obtains the following relation (eq. (29); cf. [36]; for more                  Ga +               57061                            1569
+      - fields:
+        - values.Ga2_plus_cps
+        - uncertainty.Ga2_plus_cps
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '7'
+        quote: Ga2+               13615                            749
+      - fields:
+        - values.Ga3_plus_cps
+        - uncertainty.Ga3_plus_cps
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '7'
+        quote: Ga3+               3042                             98
+      - fields:
+        - values.GaO_plus_cps
+        - uncertainty.GaO_plus_cps
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '7'
+        quote: 1                                             GaO+               374                              21
+      - fields:
+        - values.Ga2_dimer_plus_cps
+        - uncertainty.Ga2_dimer_plus_cps
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '7'
+        quote: 2nd + Δr S (0)                      (29)         Ga+                638                              43
+      - fields:
+        - values.Ga2O_plus_cps
+        - uncertainty.Ga2O_plus_cps
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '7'
+        quote: Ga2 O+             4782                             146
+    bischof_2023_psat_ga_1752k:
+      class: measured
+      effective_observation_id: bischof_2023_psat_ga_1752k
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.points[0].T_K
+        - values.points[0].P_Pa
+        - uncertainty.P_Pa
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+        quote: Among Ga-bearing species, Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752
+          K), followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K). The
+          partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same temperature.
+    bischof_2023_fig5_ga_psat_figure_only:
+      class: figure_only
+      effective_observation_id: bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
+      locator:
+        published_page: 9
+        pdf_page_index: 9
+      superseded_by: bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '5'
+        quote: Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
+    bischof_2023_table8_ga_3rd_law_this_work:
+      class: derived
+      effective_observation_id: bischof_2023_table8_ga_3rd_law_this_work
+      locator:
+        published_page: 8
+        pdf_page_index: 8
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '5'
+        quote: Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
+      - fields:
+        - values.delta_r_H_298_3rd_J_mol_mean
+        - uncertainty.delta_r_H_298_3rd_J_mol_mean
+        locator:
+          published_page: 8
+          pdf_page_index: 8
+          table: '8'
+        quote: 1753218 ± 126122                 1654037 ± 2365                         Mean
+    bischof_2023_table8_ga_2nd_law_and_factsage:
+      class: model
+      effective_observation_id: bischof_2023_table8_ga_2nd_law_and_factsage
+      locator:
+        published_page: 8
+        pdf_page_index: 8
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '5'
+        quote: Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
+      - fields:
+        - values.delta_r_H_298_2nd_J_mol_mean
+        - uncertainty.delta_r_H_298_2nd_J_mol_mean
+        locator:
+          published_page: 8
+          pdf_page_index: 8
+          table: '8'
+        quote: 1753218 ± 126122                 1654037 ± 2365                         Mean
+      - fields:
+        - values.Hult73_delta_r_H_298_3rd_J_mol
+        locator:
+          published_page: 8
+          pdf_page_index: 8
+          table: '8'
+        quote: 1623                      1603016                    529                                  1642674                          1646749                                Hult73
+    bischof_2023_psat_gao_1752k:
+      class: measured
+      effective_observation_id: bischof_2023_psat_gao_1752k
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.points[0].T_K
+        - values.points[0].P_Pa
+        - uncertainty.P_Pa
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+        quote: Among Ga-bearing species, Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752
+          K), followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K). The
+          partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same temperature.
+    bischof_2023_table10_gao_delta_f_3rd_recommended:
+      class: derived
+      effective_observation_id: bischof_2023_table10_gao_delta_f_3rd_recommended
+      locator:
+        published_page: 14
+        pdf_page_index: 14
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '5'
+        quote: Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
+      - fields:
+        - values.delta_f_H_298_3rd_J_mol
+        - uncertainty.delta_f_H_298_3rd_J_mol
+        locator:
+          published_page: 14
+          pdf_page_index: 14
+          table: '10'
+        quote: 115412 ± 62478                                           148816 ± 993                                   Mean
+    bischof_2023_table10_gao_ab_initio:
+      class: model
+      effective_observation_id: bischof_2023_table10_gao_ab_initio_deep4_quoted
+      locator:
+        published_page: 14
+        pdf_page_index: 14
+      superseded_by: bischof_2023_table10_gao_ab_initio_deep4_quoted
+      numeric_provenance:
+      - fields:
+        - values.delta_f_H_J_mol
+        locator:
+          published_page: 14
+          pdf_page_index: 14
+          table: '10'
+        quote: GaO(g) = Ga(g) + O (g)                               129404                                                                                                  Pets04,
+          FACTSG
+    bischof_2023_psat_ga2o_1752k:
+      class: measured
+      effective_observation_id: bischof_2023_psat_ga2o_1752k
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.points[0].T_K
+        - values.points[0].P_Pa
+        - uncertainty.P_Pa
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+        quote: Among Ga-bearing species, Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752
+          K), followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K). The
+          partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same temperature.
+    bischof_2023_table10_ga2o_delta_f_3rd_recommended:
+      class: derived
+      effective_observation_id: bischof_2023_table10_ga2o_delta_f_3rd_recommended
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '5'
+        quote: Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
+      - fields:
+        - values.delta_f_H_298_3rd_J_mol
+        - uncertainty.delta_f_H_298_3rd_J_mol
+        locator:
+          published_page: 14
+          pdf_page_index: 14
+          table: '10'
+        quote: − 121654 ± 55729                                         − 68966 ± 7442                                 Mean
+    bischof_2023_table13_ga2o_homogeneous_3rd:
+      class: derived
+      effective_observation_id: bischof_2023_table13_ga2o_homogeneous_3rd
+      locator:
+        published_page: 17
+        pdf_page_index: 17
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '5'
+        quote: Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
+      - fields:
+        - values.delta_r_H_298_3rd_J_mol_mean
+        - uncertainty.delta_r_H_298_3rd_J_mol_mean
+        locator:
+          published_page: 17
+          pdf_page_index: 17
+          table: '13'
+        quote: 500155 ± 6169                         Mean
+    bischof_2023_table13_ga2o_2nd_law_factsage:
+      class: model
+      effective_observation_id: bischof_2023_table13_ga2o_2nd_law_factsage
+      locator:
+        published_page: 17
+        pdf_page_index: 17
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '5'
+        quote: Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
+      - fields:
+        - values.HCM778_delta_r_H_298_3rd_J_mol
+        locator:
+          published_page: 17
+          pdf_page_index: 17
+          table: '13'
+        quote: 1623                        529329                   130                                  514378                        523647                                HCM778
+    bischof_2023_table3_in2o3_runs:
+      class: measured
+      effective_observation_id: bischof_2023_table3_in2o3_runs
+      locator:
+        published_page: 3
+        pdf_page_index: 3
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        locator:
+          published_page: 3
+          pdf_page_index: 3
+          table: '3'
+        quote: 1209–1424 (run 3)
+      - fields:
+        - T_range_K[1]
+        - values.initial_weight_mg_2019
+        - values.final_weight_mg_2019
+        locator:
+          published_page: 3
+          pdf_page_index: 3
+          table: '3'
+        quote: α-In2O3 (s)         2019   42.6            20.3             –          –              1210–1610                       10       5              down               In+
+          , In2+ , In3+ , InO+ ,
+      - fields:
+        - values.initial_weight_mg_2021
+        - values.isotherm_T_K_2021
+        - values.isotherm_t_h_2021
+        locator:
+          published_page: 3
+          pdf_page_index: 3
+          table: '3'
+        quote: α-In2O3 (s)         2021   61.0            n.d.             1295       15             1291–1429 (run
+          1);              10       5              up/down            In+ , InO+ , In+          +
+    bischof_2023_table12_in_psat_this_work:
+      class: measured
+      effective_observation_id: bischof_2023_table12_in_psat_this_work
+      locator:
+        published_page: 16
+        pdf_page_index: 16
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.points[0].T_K
+        - values.points[1].T_K
+        locator:
+          published_page: 16
+          pdf_page_index: 16
+          table: '12'
+        quote: Comparison of partial pressures of In, In2O, O2 and their ratios at 1425 and 1550        isation
+          cross sections and p(O2). Gomez et al. [9] quantify the uncertainty
+      - fields:
+        - values.p_Pa_1550
+        - values.points[0].P_Pa
+        - values.points[1].P_Pa
+        locator:
+          published_page: 16
+          pdf_page_index: 16
+          table: '12'
+        quote: p(In) [Pa]             0.003        0.008          0.072        0.192                  data collection
+          methods and quality remain unknown. Barin [40] refers to
+    bischof_2023_psat_in_1611k:
+      class: measured
+      effective_observation_id: bischof_2023_psat_in_1611k
+      locator:
+        published_page: 8
+        pdf_page_index: 8
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.points[0].T_K
+        - values.points[0].P_Pa
+        - uncertainty.P_Pa
+        locator:
+          published_page: 8
+          pdf_page_index: 8
+        quote: The sequence of the partial pressures of In-bearing species mirrors that for Ga-bearing gases, from
+          In2O (1.41 ± 0.52 Pa at 1611 K), then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa).
+    bischof_2023_fig6_in_psat_figure_only:
+      class: figure_only
+      effective_observation_id: bischof_2023_fig6_in_psat_figure_only_deep4_quoted
+      locator:
+        published_page: 9
+        pdf_page_index: 9
+      superseded_by: bischof_2023_fig6_in_psat_figure_only_deep4_quoted
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '6'
+        quote: Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
+          within a temperature range of 1210–1611 K.
+    bischof_2023_table9_in_3rd_law_this_work:
+      class: derived
+      effective_observation_id: bischof_2023_table9_in_3rd_law_this_work
+      locator:
+        published_page: 13
+        pdf_page_index: 13
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '6'
+        quote: Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
+          within a temperature range of 1210–1611 K.
+      - fields:
+        - values.delta_r_H_298_3rd_J_mol_mean
+        - uncertainty.delta_r_H_298_3rd_J_mol_mean
+        locator:
+          published_page: 13
+          pdf_page_index: 13
+          table: '9'
+        quote: 1509511 ± 132368                   1457625 ± 6908                        Mean
+    bischof_2023_table9_in_2nd_law_and_factsage:
+      class: model
+      effective_observation_id: bischof_2023_table9_in_2nd_law_and_factsage
+      locator:
+        published_page: 13
+        pdf_page_index: 13
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '6'
+        quote: Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
+          within a temperature range of 1210–1611 K.
+    bischof_2023_psat_ino_1611k:
+      class: measured
+      effective_observation_id: bischof_2023_psat_ino_1611k
+      locator:
+        published_page: 8
+        pdf_page_index: 8
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.points[0].T_K
+        - values.points[0].P_Pa
+        - uncertainty.P_Pa
+        locator:
+          published_page: 8
+          pdf_page_index: 8
+        quote: The sequence of the partial pressures of In-bearing species mirrors that for Ga-bearing gases, from
+          In2O (1.41 ± 0.52 Pa at 1611 K), then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa).
+    bischof_2023_table11_ino_delta_f_3rd_recommended:
+      class: derived
+      effective_observation_id: bischof_2023_table11_ino_delta_f_3rd_recommended
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '6'
+        quote: Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
+          within a temperature range of 1210–1611 K.
+      - fields:
+        - values.delta_f_H_298_3rd_J_mol
+        - uncertainty.delta_f_H_298_3rd_J_mol
+        locator:
+          published_page: 15
+          pdf_page_index: 15
+          table: '11'
+        quote: 146340 ± 67023                                          157744 ± 3681                                Mean
+    bischof_2023_table12_in2o_psat_this_work:
+      class: measured
+      effective_observation_id: bischof_2023_table12_in2o_psat_this_work
+      locator:
+        published_page: 16
+        pdf_page_index: 16
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.points[0].T_K
+        - values.points[1].T_K
+        locator:
+          published_page: 16
+          pdf_page_index: 16
+          table: '12'
+        quote: Comparison of partial pressures of In, In2O, O2 and their ratios at 1425 and 1550        isation
+          cross sections and p(O2). Gomez et al. [9] quantify the uncertainty
+      - fields:
+        - values.points[0].P_Pa
+        - values.points[1].P_Pa
+        locator:
+          published_page: 16
+          pdf_page_index: 16
+          table: '12'
+        quote: p(In2O) [Pa]           0.014        0.017          0.327        0.376                  the IVTANTHERMO
+          database as well as to Chaplygin [37] (cf. [10]; and ref­
+    bischof_2023_psat_in2o_1611k:
+      class: measured
+      effective_observation_id: bischof_2023_psat_in2o_1611k
+      locator:
+        published_page: 8
+        pdf_page_index: 8
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        - values.points[0].T_K
+        - values.points[0].P_Pa
+        - uncertainty.P_Pa
+        locator:
+          published_page: 8
+          pdf_page_index: 8
+        quote: The sequence of the partial pressures of In-bearing species mirrors that for Ga-bearing gases, from
+          In2O (1.41 ± 0.52 Pa at 1611 K), then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa).
+    bischof_2023_table11_in2o_delta_f_3rd_recommended:
+      class: derived
+      effective_observation_id: bischof_2023_table11_in2o_delta_f_3rd_recommended
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '6'
+        quote: Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
+          within a temperature range of 1210–1611 K.
+      - fields:
+        - values.delta_f_H_298_3rd_J_mol
+        - uncertainty.delta_f_H_298_3rd_J_mol
+        locator:
+          published_page: 15
+          pdf_page_index: 15
+          table: '11'
+        quote: − 64884 ± 5045                                          − 22245 ± 964                                Mean
+    bischof_2023_table13_in2o_homogeneous_3rd:
+      class: derived
+      effective_observation_id: bischof_2023_table13_in2o_homogeneous_3rd
+      locator:
+        published_page: 17
+        pdf_page_index: 17
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 9
+          pdf_page_index: 9
+          figure: '6'
+        quote: Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
+          within a temperature range of 1210–1611 K.
+      - fields:
+        - values.delta_r_H_298_3rd_J_mol_mean
+        - uncertainty.delta_r_H_298_3rd_J_mol_mean
+        locator:
+          published_page: 17
+          pdf_page_index: 17
+          table: '13'
+        quote: 440627 ± 3044                         MEAN
+    bischof_2023_sigma_O2:
+      class: metadata
+      effective_observation_id: bischof_2023_sigma_O2
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+      note: Legacy method-only object retained unchanged; equipment/calibration, not a species measurement.
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: 1200 and 1750 K above Ga2O3 and In2O3. Owing to the fact that these pi                     effusing
+          out of the KC passes an aperture and enters the ion source,
+      - fields:
+        - values.sigma_O2_A2
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+        quote: The instrument sensitivity factor, k, describes the transmission of                σ (O2) = 2.8 is
+          used [32]. As no error is given, an error of 17% (= 0.5) is
+    bischof_2023_table6_po2_equations:
+      class: derived
+      effective_observation_id: bischof_2023_table6_po2_equations
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: 1200 and 1750 K above Ga2O3 and In2O3. Owing to the fact that these pi                     effusing
+          out of the KC passes an aperture and enters the ion source,
+      - fields:
+        - values.pGa_O2_coeff
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+          table: '6'
+        quote: ionisation cross section equations of Jacobson [25], based on a                         pGa (O2 )
+          = √̅̅̅̅̅̅̅̅̅̅̅̅̅̅ p(Ga) = 0.51 p(Ga)                      (15)
+      - fields:
+        - values.pGaO_O2_coeff
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+          table: '6'
+        quote: pGaO(O2)                                           0.15 p(GaO)
+      - fields:
+        - values.pGa2_O2_coeff
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+          table: '6'
+        quote: pGa2 (O2 )                                         0.72 p(Ga2)
+      - fields:
+        - values.pGa2O_O2_coeff
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+          table: '6'
+        quote: pGa2 O (O2 )                                       0.45 p(Ga2O)
+      - fields:
+        - values.pIn_O2_coeff
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+          table: '6'
+        quote: pIn(O2)                                            0.40 p(In)                    o
+      - fields:
+        - values.pInO_O2_coeff
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+          table: '6'
+        quote: pInO(O2)                                           0.12 p(InO)
+      - fields:
+        - values.pIn2_O2_coeff
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+          table: '6'
+        quote: pIn2 (O2 )                                         0.56 p(In2)                    Since the results
+          for Δr HoT, 2nd are valid at the average T of the mea­
+      - fields:
+        - values.pIn2O_O2_coeff
+        locator:
+          published_page: 6
+          pdf_page_index: 6
+          table: '6'
+        quote: pIn2 O (O2 )                                       0.36 p(In2O)
+    bischof_2023_table12_o2_psat_derived:
+      class: derived
+      effective_observation_id: bischof_2023_table12_o2_psat_derived
+      locator:
+        published_page: 16
+        pdf_page_index: 16
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 16
+          pdf_page_index: 16
+          table: '12'
+        quote: Comparison of partial pressures of In, In2O, O2 and their ratios at 1425 and 1550        isation
+          cross sections and p(O2). Gomez et al. [9] quantify the uncertainty
+      - fields:
+        - values.p_O2_Pa_1425
+        - values.p_O2_Pa_1550
+        locator:
+          published_page: 16
+          pdf_page_index: 16
+          table: '12'
+        quote: p(O2) [Pa]             0.006        0.009          0.147        0.212                  erences therein).
+          Neither of these are accessible either, but Smirnov et al.
+    bischof_2023_fig7_11_lnK_figure_only:
+      class: figure_only
+      effective_observation_id: bischof_2023_fig7_11_lnK_figure_only
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+      numeric_provenance:
+      - fields:
+        - T_range_K[0]
+        - T_range_K[1]
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+        quote: 1200 and 1750 K above Ga2O3 and In2O3. Owing to the fact that these pi                     effusing
+          out of the KC passes an aperture and enters the ion source,
+method_metadata:
+  table_1:
+    class: metadata
+    locator:
+      published_page: 2
+      pdf_page_index: 2
+      table: '1'
+    columns:
+    - quantity
+    - definition
+    rows:
+    - cells:
+      - gef_T_298
+      - Gibbs energy function, referenced to 298 K, at T of the measurement and standard pressure
+      quote: gef_T_298 | Gibbs energy function, referenced to 298 K, at T of the measurement and standard pressure
+    - cells:
+      - Delta_r_gef_T_298
+      - Gibbs energy function of reaction, referenced to 298 K, at T of the measurement and standard pressure
+      quote: Delta_r_gef_T_298 | Gibbs energy function of reaction, referenced to 298 K, at T of the measurement
+        and standard pressure
+    - cells:
+      - Delta_f_H_298_2nd
+      - Standard enthalpy of formation of species i based on 2nd-law method
+      quote: Delta_f_H_298_2nd | Standard enthalpy of formation of species i based on 2nd-law method
+    - cells:
+      - Delta_f_H_298_3rd
+      - Standard enthalpy of formation of species i based on 3rd-law method
+      quote: Delta_f_H_298_3rd | Standard enthalpy of formation of species i based on 3rd-law method
+    - cells:
+      - Delta_r_H_T_2nd
+      - Enthalpy of reaction at standard pressure and average T of the measurement based on 2nd-law method
+      quote: Delta_r_H_T_2nd | Enthalpy of reaction at standard pressure and average T of the measurement based
+        on 2nd-law method
+    - cells:
+      - Delta_r_H_298_2nd
+      - Standard enthalpy of reaction based on 2nd-law method
+      quote: Delta_r_H_298_2nd | Standard enthalpy of reaction based on 2nd-law method
+    - cells:
+      - Delta_r_H_298_3rd
+      - Standard enthalpy of reaction based on 3rd-law method
+      quote: Delta_r_H_298_3rd | Standard enthalpy of reaction based on 3rd-law method
+    - cells:
+      - K
+      - Equilibrium constant
+      quote: K | Equilibrium constant
+    - cells:
+      - p_i
+      - Partial pressure of species i
+      quote: p_i | Partial pressure of species i
+    - cells:
+      - Delta_r_S_T_2nd
+      - Enthalpy of reaction at standard p and average T of the measurement based on 2nd-law method
+      quote: Delta_r_S_T_2nd | Enthalpy of reaction at standard p and average T of the measurement based on 2nd-law
+        method
+    table_csv: tables/kems-138-bischof-2023/t1.csv
+    quote_convention: Printed cells in column order, separated by |; typography transliterated; blank cells retained.
+      Not a contiguous prose quotation.
+    kind: thermodynamic_nomenclature
+    note: The entropy-symbol definition prints Enthalpy (sic); preserved, not corrected. ASCII Delta and subscripts
+      transliterate symbols.
+  table_2:
+    class: metadata
+    locator:
+      published_page: 3
+      pdf_page_index: 3
+      table: '2'
+    columns:
+    - Ga species
+    - m/z
+    - Natural abundance [%]
+    - In species
+    - m/z
+    - Natural abundance [%]
+    rows:
+    - cells:
+      - Ga+
+      - '69'
+      - '60.1'
+      - In+
+      - '115'
+      - '95.7'
+      quote: Ga+ | 69 | 60.1 | In+ | 115 | 95.7
+    - cells:
+      - ''
+      - ''
+      - ''
+      - ''
+      - '113'
+      - '4.3'
+      quote: ' |  |  |  | 113 | 4.3'
+    - cells:
+      - Ga2+
+      - '34.5'
+      - –
+      - In2+
+      - '57.5'
+      - –
+      quote: Ga2+ | 34.5 | – | In2+ | 57.5 | –
+    - cells:
+      - Ga3+
+      - '23'
+      - –
+      - In3+
+      - '38'
+      - –
+      quote: Ga3+ | 23 | – | In3+ | 38 | –
+    - cells:
+      - GaO+
+      - '85'
+      - '60.0'
+      - InO+
+      - '131'
+      - '95.5'
+      quote: GaO+ | 85 | 60.0 | InO+ | 131 | 95.5
+    - cells:
+      - Ga_2+
+      - '138'
+      - '36.1'
+      - In_2+
+      - '230'
+      - '91.6'
+      quote: Ga_2+ | 138 | 36.1 | In_2+ | 230 | 91.6
+    - cells:
+      - Ga_2O+
+      - '156'
+      - '47.9'
+      - In_2O+
+      - '246'
+      - '91.4'
+      quote: Ga_2O+ | 156 | 47.9 | In_2O+ | 246 | 91.4
+    table_csv: tables/kems-138-bischof-2023/t2.csv
+    quote_convention: Printed cells in column order, separated by |; typography transliterated; blank cells retained.
+      Not a contiguous prose quotation.
+    kind: ion_identification_and_natural_isotope_abundance
+    note: Underscore marks molecular subscript (Ga_2+); Ga2+ is doubly charged monatomic Ga. Empty isotope species
+      cells remain empty; en dash means not applicable, never zero.
+  table_4:
+    class: metadata
+    locator:
+      published_page: 5
+      pdf_page_index: 5
+      table: '4'
+    columns:
+    - reference
+    - sigma_M
+    - sigma_MO_L
+    - sigma_MO_R
+    - sigma_M2_L
+    - sigma_M2_R
+    - sigma_M2O_L
+    - sigma_M2O_R
+    rows:
+    - cells:
+      - Freund et al. [27]
+      - '8.62'
+      - '7.67'
+      - '5.75'
+      - '12.93'
+      - '12.93'
+      - '14.13'
+      - '14.37'
+      quote: Freund et al. [27] | 8.62 | 7.67 | 5.75 | 12.93 | 12.93 | 14.13 | 14.37
+    - cells:
+      - Jacobson [25]; Deutsch et al. [26]
+      - '7.48'
+      - '6.81'
+      - '4.99'
+      - '11.22'
+      - '11.22'
+      - '12.42'
+      - '12.46'
+      quote: Jacobson [25]; Deutsch et al. [26] | 7.48 | 6.81 | 4.99 | 11.22 | 11.22 | 12.42 | 12.46
+    - cells:
+      - Bonnell and Hastie [24]
+      - '5.73'
+      - '5.50'
+      - '3.82'
+      - '8.59'
+      - '8.59'
+      - '9.79'
+      - '9.54'
+      quote: Bonnell and Hastie [24] | 5.73 | 5.50 | 3.82 | 8.59 | 8.59 | 9.79 | 9.54
+    - cells:
+      - Kim and Stone [28]
+      - '9.47'
+      - '8.30'
+      - '6.31'
+      - '14.21'
+      - '14.21'
+      - '15.41'
+      - '15.79'
+      quote: Kim and Stone [28] | 9.47 | 8.30 | 6.31 | 14.21 | 14.21 | 15.41 | 15.79
+    - cells:
+      - Margreiter et al. [29]
+      - '7.39'
+      - '6.74'
+      - '4.93'
+      - '11.08'
+      - '11.08'
+      - '12.28'
+      - '12.31'
+      quote: Margreiter et al. [29] | 7.39 | 6.74 | 4.93 | 11.08 | 11.08 | 12.28 | 12.31
+    - cells:
+      - Patton et al. [30]
+      - '9.07'
+      - '8.00'
+      - '6.05'
+      - '13.61'
+      - '13.61'
+      - '14.81'
+      - '15.12'
+      quote: Patton et al. [30] | 9.07 | 8.00 | 6.05 | 13.61 | 13.61 | 14.81 | 15.12
+    - cells:
+      - Mean
+      - '7.96'
+      - '6.24'
+      - ''
+      - '11.94'
+      - ''
+      - '13.20'
+      - ''
+      quote: 'Mean | 7.96 | 6.24 |  | 11.94 |  | 13.20 | '
+    - cells:
+      - Standard deviation
+      - '1.38'
+      - '1.35'
+      - ''
+      - '1.97'
+      - ''
+      - '2.08'
+      - ''
+      quote: 'Standard deviation | 1.38 | 1.35 |  | 1.97 |  | 2.08 | '
+    table_csv: tables/kems-138-bischof-2023/t4.csv
+    quote_convention: Printed cells in column order, separated by |; typography transliterated; blank cells retained.
+      Not a contiguous prose quotation.
+    kind: literature_cross_sections_and_calculated_molecular_calibration
+    column_classes:
+      sigma_M: literature_compilation
+      molecular_left_and_right: model
+      Mean_and_Standard_deviation: derived
+    units: Å2
+    caption_quote: Summary of ionisation cross sections for different Ga species at 60 eV.
+    footnotes:
+      a: 'Left column: Jacobson [25], sum of atomic cross sections multiplied by a correction factor of 0.75; σ(O)
+        = 1.6 Å2 according to Drowart and Goldfinger [15].'
+      b: 'Right column: Gomez et al. [9], assumption that σ(M/MO) = 1.5'
+      c: 'Right column: Drowart and Goldfinger [15], assumption that σ(M2/M) = 1.5'
+      d: 'Right column: Gomez et al. [9], assumption that σ(MO/M2O) = 0.4'
+    column_note: L/R pairs follow footnotes a/b, a/c, a/d. Mean/SD cells span each pair; trailing blank cells encode
+      the span, not absent numerical measurements.
+  table_5:
+    class: metadata
+    locator:
+      published_page: 5
+      pdf_page_index: 5
+      table: '5'
+    columns:
+    - reference
+    - sigma_M
+    - sigma_MO_L
+    - sigma_MO_R
+    - sigma_M2_L
+    - sigma_M2_R
+    - sigma_M2O_L
+    - sigma_M2O_R
+    rows:
+    - cells:
+      - Freund et al. [27]
+      - '10.44'
+      - '9.03'
+      - '6.96'
+      - '15.66'
+      - '15.66'
+      - '16.86'
+      - '17.4'
+      quote: Freund et al. [27] | 10.44 | 9.03 | 6.96 | 15.66 | 15.66 | 16.86 | 17.4
+    - cells:
+      - Jacobson [25]; Deutsch et al. [26]
+      - '9.62'
+      - '8.41'
+      - '6.41'
+      - '14.42'
+      - '14.42'
+      - '15.62'
+      - '16.03'
+      quote: Jacobson [25]; Deutsch et al. [26] | 9.62 | 8.41 | 6.41 | 14.42 | 14.42 | 15.62 | 16.03
+    - cells:
+      - Bonnell and Hastie [24]
+      - '7.53'
+      - '6.85'
+      - '5.02'
+      - '11.30'
+      - '11.30'
+      - '12.50'
+      - '12.55'
+      quote: Bonnell and Hastie [24] | 7.53 | 6.85 | 5.02 | 11.30 | 11.30 | 12.50 | 12.55
+    - cells:
+      - Kim and Stone [28]
+      - '11.57'
+      - '9.88'
+      - '7.71'
+      - '17.35'
+      - '17.35'
+      - '18.55'
+      - '19.28'
+      quote: Kim and Stone [28] | 11.57 | 9.88 | 7.71 | 17.35 | 17.35 | 18.55 | 19.28
+    - cells:
+      - Margreiter et al. [29],
+      - '9.56'
+      - '8.37'
+      - '6.37'
+      - '14.33'
+      - '14.33'
+      - '15.53'
+      - '15.93'
+      quote: Margreiter et al. [29], | 9.56 | 8.37 | 6.37 | 14.33 | 14.33 | 15.53 | 15.93
+    - cells:
+      - Lotz [31]e
+      - '5.64'
+      - '5.43'
+      - '3.76'
+      - '8.46'
+      - '8.46'
+      - '9.66'
+      - '9.40'
+      quote: Lotz [31]e | 5.64 | 5.43 | 3.76 | 8.46 | 8.46 | 9.66 | 9.40
+    - cells:
+      - Mean
+      - '9.74'
+      - '7.50'
+      - ''
+      - '14.61'
+      - ''
+      - '16.03'
+      - ''
+      quote: 'Mean | 9.74 | 7.50 |  | 14.61 |  | 16.03 | '
+    - cells:
+      - Standard deviation
+      - '1.48'
+      - '1.45'
+      - ''
+      - '2.09'
+      - ''
+      - '2.22'
+      - ''
+      quote: 'Standard deviation | 1.48 | 1.45 |  | 2.09 |  | 2.22 | '
+    table_csv: tables/kems-138-bischof-2023/t5.csv
+    quote_convention: Printed cells in column order, separated by |; typography transliterated; blank cells retained.
+      Not a contiguous prose quotation.
+    kind: literature_cross_sections_and_calculated_molecular_calibration
+    column_classes:
+      sigma_M: literature_compilation
+      molecular_left_and_right: model
+      Mean_and_Standard_deviation: derived
+    units: Å2
+    caption_quote: Summary of ionisation cross sections for different In species at 60 eV.
+    footnotes:
+      a: 'Left column: Jacobson [25], sum of atomic cross sections multiplied by a correction factor of 0.75; σ(O)
+        = 1.6 Å2 according to [15].'
+      b: 'Right column: Gomez et al. [9], assumption that σ(M/MO) = 1.5'
+      c: 'Right column: Drowart and Goldfinger [15], assumption that σ(M2/M) = 1.5'
+      d: 'Right column: Gomez et al. [9], assumption that σ(MO/M2O) = 0.4'
+      e: Excluded for the calculation of the average and the standard deviation.
+    column_note: L/R pairs follow footnotes a/b, a/c, a/d. Mean/SD cells span each pair; trailing blank cells encode
+      the span, not absent numerical measurements.
