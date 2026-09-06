@@ -172,4 +172,4 @@ if __name__ == "__main__":
     digest = hashlib.sha256(args.pdf.read_bytes()).hexdigest()
     with ThreadPoolExecutor(max_workers=4) as executor:
         entries = list(executor.map(lambda page: transcribe(args.pdf, page, args.scratch, digest), range(args.first, args.last + 1)))
-    (ROOT / f"index-{args.first}-{args.last}.json").write_text(json.dumps(entries, indent=2, ensure_ascii=False) + "\n")
+    (args.scratch / f"index-{args.first}-{args.last}.json").write_text(json.dumps(entries, indent=2, ensure_ascii=False) + "\n")

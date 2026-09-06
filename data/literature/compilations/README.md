@@ -66,3 +66,7 @@ ions and condensed phases included). See `nasa-glenn/README.md`.
 `burcat/` is the complete Third Millennium NASA-7 polynomial compilation
 (ions, condensed phases, and comment-only CAS notes included). See
 `burcat/README.md`.
+
+| Compilation | Local status |
+|---|---|
+| [Robie & Hemingway 1995, USGS Bulletin 2131](robie-hemingway-1995-usgs-b2131/) | Whole-bulletin numeric-table census; native OCR records and explicit untranscribed gaps. Public domain; reference input only, never battery-scored. |
