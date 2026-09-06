@@ -58,6 +58,8 @@ HEAVY_ROSTER = frozenset({
     ("tests/chemistry/test_builtin_metallothermic_step_provider.py",
      "test_c6_static_hold_exercises_c6_proceed_decision_path"),
     ("tests/chemistry/test_builtin_metallothermic_step_provider.py",
+     "test_c6_ci_empty_window_records_binding_refusal_without_transitions"),
+    ("tests/chemistry/test_builtin_metallothermic_step_provider.py",
      "test_full_run_mass_balance_holds_with_kernel_committed_metallothermic"),
     ("tests/test_mass_balance.py",
      "test_cumulative_transition_mass_closure_bounded"),
