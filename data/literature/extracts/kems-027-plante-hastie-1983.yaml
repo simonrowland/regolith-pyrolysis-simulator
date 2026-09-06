@@ -98,6 +98,33 @@ fidelity_samples:
     pdf_page_index: 51
     figure: '19'
     note: Fig. 19 caption log P(atm) {LiBO2} = (4.73 ± 0.2) - (1.292 ± 0.02)×10^4/T
+- species: Na
+  observation_id: plante_hastie_1983_nabo2_fit_quoted
+  observable: psat_series
+  field: A
+  value: 4.09
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+- species: Li
+  observation_id: plante_hastie_1983_libo2_fit_quoted
+  observable: psat_series
+  field: A
+  value: 4.73
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+- species: Cs
+  observation_id: plante_hastie_1983_csbo2_fit_quoted
+  observable: psat_series
+  field: A
+  value: 3.45
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
 species:
   Na:
     observations:
@@ -469,6 +496,96 @@ species:
           of ions. Masked by NaBO2 Na+.
       uncertainty:
         note: detection limits as stated; not a measured point
+    - observation_id: plante_hastie_1983_nabo2_fit_quoted
+      supersedes: plante_hastie_1983_fig19_nabo2_logP_ls
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+      quote: log P(atm) {NaBO2} = (4.09 ± 0.2) - (1.190 ± 0.02) x 10^4/T
+      units: log10 pressure in atm; slope coefficient as printed in 10^4/T
+      values:
+        quantity: partial_pressure_NaBO2_fit
+        gas_species: NaBO2
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        A: 4.09
+        B_times_1e4: 1.19
+        equation_as_printed: log P(atm) {NaBO2} = (4.09 ± 0.2) - (1.190 ± 0.02) x 10^4/T
+      uncertainty:
+        A: 0.2
+        B_times_1e4: 0.02
+        note: Printed plus/minus terms; confidence level unstated.
+    - observation_id: plante_hastie_1983_nabo2_activity_quoted
+      supersedes: plante_hastie_1983_nabo2_activity_approx
+      type: activity_coefficient
+      class_tag: derived
+      locator:
+        published_page: 16
+        pdf_page_index: 22
+        figure: '5'
+      quote: From the ratio of pressures from these curves, the activity of NaBO2 in the simulated nuclear
+        glass is approximately 0.01 with a slight temperature dependence.
+      units: dimensionless
+      values:
+        quantity: activity_NaBO2
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        activity: 0.01
+        qualifier: approximately
+        basis: Ratio of fitted pressure curve to JANAF reference curve, not a raw instrument reading.
+      uncertainty:
+        note: approximately; slight temperature dependence; no numeric uncertainty printed
+    - observation_id: plante_hastie_1983_detection_limits_quoted
+      supersedes: plante_hastie_1983_ru_re_sr_undetected
+      type: psat_series
+      class_tag: measured
+      locator:
+        published_page: 35
+        pdf_page_index: 41
+        section: '4.1'
+      quote: From the mass spectrometric detection limits, partial pressure limits for the other radionuclides
+        at temperatures as high as 1500 °C are in the region of 10^-7 atm with an inert atmosphere and 10^-6
+        atm with H2O or the reactive gas mixture present.
+      units: atm
+      values:
+        quantity: undetected_radionuclide_partial_pressure_limit
+        method_class: measured_direct
+        semantics: bound_not_point_ordering
+        T_max_C_as_published: 1500
+        P_upper_atm_inert: 1.0e-07
+        P_upper_atm_H2O_or_reactive: 1.0e-06
+        detected: false
+        note: Detection bound, not a measured pressure point. No conversion or fabricated lower temperature
+          bound.
+      uncertainty:
+        note: in the region of; instrument detection limits, not standard deviations
+      additional_evidence:
+      - locator:
+          published_page: 18
+          pdf_page_index: 24
+          section: 2.5.2
+        quote: No attempt was made to observe SrO+ or Sr+, based on thermodynamic arguments presented in Section
+          4.1.
+    - observation_id: plante_hastie_1983_alpha_absence_audited
+      supersedes: plante_hastie_1983_alpha_true_absence
+      type: alpha
+      class_tag: derived
+      locator:
+        published_page: 44
+        pdf_page_index: 50
+        section: 8. Figure Captions
+      quote: Oxygen pressure vs 10^4/T(K) for SNW glass vapor
+      units: dimensionless
+      values:
+        quantity: kinetic_alpha
+        admission_status: true_absence
+        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: Audit of all four tables and figure captions finds no kinetic evaporation coefficient. Quote
+          identifies source coverage, not an author claim of absence.
   Li:
     observations:
     - observation_id: plante_hastie_1983_fig19_libo2_logP_ls
@@ -571,6 +688,48 @@ species:
         P_ref: JANAF_1971_LiBO2_liquid
       uncertainty:
         note: authors say about; no numeric sigma
+    - observation_id: plante_hastie_1983_libo2_fit_quoted
+      supersedes: plante_hastie_1983_fig19_libo2_logP_ls
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+      quote: log P(atm) {LiBO2} = (4.73 ± 0.2) - (1.292 ± 0.02) x 10^4/T
+      units: log10 pressure in atm; slope coefficient as printed in 10^4/T
+      values:
+        quantity: partial_pressure_LiBO2_fit
+        gas_species: LiBO2
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        A: 4.73
+        B_times_1e4: 1.292
+        equation_as_printed: log P(atm) {LiBO2} = (4.73 ± 0.2) - (1.292 ± 0.02) x 10^4/T
+      uncertainty:
+        A: 0.2
+        B_times_1e4: 0.02
+        note: Printed plus/minus terms; confidence level unstated.
+    - observation_id: plante_hastie_1983_libo2_activity_quoted
+      supersedes: plante_hastie_1983_libo2_activity_approx
+      type: activity_coefficient
+      class_tag: derived
+      locator:
+        published_page: 16
+        pdf_page_index: 22
+        figure: '6'
+      quote: Comparing this curve with that for pure LiBO2(l), obtained from JANAF [1971], indicates that
+        the activity of LiBO2 in the SNW glass is about 0.1, with some temperature dependence.
+      units: dimensionless
+      values:
+        quantity: activity_LiBO2
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        activity: 0.1
+        qualifier: about
+        basis: Ratio of fitted pressure curve to JANAF reference curve.
+      uncertainty:
+        note: about; some temperature dependence; no numeric uncertainty printed
   Cs:
     observations:
     - observation_id: plante_hastie_1983_fig19_csbo2_logP_ls
@@ -666,6 +825,64 @@ species:
         P_ref: Gurvich_Veits_1983_CsBO2
       uncertainty:
         note: authors print 4×10^-6; no extra sigma. Ideal-mixing estimate is two orders higher.
+    - observation_id: plante_hastie_1983_csbo2_fit_quoted
+      supersedes: plante_hastie_1983_fig19_csbo2_logP_ls
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+      quote: log P(atm) {CsBO2} = (3.45 ± 0.3) - (1.288 ± 0.04) x 10^4/T
+      units: log10 pressure in atm; slope coefficient as printed in 10^4/T
+      values:
+        quantity: partial_pressure_CsBO2_fit
+        gas_species: CsBO2
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        A: 3.45
+        B_times_1e4: 1.288
+        equation_as_printed: log P(atm) {CsBO2} = (3.45 ± 0.3) - (1.288 ± 0.04) x 10^4/T
+      uncertainty:
+        A: 0.3
+        B_times_1e4: 0.04
+        note: Printed plus/minus terms; confidence level unstated.
+    - observation_id: plante_hastie_1983_csbo2_activity_quoted
+      supersedes: plante_hastie_1983_csbo2_activity_1200K
+      type: activity_coefficient
+      class_tag: derived
+      locator:
+        published_page: 16
+        pdf_page_index: 22
+        figure: '6'
+      quote: At 1200 K, the activity of CsBO2 in the melt is about 4 x 10^-6 based on the CsBO2 pressure over
+        pure CsBO2 as given by Gurvich and Veits [1983].
+      units: dimensionless
+      values:
+        quantity: activity_CsBO2
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        activity: 4.0e-06
+        T_K: 1200
+        qualifier: about
+        basis: Fitted pressure curve and pure-component reference; ideal-mixing estimate separated into a
+          model observation.
+      uncertainty:
+        note: about; no numeric uncertainty printed
+    - observation_id: plante_hastie_1983_csbo2_ideal_model_quoted
+      type: activity_coefficient
+      class_tag: model
+      locator:
+        published_page: 35
+        pdf_page_index: 41
+        section: 4.1.1
+      quote: a(CsBO2)calc = 4 x 10^-4
+      units: dimensionless
+      values:
+        quantity: activity_CsBO2_ideal_mixing
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        activity: 0.0004
   O2:
     observations:
     - observation_id: plante_hastie_1983_o2_kms_figure_only
@@ -759,3 +976,242 @@ species:
         assigned_pO2_atm: 0.02
       uncertainty:
         note: not applicable
+    - observation_id: plante_hastie_1983_o2_figure_only_quoted
+      supersedes: plante_hastie_1983_o2_kms_figure_only
+      type: psat_series
+      class_tag: figure_only
+      locator:
+        published_page: 44
+        pdf_page_index: 50
+        figure: 7 caption; plate 5
+      quote: Oxygen pressure vs 10^4/T(K) for SNW glass vapor, series I, run 1-5 data; the five lowest temperature
+        points were rejected in the least squares analysis.
+      units: atm
+      values:
+        quantity: partial_pressure_O2
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: Scatter not digitised; comparison JANAF curve is not measured. No invented temperature grid.
+    - observation_id: plante_hastie_1983_offgas_model_quoted
+      supersedes: plante_hastie_1983_table4_offgas_cec_model
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 33
+        pdf_page_index: 39
+        table: '4'
+      quote: Calculated Equilibrium Composition (mole fraction) of Off-gas Mixture at 1 atm
+      units: mole fraction
+      values:
+        quantity: model_offgas_composition
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        table_path: tables/kems-027-plante-hastie-1983/t4.csv
+        quotes_path: tables/kems-027-plante-hastie-1983/t4.provenance.yaml
+        semantics: Equilibrium composition table retained cell-for-cell in corpus, not a rate time series.
+    - observation_id: plante_hastie_1983_thermodynamic_figures_quoted
+      supersedes: plante_hastie_1983_fig20_21_model_proxy
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '20'
+      quote: Calculations assume an oxygen partial pressure of 0.02 atm. The nominal glass composition was
+        used with activities set equal to oxide component mole fractions.
+      units: atm
+      values:
+        quantity: estimated_radionuclide_partial_pressures
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        assigned_pO2_atm: 0.02
+        semantics: bound_not_point_ordering
+        reason: Model curves not digitised; no measurements inferred from curves.
+      additional_evidence:
+      - locator:
+          published_page: 46
+          pdf_page_index: 52
+          figure: '21'
+        quote: Predicted metal hydroxide partial pressures, calculated for the reactions shown.
+
+deepening:
+  dispatch_id: deep-w2-kems-027-plante-hastie-1983
+  date: '2026-09-06'
+  parent_policy: Original observation objects retained byte-for-byte; replacements use supersedes. Metadata
+    replacements are not observation evidence.
+  battery_limitation: Battery does not honor supersedes; historical fitted grids can still be scored.
+    Do not adopt those scores as measurements.
+  tables: All four printed tables transcribed in corpus tables/kems-027-plante-hastie-1983/; Table 2 is
+    calibration metadata, not measured pressure evidence.
+  quote_convention: Quotes transcribe printed text with normalized whitespace, subscripts and superscript
+    exponents; no evaluated pressure grids added.
+metadata:
+  apparatus:
+    supersedes: plante_hastie_1983_kms_pt_cell_geometry
+    class_tag: derived
+    locator:
+      published_page: 7
+      pdf_page_index: 13
+      section: '2.2'
+    quote: The Knudsen cell was made of 0.025 cm Pt sheet and was of welded construction. It was 0.80
+      cm o.d. by 1.90 cm high
+    dimensions_as_printed:
+      wall_thickness_cm: 0.025
+      cell_od_cm: 0.8
+      height_cm: 1.9
+    orifice:
+      locator:
+        published_page: 7
+        pdf_page_index: 13
+        section: '2.2'
+      quote: An effusion orifice diameter of 0.5 cm was used.
+      diameter_cm: 0.5
+    note: Geometry retained as metadata; original inferred area remains historical, not a new measured
+      value.
+  glass_composition:
+    supersedes: plante_hastie_1983_table1_snw_glass_composition
+    class_tag: measured
+    locator:
+      published_page: 3
+      pdf_page_index: 9
+      table: '1'
+    quote: Simulated Nuclear Waste (SNW) Glass Composition
+    table_path: tables/kems-027-plante-hastie-1983/t1.csv
+    quotes_path: tables/kems-027-plante-hastie-1983/t1.provenance.yaml
+    note: Nominal recipe and analytical composition are distinguished column-by-column in table provenance;
+      composition is sample metadata, not a rate time series.
+    transcription:
+      page: 3
+      pdf_page_index: 9
+      table: '1'
+      title: Simulated Nuclear Waste (SNW) Glass Composition
+      method: visual_from_250dpi_pdftoppm
+      completeness: full
+      reviewer: DEEP-kems-027-plante-hastie-1983-independent-audit
+      verification: All CSV data cells checked against PDF page render; no numeric discrepancies.
+      quote_normalization: Chemical subscripts flattened; spaces and column separators normalized. Printed
+        decimal precision retained.
+      row_locator_rule: Every row quote and every quoted cell inherits this file's page, pdf_page_index
+        and table; row key identifies printed row.
+      uncertainty: No numerical cell uncertainties printed in this table.
+      class_tag: measured
+      classification_note: Analytical composition is measured sample metadata; nominal composition is
+        specified metadata, not a vaporization observation.
+      header_quote: 'Compound | Nominal Composition: Weight %, Mole % | Analytical Composition: Weight
+        %, Mole %'
+      footnote_quotes:
+        a: '[Soper, 1982]'
+        b: See text for selection
+      row_quotes:
+        SiO2: SiO2 52.00 57.01 53.76 59.40
+        Fe2O3: Fe2O3 12.96 5.35 11.49 4.78
+        Al2O3: Al2O3 4.86 3.14 4.75 3.09
+        B2O3: B2O3 7.29 6.70 6.49 6.19
+        Li2O: Li2O 5.10 11.25 3.96 8.80
+        Na2O: Na2O 10.13 10.76 8.59 9.20
+        MnO2: MnO2 3.25 1.36 3.57 2.72
+        NiO: NiO 1.05 0.93 1.80 1.60
+        CaO: CaO 1.59 1.87 1.01 1.19
+        MgO: MgO 0.68 1.11 0.54 0.88
+        ZrO2: ZrO2 0.70 0.38 3.79 2.04
+        SrO: SrO 0.09 0.06 0.05 0.03
+        Cs2O: Cs2O 0.10 0.03 0.07 0.02
+        RuO2: RuO2 0.09 0.05 0.11 0.05
+        Re2O7: Re2O7 0.10 0.01 0.03 0.01
+      date: '2026-09-06'
+      note: 'Footnote a: Soper 1982. Footnote b: see text for selection (nominal used for thermodynamic
+        estimates). Values as printed; no unit conversion.
+
+        '
+  mass_spectrometric_constants:
+    class_tag: derived
+    locator:
+      published_page: 14
+      pdf_page_index: 20
+      table: '2'
+    quote: Mass Spectrometric Constants Used for Ions Over Simulated Nuclear Waste Glass
+    table_path: tables/kems-027-plante-hastie-1983/t2.csv
+    quotes_path: tables/kems-027-plante-hastie-1983/t2.provenance.yaml
+    note: A is isotopic fraction; tau is quadrupole transmission; sigma is ionization cross section, not
+      uncertainty. Calibration constants remain metadata.
+    transcription:
+      page: 14
+      pdf_page_index: 20
+      table: '2'
+      title: Mass Spectrometric Constants Used for Ions Over Simulated Nuclear Waste Glass
+      method: visual_from_250dpi_pdftoppm
+      completeness: full
+      reviewer: DEEP-kems-027-plante-hastie-1983-independent-audit
+      verification: All CSV data cells checked against PDF page render; no numeric discrepancies.
+      quote_normalization: Chemical subscripts flattened; spaces and column separators normalized. Printed
+        decimal precision retained.
+      row_locator_rule: Every row quote and every quoted cell inherits this file's page, pdf_page_index
+        and table; row key identifies printed row.
+      uncertainty: No numerical cell uncertainties printed in this table.
+      class_tag: derived
+      classification_note: Calibration metadata; includes estimated cross sections, not measured partial
+        pressures.
+      header_quote: 'ion | m/e | A | Series I (Runs 1-4): τ, σ | Series I (Run 5) and Series II: τ, σ'
+      footnote_quotes:
+        a: Units of πa₀², e.g., see Bonnell and Hastie (1979).
+      row_quotes:
+        Li: Li 7 0.925 0.97 1.98 0.83 2.26
+        Na: Na 23 1.00 0.97 2.14 0.97 2.33
+        O2: O2 32 1.00 0.87 1.20 0.91 1.20
+        LiBO2: LiBO2 50 0.742 0.64 0.42 0.88 0.14
+        NaBO2: NaBO2 66 0.802 0.53 0.26 0.87 0.08
+        Cs: Cs 133 1.00 0.29 2.40 0.70 2.40
+      date: '2026-09-06'
+      note: 'sigma in units of pi a0^2 (footnote a; Bonnell and Hastie 1979). A is isotopic fraction.
+        tau is quadrupole transmission. Calibration metadata, not a vapour-pressure table.
+
+        '
+  integrated_mass_balance:
+    supersedes: plante_hastie_1983_table3_mass_loss
+    class_tag: derived
+    locator:
+      published_page: 15
+      pdf_page_index: 21
+      table: '3'
+    quote: Comparison of Calculated Weight Loss Data with Sample Composition (in mg)
+    table_path: tables/kems-027-plante-hastie-1983/t3.csv
+    quotes_path: tables/kems-027-plante-hastie-1983/t3.provenance.yaml
+    note: Integrated ion-current mass balance, not a timed gravimetric series. Complete derived table
+      retained in corpus without misusing an observation type.
+    transcription:
+      page: 15
+      pdf_page_index: 21
+      table: '3'
+      title: Comparison of Calculated Weight Loss Data with Sample Composition (in mg)
+      method: visual_from_250dpi_pdftoppm_rotated_90
+      completeness: full
+      reviewer: DEEP-kems-027-plante-hastie-1983-independent-audit
+      verification: All CSV data cells checked against PDF page render; no numeric discrepancies.
+      quote_normalization: Chemical subscripts flattened; spaces and column separators normalized. Printed
+        decimal precision retained.
+      row_locator_rule: Every row quote and every quoted cell inherits this file's page, pdf_page_index
+        and table; row key identifies printed row.
+      uncertainty: No numerical cell uncertainties printed in this table.
+      class_tag: derived
+      classification_note: Calculated integrated species/oxide-equivalent losses and initial inventories;
+        no printed time axis.
+      header_quote: 'Series I (Initial sample weight 263.1 mg) | Runs 1-4: Borate Loss, Oxide Equivalent
+        | Run 5: Borate Loss, Oxide Equivalent | Total Lossᵃ | Total Oxide Present | Series II (Initial
+        sample weight 418.4 mg): Borate Loss, Oxide Equivalent, Total Oxide Present'
+      footnote_quotes:
+        a: Summation of Runs 1-5, oxide equivalent.
+      row_quotes:
+        Na2O: Na2O 7.89 3.71 3.30 1.55 5.3 26.1 12.36 5.82 42.3
+        Li2O: Li2O 4.33 1.30 2.16 0.65 2.0 13.4 5.74 1.72 21.3
+        Cs2O: Cs2O 0.06 0.05 0.04 0.03 0.08 0.26 0.62 0.50 0.42
+        B2O3: B2O3 --- 7.22 --- 3.27 10.5 19.2 --- 10.69 30.5
+        O2: O2 1.43 1.43 1.00 1.00 2.43 1.1 3.39 3.39 1.81
+      date: '2026-09-06'
+      note: 'Landscape table. Series I initial sample weight 263.1 mg; Series II 418.4 mg. Footnote a:
+        summation of Runs 1-5, oxide equivalent. B2O3 borate-loss cells are printed dashes (true absence,
+        not 0) — left blank in the CSV. Calculated from ion intensities via eq. 2.6, not a gravimetric
+        time series. Series II Cs2O oxide equivalent 0.50 mg exceeds oxide present 0.42 mg (authors: Series
+        II CsBO2 pressures anomalously high).
+
+        '
