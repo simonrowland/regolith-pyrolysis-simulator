@@ -1,10 +1,13 @@
 schema_version: literature_extract.v1
 source_id: kems-041-sossi-fegley-2018
+aliases:
+  - sossi-fegley-2018
 source:
   citation: Sossi, P.A. & Fegley, B. Jr. (2018), review compilation of metal-oxide vapour speciation and
     melt activity coefficients (Table 1 pure oxides; Table 2 complex silicate melts)
   year: 2018
-  doi: null
+  doi: 10.2138/rmg.2018.84.11
+  url: https://doi.org/10.2138/rmg.2018.84.11
 extraction:
   method: OCR MinerU Table 2 full activity-coefficient inventory (28 oxides) + Table 1 index note. Secondary
     compilation — not primary KEMS co-measured partial pressures.
@@ -69,6 +72,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_As_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: As
+        solar_nebula_1500K_1e-4_bar: As
+        h_chondrite_1500K_1e-4_bar: AsS
+        volcanic_gas_1143_1213K_1_bar: AsS5,7,8, AsO7
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
   Bi:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Bi__BiO_1_5_
@@ -97,6 +119,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Bi_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Bi
+        solar_nebula_1500K_1e-4_bar: Bi
+        h_chondrite_1500K_1e-4_bar: Bi
+        volcanic_gas_1143_1213K_1_bar: Bi6–8, (BiS5,6, BiCl5)
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
   Ca:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Ca_CaO
@@ -208,6 +249,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Cr_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Cr
+        solar_nebula_1500K_1e-4_bar: Cr
+        h_chondrite_1500K_1e-4_bar: Cr
+        volcanic_gas_1143_1213K_1_bar: CrO2Cl25, CrO2H27
+        anhydrous_ferrobasalt_1573_1823K_1_bar: CrO2
+        missing_as_printed: em-dash means true absence, never 0
   Cu:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
@@ -236,6 +296,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Cu_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Cu
+        solar_nebula_1500K_1e-4_bar: Cu
+        h_chondrite_1500K_1e-4_bar: Cu
+        volcanic_gas_1143_1213K_1_bar: CuCl5–8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Cu
+        missing_as_printed: em-dash means true absence, never 0
   Fe:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Fe_FeO
@@ -265,6 +344,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Fe_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Fe
+        solar_nebula_1500K_1e-4_bar: Fe
+        h_chondrite_1500K_1e-4_bar: Fe
+        volcanic_gas_1143_1213K_1_bar: Fe(OH)26–8, (FeCl25,7)
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Fe
+        missing_as_printed: em-dash means true absence, never 0
   Ge:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Ge_GeO
@@ -293,6 +391,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Ge_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Ge
+        solar_nebula_1500K_1e-4_bar: GeS
+        h_chondrite_1500K_1e-4_bar: GeS
+        volcanic_gas_1143_1213K_1_bar: GeS7
+        anhydrous_ferrobasalt_1573_1823K_1_bar: GeO
+        missing_as_printed: em-dash means true absence, never 0
   GeO2:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_GeO2__GeO_2_
@@ -321,6 +438,35 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table1_GeO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 744.0
+      - 1373.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: GeO2(s)
+        melting_point_K_as_published: 1388
+        gas_species_as_published: GeO, Ge, Ge2O, (GeO)2, (GeO)3
+        dominant_gas_species: GeO
+        temperature_windows_as_published: 758–859^a; 1313–1373^b; 744–1373^c; 1213–1347^d; 965–1144^e
+        primary_citation: "Jolly & Latimer 1952"
+        references_as_published: "^a Jolly & Latimer 1952; ^b Shimazaki et al. 1957; ^c Drowart et al. 1965b; ^d Kazenas et al. 1973; ^e Rau & Schnedler 1984"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   In:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_In__InO_1_5_
@@ -349,6 +495,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_In_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: In
+        solar_nebula_1500K_1e-4_bar: In
+        h_chondrite_1500K_1e-4_bar: In
+        volcanic_gas_1143_1213K_1_bar: InCl6,7
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
   K:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_K__KO_0_5_
@@ -377,6 +542,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_K_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: K
+        solar_nebula_1500K_1e-4_bar: K
+        h_chondrite_1500K_1e-4_bar: K
+        volcanic_gas_1143_1213K_1_bar: KCl5–8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: K
+        missing_as_printed: em-dash means true absence, never 0
   Mg:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Mg_MgO
@@ -433,6 +617,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Mn_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Mn
+        solar_nebula_1500K_1e-4_bar: Mn
+        h_chondrite_1500K_1e-4_bar: Mn
+        volcanic_gas_1143_1213K_1_bar: MnCl25,7,8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Mn
+        missing_as_printed: em-dash means true absence, never 0
   MoO2:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
@@ -461,6 +664,36 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table1_MoO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1481.0
+      - 2466.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: MoO2(s)
+        melting_point_K_as_published: 1373
+        gas_species_as_published: MoO3, (MoO3)2, MoO2, (MoO3)3, MoOb
+        dominant_gas_species: MoO3
+        temperature_windows_as_published: 1481–1777^a; 2262–2466^b
+        primary_citation: Burns et al., 1960
+        references_as_published: ^a Burns et al., 1960; ^b DeMaria et al. 1960
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        melting_point_note: dec.
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   MoO3:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
@@ -489,6 +722,35 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table1_MoO3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 800.0
+      - 1060.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: MoO3(s)
+        melting_point_K_as_published: 1074
+        gas_species_as_published: (MoO3)3, (MoO3)n n=4,5
+        dominant_gas_species: (MoO3)3
+        temperature_windows_as_published: 800–1000^a; 980–1060^b
+        primary_citation: Berkowitz et al. 1957b
+        references_as_published: ^a Berkowitz et al. 1957b; ^b Ackermann et al. 1960
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Na:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
@@ -517,6 +779,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Na_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Na
+        solar_nebula_1500K_1e-4_bar: Na
+        h_chondrite_1500K_1e-4_bar: Na
+        volcanic_gas_1143_1213K_1_bar: NaCl5–8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Na
+        missing_as_printed: em-dash means true absence, never 0
   Ni:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Ni_NiO
@@ -574,6 +855,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_P_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: P
+        solar_nebula_1500K_1e-4_bar: PO
+        h_chondrite_1500K_1e-4_bar: P4O6
+        volcanic_gas_1143_1213K_1_bar: —
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
   Pb:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Pb_PbO
@@ -602,6 +902,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Pb_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Pb
+        solar_nebula_1500K_1e-4_bar: Pb
+        h_chondrite_1500K_1e-4_bar: PbS
+        volcanic_gas_1143_1213K_1_bar: PbS6–8, (PbCl25)
+        anhydrous_ferrobasalt_1573_1823K_1_bar: PbO, Pb
+        missing_as_printed: em-dash means true absence, never 0
   SiO2:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_SiO2__SiO_2_
@@ -630,6 +949,35 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table1_SiO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1200.0
+      - 2200.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: SiO2 cristobalite; SiO2(l)g
+        melting_point_K_as_published: 1996
+        gas_species_as_published: SiO, SiO2 ≫ Si
+        dominant_gas_species: SiO
+        temperature_windows_as_published: 1840–1951^a; 1200–1950^b; 1600–1754^c; 1823–1983^d; 1833–1877^e; 1887–1988^f; 1800–2200^g
+        primary_citation: "Brewer & Mastick 1951"
+        references_as_published: "^a Brewer & Mastick 1951; ^b Porter et al. 1955c; ^c Nesmeyanov & Firsova 1960; ^d Nagai et al. 1973; ^e Zmbov et al. 1973; ^f Kazenas et al. 1985; ^g Shornikov et al. 1998"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1748392
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Sn:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Sn_SnO
@@ -658,6 +1006,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Sn_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Sn
+        solar_nebula_1500K_1e-4_bar: SnS
+        h_chondrite_1500K_1e-4_bar: SnS
+        volcanic_gas_1143_1213K_1_bar: SnS6,7
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
   TiO2:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_TiO2__TiO_2_
@@ -686,6 +1053,35 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table1_TiO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1850.0
+      - 2540.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: TiO2 (rutile,l)
+        melting_point_K_as_published: 2143
+        gas_species_as_published: TiO2 ~ TiO ≫ Ti
+        dominant_gas_species: TiO2 ~ TiO
+        temperature_windows_as_published: 1881^a; 2193^b; 1850–2540^c
+        primary_citation: Berkowitz et al. 1957d
+        references_as_published: ^a Berkowitz et al. 1957d; ^b Gilles et al. 1968; ^c Semenov 1969
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   V:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_V__V_2O_3__1900K
@@ -858,6 +1254,35 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: approximate range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table1_WO3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1300.0
+      - 3150.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: WO3(s)
+        melting_point_K_as_published: 1745
+        gas_species_as_published: W3O9, W4O12, W5O15, W2O6, WO3, WO2, WO, W3O8, W3O9 (over W)b,d
+        dominant_gas_species: W3O9
+        temperature_windows_as_published: 1368–1492^a; 2188–2475^b; 1300–1600^c; 1400–3150^d
+        primary_citation: Berkowitz et al. 1957c
+        references_as_published: "^a Berkowitz et al. 1957c; ^b DeMaria et al. 1960; ^c Ackermann & Rauh 1963; ^d Schissel & Trulson 1966"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1743722
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Zn:
     observations:
     - observation_id: sossi_fegley_2018_table2_gamma_Zn_ZnO
@@ -886,6 +1311,25 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    - observation_id: sossi_fegley_2018_table5_Zn_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Zn
+        solar_nebula_1500K_1e-4_bar: Zn
+        h_chondrite_1500K_1e-4_bar: Zn
+        volcanic_gas_1143_1213K_1_bar: Zn7,8, (ZnCl25)
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Zn
+        missing_as_printed: em-dash means true absence, never 0
   SiO:
     observations:
     - observation_id: sossi_fegley_2018_table1_pure_oxide_vapour_speciation_index
@@ -908,6 +1352,2703 @@ species:
           context, not melt. Useful for carrier identity ladder; absolute P not bulk-transcribed in this
           multicarrier-mine pass (table is long). Do not treat pure-oxide carriers as melt partial pressures.
         distinct_from_table2: Table 2 = melt activity coefficients; Table 1 = pure oxide vapour speciation
+  Al2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Al2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 402
+        pdf_page_index: 10
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1500.0
+      - 4700.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: α-Al2O3(s,l)
+        melting_point_K_as_published: 2327
+        gas_species_as_published: Al, AlO, Al2O, AlO2d,g, Al2O2
+        dominant_gas_species: Al
+        temperature_windows_as_published: 2309–2605^a; 1500–1800^b; 2188–2594^c; 1900–2600^d; 2300–2600^e; 2450^f; 2200–2318^g; 2105–2800^h; 3500–4700(l)^i; 2300–2600^j
+        primary_citation: "Brewer & Searcy 1951"
+        references_as_published: "^a Brewer & Searcy 1951; ^b Porter et al. 1955a; ^c Drowart et al. 1960; ^d Farber et al. 1972a; ^e Chervonnyi et al. 1977; ^f Paule 1976; ^g Ho & Burns 1980; ^h Milushin et al. 1987; ^i Hastie et al. 2000; ^j Chervonnyi 2010"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1021/ja01155a090
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  As2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_As2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 402
+        pdf_page_index: 10
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 367.0
+      - 1700.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: As2O3(s,l) arsenolite
+        melting_point_K_as_published: 551
+        gas_species_as_published: As4O6 ≫ As4O5, As4O4, As2O3, AsO
+        dominant_gas_species: As4O6
+        temperature_windows_as_published: 367–429^a; 400–1700^b; 375–415^c
+        primary_citation: "Behrens & Rosenblatt 1972"
+        references_as_published: "^a Behrens & Rosenblatt 1972; ^b Brittain et al. 1982; ^c Kazenas & Petrov 1997"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1016/0021-9614(72)90055-9
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  B2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_B2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1170.0
+      - 1590.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: B2O3(l)
+        melting_point_K_as_published: 723
+        gas_species_as_published: B2O3, B2O2, BO, B
+        dominant_gas_species: B2O3
+        temperature_windows_as_published: 1300–1500^a; 1410–1590^b; 1200–1440^c; 1170–1400^d
+        primary_citation: Inghram et al. 1956
+        references_as_published: "^a Inghram et al. 1956; ^b Hildenbrand et al. 1963; ^c Büchler & Berkowitz-Mattuch 1963; ^d Jacobson & Myers 2011"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  BaO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_BaO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1150.0
+      - 1917.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: BaO(s)
+        melting_point_K_as_published: 2246
+        gas_species_as_published: BaO, Ba, Ba2O3, Ba2O2, Ba2O
+        dominant_gas_species: BaO
+        temperature_windows_as_published: 1200–1500^a; 1150–1390^b; 1530–1758^c; 1365–1917^d; 1340–1660^e
+        primary_citation: "Claasen & Veenemans 1933"
+        references_as_published: "^a Claasen & Veenemans 1933; ^b Pelchowitch 1954; ^c Inghram et al. 1955; ^d Newbury et al. 1968; ^e Hilpert & Gerads 1975"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1007/bf01333860
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  BeO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_BeO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1900.0
+      - 2500.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: BeO(s)
+        melting_point_K_as_published: 2851
+        gas_species_as_published: Be, (BeO)3, (BeO)4, BeO, (BeO)2, (BeO)5, (BeO)6, Be2Ob
+        dominant_gas_species: Be
+        temperature_windows_as_published: 1900–2400^a; 2300–2500^b
+        primary_citation: Chupka et al. 1959
+        references_as_published: "^a Chupka et al. 1959; ^b Theard & Hildenbrand 1964"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Bi2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Bi2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 987.0
+      - 1193.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Bi2O3(s,l)
+        melting_point_K_as_published: 1098
+        gas_species_as_published: Bi, BiO, Bi4O6, Bi2, Bi2O3, Bi3O4, Bi2O2, Bi2O
+        dominant_gas_species: Bi
+        temperature_windows_as_published: 1003–1193^a; 987–1017^b
+        primary_citation: Sidorov et al. 1980
+        references_as_published: "^a Sidorov et al. 1980; ^b Oniyama & Wahlbeck 1998"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  CaO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_CaO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1500.0
+      - 2227.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: CaO(s)
+        melting_point_K_as_published: 3172
+        gas_species_as_published: Ca, CaO
+        dominant_gas_species: Ca
+        temperature_windows_as_published: 2080–2206^a; 1500–1900^b; 1923–2227^c
+        primary_citation: Farber and Srivastava 1976a
+        references_as_published: "^a Farber and Srivastava 1976a; ^b Sata et al. 1982; ^c Samoilova & Kazenas 1995"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  CdO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_CdO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 873.0
+      - 1374.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: CdO(s)
+        melting_point_K_as_published: 1755
+        gas_species_as_published: Cd ≫ CdO
+        dominant_gas_species: Cd
+        temperature_windows_as_published: 1150–1374^a; 873–1056^b; 1014–1188^c; 886–1090^d; 980–1334^e
+        primary_citation: "Gilbert & Kitchener 1956"
+        references_as_published: "^a Gilbert & Kitchener 1956; ^b Kodera et al. 1968; ^c Miller 1975; ^d Behrens and Mason 1981; ^e Kazenas et al. 1984a"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        melting_point_note: dec.
+        primary_citation_doi: 10.1039/jr9560003919
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  CeO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_CeO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1700.0
+      - 2320.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: CeO2(s)
+        melting_point_K_as_published: 2753
+        gas_species_as_published: CeO2, CeO ≫ Ce
+        dominant_gas_species: CeO2
+        temperature_windows_as_published: 1825–2320^a; 1736–2067^b; 1700–2200^c
+        primary_citation: "Ackermann & Rauh 1971b"
+        references_as_published: "^a Ackermann & Rauh 1971b; ^b Piacente et al. 1973; ^c Marushkin et al. 2000"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Ce2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Ce2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1825.0
+      - 2320.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Ce2O3(s)
+        melting_point_K_as_published: 2523
+        gas_species_as_published: CeO, CeO2 ≫ Ce
+        dominant_gas_species: CeO
+        temperature_windows_as_published: 1825–2320^a; 1850–2050^b
+        primary_citation: "Ackermann & Rauh 1971b"
+        references_as_published: "^a Ackermann & Rauh 1971b; ^b Marushkin et al. 2000"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  CoO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_CoO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1578.0
+      - 1818.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: CoO(s)
+        melting_point_K_as_published: 2103
+        gas_species_as_published: Co, CoO
+        dominant_gas_species: Co
+        temperature_windows_as_published: 1578–1744^a; 1617–1818^b
+        primary_citation: Grimley et al. 1966
+        references_as_published: ^a Grimley et al. 1966; ^b Kazenas and Tagirov 1995
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Cr2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Cr2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1690.0
+      - 2059.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Cr2O3(s)
+        melting_point_K_as_published: 2603
+        gas_species_as_published: Cr, CrO, CrO2, CrO3
+        dominant_gas_species: Cr
+        temperature_windows_as_published: 1839–2059^a; 1690–2020^b
+        primary_citation: Grimley et al. 1961
+        references_as_published: ^a Grimley et al. 1961; ^b Chizikov et al. 1972
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  CrO3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_CrO3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 423.0
+      - 523.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: CrO3(s)
+        melting_point_K_as_published: 470
+        gas_species_as_published: (CrO3)n, (n = 3–5), CrxO3x−2
+        dominant_gas_species: (CrO3)n
+        temperature_windows_as_published: 423–523^a; 440–480^b
+        primary_citation: McDonald and Margrave 1968
+        references_as_published: "^a McDonald and Margrave 1968; ^b Kazenas & Samoilova 1995"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1016/0022-1902(68)80495-6
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Cs2O:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Cs2O_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 298.0
+      - 2500.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Cs2O(s,l)
+        melting_point_K_as_published: 768
+        gas_species_as_published: Cs2O, Cs, Cs2O2, CsO
+        dominant_gas_species: Cs2O
+        temperature_windows_as_published: 443–1000^a; 1070–1170^b; 298–2500^c; 620–1100^d
+        primary_citation: Tower 1969
+        references_as_published: "^a Tower 1969; ^b Nicolosi et al. 1979; ^c Glushko et al. 1982; ^d Lamoreaux & Hildenbrand 1984"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Cu2O:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Cu2O_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1210.0
+      - 1452.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Cu2O(s)
+        melting_point_K_as_published: 1517
+        gas_species_as_published: Cu
+        dominant_gas_species: Cu
+        temperature_windows_as_published: 1280–1450^a; 1210–1452^b
+        primary_citation: Kazenas et al. 1969
+        references_as_published: ^a Kazenas et al. 1969; ^b Kodera et al. 1968
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  CuO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_CuO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 873.0
+      - 2000.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: CuO(s,l)
+        melting_point_K_as_published: 1599
+        gas_species_as_published: Cu, Cu2, CuO
+        dominant_gas_species: Cu
+        temperature_windows_as_published: 873–1173^a; 873–1273^b; 1200–2000^c
+        primary_citation: Kodera et al. 1968
+        references_as_published: "^a Kodera et al. 1968; ^b Mack et al. 1923; ^c IVTAN code & database"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1246/bcsj.41.1039
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Dy2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Dy2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2000.0
+      - 2637.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Dy2O3(s)
+        melting_point_K_as_published: 2680
+        gas_species_as_published: DyO, Dy
+        dominant_gas_species: DyO
+        temperature_windows_as_published: 2432–2637^a; 2000–2500^b
+        primary_citation: Ames et al. 1967
+        references_as_published: ^a Ames et al. 1967; ^b Panish 1961b
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Er2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Er2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2000.0
+      - 2687.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Er2O3(s)
+        melting_point_K_as_published: 2691
+        gas_species_as_published: ErO, Er
+        dominant_gas_species: ErO
+        temperature_windows_as_published: 2492–2687^a; 2000–2500^b
+        primary_citation: Ames et al. 1967
+        references_as_published: ^a Ames et al. 1967; ^b Panish 1961b
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Eu2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Eu2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1950.0
+      - 2350.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Eu2O3(s)
+        melting_point_K_as_published: 2623
+        gas_species_as_published: Eu, EuOa,b; EuO ≫ Euc
+        dominant_gas_species: Eu (a,b); EuO ≫ Eu (c)
+        temperature_windows_as_published: 1984–2188^a; 1950–2350^b
+        primary_citation: Ames et al. 1967
+        references_as_published: ^a Ames et al. 1967; ^b Panish 1961a; ^c Dulick et al. 1986
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Fe1-xO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Fe1_xO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 403
+        pdf_page_index: 11
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1543.0
+      - 1950.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Fe1−xO(s) wüstite; FeO(l)c
+        melting_point_K_as_published: 1650
+        gas_species_as_published: "Fe > FeO"
+        dominant_gas_species: Fe
+        temperature_windows_as_published: 1776(l)^a; 1773–1867(l)^b; 1600–1750(s,l)^c; 1543–1573^d; 1930–1950(l)^e
+        primary_citation: "Brewer & Mastick 1951"
+        references_as_published: "^a Brewer & Mastick 1951; ^b Washburn 1963; ^c Chizikov et al. 1971; ^d Shchedrin et al. 1978; ^e Kazenas and Tagirov 1995"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1748392
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Fe3O4:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Fe3O4_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1373.0
+      - 1673.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Fe3O4(s)
+        melting_point_K_as_published: 1870
+        gas_species_as_published: Feb
+        dominant_gas_species: Fe
+        temperature_windows_as_published: 1400–1600^a; 1373–1673^b
+        primary_citation: Chizikov et al. 1971
+        references_as_published: ^a Chizikov et al. 1971; ^b Shchedrin et al. 1978
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Fe2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Fe2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1030.0
+      - 1764.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Fe2O3(s,l)
+        melting_point_K_as_published: 1730
+        gas_species_as_published: Feb, FeOb, FeO2b
+        dominant_gas_species: Fe
+        temperature_windows_as_published: 1030–1200^a; 1639–1764^b
+        primary_citation: Chizikov et al. 1971
+        references_as_published: ^a Chizikov et al. 1971; ^b Hildenbrand 1975
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        melting_point_note: dec in 1 atm O2
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Ga2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Ga2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1013.0
+      - 2068.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Ga2O3(s)
+        melting_point_K_as_published: 2080
+        gas_species_as_published: Ga2O, Ga, GaO
+        dominant_gas_species: Ga2O
+        temperature_windows_as_published: 1073–1273^a; 2068^b; 1013–1841^c
+        primary_citation: "Frosch & Thurmond 1962"
+        references_as_published: "^a Frosch & Thurmond 1962; ^b Burns 1966; ^c Shchukarev et al. 1969"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1021/j100811a027
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Gd2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Gd2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2000.0
+      - 2590.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Gd2O3(s)
+        melting_point_K_as_published: 2693
+        gas_species_as_published: GdO ≫ Gd
+        dominant_gas_species: GdO
+        temperature_windows_as_published: 2000–2500^a; 2350–2590^b; 2400–2550^c; 2100–2350^d
+        primary_citation: Panish 1961b
+        references_as_published: "^a Panish 1961b; ^b Messier 1967; ^c Ames et al. 1967; ^d Alcock & Peleg 1967"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  HfO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_HfO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2150.0
+      - 2900.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: HfO2(s)
+        melting_point_K_as_published: 3073
+        gas_species_as_published: "HfO > HfO2 ≫ Hf"
+        dominant_gas_species: HfO
+        temperature_windows_as_published: 2246–2600^a; 2150–2500^b; 2200–2900^c
+        primary_citation: "Panish & Reif 1963"
+        references_as_published: "^a Panish & Reif 1963; ^b Alcock & Peleg 1967; ^c Belov & Semenov 1985"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1733473
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Ho2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Ho2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2000.0
+      - 2711.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Ho2O3(s)
+        melting_point_K_as_published: 2686
+        gas_species_as_published: HoO, Ho
+        dominant_gas_species: HoO
+        temperature_windows_as_published: 2487–2711^a; 2000–2500^b
+        primary_citation: Ames et al. 1967
+        references_as_published: ^a Ames et al. 1967; ^b Panish 1961b
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  In2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_In2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 873.0
+      - 1631.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: In2O3(s)
+        melting_point_K_as_published: 2186
+        gas_species_as_published: In2O, In, InO
+        dominant_gas_species: In2O
+        temperature_windows_as_published: 1290–1490^a; 1269–1539^b; 1300–1500^c; 1539–1631^d; 873–1223^e; 1322–1520^f
+        primary_citation: Shchukarev et al. 1961b
+        references_as_published: ^a Shchukarev et al. 1961b; ^b Burns et al. 1963; ^c Burns 1966; ^d Shchukarev et al. 1969; ^e Valderraman and Jacob 1977; ^f Gomez et al. 1982
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  K2O:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_K2O_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 298.0
+      - 3000.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: K2O(s,l)
+        melting_point_K_as_published: 1013
+        gas_species_as_published: K, K2O, KO, K2O2d, K2d, KO2d
+        dominant_gas_species: K
+        temperature_windows_as_published: 1087–1186^a; 1037–1184^b; 580–825^c; 298–3000^d
+        primary_citation: Ehlert 1977
+        references_as_published: ^a Ehlert 1977; ^b Simmons et al. 1977; ^c Byker et al. 1979; ^d Lamoreaux and Hildenbrand 1984
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        melting_point_note: Kb
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  La2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_La2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1778.0
+      - 2441.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: La2O3(s)
+        melting_point_K_as_published: 2586
+        gas_species_as_published: LaO ≫ La
+        dominant_gas_species: LaO
+        temperature_windows_as_published: 2230–2440^a; 2234–2441^b; 1778–2427^c
+        primary_citation: Walsh et al. 1960
+        references_as_published: "^a Walsh et al. 1960; ^b Goldstein et al. 1961; ^c Ackermann & Rauh 1971a"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Li2O:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Li2O_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1000.0
+      - 1700.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Li2O(s)
+        melting_point_K_as_published: 1711
+        gas_species_as_published: "Li ~ Li2O > LiO > Li3Od,e, Li2O2d,e"
+        dominant_gas_species: Li ~ Li2O
+        temperature_windows_as_published: 1000–1600^a; 1494–1669^b; 1447–1662^c; 1300–1700^d; 1225–1507^e
+        primary_citation: Berkowitz et al. 1959
+        references_as_published: ^a Berkowitz et al. 1959; ^b Hildenbrand et al. 1963; ^c White et al. 1963; ^d Kudo et al. 1978; ^e Kimura et al. 1980
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Lu2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Lu2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2000.0
+      - 2700.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Lu2O3(s)
+        melting_point_K_as_published: 2763
+        gas_species_as_published: LuO ≫ Lu (LuO/Lu ~ 4)c
+        dominant_gas_species: LuO
+        temperature_windows_as_published: 2615–2700^a; 2000–2500^b; 2700^c
+        primary_citation: Ames et al. 1967
+        references_as_published: "^a Ames et al. 1967; ^b Panish 1961b; ^c Lopatin & Shugurov 2014"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  MgO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_MgO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1573.0
+      - 2160.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: MgO(s)
+        melting_point_K_as_published: 3100
+        gas_species_as_published: Mg, MgO
+        dominant_gas_species: Mg
+        temperature_windows_as_published: 1950^a; 1720–1960^b; 2020–2160^c; 1573–1973^d; 1820–1983^e
+        primary_citation: Porter et al. 1955b
+        references_as_published: "^a Porter et al. 1955b; ^b Alcock & Peleg 1967; ^c Farber & Srivastava 1976b; ^d Sata et al. 1978; ^e Kazenas et al. 1983"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  MnO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_MnO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 404
+        pdf_page_index: 12
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1535.0
+      - 1999.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: MnO(s)
+        melting_point_K_as_published: 2115
+        gas_species_as_published: Mn, MnO, MnO2c
+        dominant_gas_species: Mn
+        temperature_windows_as_published: 1767^a; 1618–1815^b; 1858–1999^c; 1535–1782^d
+        primary_citation: "Brewer & Mastick 1951"
+        references_as_published: "^a Brewer & Mastick 1951; ^b Kazenas et al. 1984b; ^c Hildenbrand & Lau 1994; ^d Matraszek et al. 2004"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1748392
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Na2O:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Na2O_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 873.0
+      - 1304.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Na2O(s)
+        melting_point_K_as_published: 1405
+        gas_species_as_published: Na, Na2O, NaO, NaO2c
+        dominant_gas_species: Na
+        temperature_windows_as_published: 987–1114^a; 1144–1304^b; 984–1056^c; 873–1003^d
+        primary_citation: Hildenbrand and Murad 1970
+        references_as_published: ^a Hildenbrand and Murad 1970; ^b Piacente et al. 1972; ^c Hildenbrand and Lau, 1993; ^d Popovic et al. 2012
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1674508
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  NbO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_NbO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1773.0
+      - 2473.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: NbO(s,l)
+        melting_point_K_as_published: 2210
+        gas_species_as_published: NbO2 ~ NbO
+        dominant_gas_species: NbO2 ~ NbO
+        temperature_windows_as_published: 1773–2473(s,l)^a; 2032–2125^b; 1971–2175^c
+        primary_citation: Shchukarev et al. 1966
+        references_as_published: "^a Shchukarev et al. 1966; ^b Kamegashira et al. 1981; ^c Matsui & Naito 1982"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  NbO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_NbO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1773.0
+      - 2473.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: NbO2(s,l)
+        melting_point_K_as_published: 2175
+        gas_species_as_published: NbO2, NbO
+        dominant_gas_species: NbO2
+        temperature_windows_as_published: 1773–2473^a; 1963–2323^b
+        primary_citation: Shchukarev et al. 1966
+        references_as_published: ^a Shchukarev et al. 1966; ^b Kamegashira et al. 1981
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        melting_point_note: 2188 Kb
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Nb2O5:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Nb2O5_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1726.0
+      - 2271.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Nb2O5(s,l)
+        melting_point_K_as_published: 1785
+        gas_species_as_published: NbO2
+        dominant_gas_species: NbO2
+        temperature_windows_as_published: 1726–2271
+        primary_citation: "Matsui & Naito 1983"
+        references_as_published: "Matsui & Naito 1983"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1016/0022-3115(83)90306-9
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Nd2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Nd2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1950.0
+      - 2485.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Nd2O3(s)
+        melting_point_K_as_published: 2593
+        gas_species_as_published: NdO ≫ Nd
+        dominant_gas_species: NdO
+        temperature_windows_as_published: 2250–2400^a; 2255–2408^b; 1950–2350^c; 2155–2485^d
+        primary_citation: Walsh et al. 1960
+        references_as_published: ^a Walsh et al. 1960; ^b Goldstein et al. 1961; ^c Panish 1961a; ^d Tetenbaum 1975
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  NiO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_NiO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1400.0
+      - 1816.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: NiO(s)
+        melting_point_K_as_published: 2228
+        gas_species_as_published: Ni, NiO
+        dominant_gas_species: Ni
+        temperature_windows_as_published: 1782–1816^a; 1575–1709^b; 1400–1570^c; 1587–1730^d
+        primary_citation: "Brewer & Mastick 1951"
+        references_as_published: "^a Brewer & Mastick 1951; ^b Grimley et al. 1961b; ^c Kodera et al. 1968; ^d Kazenas and Tagirov 1995"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1748392
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  OsO4:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_OsO4_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1100.0
+      - 1750.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: OsO4(l)
+        melting_point_K_as_published: 314
+        gas_species_as_published: OsO4, OsO3 ≫ OsO2
+        dominant_gas_species: OsO4
+        temperature_windows_as_published: 1100–1750
+        primary_citation: Grimley et al. 1960
+        references_as_published: Grimley et al. 1960
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  P4O10:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_P4O10_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 313.0
+      - 923.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: P4O10(s)
+        melting_point_K_as_published: 699
+        gas_species_as_published: P4O10 ≫ P4O9, P4O8, P4O7, P4O6
+        dominant_gas_species: P4O10
+        temperature_windows_as_published: 333–923^a; 313–773^b; 370–423^c
+        primary_citation: Hashizume et al. 1966
+        references_as_published: "^a Hashizume et al. 1966; ^b Muenow et al. 1970; ^c Kazenas & Petrov 1997"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  PbO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_PbO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 810.0
+      - 1150.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: PbO(s)
+        melting_point_K_as_published: 1160
+        gas_species_as_published: PbO, Pb, (PbO)n (n=2–6)
+        dominant_gas_species: PbO
+        temperature_windows_as_published: 1000–1150^a; 1010–1105^b; 810–1040^c
+        primary_citation: Drowart et al. 1965a
+        references_as_published: "^a Drowart et al. 1965a; ^b Kazenas & Petrov 1996; ^c Kobertz et al. 2014"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Pr2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Pr2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1950.0
+      - 2350.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Pr2O3(s)
+        melting_point_K_as_published: 2573
+        gas_species_as_published: PrO ≫ Pr
+        dominant_gas_species: PrO
+        temperature_windows_as_published: 1950–2350^a; Calculated^b
+        primary_citation: Panish 1961a
+        references_as_published: ^a Panish 1961a; ^b Dulick et al. 1986
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1731658
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Rb2O:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Rb2O_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 298.0
+      - 3000.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Rb2O(s,l)
+        melting_point_K_as_published: 900
+        gas_species_as_published: Rb, Rb2, Rb2O, RbO, Rb2O2
+        dominant_gas_species: Rb
+        temperature_windows_as_published: 1020–1135^a; 298–3000^b
+        primary_citation: Nicolosi et al. 1979
+        references_as_published: ^a Nicolosi et al. 1979; ^b Lamoreaux and Hildenbrand 1984
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Re2O7:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Re2O7_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 327.0
+      - 463.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Re2O7(s)
+        melting_point_K_as_published: 570
+        gas_species_as_published: Re2O7, ReO3, ReO2, Re2O6, Re2O5
+        dominant_gas_species: Re2O7
+        temperature_windows_as_published: 327–463
+        primary_citation: Skinner and Searcy, 1973
+        references_as_published: Skinner and Searcy, 1973
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1021/j100631a020
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Sb2O4:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Sb2O4_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1090.0
+      - 1090.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Sb2O4(s)
+        melting_point_K_as_published: 1524
+        gas_species_as_published: Sb4O6, Sb3O4, Sb2O3, Sb, Sb2O2
+        dominant_gas_species: Sb4O6
+        temperature_windows_as_published: 1090
+        primary_citation: Asryan et al. 2003
+        primary_citation_doi: "10.1023/a:1025776803970"
+        references_as_published: Asryan et al. 2003
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        melting_point_note: dec.
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Sb2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Sb2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 580.0
+      - 1073.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Sb2O3(s,l) orthorhombica,b 928 K; cubica,c 843 K Ttrans
+        melting_point_K_as_published: 928
+        gas_species_as_published: Sb4O6a,b,c (+ Sb4O5, Sb3O4, Sb2O2, SbO)c
+        dominant_gas_species: Sb4O6
+        temperature_windows_as_published: 742–829 (cubic)^a; 742–917 (orthorh)^a; 929–1073 (liq)^a; 627–732 (orthorh)^b; 580–730 (cubic)^c
+        primary_citation: Hincke 1930
+        references_as_published: ^a Hincke 1930; ^b Behrens and Rosenblatt 1973; ^c Semenov et al. 1983
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        melting_point_note: orthorhombic; cubic Ttrans 843 K
+        primary_citation_doi: 10.1021/ja01373a016
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Sc2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Sc2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2481.0
+      - 2768.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Sc2O3(s)
+        melting_point_K_as_published: 2762
+        gas_species_as_published: ScO, Sc
+        dominant_gas_species: ScO
+        temperature_windows_as_published: 2555–2693^a; 2481–2740^b; 2521–2768^c
+        primary_citation: Ames et al. 1967
+        references_as_published: "^a Ames et al. 1967; ^b Belov et al. 1987; ^c Rostai & Wahlbeck 1999"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Sm2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Sm2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1950.0
+      - 2499.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Sm2O3(s)
+        melting_point_K_as_published: 2613
+        gas_species_as_published: SmO, Sm
+        dominant_gas_species: SmO
+        temperature_windows_as_published: 2333–2499^a; 1950–2350^b
+        primary_citation: Ames et al. 1967
+        references_as_published: ^a Ames et al. 1967; ^b Panish 1961a
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  SnO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_SnO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1160.0
+      - 1672.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: SnO2(s)
+        melting_point_K_as_published: 1903
+        gas_species_as_published: SnO, Sn2O2a,d
+        dominant_gas_species: SnO
+        temperature_windows_as_published: 1254–1538^a; 1315–1660^b; 1296–1672^c; 1160–1450^d
+        primary_citation: Colin et al. 1965
+        references_as_published: ^a Colin et al. 1965; ^b Hoenig and Searcy, 1966; ^c Kazenas et al. 1996; ^d Zimmermann et al. 1999
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  SrO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_SrO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1575.0
+      - 2102.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: SrO(s)
+        melting_point_K_as_published: 2805
+        gas_species_as_published: Sr ~ SrO
+        dominant_gas_species: Sr ~ SrO
+        temperature_windows_as_published: 1575–1750^a; 2100^b; 2010–2102^c; 1905–1996^d
+        primary_citation: Pelchowitch 1954
+        references_as_published: "^a Pelchowitch 1954; ^b Porter et al. 1955b; ^c Farber and Srivastava 1976; ^d Samoilova & Kazenas 1994"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Ta2O5:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Ta2O5_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1573.0
+      - 2525.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Ta2O5(s,l)
+        melting_point_K_as_published: 2145
+        gas_species_as_published: TaO2, TaO ≫ Ta
+        dominant_gas_species: TaO2
+        temperature_windows_as_published: 2019–2314^a; 1573–2073^b; 1924–2268^c; 1880–2525^d; 2043–2262^e
+        primary_citation: Inghram et al. 1957
+        references_as_published: "^a Inghram et al. 1957; ^b Kofstad 1964; ^c Krikorian & Carpenter 1965; ^d Smoes et al. 1976; ^e Kazenas et al. 1994"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Tb2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Tb2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2000.0
+      - 2500.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Tb2O3(s)
+        melting_point_K_as_published: 2682
+        gas_species_as_published: TbO ≫ Tb
+        dominant_gas_species: TbO
+        temperature_windows_as_published: 2000–2500
+        primary_citation: Panish 1961b
+        references_as_published: Panish 1961b
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  ThO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_ThO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1782.0
+      - 6230.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: ThO2(s,l)
+        melting_point_K_as_published: 3650
+        gas_species_as_published: ThO2, ThO ≫ Th
+        dominant_gas_species: ThO2
+        temperature_windows_as_published: 2050–2250^a; 2170–2400^b; 2000–3000^c; 2170–2500^d; 2400–2800^e; 1782–1940^f; 2390–2950^g; 5140–6230^h
+        primary_citation: Shapiro 1952
+        references_as_published: "^a Shapiro 1952; ^b Wolff & Alcock 1962; ^c Ackermann et al. 1963; ^d Peleg & Alcock 1966; ^e Ackermann & Rauh 1973; ^f Murad & Hildenbrand 1974; ^g Belov & Semenov 1979; ^h Joseph et al. 2002"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  TiO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_TiO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1840.0
+      - 2153.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: TiO(s,l)
+        melting_point_K_as_published: 2023
+        gas_species_as_published: TiO, Ti, TiO2
+        dominant_gas_species: TiO
+        temperature_windows_as_published: 1840^a; 2023–2153^b
+        primary_citation: Berkowitz et al. 1957d
+        references_as_published: ^a Berkowitz et al. 1957d; ^b Gilles et al. 1968
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Ti2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Ti2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1675.0
+      - 2194.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Ti2O3(s,l)
+        melting_point_K_as_published: 2115
+        gas_species_as_published: TiO ~ TiO2 ≫ Ti
+        dominant_gas_species: TiO ~ TiO2
+        temperature_windows_as_published: 2194^a; 1675–1768^b
+        primary_citation: Berkowitz et al. 1957d
+        references_as_published: "^a Berkowitz et al. 1957d; ^b Wu & Wahlbeck 1972"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Ti3O5:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Ti3O5_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1837.0
+      - 2143.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Ti3O5(s,l)
+        melting_point_K_as_published: 2050
+        gas_species_as_published: TiO2 ~ 2×TiO
+        dominant_gas_species: TiO2 ~ 2×TiO
+        temperature_windows_as_published: 1870–2000^a; 1837–2040^b; 2097–2143^c
+        primary_citation: "Hampson & Gilles 1971"
+        references_as_published: "^a Hampson & Gilles 1971; ^b Wahlbeck and Gilles 1967; ^c Gilles et al. 1968"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.1676654
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Tl2O:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Tl2O_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 620.0
+      - 940.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Tl2O(s,l)
+        melting_point_K_as_published: 852
+        gas_species_as_published: Tl2O ≫ Tl3O, Tl4O2
+        dominant_gas_species: Tl2O
+        temperature_windows_as_published: 620–770^a; 820–940^b
+        primary_citation: Cubicciotti 1969, 1970
+        references_as_published: ^a Cubicciotti 1969, 1970; ^b Holstein 1993a
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Tl4O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Tl4O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 773.0
+      - 1080.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Tl4O3(s,l)
+        melting_point_K_as_published: 990
+        gas_species_as_published: Tl2O
+        dominant_gas_species: Tl2O
+        temperature_windows_as_published: ~773^a; 920–1080^b
+        primary_citation: "Wahlbeck & Myers 1997"
+        references_as_published: "^a Wahlbeck & Myers 1997; ^b Holstein 1993a"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1063/1.474072
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Tl2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Tl2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 657.0
+      - 1060.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Tl2O3(s)
+        melting_point_K_as_published: 1107
+        gas_species_as_published: Tl2O, Tl, TlO
+        dominant_gas_species: Tl2O
+        temperature_windows_as_published: 915–1030^a; 803–948^b; 657–773^c; 880–1060^d
+        primary_citation: Shchukarev et al. 1961a
+        references_as_published: "^a Shchukarev et al. 1961a; ^b Cubicciotti & Keneshea 1967; ^c Wahlbeck et al. 1991; ^d Holstein 1993a"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Tm2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Tm2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2000.0
+      - 2641.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Tm2O3(s)
+        melting_point_K_as_published: 2683
+        gas_species_as_published: Tm, TmO
+        dominant_gas_species: Tm
+        temperature_windows_as_published: 2450–2641^a; 2000–2500^b
+        primary_citation: Ames et al. 1967
+        references_as_published: ^a Ames et al. 1967; ^b Panish 1961b
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  UO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_UO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1600.0
+      - 5708.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: UO2(s,l)
+        melting_point_K_as_published: 3123
+        gas_species_as_published: UO2, UO3, UO
+        dominant_gas_species: UO2
+        temperature_windows_as_published: 1600–2800^a; 2200–2800^b; 2025–2343^c; 2500–5000(s,l)^d; 4715, 5708(l)^e; 2800–3400(s,l)^f
+        primary_citation: Ackermann et al. 1956
+        references_as_published: "^a Ackermann et al. 1956; ^b Ohse 1966; ^c Matsui & Naito 1985; ^d Joseph et al. 1996; ^e Joseph et al. 2002; ^f Pflieger et al. 2011"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  U3O8:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_U3O8_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 406
+        pdf_page_index: 14
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 840.0
+      - 1700.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: U3O8(s) (in 1 kb He)
+        melting_point_K_as_published: 2010
+        gas_species_as_published: UO3
+        dominant_gas_species: UO3
+        temperature_windows_as_published: 1230–1700^a; 840–1450^b
+        primary_citation: Ackermann et al. 1960
+        references_as_published: "^a Ackermann et al. 1960; ^b Ackermann & Chang 1973"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1021/j100832a016
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  VO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_VO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1680.0
+      - 1999.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: VO(s)
+        melting_point_K_as_published: 2063
+        gas_species_as_published: VO, V ≫ VO2
+        dominant_gas_species: VO
+        temperature_windows_as_published: 1680–1950^a; 1803–1999^b
+        primary_citation: Berkowitz et al. 1957a
+        references_as_published: ^a Berkowitz et al. 1957a; ^b Banchorndhevakul et al. 1986
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  V2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_V2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1839.0
+      - 2270.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: V2O3(s)
+        melting_point_K_as_published: 2340
+        gas_species_as_published: VO ~ VO2, V
+        dominant_gas_species: VO ~ VO2
+        temperature_windows_as_published: 2270^a; 1914–2182^b; 1839–2105^c
+        primary_citation: Farber et al. 1972b
+        references_as_published: ^a Farber et al. 1972b; ^b Banchorndhevakul et al. 1985; ^c Wang et al. 2010
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  V2O4:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_V2O4_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1673.0
+      - 2273.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: V2O4(s,l)
+        melting_point_K_as_published: 1818
+        gas_species_as_published: VO2, VO, V4O10, V
+        dominant_gas_species: VO2
+        temperature_windows_as_published: 1673–2273^a; 2063–2270^b
+        primary_citation: "Frantseva & Semenov 1969"
+        references_as_published: "^a Frantseva & Semenov 1969; ^b Farber et al. 1972b"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  V2O5:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_V2O5_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1003.0
+      - 1950.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: V2O5(s,l)
+        melting_point_K_as_published: 943
+        gas_species_as_published: V4O10, V4O8, V6O14, V6O12, V2O4
+        dominant_gas_species: V4O10
+        temperature_windows_as_published: 1680–1950^a; 1003–1205^b
+        primary_citation: Berkowitz et al. 1957a
+        references_as_published: ^a Berkowitz et al. 1957a; ^b Farber et al. 1972b
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Y2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Y2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1400.0
+      - 5000.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Y2O3(s,l)
+        melting_point_K_as_published: 2712
+        gas_species_as_published: YO ≫ Y
+        dominant_gas_species: YO
+        temperature_windows_as_published: 2500–2700^a; 2492–2697^b; 2170–2500^c; 1400–2100^d; 1600–2700^e; 3500–5000(l)^f
+        primary_citation: Walsh et al. 1960
+        references_as_published: "^a Walsh et al. 1960; ^b Ames et al. 1967; ^c Alcock & Peleg 1967; ^d Ackermann et al. 1970; ^e Ackermann & Rauh 1973; ^f Hastie et al. 2000"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  Yb2O3:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_Yb2O3_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 2000.0
+      - 2626.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: Yb2O3(s)
+        melting_point_K_as_published: 2707
+        gas_species_as_published: Yb, YbO
+        dominant_gas_species: Yb
+        temperature_windows_as_published: 2000–2500^a; 2371–2626^b; 2000–2500^c; 2290–2580^d
+        primary_citation: Panish 1961b
+        references_as_published: "^a Panish 1961b; ^b Ames et al. 1967; ^c Alcock & Peleg 1967; ^d Stolyarova et al. 2014"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  ZnO:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_ZnO_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1023.0
+      - 1632.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: ZnO(s)
+        melting_point_K_as_published: 2248
+        gas_species_as_published: Zn ≫ ZnOd
+        dominant_gas_species: Zn
+        temperature_windows_as_published: 1229–1259^a; 1321–1632^b; 1023–1473^c; 1200–1540^d
+        primary_citation: Anthrop and Searcy 1964
+        references_as_published: ^a Anthrop and Searcy 1964; ^b Hoenig 1964; ^c Kodera et al. 1968; ^d Kazenas et al. 1984
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi: 10.1021/j100790a052
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  ZrO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_ZrO2_speciation
+      type: activity_coefficient
+      locator:
+        table: 1
+        page: 407
+        pdf_page_index: 15
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 1700.0
+      - 2875.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: ZrO2(s)
+        melting_point_K_as_published: 2950
+        gas_species_as_published: ZrO ~ ZrO2 ≫ Zr
+        dominant_gas_species: ZrO ~ ZrO2
+        temperature_windows_as_published: 1700–2500^a; 1800–2390^b; 2060–2875^c; 1790–2430^d; 2600–2820^e
+        primary_citation: Chupka et al. 1957
+        references_as_published: "^a Chupka et al. 1957; ^b Peleg & Alcock 1966; ^c Ackermann et al. 1975; ^d Murad & Hildenbrand 1975; ^e Belov et al. 1981"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
+  volatility_order:
+    observations:
+    - observation_id: sossi_fegley_2018_table3_order_1
+      type: activity_coefficient
+      locator:
+        table: "3"
+        page: 424
+        pdf_page_index: 32
+        note: "Qualitative order of element volatilities, from least to most"
+      phase: comparison_of_solar_nebula_and_silicate_melt_evaporation
+      regime: compiled_qualitative_volatility_order
+      units: qualitative ordering (not a numeric gamma)
+      values:
+        quantity: qualitative_volatility_order
+        semantics: bound_not_point_ordering
+        regime_as_published: Solar nebula (Lodders 2003)
+        order_as_published: Mo < Cr < Mn ≈ Li < Cu < K ≈ Ag < Sb ≈ Ga ≈ Na < Ge < Rb < Bi ≈ Pb ≈ Zn ≈ Sn < Cd < In < Tl
+        citation_as_published: Lodders 2003
+    - observation_id: sossi_fegley_2018_table3_order_2
+      type: activity_coefficient
+      locator:
+        table: "3"
+        page: 424
+        pdf_page_index: 32
+        note: "Qualitative order of element volatilities, from least to most"
+      phase: comparison_of_solar_nebula_and_silicate_melt_evaporation
+      regime: compiled_qualitative_volatility_order
+      units: qualitative ordering (not a numeric gamma)
+      values:
+        quantity: qualitative_volatility_order
+        semantics: bound_not_point_ordering
+        regime_as_published: Evaporation of ferrobasalt (Sossi et al. 2016a)
+        order_as_published: Mn < Mo < Cr < Li < Ga ≈ Na < K < Cu ≈ Rb < Zn ≈ Ge < Pb < Ag < Cd
+        citation_as_published: Sossi et al. 2016a
+    - observation_id: sossi_fegley_2018_table3_order_3
+      type: activity_coefficient
+      locator:
+        table: "3"
+        page: 424
+        pdf_page_index: 32
+        note: "Qualitative order of element volatilities, from least to most"
+      phase: comparison_of_solar_nebula_and_silicate_melt_evaporation
+      regime: compiled_qualitative_volatility_order
+      units: qualitative ordering (not a numeric gamma)
+      values:
+        quantity: qualitative_volatility_order
+        semantics: bound_not_point_ordering
+        regime_as_published: "Evaporation of MORB (Norris & Wood 2017)"
+        order_as_published: Cr ≈ Ga < In < Zn < Cu ≈ Pb < Sn < Tl ≈ Ag < Bi < Ge < Cd < Sb
+        citation_as_published: "Norris & Wood 2017"
+  steam_atmosphere_fugacity:
+    observations:
+    - observation_id: sossi_fegley_2018_table4_elemental_fugacities
+      type: gibbs_table
+      locator:
+        table: "4"
+        page: 428
+        pdf_page_index: 36
+        note: "Illustrative elemental fugacities for key volatiles (2000 K, one bar) steam atmosphere"
+      T_range_K:
+      - 2000.0
+      - 2000.0
+      phase: steam_atmosphere_model
+      regime: compiled_model_fugacity
+      units: bar (elemental fugacity as printed)
+      values:
+        quantity: elemental_fugacity
+        T_K_as_published: '2000'
+        P_bar_as_published: '1'
+        fH2_as_published: '9.02 × 10−2'
+        fO2_as_published: '4.74 × 10−6'
+        fF2_as_published: '6.00 × 10−18'
+        fS2_as_published: '1.29 × 10−3'
+        fCl2_as_published: '4.16 × 10−10'
+        note: BSE–steam atmosphere model of Fegley et al. (2016); BSE from Palme and O’Neill (2014)
+  Ag:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Ag_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Ag
+        solar_nebula_1500K_1e-4_bar: Ag
+        h_chondrite_1500K_1e-4_bar: Ag
+        volcanic_gas_1143_1213K_1_bar: Ag8, (AgCl)8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Ag
+        missing_as_printed: em-dash means true absence, never 0
+  Au:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Au_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Au
+        solar_nebula_1500K_1e-4_bar: AuS1
+        h_chondrite_1500K_1e-4_bar: AuS
+        volcanic_gas_1143_1213K_1_bar: AuS8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Br:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Br_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Br
+        solar_nebula_1500K_1e-4_bar: HBr
+        h_chondrite_1500K_1e-4_bar: NaBr
+        volcanic_gas_1143_1213K_1_bar: HBr5–8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Cd:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Cd_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Cd
+        solar_nebula_1500K_1e-4_bar: Cd
+        h_chondrite_1500K_1e-4_bar: Cd
+        volcanic_gas_1143_1213K_1_bar: Cd5,7,8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Cd
+        missing_as_printed: em-dash means true absence, never 0
+  Cl:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Cl_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Cl
+        solar_nebula_1500K_1e-4_bar: HCl
+        h_chondrite_1500K_1e-4_bar: NaCl
+        volcanic_gas_1143_1213K_1_bar: HCl5–8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Cs:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Cs_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Cs
+        solar_nebula_1500K_1e-4_bar: Cs2
+        h_chondrite_1500K_1e-4_bar: Cs
+        volcanic_gas_1143_1213K_1_bar: CsCl7,8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Cs9
+        missing_as_printed: em-dash means true absence, never 0
+  F:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_F_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: F
+        solar_nebula_1500K_1e-4_bar: HF
+        h_chondrite_1500K_1e-4_bar: NaF
+        volcanic_gas_1143_1213K_1_bar: HF5–8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Ga:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Ga_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Ga
+        solar_nebula_1500K_1e-4_bar: Ga
+        h_chondrite_1500K_1e-4_bar: GaF3
+        volcanic_gas_1143_1213K_1_bar: GaCl6,7
+        anhydrous_ferrobasalt_1573_1823K_1_bar: GaO, Ga
+        missing_as_printed: em-dash means true absence, never 0
+  H:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_H_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: H
+        solar_nebula_1500K_1e-4_bar: H2
+        h_chondrite_1500K_1e-4_bar: H2
+        volcanic_gas_1143_1213K_1_bar: H2O5–8
+        missing_as_printed: em-dash means true absence, never 0
+  I:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_I_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: I
+        solar_nebula_1500K_1e-4_bar: I
+        h_chondrite_1500K_1e-4_bar: NaI
+        volcanic_gas_1143_1213K_1_bar: —
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Li:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Li_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Li
+        solar_nebula_1500K_1e-4_bar: Li
+        h_chondrite_1500K_1e-4_bar: —
+        volcanic_gas_1143_1213K_1_bar: LiCl5,7
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Li, LiO
+        missing_as_printed: em-dash means true absence, never 0
+  Mo:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Mo_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Mo
+        solar_nebula_1500K_1e-4_bar: Mo
+        h_chondrite_1500K_1e-4_bar: —
+        volcanic_gas_1143_1213K_1_bar: H2MoO46–8, (MoO2Cl25)
+        anhydrous_ferrobasalt_1573_1823K_1_bar: MoO3
+        missing_as_printed: em-dash means true absence, never 0
+  O:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_O_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: O
+        solar_nebula_1500K_1e-4_bar: CO4
+        h_chondrite_1500K_1e-4_bar: CO
+        volcanic_gas_1143_1213K_1_bar: H2O5–8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Rb:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Rb_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Rb
+        solar_nebula_1500K_1e-4_bar: Rb
+        h_chondrite_1500K_1e-4_bar: Rb
+        volcanic_gas_1143_1213K_1_bar: RbCl7,8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: Rb
+        missing_as_printed: em-dash means true absence, never 0
+  S:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_S_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: S
+        solar_nebula_1500K_1e-4_bar: H2S
+        h_chondrite_1500K_1e-4_bar: S2
+        volcanic_gas_1143_1213K_1_bar: SO25–8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Sb:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Sb_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Sb
+        solar_nebula_1500K_1e-4_bar: Sb
+        h_chondrite_1500K_1e-4_bar: SbS
+        volcanic_gas_1143_1213K_1_bar: SbS5,7,8, SbO7,(SbCl35)
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Se:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Se_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Se
+        solar_nebula_1500K_1e-4_bar: Se
+        h_chondrite_1500K_1e-4_bar: SeS
+        volcanic_gas_1143_1213K_1_bar: H2Se8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Te:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Te_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Te
+        solar_nebula_1500K_1e-4_bar: Te
+        h_chondrite_1500K_1e-4_bar: Te
+        volcanic_gas_1143_1213K_1_bar: Te8
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  Tl:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_Tl_speciation
+      type: activity_coefficient
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Speciation of major gases at these conditions"
+      phase: gas
+      regime: compiled_speciation_by_environment
+      units: species names (no P series; compilation index)
+      values:
+        quantity: major_gas_speciation_by_environment
+        semantics: bound_not_point_ordering
+        element_as_published: Tl
+        solar_nebula_1500K_1e-4_bar: Tl
+        h_chondrite_1500K_1e-4_bar: Tl
+        volcanic_gas_1143_1213K_1_bar: TlCl6,7
+        anhydrous_ferrobasalt_1573_1823K_1_bar: —
+        missing_as_printed: em-dash means true absence, never 0
+  table5_log_fO2:
+    observations:
+    - observation_id: sossi_fegley_2018_table5_log_fO2
+      type: gibbs_table
+      locator:
+        table: "5"
+        page: 431
+        pdf_page_index: 39
+        note: "Table 5 footer row log fO2"
+      units: log10 fO2 as printed
+      values:
+        quantity: log_fO2
+        solar_nebula: '–18.06'
+        h_chondrite: '–12.48'
+        volcanic_gas: '–12.58 to –10.93'
+        anhydrous_ferrobasalt: '–10 to –0.67'
 fidelity_samples:
 - path: species.Fe.observations[sossi_fegley_2018_table2_gamma_Fe_FeO].values.gamma_range_as_published
   value: 0.6–2.3 $^{a}$ 1.2–2.1 $^{b}$ 0.9–1.8 $^{c}$ ≈0.5–2.5 $^{d}$
@@ -927,3 +4068,34 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
     table: '2'
+
+- species: Al2O3
+  observable: activity_coefficient
+  observation_id: sossi_fegley_2018_table1_Al2O3_speciation
+  field: dominant_gas_species
+  value: Al
+  locator:
+    table: '1'
+    page: 402
+    pdf_page_index: 10
+    note: bold Al is the most abundant metal-bearing gas over α-Al2O3
+- species: SiO2
+  observable: activity_coefficient
+  observation_id: sossi_fegley_2018_table1_SiO2_speciation
+  field: dominant_gas_species
+  value: SiO
+  locator:
+    table: '1'
+    page: 405
+    pdf_page_index: 13
+    note: bold SiO over cristobalite/SiO2(l)
+- species: As2O3
+  observable: activity_coefficient
+  observation_id: sossi_fegley_2018_table1_As2O3_speciation
+  field: dominant_gas_species
+  value: As4O6
+  locator:
+    table: '1'
+    page: 402
+    pdf_page_index: 10
+    note: bold As4O6 ≫ other As-O gases
