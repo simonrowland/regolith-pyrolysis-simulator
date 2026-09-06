@@ -1,0 +1,131 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0198",
+  "census_id": "high-temperature-printed-page-224",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "CASSITB&ITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "FOB!ATION FRO! THE ELEI'IENTS",
+  "formula_weight": {
+    "as_published": "150.689",
+    "value": 150.689,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      230
+    ],
+    "printed_pages": [
+      224
+    ],
+    "pdftotext_layout_page_file": "page-230.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28"
+  ],
+  "title_line_as_published": "CASSITB&ITE                                                                       FOR!ULA iEIGHT   150.689",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "           crystals 298.15 to •elting point 1903 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOB!ATION FRO! THE ELEI'IENTS",
+    "                                                                                        GIBBS",
+    "TEMP.      <a;-a~ 98 )/T      so",
+    "                               T      -(G;-H~ga)/T          co",
+    "                                                             p    ENTHALPY           FREE EBERGY    Log Kf",
+    "  K         J/mol•K        J/•ol•l(    J/mol• K         J/•ol•K          kJ/•ol         kJ/•ol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/mol•K",
+    "entropy": "J/•ol•l(",
+    "negative_gibbs_function": "J/mol• K",
+    "heat_capacity": "J/•ol•K",
+    "formation_enthalpy": "kJ/•ol",
+    "formation_gibbs_energy": "kJ/•ol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 14,
+  "uncertainty_line_as_published": "UNCEBTUNTY                    1.25            1.25                         0.628          0.753      0.132",
+  "uncertainty_values": [
+    {
+      "as_published": "1.25",
+      "value": 1.25,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.25",
+      "value": 1.25,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.628",
+      "value": 0.628,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.753",
+      "value": 0.753,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.132",
+      "value": 0.132,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQUlTIOI",
+    "          72.158 + 1.1726x1o- z T                2.0502x10• T-Z",
+    "             (BQUlTIOI VALID PRO!             298 - 1500 K)",
+    "B!l'EB.ENCE     115           120                                           262                    CO!PILBD",
+    "                                                                                                    5-24-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28",
+      "detector_only": false
+    }
+  ]
+}

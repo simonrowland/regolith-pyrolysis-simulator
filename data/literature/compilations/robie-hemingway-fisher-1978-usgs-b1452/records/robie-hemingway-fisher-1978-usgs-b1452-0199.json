@@ -1,0 +1,135 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0199",
+  "census_id": "high-temperature-printed-page-225",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "STIOVTIDII OIIDB",
+  "formula_as_published": "sro",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1800 1.",
+    "                                                               JGIIIlTIOI 11011 THB BLBIIBITS",
+    "                                                                               GIBBS",
+    "  K"
+  ],
+  "description_lines_as_published": [
+    "sro:      Crystals 298.15 to 1800 1.",
+    "                                                               JGIIIlTIOI 11011 THB BLBIIBITS",
+    "                                                                               GIBBS",
+    "  K"
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "103.619",
+    "value": 103.619,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      231
+    ],
+    "printed_pages": [
+      225
+    ],
+    "pdftotext_layout_page_file": "page-231.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "7 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 27, 29, 33, 35, 42, 44, 71"
+  ],
+  "title_line_as_published": "STIOVTIDII OIIDB                                                           FOIIIULl lEIGHT    103.619",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "sro:      Crystals 298.15 to 1800 1.",
+    "                                                               JGIIIlTIOI 11011 THB BLBIIBITS",
+    "                                                                               GIBBS",
+    "TEIIP.                                                        BITHlLPt     Fill IlliG!     Log I t",
+    "  K"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "",
+    "entropy": "",
+    "negative_gibbs_function": "",
+    "heat_capacity": "",
+    "formation_enthalpy": "",
+    "formation_gibbs_energy": "",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 20,
+  "uncertainty_line_as_published": "OICBITll ITt                0.42         0.42                      0.920           0.930        0.163",
+  "uncertainty_values": [
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.920",
+      "value": 0.92,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.930",
+      "value": 0.93,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.163",
+      "value": 0.163,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "sro:      Crystals 298.15 to 1800 1.",
+    "                                                               JGIIIlTIOI 11011 THB BLBIIBITS",
+    "                                                                               GIBBS",
+    "  K"
+  ],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "7 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 27, 29, 33, 35, 42, 44, 71",
+      "detector_only": false
+    }
+  ]
+}

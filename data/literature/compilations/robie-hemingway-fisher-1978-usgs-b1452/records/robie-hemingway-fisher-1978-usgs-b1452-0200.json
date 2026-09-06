@@ -1,0 +1,135 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0200",
+  "census_id": "high-temperature-printed-page-226",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "DITABTlLU! PBBTOIIDI (BETA)",
+  "formula_as_published": "Ta 2 0 5",
+  "phase_state_as_published": [
+    "Crystals 298.15 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Ta 2 0 5 :    Crystals 298.15 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "441.893",
+    "value": 441.893,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      232
+    ],
+    "printed_pages": [
+      226
+    ],
+    "pdftotext_layout_page_file": "page-232.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 47"
+  ],
+  "title_line_as_published": "DITABTlLU! PBBTOIIDI (BETA)                                                        POB!ULA WEIGHT    441.893",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Ta 2 0 5 :    Crystals 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POB!lTIOII PRO! THE ELE!EJTS",
+    "                                                                                         GIBBS",
+    "TE!P.         ( u;-a~ 98 )/T      so     -(G;-u~ 98 )/T      cop    EIITHALPI         FREE EBERGY     Log Kf",
+    "                                   T",
+    "   K           J/•ol•K         J/•ol•K     J/•ol•K        J/•ol•K       ltJ/•ol         kJ/•01",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/•ol•K",
+    "entropy": "J/•ol•K",
+    "negative_gibbs_function": "J/•ol•K",
+    "heat_capacity": "J/•ol•K",
+    "formation_enthalpy": "ltJ/•ol",
+    "formation_gibbs_energy": "kJ/•01",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 17,
+  "uncertainty_line_as_published": "UNCEBTllliTY                      1.26          1.26                        4.18lt         4.200       0.736",
+  "uncertainty_values": [
+    {
+      "as_published": "1.26",
+      "value": 1.26,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.26",
+      "value": 1.26,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.18lt",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.200",
+      "value": 4.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.736",
+      "value": 0.736,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Ta 2 0 5 :    Crystals 298.15 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQUATION",
+    "             1.8972x10Z +       1.66J9x1o-z T           7.7377x10Z    r-o·s",
+    "                (EQUATIOM VALID FRO!       298 -       1800 K)",
+    "REPEREMCE           33            33                                          33                    CO!PILED",
+    "                  189                                                                                &- 2-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 47",
+      "detector_only": false
+    }
+  ]
+}

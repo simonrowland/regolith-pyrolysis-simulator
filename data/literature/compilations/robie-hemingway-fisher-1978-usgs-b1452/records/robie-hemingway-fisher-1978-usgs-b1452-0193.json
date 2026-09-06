@@ -1,0 +1,131 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0193",
+  "census_id": "high-temperature-printed-page-219",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "COESITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "60.085",
+    "value": 60.085,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      225
+    ],
+    "printed_pages": [
+      219
+    ],
+    "pdftotext_layout_page_file": "page-225.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 37, 39"
+  ],
+  "title_line_as_published": "COESITE                                                                          FORMULA WEIGHT     60.085",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "          crystals 298.15 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORftATIOII F.BOft THE ELEftEIITS",
+    "                                                                                       GIBBS",
+    "TEI!P.    ( H;-a; 98 )/T      so     -( G;-a~ 98 )/T      CD      E»THALPY          FREE EIERGY     Loq Kf",
+    "                               T                           p",
+    "  K        J/aol•K         J/aol•K     J/aol•lt        J/aol•K          kJ/aol        kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•lt",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 17,
+  "uncertainty_line_as_published": "UIICERTAIIITY                 0.42           0.42                         2.092          2.134       0.374",
+  "uncertainty_values": [
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.092",
+      "value": 2.092,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.134",
+      "value": 2.134,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.374",
+      "value": 0.374,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQUATION",
+    "          2.3306x102 -       7.7765x1o-z T",
+    "              2.6036x10• r-z",
+    "              (EQUATION VALID FBOII          298 -   1800 K)",
+    "REF.BREIICE     285           101                                          101                    COftPil.BD",
+    "                                                                                                   7-16-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 37, 39",
+      "detector_only": false
+    }
+  ]
+}
