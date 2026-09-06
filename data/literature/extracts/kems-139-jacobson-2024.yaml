@@ -1,0 +1,690 @@
+schema_version: literature_extract.v1
+source_id: kems-139-jacobson-2024
+source:
+  citation: 'Jacobson, N. S., Colle, J.-Y., Stolyarova, V., Markus, T. & Nuta, I. (2024), "Knudsen effusion
+    mass spectrometry: Current and future approaches", Rapid Commun. Mass Spectrom. 38(14):e9744, DOI
+    10.1002/rcm.9744. HAL hal-04602114.'
+  doi: 10.1002/rcm.9744
+  url: https://hal.science/hal-04602114/document
+  year: 2024
+  related_sources:
+  - document: hal-04602114
+    relation: hal_oa_deposit
+    note: Official OA PDF used this round. HAL licence_s CC BY 4.0; fileLicenses_s https://creativecommons.org/licenses/by/4.0/.
+  - document: 10.1063/5.0120504
+    relation: table_2_cited_primary
+    note: Bauschlicher, Kowalski & Jacobson, J. Chem. Phys. 157, 154302 (2022). Table 2 reprints that
+      primary.
+  - document: kems-022-demaria-1971
+    relation: table_1_observed_species_primary
+    note: De Maria et al. 1971 LPSC, cited as [118].
+extraction:
+  method: 'Official HAL OA PDF https://hal.science/hal-04602114/document (HTTP 200 application/pdf, 12
+    604 954 bytes, sha256 3896c027a2c5add755999981b3232bae6735844113f2560a95d11c4324190218). doi.org 10.1002/rcm.9744
+    HTTP/2 302 to Wiley; Wiley HTTP 403 Cloudflare JS challenge — not bypassed. HAL licence_s CC BY 4.0;
+    Crossref VOR license CC BY-NC-ND 4.0. pdftotext -layout + 300 dpi pdftoppm of table pages. Tables
+    1-2 transcribed from the render (pdftotext dropped minus signs on Table 2 Δgef and mangled caption
+    10^{-n} exponents). Figures 1-22 listed figure-only, not digitised. No MinerU. Review compilation:
+    FactSage Table 1 pressures retyped rate_series + method_class model_derived (kems-036 convention;
+    never a measured psat_series) so the battery refuses model_output_not_measurement; De Maria checkmarks
+    retyped rate_series vapour_species_map (cited primary kems-022-demaria-1971); Snyder composition stays
+    gibbs_table review_compilation with cited primary [117]; Table 2 ion intensities compiled from [15]
+    with third-law derived columns distinct from the narrative second-law fit (method_class model_derived)
+    and from CCSD(T) ΔfH (ccsdt_method_class model_derived). Fig. 16 van''t Hoff retyped rate_series figure-only.
+    Citation manifest [1]-[326] with doi.org HEAD; [17] is Meschi 1960 JCP 10.1063/1.1731179 (not the
+    [296] FLiNaK DOI). No unit conversion. Missing = absent, never 0.'
+  date: '2026-09-06'
+  worker: wave-W2-jacobson-2024-r2
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-139-jacobson-2024/kems-139-jacobson-2024/
+review_status: draft
+fidelity_samples:
+- species: SiO2
+  observable: gibbs_table
+  observation_id: jacobson_2024_t1_snyder_12022_composition
+  field: SiO2
+  value: 43.2
+  locator:
+    table: '1'
+    published_page: 18
+    pdf_page_index: 19
+    note: Table 1 chemical analysis SiO2 43.2 (Snyder et al. 117)
+- species: SiO
+  observable: rate_series
+  observation_id: jacobson_2024_t1_factsage_2500k_predicted_psat
+  field: SiO_g_p_bar
+  value: 0.004541139
+  locator:
+    table: '1'
+    published_page: 18
+    pdf_page_index: 19
+    note: Table 1 SiO(g) 0.004541139 bar (FactSage) with De Maria checkmark
+- species: HfO
+  observable: gibbs_table
+  observation_id: jacobson_2024_t2_hfo_third_law_compilation
+  field: I_cps_at_1934K
+  value: 170.4
+  locator:
+    table: '2'
+    published_page: 23
+    pdf_page_index: 24
+    note: Table 2 first row T=1934 I=170.4 cps
+- species: HfO
+  observable: gibbs_table
+  observation_id: jacobson_2024_t2_hfo_third_law_compilation
+  field: delta_rH_298_J_mol_at_1934K
+  value: 616914.8
+  locator:
+    table: '2'
+    published_page: 23
+    pdf_page_index: 24
+    note: Table 2 first row ΔrH(298)=616,914.8 J/mol as printed in the cell
+- species: HfO
+  observable: gibbs_table
+  observation_id: jacobson_2024_t2_hfo_third_law_average_narrative
+  field: delta_rH_298_kJ_mol_magnitude
+  value: 616.2
+  locator:
+    published_page: 23
+    pdf_page_index: 24
+    paragraph: average of the third law enthalpies of reaction
+    note: prose prints -616.2 ± 1.2 kJ/mol; table-cell mean magnitude is 616.2 kJ/mol
+species:
+  SiO2:
+    observations:
+    - observation_id: jacobson_2024_t1_snyder_12022_composition
+      type: gibbs_table
+      locator:
+        table: '1'
+        page: 18
+        published_page: 18
+        pdf_page_index: 19
+        note: Chemical analysis (Snyder et al. 117) of lunar basalt sample 12022
+      phase: lunar_basalt_12022
+      regime: review_compilation
+      units: as_printed_no_header_unit
+      values:
+        quantity: bulk_sample_composition
+        method_class: review_compilation
+        semantics: compiled_composition_not_gibbs_energy
+        sample_as_printed: lunar basalt sample 12022
+        cited_primary: '[117] Snyder GA, Neal CR, Taylor LA, Halliday AN, Anatexis of lunar cumulate mantle...'
+        cited_primary_doi: 10.1016/S0016-7037(97)00082-3
+        cited_primary_doi_resolver: HTTP/2 302; Location=https://linkinghub.elsevier.com/retrieve/pii/S0016703797000823
+        SiO2: 43.2
+        T_K_of_companion_factsage: 2500.0
+        footnote_as_printed: 3300 ppm by weight Cr (form not clear and not included in calculations).
+        units_note: Table header does not print wt% or mol%; footnote uses ppm by weight for Cr. Oxide
+          numbers stored as printed, no unit invented.
+        oxides:
+        - oxide_as_printed: SiO2
+          value_as_printed: '43.2'
+          value: 43.2
+          quote: SiO2 43.2
+        - oxide_as_printed: TiO2
+          value_as_printed: '5.16'
+          value: 5.16
+          quote: TiO2 5.16
+        - oxide_as_printed: Al2O3
+          value_as_printed: '9.04'
+          value: 9.04
+          quote: Al2O3 9.04
+        - oxide_as_printed: FeO
+          value_as_printed: '21.44'
+          value: 21.44
+          quote: FeO 21.44
+        - oxide_as_printed: MnO
+          value_as_printed: '0.25'
+          value: 0.25
+          quote: MnO 0.25
+        - oxide_as_printed: MgO
+          value_as_printed: '10.43'
+          value: 10.43
+          quote: MgO 10.43
+        - oxide_as_printed: CaO
+          value_as_printed: '9.56'
+          value: 9.56
+          quote: CaO 9.56
+        - oxide_as_printed: Na2O
+          value_as_printed: '0.47'
+          value: 0.47
+          quote: Na2O 0.47
+        - oxide_as_printed: K2O
+          value_as_printed: '0.07'
+          value: 0.07
+          quote: K2O 0.07
+        - oxide_as_printed: P2O5
+          value_as_printed: '0.13'
+          value: 0.13
+          quote: P2O5 0.13
+        table_csv: tables/kems-139-jacobson-2024/t1.csv
+        quote: Chemical analysis (Snyder et al.117)  SiO2 43.2  TiO2 5.16  Al2O3 9.04  FeO 21.44  MnO
+          0.25  MgO 10.43  CaO 9.56  Na2O 0.47  K2O 0.07  P2O5 0.13
+      uncertainty:
+        note: none stated on the oxide numbers; Cr footnote only
+  SiO:
+    observations:
+    - observation_id: jacobson_2024_t1_factsage_2500k_predicted_psat
+      type: rate_series
+      locator:
+        table: '1'
+        page: 18
+        published_page: 18
+        pdf_page_index: 19
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage 115 calculations)
+      T_range_K:
+      - 2500.0
+      - 2500.0
+      phase: lunar_basalt_12022_factsage_slag
+      regime: thermochemical_equilibrium_model
+      units: bar as printed
+      values:
+        quantity: predicted_partial_pressure
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        factsage_note: factsage_model_output_not_measurement
+        model_as_printed: SLAG database in FactSage at 2500 K
+        cited_primary: '[115] Bale CW et al., FactSage thermochemical software and databases, CAL 26 (2002)
+          189-228'
+        cited_primary_doi: 10.1016/S0364-5916(02)00035-4
+        cited_primary_doi_resolver: HTTP/2 302; Location=https://linkinghub.elsevier.com/retrieve/pii/S0364591602000354
+        T_K_as_printed: 2500
+        SiO_g_p_bar: 0.004541139
+        SiO_g_p_bar_as_printed: '0.004541139'
+        points:
+        - species_as_printed: PO2(g)
+          species_id: PO2
+          T_K: 2500.0
+          p_bar: 0.004569408
+          p_bar_as_printed: '0.004569408'
+          observed_de_maria: not_printed
+          quote: PO2(g) 0.004569408
+        - species_as_printed: SiO(g)
+          species_id: SiO
+          T_K: 2500.0
+          p_bar: 0.004541139
+          p_bar_as_printed: '0.004541139'
+          observed_de_maria: checkmark
+          quote: SiO(g) 0.004541139 checkmark
+        - species_as_printed: Fe(g)
+          species_id: Fe
+          T_K: 2500.0
+          p_bar: 0.003317841
+          p_bar_as_printed: '0.003317841'
+          observed_de_maria: checkmark
+          quote: Fe(g) 0.003317841 checkmark
+        - species_as_printed: Na(g)
+          species_id: Na
+          T_K: 2500.0
+          p_bar: 0.002800994
+          p_bar_as_printed: '0.002800994'
+          observed_de_maria: checkmark
+          quote: Na(g) 0.002800994 checkmark
+        - species_as_printed: PO(g)
+          species_id: PO
+          T_K: 2500.0
+          p_bar: 0.001925179
+          p_bar_as_printed: '0.001925179'
+          observed_de_maria: not_printed
+          quote: PO(g) 0.001925179
+        - species_as_printed: K(g)
+          species_id: K
+          T_K: 2500.0
+          p_bar: 0.000794608
+          p_bar_as_printed: '0.000794608'
+          observed_de_maria: checkmark
+          quote: K(g) 0.000794608 checkmark
+        - species_as_printed: FeO(g)
+          species_id: FeO_gas
+          T_K: 2500.0
+          p_bar: 0.00031189
+          p_bar_as_printed: '0.00031189'
+          observed_de_maria: not_printed
+          quote: FeO(g) 0.00031189
+        - species_as_printed: O(g)
+          species_id: O
+          T_K: 2500.0
+          p_bar: 0.000156368
+          p_bar_as_printed: '0.000156368'
+          observed_de_maria: checkmark
+          quote: O(g) 0.000156368 checkmark
+        - species_as_printed: O2(g)
+          species_id: O2
+          T_K: 2500.0
+          p_bar: 0.000116427
+          p_bar_as_printed: '0.000116427'
+          observed_de_maria: checkmark
+          quote: O2(g) 0.000116427 checkmark
+        - species_as_printed: Mg(g)
+          species_id: Mg
+          T_K: 2500.0
+          p_bar: 0.000107833
+          p_bar_as_printed: '0.000107833'
+          observed_de_maria: checkmark
+          quote: Mg(g) 0.000107833 checkmark
+        - species_as_printed: SiO2(g)
+          species_id: SiO2_gas
+          T_K: 2500.0
+          p_bar: 6.14219e-05
+          p_bar_as_printed: '6.14219E-05'
+          observed_de_maria: checkmark
+          quote: SiO2(g) 6.14219E-05 checkmark
+        - species_as_printed: TiO2(g)
+          species_id: TiO2_gas
+          T_K: 2500.0
+          p_bar: 7.34285e-06
+          p_bar_as_printed: '7.34285E-06'
+          observed_de_maria: checkmark
+          quote: TiO2(g) 7.34285E-06 checkmark
+        - species_as_printed: P(g)
+          species_id: P
+          T_K: 2500.0
+          p_bar: 3.85922e-06
+          p_bar_as_printed: '3.85922E-06'
+          observed_de_maria: not_printed
+          quote: P(g) 3.85922E-06
+        - species_as_printed: KO(g)
+          species_id: KO
+          T_K: 2500.0
+          p_bar: 1.08059e-06
+          p_bar_as_printed: '1.08059E-06'
+          observed_de_maria: not_printed
+          quote: KO(g) 1.08059E-06
+        - species_as_printed: TiO(g)
+          species_id: TiO
+          T_K: 2500.0
+          p_bar: 2.00284e-07
+          p_bar_as_printed: '2.00284E-07'
+          observed_de_maria: checkmark
+          quote: TiO(g) 2.00284E-07 checkmark
+        - species_as_printed: Ca(g)
+          species_id: Ca
+          T_K: 2500.0
+          p_bar: 1.0955e-07
+          p_bar_as_printed: '1.0955E-07'
+          observed_de_maria: checkmark
+          quote: Ca(g) 1.0955E-07 checkmark
+        - species_as_printed: CaO(g)
+          species_id: CaO_gas
+          T_K: 2500.0
+          p_bar: 1.8925e-08
+          p_bar_as_printed: '1.8925E-08'
+          observed_de_maria: not_printed
+          quote: CaO(g) 1.8925E-08
+        - species_as_printed: Al(g)
+          species_id: Al
+          T_K: 2500.0
+          p_bar: 3.66595e-09
+          p_bar_as_printed: '3.66595E-09'
+          observed_de_maria: checkmark
+          quote: Al(g) 3.66595E-09 checkmark
+        - species_as_printed: Si(g)
+          species_id: Si
+          T_K: 2500.0
+          p_bar: 3.17871e-09
+          p_bar_as_printed: '3.17871E-09'
+          observed_de_maria: not_printed
+          quote: Si(g) 3.17871E-09
+        - species_as_printed: K2(g)
+          species_id: K2
+          T_K: 2500.0
+          p_bar: 8.01489e-10
+          p_bar_as_printed: '8.01489E-10'
+          observed_de_maria: not_printed
+          quote: K2(g) 8.01489E-10
+        - species_as_printed: Ti(g)
+          species_id: Ti
+          T_K: 2500.0
+          p_bar: 1.85167e-11
+          p_bar_as_printed: '1.85167E-11'
+          observed_de_maria: not_printed
+          quote: Ti(g) 1.85167E-11
+        table_csv: tables/kems-139-jacobson-2024/t1.csv
+        quote: Predicted vapor species of a lunar basalt at 2500 K (from FactSage115 calculations) compared
+          to experimentally observed species reported by De Maria et al.118
+      uncertainty:
+        note: none stated; FactSage model output
+    - observation_id: jacobson_2024_t1_demaria_observed_species
+      type: rate_series
+      locator:
+        table: '1'
+        page: 18
+        published_page: 18
+        pdf_page_index: 19
+        note: Vapors observed (De Maria et al. 118) column; checkmarks and extra names Cr, AlO, Al2O
+      T_range_K: null
+      phase: Apollo_12_lunar_basalt_12022
+      regime: review_compilation
+      units: presence_checkmark_no_pressures_in_this_table
+      values:
+        quantity: vapour_species_map_no_numeric_pressures
+        method_class: review_compilation
+        semantics: bound_not_point_ordering
+        cited_primary: '[118] De Maria G, Balducci G, Guido M, Piacente V, Mass spectrometric investigation
+          of the vaporization process of Apollo 12 lunar samples, Proc. Lunar Sci. Conf. 2 (1971)'
+        cited_primary_doi: ''
+        cited_primary_doi_note: doi.org not queried (no identity-confirmed DOI). Existing corpus source_id
+          kems-022-demaria-1971.
+        existing_corpus_source_id: kems-022-demaria-1971
+        observed_with_checkmark_as_printed:
+        - SiO(g)
+        - Fe(g)
+        - Na(g)
+        - K(g)
+        - O(g)
+        - O2(g)
+        - Mg(g)
+        - SiO2(g)
+        - TiO2(g)
+        - TiO(g)
+        - Ca(g)
+        - Al(g)
+        observed_named_without_factsage_pressure_as_printed:
+        - Cr
+        - AlO
+        - Al2O
+        not_checked_factsage_species_as_printed:
+        - PO2(g)
+        - PO(g)
+        - FeO(g)
+        - P(g)
+        - KO(g)
+        - CaO(g)
+        - Si(g)
+        - K2(g)
+        - Ti(g)
+        extra_observed:
+        - species_as_printed: Cr
+          observed_de_maria: named_without_pressure
+          p_bar: absent
+          quote: Cr
+        - species_as_printed: AlO
+          observed_de_maria: named_without_pressure
+          p_bar: absent
+          quote: AlO
+        - species_as_printed: Al2O
+          observed_de_maria: named_without_pressure
+          p_bar: absent
+          quote: Al2O
+        table_csv: tables/kems-139-jacobson-2024/t1.csv
+        quote: The experimental study of De Maria et al.118 reports observations of many of the predicted
+          vapor species.
+      uncertainty:
+        note: presence/absence only; no numeric p(i) in this review table
+  HfO:
+    observations:
+    - observation_id: jacobson_2024_t2_hfo_third_law_compilation
+      type: gibbs_table
+      locator:
+        table: '2'
+        page: 23
+        published_page: 23
+        pdf_page_index: 24
+        note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+      T_range_K:
+      - 1934.0
+      - 2034.0
+      phase: Hf_plus_HfO2_univariant
+      regime: kems_third_law_thermochemistry
+      units: I in cps; kIT/σ in bar; Δgef in J/mol K; ΔrH(298) in J/mol; as printed
+      values:
+        quantity: third_law_reaction_enthalpy_and_compiled_ion_intensity
+        method_class: review_compilation
+        semantics: compiled_from_cited_primary_not_this_papers_measurement
+        reaction_as_printed: ½Hf(s) + ½HfO2(s) = HfO(g)
+        cited_primary: '[15] Bauschlicher CW Jr, Kowalski BA, Jacobson NS, Quantum chemical and experimental
+          thermodynamic studies of HfO(g), J. Chem. Phys. 157 (2022) 154302'
+        cited_primary_doi: 10.1063/5.0120504
+        cited_primary_doi_resolver: HTTP/2 302; Location=https://pubs.aip.org/jcp/article/157/15/154302/2841915/Quantum-chemical-and-experimental-thermodynamic
+        sigma_as_printed: 8.2 × 10⁻¹⁰ m²
+        sigma_m2: 8.2e-10
+        k_as_printed: 1.68 × 10⁻²³ bar-m²/cps-K
+        k_bar_m2_cps_K: 1.68e-23
+        columns_as_printed: T (K) | I (cps) | Standard deviation | IT (cps K) | kIT/σ (bar) | −RT ln Kp
+          (J/mol) | Δgef (J/mol K) | ΔrH (298) = −RT ln Kp − T Δgef (J/mol)
+        column_roles:
+          T_K: compiled instrument temperature from [15]
+          I_cps: compiled measured HfO+ ion intensity from [15]
+          standard_deviation_I_cps: printed standard deviation of I
+          IT_cps_K: derived I×T as printed
+          kIT_over_sigma_bar: derived partial pressure (bar) as printed
+          minus_RT_ln_Kp_J_mol: derived
+          delta_gef_J_mol_K: tabulated free-energy function (negative as printed)
+          delta_rH_298_J_mol: third-law derived ΔrH(298); cells are positive J/mol as printed
+        I_cps_at_1934K: 170.4
+        delta_rH_298_J_mol_at_1934K: 616914.8
+        points:
+        - T_K: 1934.0
+          I_cps: 170.4
+          standard_deviation_I_cps: 8.3
+          IT_cps_K: 329553.6
+          IT_cps_K_as_printed: 329,553.6
+          kIT_over_sigma_bar: 6.75e-09
+          kIT_over_sigma_bar_as_printed: '6.75E-09'
+          minus_RT_ln_Kp_J_mol: 302506.7
+          minus_RT_ln_Kp_J_mol_as_printed: 302,506.7
+          delta_gef_J_mol_K: -162.57
+          delta_rH_298_J_mol: 616914.8
+          delta_rH_298_J_mol_as_printed: 616,914.8
+          quote: 1934  170.4  8.3  329,553.6  6.75E-09  302,506.7  -162.57  616,914.8
+        - T_K: 1986.0
+          I_cps: 457.6
+          standard_deviation_I_cps: 14.5
+          IT_cps_K: 908753.9
+          IT_cps_K_as_printed: 908,753.9
+          kIT_over_sigma_bar: 1.86e-08
+          kIT_over_sigma_bar_as_printed: '1.86E-08'
+          minus_RT_ln_Kp_J_mol: 293891.9
+          minus_RT_ln_Kp_J_mol_as_printed: 293,891.9
+          delta_gef_J_mol_K: -162.22
+          delta_rH_298_J_mol: 616051.4
+          delta_rH_298_J_mol_as_printed: 616,051.4
+          quote: 1986  457.6  14.5  908,753.9  1.86E-08  293,891.9  -162.22  616,051.4
+        - T_K: 1957.0
+          I_cps: 296.1
+          standard_deviation_I_cps: 18.7
+          IT_cps_K: 579448.1
+          IT_cps_K_as_printed: 579,448.1
+          kIT_over_sigma_bar: 1.19e-08
+          kIT_over_sigma_bar_as_printed: '1.19E-08'
+          minus_RT_ln_Kp_J_mol: 296922.2
+          minus_RT_ln_Kp_J_mol_as_printed: 296,922.2
+          delta_gef_J_mol_K: -162.41
+          delta_rH_298_J_mol: 614763.3
+          delta_rH_298_J_mol_as_printed: 614,763.3
+          quote: 1957  296.1  18.7  579,448.1  1.19E-08  296,922.2  -162.41  614,763.3
+        - T_K: 1945.0
+          I_cps: 228.0
+          standard_deviation_I_cps: 11.6
+          IT_cps_K: 443460.0
+          IT_cps_K_as_printed: 443,460.0
+          kIT_over_sigma_bar: 9.09e-09
+          kIT_over_sigma_bar_as_printed: '9.09E-09'
+          minus_RT_ln_Kp_J_mol: 299426.7
+          minus_RT_ln_Kp_J_mol_as_printed: 299,426.7
+          delta_gef_J_mol_K: -162.49
+          delta_rH_298_J_mol: 615477.5
+          delta_rH_298_J_mol_as_printed: 615,477.5
+          quote: 1945  228.0  11.6  443,460.0  9.09E-09  299,426.7  -162.49  615,477.5
+        - T_K: 1994.0
+          I_cps: 519.9
+          standard_deviation_I_cps: 25.7
+          IT_cps_K: 1036640.7
+          IT_cps_K_as_printed: 1,036,640.7
+          kIT_over_sigma_bar: 2.12e-08
+          kIT_over_sigma_bar_as_printed: '2.12E-08'
+          minus_RT_ln_Kp_J_mol: 292893.1
+          minus_RT_ln_Kp_J_mol_as_printed: 292,893.1
+          delta_gef_J_mol_K: -162.16
+          delta_rH_298_J_mol: 616241.7
+          delta_rH_298_J_mol_as_printed: 616,241.7
+          quote: 1994  519.9  25.7  1,036,640.7  2.12E-08  292,893.1  -162.16  616,241.7
+        - T_K: 2034.0
+          I_cps: 896.0
+          standard_deviation_I_cps: 21.4
+          IT_cps_K: 1822464.0
+          IT_cps_K_as_printed: 1,822,464.0
+          kIT_over_sigma_bar: 3.73e-08
+          kIT_over_sigma_bar_as_printed: '3.73E-08'
+          minus_RT_ln_Kp_J_mol: 289227.5
+          minus_RT_ln_Kp_J_mol_as_printed: 289,227.5
+          delta_gef_J_mol_K: -161.89
+          delta_rH_298_J_mol: 618509.3
+          delta_rH_298_J_mol_as_printed: 618,509.3
+          quote: 2034  896.0  21.4  1,822,464.0  3.73E-08  289,227.5  -161.89  618,509.3
+        - T_K: 1952.0
+          I_cps: 264.5
+          standard_deviation_I_cps: 14.4
+          IT_cps_K: 516245.4
+          IT_cps_K_as_printed: 516,245.4
+          kIT_over_sigma_bar: 1.06e-08
+          kIT_over_sigma_bar_as_printed: '1.06E-08'
+          minus_RT_ln_Kp_J_mol: 298037.9
+          minus_RT_ln_Kp_J_mol_as_printed: 298,037.9
+          delta_gef_J_mol_K: -162.45
+          delta_rH_298_J_mol: 615133.3
+          delta_rH_298_J_mol_as_printed: 615,133.3
+          quote: 1952  264.5  14.4  516,245.4  1.06E-08  298,037.9  -162.45  615,133.3
+        - T_K: 2004.0
+          I_cps: 622.2
+          standard_deviation_I_cps: 18.1
+          IT_cps_K: 1246848.7
+          IT_cps_K_as_printed: 1,246,848.7
+          kIT_over_sigma_bar: 2.55e-08
+          kIT_over_sigma_bar_as_printed: '2.55E-08'
+          minus_RT_ln_Kp_J_mol: 291285.7
+          minus_RT_ln_Kp_J_mol_as_printed: 291,285.7
+          delta_gef_J_mol_K: -162.09
+          delta_rH_298_J_mol: 616119.7
+          delta_rH_298_J_mol_as_printed: 616,119.7
+          quote: 2004  622.2  18.1  1,246,848.7  2.55E-08  291,285.7  -162.09  616,119.7
+        table_csv: tables/kems-139-jacobson-2024/t2.csv
+        quote: TABLE 2 Third law thermodynamic calculations for the reaction ½Hf(s) + ½HfO2(s) = HfO(g),
+          using σ = 8.2 × 10⁻¹⁰ m² and k = 1.68 × 10⁻²³ bar-m²/cps-K.
+      uncertainty:
+        note: standard_deviation column is of I (cps) as printed; no sigma on ΔrH cells
+    - observation_id: jacobson_2024_t2_hfo_second_law_narrative
+      type: gibbs_table
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 24
+        paragraph: A second law plot of ln(IT) versus 1/T
+      T_range_K:
+      - 1976.0
+      - 1976.0
+      phase: Hf_plus_HfO2_univariant
+      regime: kems_second_law_fit
+      units: kJ/mol as printed
+      values:
+        quantity: second_law_reaction_enthalpy
+        method_class: model_derived
+        semantics: second_law_fit_not_measurement
+        cited_primary: '[15] Bauschlicher, Kowalski & Jacobson 2022 JCP'
+        cited_primary_doi: 10.1063/5.0120504
+        T_K_as_printed: 1976
+        delta_rH_1976K_kJ_mol_as_printed: -548.5 ± 22
+        delta_rH_1976K_kJ_mol_magnitude: 548.5
+        delta_rH_298K_kJ_mol_as_printed: -633.0 ± 22
+        delta_rH_298K_kJ_mol_magnitude: 633.0
+        heat_capacity_sources_as_printed: calculated heat capacity for HfO [15] and tabulated heat capacity
+          for Hf [115,140] and HfO2 [115,141]
+        sign_note: Prose prints a leading minus after the line break (yielded an enthalpy ... of -548.5
+          ± 22 kJ/mol; ... calculated to be -633.0 ± 22 kJ/mol). Table 2 ΔrH cells for the same reaction
+          are positive J/mol. Magnitudes stored separately from the printed signed strings. No sign invented.
+        quote: A second law plot of ln(IT) versus 1/T yielded an enthalpy at 1976 K of -548.5 ± 22 kJ/mol.
+          Using Equation (24) and the calculated heat capacity for HfO15 and the tabulated heat capacity
+          for Hf115,140 and HfO2,115,141 an enthalpy of reaction at 298.15 K was calculated to be -633.0
+          ± 22 kJ/mol.
+      uncertainty:
+        as_printed: ± 22 kJ/mol
+        note: printed with both the 1976 K and 298.15 K second-law values
+    - observation_id: jacobson_2024_t2_hfo_third_law_average_narrative
+      type: gibbs_table
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 24
+        paragraph: The average of the third law enthalpies of reaction
+      T_range_K:
+      - 1934.0
+      - 2034.0
+      phase: Hf_plus_HfO2_univariant
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol as printed
+      values:
+        quantity: third_law_reaction_enthalpy_average
+        method_class: review_compilation
+        semantics: third_law_derived_from_compiled_primary
+        cited_primary: '[15] Bauschlicher, Kowalski & Jacobson 2022 JCP'
+        cited_primary_doi: 10.1063/5.0120504
+        delta_rH_298_kJ_mol_as_printed: -616.2 ± 1.2
+        delta_rH_298_kJ_mol_magnitude: 616.2
+        agreement_as_printed: Agreement is with 2.7%; however, the third law thermodynamic measurement
+          is preferred as there are not sufficient data points or temperature range for a reliable second
+          law enthalpy of reaction.
+        sign_note: Prose prints -616.2 ± 1.2 kJ/mol. Mean of the eight positive Table 2 ΔrH cells is 616151.375
+          J/mol = 616.2 kJ/mol. Magnitude stored separately.
+        quote: The average of the third law enthalpies of reaction (taken at each temperature) was -616.2
+          ± 1.2 kJ/mol.
+      uncertainty:
+        as_printed: ± 1.2 kJ/mol
+        note: printed on the third-law average
+    - observation_id: jacobson_2024_hfo_delta_fH_kems_vs_ccsdt
+      type: gibbs_table
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 24
+        paragraph: The computed enthalpy of formation of HfO(g) using CCSD(T)
+      phase: HfO_gas
+      regime: review_compilation
+      units: kJ/mol as printed
+      values:
+        quantity: enthalpy_of_formation_HfO_g
+        method_class: review_compilation
+        cited_primary: '[15] Bauschlicher, Kowalski & Jacobson 2022 JCP'
+        cited_primary_doi: 10.1063/5.0120504
+        hfo2_enthalpy_source: '[141] Barin, Thermochemical Data of Pure Substances'
+        hfo2_enthalpy_doi: 10.1002/9783527619825
+        kems_third_law_kJ_mol: 58.4
+        kems_third_law_as_printed: 58.4 ± 12.3 kJ/mol
+        kems_method_class: review_compilation
+        ccsdt_kJ_mol: 63.19
+        ccsdt_as_printed: 63.19 ± 10 kJ/mol
+        ccsdt_method_class: model_derived
+        ccsdt_note: CCSD(T) (coupled cluster, single, doubles, with approximate triples) — quantum-chemical
+          model, not a measured observation
+        quote: The computed enthalpy of formation of HfO(g) using CCSD(T) (coupled cluster, single, doubles,
+          with approximate triples) methods is 63.19 ± 10 kJ/mol compared to 58.4 ± 12.3 kJ/mol using
+          third law methods with KEMS.15
+      uncertainty:
+        kems_as_printed: ± 12.3 kJ/mol
+        ccsdt_as_printed: ± 10 kJ/mol
+  Au:
+    observations:
+    - observation_id: jacobson_2024_fig16_au_vant_hoff_figure_only
+      type: rate_series
+      locator:
+        figure: '16'
+        page: 23
+        published_page: 23
+        pdf_page_index: 24
+        note: van't Hoff plot for enthalpy of vaporization of Au
+      phase: Au
+      regime: kems_second_law_fit
+      units: none (figure-only; no tabulated points)
+      values:
+        quantity: vant_hoff_plot_figure_only
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        admission_status: rejected_no_figure_reading
+        completeness: figure-only
+        caption_as_printed: FIGURE 16 van't Hoff plot for enthalpy of vaporization of Au.
+        prose_as_printed: The vaporization of Au and second law enthalpy is used as a frequent check for
+          instrument operation—stability, temperature correction, and linearity of instrument between
+          vapor pressure and the product of intensity and absolute temperature.
+        printed_fit_on_figure_as_printed: y= -41162x + 44.532; R² = 0.9999
+        note: Figure not digitised. Printed slope/intercept remain on the figure; not copied as a measured
+          Psat series.
+      uncertainty:
+        note: not applicable; figure-only
