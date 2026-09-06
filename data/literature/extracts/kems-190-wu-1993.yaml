@@ -1,0 +1,719 @@
+schema_version: literature_extract.v1
+source_id: kems-190-wu-1993
+source:
+  citation: "Wu, P., Eriksson, G., Pelton, A. D. & Blander, M. (1993), \"Prediction of the Thermodynamic Properties and Phase Diagrams of Silicate Systems—Evaluation of the FeO-MgO-SiO2 System\", ISIJ International 33(1):26–35"
+  doi: 10.2355/isijinternational.33.26
+  url: https://www.jstage.jst.go.jp/article/isijinternational1989/33/1/33_1_26/_pdf
+  year: 1993
+extraction:
+  method: manual transcription from 301 dpi J-STAGE scan with local Tesseract OCR used only as a reading aid; all table cells visually checked
+  date: '2026-09-06'
+  worker: wave-W3-wu-1993-r3
+  provenance_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/
+review_status: draft
+figures_not_digitized:
+  locator:
+    published_page: 28
+    section: Binary Systems and Ternary Systems
+    note: Figures 1–11 on published pages 28–34
+  method_class: model_derived
+  admission_status: rejected_no_figure_reading
+  figures:
+    - {figure: '1', published_page: '28', content: 'optimized FeO-MgO phase diagram; calculated curves and Schenck and Pfaff points'}
+    - {figure: '2', published_page: '29', content: 'optimized FeO activities in FeO-MgO solid solutions at 1127°C; calculated lines and Srecec et al. points'}
+    - {figure: '3', published_page: '29', content: 'optimized MgO-SiO2 phase diagram; calculated curves and multiple literature datasets'}
+    - {figure: '4', published_page: '30', content: 'calculated SiO2 activities in liquid MgO-SiO2 at 1600 and 1700°C with literature points'}
+    - {figure: '5', published_page: '30', content: 'optimized FeO-SiO2 phase diagram in equilibrium with metallic Fe'}
+    - {figure: '6', published_page: '31', content: 'calculated FeO activity in liquid FeO-SiO2 at 1325 and 1880°C with literature points'}
+    - {figure: '7', published_page: '31', content: 'calculated enthalpy of mixing at 1420°C with Ban-ya et al. points'}
+    - {figure: '8', published_page: '33', content: 'optimized MgO-FeO-SiO2 liquidus; dotted measured isotherms'}
+    - {figure: '9', published_page: '34', content: 'calculated 1200°C magnesiowustite-olivine tie-line and literature points'}
+    - {figure: '10', published_page: '34', content: 'calculated 1200°C olivine-pyroxene tie-line and literature points'}
+    - {figure: '11', published_page: '34', content: 'calculated 2000°C ternary iso-activity curves for MgO, FeO, and SiO2'}
+  note: No curve coordinates were tabulated. The page renders were inspected, but no points were digitized; exact-looking OCR or visual grid readings are not admitted as data.
+fidelity_samples:
+  - species: MgO
+    observable: gibbs_table
+    observation_id: wu_1993_table1_mgo_compiled_thermochemistry
+    field: fidelity_A_MgO_liquid_cal_mol
+    value: -130340.58
+    locator: {published_page: 28, table: '1', note: 'MgO(l), 298–3098 K, column A prints −130 340.58'}
+  - species: Mg2SiO4
+    observable: gibbs_table
+    observation_id: wu_1993_table1_mg2sio4_optimized_thermochemistry
+    field: fidelity_A_cal_mol
+    value: -520482.62
+    locator: {published_page: 28, table: '1', note: 'Mg2SiO4(s), 298–2161 K, column A prints −520 482.62'}
+  - species: MgO
+    observable: gibbs_table
+    observation_id: wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    field: fidelity_RT_ln_gamma_J_mol
+    value: -30770
+    locator: {published_page: 32, table: '2', note: 'MgO-SiO2, XSiO2=0.4, MgO column at 2000°C prints −30 770'}
+  - species: Fe2SiO4
+    observable: transition_point
+    observation_id: wu_1993_table3_reported_solidus_points
+    field: fidelity_first_temperature_C
+    value: 1495
+    locator: {published_page: 33, table: '3', note: 'First row prints 1 495°C, Exp. 41, Calc. 40.5'}
+  - species: Fe2SiO4
+    observable: transition_point
+    observation_id: wu_1993_table3_calculated_solidus_points
+    field: fidelity_first_calculated_wt_pct
+    value: 40.5
+    locator: {published_page: 33, table: '3', note: 'First row calculated Fe2SiO4 composition prints 40.5 wt%'}
+  - species: SiO2
+    observable: gibbs_table
+    observation_id: wu_1993_optimized_binary_model_parameters
+    field: fidelity_equation7_constant_J_mol
+    value: -86090
+    locator: {published_page: 30, equation: '7', note: 'Equation 7 constant term prints −86 090 J mol−1'}
+  - species: FeO
+    observable: transition_point
+    observation_id: wu_1993_calculated_ternary_peritectic
+    field: fidelity_temperature_C
+    value: 1310
+    locator: {published_page: 34, paragraph: 'For the liquid phase', note: 'The ternary peritectic point was calculated at 1310°C'}
+species:
+  MgO:
+    observations:
+      - observation_id: wu_1993_table1_mgo_compiled_thermochemistry
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          published_page: 28
+          table: '1'
+          note: MgO liquid and solid rows
+        phase: pure_MgO_liquid_and_solid
+        standard_state: elements at 298.15 K
+        regime: evaluated_pure_component_thermochemistry
+        units: cal_mol_and_cal_mol_K_as_published
+        values:
+          quantity: thermodynamic_function_coefficients
+          method_class: review_compilation
+          evidence_class: compiled_pure_component_thermochemistry
+          equations_as_published:
+            H: H(cal mol^-1) = A + integral_298.15^T Cp dT
+            S: S(cal mol^-1 K^-1) = B + integral_298.15^T (Cp/T) dT
+            Cp: Cp(cal mol^-1 K^-1) = a + b(10^-3)T + c(10^5)T^-2 + dT^-1/2 + e(10^8)T^-3
+          conversion_note_as_published: 'Note: 1 cal = 4.184 J'
+          source_basis_as_published: Berman et al. [9] and Barin et al. [10,11]
+          fidelity_A_MgO_liquid_cal_mol: -130340.58
+          fidelity_quote: 'MgO(l) (298–3098 K) | −130 340.58 | 6.4541207 | 17.398557 | −0.7510000 | 1.2494063 | −70.793260 | 0.013968958'
+          rows:
+            - phase_as_published: MgO(l)
+              T_range_K_as_published: [298, 3098]
+              A_cal_mol: -130340.58
+              B_cal_mol_K: 6.4541207
+              a_cal_mol_K: 17.398557
+              b_coefficient_1e_minus_3: -0.7510000
+              c_coefficient_1e_5: 1.2494063
+              d_coefficient_T_minus_half: -70.793260
+              e_coefficient_1e_8_T_minus_3: 0.013968958
+              locator: {published_page: 28, table: '1', row: 'MgO(l) (298–3098 K)'}
+              printed_quote: 'MgO(l) (298–3098 K) | −130 340.58 | 6.4541207 | 17.398557 | −0.7510000 | 1.2494063 | −70.793260 | 0.013968958'
+            - phase_as_published: MgO(s)
+              T_range_K_as_published: [298, 3098]
+              A_cal_mol: -143761.95
+              B_cal_mol_K: 6.4415388
+              a_cal_mol_K: 14.605557
+              c_coefficient_1e_5: -1.4845937
+              d_coefficient_T_minus_half: -70.793260
+              e_coefficient_1e_8_T_minus_3: 0.013968958
+              locator: {published_page: 28, table: '1', row: 'MgO(s) (298–3098 K)'}
+              printed_quote: 'MgO(s) (298–3098 K) | −143 761.95 | 6.4415388 | 14.605557 | [blank b] | −1.4845937 | −70.793260 | 0.013968958'
+        uncertainty:
+          note: No numeric uncertainty is printed for the Table 1 cells.
+      - observation_id: wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+          published_page: 32
+          table: '2'
+          note: MgO-SiO2 system, RT ln gamma_MgO columns
+        phase: MgO-SiO2_liquid
+        standard_state: liquid standard state
+        regime: modified_quasichemical_model_binary_optimization
+        units: J_mol^-1
+        values:
+          quantity: RT_ln_gamma
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          system: MgO-SiO2
+          component: MgO
+          temperature_headers_C_as_published: [1800, 2000, 2200]
+          temperature_header_quote: 'RT ln γMgO (J mol−1): 1800°C | 2000°C | 2200°C'
+          fidelity_RT_ln_gamma_J_mol: -30770
+          fidelity_quote: '0.4 | −33 815 | −30 770 | −28 117'
+          rows:
+            - X_SiO2_as_published: 0.2
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': -6279, '2200': -6970}
+              parenthetical_temperature_columns_as_published: ['2000', '2200']
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.2'}
+              printed_quote: '0.2 | — | (−6 279) | (−6 970)'
+            - X_SiO2_as_published: 0.3
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': -17159, '2200': -17272}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.3'}
+              printed_quote: '0.3 | — | −17 159 | −17 272'
+            - X_SiO2_as_published: 0.4
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': -33815, '2000': -30770, '2200': -28117}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.4'}
+              printed_quote: '0.4 | −33 815 | −30 770 | −28 117'
+            - X_SiO2_as_published: 0.5
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': -41605, '2000': -37237, '2200': -33116}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.5'}
+              printed_quote: '0.5 | −41 605 | −37 237 | −33 116'
+            - X_SiO2_as_published: 0.6
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': -44771, '2000': -39636, '2200': -34650}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.6'}
+              printed_quote: '0.6 | −44 771 | −39 636 | −34 650'
+            - X_SiO2_as_published: 0.7
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': -38707, '2200': -33931}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.7'}
+              printed_quote: '0.7 | — | −38 707 | −33 931'
+            - X_SiO2_as_published: 0.8
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': -33559, '2200': -30999}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.8'}
+              printed_quote: '0.8 | — | −33 559 | −30 999'
+            - X_SiO2_as_published: 0.9
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': -22781, '2200': -25451}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.9'}
+              printed_quote: '0.9 | — | −22 781 | −25 451'
+        uncertainty:
+          note: No numeric uncertainty is printed for the calculated Table 2 values; parentheses are retained without inferring their meaning.
+  FeO:
+    observations:
+      - observation_id: wu_1993_table1_feo_compiled_thermochemistry
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          published_page: 28
+          table: '1'
+          note: FeO liquid and solid rows
+        phase: stoichiometric_FeO_liquid_and_solid
+        standard_state: elements at 298.15 K
+        regime: evaluated_pure_component_thermochemistry
+        units: cal_mol_and_cal_mol_K_as_published
+        values:
+          quantity: thermodynamic_function_coefficients
+          method_class: review_compilation
+          evidence_class: compiled_pure_component_thermochemistry
+          source_basis_as_published: Robie et al. [13], Barin et al. [10], Coughlin et al. [15], with stated assumptions for stoichiometric FeO
+          rows:
+            - phase_as_published: FeO(l)
+              T_range_K_as_published: [298, 1644]
+              A_cal_mol: -56081.06
+              B_cal_mol_K: 18.753713
+              a_cal_mol_K: -4.3079527
+              b_coefficient_1e_minus_3: 7.3155019
+              c_coefficient_1e_5: -6.0547323
+              d_coefficient_T_minus_half: 358.72371
+              locator: {published_page: 28, table: '1', row: 'FeO(l) (298–1644 K)'}
+              printed_quote: 'FeO(l) (298–1 644 K) | −56 081.06 | 18.753713 | −4.3079527 | 7.3155019 | −6.0547323 | 358.72371 | [blank e]'
+            - phase_as_published: FeO(l)
+              T_range_K_as_published: [1644, 5000]
+              A_cal_mol: -59216.32
+              B_cal_mol_K: 13.977535
+              a_cal_mol_K: 16.300000
+              locator: {published_page: 28, table: '1', row: 'FeO(l) (1644–5000 K)'}
+              printed_quote: 'FeO(l) (1 644–5 000 K) | −59 216.32 | 13.977535 | 16.300000 | [blank b–e]'
+            - phase_as_published: FeO(s)
+              T_range_K_as_published: [298, 1644]
+              A_cal_mol: -63535.43
+              B_cal_mol_K: 14.219836
+              a_cal_mol_K: -4.3079527
+              b_coefficient_1e_minus_3: 7.3155019
+              c_coefficient_1e_5: -6.0547323
+              d_coefficient_T_minus_half: 358.72371
+              locator: {published_page: 28, table: '1', row: 'FeO(s) (298–1644 K)'}
+              printed_quote: 'FeO(s) (298–1 644 K) | −63 535.43 | 14.219836 | −4.3079527 | 7.3155019 | −6.0547323 | 358.72371 | [blank e]'
+            - phase_as_published: FeO(s)
+              T_range_K_as_published: [1644, 5000]
+              A_cal_mol: -66670.69
+              B_cal_mol_K: 9.4436587
+              a_cal_mol_K: 16.300000
+              locator: {published_page: 28, table: '1', row: 'FeO(s) (1644–5000 K)'}
+              printed_quote: 'FeO(s) (1 644–5 000 K) | −66 670.69 | 9.4436587 | 16.300000 | [blank b–e]'
+        uncertainty:
+          note: No numeric uncertainty is printed for the Table 1 cells.
+      - observation_id: wu_1993_table2_feo_sio2_feo_model_rtln_gamma
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+          published_page: 32
+          table: '2'
+          note: FeO-SiO2 system, RT ln gamma_FeO columns
+        phase: FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe
+        standard_state: liquid standard state
+        regime: modified_quasichemical_model_binary_optimization
+        units: J_mol^-1
+        values:
+          quantity: RT_ln_gamma
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          system: FeO-SiO2
+          component: FeO
+          temperature_headers_C_as_published: [1400, 1600, 1800]
+          temperature_header_quote: 'RT ln γFeO (J mol−1): 1400°C | 1600°C | 1800°C'
+          rows:
+            - X_SiO2_as_published: 0.1
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': 718, '1600': 782, '1800': 851}
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.1'}
+              printed_quote: '0.1 | 718 | 782 | 851'
+            - X_SiO2_as_published: 0.2
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': 793, '1600': 1013, '1800': 1238}
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.2'}
+              printed_quote: '0.2 | 793 | 1 013 | 1 238'
+            - X_SiO2_as_published: 0.3
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': -1428, '1600': -816, '1800': -242}
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.3'}
+              printed_quote: '0.3 | −1 428 | −816 | −242'
+            - X_SiO2_as_published: 0.4
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': -4282, '1600': -3150, '1800': -2107}
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.4'}
+              printed_quote: '0.4 | −4 282 | −3 150 | −2 107'
+            - X_SiO2_as_published: 0.5
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': -5612, '1600': -4100, '1800': -2664}
+              parenthetical_temperature_columns_as_published: ['1400']
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.5'}
+              printed_quote: '0.5 | (−5 612) | −4 100 | −2 664'
+            - X_SiO2_as_published: 0.6
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': -4521, '1600': -3028, '1800': -1485}
+              parenthetical_temperature_columns_as_published: ['1400', '1600']
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.6'}
+              printed_quote: '0.6 | (−4 521) | (−3 028) | −1 485'
+        uncertainty:
+          note: No numeric uncertainty is printed for the calculated Table 2 values; parentheses are retained without inferring their meaning.
+      - observation_id: wu_1993_reported_ternary_peritectic
+        type: transition_point
+        locator:
+          published_page: 33
+          paragraph: The MgO-FeO-SiO2 System
+          note: Reported ternary peritectic and phase compositions from reference 16
+        phase: MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe
+        regime: reported_quench_experiment_from_Bowen_and_Schairer_1932
+        units: C_and_wt_percent_as_published
+        values:
+          quantity: ternary_peritectic_temperature_and_phase_compositions
+          property_kind: ternary_peritectic
+          method_class: measured_direct
+          original_experimental_citation: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 24 (1932) 177 [reference 16]'
+          temperature_C_as_published: 1306
+          liquid_wt_pct_as_published: {MgO: 9, FeO: 46, SiO2: 45}
+          olivine_wt_pct_as_published: {Fe2SiO4: 68, Mg2SiO4: 32}
+          pyroxene_wt_pct_as_published: {FeSiO3: 62, MgSiO3: 38}
+          printed_quote: 'A ternary peritectic invariant was observed at 1306°C with a liquid of 9 wt% MgO, 46 wt% FeO and 45 wt% SiO2 ... olivine containing 68 wt% Fe2SiO4 and 32 wt% Mg2SiO4 ... pyroxene containing 62 wt% FeSiO3 and 38 wt% MgSiO3.'
+        uncertainty:
+          note: No numeric uncertainty is printed for the reported invariant or compositions.
+      - observation_id: wu_1993_calculated_ternary_peritectic
+        type: transition_point
+        locator:
+          published_page: 34
+          paragraph: For the liquid phase
+          note: Calculated ternary peritectic and phase compositions
+        phase: MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe
+        regime: modified_quasichemical_model_asymmetric_combining_rule
+        units: C_and_wt_percent_as_published
+        values:
+          quantity: ternary_peritectic_temperature_and_phase_compositions
+          property_kind: ternary_peritectic
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          fidelity_temperature_C: 1310
+          temperature_C_as_published: 1310
+          liquid_wt_pct_as_published: {MgO: 10.5, FeO: 45, SiO2: 44.5}
+          olivine_Fe2SiO4_wt_pct_as_published: 61
+          pyroxene_FeSiO3_wt_pct_as_published: 50
+          printed_quote: 'The ternary peritectic point was calculated at 1310°C at a liquid composition of 10.5 wt% MgO, 45 wt% FeO and 44.5 wt% SiO2 ... calculated olivine composition ... 61 wt% Fe2SiO4 ... calculated pyroxene composition ... 50 wt% FeSiO3.'
+        uncertainty:
+          note: No numeric uncertainty is printed for the calculated invariant or compositions.
+  SiO2:
+    observations:
+      - observation_id: wu_1993_table1_sio2_compiled_thermochemistry
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          published_page: 28
+          table: '1'
+          note: SiO2 liquid, tridymite, and cristobalite rows
+        phase: pure_SiO2_liquid_and_solid_polymorphs
+        standard_state: elements at 298.15 K
+        regime: evaluated_pure_component_thermochemistry
+        units: cal_mol_and_cal_mol_K_as_published
+        values:
+          quantity: thermodynamic_function_coefficients
+          method_class: review_compilation
+          evidence_class: compiled_pure_component_thermochemistry
+          source_basis_as_published: Berman et al. [9] and JANAF [12]
+          rows:
+            - phase_as_published: SiO2(l)
+              T_range_K_as_published: [298, 1996]
+              A_cal_mol: -214339.36
+              B_cal_mol_K: 12.148448
+              a_cal_mol_K: 19.960229
+              c_coefficient_1e_5: -5.8684512
+              d_coefficient_T_minus_half: -89.553776
+              e_coefficient_1e_8_T_minus_3: 0.66938861
+              locator: {published_page: 28, table: '1', row: 'SiO2(l) (298–1996 K)'}
+              printed_quote: 'SiO2(l) (298–1 996 K) | −214 339.36 | 12.148448 | 19.960229 | [blank b] | −5.8684512 | −89.553776 | 0.66938861'
+            - phase_as_published: SiO2(l)
+              T_range_K_as_published: [1996, 5000]
+              A_cal_mol: -221471.21
+              B_cal_mol_K: 2.3702523
+              a_cal_mol_K: 20.500000
+              locator: {published_page: 28, table: '1', row: 'SiO2(l) (1996–5000 K)'}
+              printed_quote: 'SiO2(l) (1 996–5 000 K) | −221 471.21 | 2.3702523 | 20.500000 | [blank b–e]'
+            - phase_as_published: SiO2(tr)
+              T_range_K_as_published: [390, 1738]
+              A_cal_mol: -216788.99
+              B_cal_mol_K: 10.880425
+              a_cal_mol_K: 18.014500
+              c_coefficient_1e_5: -14.240189
+              e_coefficient_1e_8_T_minus_3: 2.2902632
+              locator: {published_page: 28, table: '1', row: 'SiO2(tr) (390–1738 K)'}
+              printed_quote: 'SiO2(tr) (390–1 738 K) | −216 788.99 | 10.880425 | 18.014500 | [blank b] | −14.240189 | [blank d] | 2.2902632'
+            - phase_as_published: SiO2(cr)
+              T_range_K_as_published: [1738, 1996]
+              A_cal_mol: -216629.36
+              B_cal_mol_K: 11.001147
+              a_cal_mol_K: 19.960229
+              c_coefficient_1e_5: -5.8684512
+              d_coefficient_T_minus_half: -89.553776
+              e_coefficient_1e_8_T_minus_3: 0.66938861
+              locator: {published_page: 28, table: '1', row: 'SiO2(cr) (1738–1996 K)'}
+              printed_quote: 'SiO2(cr) (1 738–1 996 K) | −216 629.36 | 11.001147 | 19.960229 | [blank b] | −5.8684512 | −89.553776 | 0.66938861'
+        uncertainty:
+          note: No numeric uncertainty is printed for the Table 1 cells.
+      - observation_id: wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+          published_page: 32
+          table: '2'
+          note: MgO-SiO2 system, RT ln gamma_SiO2 columns
+        phase: MgO-SiO2_liquid
+        standard_state: liquid standard state
+        regime: modified_quasichemical_model_binary_optimization
+        units: J_mol^-1
+        values:
+          quantity: RT_ln_gamma
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          system: MgO-SiO2
+          component: SiO2
+          temperature_headers_C_as_published: [1800, 2000, 2200]
+          temperature_header_quote: 'RT ln γSiO2 (J mol−1): 1800°C | 2000°C | 2200°C'
+          rows:
+            - X_SiO2_as_published: 0.2
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': -63511, '2200': -56444}
+              parenthetical_temperature_columns_as_published: ['2000', '2200']
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.2'}
+              printed_quote: '0.2 | — | (−63 511) | (−56 444)'
+            - X_SiO2_as_published: 0.3
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': -31405, '2200': -25725}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.3'}
+              printed_quote: '0.3 | — | −31 405 | −25 725'
+            - X_SiO2_as_published: 0.4
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': -5538, '2000': -5434, '2200': -5001}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.4'}
+              printed_quote: '0.4 | −5 538 | −5 434 | −5 001'
+            - X_SiO2_as_published: 0.5
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': 4317, '2000': 2759, '2200': 1352}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.5'}
+              printed_quote: '0.5 | 4 317 | 2 759 | 1 352'
+            - X_SiO2_as_published: 0.6
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': 7030, '2000': 4824, '2200': 2685}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.6'}
+              printed_quote: '0.6 | 7 030 | 4 824 | 2 685'
+            - X_SiO2_as_published: 0.7
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': 4392, '2200': 2338}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.7'}
+              printed_quote: '0.7 | — | 4 392 | 2 338'
+            - X_SiO2_as_published: 0.8
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': 2738, '2200': 1390}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.8'}
+              printed_quote: '0.8 | — | 2 738 | 1 390'
+            - X_SiO2_as_published: 0.9
+              RT_ln_gamma_J_mol_by_temperature_C: {'1800': absent, '2000': 896, '2200': 436}
+              locator: {published_page: 32, table: '2', row: 'MgO-SiO2 XSiO2=0.9'}
+              printed_quote: '0.9 | — | 896 | 436'
+        uncertainty:
+          note: No numeric uncertainty is printed for the calculated Table 2 values; parentheses are retained without inferring their meaning.
+      - observation_id: wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+          published_page: 32
+          table: '2'
+          note: FeO-SiO2 system, RT ln gamma_SiO2 columns
+        phase: FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe
+        standard_state: liquid standard state
+        regime: modified_quasichemical_model_binary_optimization
+        units: J_mol^-1
+        values:
+          quantity: RT_ln_gamma
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          system: FeO-SiO2
+          component: SiO2
+          temperature_headers_C_as_published: [1400, 1600, 1800]
+          temperature_header_quote: 'RT ln γSiO2 (J mol−1): 1400°C | 1600°C | 1800°C'
+          rows:
+            - X_SiO2_as_published: 0.1
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': -2687, '1600': 327, '1800': 3200}
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.1'}
+              printed_quote: '0.1 | −2 687 | 327 | 3 200'
+            - X_SiO2_as_published: 0.2
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': -3917, '1600': -1765, '1800': 237}
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.2'}
+              printed_quote: '0.2 | −3 917 | −1 765 | 237'
+            - X_SiO2_as_published: 0.3
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': 2595, '1600': 3584, '1800': 4549}
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.3'}
+              printed_quote: '0.3 | 2 595 | 3 584 | 4 549'
+            - X_SiO2_as_published: 0.4
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': 7999, '1600': 8010, '1800': 8099}
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.4'}
+              printed_quote: '0.4 | 7 999 | 8 010 | 8 099'
+            - X_SiO2_as_published: 0.5
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': 9724, '1600': 9256, '1800': 8853}
+              parenthetical_temperature_columns_as_published: ['1400']
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.5'}
+              printed_quote: '0.5 | (9 724) | 9 256 | 8 853'
+            - X_SiO2_as_published: 0.6
+              RT_ln_gamma_J_mol_by_temperature_C: {'1400': 8903, '1600': 8435, '1800': 7933}
+              parenthetical_temperature_columns_as_published: ['1400', '1600']
+              locator: {published_page: 32, table: '2', row: 'FeO-SiO2 XSiO2=0.6'}
+              printed_quote: '0.6 | (8 903) | (8 435) | 7 933'
+        uncertainty:
+          note: No numeric uncertainty is printed for the calculated Table 2 values; parentheses are retained without inferring their meaning.
+      - observation_id: wu_1993_optimized_binary_model_parameters
+        type: gibbs_table
+        locator:
+          published_page: 28
+          section: Binary Systems
+          note: Equations 6–11 and the FeO-MgO liquid omega statement on pages 28–33
+        phase: FeO-MgO-SiO2_binary_liquid_and_solid_solution_models
+        regime: nonlinear_least_squares_modified_quasichemical_optimization
+        units: mixed_as_published
+        values:
+          quantity: optimized_binary_thermodynamic_model_parameters
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          evidence_class: thermodynamic_model_parameter
+          fidelity_equation7_constant_J_mol: -86090
+          fidelity_quote: 'ω = −86 090 − 48 974 YSiO2 + 328 109 YSiO2^7 J mol−1'
+          rows:
+            - system: FeO-MgO_solid
+              equation: '6'
+              numeric_coefficients_as_published: [10175]
+              locator: {published_page: 28, equation: '6'}
+              printed_quote: 'gE(sol) = 10 175 XFeO XMgO J mol−1'
+            - system: FeO-MgO_liquid
+              equation: prose_following_equation_6
+              numeric_coefficients_as_published: [3347]
+              locator: {published_page: 29, paragraph: 'resulting liquid properties'}
+              printed_quote: 'represented by the quasichemical model with ω = 3 347 J mol−1'
+            - system: MgO-SiO2_liquid_omega
+              equation: '7'
+              numeric_coefficients_as_published: [-86090, -48974, 328109]
+              locator: {published_page: 30, equation: '7'}
+              printed_quote: 'ω = −86 090 − 48 974 YSiO2 + 328 109 YSiO2^7 J mol−1'
+            - system: MgO-SiO2_liquid_eta
+              equation: '8'
+              numeric_coefficients_as_published: [-37.656, 125.52]
+              locator: {published_page: 30, equation: '8'}
+              printed_quote: 'η = −37.656 YSiO2 + 125.52 YSiO2^7 J mol−1 K−1'
+            - system: FeO-SiO2_liquid_omega
+              equation: '9'
+              numeric_coefficients_as_published: [-17697, -38528, 842570, -1549201, 962015]
+              locator: {published_page: 31, equation: '9'}
+              printed_quote: 'ω = −17 697 − 38 528 YSiO2 + 842 570 YSiO2^5 − 1 549 201 YSiO2^6 + 962 015 YSiO2^7 J mol−1'
+            - system: FeO-SiO2_liquid_eta
+              equation: '10'
+              numeric_coefficients_as_published: [-16.736, 62.76]
+              locator: {published_page: 31, equation: '10'}
+              printed_quote: 'η = −16.736 + 62.76 YSiO2^7 J mol−1 K−1'
+            - system: MgSiO3-FeSiO3_solid
+              equation: '11'
+              numeric_coefficients_as_published: [-6694]
+              locator: {published_page: 33, equation: '11'}
+              printed_quote: 'gE = −6 694 XFeSiO3 XMgSiO3 J mol−1'
+        uncertainty:
+          note: No numeric parameter uncertainties are printed; the equations are optimized model output.
+  Mg2SiO4:
+    observations:
+      - observation_id: wu_1993_table1_mg2sio4_optimized_thermochemistry
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          published_page: 28
+          table: '1'
+          row: Mg2SiO4(s)
+        phase: Mg2SiO4_solid
+        standard_state: elements at 298.15 K
+        regime: binary_optimization
+        units: cal_mol_and_cal_mol_K_as_published
+        values:
+          quantity: thermodynamic_function_coefficients
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          evidence_class: thermodynamic_model_parameter
+          fidelity_A_cal_mol: -520482.62
+          fidelity_quote: 'Mg2SiO4(s) (298–2 161 K) | −520 482.62 | 22.468913 | 57.036654 | [blank b,c] | −478.31286 | −0.27782811'
+          rows:
+            - phase_as_published: Mg2SiO4(s)
+              T_range_K_as_published: [298, 2161]
+              A_cal_mol: -520482.62
+              B_cal_mol_K: 22.468913
+              a_cal_mol_K: 57.036654
+              d_coefficient_T_minus_half: -478.31286
+              e_coefficient_1e_8_T_minus_3: -0.27782811
+              locator: {published_page: 28, table: '1', row: 'Mg2SiO4(s)'}
+              printed_quote: 'Mg2SiO4(s) (298–2 161 K) | −520 482.62 | 22.468913 | 57.036654 | [blank b,c] | −478.31286 | −0.27782811'
+        uncertainty:
+          note: No numeric uncertainty is printed for the optimized Table 1 row.
+  Fe2SiO4:
+    observations:
+      - observation_id: wu_1993_table1_fe2sio4_optimized_thermochemistry
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          published_page: 28
+          table: '1'
+          row: Fe2SiO4(s)
+        phase: Fe2SiO4_solid
+        standard_state: elements at 298.15 K
+        regime: binary_optimization
+        units: cal_mol_and_cal_mol_K_as_published
+        values:
+          quantity: thermodynamic_function_coefficients
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          evidence_class: thermodynamic_model_parameter
+          rows:
+            - phase_as_published: Fe2SiO4(s)
+              T_range_K_as_published: [298, 2200]
+              A_cal_mol: -354104.43
+              B_cal_mol_K: 36.073145
+              a_cal_mol_K: 59.495249
+              d_coefficient_T_minus_half: -459.81238
+              e_coefficient_1e_8_T_minus_3: -0.33246677
+              locator: {published_page: 28, table: '1', row: 'Fe2SiO4(s)'}
+              printed_quote: 'Fe2SiO4(s) (298–2 200 K) | −354 104.43 | 36.073145 | 59.495249 | [blank b,c] | −459.81238 | −0.33246677'
+        uncertainty:
+          note: No numeric uncertainty is printed for the optimized Table 1 row.
+      - observation_id: wu_1993_table3_reported_solidus_points
+        type: transition_point
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t3.csv
+          published_page: 33
+          table: '3'
+          note: Reported column, wt% Fe2SiO4 along Mg2SiO4-Fe2SiO4 pseudobinary join
+        phase: Mg2SiO4-Fe2SiO4_solidus
+        regime: reported_quench_experiment_from_Bowen_and_Schairer_1932
+        units: C_and_wt_percent_as_published
+        values:
+          quantity: composition_dependent_solidus_points
+          property_kind: solidus_composition_series
+          method_class: measured_direct
+          original_experimental_citation: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 24 (1932) 177 [reference 16]'
+          fidelity_first_temperature_C: 1495
+          fidelity_quote: '1 495 | Exp. 41 | Calc. 40.5'
+          rows:
+            - {temperature_C_as_published: 1495, Fe2SiO4_wt_pct_as_published: 41, locator: {published_page: 33, table: '3', row: '1495'}, printed_quote: '1 495 | 41 | 40.5'}
+            - {temperature_C_as_published: 1465, Fe2SiO4_wt_pct_as_published: 45, locator: {published_page: 33, table: '3', row: '1465'}, printed_quote: '1 465 | 45 | 45'}
+            - {temperature_C_as_published: 1440, Fe2SiO4_wt_pct_as_published: 47.5, locator: {published_page: 33, table: '3', row: '1440'}, printed_quote: '1 440 | 47.5 | 49'}
+            - {temperature_C_as_published: 1410, Fe2SiO4_wt_pct_as_published: 54, locator: {published_page: 33, table: '3', row: '1410'}, printed_quote: '1 410 | 54 | 54'}
+            - {temperature_C_as_published: 1318, Fe2SiO4_wt_pct_as_published: 70, locator: {published_page: 33, table: '3', row: '1318'}, printed_quote: '1 318 | 70 | 71.5'}
+            - {temperature_C_as_published: 1276, Fe2SiO4_wt_pct_as_published: 80, locator: {published_page: 33, table: '3', row: '1276'}, printed_quote: '1 276 | 80 | 81'}
+        uncertainty:
+          note: No numeric uncertainty is printed for the reported Table 3 points.
+      - observation_id: wu_1993_table3_calculated_solidus_points
+        type: transition_point
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t3.csv
+          published_page: 33
+          table: '3'
+          note: Calculated column, wt% Fe2SiO4 along Mg2SiO4-Fe2SiO4 pseudobinary join
+        phase: Mg2SiO4-Fe2SiO4_solidus
+        regime: modified_quasichemical_model_prediction
+        units: C_and_wt_percent_as_published
+        values:
+          quantity: composition_dependent_solidus_points
+          property_kind: solidus_composition_series
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          fidelity_first_calculated_wt_pct: 40.5
+          fidelity_quote: '1 495 | Exp. 41 | Calc. 40.5'
+          rows:
+            - {temperature_C_as_published: 1495, Fe2SiO4_wt_pct_as_published: 40.5, locator: {published_page: 33, table: '3', row: '1495'}, printed_quote: '1 495 | 41 | 40.5'}
+            - {temperature_C_as_published: 1465, Fe2SiO4_wt_pct_as_published: 45, locator: {published_page: 33, table: '3', row: '1465'}, printed_quote: '1 465 | 45 | 45'}
+            - {temperature_C_as_published: 1440, Fe2SiO4_wt_pct_as_published: 49, locator: {published_page: 33, table: '3', row: '1440'}, printed_quote: '1 440 | 47.5 | 49'}
+            - {temperature_C_as_published: 1410, Fe2SiO4_wt_pct_as_published: 54, locator: {published_page: 33, table: '3', row: '1410'}, printed_quote: '1 410 | 54 | 54'}
+            - {temperature_C_as_published: 1318, Fe2SiO4_wt_pct_as_published: 71.5, locator: {published_page: 33, table: '3', row: '1318'}, printed_quote: '1 318 | 70 | 71.5'}
+            - {temperature_C_as_published: 1276, Fe2SiO4_wt_pct_as_published: 81, locator: {published_page: 33, table: '3', row: '1276'}, printed_quote: '1 276 | 80 | 81'}
+        uncertainty:
+          note: No numeric uncertainty is printed for the calculated Table 3 points.
+  MgSiO3:
+    observations:
+      - observation_id: wu_1993_table1_mgsio3_optimized_thermochemistry
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          published_page: 28
+          table: '1'
+          row: MgSiO3(s)
+        phase: MgSiO3_solid
+        standard_state: elements at 298.15 K
+        regime: binary_optimization
+        units: cal_mol_and_cal_mol_K_as_published
+        values:
+          quantity: thermodynamic_function_coefficients
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          evidence_class: thermodynamic_model_parameter
+          rows:
+            - phase_as_published: MgSiO3(s)
+              T_range_K_as_published: [1257, 1830]
+              A_cal_mol: -368906.91
+              B_cal_mol_K: 16.117975
+              a_cal_mol_K: 39.813456
+              c_coefficient_1e_5: -5.4267686
+              d_coefficient_T_minus_half: -286.94742
+              e_coefficient_1e_8_T_minus_3: 0.66718532
+              locator: {published_page: 28, table: '1', row: 'MgSiO3(s)'}
+              printed_quote: 'MgSiO3(s) (1 257–1 830 K) | −368 906.91 | 16.117975 | 39.813456 | [blank b] | −5.4267686 | −286.94742 | 0.66718532'
+        uncertainty:
+          note: No numeric uncertainty is printed for the optimized Table 1 row.
+  FeSiO3:
+    observations:
+      - observation_id: wu_1993_table1_fesio3_optimized_thermochemistry
+        type: gibbs_table
+        locator:
+          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          published_page: 28
+          table: '1'
+          row: FeSiO3(s)
+        phase: FeSiO3_solid
+        standard_state: elements at 298.15 K
+        regime: binary_optimization
+        units: cal_mol_and_cal_mol_K_as_published
+        values:
+          quantity: thermodynamic_function_coefficients
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          evidence_class: thermodynamic_model_parameter
+          rows:
+            - phase_as_published: FeSiO3(s)
+              T_range_K_as_published: [298, 1900]
+              A_cal_mol: -285462.23
+              B_cal_mol_K: 22.916628
+              a_cal_mol_K: 40.406448
+              c_coefficient_1e_5: -5.0127103
+              d_coefficient_T_minus_half: -285.12691
+              e_coefficient_1e_8_T_minus_3: 0.69917055
+              locator: {published_page: 28, table: '1', row: 'FeSiO3(s)'}
+              printed_quote: 'FeSiO3(s) (298–1 900 K) | −285 462.23 | 22.916628 | 40.406448 | [blank b] | −5.0127103 | −285.12691 | 0.69917055'
+        uncertainty:
+          note: No numeric uncertainty is printed for the optimized Table 1 row.
