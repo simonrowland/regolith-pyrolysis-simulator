@@ -7,6 +7,8 @@ import re
 import subprocess
 import tempfile
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 LABELS = ROOT / "web/report_viewer/labels.js"
@@ -578,11 +580,23 @@ def test_p11_silica_state_chips_are_mutually_exclusive() -> None:
     lunar_block, lunar_cls = _lunar()
     lunar_silica = lunar_cls["pure_silica_glass"]
     assert lunar_silica["stage_3_capture_kg"] > 0
-    assert lunar_silica["class_total_kg"] == 0
     lunar_card = _card(_render(_wrapped(lunar_block)), "silica")
+    # Classification axis, not certification: this C0 24 h golden never
+    # executed the pO2-hold -> pN2 SiO-release switch (mandate section 5,
+    # class 2 is on-demand by that switch), so its incidental Stage-3 capture
+    # is non-product inventory and the chip is derived, not a snapshot. The
+    # separate b-476 question (producer zeroing class_total_kg for
+    # non-authoritative SiO evidence) is held in the strict xfail below and
+    # must not be read into this assertion.
     assert _assert_exclusive_silica_chips(lunar_card) == [
         "flagged capture · not a product"
     ]
+    _assert_traced_kg(
+        lunar_card,
+        "stage_3_capture_kg",
+        lunar_silica["stage_3_capture_kg"],
+        state="flagged-unqualified-capture",
+    )
 
     block, classification = _mars()
     silica = classification["pure_silica_glass"]
@@ -615,19 +629,25 @@ def test_p11_mutant_that_emits_both_silica_route_chips_must_fail() -> None:
     assert len(chips) >= 2
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="b-476: producer zeros Class-2 silica mass for non-authoritative SiO",
+)
+def test_p11_lunar_class_total_tracks_flagged_stage_3_capture() -> None:
+    _, lunar_cls = _lunar()
+    silica = lunar_cls["pure_silica_glass"]
+    assert silica["stage_3_capture_kg"] > 0
+    assert silica["class_total_kg"] == silica["stage_3_capture_kg"]
+
+
+@pytest.mark.skip(reason="needs qualified-switch golden; b-476")
 def test_p11_lunar_qualified_silica_capture_is_not_flagged() -> None:
+    # Qualified-chip rendering needs a golden that executed the pO2-hold → pN2
+    # SiO-release switch. The lunar C0 fixture did not, and manufacturing that
+    # premise is forbidden. Keep the nodeid so the skip is visible in the
+    # original ten.
     block, classification = _lunar()
     silica = classification["pure_silica_glass"]
-    # The current lunar run lacks the executed release sequence required for
-    # qualification. Synthesize that producer state here so this remains a
-    # focused viewer test of the qualified branch rather than a golden claim.
-    silica["class_total_kg"] = silica["stage_3_capture_kg"]
-    flagged_heading = "Stage 3 silica capture (not a product)"
-    assert flagged_heading in block["markdown"]
-    block["markdown"] = (
-        "## 2. Pure silica glass (qualified product)\n\n"
-        "Pure silica glass is established by the executed release sequence."
-    )
     html = _render(_wrapped(block))
     silica_card = _card(html, "silica")
     assert _assert_exclusive_silica_chips(silica_card) == ["qualified silica product"]

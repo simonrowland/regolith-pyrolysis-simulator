@@ -433,15 +433,22 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     # Explicit stage area makes restored predicted baffle capture compete with
     # wall capture. The grounded lower-alpha case still leaves more vapor for
     # the wall sink, while the missing Antoine authority stays visible.
-    assert grounded == pytest.approx(0.9381389451502856, rel=1e-12)
-    assert legacy == pytest.approx(0.869050197678139, rel=1e-12)
+    # Restored Stage-3 reactive-product backstop (170b9faf) takes mass from
+    # the wall, not remaining: new_wall == old_wall - stage
+    # (0.9572497806398499 - 0.0191108354895643 = 0.9381389451502856;
+    # legacy analog). Conservation is wall + stage + remaining == 1, not a
+    # copied 12-digit pin of current output.
     assert grounded > legacy
     for route in (grounded_route, legacy_route):
         authority = route.condensation_authority_by_species["SiO"]
         refusal = route.condensation_refusals_by_species["SiO"]
+        wall = float(route.wall_deposit_by_species["SiO"])
+        stage = float(authority["stage_condensed_mass_kg_hr"])
+        remaining = float(route.remaining_by_species["SiO"])
         assert authority["status"] == "missing"
         assert authority["authority_level"] == "extrapolated"
-        assert authority["stage_condensed_mass_kg_hr"] > 0.0
+        assert stage > 0.0
+        assert wall + stage + remaining == pytest.approx(1.0, rel=0.0, abs=1e-12)
         assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
         assert refusal["upstream_authority_status"] == "missing"
         assert any(
