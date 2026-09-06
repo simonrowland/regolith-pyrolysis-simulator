@@ -3839,7 +3839,12 @@ def build_sio_yield_report(
     final_sio2_mol = float(cleaned_melt.get("SiO2", 0.0))
     sio_evaporated_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
     si_terminal_mol = float(condensation_train.get("Si", 0.0))
-    sio2_terminal_mol = float(condensation_train.get("SiO2", 0.0))
+    # Condensed SiO2(g) removes one mole of SiO2-equivalent per mole from the
+    # evolved chain, so it belongs in the same terminal ledger projection as
+    # condensed SiO2 rather than disappearing from the exported diagnostics.
+    sio2_terminal_mol = float(condensation_train.get("SiO2", 0.0)) + float(
+        condensation_train.get("SiO2_gas", 0.0)
+    )
     sio_wall_mol = _sio_wall_terminal_mol(wall_deposit)
     sio_escape_mol = float(terminal_offgas.get("SiO", 0.0))
     sio_retained_holdup_mol = float(retained_holdup.get("SiO", 0.0))
@@ -3855,7 +3860,6 @@ def build_sio_yield_report(
         + sio_escape_mol
         + sio_retained_holdup_mol
         + sio2_gas_escape_mol
-        + float(condensation_train.get("SiO2_gas", 0.0))
     )
     if sio_evaporated_mol > 0.0:
         closure_error_pct = abs(

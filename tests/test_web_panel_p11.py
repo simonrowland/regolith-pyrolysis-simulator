@@ -577,9 +577,12 @@ def test_p11_silica_state_chips_are_mutually_exclusive() -> None:
 
     lunar_block, lunar_cls = _lunar()
     lunar_silica = lunar_cls["pure_silica_glass"]
-    assert lunar_silica["class_total_kg"] > 0
+    assert lunar_silica["stage_3_capture_kg"] > 0
+    assert lunar_silica["class_total_kg"] == 0
     lunar_card = _card(_render(_wrapped(lunar_block)), "silica")
-    assert _assert_exclusive_silica_chips(lunar_card) == ["qualified silica product"]
+    assert _assert_exclusive_silica_chips(lunar_card) == [
+        "flagged capture · not a product"
+    ]
 
     block, classification = _mars()
     silica = classification["pure_silica_glass"]
@@ -615,6 +618,16 @@ def test_p11_mutant_that_emits_both_silica_route_chips_must_fail() -> None:
 def test_p11_lunar_qualified_silica_capture_is_not_flagged() -> None:
     block, classification = _lunar()
     silica = classification["pure_silica_glass"]
+    # The current lunar run lacks the executed release sequence required for
+    # qualification. Synthesize that producer state here so this remains a
+    # focused viewer test of the qualified branch rather than a golden claim.
+    silica["class_total_kg"] = silica["stage_3_capture_kg"]
+    flagged_heading = "Stage 3 silica capture (not a product)"
+    assert flagged_heading in block["markdown"]
+    block["markdown"] = (
+        "## 2. Pure silica glass (qualified product)\n\n"
+        "Pure silica glass is established by the executed release sequence."
+    )
     html = _render(_wrapped(block))
     silica_card = _card(html, "silica")
     assert _assert_exclusive_silica_chips(silica_card) == ["qualified silica product"]
@@ -634,6 +647,7 @@ def test_p11_lunar_qualified_silica_capture_is_not_flagged() -> None:
         state="qualified-product",
     )
     assert "flagged capture · not a product" not in silica_card
+    assert "Pure silica glass is not established" not in html
 
 
 def test_p11_indeterminate_classification_kg_is_no_material() -> None:
@@ -659,6 +673,10 @@ def test_p11_indeterminate_classification_kg_is_no_material() -> None:
 def test_p11_rump_class_total_is_not_hardcoded_floor_gloss() -> None:
     block, classification = _lunar()
     rump = classification["refractory_ceramic_rump"]
+    # The producer intentionally defines the current class total as the
+    # refractory floor. Give the viewer a distinct emitted value to prove it
+    # copies class_total_kg instead of hardcoding the sibling floor field.
+    rump["class_total_kg"] = rump["rump_refractory_oxides_kg"] + 1.25
     assert rump["class_total_kg"] != rump["rump_refractory_oxides_kg"]
     html = _render(_wrapped(block))
     rump_card = _card(html, "rump")

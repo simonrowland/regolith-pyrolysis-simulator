@@ -430,19 +430,18 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     grounded = float(grounded_route.wall_deposit_by_species["SiO"])
     legacy = float(legacy_route.wall_deposit_by_species["SiO"])
 
-    # Explicit stage area makes baffle capture compete with wall capture; the
-    # grounded lower-alpha case leaves more vapor for the wall sink.
-    # f7bcbf79 removed the fabricated 100 Pa stage pressure. The stage now
-    # records its missing-input pass-through and captures zero; that mass stays
-    # available to this explicitly configured, status-bearing wall path.
-    assert grounded == pytest.approx(0.9572497806398499, rel=1e-12)
-    assert legacy == pytest.approx(0.8899330725303272, rel=1e-12)
+    # Explicit stage area makes restored predicted baffle capture compete with
+    # wall capture. The grounded lower-alpha case still leaves more vapor for
+    # the wall sink, while the missing Antoine authority stays visible.
+    assert grounded == pytest.approx(0.9381389451502856, rel=1e-12)
+    assert legacy == pytest.approx(0.869050197678139, rel=1e-12)
     assert grounded > legacy
     for route in (grounded_route, legacy_route):
         authority = route.condensation_authority_by_species["SiO"]
         refusal = route.condensation_refusals_by_species["SiO"]
         assert authority["status"] == "missing"
-        assert authority["stage_condensed_mass_kg_hr"] == pytest.approx(0.0)
+        assert authority["authority_level"] == "extrapolated"
+        assert authority["stage_condensed_mass_kg_hr"] > 0.0
         assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
         assert refusal["upstream_authority_status"] == "missing"
         assert any(

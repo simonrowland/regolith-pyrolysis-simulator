@@ -1323,6 +1323,9 @@ def test_b1_oxide_row_requires_activity_for_condensation_without_antoine() -> No
         pipe_diameter_m=0.12,
         carrier_gas="O2",
         species_partial_pressures_mbar={"K": 1.0},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
     )
     melt = MeltState()
     melt.temperature_C = 826.85
@@ -1330,13 +1333,21 @@ def test_b1_oxide_row_requires_activity_for_condensation_without_antoine() -> No
         EvaporationFlux(species_kg_hr={"K": 1.0}, total_kg_hr=1.0),
         melt,
     )
-    # Condensation has no source-activity evidence for this synthetic row and
-    # must status-bearing pass through instead of evaluating at implicit a=1.
+    # Historical gate nodeid retained: pressure-isolated condensation now uses
+    # explicit stage geometry and preserves its extrapolated authority status.
     k_refusal = route.condensation_refusals_by_species.get("K")
     assert k_refusal is not None
-    assert k_refusal.get("status") == "pass_through"
+    assert k_refusal.get("status") == "extrapolated"
+    authority = route.condensation_authority_by_species["K"]
+    assert authority["status"] == "missing"
+    assert authority["authority_level"] == "extrapolated"
+    assert k_refusal["upstream_authority_status"] == "missing"
+    assert authority["stage_condensed_mass_kg_hr"] > 0.0
     assert "K" not in route.wall_deposit_by_species
-    assert route.remaining_by_species["K"] == pytest.approx(1.0)
+    assert 0.0 < route.remaining_by_species["K"] < 1.0
+    assert route.remaining_by_species["K"] + authority[
+        "stage_condensed_mass_kg_hr"
+    ] == pytest.approx(1.0)
 
 
 def test_metals_projection_reference_evaluation_declares_neutral_inputs() -> None:

@@ -192,8 +192,11 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
         transition.reason == "evaporate_CrO2"
         for transition in sim.atom_ledger.transitions
     )
-    assert terminal_chromia.get("Cr2O3", 0.0) == 0.0
+    # Stage 2 now materializes the declared stable CrO2 -> Cr2O3 + O2 route;
+    # the terminal cartridge mirrors that product without duplicating atoms.
+    assert terminal_chromia.get("Cr2O3", 0.0) > 0.0
     assert "Cr2O3" not in train
+    assert stage_2.get("Cr2O3", 0.0) == pytest.approx(terminal_chromia["Cr2O3"])
     assert stage_2.get("Cr", 0.0) > 0.0
     assert all("Cr" not in stage for stage in later_stages)
     # The multi-carrier chromium rail may redistribute Cr among melt, vapour,

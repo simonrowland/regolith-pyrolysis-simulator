@@ -1266,12 +1266,12 @@ def test_p14_lunar_fixture_origin_tier_copies_all_emitted_links() -> None:
     emitted_mols = [link["mol_atoms"] for link in payload["links"]]
 
     assert len(payload["nodes"]) == 79
-    assert len(payload["links"]) == 89
+    assert len(payload["links"]) == 90
     assert "Pending origin-resolved shares" not in html
     assert "Malformed provenance payload" not in html
     assert [float(value) for value in table_fractions] == emitted_fractions
     assert [float(value) for value in table_mols] == emitted_mols
-    assert html.count("data-p14-origin-link=") == 89
+    assert html.count("data-p14-origin-link=") == len(payload["links"])
     assert NUMERIC_KG.search(
         _html_region(html, '<div class="sec-p14-flow sec-p14-origin-flow">', "</small></div>")
     ) is None
