@@ -1789,10 +1789,13 @@ def evaluate_observation(
         return _evaluate_activity(obs, evaluation, vp_data=vp_data, pO2=pO2)
     if obs.obs_type == "gibbs_table":
         evidence_class = str(obs.values.get("evidence_class") or "")
+        admission_status = str(obs.values.get("admission_status") or "")
         if evidence_class == "thermodynamic_model_parameter":
             reason = "thermodynamic_model_parameter_not_activity_measurement"
         elif evidence_class == "pure_solid_thermochemistry":
             reason = "pure_solid_thermochemistry_not_melt_activity"
+        elif admission_status == "model_output_not_measurement":
+            reason = "model_output_not_measurement"
         else:
             reason = "gibbs_table_not_runtime_observable"
         evaluation.skip_reason = f"{_TYPED_SKIP_PREFIX}{reason}"

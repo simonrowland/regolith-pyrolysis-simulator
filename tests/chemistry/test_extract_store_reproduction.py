@@ -1297,6 +1297,33 @@ def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     assert evaluation.skip_reasons == [skip_reason]
 
 
+def test_wetzel_model_tables_refuse_as_model_output() -> None:
+    observation_ids = {
+        f"wetzel_gail_2013_table{table}_quoted_model" for table in range(1, 7)
+    }
+    observations = [
+        row
+        for row in load_adopted_observations()
+        if row.source_id == "kems-011-wetzel-gail-2013"
+        and row.observation_id in observation_ids
+    ]
+    assert {row.observation_id for row in observations} == observation_ids
+    for observation in observations:
+        assert observation.obs_type == "gibbs_table"
+        assert observation.values["method_class"] == "model_derived"
+        assert (
+            observation.values["admission_status"]
+            == "model_output_not_measurement"
+        )
+        evaluation = evaluate_observation(
+            observation,
+            vapor_pressure_data=load_vapor_pressure_data(),
+        )
+        assert evaluation.records == []
+        assert evaluation.skip_reason == "typed-refusal:model_output_not_measurement"
+        assert evaluation.skip_reasons == [evaluation.skip_reason]
+
+
 def test_transition_point_is_an_adopted_target_type(
     adopted_observations: list[AdoptedObservation],
 ) -> None:

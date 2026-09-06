@@ -10,6 +10,143 @@ extraction:
   worker: ocr-phase2b-gk
   provenance_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/
 review_status: draft
+corrections:
+- observation_id: wetzel_gail_2013_table3_quoted_model
+  field: uncertainty
+  old: absent
+  new:
+    note: Each value is the right-hand term printed after ± for its paired coefficient; the paper does not state a statistical convention.
+    rows:
+    - osc_no: "1"
+      values: {"omega0_a_cm-1":"2.57","omega0_b_cm-1_K-1":"0.0048","omegap_a_cm-1":"10.59","omegap_b_cm-1_K-1":"0.020","sigma_a_cm-1":"1.29","sigma_b_cm-1_K-1":"0.0024"}
+      quote: "1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024"
+      locator: {page: 5, table: '3', row: "1"}
+    - osc_no: "2"
+      values: {"omega0_a_cm-1":"1.62","omega0_b_cm-1_K-1":"0.0030","omegap_a_cm-1":"11.7","omegap_b_cm-1_K-1":"0.022","sigma_a_cm-1":"0.81","sigma_b_cm-1_K-1":"0.0015"}
+      quote: "2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015"
+      locator: {page: 5, table: '3', row: "2"}
+    - osc_no: "3"
+      values: {"omega0_a_cm-1":"3.53","omega0_b_cm-1_K-1":"0.0065","omegap_a_cm-1":"8.32","omegap_b_cm-1_K-1":"0.015","sigma_a_cm-1":"0.95","sigma_b_cm-1_K-1":"0.0018"}
+      quote: "3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018"
+      locator: {page: 5, table: '3', row: "3"}
+    - osc_no: "4"
+      values: {"omega0_a_cm-1":"6.96","omega0_b_cm-1_K-1":"0.013","omegap_a_cm-1":"20.2","omegap_b_cm-1_K-1":"0.037","sigma_a_cm-1":"4.19","sigma_b_cm-1_K-1":"0.0078"}
+      quote: "4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078"
+      locator: {page: 5, table: '3', row: "4"}
+  page: 5
+  quote: |-
+    1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024
+    2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015
+    3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018
+    4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078
+- observation_id: wetzel_gail_2013_table1_quoted_model
+  field: type
+  old: rate_series
+  new: gibbs_table
+  page: 4
+  quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
+- observation_id: wetzel_gail_2013_table2_quoted_model
+  field: type
+  old: rate_series
+  new: gibbs_table
+  page: 4
+  quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
+- observation_id: wetzel_gail_2013_table3_quoted_model
+  field: type
+  old: rate_series
+  new: gibbs_table
+  page: 5
+  quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
+- observation_id: wetzel_gail_2013_table4_quoted_model
+  field: type
+  old: rate_series
+  new: gibbs_table
+  page: 7
+  quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
+- observation_id: wetzel_gail_2013_table5_quoted_model
+  field: type
+  old: rate_series
+  new: gibbs_table
+  page: 8
+  quote: 'Data used for calculation of silicon monoxide growth.'
+- observation_id: wetzel_gail_2013_table6_quoted_model
+  field: type
+  old: rate_series
+  new: gibbs_table
+  page: 8
+  quote: 'Basic parameters of the dust-shell models'
+- observation_id: wetzel_gail_2013_table1_quoted_model
+  field: values.admission_status
+  old: absent
+  new: model_output_not_measurement
+  page: 4
+  quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
+- observation_id: wetzel_gail_2013_table2_quoted_model
+  field: values.admission_status
+  old: absent
+  new: model_output_not_measurement
+  page: 4
+  quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
+- observation_id: wetzel_gail_2013_table3_quoted_model
+  field: values.admission_status
+  old: absent
+  new: model_output_not_measurement
+  page: 5
+  quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
+- observation_id: wetzel_gail_2013_table4_quoted_model
+  field: values.admission_status
+  old: absent
+  new: model_output_not_measurement
+  page: 7
+  quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
+- observation_id: wetzel_gail_2013_table5_quoted_model
+  field: values.admission_status
+  old: absent
+  new: model_output_not_measurement
+  page: 8
+  quote: 'Data used for calculation of silicon monoxide growth.'
+- observation_id: wetzel_gail_2013_table6_quoted_model
+  field: values.admission_status
+  old: absent
+  new: model_output_not_measurement
+  page: 8
+  quote: 'Basic parameters of the dust-shell models'
+- observation_id: wetzel_gail_2013_table1_quoted_model
+  field: values.note
+  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  page: 4
+  quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
+- observation_id: wetzel_gail_2013_table2_quoted_model
+  field: values.note
+  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  page: 4
+  quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
+- observation_id: wetzel_gail_2013_table3_quoted_model
+  field: values.note
+  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  page: 5
+  quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
+- observation_id: wetzel_gail_2013_table4_quoted_model
+  field: values.note
+  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  page: 7
+  quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
+- observation_id: wetzel_gail_2013_table5_quoted_model
+  field: values.note
+  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  page: 8
+  quote: 'Data used for calculation of silicon monoxide growth.'
+- observation_id: wetzel_gail_2013_table6_quoted_model
+  field: values.note
+  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+  page: 8
+  quote: 'Basic parameters of the dust-shell models'
 deepening:
   date: '2026-09-06'
   worker: deep2-kems-011-wetzel-gail-2013
@@ -204,7 +341,7 @@ species:
         qualifier: approximate
       note: Replaces the parent measured_direct interpretation and unrelated Fig. 4a locator. Eq. (8) extrapolation is used for dust growth; no direct condensation coefficient was measured here.
     - observation_id: wetzel_gail_2013_table1_quoted_model
-      type: rate_series
+      type: gibbs_table
       class: model
       locator: {page: 4, table: '1'}
       quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
@@ -214,9 +351,10 @@ species:
       values:
         quantity: brendel_oscillator_model_parameters
         method_class: model_derived
+        admission_status: model_output_not_measurement
         semantics: bound_not_point_ordering
         table_file: tables/kems-011-wetzel-gail-2013/t1.csv
-        note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+        note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
         - cells: {"osc":"1","omega_0_cm-1":"1100","omega_p_cm-1":"329","sigma_cm-1":"47"}
           quote: "1 | 1100 | 329 | 47"
@@ -235,7 +373,7 @@ species:
           quote: "eps_inf | 3.61"
           locator: {page: 4, table: '1', row: "eps_inf"}
     - observation_id: wetzel_gail_2013_table2_quoted_model
-      type: rate_series
+      type: gibbs_table
       class: model
       locator: {page: 4, table: '2'}
       quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
@@ -245,9 +383,10 @@ species:
       values:
         quantity: brendel_oscillator_model_parameters
         method_class: model_derived
+        admission_status: model_output_not_measurement
         semantics: bound_not_point_ordering
         table_file: tables/kems-011-wetzel-gail-2013/t2.csv
-        note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+        note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
         - cells: {"T_K":"40","osc_no":"1","omega_0_cm-1":"1077","omega_p_cm-1":"336","sigma_cm-1":"52"}
           quote: "40 | 1 | 1077 | 336 | 52"
@@ -358,19 +497,39 @@ species:
           quote: "873 | 3b | 661 | 229 | 62"
           locator: {page: 4, table: '2', row: "873 / 3b"}
     - observation_id: wetzel_gail_2013_table3_quoted_model
-      type: rate_series
+      type: gibbs_table
       class: model
       locator: {page: 5, table: '3'}
       quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
       phase: amorphous_SiO
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
+      uncertainty:
+        note: Each value is the right-hand term printed after ± for its paired coefficient; the paper does not state a statistical convention.
+        rows:
+        - osc_no: "1"
+          values: {"omega0_a_cm-1":"2.57","omega0_b_cm-1_K-1":"0.0048","omegap_a_cm-1":"10.59","omegap_b_cm-1_K-1":"0.020","sigma_a_cm-1":"1.29","sigma_b_cm-1_K-1":"0.0024"}
+          quote: "1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024"
+          locator: {page: 5, table: '3', row: "1"}
+        - osc_no: "2"
+          values: {"omega0_a_cm-1":"1.62","omega0_b_cm-1_K-1":"0.0030","omegap_a_cm-1":"11.7","omegap_b_cm-1_K-1":"0.022","sigma_a_cm-1":"0.81","sigma_b_cm-1_K-1":"0.0015"}
+          quote: "2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015"
+          locator: {page: 5, table: '3', row: "2"}
+        - osc_no: "3"
+          values: {"omega0_a_cm-1":"3.53","omega0_b_cm-1_K-1":"0.0065","omegap_a_cm-1":"8.32","omegap_b_cm-1_K-1":"0.015","sigma_a_cm-1":"0.95","sigma_b_cm-1_K-1":"0.0018"}
+          quote: "3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018"
+          locator: {page: 5, table: '3', row: "3"}
+        - osc_no: "4"
+          values: {"omega0_a_cm-1":"6.96","omega0_b_cm-1_K-1":"0.013","omegap_a_cm-1":"20.2","omegap_b_cm-1_K-1":"0.037","sigma_a_cm-1":"4.19","sigma_b_cm-1_K-1":"0.0078"}
+          quote: "4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078"
+          locator: {page: 5, table: '3', row: "4"}
       values:
         quantity: brendel_oscillator_model_parameters
         method_class: model_derived
+        admission_status: model_output_not_measurement
         semantics: bound_not_point_ordering
         table_file: tables/kems-011-wetzel-gail-2013/t3.csv
-        note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+        note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
         - cells: {"osc_no":"1","omega0_a_cm-1":"1078.2","omega0_a_err":"2.57","omega0_b_cm-1_K-1":"0.064","omega0_b_err":"0.0048","omegap_a_cm-1":"311.0","omegap_a_err":"10.59","omegap_b_cm-1_K-1":"0.103","omegap_b_err":"0.020","sigma_a_cm-1":"48.74","sigma_a_err":"1.29","sigma_b_cm-1_K-1":"0.0056","sigma_b_err":"0.0024"}
           quote: "1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024"
@@ -385,7 +544,7 @@ species:
           quote: "4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078"
           locator: {page: 5, table: '3', row: "4"}
     - observation_id: wetzel_gail_2013_table4_quoted_model
-      type: rate_series
+      type: gibbs_table
       class: model
       locator: {page: 7, table: '4'}
       quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
@@ -395,9 +554,10 @@ species:
       values:
         quantity: dust_model_input_parameters
         method_class: model_derived
+        admission_status: model_output_not_measurement
         semantics: bound_not_point_ordering
         table_file: tables/kems-011-wetzel-gail-2013/t4.csv
-        note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+        note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
         - cells: {"species":"SiO","A_d":"44.09","rho_d_g_cm-3":"2.13","key_element":"Si","epsilon_key_element":"3.55e-5"}
           quote: "SiO | 44.09 | 2.13 | Si | 3.55 × 10^-5"
@@ -412,7 +572,7 @@ species:
           quote: "Pyroxene | 116.2 | 3.61 | Si | 3.55 × 10^-5"
           locator: {page: 7, table: '4', row: "Pyroxene"}
     - observation_id: wetzel_gail_2013_table5_quoted_model
-      type: rate_series
+      type: gibbs_table
       class: model
       locator: {page: 8, table: '5'}
       quote: 'Data used for calculation of silicon monoxide growth.'
@@ -422,9 +582,10 @@ species:
       values:
         quantity: dust_model_input_parameters
         method_class: model_derived
+        admission_status: model_output_not_measurement
         semantics: bound_not_point_ordering
         table_file: tables/kems-011-wetzel-gail-2013/t5.csv
-        note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+        note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
         - cells: {"quantity":"V_d","unit":"cm3","value":"3.46e-23"}
           quote: "V_d | cm3 | 3.46 × 10^-23"
@@ -454,7 +615,7 @@ species:
           quote: "R_c | cm | 3.2 × 10^13"
           locator: {page: 8, table: '5', row: "R_c"}
     - observation_id: wetzel_gail_2013_table6_quoted_model
-      type: rate_series
+      type: gibbs_table
       class: model
       locator: {page: 8, table: '6'}
       quote: 'Basic parameters of the dust-shell models'
@@ -464,9 +625,10 @@ species:
       values:
         quantity: dust_model_input_parameters
         method_class: model_derived
+        admission_status: model_output_not_measurement
         semantics: bound_not_point_ordering
         table_file: tables/kems-011-wetzel-gail-2013/t6.csv
-        note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
+        note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
         - cells: {"group":"Star","parameter":"T_eff","value":"2700 K"}
           quote: "Star | T_eff | 2700 K"
