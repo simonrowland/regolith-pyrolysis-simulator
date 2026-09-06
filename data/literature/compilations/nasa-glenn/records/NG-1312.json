@@ -1,0 +1,295 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1312",
+  "name_as_published": "BaCL2(a)",
+  "citation_as_published": "CrII,rhombic. Gurvich,1996a pt1 p574 pt2 p435.",
+  "cea_section": "products",
+  "formula": "BaCl2",
+  "phase": "a",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 2,
+  "source_ref_code": "tpis96",
+  "composition": [
+    {
+      "element_as_published": "BA",
+      "count_as_published": "  1.00",
+      "element": "Ba",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": "  2.00",
+      "element": "Cl",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "208.2330000",
+    "value": 208.233
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-855200.000",
+    "value": -855200.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "100.000",
+        "value": 100.0
+      },
+      "T_max_K": {
+        "as_published": "500.000",
+        "value": 500.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "16700.460",
+        "value": 16700.46
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-7.376444120D+04",
+          "value": -73764.4412
+        },
+        {
+          "as_published": "1.806760784D+03",
+          "value": 1806.760784
+        },
+        {
+          "as_published": "-1.415837573D+01",
+          "value": -14.15837573
+        },
+        {
+          "as_published": "1.391571933D-01",
+          "value": 0.1391571933
+        },
+        {
+          "as_published": "-4.179089240D-04",
+          "value": -0.000417908924
+        },
+        {
+          "as_published": "6.207438290D-07",
+          "value": 6.20743829e-07
+        },
+        {
+          "as_published": "-3.577305500D-10",
+          "value": -3.5773055e-10
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.127273901D+05",
+        "value": -112727.3901
+      },
+      "b2": {
+        "as_published": "7.349900590D+01",
+        "value": 73.4990059
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    100.000    500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16700.460",
+      "raw_coeff_lines": [
+        "-7.376444120D+04 1.806760784D+03-1.415837573D+01 1.391571933D-01-4.179089240D-04",
+        " 6.207438290D-07-3.577305500D-10                -1.127273901D+05 7.349900590D+01"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "500.000",
+        "value": 500.0
+      },
+      "T_max_K": {
+        "as_published": "1198.000",
+        "value": 1198.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "16700.460",
+        "value": 16700.46
+      },
+      "a_coefficients": [
+        {
+          "as_published": "7.096028509D+02",
+          "value": 709.6028509
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "8.343245723D+00",
+          "value": 8.343245723
+        },
+        {
+          "as_published": "2.300676769D-03",
+          "value": 0.002300676769
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.054434434D+05",
+        "value": -105443.4434
+      },
+      "b2": {
+        "as_published": "-3.333989736D+01",
+        "value": -33.33989736
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    500.000   1198.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16700.460",
+      "raw_coeff_lines": [
+        " 7.096028509D+02 0.000000000D+00 8.343245723D+00 2.300676769D-03 0.000000000D+00",
+        " 0.000000000D+00 0.000000000D+00                -1.054434434D+05-3.333989736D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 11240,
+    "header_line": 11241,
+    "end_line": 11247
+  },
+  "source_text": {
+    "name_line": "BaCL2(a)          CrII,rhombic. Gurvich,1996a pt1 p574 pt2 p435.",
+    "header_line": " 2 tpis96 BA  1.00CL  2.00    0.00    0.00    0.00 1  208.2330000    -855200.000",
+    "interval_lines": [
+      "    100.000    500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16700.460",
+      "-7.376444120D+04 1.806760784D+03-1.415837573D+01 1.391571933D-01-4.179089240D-04",
+      " 6.207438290D-07-3.577305500D-10                -1.127273901D+05 7.349900590D+01",
+      "    500.000   1198.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16700.460",
+      " 7.096028509D+02 0.000000000D+00 8.343245723D+00 2.300676769D-03 0.000000000D+00",
+      " 0.000000000D+00 0.000000000D+00                -1.054434434D+05-3.333989736D+01"
+    ]
+  }
+}

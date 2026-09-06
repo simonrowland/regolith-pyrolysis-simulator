@@ -1,0 +1,295 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1492",
+  "name_as_published": "FeSO4(cr)",
+  "citation_as_published": "Chase,1998 p1240.",
+  "cea_section": "products",
+  "formula": "FeSO4",
+  "phase": "cr",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 2,
+  "source_ref_code": "j 6/66",
+  "composition": [
+    {
+      "element_as_published": "FE",
+      "count_as_published": "  1.00",
+      "element": "Fe",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": "  1.00",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  4.00",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "151.9076000",
+    "value": 151.9076
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-928848.000",
+    "value": -928848.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "700.000",
+        "value": 700.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "16769.472",
+        "value": 16769.472
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-6.203392950D+05",
+          "value": -620339.295
+        },
+        {
+          "as_published": "8.502519150D+03",
+          "value": 8502.51915
+        },
+        {
+          "as_published": "-4.378024090D+01",
+          "value": -43.7802409
+        },
+        {
+          "as_published": "1.731987422D-01",
+          "value": 0.1731987422
+        },
+        {
+          "as_published": "-2.431424518D-04",
+          "value": -0.0002431424518
+        },
+        {
+          "as_published": "1.792173046D-07",
+          "value": 1.792173046e-07
+        },
+        {
+          "as_published": "-5.528922570D-11",
+          "value": -5.52892257e-11
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.550636343D+05",
+        "value": -155063.6343
+      },
+      "b2": {
+        "as_published": "2.467116078D+02",
+        "value": 246.7116078
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000    700.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16769.472",
+      "raw_coeff_lines": [
+        "-6.203392950D+05 8.502519150D+03-4.378024090D+01 1.731987422D-01-2.431424518D-04",
+        " 1.792173046D-07-5.528922570D-11                -1.550636343D+05 2.467116078D+02"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "700.000",
+        "value": 700.0
+      },
+      "T_max_K": {
+        "as_published": "2000.000",
+        "value": 2000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "16769.472",
+        "value": 16769.472
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-7.679585180D+06",
+          "value": -7679585.18
+        },
+        {
+          "as_published": "3.308117000D+04",
+          "value": 33081.17
+        },
+        {
+          "as_published": "-4.678167570D+01",
+          "value": -46.7816757
+        },
+        {
+          "as_published": "6.781223220D-02",
+          "value": 0.0678122322
+        },
+        {
+          "as_published": "-3.741392130D-05",
+          "value": -3.74139213e-05
+        },
+        {
+          "as_published": "1.099952323D-08",
+          "value": 1.099952323e-08
+        },
+        {
+          "as_published": "-1.320141816D-12",
+          "value": -1.320141816e-12
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-3.134827612D+05",
+        "value": -313482.7612
+      },
+      "b2": {
+        "as_published": "3.336437670D+02",
+        "value": 333.643767
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    700.000   2000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16769.472",
+      "raw_coeff_lines": [
+        "-7.679585180D+06 3.308117000D+04-4.678167570D+01 6.781223220D-02-3.741392130D-05",
+        " 1.099952323D-08-1.320141816D-12                -3.134827612D+05 3.336437670D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 12290,
+    "header_line": 12291,
+    "end_line": 12297
+  },
+  "source_text": {
+    "name_line": "FeSO4(cr)         Chase,1998 p1240.",
+    "header_line": " 2 j 6/66 FE  1.00S   1.00O   4.00    0.00    0.00 1  151.9076000    -928848.000",
+    "interval_lines": [
+      "    300.000    700.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16769.472",
+      "-6.203392950D+05 8.502519150D+03-4.378024090D+01 1.731987422D-01-2.431424518D-04",
+      " 1.792173046D-07-5.528922570D-11                -1.550636343D+05 2.467116078D+02",
+      "    700.000   2000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16769.472",
+      "-7.679585180D+06 3.308117000D+04-4.678167570D+01 6.781223220D-02-3.741392130D-05",
+      " 1.099952323D-08-1.320141816D-12                -3.134827612D+05 3.336437670D+02"
+    ]
+  }
+}

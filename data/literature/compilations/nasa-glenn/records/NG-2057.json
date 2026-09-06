@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2057",
+  "name_as_published": "C6H14(L),n-hexa",
+  "citation_as_published": "n-hexane. TRC(4/85) p,tc,uc,vc1440,1441.                React.",
+  "cea_section": "reactants",
+  "formula": "C6H14",
+  "phase": "L",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "n 4/85",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  6.00",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 14.00",
+      "element": "H",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "86.1753600",
+    "value": 86.17536
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-198660.000",
+    "value": -198660.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "177.860",
+        "value": 177.86
+      },
+      "T_max_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "46920.000",
+        "value": 46920.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "7.721016130D+06",
+          "value": 7721016.13
+        },
+        {
+          "as_published": "-2.249298616D+05",
+          "value": -224929.8616
+        },
+        {
+          "as_published": "2.717090647D+03",
+          "value": 2717.090647
+        },
+        {
+          "as_published": "-1.698251992D+01",
+          "value": -16.98251992
+        },
+        {
+          "as_published": "5.907215180D-02",
+          "value": 0.0590721518
+        },
+        {
+          "as_published": "-1.074528475D-04",
+          "value": -0.0001074528475
+        },
+        {
+          "as_published": "8.024238270D-08",
+          "value": 8.02423827e-08
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "8.808691730D+05",
+        "value": 880869.173
+      },
+      "b2": {
+        "as_published": "-1.292771483D+04",
+        "value": -12927.71483
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    177.860    300.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        46920.000",
+      "raw_coeff_lines": [
+        " 7.721016130D+06-2.249298616D+05 2.717090647D+03-1.698251992D+01 5.907215180D-02",
+        "-1.074528475D-04 8.024238270D-08                 8.808691730D+05-1.292771483D+04"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15574,
+    "header_line": 15575,
+    "end_line": 15578
+  },
+  "source_text": {
+    "name_line": "C6H14(L),n-hexa   n-hexane. TRC(4/85) p,tc,uc,vc1440,1441.                React.",
+    "header_line": " 1 n 4/85 C   6.00H  14.00    0.00    0.00    0.00 1   86.1753600    -198660.000",
+    "interval_lines": [
+      "    177.860    300.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        46920.000",
+      " 7.721016130D+06-2.249298616D+05 2.717090647D+03-1.698251992D+01 5.907215180D-02",
+      "-1.074528475D-04 8.024238270D-08                 8.808691730D+05-1.292771483D+04"
+    ]
+  }
+}

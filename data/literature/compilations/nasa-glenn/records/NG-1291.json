@@ -1,0 +1,396 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1291",
+  "name_as_published": "AL2SiO5(an)",
+  "citation_as_published": "Andalusite. Chase,1998 p160.",
+  "cea_section": "products",
+  "formula": "Al2SiO5",
+  "phase": "condensed",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 3,
+  "source_ref_code": "j 9/67",
+  "composition": [
+    {
+      "element_as_published": "AL",
+      "count_as_published": "  2.00",
+      "element": "Al",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "SI",
+      "count_as_published": "  1.00",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  5.00",
+      "element": "O",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "162.0455760",
+    "value": 162.045576
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-2592072.000",
+    "value": -2592072.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "600.000",
+        "value": 600.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "17093.000",
+        "value": 17093.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-5.435020350D+05",
+          "value": -543502.035
+        },
+        {
+          "as_published": "8.364904470D+03",
+          "value": 8364.90447
+        },
+        {
+          "as_published": "-5.479541870D+01",
+          "value": -54.7954187
+        },
+        {
+          "as_published": "2.421451459D-01",
+          "value": 0.2421451459
+        },
+        {
+          "as_published": "-3.247828060D-04",
+          "value": -0.000324782806
+        },
+        {
+          "as_published": "1.619746222D-07",
+          "value": 1.619746222e-07
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-3.531115760D+05",
+        "value": -353111.576
+      },
+      "b2": {
+        "as_published": "2.892220103D+02",
+        "value": 289.2220103
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000    600.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17093.000",
+      "raw_coeff_lines": [
+        "-5.435020350D+05 8.364904470D+03-5.479541870D+01 2.421451459D-01-3.247828060D-04",
+        " 1.619746222D-07 0.000000000D+00                -3.531115760D+05 2.892220103D+02"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "600.000",
+        "value": 600.0
+      },
+      "T_max_K": {
+        "as_published": "1500.000",
+        "value": 1500.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "17093.000",
+        "value": 17093.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "9.635670330D+06",
+          "value": 9635670.33
+        },
+        {
+          "as_published": "-6.505315100D+04",
+          "value": -65053.151
+        },
+        {
+          "as_published": "1.886717981D+02",
+          "value": 188.6717981
+        },
+        {
+          "as_published": "-2.227599181D-01",
+          "value": -0.2227599181
+        },
+        {
+          "as_published": "1.677460173D-04",
+          "value": 0.0001677460173
+        },
+        {
+          "as_published": "-6.532301110D-08",
+          "value": -6.53230111e-08
+        },
+        {
+          "as_published": "1.041420443D-11",
+          "value": 1.041420443e-11
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "4.284683500D+04",
+        "value": 42846.835
+      },
+      "b2": {
+        "as_published": "-1.170130476D+03",
+        "value": -1170.130476
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    600.000   1500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17093.000",
+      "raw_coeff_lines": [
+        " 9.635670330D+06-6.505315100D+04 1.886717981D+02-2.227599181D-01 1.677460173D-04",
+        "-6.532301110D-08 1.041420443D-11                 4.284683500D+04-1.170130476D+03"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1500.000",
+        "value": 1500.0
+      },
+      "T_max_K": {
+        "as_published": "3000.000",
+        "value": 3000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "17093.000",
+        "value": 17093.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "5.600590290D+07",
+          "value": 56005902.9
+        },
+        {
+          "as_published": "-1.591905491D+05",
+          "value": -159190.5491
+        },
+        {
+          "as_published": "2.058003747D+02",
+          "value": 205.8003747
+        },
+        {
+          "as_published": "-1.103017260D-01",
+          "value": -0.110301726
+        },
+        {
+          "as_published": "3.860284650D-05",
+          "value": 3.86028465e-05
+        },
+        {
+          "as_published": "-6.943079960D-09",
+          "value": -6.94307996e-09
+        },
+        {
+          "as_published": "5.126291370D-13",
+          "value": 5.12629137e-13
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "6.964365160D+05",
+        "value": 696436.516
+      },
+      "b2": {
+        "as_published": "-1.424396263D+03",
+        "value": -1424.396263
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1500.000   3000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17093.000",
+      "raw_coeff_lines": [
+        " 5.600590290D+07-1.591905491D+05 2.058003747D+02-1.103017260D-01 3.860284650D-05",
+        "-6.943079960D-09 5.126291370D-13                 6.964365160D+05-1.424396263D+03"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 27,
+  "interval_count": 3,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 11105,
+    "header_line": 11106,
+    "end_line": 11115
+  },
+  "source_text": {
+    "name_line": "AL2SiO5(an)       Andalusite. Chase,1998 p160.",
+    "header_line": " 3 j 9/67 AL  2.00SI  1.00O   5.00    0.00    0.00 1  162.0455760   -2592072.000",
+    "interval_lines": [
+      "    300.000    600.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17093.000",
+      "-5.435020350D+05 8.364904470D+03-5.479541870D+01 2.421451459D-01-3.247828060D-04",
+      " 1.619746222D-07 0.000000000D+00                -3.531115760D+05 2.892220103D+02",
+      "    600.000   1500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17093.000",
+      " 9.635670330D+06-6.505315100D+04 1.886717981D+02-2.227599181D-01 1.677460173D-04",
+      "-6.532301110D-08 1.041420443D-11                 4.284683500D+04-1.170130476D+03",
+      "   1500.000   3000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17093.000",
+      " 5.600590290D+07-1.591905491D+05 2.058003747D+02-1.103017260D-01 3.860284650D-05",
+      "-6.943079960D-09 5.126291370D-13                 6.964365160D+05-1.424396263D+03"
+    ]
+  }
+}

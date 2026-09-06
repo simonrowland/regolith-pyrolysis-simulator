@@ -1,0 +1,295 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-0431",
+  "name_as_published": "CH3C(CH3)2CH3",
+  "citation_as_published": "2,2-Dimethylpropane (neopentane). TRC(10/85) tuvw1350.",
+  "cea_section": "products",
+  "formula": "C5H12",
+  "phase": "gas",
+  "phase_flag": 0,
+  "phase_flag_as_published": " 0",
+  "n_intervals_declared": 2,
+  "source_ref_code": "n10/85",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  5.00",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 12.00",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "72.1487800",
+    "value": 72.14878
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-167920.000",
+    "value": -167920.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "23179.000",
+        "value": 23179.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-8.973222270D+06",
+          "value": -8973222.27
+        },
+        {
+          "as_published": "1.289225617D+05",
+          "value": 128922.5617
+        },
+        {
+          "as_published": "-7.199344830D+02",
+          "value": -719.934483
+        },
+        {
+          "as_published": "2.056862183D+00",
+          "value": 2.056862183
+        },
+        {
+          "as_published": "-2.953159699D-03",
+          "value": -0.002953159699
+        },
+        {
+          "as_published": "2.158893146D-06",
+          "value": 2.158893146e-06
+        },
+        {
+          "as_published": "-6.268318770D-10",
+          "value": -6.26831877e-10
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-6.394932020D+05",
+        "value": -639493.202
+      },
+      "b2": {
+        "as_published": "4.020806360D+03",
+        "value": 4020.80636
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        23179.000",
+      "raw_coeff_lines": [
+        "-8.973222270D+06 1.289225617D+05-7.199344830D+02 2.056862183D+00-2.953159699D-03",
+        " 2.158893146D-06-6.268318770D-10                -6.394932020D+05 4.020806360D+03"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "23179.000",
+        "value": 23179.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "1.684705520D+07",
+          "value": 16847055.2
+        },
+        {
+          "as_published": "-5.979430570D+04",
+          "value": -59794.3057
+        },
+        {
+          "as_published": "8.685451480D+01",
+          "value": 86.8545148
+        },
+        {
+          "as_published": "-9.621917600D-03",
+          "value": -0.0096219176
+        },
+        {
+          "as_published": "1.653363091D-06",
+          "value": 1.653363091e-06
+        },
+        {
+          "as_published": "-1.674727926D-10",
+          "value": -1.674727926e-10
+        },
+        {
+          "as_published": "7.372119360D-15",
+          "value": 7.37211936e-15
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "3.458496820D+05",
+        "value": 345849.682
+      },
+      "b2": {
+        "as_published": "-5.760466970D+02",
+        "value": -576.046697
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        23179.000",
+      "raw_coeff_lines": [
+        " 1.684705520D+07-5.979430570D+04 8.685451480D+01-9.621917600D-03 1.653363091D-06",
+        "-1.674727926D-10 7.372119360D-15                 3.458496820D+05-5.760466970D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 3634,
+    "header_line": 3635,
+    "end_line": 3641
+  },
+  "source_text": {
+    "name_line": "CH3C(CH3)2CH3     2,2-Dimethylpropane (neopentane). TRC(10/85) tuvw1350.",
+    "header_line": " 2 n10/85 C   5.00H  12.00    0.00    0.00    0.00 0   72.1487800    -167920.000",
+    "interval_lines": [
+      "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        23179.000",
+      "-8.973222270D+06 1.289225617D+05-7.199344830D+02 2.056862183D+00-2.953159699D-03",
+      " 2.158893146D-06-6.268318770D-10                -6.394932020D+05 4.020806360D+03",
+      "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        23179.000",
+      " 1.684705520D+07-5.979430570D+04 8.685451480D+01-9.621917600D-03 1.653363091D-06",
+      "-1.674727926D-10 7.372119360D-15                 3.458496820D+05-5.760466970D+02"
+    ]
+  }
+}

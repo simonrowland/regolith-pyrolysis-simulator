@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1505",
+  "name_as_published": "GaCL3(L)",
+  "citation_as_published": "Liquid. Gurvich,1996a pt1 p234 pt2 p188.",
+  "cea_section": "products",
+  "formula": "GaCl3",
+  "phase": "L",
+  "phase_flag": 2,
+  "phase_flag_as_published": " 2",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis96",
+  "composition": [
+    {
+      "element_as_published": "GA",
+      "count_as_published": "  1.00",
+      "element": "Ga",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": "  3.00",
+      "element": "Cl",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "176.0820000",
+    "value": 176.082
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-527000.000",
+    "value": -527000.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "351.000",
+        "value": 351.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "20000.000",
+        "value": 20000.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.310961199D+01",
+          "value": 13.10961199
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-6.599449360D+04",
+        "value": -65994.4936
+      },
+      "b2": {
+        "as_published": "-5.489418092D+01",
+        "value": -54.89418092
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    351.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        20000.000",
+      "raw_coeff_lines": [
+        " 0.000000000D+00 0.000000000D+00 1.310961199D+01 0.000000000D+00 0.000000000D+00",
+        " 0.000000000D+00 0.000000000D+00                -6.599449360D+04-5.489418092D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 12376,
+    "header_line": 12377,
+    "end_line": 12380
+  },
+  "source_text": {
+    "name_line": "GaCL3(L)          Liquid. Gurvich,1996a pt1 p234 pt2 p188.",
+    "header_line": " 1 tpis96 GA  1.00CL  3.00    0.00    0.00    0.00 2  176.0820000    -527000.000",
+    "interval_lines": [
+      "    351.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        20000.000",
+      " 0.000000000D+00 0.000000000D+00 1.310961199D+01 0.000000000D+00 0.000000000D+00",
+      " 0.000000000D+00 0.000000000D+00                -6.599449360D+04-5.489418092D+01"
+    ]
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2082",
+  "name_as_published": "InertJP-10(g)",
+  "citation_as_published": "Exo-tetrahydrodicyclopentadiene. Zehe,2002.             React.",
+  "cea_section": "reactants",
+  "formula": "IC10IH16",
+  "phase": "g",
+  "phase_flag": 0,
+  "phase_flag_as_published": " 0",
+  "n_intervals_declared": 2,
+  "source_ref_code": "g 6/01",
+  "composition": [
+    {
+      "element_as_published": "IC",
+      "count_as_published": " 10.00",
+      "element": "IC",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "IH",
+      "count_as_published": " 16.00",
+      "element": "IH",
+      "count": 16.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "136.2340400",
+    "value": 136.23404
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-86855.900",
+    "value": -86855.9,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "22997.434",
+        "value": 22997.434
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-7.310769440D+05",
+          "value": -731076.944
+        },
+        {
+          "as_published": "1.521764245D+04",
+          "value": 15217.64245
+        },
+        {
+          "as_published": "-1.139312644D+02",
+          "value": -113.9312644
+        },
+        {
+          "as_published": "4.281501620D-01",
+          "value": 0.428150162
+        },
+        {
+          "as_published": "-5.218740440D-04",
+          "value": -0.000521874044
+        },
+        {
+          "as_published": "3.357233400D-07",
+          "value": 3.3572334e-07
+        },
+        {
+          "as_published": "-8.805750980D-11",
+          "value": -8.80575098e-11
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-8.067482120D+04",
+        "value": -80674.8212
+      },
+      "b2": {
+        "as_published": "6.320148610D+02",
+        "value": 632.014861
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        22997.434",
+      "raw_coeff_lines": [
+        "-7.310769440D+05 1.521764245D+04-1.139312644D+02 4.281501620D-01-5.218740440D-04",
+        " 3.357233400D-07-8.805750980D-11                -8.067482120D+04 6.320148610D+02"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "22997.434",
+        "value": 22997.434
+      },
+      "a_coefficients": [
+        {
+          "as_published": "1.220329594D+07",
+          "value": 12203295.94
+        },
+        {
+          "as_published": "-5.794846240D+04",
+          "value": -57948.4624
+        },
+        {
+          "as_published": "1.092281156D+02",
+          "value": 109.2281156
+        },
+        {
+          "as_published": "-1.082406215D-02",
+          "value": -0.01082406215
+        },
+        {
+          "as_published": "2.034992622D-06",
+          "value": 2.034992622e-06
+        },
+        {
+          "as_published": "-2.052060369D-10",
+          "value": -2.052060369e-10
+        },
+        {
+          "as_published": "8.575760210D-15",
+          "value": 8.57576021e-15
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "3.257334050D+05",
+        "value": 325733.405
+      },
+      "b2": {
+        "as_published": "-7.092350760D+02",
+        "value": -709.235076
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        22997.434",
+      "raw_coeff_lines": [
+        " 1.220329594D+07-5.794846240D+04 1.092281156D+02-1.082406215D-02 2.034992622D-06",
+        "-2.052060369D-10 8.575760210D-15                 3.257334050D+05-7.092350760D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "nonstandard_element_token",
+      "slot": 0,
+      "element_as_published": "IC",
+      "normalized": "IC"
+    },
+    {
+      "kind": "nonstandard_element_token",
+      "slot": 1,
+      "element_as_published": "IH",
+      "normalized": "IH"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15671,
+    "header_line": 15672,
+    "end_line": 15678
+  },
+  "source_text": {
+    "name_line": "InertJP-10(g)     Exo-tetrahydrodicyclopentadiene. Zehe,2002.             React.",
+    "header_line": " 2 g 6/01 IC 10.00IH 16.00    0.00    0.00    0.00 0  136.2340400     -86855.900",
+    "interval_lines": [
+      "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        22997.434",
+      "-7.310769440D+05 1.521764245D+04-1.139312644D+02 4.281501620D-01-5.218740440D-04",
+      " 3.357233400D-07-8.805750980D-11                -8.067482120D+04 6.320148610D+02",
+      "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        22997.434",
+      " 1.220329594D+07-5.794846240D+04 1.092281156D+02-1.082406215D-02 2.034992622D-06",
+      "-2.052060369D-10 8.575760210D-15                 3.257334050D+05-7.092350760D+02"
+    ]
+  }
+}

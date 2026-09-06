@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2045",
+  "name_as_published": "C2H5OH(L)",
+  "citation_as_published": "Ethanol. TRC(12/87) p5000 (12/84) tc,uc,vc5031-3.       React.",
+  "cea_section": "reactants",
+  "formula": "C2H6O",
+  "phase": "L",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "n12/84",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  2.00",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  6.00",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  1.00",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "46.0684400",
+    "value": 46.06844
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-277510.000",
+    "value": -277510.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "159.000",
+        "value": 159.0
+      },
+      "T_max_K": {
+        "as_published": "390.000",
+        "value": 390.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "24082.000",
+        "value": 24082.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "4.501115940D+05",
+          "value": 450111.594
+        },
+        {
+          "as_published": "-1.020828990D+04",
+          "value": -10208.2899
+        },
+        {
+          "as_published": "1.014266780D+02",
+          "value": 101.426678
+        },
+        {
+          "as_published": "-3.874672610D-01",
+          "value": -0.387467261
+        },
+        {
+          "as_published": "7.121392610D-04",
+          "value": 0.000712139261
+        },
+        {
+          "as_published": "-1.857071450D-07",
+          "value": -1.85707145e-07
+        },
+        {
+          "as_published": "-2.037622570D-10",
+          "value": -2.03762257e-10
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "7.448557900D+03",
+        "value": 7448.5579
+      },
+      "b2": {
+        "as_published": "-5.044255520D+02",
+        "value": -504.425552
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    159.000    390.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        24082.000",
+      "raw_coeff_lines": [
+        " 4.501115940D+05-1.020828990D+04 1.014266780D+02-3.874672610D-01 7.121392610D-04",
+        "-1.857071450D-07-2.037622570D-10                 7.448557900D+03-5.044255520D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15532,
+    "header_line": 15533,
+    "end_line": 15536
+  },
+  "source_text": {
+    "name_line": "C2H5OH(L)         Ethanol. TRC(12/87) p5000 (12/84) tc,uc,vc5031-3.       React.",
+    "header_line": " 1 n12/84 C   2.00H   6.00O   1.00    0.00    0.00 1   46.0684400    -277510.000",
+    "interval_lines": [
+      "    159.000    390.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        24082.000",
+      " 4.501115940D+05-1.020828990D+04 1.014266780D+02-3.874672610D-01 7.121392610D-04",
+      "-1.857071450D-07-2.037622570D-10                 7.448557900D+03-5.044255520D+02"
+    ]
+  }
+}

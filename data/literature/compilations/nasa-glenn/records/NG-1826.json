@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1826",
+  "name_as_published": "RbNO3(II)",
+  "citation_as_published": "Hexagonal. Gurvich,1982 pt1 p455 pt2 p479.",
+  "cea_section": "products",
+  "formula": "RbNO3",
+  "phase": "II",
+  "phase_flag": 3,
+  "phase_flag_as_published": " 3",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis82",
+  "composition": [
+    {
+      "element_as_published": "RB",
+      "count_as_published": "  1.00",
+      "element": "Rb",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": "  1.00",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  3.00",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "147.4727000",
+    "value": 147.4727
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-494700.000",
+    "value": -494700.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "493.000",
+        "value": 493.0
+      },
+      "T_max_K": {
+        "as_published": "556.000",
+        "value": 556.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "19640.000",
+        "value": 19640.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.078616780D+02",
+          "value": 107.861678
+        },
+        {
+          "as_published": "-2.821762196D-01",
+          "value": -0.2821762196
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "3.922207081D-07",
+          "value": 3.922207081e-07
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-8.057470150D+04",
+        "value": -80574.7015
+      },
+      "b2": {
+        "as_published": "-5.191016028D+02",
+        "value": -519.1016028
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    493.000    556.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        19640.000",
+      "raw_coeff_lines": [
+        " 0.000000000D+00 0.000000000D+00 1.078616780D+02-2.821762196D-01 0.000000000D+00",
+        " 3.922207081D-07 0.000000000D+00                -8.057470150D+04-5.191016028D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 14248,
+    "header_line": 14249,
+    "end_line": 14252
+  },
+  "source_text": {
+    "name_line": "RbNO3(II)         Hexagonal. Gurvich,1982 pt1 p455 pt2 p479.",
+    "header_line": " 1 tpis82 RB  1.00N   1.00O   3.00    0.00    0.00 3  147.4727000    -494700.000",
+    "interval_lines": [
+      "    493.000    556.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        19640.000",
+      " 0.000000000D+00 0.000000000D+00 1.078616780D+02-2.821762196D-01 0.000000000D+00",
+      " 3.922207081D-07 0.000000000D+00                -8.057470150D+04-5.191016028D+02"
+    ]
+  }
+}

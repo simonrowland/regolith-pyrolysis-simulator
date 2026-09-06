@@ -35,6 +35,10 @@ Currently misfiled in `../extracts/`: `janaf-4th`, `nist-webbook`, `nasa-cea-the
 `simulator/chemistry/offgas_fo2.py:109` reads `data/literature/extracts/nasa-cea-thermo.yaml`
 directly. Migration is a code change, not a file move.
 
+NASA Glenn / CEA `thermo.inp` now lives at `./nasa-glenn/` (complete 2111-record
+harvest). The 1615-species extract `../extracts/nasa-cea-thermo.yaml` is left in
+place this round and is superseded by that compilation.
+
 ## Status of what we actually hold
 
 `janaf/` is a target-first partial harvest of NIST-JANAF 4th edition HTML tables (380 species).
@@ -47,3 +51,6 @@ and coverage are in `sgte-unary/README.md`. Compilations still produce no scorin
 `janaf-4th.yaml` (still under `../extracts/`) is **not JANAF**. It is a `review_status: draft` manual transcription of a few
 phosphorus carriers, pointing at `janaf.nist.gov` table URLs. The full NIST-JANAF 4th edition is
 ~1,800 species tables and is freely available. Completing the JANAF harvest is an open task.
+
+`nasa-glenn/` is the complete CEA `thermo.inp` compilation (products + reactants,
+ions and condensed phases included). See `nasa-glenn/README.md`.

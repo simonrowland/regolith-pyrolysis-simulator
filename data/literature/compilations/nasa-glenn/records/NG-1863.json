@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1863",
+  "name_as_published": "SiO2(b-qz)",
+  "citation_as_published": "Beta-quartz,hexagonal. Gurvich,1991 pt1 p250 pt2 p228.",
+  "cea_section": "products",
+  "formula": "SiO2",
+  "phase": "condensed",
+  "phase_flag": 2,
+  "phase_flag_as_published": " 2",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis91",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": "  1.00",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  2.00",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "60.0843000",
+    "value": 60.0843
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-910700.000",
+    "value": -910700.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "848.000",
+        "value": 848.0
+      },
+      "T_max_K": {
+        "as_published": "1200.000",
+        "value": 1200.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "6916.000",
+        "value": 6916.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "2.317635074D+04",
+          "value": 23176.35074
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "7.026511484D+00",
+          "value": 7.026511484
+        },
+        {
+          "as_published": "1.241925261D-03",
+          "value": 0.001241925261
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.117012474D+05",
+        "value": -111701.2474
+      },
+      "b2": {
+        "as_published": "-3.580751356D+01",
+        "value": -35.80751356
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    848.000   1200.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6916.000",
+      "raw_coeff_lines": [
+        " 2.317635074D+04 0.000000000D+00 7.026511484D+00 1.241925261D-03 0.000000000D+00",
+        " 0.000000000D+00 0.000000000D+00                -1.117012474D+05-3.580751356D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 14463,
+    "header_line": 14464,
+    "end_line": 14467
+  },
+  "source_text": {
+    "name_line": "SiO2(b-qz)        Beta-quartz,hexagonal. Gurvich,1991 pt1 p250 pt2 p228.",
+    "header_line": " 1 tpis91 SI  1.00O   2.00    0.00    0.00    0.00 2   60.0843000    -910700.000",
+    "interval_lines": [
+      "    848.000   1200.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6916.000",
+      " 2.317635074D+04 0.000000000D+00 7.026511484D+00 1.241925261D-03 0.000000000D+00",
+      " 0.000000000D+00 0.000000000D+00                -1.117012474D+05-3.580751356D+01"
+    ]
+  }
+}

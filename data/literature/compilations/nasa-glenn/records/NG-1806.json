@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1806",
+  "name_as_published": "Pb3O4(cr)",
+  "citation_as_published": "Tetragonal. Gurvich,1991 pt1 p418 pt2 p349.",
+  "cea_section": "products",
+  "formula": "Pb3O4",
+  "phase": "cr",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis91",
+  "composition": [
+    {
+      "element_as_published": "PB",
+      "count_as_published": "  3.00",
+      "element": "Pb",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  4.00",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "685.5976000",
+    "value": 685.5976
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-720000.000",
+    "value": -720000.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "29830.000",
+        "value": 29830.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "7.031601470D+06",
+          "value": 7031601.47
+        },
+        {
+          "as_published": "-8.770415980D+04",
+          "value": -87704.1598
+        },
+        {
+          "as_published": "4.195886490D+02",
+          "value": 419.588649
+        },
+        {
+          "as_published": "-9.058738460D-01",
+          "value": -0.905873846
+        },
+        {
+          "as_published": "1.138287119D-03",
+          "value": 0.001138287119
+        },
+        {
+          "as_published": "-7.358926050D-07",
+          "value": -7.35892605e-07
+        },
+        {
+          "as_published": "1.922732625D-10",
+          "value": 1.922732625e-10
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "3.431611340D+05",
+        "value": 343161.134
+      },
+      "b2": {
+        "as_published": "-2.394229365D+03",
+        "value": -2394.229365
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        29830.000",
+      "raw_coeff_lines": [
+        " 7.031601470D+06-8.770415980D+04 4.195886490D+02-9.058738460D-01 1.138287119D-03",
+        "-7.358926050D-07 1.922732625D-10                 3.431611340D+05-2.394229365D+03"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 14142,
+    "header_line": 14143,
+    "end_line": 14146
+  },
+  "source_text": {
+    "name_line": "Pb3O4(cr)         Tetragonal. Gurvich,1991 pt1 p418 pt2 p349.",
+    "header_line": " 1 tpis91 PB  3.00O   4.00    0.00    0.00    0.00 1  685.5976000    -720000.000",
+    "interval_lines": [
+      "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        29830.000",
+      " 7.031601470D+06-8.770415980D+04 4.195886490D+02-9.058738460D-01 1.138287119D-03",
+      "-7.358926050D-07 1.922732625D-10                 3.431611340D+05-2.394229365D+03"
+    ]
+  }
+}

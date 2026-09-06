@@ -1,0 +1,396 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-0559",
+  "name_as_published": "F",
+  "citation_as_published": "Hf:Cox,1989.  Moore,1971. Moore,1970a. Gordon,1999.",
+  "cea_section": "products",
+  "formula": "F",
+  "phase": "gas",
+  "phase_flag": 0,
+  "phase_flag_as_published": " 0",
+  "n_intervals_declared": 3,
+  "source_ref_code": "g 5/97",
+  "composition": [
+    {
+      "element_as_published": "F ",
+      "count_as_published": "  1.00",
+      "element": "F",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "18.9984032",
+    "value": 18.9984032
+  },
+  "delta_f_H_298_15": {
+    "as_published": "79380.000",
+    "value": 79380.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "6518.460",
+        "value": 6518.46
+      },
+      "a_coefficients": [
+        {
+          "as_published": "1.137409088D+03",
+          "value": 1137.409088
+        },
+        {
+          "as_published": "-1.453392797D+02",
+          "value": -145.3392797
+        },
+        {
+          "as_published": "4.077403610D+00",
+          "value": 4.07740361
+        },
+        {
+          "as_published": "-4.303360140D-03",
+          "value": -0.00430336014
+        },
+        {
+          "as_published": "5.728897740D-06",
+          "value": 5.72889774e-06
+        },
+        {
+          "as_published": "-3.819312900D-09",
+          "value": -3.8193129e-09
+        },
+        {
+          "as_published": "1.018322509D-12",
+          "value": 1.018322509e-12
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "9.311110120D+03",
+        "value": 9311.11012
+      },
+      "b2": {
+        "as_published": "-3.558982650D+00",
+        "value": -3.55898265
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6518.460",
+      "raw_coeff_lines": [
+        " 1.137409088D+03-1.453392797D+02 4.077403610D+00-4.303360140D-03 5.728897740D-06",
+        "-3.819312900D-09 1.018322509D-12                 9.311110120D+03-3.558982650D+00"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "6518.460",
+        "value": 6518.46
+      },
+      "a_coefficients": [
+        {
+          "as_published": "1.473506226D+04",
+          "value": 14735.06226
+        },
+        {
+          "as_published": "8.149927360D+01",
+          "value": 81.4992736
+        },
+        {
+          "as_published": "2.444371819D+00",
+          "value": 2.444371819
+        },
+        {
+          "as_published": "2.120210026D-05",
+          "value": 2.120210026e-05
+        },
+        {
+          "as_published": "-4.546918620D-09",
+          "value": -4.54691862e-09
+        },
+        {
+          "as_published": "5.109528730D-13",
+          "value": 5.10952873e-13
+        },
+        {
+          "as_published": "-2.333894647D-17",
+          "value": -2.333894647e-17
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "8.388374650D+03",
+        "value": 8388.37465
+      },
+      "b2": {
+        "as_published": "5.478710640D+00",
+        "value": 5.47871064
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6518.460",
+      "raw_coeff_lines": [
+        " 1.473506226D+04 8.149927360D+01 2.444371819D+00 2.120210026D-05-4.546918620D-09",
+        " 5.109528730D-13-2.333894647D-17                 8.388374650D+03 5.478710640D+00"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "T_max_K": {
+        "as_published": "20000.000",
+        "value": 20000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "6518.460",
+        "value": 6518.46
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-2.926724756D+07",
+          "value": -29267247.56
+        },
+        {
+          "as_published": "1.775674924D+04",
+          "value": 17756.74924
+        },
+        {
+          "as_published": "-1.814463258D+00",
+          "value": -1.814463258
+        },
+        {
+          "as_published": "5.351200280D-04",
+          "value": 0.000535120028
+        },
+        {
+          "as_published": "-3.513620800D-08",
+          "value": -3.5136208e-08
+        },
+        {
+          "as_published": "1.101519690D-12",
+          "value": 1.10151969e-12
+        },
+        {
+          "as_published": "-1.061293837D-17",
+          "value": -1.061293837e-17
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.319642721D+05",
+        "value": -131964.2721
+      },
+      "b2": {
+        "as_published": "4.248814560D+01",
+        "value": 42.4881456
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   6000.000  20000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6518.460",
+      "raw_coeff_lines": [
+        "-2.926724756D+07 1.775674924D+04-1.814463258D+00 5.351200280D-04-3.513620800D-08",
+        " 1.101519690D-12-1.061293837D-17                -1.319642721D+05 4.248814560D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 27,
+  "interval_count": 3,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 4739,
+    "header_line": 4740,
+    "end_line": 4749
+  },
+  "source_text": {
+    "name_line": "F                 Hf:Cox,1989.  Moore,1971. Moore,1970a. Gordon,1999.",
+    "header_line": " 3 g 5/97 F   1.00    0.00    0.00    0.00    0.00 0   18.9984032      79380.000",
+    "interval_lines": [
+      "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6518.460",
+      " 1.137409088D+03-1.453392797D+02 4.077403610D+00-4.303360140D-03 5.728897740D-06",
+      "-3.819312900D-09 1.018322509D-12                 9.311110120D+03-3.558982650D+00",
+      "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6518.460",
+      " 1.473506226D+04 8.149927360D+01 2.444371819D+00 2.120210026D-05-4.546918620D-09",
+      " 5.109528730D-13-2.333894647D-17                 8.388374650D+03 5.478710640D+00",
+      "   6000.000  20000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6518.460",
+      "-2.926724756D+07 1.775674924D+04-1.814463258D+00 5.351200280D-04-3.513620800D-08",
+      " 1.101519690D-12-1.061293837D-17                -1.319642721D+05 4.248814560D+01"
+    ]
+  }
+}

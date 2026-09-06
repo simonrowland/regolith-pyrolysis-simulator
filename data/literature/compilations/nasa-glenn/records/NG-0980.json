@@ -1,0 +1,295 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-0980",
+  "name_as_published": "P2O3",
+  "citation_as_published": "Gurvich,1989 pt1 p410 pt2 p262.",
+  "cea_section": "products",
+  "formula": "P2O3",
+  "phase": "gas",
+  "phase_flag": 0,
+  "phase_flag_as_published": " 0",
+  "n_intervals_declared": 2,
+  "source_ref_code": "tpis89",
+  "composition": [
+    {
+      "element_as_published": "P ",
+      "count_as_published": "  2.00",
+      "element": "P",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  3.00",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "109.9457220",
+    "value": 109.945722
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-684645.274",
+    "value": -684645.274,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "16094.881",
+        "value": 16094.881
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-6.645753890D+04",
+          "value": -66457.5389
+        },
+        {
+          "as_published": "7.580900550D+02",
+          "value": 758.090055
+        },
+        {
+          "as_published": "9.888436770D-01",
+          "value": 0.988843677
+        },
+        {
+          "as_published": "2.859878730D-02",
+          "value": 0.0285987873
+        },
+        {
+          "as_published": "-3.231142110D-05",
+          "value": -3.23114211e-05
+        },
+        {
+          "as_published": "1.834525170D-08",
+          "value": 1.83452517e-08
+        },
+        {
+          "as_published": "-4.212489300D-12",
+          "value": -4.2124893e-12
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-8.820036740D+04",
+        "value": -88200.3674
+      },
+      "b2": {
+        "as_published": "2.689914458D+01",
+        "value": 26.89914458
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16094.881",
+      "raw_coeff_lines": [
+        "-6.645753890D+04 7.580900550D+02 9.888436770D-01 2.859878730D-02-3.231142110D-05",
+        " 1.834525170D-08-4.212489300D-12                -8.820036740D+04 2.689914458D+01"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "16094.881",
+        "value": 16094.881
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-2.175344110D+05",
+          "value": -217534.411
+        },
+        {
+          "as_published": "-1.369902000D+03",
+          "value": -1369.902
+        },
+        {
+          "as_published": "1.401142960D+01",
+          "value": 14.0114296
+        },
+        {
+          "as_published": "-4.023856960D-04",
+          "value": -0.000402385696
+        },
+        {
+          "as_published": "8.868345780D-08",
+          "value": 8.86834578e-08
+        },
+        {
+          "as_published": "-1.015657280D-11",
+          "value": -1.01565728e-11
+        },
+        {
+          "as_published": "4.704356060D-16",
+          "value": 4.70435606e-16
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-7.922757000D+04",
+        "value": -79227.57
+      },
+      "b2": {
+        "as_published": "-4.739487232D+01",
+        "value": -47.39487232
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16094.881",
+      "raw_coeff_lines": [
+        "-2.175344110D+05-1.369902000D+03 1.401142960D+01-4.023856960D-04 8.868345780D-08",
+        "-1.015657280D-11 4.704356060D-16                -7.922757000D+04-4.739487232D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 8386,
+    "header_line": 8387,
+    "end_line": 8393
+  },
+  "source_text": {
+    "name_line": "P2O3              Gurvich,1989 pt1 p410 pt2 p262.",
+    "header_line": " 2 tpis89 P   2.00O   3.00    0.00    0.00    0.00 0  109.9457220    -684645.274",
+    "interval_lines": [
+      "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16094.881",
+      "-6.645753890D+04 7.580900550D+02 9.888436770D-01 2.859878730D-02-3.231142110D-05",
+      " 1.834525170D-08-4.212489300D-12                -8.820036740D+04 2.689914458D+01",
+      "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16094.881",
+      "-2.175344110D+05-1.369902000D+03 1.401142960D+01-4.023856960D-04 8.868345780D-08",
+      "-1.015657280D-11 4.704356060D-16                -7.922757000D+04-4.739487232D+01"
+    ]
+  }
+}

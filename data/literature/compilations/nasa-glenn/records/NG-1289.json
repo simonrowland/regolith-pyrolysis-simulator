@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1289",
+  "name_as_published": "AL2S3(b)",
+  "citation_as_published": "Rhombohedral gamma. Gurvich,1996a pt1 p201 pt2 p162.",
+  "cea_section": "products",
+  "formula": "Al2S3",
+  "phase": "b",
+  "phase_flag": 3,
+  "phase_flag_as_published": " 3",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis96",
+  "composition": [
+    {
+      "element_as_published": "AL",
+      "count_as_published": "  2.00",
+      "element": "Al",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": "  3.00",
+      "element": "S",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "150.1580760",
+    "value": 150.158076
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-648500.000",
+    "value": -648500.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "1273.000",
+        "value": 1273.0
+      },
+      "T_max_K": {
+        "as_published": "1373.000",
+        "value": 1373.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "18630.440",
+        "value": 18630.44
+      },
+      "a_coefficients": [
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.683803375D+01",
+          "value": 16.83803375
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-8.445251510D+04",
+        "value": -84452.5151
+      },
+      "b2": {
+        "as_published": "-8.466769750D+01",
+        "value": -84.6676975
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1273.000   1373.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        18630.440",
+      "raw_coeff_lines": [
+        " 0.000000000D+00 0.000000000D+00 1.683803375D+01 0.000000000D+00 0.000000000D+00",
+        " 0.000000000D+00 0.000000000D+00                -8.445251510D+04-8.466769750D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 11095,
+    "header_line": 11096,
+    "end_line": 11099
+  },
+  "source_text": {
+    "name_line": "AL2S3(b)          Rhombohedral gamma. Gurvich,1996a pt1 p201 pt2 p162.",
+    "header_line": " 1 tpis96 AL  2.00S   3.00    0.00    0.00    0.00 3  150.1580760    -648500.000",
+    "interval_lines": [
+      "   1273.000   1373.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        18630.440",
+      " 0.000000000D+00 0.000000000D+00 1.683803375D+01 0.000000000D+00 0.000000000D+00",
+      " 0.000000000D+00 0.000000000D+00                -8.445251510D+04-8.466769750D+01"
+    ]
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2058",
+  "name_as_published": "C7H8(L)",
+  "citation_as_published": "TRC(10/86) tc uc vc3200-1 (4/83) p-3200.                React.",
+  "cea_section": "reactants",
+  "formula": "C7H8",
+  "phase": "L",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "n10/86",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  7.00",
+      "element": "C",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  8.00",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "92.1384200",
+    "value": 92.13842
+  },
+  "delta_f_H_298_15": {
+    "as_published": "12180.000",
+    "value": 12180.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "178.150",
+        "value": 178.15
+      },
+      "T_max_K": {
+        "as_published": "500.000",
+        "value": 500.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "33470.000",
+        "value": 33470.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-3.713549510D+06",
+          "value": -3713549.51
+        },
+        {
+          "as_published": "7.772529030D+04",
+          "value": 77725.2903
+        },
+        {
+          "as_published": "-6.312269860D+02",
+          "value": -631.226986
+        },
+        {
+          "as_published": "2.724391982D+00",
+          "value": 2.724391982
+        },
+        {
+          "as_published": "-6.103535080D-03",
+          "value": -0.00610353508
+        },
+        {
+          "as_published": "7.022421900D-06",
+          "value": 7.0224219e-06
+        },
+        {
+          "as_published": "-3.113715680D-09",
+          "value": -3.11371568e-09
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-3.452115500D+05",
+        "value": -345211.55
+      },
+      "b2": {
+        "as_published": "3.265980710D+03",
+        "value": 3265.98071
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    178.150    500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        33470.000",
+      "raw_coeff_lines": [
+        "-3.713549510D+06 7.772529030D+04-6.312269860D+02 2.724391982D+00-6.103535080D-03",
+        " 7.022421900D-06-3.113715680D-09                -3.452115500D+05 3.265980710D+03"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15579,
+    "header_line": 15580,
+    "end_line": 15583
+  },
+  "source_text": {
+    "name_line": "C7H8(L)           TRC(10/86) tc uc vc3200-1 (4/83) p-3200.                React.",
+    "header_line": " 1 n10/86 C   7.00H   8.00    0.00    0.00    0.00 1   92.1384200      12180.000",
+    "interval_lines": [
+      "    178.150    500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        33470.000",
+      "-3.713549510D+06 7.772529030D+04-6.312269860D+02 2.724391982D+00-6.103535080D-03",
+      " 7.022421900D-06-3.113715680D-09                -3.452115500D+05 3.265980710D+03"
+    ]
+  }
+}

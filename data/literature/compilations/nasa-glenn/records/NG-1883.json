@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1883",
+  "name_as_published": "SnI2(cr)",
+  "citation_as_published": "Monoclinic. Gurvich,1991 pt1 p386 pt2 p328.",
+  "cea_section": "products",
+  "formula": "SnI2",
+  "phase": "cr",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis91",
+  "composition": [
+    {
+      "element_as_published": "SN",
+      "count_as_published": "  1.00",
+      "element": "Sn",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "I ",
+      "count_as_published": "  2.00",
+      "element": "I",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "372.5189400",
+    "value": 372.51894
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-153000.000",
+    "value": -153000.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "595.700",
+        "value": 595.7
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "18950.000",
+        "value": 18950.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "8.194427570D+05",
+          "value": 819442.757
+        },
+        {
+          "as_published": "-1.285027272D+04",
+          "value": -12850.27272
+        },
+        {
+          "as_published": "8.314392190D+01",
+          "value": 83.1439219
+        },
+        {
+          "as_published": "-1.959449848D-01",
+          "value": -0.1959449848
+        },
+        {
+          "as_published": "2.384765022D-04",
+          "value": 0.0002384765022
+        },
+        {
+          "as_published": "-9.891789320D-08",
+          "value": -9.89178932e-08
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "3.957086730D+04",
+        "value": 39570.8673
+      },
+      "b2": {
+        "as_published": "-4.432502620D+02",
+        "value": -443.250262
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000    595.7007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        18950.000",
+      "raw_coeff_lines": [
+        " 8.194427570D+05-1.285027272D+04 8.314392190D+01-1.959449848D-01 2.384765022D-04",
+        "-9.891789320D-08 0.000000000D+00                 3.957086730D+04-4.432502620D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 14584,
+    "header_line": 14585,
+    "end_line": 14588
+  },
+  "source_text": {
+    "name_line": "SnI2(cr)          Monoclinic. Gurvich,1991 pt1 p386 pt2 p328.",
+    "header_line": " 1 tpis91 SN  1.00I   2.00    0.00    0.00    0.00 1  372.5189400    -153000.000",
+    "interval_lines": [
+      "    300.000    595.7007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        18950.000",
+      " 8.194427570D+05-1.285027272D+04 8.314392190D+01-1.959449848D-01 2.384765022D-04",
+      "-9.891789320D-08 0.000000000D+00                 3.957086730D+04-4.432502620D+02"
+    ]
+  }
+}

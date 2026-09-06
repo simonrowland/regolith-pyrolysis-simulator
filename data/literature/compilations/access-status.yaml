@@ -56,12 +56,27 @@ sources:
     access: open_public_source
     official_repository_url: https://github.com/nasa/cea/blob/main/data/thermo.inp
     official_software_url: https://www.nasa.gov/glenn/research/chemical-equilibrium-with-applications/
-    local_status: substantial_but_filtered_and_not_complete
+    local_status: superseded_by_nasa_glenn_compilation
     existing_path: data/literature/extracts/nasa-cea-thermo.yaml
     existing_species_count: 1615
-    filter_note: Existing ingest deliberately omits ions, D/T isotopes, noble gases, and condensed non-feedstock species.
-    harvest_status: not_extended_in_this_pass
-    reason: The authoritative raw thermo.inp snapshot is absent locally and could not be downloaded under worker network isolation; rebuilding from an unverified derivative would violate provenance.
+    filter_note: Existing extract omits ions, D/T isotopes, noble gases, condensed non-feedstock species, inverted-interval Br2(cr), and the END PRODUCTS reactants block. Left in extracts/ this round.
+    harvest_status: complete_at_data/literature/compilations/nasa-glenn/
+    harvested_record_count: 2111
+
+  nasa_glenn:
+    citation: McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp (9/8/2021 Snyder snapshot).
+    identifier: NASA/TP-2002-211556
+    access: open_public_source
+    official_url: https://www.grc.nasa.gov/www/CEAWeb/
+    official_repository_url: https://github.com/nasa/cea/blob/main/data/thermo.inp
+    licence: US government work; 17 U.S.C. § 105 (no U.S. copyright)
+    local_status: complete_harvest
+    harvested_path: data/literature/compilations/nasa-glenn/
+    harvested_record_count: 2111
+    source_path: data/literature/compilations/nasa-glenn/source/thermo.inp
+    source_sha256: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
+    date: '2026-09-06'
+    evidence: Byte-copied thermo.inp from docs-private/research/2026-08-01-cea-sweep/; fixed-column parse of every PRODUCTS and REACTANTS record; round-trip test in tests/test_nasa_glenn_compilation.py.
 
   ivtanthermo_glushko:
     citation: IVTANTHERMO thermodynamic database, Institute for High Temperatures, Russian Academy of Sciences; Glushko thermodynamic-property compilation.

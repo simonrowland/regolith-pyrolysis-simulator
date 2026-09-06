@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1285",
+  "name_as_published": "AL(OH)3(a)",
+  "citation_as_published": "Gibbsite. Gurvich,1996a pt1 p150 pt2 p114.",
+  "cea_section": "products",
+  "formula": "AlO3H3",
+  "phase": "a",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis96",
+  "composition": [
+    {
+      "element_as_published": "AL",
+      "count_as_published": "  1.00",
+      "element": "Al",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  3.00",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  3.00",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "78.0035580",
+    "value": 78.003558
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-1293500.000",
+    "value": -1293500.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "100.000",
+        "value": 100.0
+      },
+      "T_max_K": {
+        "as_published": "500.000",
+        "value": 500.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "12460.000",
+        "value": 12460.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-2.376748819D+04",
+          "value": -23767.48819
+        },
+        {
+          "as_published": "9.289791210D+02",
+          "value": 928.979121
+        },
+        {
+          "as_published": "-1.532337335D+01",
+          "value": -15.32337335
+        },
+        {
+          "as_published": "1.307578268D-01",
+          "value": 0.1307578268
+        },
+        {
+          "as_published": "-2.205157141D-04",
+          "value": -0.0002205157141
+        },
+        {
+          "as_published": "1.567014467D-07",
+          "value": 1.567014467e-07
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.605485750D+05",
+        "value": -160548.575
+      },
+      "b2": {
+        "as_published": "6.795129010D+01",
+        "value": 67.9512901
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    100.000    500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        12460.000",
+      "raw_coeff_lines": [
+        "-2.376748819D+04 9.289791210D+02-1.532337335D+01 1.307578268D-01-2.205157141D-04",
+        " 1.567014467D-07 0.000000000D+00                -1.605485750D+05 6.795129010D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 11066,
+    "header_line": 11067,
+    "end_line": 11070
+  },
+  "source_text": {
+    "name_line": "AL(OH)3(a)        Gibbsite. Gurvich,1996a pt1 p150 pt2 p114.",
+    "header_line": " 1 tpis96 AL  1.00O   3.00H   3.00    0.00    0.00 1   78.0035580   -1293500.000",
+    "interval_lines": [
+      "    100.000    500.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        12460.000",
+      "-2.376748819D+04 9.289791210D+02-1.532337335D+01 1.307578268D-01-2.205157141D-04",
+      " 1.567014467D-07 0.000000000D+00                -1.605485750D+05 6.795129010D+01"
+    ]
+  }
+}

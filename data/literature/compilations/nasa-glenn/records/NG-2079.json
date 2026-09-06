@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2079",
+  "name_as_published": "JP-10(L)",
+  "citation_as_published": "Exo-tetrahydrodicyclopentadiene. Smith,1979.            React.",
+  "cea_section": "reactants",
+  "formula": "C10H16",
+  "phase": "L",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 0,
+  "source_ref_code": "g 6/01",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 10.00",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 16.00",
+      "element": "H",
+      "count": 16.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "136.2340400",
+    "value": 136.23404
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-122800.400",
+    "value": -122800.4,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "298.150",
+        "value": 298.15
+      },
+      "T_max_K": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "n_poly_terms": {
+        "as_published": "0",
+        "value": 0.0
+      },
+      "exponents": [
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "a_coefficients": [],
+      "a8_as_published": "",
+      "b1": null,
+      "b2": null,
+      "coefficient_count": 0,
+      "raw_t_line": "    298.150      0.0000  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0            0.000",
+      "raw_coeff_lines": [],
+      "ambiguities": [
+        {
+          "kind": "assigned_enthalpy_no_polynomial",
+          "note": "nint=0 reactant/product: dummy T-line only, no coefficient lines. T_max is 0 as published."
+        },
+        {
+          "kind": "inverted_or_zero_width_T_interval",
+          "T_min_K_as_published": "298.150",
+          "T_max_K_as_published": "0.000",
+          "note": "Published T bounds retained; interval not dropped."
+        }
+      ]
+    }
+  ],
+  "coefficient_count": 0,
+  "interval_count": 1,
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "interval_index": 0,
+      "kind": "assigned_enthalpy_no_polynomial",
+      "note": "nint=0 reactant/product: dummy T-line only, no coefficient lines. T_max is 0 as published."
+    },
+    {
+      "interval_index": 0,
+      "kind": "inverted_or_zero_width_T_interval",
+      "T_min_K_as_published": "298.150",
+      "T_max_K_as_published": "0.000",
+      "note": "Published T bounds retained; interval not dropped."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15657,
+    "header_line": 15658,
+    "end_line": 15659
+  },
+  "source_text": {
+    "name_line": "JP-10(L)          Exo-tetrahydrodicyclopentadiene. Smith,1979.            React.",
+    "header_line": " 0 g 6/01 C  10.00H  16.00    0.00    0.00    0.00 1  136.2340400    -122800.400",
+    "interval_lines": [
+      "    298.150      0.0000  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0            0.000"
+    ]
+  }
+}

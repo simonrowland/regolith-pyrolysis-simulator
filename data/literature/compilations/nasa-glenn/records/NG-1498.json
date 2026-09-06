@@ -1,0 +1,204 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1498",
+  "name_as_published": "Fe3O4(cr)",
+  "citation_as_published": "Magnetite above Curie Pt. Pankratz,1983 p160.",
+  "cea_section": "products",
+  "formula": "Fe3O4",
+  "phase": "cr",
+  "phase_flag": 2,
+  "phase_flag_as_published": " 2",
+  "n_intervals_declared": 1,
+  "source_ref_code": "g 1/01",
+  "composition": [
+    {
+      "element_as_published": "FE",
+      "count_as_published": "  3.00",
+      "element": "Fe",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  4.00",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "231.5326000",
+    "value": 231.5326
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-1118383.200",
+    "value": -1118383.2,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "850.000",
+        "value": 850.0
+      },
+      "T_max_K": {
+        "as_published": "1870.000",
+        "value": 1870.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "24762.073",
+        "value": 24762.073
+      },
+      "a_coefficients": [
+        {
+          "as_published": "5.731691980D+07",
+          "value": 57316919.8
+        },
+        {
+          "as_published": "-1.816105186D+05",
+          "value": -181610.5186
+        },
+        {
+          "as_published": "2.777813396D+02",
+          "value": 277.7813396
+        },
+        {
+          "as_published": "-1.849830315D-01",
+          "value": -0.1849830315
+        },
+        {
+          "as_published": "6.145641150D-05",
+          "value": 6.14564115e-05
+        },
+        {
+          "as_published": "-3.660350860D-09",
+          "value": -3.66035086e-09
+        },
+        {
+          "as_published": "-1.383713617D-12",
+          "value": -1.383713617e-12
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "9.906992850D+05",
+        "value": 990699.285
+      },
+      "b2": {
+        "as_published": "-1.868855147D+03",
+        "value": -1868.855147
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    850.000   1870.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        24762.073",
+      "raw_coeff_lines": [
+        " 5.731691980D+07-1.816105186D+05 2.777813396D+02-1.849830315D-01 6.145641150D-05",
+        "-3.660350860D-09-1.383713617D-12                 9.906992850D+05-1.868855147D+03"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "duplicate_name_as_published",
+      "name_as_published": "Fe3O4(cr)",
+      "record_ids": [
+        "NG-1497",
+        "NG-1498"
+      ],
+      "note": "Distinct thermo.inp records; not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 12341,
+    "header_line": 12342,
+    "end_line": 12345
+  },
+  "source_text": {
+    "name_line": "Fe3O4(cr)         Magnetite above Curie Pt. Pankratz,1983 p160.",
+    "header_line": " 1 g 1/01 FE  3.00O   4.00    0.00    0.00    0.00 2  231.5326000   -1118383.200",
+    "interval_lines": [
+      "    850.000   1870.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        24762.073",
+      " 5.731691980D+07-1.816105186D+05 2.777813396D+02-1.849830315D-01 6.145641150D-05",
+      "-3.660350860D-09-1.383713617D-12                 9.906992850D+05-1.868855147D+03"
+    ]
+  }
+}

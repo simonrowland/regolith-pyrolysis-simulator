@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1904",
+  "name_as_published": "SrCO3(L)",
+  "citation_as_published": "Liquid. Gurvich,1996a pt1 p532 pt2 p411.",
+  "cea_section": "products",
+  "formula": "SrCO3",
+  "phase": "L",
+  "phase_flag": 4,
+  "phase_flag_as_published": " 4",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis96",
+  "composition": [
+    {
+      "element_as_published": "SR",
+      "count_as_published": "  1.00",
+      "element": "Sr",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  1.00",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  3.00",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "147.6289000",
+    "value": 147.6289
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-1226000.000",
+    "value": -1226000.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "1767.000",
+        "value": 1767.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "15120.499",
+        "value": 15120.499
+      },
+      "a_coefficients": [
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.984482549D+01",
+          "value": 19.84482549
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.534232745D+05",
+        "value": -153423.2745
+      },
+      "b2": {
+        "as_published": "-1.073837834D+02",
+        "value": -107.3837834
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1767.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        15120.499",
+      "raw_coeff_lines": [
+        " 0.000000000D+00 0.000000000D+00 1.984482549D+01 0.000000000D+00 0.000000000D+00",
+        " 0.000000000D+00 0.000000000D+00                -1.534232745D+05-1.073837834D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 14713,
+    "header_line": 14714,
+    "end_line": 14717
+  },
+  "source_text": {
+    "name_line": "SrCO3(L)          Liquid. Gurvich,1996a pt1 p532 pt2 p411.",
+    "header_line": " 1 tpis96 SR  1.00C   1.00O   3.00    0.00    0.00 4  147.6289000   -1226000.000",
+    "interval_lines": [
+      "   1767.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        15120.499",
+      " 0.000000000D+00 0.000000000D+00 1.984482549D+01 0.000000000D+00 0.000000000D+00",
+      " 0.000000000D+00 0.000000000D+00                -1.534232745D+05-1.073837834D+02"
+    ]
+  }
+}

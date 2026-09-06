@@ -1,0 +1,295 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-0398",
+  "name_as_published": "CNCOCN",
+  "citation_as_published": "Oxopropanedinitrile, NC-CO-CN. Dorofeeva,2001.",
+  "cea_section": "products",
+  "formula": "C3N2O",
+  "phase": "gas",
+  "phase_flag": 0,
+  "phase_flag_as_published": " 0",
+  "n_intervals_declared": 2,
+  "source_ref_code": "srd 01",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  3.00",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": "  2.00",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  1.00",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "80.0449000",
+    "value": 80.0449
+  },
+  "delta_f_H_298_15": {
+    "as_published": "247500.000",
+    "value": 247500.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "17147.758",
+        "value": 17147.758
+      },
+      "a_coefficients": [
+        {
+          "as_published": "1.131052007D+05",
+          "value": 113105.2007
+        },
+        {
+          "as_published": "-1.978834859D+03",
+          "value": -1978.834859
+        },
+        {
+          "as_published": "1.626886148D+01",
+          "value": 16.26886148
+        },
+        {
+          "as_published": "-8.330801790D-03",
+          "value": -0.00833080179
+        },
+        {
+          "as_published": "1.884126795D-05",
+          "value": 1.884126795e-05
+        },
+        {
+          "as_published": "-1.530681099D-08",
+          "value": -1.530681099e-08
+        },
+        {
+          "as_published": "4.418124730D-12",
+          "value": 4.41812473e-12
+        }
+      ],
+      "a8_as_published": " 0.000000000D+00",
+      "b1": {
+        "as_published": "3.680261690D+04",
+        "value": 36802.6169
+      },
+      "b2": {
+        "as_published": "-5.963327110D+01",
+        "value": -59.6332711
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000  1000.000 7 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17147.758",
+      "raw_coeff_lines": [
+        " 1.131052007D+05-1.978834859D+03 1.626886148D+01-8.330801790D-03 1.884126795D-05",
+        "-1.530681099D-08 4.418124730D-12 0.000000000D+00 3.680261690D+04-5.963327110D+01"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "17147.758",
+        "value": 17147.758
+      },
+      "a_coefficients": [
+        {
+          "as_published": "7.000508390D+05",
+          "value": 700050.839
+        },
+        {
+          "as_published": "-5.085998530D+03",
+          "value": -5085.99853
+        },
+        {
+          "as_published": "1.946753161D+01",
+          "value": 19.46753161
+        },
+        {
+          "as_published": "-1.302851179D-03",
+          "value": -0.001302851179
+        },
+        {
+          "as_published": "2.753596900D-07",
+          "value": 2.7535969e-07
+        },
+        {
+          "as_published": "-3.056286034D-11",
+          "value": -3.056286034e-11
+        },
+        {
+          "as_published": "1.382138451D-15",
+          "value": 1.382138451e-15
+        }
+      ],
+      "a8_as_published": " 0.000000000D+00",
+      "b1": {
+        "as_published": "5.539336600D+04",
+        "value": 55393.366
+      },
+      "b2": {
+        "as_published": "-8.627548600D+01",
+        "value": -86.275486
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1000.000  6000.000 7 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17147.758",
+      "raw_coeff_lines": [
+        " 7.000508390D+05-5.085998530D+03 1.946753161D+01-1.302851179D-03 2.753596900D-07",
+        "-3.056286034D-11 1.382138451D-15 0.000000000D+00 5.539336600D+04-8.627548600D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 3364,
+    "header_line": 3365,
+    "end_line": 3371
+  },
+  "source_text": {
+    "name_line": "CNCOCN            Oxopropanedinitrile, NC-CO-CN. Dorofeeva,2001.",
+    "header_line": " 2 srd 01 C   3.00N   2.00O   1.00    0.00    0.00 0   80.0449000     247500.000",
+    "interval_lines": [
+      "    300.000  1000.000 7 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17147.758",
+      " 1.131052007D+05-1.978834859D+03 1.626886148D+01-8.330801790D-03 1.884126795D-05",
+      "-1.530681099D-08 4.418124730D-12 0.000000000D+00 3.680261690D+04-5.963327110D+01",
+      "   1000.000  6000.000 7 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17147.758",
+      " 7.000508390D+05-5.085998530D+03 1.946753161D+01-1.302851179D-03 2.753596900D-07",
+      "-3.056286034D-11 1.382138451D-15 0.000000000D+00 5.539336600D+04-8.627548600D+01"
+    ]
+  }
+}

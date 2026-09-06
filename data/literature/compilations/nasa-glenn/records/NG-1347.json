@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1347",
+  "name_as_published": "BeF2(L)",
+  "citation_as_published": "Liquid.Gurvich,1996a pt1 p364 pt2 p292.",
+  "cea_section": "products",
+  "formula": "BeF2",
+  "phase": "L",
+  "phase_flag": 3,
+  "phase_flag_as_published": " 3",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis96",
+  "composition": [
+    {
+      "element_as_published": "BE",
+      "count_as_published": "  1.00",
+      "element": "Be",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": "  2.00",
+      "element": "F",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "47.0089884",
+    "value": 47.0089884
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-1027000.000",
+    "value": -1027000.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "823.000",
+        "value": 823.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "8468.000",
+        "value": 8468.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-1.882035141D+06",
+          "value": -1882035.141
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.234468417D+01",
+          "value": 12.34468417
+        },
+        {
+          "as_published": "-1.836548396D-04",
+          "value": -0.0001836548396
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.310986361D+05",
+        "value": -131098.6361
+      },
+      "b2": {
+        "as_published": "-6.898102574D+01",
+        "value": -68.98102574
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    823.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         8468.000",
+      "raw_coeff_lines": [
+        "-1.882035141D+06 0.000000000D+00 1.234468417D+01-1.836548396D-04 0.000000000D+00",
+        " 0.000000000D+00 0.000000000D+00                -1.310986361D+05-6.898102574D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 11445,
+    "header_line": 11446,
+    "end_line": 11449
+  },
+  "source_text": {
+    "name_line": "BeF2(L)           Liquid.Gurvich,1996a pt1 p364 pt2 p292.",
+    "header_line": " 1 tpis96 BE  1.00F   2.00    0.00    0.00    0.00 3   47.0089884   -1027000.000",
+    "interval_lines": [
+      "    823.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         8468.000",
+      "-1.882035141D+06 0.000000000D+00 1.234468417D+01-1.836548396D-04 0.000000000D+00",
+      " 0.000000000D+00 0.000000000D+00                -1.310986361D+05-6.898102574D+01"
+    ]
+  }
+}

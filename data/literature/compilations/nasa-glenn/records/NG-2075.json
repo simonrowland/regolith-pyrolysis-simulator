@@ -1,0 +1,189 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2075",
+  "name_as_published": "JP-5",
+  "citation_as_published": "Or ASTMA1(L). McBride,1996 pp85,93. Hcomb = 18600.BTU/#",
+  "cea_section": "reactants",
+  "formula": "CH1.92",
+  "phase": "condensed",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 0,
+  "source_ref_code": "g 6/96",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  1.00",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  1.92",
+      "element": "H",
+      "count": 1.92,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "13.9459448",
+    "value": 13.9459448
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-22183.000",
+    "value": -22183.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "298.150",
+        "value": 298.15
+      },
+      "T_max_K": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "n_poly_terms": {
+        "as_published": "0",
+        "value": 0.0
+      },
+      "exponents": [
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "a_coefficients": [],
+      "a8_as_published": "",
+      "b1": null,
+      "b2": null,
+      "coefficient_count": 0,
+      "raw_t_line": "    298.150      0.0000  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0            0.000",
+      "raw_coeff_lines": [],
+      "ambiguities": [
+        {
+          "kind": "assigned_enthalpy_no_polynomial",
+          "note": "nint=0 reactant/product: dummy T-line only, no coefficient lines. T_max is 0 as published."
+        },
+        {
+          "kind": "inverted_or_zero_width_T_interval",
+          "T_min_K_as_published": "298.150",
+          "T_max_K_as_published": "0.000",
+          "note": "Published T bounds retained; interval not dropped."
+        }
+      ]
+    }
+  ],
+  "coefficient_count": 0,
+  "interval_count": 1,
+  "ambiguity_count": 4,
+  "ambiguities": [
+    {
+      "kind": "non_integer_atom_count",
+      "slot": 1,
+      "element_as_published": "H ",
+      "count_as_published": "  1.92"
+    },
+    {
+      "interval_index": 0,
+      "kind": "assigned_enthalpy_no_polynomial",
+      "note": "nint=0 reactant/product: dummy T-line only, no coefficient lines. T_max is 0 as published."
+    },
+    {
+      "interval_index": 0,
+      "kind": "inverted_or_zero_width_T_interval",
+      "T_min_K_as_published": "298.150",
+      "T_max_K_as_published": "0.000",
+      "note": "Published T bounds retained; interval not dropped."
+    },
+    {
+      "kind": "condensed_phase_flag_without_name_suffix",
+      "phase_flag": 1,
+      "name_as_published": "JP-5"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15645,
+    "header_line": 15646,
+    "end_line": 15647
+  },
+  "source_text": {
+    "name_line": "JP-5              Or ASTMA1(L). McBride,1996 pp85,93. Hcomb = 18600.BTU/#",
+    "header_line": " 0 g 6/96 C   1.00H   1.92    0.00    0.00    0.00 1   13.9459448     -22183.000",
+    "interval_lines": [
+      "    298.150      0.0000  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0            0.000"
+    ]
+  }
+}

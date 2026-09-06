@@ -1,0 +1,295 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1428",
+  "name_as_published": "CsOH(b)",
+  "citation_as_published": "Beta.  Gurvich,1997.",
+  "cea_section": "products",
+  "formula": "CsOH",
+  "phase": "b",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 2,
+  "source_ref_code": "g 8/97",
+  "composition": [
+    {
+      "element_as_published": "CS",
+      "count_as_published": "  1.00",
+      "element": "Cs",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  1.00",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  1.00",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "149.9127900",
+    "value": 149.91279
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-416200.000",
+    "value": -416200.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "100.000",
+        "value": 100.0
+      },
+      "T_max_K": {
+        "as_published": "298.150",
+        "value": 298.15
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "14103.000",
+        "value": 14103.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-1.070491244D+06",
+          "value": -1070491.244
+        },
+        {
+          "as_published": "2.726790967D+04",
+          "value": 27267.90967
+        },
+        {
+          "as_published": "-2.447999195D+02",
+          "value": -244.7999195
+        },
+        {
+          "as_published": "9.717566950D-01",
+          "value": 0.971756695
+        },
+        {
+          "as_published": "-1.304183626D-03",
+          "value": -0.001304183626
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.676915176D+05",
+        "value": -167691.5176
+      },
+      "b2": {
+        "as_published": "1.260979156D+03",
+        "value": 1260.979156
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    100.000    298.1507 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        14103.000",
+      "raw_coeff_lines": [
+        "-1.070491244D+06 2.726790967D+04-2.447999195D+02 9.717566950D-01-1.304183626D-03",
+        " 0.000000000D+00 0.000000000D+00                -1.676915176D+05 1.260979156D+03"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "298.150",
+        "value": 298.15
+      },
+      "T_max_K": {
+        "as_published": "498.200",
+        "value": 498.2
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "14103.000",
+        "value": 14103.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "2.988510447D+05",
+          "value": 298851.0447
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "-5.599488124D+00",
+          "value": -5.599488124
+        },
+        {
+          "as_published": "4.758933479D-02",
+          "value": 0.04758933479
+        },
+        {
+          "as_published": "-3.982976748D-05",
+          "value": -3.982976748e-05
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-4.914854260D+04",
+        "value": -49148.5426
+      },
+      "b2": {
+        "as_published": "3.370083195D+01",
+        "value": 33.70083195
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    298.150    498.2007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        14103.000",
+      "raw_coeff_lines": [
+        " 2.988510447D+05 0.000000000D+00-5.599488124D+00 4.758933479D-02-3.982976748D-05",
+        " 0.000000000D+00 0.000000000D+00                -4.914854260D+04 3.370083195D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 11934,
+    "header_line": 11935,
+    "end_line": 11941
+  },
+  "source_text": {
+    "name_line": "CsOH(b)           Beta.  Gurvich,1997.",
+    "header_line": " 2 g 8/97 CS  1.00O   1.00H   1.00    0.00    0.00 1  149.9127900    -416200.000",
+    "interval_lines": [
+      "    100.000    298.1507 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        14103.000",
+      "-1.070491244D+06 2.726790967D+04-2.447999195D+02 9.717566950D-01-1.304183626D-03",
+      " 0.000000000D+00 0.000000000D+00                -1.676915176D+05 1.260979156D+03",
+      "    298.150    498.2007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        14103.000",
+      " 2.988510447D+05 0.000000000D+00-5.599488124D+00 4.758933479D-02-3.982976748D-05",
+      " 0.000000000D+00 0.000000000D+00                -4.914854260D+04 3.370083195D+01"
+    ]
+  }
+}

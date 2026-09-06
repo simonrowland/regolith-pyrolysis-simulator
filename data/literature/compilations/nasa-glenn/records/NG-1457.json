@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1457",
+  "name_as_published": "CuF2(cr)",
+  "citation_as_published": "Crystal. Pankratz,1984 p188.",
+  "cea_section": "products",
+  "formula": "CuF2",
+  "phase": "cr",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "g10/00",
+  "composition": [
+    {
+      "element_as_published": "CU",
+      "count_as_published": "  1.00",
+      "element": "Cu",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": "  2.00",
+      "element": "F",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "101.5428064",
+    "value": 101.5428064
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-539819.680",
+    "value": -539819.68,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "298.150",
+        "value": 298.15
+      },
+      "T_max_K": {
+        "as_published": "1109.000",
+        "value": 1109.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "2.173703718D+04",
+          "value": 21737.03718
+        },
+        {
+          "as_published": "-4.937180300D+02",
+          "value": -493.71803
+        },
+        {
+          "as_published": "7.140314880D+00",
+          "value": 7.14031488
+        },
+        {
+          "as_published": "9.517087050D-03",
+          "value": 0.00951708705
+        },
+        {
+          "as_published": "-7.459164380D-06",
+          "value": -7.45916438e-06
+        },
+        {
+          "as_published": "1.904472482D-09",
+          "value": 1.904472482e-09
+        },
+        {
+          "as_published": "4.473847180D-13",
+          "value": 4.47384718e-13
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-6.452906470D+04",
+        "value": -64529.0647
+      },
+      "b2": {
+        "as_published": "-3.535501070D+01",
+        "value": -35.3550107
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    298.150   1109.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      "raw_coeff_lines": [
+        " 2.173703718D+04-4.937180300D+02 7.140314880D+00 9.517087050D-03-7.459164380D-06",
+        " 1.904472482D-09 4.473847180D-13                -6.452906470D+04-3.535501070D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 12091,
+    "header_line": 12092,
+    "end_line": 12095
+  },
+  "source_text": {
+    "name_line": "CuF2(cr)          Crystal. Pankratz,1984 p188.",
+    "header_line": " 1 g10/00 CU  1.00F   2.00    0.00    0.00    0.00 1  101.5428064    -539819.680",
+    "interval_lines": [
+      "    298.150   1109.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      " 2.173703718D+04-4.937180300D+02 7.140314880D+00 9.517087050D-03-7.459164380D-06",
+      " 1.904472482D-09 4.473847180D-13                -6.452906470D+04-3.535501070D+01"
+    ]
+  }
+}

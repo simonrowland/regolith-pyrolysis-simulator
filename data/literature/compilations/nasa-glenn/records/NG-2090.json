@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2090",
+  "name_as_published": "NH4CLO4(I)",
+  "citation_as_published": "Ammonium Perchlorate. Chase,1998 p766.                  React.",
+  "cea_section": "reactants",
+  "formula": "NH4ClO4",
+  "phase": "I",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "j12/62",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": "  1.00",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  4.00",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": "  1.00",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  4.00",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "117.4890600",
+    "value": 117.48906
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-295767.000",
+    "value": -295767.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "100.000",
+        "value": 100.0
+      },
+      "T_max_K": {
+        "as_published": "513.150",
+        "value": 513.15
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "25238.000",
+        "value": 25238.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-3.075344900D+03",
+          "value": -3075.3449
+        },
+        {
+          "as_published": "-2.136506130D+02",
+          "value": -213.650613
+        },
+        {
+          "as_published": "1.021583093D+01",
+          "value": 10.21583093
+        },
+        {
+          "as_published": "1.659463617D-02",
+          "value": 0.01659463617
+        },
+        {
+          "as_published": "1.665266832D-05",
+          "value": 1.665266832e-05
+        },
+        {
+          "as_published": "-2.306096672D-08",
+          "value": -2.306096672e-08
+        },
+        {
+          "as_published": "1.543657693D-11",
+          "value": 1.543657693e-11
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-3.825767260D+04",
+        "value": -38257.6726
+      },
+      "b2": {
+        "as_published": "-4.230254380D+01",
+        "value": -42.3025438
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    100.000    513.1507 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        25238.000",
+      "raw_coeff_lines": [
+        "-3.075344900D+03-2.136506130D+02 1.021583093D+01 1.659463617D-02 1.665266832D-05",
+        "-2.306096672D-08 1.543657693D-11                -3.825767260D+04-4.230254380D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15714,
+    "header_line": 15715,
+    "end_line": 15718
+  },
+  "source_text": {
+    "name_line": "NH4CLO4(I)        Ammonium Perchlorate. Chase,1998 p766.                  React.",
+    "header_line": " 1 j12/62 N   1.00H   4.00CL  1.00O   4.00    0.00 1  117.4890600    -295767.000",
+    "interval_lines": [
+      "    100.000    513.1507 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        25238.000",
+      "-3.075344900D+03-2.136506130D+02 1.021583093D+01 1.659463617D-02 1.665266832D-05",
+      "-2.306096672D-08 1.543657693D-11                -3.825767260D+04-4.230254380D+01"
+    ]
+  }
+}

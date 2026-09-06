@@ -1,0 +1,295 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-0293",
+  "name_as_published": "CH2OH",
+  "citation_as_published": "Hydroxymethyl Radical. Johnson,1996.",
+  "cea_section": "products",
+  "formula": "CH3O",
+  "phase": "gas",
+  "phase_flag": 0,
+  "phase_flag_as_published": " 0",
+  "n_intervals_declared": 2,
+  "source_ref_code": "g11/00",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  1.00",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  3.00",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  1.00",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "31.0339200",
+    "value": 31.03392
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-17800.000",
+    "value": -17800.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "11781.000",
+        "value": 11781.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-1.560076238D+05",
+          "value": -156007.6238
+        },
+        {
+          "as_published": "2.685446279D+03",
+          "value": 2685.446279
+        },
+        {
+          "as_published": "-1.342022420D+01",
+          "value": -13.4202242
+        },
+        {
+          "as_published": "5.757139470D-02",
+          "value": 0.0575713947
+        },
+        {
+          "as_published": "-7.284449990D-05",
+          "value": -7.28444999e-05
+        },
+        {
+          "as_published": "4.836648860D-08",
+          "value": 4.83664886e-08
+        },
+        {
+          "as_published": "-1.293492601D-11",
+          "value": -1.293492601e-11
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.596820410D+04",
+        "value": -15968.2041
+      },
+      "b2": {
+        "as_published": "9.963033700D+01",
+        "value": 99.630337
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        11781.000",
+      "raw_coeff_lines": [
+        "-1.560076238D+05 2.685446279D+03-1.342022420D+01 5.757139470D-02-7.284449990D-05",
+        " 4.836648860D-08-1.293492601D-11                -1.596820410D+04 9.963033700D+01"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "11781.000",
+        "value": 11781.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "2.250349506D+06",
+          "value": 2250349.506
+        },
+        {
+          "as_published": "-8.173186060D+03",
+          "value": -8173.18606
+        },
+        {
+          "as_published": "1.599639179D+01",
+          "value": 15.99639179
+        },
+        {
+          "as_published": "-8.704133720D-04",
+          "value": -0.000870413372
+        },
+        {
+          "as_published": "6.069183950D-08",
+          "value": 6.06918395e-08
+        },
+        {
+          "as_published": "4.408349460D-12",
+          "value": 4.40834946e-12
+        },
+        {
+          "as_published": "-5.702309500D-16",
+          "value": -5.7023095e-16
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "4.645313430D+04",
+        "value": 46453.1343
+      },
+      "b2": {
+        "as_published": "-7.835158450D+01",
+        "value": -78.3515845
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        11781.000",
+      "raw_coeff_lines": [
+        " 2.250349506D+06-8.173186060D+03 1.599639179D+01-8.704133720D-04 6.069183950D-08",
+        " 4.408349460D-12-5.702309500D-16                 4.645313430D+04-7.835158450D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 2497,
+    "header_line": 2498,
+    "end_line": 2504
+  },
+  "source_text": {
+    "name_line": "CH2OH             Hydroxymethyl Radical. Johnson,1996.",
+    "header_line": " 2 g11/00 C   1.00H   3.00O   1.00    0.00    0.00 0   31.0339200     -17800.000",
+    "interval_lines": [
+      "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        11781.000",
+      "-1.560076238D+05 2.685446279D+03-1.342022420D+01 5.757139470D-02-7.284449990D-05",
+      " 4.836648860D-08-1.293492601D-11                -1.596820410D+04 9.963033700D+01",
+      "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        11781.000",
+      " 2.250349506D+06-8.173186060D+03 1.599639179D+01-8.704133720D-04 6.069183950D-08",
+      " 4.408349460D-12-5.702309500D-16                 4.645313430D+04-7.835158450D+01"
+    ]
+  }
+}

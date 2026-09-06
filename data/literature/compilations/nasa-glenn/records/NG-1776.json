@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1776",
+  "name_as_published": "NiS(a)",
+  "citation_as_published": "ALpha. Chase,1998 pp1704-6.",
+  "cea_section": "products",
+  "formula": "NiS",
+  "phase": "a",
+  "phase_flag": 2,
+  "phase_flag_as_published": " 2",
+  "n_intervals_declared": 1,
+  "source_ref_code": "j12/76",
+  "composition": [
+    {
+      "element_as_published": "NI",
+      "count_as_published": "  1.00",
+      "element": "Ni",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": "  1.00",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "90.7584000",
+    "value": 90.7584
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-87864.000",
+    "value": -87864.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "652.000",
+        "value": 652.0
+      },
+      "T_max_K": {
+        "as_published": "1249.000",
+        "value": 1249.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "8465.000",
+        "value": 8465.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "2.424566967D+05",
+          "value": 242456.6967
+        },
+        {
+          "as_published": "-1.320914239D+03",
+          "value": -1320.914239
+        },
+        {
+          "as_published": "7.077218200D+00",
+          "value": 7.0772182
+        },
+        {
+          "as_published": "9.029383650D-05",
+          "value": 9.02938365e-05
+        },
+        {
+          "as_published": "2.068184040D-06",
+          "value": 2.06818404e-06
+        },
+        {
+          "as_published": "-6.559770780D-10",
+          "value": -6.55977078e-10
+        },
+        {
+          "as_published": "8.194048850D-14",
+          "value": 8.19404885e-14
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-3.434758890D+03",
+        "value": -3434.75889
+      },
+      "b2": {
+        "as_published": "-3.562024750D+01",
+        "value": -35.6202475
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    652.000   1249.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         8465.000",
+      "raw_coeff_lines": [
+        " 2.424566967D+05-1.320914239D+03 7.077218200D+00 9.029383650D-05 2.068184040D-06",
+        "-6.559770780D-10 8.194048850D-14                -3.434758890D+03-3.562024750D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 13968,
+    "header_line": 13969,
+    "end_line": 13972
+  },
+  "source_text": {
+    "name_line": "NiS(a)            ALpha. Chase,1998 pp1704-6.",
+    "header_line": " 1 j12/76 NI  1.00S   1.00    0.00    0.00    0.00 2   90.7584000     -87864.000",
+    "interval_lines": [
+      "    652.000   1249.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         8465.000",
+      " 2.424566967D+05-1.320914239D+03 7.077218200D+00 9.029383650D-05 2.068184040D-06",
+      "-6.559770780D-10 8.194048850D-14                -3.434758890D+03-3.562024750D+01"
+    ]
+  }
+}

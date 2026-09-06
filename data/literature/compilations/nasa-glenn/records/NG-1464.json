@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1464",
+  "name_as_published": "Cu(OH)2(cr)",
+  "citation_as_published": "Crystal. King,1973 p62.",
+  "cea_section": "products",
+  "formula": "CuO2H2",
+  "phase": "cr",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "g10/00",
+  "composition": [
+    {
+      "element_as_published": "CU",
+      "count_as_published": "  1.00",
+      "element": "Cu",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  2.00",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  2.00",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "97.5606800",
+    "value": 97.56068
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-443085.600",
+    "value": -443085.6,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "298.150",
+        "value": 298.15
+      },
+      "T_max_K": {
+        "as_published": "2000.000",
+        "value": 2000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-2.719377798D+05",
+          "value": -271937.7798
+        },
+        {
+          "as_published": "2.064524617D+03",
+          "value": 2064.524617
+        },
+        {
+          "as_published": "2.639692948D+00",
+          "value": 2.639692948
+        },
+        {
+          "as_published": "1.680803576D-02",
+          "value": 0.01680803576
+        },
+        {
+          "as_published": "-1.185312108D-05",
+          "value": -1.185312108e-05
+        },
+        {
+          "as_published": "4.128854220D-09",
+          "value": 4.12885422e-09
+        },
+        {
+          "as_published": "-5.731701790D-13",
+          "value": -5.73170179e-13
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-6.740281360D+04",
+        "value": -67402.8136
+      },
+      "b2": {
+        "as_published": "-3.697949500D+00",
+        "value": -3.6979495
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    298.150   2000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      "raw_coeff_lines": [
+        "-2.719377798D+05 2.064524617D+03 2.639692948D+00 1.680803576D-02-1.185312108D-05",
+        " 4.128854220D-09-5.731701790D-13                -6.740281360D+04-3.697949500D+00"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 12129,
+    "header_line": 12130,
+    "end_line": 12133
+  },
+  "source_text": {
+    "name_line": "Cu(OH)2(cr)       Crystal. King,1973 p62.",
+    "header_line": " 1 g10/00 CU  1.00O   2.00H   2.00    0.00    0.00 1   97.5606800    -443085.600",
+    "interval_lines": [
+      "    298.150   2000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      "-2.719377798D+05 2.064524617D+03 2.639692948D+00 1.680803576D-02-1.185312108D-05",
+      " 4.128854220D-09-5.731701790D-13                -6.740281360D+04-3.697949500D+00"
+    ]
+  }
+}

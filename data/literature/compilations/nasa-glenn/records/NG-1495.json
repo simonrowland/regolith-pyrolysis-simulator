@@ -1,0 +1,305 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1495",
+  "name_as_published": "Fe2O3(cr)",
+  "citation_as_published": "Hematite above Curie pt. Pankratz,1983 p158.",
+  "cea_section": "products",
+  "formula": "Fe2O3",
+  "phase": "cr",
+  "phase_flag": 2,
+  "phase_flag_as_published": " 2",
+  "n_intervals_declared": 2,
+  "source_ref_code": "g 1/01",
+  "composition": [
+    {
+      "element_as_published": "FE",
+      "count_as_published": "  2.00",
+      "element": "Fe",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  3.00",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "159.6882000",
+    "value": 159.6882
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-824248.000",
+    "value": -824248.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "960.000",
+        "value": 960.0
+      },
+      "T_max_K": {
+        "as_published": "1800.000",
+        "value": 1800.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-2.844009066D+07",
+          "value": -28440090.66
+        },
+        {
+          "as_published": "1.253786450D+05",
+          "value": 125378.645
+        },
+        {
+          "as_published": "-2.119080355D+02",
+          "value": -211.9080355
+        },
+        {
+          "as_published": "2.221481558D-01",
+          "value": 0.2221481558
+        },
+        {
+          "as_published": "-1.206765164D-04",
+          "value": -0.0001206765164
+        },
+        {
+          "as_published": "3.480738050D-08",
+          "value": 3.48073805e-08
+        },
+        {
+          "as_published": "-4.165297860D-12",
+          "value": -4.16529786e-12
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-8.483926520D+05",
+        "value": -848392.652
+      },
+      "b2": {
+        "as_published": "1.433002161D+03",
+        "value": 1433.002161
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    960.000   1800.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      "raw_coeff_lines": [
+        "-2.844009066D+07 1.253786450D+05-2.119080355D+02 2.221481558D-01-1.206765164D-04",
+        " 3.480738050D-08-4.165297860D-12                -8.483926520D+05 1.433002161D+03"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1800.000",
+        "value": 1800.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.711439880D+01",
+          "value": 17.1143988
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-1.041599645D+05",
+        "value": -104159.9645
+      },
+      "b2": {
+        "as_published": "-8.780613745D+01",
+        "value": -87.80613745
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1800.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      "raw_coeff_lines": [
+        " 0.000000000D+00 0.000000000D+00 1.711439880D+01 0.000000000D+00 0.000000000D+00",
+        " 0.000000000D+00 0.000000000D+00                -1.041599645D+05-8.780613745D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "duplicate_name_as_published",
+      "name_as_published": "Fe2O3(cr)",
+      "record_ids": [
+        "NG-1494",
+        "NG-1495"
+      ],
+      "note": "Distinct thermo.inp records; not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 12314,
+    "header_line": 12315,
+    "end_line": 12321
+  },
+  "source_text": {
+    "name_line": "Fe2O3(cr)         Hematite above Curie pt. Pankratz,1983 p158.",
+    "header_line": " 2 g 1/01 FE  2.00O   3.00    0.00    0.00    0.00 2  159.6882000    -824248.000",
+    "interval_lines": [
+      "    960.000   1800.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      "-2.844009066D+07 1.253786450D+05-2.119080355D+02 2.221481558D-01-1.206765164D-04",
+      " 3.480738050D-08-4.165297860D-12                -8.483926520D+05 1.433002161D+03",
+      "   1800.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      " 0.000000000D+00 0.000000000D+00 1.711439880D+01 0.000000000D+00 0.000000000D+00",
+      " 0.000000000D+00 0.000000000D+00                -1.041599645D+05-8.780613745D+01"
+    ]
+  }
+}

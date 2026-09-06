@@ -1,0 +1,295 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-0433",
+  "name_as_published": "C6D6",
+  "citation_as_published": "Benzene-d6. Burcat,1985.",
+  "cea_section": "products",
+  "formula": "C6D6",
+  "phase": "gas",
+  "phase_flag": 0,
+  "phase_flag_as_published": " 0",
+  "n_intervals_declared": 2,
+  "source_ref_code": "g 1/01",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  6.00",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": "  6.00",
+      "element": "D",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "84.1488120",
+    "value": 84.148812
+  },
+  "delta_f_H_298_15": {
+    "as_published": "58157.378",
+    "value": 58157.378,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "300.000",
+        "value": 300.0
+      },
+      "T_max_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "16324.686",
+        "value": 16324.686
+      },
+      "a_coefficients": [
+        {
+          "as_published": "2.762911236D+05",
+          "value": 276291.1236
+        },
+        {
+          "as_published": "-2.865868902D+03",
+          "value": -2865.868902
+        },
+        {
+          "as_published": "5.395070430D+00",
+          "value": 5.39507043
+        },
+        {
+          "as_published": "5.939315170D-02",
+          "value": 0.0593931517
+        },
+        {
+          "as_published": "-6.023631180D-05",
+          "value": -6.02363118e-05
+        },
+        {
+          "as_published": "3.381398570D-08",
+          "value": 3.38139857e-08
+        },
+        {
+          "as_published": "-8.306046370D-12",
+          "value": -8.30604637e-12
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "2.047083778D+04",
+        "value": 20470.83778
+      },
+      "b2": {
+        "as_published": "-2.011790696D+01",
+        "value": -20.11790696
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16324.686",
+      "raw_coeff_lines": [
+        " 2.762911236D+05-2.865868902D+03 5.395070430D+00 5.939315170D-02-6.023631180D-05",
+        " 3.381398570D-08-8.306046370D-12                 2.047083778D+04-2.011790696D+01"
+      ],
+      "ambiguities": []
+    },
+    {
+      "T_min_K": {
+        "as_published": "1000.000",
+        "value": 1000.0
+      },
+      "T_max_K": {
+        "as_published": "6000.000",
+        "value": 6000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "16324.686",
+        "value": 16324.686
+      },
+      "a_coefficients": [
+        {
+          "as_published": "1.758057871D+06",
+          "value": 1758057.871
+        },
+        {
+          "as_published": "-1.572121558D+04",
+          "value": -15721.21558
+        },
+        {
+          "as_published": "4.468162490D+01",
+          "value": 44.6816249
+        },
+        {
+          "as_published": "-4.003361920D-03",
+          "value": -0.00400336192
+        },
+        {
+          "as_published": "8.445434400D-07",
+          "value": 8.4454344e-07
+        },
+        {
+          "as_published": "-9.360556980D-11",
+          "value": -9.36055698e-11
+        },
+        {
+          "as_published": "4.228475530D-15",
+          "value": 4.22847553e-15
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "8.962045360D+04",
+        "value": 89620.4536
+      },
+      "b2": {
+        "as_published": "-2.615332268D+02",
+        "value": -261.5332268
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16324.686",
+      "raw_coeff_lines": [
+        " 1.758057871D+06-1.572121558D+04 4.468162490D+01-4.003361920D-03 8.445434400D-07",
+        "-9.360556980D-11 4.228475530D-15                 8.962045360D+04-2.615332268D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 18,
+  "interval_count": 2,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 3650,
+    "header_line": 3651,
+    "end_line": 3657
+  },
+  "source_text": {
+    "name_line": "C6D6              Benzene-d6. Burcat,1985.",
+    "header_line": " 2 g 1/01 C   6.00D   6.00    0.00    0.00    0.00 0   84.1488120      58157.378",
+    "interval_lines": [
+      "    300.000   1000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16324.686",
+      " 2.762911236D+05-2.865868902D+03 5.395070430D+00 5.939315170D-02-6.023631180D-05",
+      " 3.381398570D-08-8.306046370D-12                 2.047083778D+04-2.011790696D+01",
+      "   1000.000   6000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        16324.686",
+      " 1.758057871D+06-1.572121558D+04 4.468162490D+01-4.003361920D-03 8.445434400D-07",
+      "-9.360556980D-11 4.228475530D-15                 8.962045360D+04-2.615332268D+02"
+    ]
+  }
+}

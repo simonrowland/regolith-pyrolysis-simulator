@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1966",
+  "name_as_published": "U(L)",
+  "citation_as_published": "Liquid. Ref-Elm. Cox,1989 p234.",
+  "cea_section": "products",
+  "formula": "U",
+  "phase": "L",
+  "phase_flag": 4,
+  "phase_flag_as_published": " 4",
+  "n_intervals_declared": 1,
+  "source_ref_code": "coda89",
+  "composition": [
+    {
+      "element_as_published": "U ",
+      "count_as_published": "  1.00",
+      "element": "U",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "238.0289100",
+    "value": 238.02891
+  },
+  "delta_f_H_298_15": {
+    "as_published": "0.000",
+    "value": 0.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "1408.000",
+        "value": 1408.0
+      },
+      "T_max_K": {
+        "as_published": "4000.000",
+        "value": 4000.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "6364.000",
+        "value": 6364.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-9.466562120D+04",
+          "value": -94665.6212
+        },
+        {
+          "as_published": "8.526619680D+02",
+          "value": 852.661968
+        },
+        {
+          "as_published": "4.209128020D+00",
+          "value": 4.20912802
+        },
+        {
+          "as_published": "8.407200810D-04",
+          "value": 0.000840720081
+        },
+        {
+          "as_published": "-1.309545676D-07",
+          "value": -1.309545676e-07
+        },
+        {
+          "as_published": "1.985020032D-11",
+          "value": 1.985020032e-11
+        },
+        {
+          "as_published": "-1.231574075D-15",
+          "value": -1.231574075e-15
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-5.956398090D+03",
+        "value": -5956.39809
+      },
+      "b2": {
+        "as_published": "-1.667247672D+01",
+        "value": -16.67247672
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "   1408.000   4000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6364.000",
+      "raw_coeff_lines": [
+        "-9.466562120D+04 8.526619680D+02 4.209128020D+00 8.407200810D-04-1.309545676D-07",
+        " 1.985020032D-11-1.231574075D-15                -5.956398090D+03-1.667247672D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15089,
+    "header_line": 15090,
+    "end_line": 15093
+  },
+  "source_text": {
+    "name_line": "U(L)              Liquid. Ref-Elm. Cox,1989 p234.",
+    "header_line": " 1 coda89 U   1.00    0.00    0.00    0.00    0.00 4  238.0289100          0.000",
+    "interval_lines": [
+      "   1408.000   4000.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         6364.000",
+      "-9.466562120D+04 8.526619680D+02 4.209128020D+00 8.407200810D-04-1.309545676D-07",
+      " 1.985020032D-11-1.231574075D-15                -5.956398090D+03-1.667247672D+01"
+    ]
+  }
+}

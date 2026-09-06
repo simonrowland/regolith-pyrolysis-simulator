@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2017",
+  "name_as_published": "ZnSO4(a')",
+  "citation_as_published": "Alpha'.Chase,1998 p1788.",
+  "cea_section": "products",
+  "formula": "ZnSO4",
+  "phase": "condensed",
+  "phase_flag": 2,
+  "phase_flag_as_published": " 2",
+  "n_intervals_declared": 1,
+  "source_ref_code": "j 3/79",
+  "composition": [
+    {
+      "element_as_published": "ZN",
+      "count_as_published": "  1.00",
+      "element": "Zn",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": "  1.00",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  4.00",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "161.4526000",
+    "value": 161.4526
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-980143.840",
+    "value": -980143.84,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "540.000",
+        "value": 540.0
+      },
+      "T_max_K": {
+        "as_published": "1013.000",
+        "value": 1013.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "17238.080",
+        "value": 17238.08
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-3.253792010D+06",
+          "value": -3253792.01
+        },
+        {
+          "as_published": "3.252313710D+04",
+          "value": 32523.1371
+        },
+        {
+          "as_published": "-1.146490609D+02",
+          "value": -114.6490609
+        },
+        {
+          "as_published": "2.718567520D-01",
+          "value": 0.271856752
+        },
+        {
+          "as_published": "-3.079986965D-04",
+          "value": -0.0003079986965
+        },
+        {
+          "as_published": "1.830520033D-07",
+          "value": 1.830520033e-07
+        },
+        {
+          "as_published": "-4.445112450D-11",
+          "value": -4.44511245e-11
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-2.895173465D+05",
+        "value": -289517.3465
+      },
+      "b2": {
+        "as_published": "6.881710230D+02",
+        "value": 688.171023
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    540.000   1013.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17238.080",
+      "raw_coeff_lines": [
+        "-3.253792010D+06 3.252313710D+04-1.146490609D+02 2.718567520D-01-3.079986965D-04",
+        " 1.830520033D-07-4.445112450D-11                -2.895173465D+05 6.881710230D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15392,
+    "header_line": 15393,
+    "end_line": 15396
+  },
+  "source_text": {
+    "name_line": "ZnSO4(a')         Alpha'.Chase,1998 p1788.",
+    "header_line": " 1 j 3/79 ZN  1.00S   1.00O   4.00    0.00    0.00 2  161.4526000    -980143.840",
+    "interval_lines": [
+      "    540.000   1013.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        17238.080",
+      "-3.253792010D+06 3.252313710D+04-1.146490609D+02 2.718567520D-01-3.079986965D-04",
+      " 1.830520033D-07-4.445112450D-11                -2.895173465D+05 6.881710230D+02"
+    ]
+  }
+}

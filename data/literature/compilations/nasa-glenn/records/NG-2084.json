@@ -1,0 +1,207 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-2084",
+  "name_as_published": "InertJet-A(L)",
+  "citation_as_published": "McBride,1996. Faith,1971. Gracia-Salcedo,1988.          React.",
+  "cea_section": "reactants",
+  "formula": "IC12IH23",
+  "phase": "L",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "g 2/96",
+  "composition": [
+    {
+      "element_as_published": "IC",
+      "count_as_published": " 12.00",
+      "element": "IC",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "IH",
+      "count_as_published": " 23.00",
+      "element": "IH",
+      "count": 23.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "167.3110200",
+    "value": 167.31102
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-303403.000",
+    "value": -303403.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "220.000",
+        "value": 220.0
+      },
+      "T_max_K": {
+        "as_published": "550.000",
+        "value": 550.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "0.000",
+        "value": 0.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "-4.218262130D+05",
+          "value": -421826.213
+        },
+        {
+          "as_published": "-5.576600450D+03",
+          "value": -5576.60045
+        },
+        {
+          "as_published": "1.522120958D+02",
+          "value": 152.2120958
+        },
+        {
+          "as_published": "-8.610197550D-01",
+          "value": -0.861019755
+        },
+        {
+          "as_published": "3.071662234D-03",
+          "value": 0.003071662234
+        },
+        {
+          "as_published": "-4.702789540D-06",
+          "value": -4.70278954e-06
+        },
+        {
+          "as_published": "2.743019833D-09",
+          "value": 2.743019833e-09
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-3.238369150D+04",
+        "value": -32383.6915
+      },
+      "b2": {
+        "as_published": "-6.781094910D+02",
+        "value": -678.109491
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    220.000    550.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      "raw_coeff_lines": [
+        "-4.218262130D+05-5.576600450D+03 1.522120958D+02-8.610197550D-01 3.071662234D-03",
+        "-4.702789540D-06 2.743019833D-09                -3.238369150D+04-6.781094910D+02"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "nonstandard_element_token",
+      "slot": 0,
+      "element_as_published": "IC",
+      "normalized": "IC"
+    },
+    {
+      "kind": "nonstandard_element_token",
+      "slot": 1,
+      "element_as_published": "IH",
+      "normalized": "IH"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 15684,
+    "header_line": 15685,
+    "end_line": 15688
+  },
+  "source_text": {
+    "name_line": "InertJet-A(L)     McBride,1996. Faith,1971. Gracia-Salcedo,1988.          React.",
+    "header_line": " 1 g 2/96 IC 12.00IH 23.00    0.00    0.00    0.00 1  167.3110200    -303403.000",
+    "interval_lines": [
+      "    220.000    550.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0            0.000",
+      "-4.218262130D+05-5.576600450D+03 1.522120958D+02-8.610197550D-01 3.071662234D-03",
+      "-4.702789540D-06 2.743019833D-09                -3.238369150D+04-6.781094910D+02"
+    ]
+  }
+}

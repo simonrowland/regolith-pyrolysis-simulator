@@ -1,0 +1,194 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "nasa-glenn",
+  "source": {
+    "database": "NASA Glenn / CEA thermo.inp",
+    "citation": "McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.",
+    "version": "thermo.inp dated 9/8/2021 (Snyder CEA standalone updates)",
+    "official_url": "https://www.grc.nasa.gov/www/CEAWeb/",
+    "licence": "US government work; 17 U.S.C. \u00a7 105 (no U.S. copyright). Public-domain basis."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "NG-1816",
+  "name_as_published": "RbF(cr)",
+  "citation_as_published": "Cubic. Gurvich,1982 pt1 p438 pt2 p463.",
+  "cea_section": "products",
+  "formula": "RbF",
+  "phase": "cr",
+  "phase_flag": 1,
+  "phase_flag_as_published": " 1",
+  "n_intervals_declared": 1,
+  "source_ref_code": "tpis82",
+  "composition": [
+    {
+      "element_as_published": "RB",
+      "count_as_published": "  1.00",
+      "element": "Rb",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": "  1.00",
+      "element": "F",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0.00",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "104.4662032",
+    "value": 104.4662032
+  },
+  "delta_f_H_298_15": {
+    "as_published": "-559700.000",
+    "value": -559700.0,
+    "units_as_published": "J/mol"
+  },
+  "intervals": [
+    {
+      "T_min_K": {
+        "as_published": "298.150",
+        "value": 298.15
+      },
+      "T_max_K": {
+        "as_published": "1068.000",
+        "value": 1068.0
+      },
+      "n_poly_terms": {
+        "as_published": "7",
+        "value": 7.0
+      },
+      "exponents": [
+        {
+          "as_published": "-2.0",
+          "value": -2.0
+        },
+        {
+          "as_published": "-1.0",
+          "value": -1.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        },
+        {
+          "as_published": "1.0",
+          "value": 1.0
+        },
+        {
+          "as_published": "2.0",
+          "value": 2.0
+        },
+        {
+          "as_published": "3.0",
+          "value": 3.0
+        },
+        {
+          "as_published": "4.0",
+          "value": 4.0
+        },
+        {
+          "as_published": "0.0",
+          "value": 0.0
+        }
+      ],
+      "H298_minus_H0": {
+        "as_published": "10900.000",
+        "value": 10900.0
+      },
+      "a_coefficients": [
+        {
+          "as_published": "5.640741306D+03",
+          "value": 5640.741306
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "5.092663308D+00",
+          "value": 5.092663308
+        },
+        {
+          "as_published": "3.129949931D-03",
+          "value": 0.003129949931
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.000000000D+00",
+          "value": 0.0
+        }
+      ],
+      "a8_as_published": "                ",
+      "b1": {
+        "as_published": "-6.895462790D+04",
+        "value": -68954.6279
+      },
+      "b2": {
+        "as_published": "-2.057230003D+01",
+        "value": -20.57230003
+      },
+      "coefficient_count": 9,
+      "raw_t_line": "    298.150   1068.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        10900.000",
+      "raw_coeff_lines": [
+        " 5.640741306D+03 0.000000000D+00 5.092663308D+00 3.129949931D-03 0.000000000D+00",
+        " 0.000000000D+00 0.000000000D+00                -6.895462790D+04-2.057230003D+01"
+      ],
+      "ambiguities": []
+    }
+  ],
+  "coefficient_count": 9,
+  "interval_count": 1,
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
+    "name_line": 14198,
+    "header_line": 14199,
+    "end_line": 14202
+  },
+  "source_text": {
+    "name_line": "RbF(cr)           Cubic. Gurvich,1982 pt1 p438 pt2 p463.",
+    "header_line": " 1 tpis82 RB  1.00F   1.00    0.00    0.00    0.00 1  104.4662032    -559700.000",
+    "interval_lines": [
+      "    298.150   1068.0007 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0        10900.000",
+      " 5.640741306D+03 0.000000000D+00 5.092663308D+00 3.129949931D-03 0.000000000D+00",
+      " 0.000000000D+00 0.000000000D+00                -6.895462790D+04-2.057230003D+01"
+    ]
+  }
+}
