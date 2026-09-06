@@ -98,6 +98,7 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     sim.melt = SimpleNamespace(hour=4)
     sim.overhead = SimpleNamespace(pressure_mbar=2.0)
     sim.record = SimpleNamespace(snapshots=[])
+    sim._condensation_model = SimpleNamespace(last_sticking_alpha_provenance_notice={})
     schedule_backing = {"points": [{"temperature_C": 25.0}]}
     schedule = MappingProxyType(schedule_backing)
     schedule_backing["self"] = schedule
@@ -240,8 +241,8 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     created_prefixes = []
 
     class TrackingHistoryPrefix(simulator_core._RefusalSnapshotHistoryPrefix):
-        def __init__(self, source, memo):
-            super().__init__(source, memo)
+        def __init__(self, source, memo, **kwargs):
+            super().__init__(source, memo, **kwargs)
             created_prefixes.append(self)
 
     monkeypatch.setattr(
@@ -255,6 +256,9 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = BatchRecord(snapshots=[committed])
+    sim._condensation_model = SimpleNamespace(
+        operating_history=[committed, {"wall_temperature_C": 25.0}],
+    )
     sim.runtime_state = {"nested": {"temperature_C": 25.0}}
     sim.atom_ledger = FakeLedger()
     sim._chem_registry = object()
@@ -268,8 +272,8 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     assert isinstance(sim.record.snapshots, list)
     assert sim.record.snapshots == [committed]
     assert sim.record.snapshots[0] is committed
-    assert len(created_prefixes) == 1
-    assert created_prefixes[0]._memo == {}
+    assert len(created_prefixes) == 2
+    assert all(prefix._memo == {} for prefix in created_prefixes)
     with pytest.raises(RefusalStateSnapshotError) as direct_snapshot:
         sim._snapshot_terminal_refusal_hour_state()
     assert isinstance(direct_snapshot.value.__cause__, AssertionError)
@@ -298,7 +302,14 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = BatchRecord(snapshots=[committed])
+    operating_prefix = {"pressures": {"Na": 1.0}}
+    operating_tail = {"pressures": {"Na": 2.0}}
+    sim._condensation_model = SimpleNamespace(
+        operating_history=[operating_prefix, operating_tail],
+        last_sticking_alpha_provenance_notice={},
+    )
     sim.runtime_state = {"nested": {"temperature_C": 25.0}}
+    sim.runtime_state["operating_tail"] = operating_tail
     sim.atom_ledger = FakeLedger()
     sim._chem_registry = object()
     sim._chem_kernel = object()
@@ -307,6 +318,8 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     def refuse_after_mutation() -> None:
         sim.runtime_state["nested"]["temperature_C"] = 900.0
         sim.record.snapshots.append(HourSnapshot(hour=4))
+        sim._condensation_model.operating_history[-1]["pressures"]["Na"] = 999.0
+        sim._condensation_model.operating_history.append({"pressures": {"Na": 3.0}})
         raise refusal
 
     sim._step_one_hour = refuse_after_mutation
@@ -315,7 +328,14 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
         sim.step()
 
     assert raised.value is refusal
-    assert sim.runtime_state == {"nested": {"temperature_C": 25.0}}
+    assert sim.runtime_state["nested"] == {"temperature_C": 25.0}
+    history = sim._condensation_model.operating_history
+    assert isinstance(history, list)
+    assert history == [{"pressures": {"Na": 1.0}}, {"pressures": {"Na": 2.0}}]
+    assert history[0] is not operating_prefix
+    assert history[0]["pressures"] is not operating_prefix["pressures"]
+    assert history[1] is sim.runtime_state["operating_tail"]
+    assert history[1] is not operating_tail
     assert isinstance(sim.record.snapshots, list)
     assert sim.record.snapshots == [committed]
     assert sim.record.snapshots[0] is not committed

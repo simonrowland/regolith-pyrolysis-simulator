@@ -2717,6 +2717,22 @@ class CondensationModel:
         return geometry
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
+        """Route one flux batch, checking catalog mutations once per batch."""
+        data = self.vapor_pressure_data
+        if not isinstance(data, VaporPressureCompatibilityView):
+            return self._route(evap_flux, melt)
+        missing = object()
+        previous = getattr(data, '_route_catalog', missing)
+        data._route_catalog = None
+        try:
+            return self._route(evap_flux, melt)
+        finally:
+            if previous is missing:
+                del data._route_catalog
+            else:
+                data._route_catalog = previous
+
+    def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """
         Route all evaporated species through the train.
 
@@ -4641,6 +4657,20 @@ CONDENSATION_ADMISSION_REFUSAL_NO_DATA = "antoine_data_unavailable"
 CONDENSATION_FLUX_DORMANT_REFUSAL = "flux_dormant_never_inventory_debit"
 
 
+def _condensation_catalog(vapor_pressure_data, catalog_payload):
+    cached = getattr(vapor_pressure_data, '_route_catalog', None)
+    if cached is not None:
+        return cached
+    from simulator.vapour_rail.catalog import compiled_catalog_for
+
+    catalog = compiled_catalog_for(catalog_payload, emit_u0_request_rules=False)
+    # The owned input is read-only during route(). Standalone calls and the next
+    # route still check mutations; per-species pressure samples reuse this result.
+    if hasattr(vapor_pressure_data, '_route_catalog'):
+        vapor_pressure_data._route_catalog = catalog
+    return catalog
+
+
 def _assert_condensation_applicable(
     species: str,
     *,
@@ -4656,10 +4686,8 @@ def _assert_condensation_applicable(
     catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
     if catalog_payload is None:
         return
-    from simulator.vapour_rail.catalog import compiled_catalog_for
-
-    compiled_catalog_for(
-        catalog_payload, emit_u0_request_rules=False
+    _condensation_catalog(
+        vapor_pressure_data, catalog_payload
     ).assert_hot_train_applicable(species)
 
 
@@ -4761,13 +4789,11 @@ def _species_has_compiled_or_legacy_pressure(
         return False
     catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
     if catalog_payload is not None:
-        from simulator.vapour_rail.catalog import compiled_catalog_for
-
         try:
             # Reuse process-memoized compile; evaluator-only (no U0 rules).
             # b-189-exempt: capability probe; production caller gates first
-            compiled_catalog_for(
-                catalog_payload, emit_u0_request_rules=False
+            _condensation_catalog(
+                vapor_pressure_data, catalog_payload
             ).evaluator_for(species)
         except ValueError:
             pass
@@ -5584,12 +5610,10 @@ def _antoine_psat_pa(
     )
     catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
     if not has_legacy_antoine and catalog_payload is not None:
-        from simulator.vapour_rail.catalog import compiled_catalog_for
-
         # Hot Psat path: reuse memoized compile; no U0 rule emission.
         # b-189-exempt: gated above unless diagnostic reproduction opts out
-        evaluator = compiled_catalog_for(
-            catalog_payload, emit_u0_request_rules=False
+        evaluator = _condensation_catalog(
+            vapor_pressure_data, catalog_payload
         ).evaluator_for(species)
         if evaluator.activity_exponent or evaluator.pO2_exponent:
             refusal = WallSaturationPressureRefusal(species, T_K,

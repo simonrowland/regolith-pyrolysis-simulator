@@ -90,6 +90,52 @@ def _configured_model(payload: dict, species_id: str) -> CondensationModel:
     return model
 
 
+def test_route_reuses_catalog_but_rechecks_mutations_between_batches(payload, monkeypatch):
+    import simulator.vapour_rail.catalog as catalog_module
+
+    model = _configured_model(payload, "Na")
+    family_id = compiled_catalog_for(
+        payload, emit_u0_request_rules=False
+    ).species["Na"].family_id
+    original = catalog_module.compiled_catalog_for
+    calls = []
+
+    def counted(*args, **kwargs):
+        calls.append(1)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(catalog_module, "compiled_catalog_for", counted)
+    flux = EvaporationFlux(species_kg_hr={"Na": 1.0}, total_kg_hr=1.0)
+    model.route(flux, MeltState())
+    assert len(calls) == 1
+
+    model.vapor_pressure_data.catalog_payload["families"][family_id][
+        "code_metadata"
+    ]["hot_train_applicability"] = "not_applicable"
+    refused = model.route(flux, MeltState())
+    assert len(calls) == 2
+    assert refused.condensation_refusals_by_species["Na"]["reason"] == (
+        REFUSAL_INAPPLICABLE_PREDICATE
+    )
+    with pytest.raises(HotTrainInapplicable):
+        _antoine_psat_pa("Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data)
+
+
+def test_route_failure_does_not_leave_a_stale_catalog(payload, monkeypatch):
+    model = _configured_model(payload, "Na")
+
+    def failing_route(*args):
+        _antoine_psat_pa("Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data)
+        raise RuntimeError("routing interrupted")
+
+    monkeypatch.setattr(model, "_route", failing_route)
+    with pytest.raises(RuntimeError, match="routing interrupted"):
+        model.route(EvaporationFlux(), MeltState())
+    _set_applicability(model.vapor_pressure_data.catalog_payload, "Na", "not_applicable")
+    with pytest.raises(HotTrainInapplicable):
+        _antoine_psat_pa("Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data)
+
+
 @pytest.mark.parametrize("species_id", DORMANT_CARRIERS)
 def test_dormant_carrier_refused_at_condensation_seam(payload, species_id) -> None:
     """Rows that previously yielded pressure (for example Pb) now decline."""

@@ -62,29 +62,38 @@ class RefusalStateSnapshotError(TypeError):
 
 
 class _RefusalSnapshotHistoryPrefix:
-    """O(1) rollback view of committed, append-only batch snapshots.
+    """O(1) rollback view of committed history with a copied mutable tail.
 
     ``BatchRecord.snapshots`` is only appended to by the core loop; committed
     entries are read but never mutated by later hours.  Holding a prefix view
     avoids recursively copying the complete hourly history before every step.
+    Condensation operating history additionally permits edits to its last row,
+    which is copied eagerly while the older prefix remains shared.
     A terminal refusal materializes the prefix before the rollback consumer is
     called, so restored state still owns an ordinary list with identical
     ordered content.
     """
 
-    __slots__ = ('_source', '_length', '_memo')
+    __slots__ = ('_source', '_length', '_memo', '_tail')
 
-    def __init__(self, source: list[Any], memo: Dict[int, Any]) -> None:
+    def __init__(
+        self, source: list[Any], memo: Dict[int, Any], *, mutable_tail: int = 0,
+    ) -> None:
         self._source = source
-        self._length = len(source)
+        self._length = max(0, len(source) - mutable_tail)
         self._memo = memo
+        self._tail: list[Any] = []
+        memo[id(source)] = self
+        if mutable_tail:
+            self._tail = _deepcopy_refusal_state(source[self._length:], memo)
 
     def __len__(self) -> int:
-        return self._length
+        return self._length + len(self._tail)
 
     def __iter__(self):
         for index in range(self._length):
             yield self._source[index]
+        yield from self._tail
 
     def materialize(self) -> list[Any]:
         # Terminal refusal is the cold path: pay the legacy copy cost here so
@@ -94,8 +103,9 @@ class _RefusalSnapshotHistoryPrefix:
         materialized: list[Any] = []
         self._memo[id(self._source)] = materialized
         materialized.extend(
-            _deepcopy_refusal_state(list(self), self._memo)
+            _deepcopy_refusal_state(self._source[:self._length], self._memo)
         )
+        materialized.extend(self._tail)
         return materialized
 
     def release(self) -> None:
@@ -113,6 +123,10 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
     history = getattr(record, 'snapshots', None)
     if isinstance(history, _RefusalSnapshotHistoryPrefix):
         record.snapshots = history.materialize()
+    model = state.get('_condensation_model')
+    history = getattr(model, 'operating_history', None)
+    if isinstance(history, _RefusalSnapshotHistoryPrefix):
+        model.operating_history = history.materialize()
 
 
 # Immutable leaves cannot contain MappingProxyType, so they cannot need a
@@ -12796,6 +12810,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 record_snapshots,
                 memo,
             )
+        operating_history = getattr(
+            getattr(self, '_condensation_model', None), 'operating_history', None,
+        )
+        if defer_committed_history and isinstance(operating_history, list):
+            # Condensation only edits history[-1] and appends new rows. Keep that
+            # mutable frontier detached; copying the older rows every hour turns
+            # linear history growth into quadratic rollback-preparation work.
+            memo[id(operating_history)] = _RefusalSnapshotHistoryPrefix(
+                operating_history, memo, mutable_tail=1,
+            )
         state_source = {
             name: value
             for name, value in self.__dict__.items()
@@ -12867,10 +12891,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 defer_committed_history=True,
             )
         )
-        terminal_refusal_history = getattr(
-            terminal_refusal_state.get('record'),
-            'snapshots',
-            None,
+        terminal_refusal_histories = (
+            getattr(terminal_refusal_state.get('record'), 'snapshots', None),
+            getattr(
+                terminal_refusal_state.get('_condensation_model'),
+                'operating_history', None,
+            ),
         )
         try:
             return self._step_one_hour()
@@ -12918,11 +12944,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     pass
             raise
         finally:
-            if isinstance(
-                terminal_refusal_history,
-                _RefusalSnapshotHistoryPrefix,
-            ):
-                terminal_refusal_history.release()
+            for history in terminal_refusal_histories:
+                if isinstance(history, _RefusalSnapshotHistoryPrefix):
+                    history.release()
 
     def _step_one_hour(self) -> HourSnapshot:
         """
