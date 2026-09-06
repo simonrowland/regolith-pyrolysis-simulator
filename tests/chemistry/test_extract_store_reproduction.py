@@ -332,7 +332,8 @@ def test_refused_markers_never_score(monkeypatch, markers, nested) -> None:
 
 @pytest.mark.parametrize("length", [2, 3])
 @pytest.mark.parametrize("split", [False, True])
-def test_supersession_adopts_only_terminal_identity(monkeypatch, length, split) -> None:
+@pytest.mark.parametrize("cross_species", [False, True])
+def test_supersession_adopts_only_terminal_identity(monkeypatch, length, split, cross_species) -> None:
     import extract_merge
     rows = []
     for i in range(length):
@@ -349,6 +350,9 @@ def test_supersession_adopts_only_terminal_identity(monkeypatch, length, split) 
         terminal_ids.append("split-child")
     doc = {"source_id": "kems-fixture", "review_status": "reviewed",
            "species": {"Fe": {"observations": rows}}}
+    if cross_species:
+        doc["species"]["Mg"] = {"observations": [r for r in rows if r["observation_id"] in terminal_ids]}
+        doc["species"]["Fe"]["observations"] = [r for r in rows if r["observation_id"] not in terminal_ids]
     monkeypatch.setattr(extract_merge, "load_extracts", lambda directory: [doc])
     observations = load_adopted_observations()
     assert [o.observation_id for o in observations if o.adoption_basis != "superseded"] == terminal_ids

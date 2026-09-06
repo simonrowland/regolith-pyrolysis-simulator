@@ -142,6 +142,29 @@ def test_superseded_extract_is_outside_selected_denominator(extract_comparator, 
     assert rows and all(not row["selected"] and not row["score_eligible"] for row in rows)
 
 
+@pytest.mark.parametrize("key", ["class", "class_tag", "scientific_class", "evidence_kind",
+                                  "admission_status", "measurement_status", "status",
+                                  "alpha_role", "method_class"])
+@pytest.mark.parametrize("nested", [False, True])
+def test_unknown_evidence_marker_never_scores(extract_comparator, key, nested):
+    from scripts.calibration_battery import extract_rows, finalize_rows
+    from simulator.diagnostic_helpers import extract_reproduction as e
+    evaluate = e.evaluate_observation
+    obs = extract_comparator("match")
+    token = "novel_evidence_b481"
+    (obs.values if nested else obs.admission_metadata)[key] = token
+    reason = f"unknown_evidence_marker:{key}={token}"
+    assert e.observation_admission_reason(obs) == reason
+    result = evaluate(obs)
+    assert result.skip_reason == f"typed-refusal:{reason}"
+    assert not any(r.status in {"match", "mismatch"} for r in result.records)
+    # The fixture returns numeric comparator matches to test the battery gate independently.
+    rows = finalize_rows(extract_rows())
+    assert rows and all(not r["selected"] and not r["score_eligible"] for r in rows)
+    assert all(r["terminal_bucket"] != "scored" for r in rows)
+    assert all(set(r["signed_residual"].values()) == {None} for r in rows)
+
+
 def test_equal_measurements_without_supersession_remain_independent(extract_comparator, monkeypatch):
     from dataclasses import replace
     from scripts.calibration_battery import extract_rows

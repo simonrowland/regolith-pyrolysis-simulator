@@ -303,6 +303,10 @@ def load_vapor_pressure_data(
 
 def _refusal_marker_reason(markers: Mapping[str, Any]) -> str | None:
     # Explicit source roles, not ID/prose substrings or residual-based guesses.
+    for key, vocabulary in _EVIDENCE_VOCABULARY.items():
+        token = markers.get(key)
+        if token is not None and (not isinstance(token, str) or token not in vocabulary):
+            return f"unknown_evidence_marker:{key}={token}"
     for key in ("class", "class_tag", "scientific_class", "evidence_kind"):
         role = markers.get(key)
         if role in _ROLE_REFUSALS:
@@ -370,6 +374,29 @@ _MARKER_REFUSALS = {
     "withdrawn": "withdrawn",
 }
 
+# Exact existing source vocabulary. Unknown spellings must not gain admission.
+_EVIDENCE_VOCABULARY = {
+    **{key: set(_ROLE_REFUSALS) | {"measured"}
+       for key in ("class", "class_tag", "scientific_class")},
+    "evidence_kind": set(_ROLE_REFUSALS) | set(_MARKER_REFUSALS),
+    "method_class": set().union(*_EXCLUDED_METHOD_ROLES.values()) | {
+        "author_reported_envelope", "authors_reduced_from_ion_intensities",
+        "directly_reduced_measurement", "measured", "measured KEMS",
+        "measured_LA_ICP_MS", "measured_and_compiled_calorimetry", "measured_direct",
+        "measured_direct_qualitative", "measured_direct_qualitative_with_thermodynamic_crosscheck",
+        "measured_kems", "method_only", "mixed", "mixed_measured_and_model_curves",
+        "proxy", "qualitative_comparison", "second_law_kems", "third_law_kems",
+    },
+    "admission_status": set(_MARKER_REFUSALS) | {
+        "bound_not_point", "equipment_metadata", "note_parent_unaltered", "true_absence",
+    },
+    "status": set(_MARKER_REFUSALS) | {
+        "CONTESTED", "not_observed", "pointer_or_anchor_without_numeric_points",
+    },
+    "measurement_status": set(_MARKER_REFUSALS),
+    "alpha_role": set(_MARKER_REFUSALS),
+}
+
 
 def observation_admission_reason(obs: AdoptedObservation) -> str | None:
     """Shared scoring/selection gate; supersession is resolved by the loader."""
@@ -420,15 +447,17 @@ def load_adopted_observations(
                         float(dex) if dex is not None else None
                     )
 
+    # IDs are source-wide: replacement edges can cross species. Removing
+    # every parent also resolves A <- B <- C to terminal C.
+    superseded = {
+        (str(entry.get("source_id") or ""), str(row["supersedes"]))
+        for entry in extracts
+        for block in (entry.get("species") or {}).values()
+        for row in block.get("observations") or []
+        if row.get("supersedes")
+    }
     adopted: list[AdoptedObservation] = []
     for species_id, block in sorted((view.get("species") or {}).items()):
-        # Every edge removes its parent from scoring, so A <- B <- C leaves
-        # only C. Source/species scope prevents unrelated ID collisions.
-        superseded = {
-            (str(row.get("source_id") or ""), str(row["supersedes"]))
-            for row in block.get("observations") or []
-            if row.get("supersedes")
-        }
         for obs in block.get("observations") or []:
             otype = str(obs.get("type") or "")
             source_id = str(obs.get("source_id") or "")
