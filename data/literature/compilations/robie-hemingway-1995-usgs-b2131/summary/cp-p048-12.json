@@ -1,0 +1,187 @@
+{
+  "record_id": "cp-p048-12",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 54,
+  "page": 48,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
+  "name_as_published": "DILITHIUM MONOXIDE",
+  "formula_as_published": "Li20",
+  "phase_as_published": [],
+  "header_and_units_raw": "NAME AND FORMULA             ENTROPY              A1           A2           A3            A4             A5     T range   T...    A._H•\n                            J •IIIOL\"'·IC'                    (T)          n·2>        (T-o.&)         (T2)       IC       IC     kJ·•l\"'\n\n",
+  "source_text": "DILITHIUM MONOXIDE               37.6        6.133E+01    3.568E-02    -1.168E+06    -7.050£+01   -7.318E-06      298\nLi20                              0.8                                                                            2000",
+  "rows": [
+    {
+      "label_raw": "DILITHIUM MONOXIDE",
+      "cells": {
+        "entropy": {
+          "raw": "37.6",
+          "value": 37.6,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 33,
+          "end_offset": 37
+        },
+        "A1": {
+          "raw": "6.133E+01",
+          "value": 61.33,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 45,
+          "end_offset": 54
+        },
+        "A2": {
+          "raw": "3.568E-02",
+          "value": 0.03568,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 58,
+          "end_offset": 67
+        },
+        "A3": {
+          "raw": "-1.168E+06",
+          "value": -1168000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 71,
+          "end_offset": 81
+        },
+        "A4": {
+          "raw": "-7.050£+01",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 85,
+          "end_offset": 95
+        },
+        "A5": {
+          "raw": "-7.318E-06",
+          "value": -7.318e-06,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 98,
+          "end_offset": 108
+        },
+        "temperature_range": {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 114,
+          "end_offset": 117
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "Li20",
+      "cells": {
+        "entropy": {
+          "raw": "0.8",
+          "value": 0.8,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 34,
+          "end_offset": 37
+        },
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "2000",
+          "value": 2000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 113,
+          "end_offset": 117
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [],
+  "ambiguities": [
+    "A4: unparsed printed OCR token '-7.050£+01'",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 45,
+  "source_line_end": 46
+}

@@ -1,0 +1,136 @@
+{
+  "record_id": "cp-p048-08",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 54,
+  "page": 48,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "MAGNETITE",
+  "formula_candidate": "F~o4",
+  "header_and_units_raw": "NAME AND FORMULA             ENTROPY              A1           A2           A3            A4             A5     T range   T...    A._H•\n                            J •IIIOL\"'·IC'                    (T)          n·2>        (T-o.&)         (T2)       IC       IC     kJ·•l\"'\n\n",
+  "source_text": "MAGNETITE                       146.1 2.65911E+03 -2.5215E+OO          2.0734E+07 -3.6455E+04     1.3677E-03      298\nF~o4                              0.4                                                                             800",
+  "rows": [
+    {
+      "raw": "MAGNETITE                       146.1 2.65911E+03 -2.5215E+OO          2.0734E+07 -3.6455E+04     1.3677E-03      298",
+      "tokens": [
+        {
+          "raw": "MAGNETITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 9
+        },
+        {
+          "raw": "146.1",
+          "value": 146.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 32,
+          "end_offset": 37
+        },
+        {
+          "raw": "2.65911E+03",
+          "value": 2659.11,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 38,
+          "end_offset": 49
+        },
+        {
+          "raw": "-2.5215E+OO",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 50,
+          "end_offset": 61
+        },
+        {
+          "raw": "2.0734E+07",
+          "value": 20734000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 71,
+          "end_offset": 81
+        },
+        {
+          "raw": "-3.6455E+04",
+          "value": -36455.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 82,
+          "end_offset": 93
+        },
+        {
+          "raw": "1.3677E-03",
+          "value": 0.0013677,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 98,
+          "end_offset": 108
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 114,
+          "end_offset": 117
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "F~o4                              0.4                                                                             800",
+      "tokens": [
+        {
+          "raw": "F~o4",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 4
+        },
+        {
+          "raw": "0.4",
+          "value": 0.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 34,
+          "end_offset": 37
+        },
+        {
+          "raw": "800",
+          "value": 800.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 114,
+          "end_offset": 117
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A1: unparsed printed OCR token '2.65911E+03 -2.5215E+OO'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A1', '2.65911E+03 -2.5215E+OO')]",
+    "Body label or prose enters numeric region: [('A1', '2.65911E+03 -2.5215E+OO')]",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 33,
+  "source_line_end": 34
+}
