@@ -1,0 +1,92 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0239",
+  "census_id": "high-temperature-printed-page-265",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "SlGIIESIOPBIRITE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "199.997",
+    "value": 199.997,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      271
+    ],
+    "printed_pages": [
+      265
+    ],
+    "pdftotext_layout_page_file": "page-271.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "12 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 17, 32, 34, 37, 39, 41, 43, 49, 51, 55, 57, 88"
+  ],
+  "title_line_as_published": "SlGIIESIOPBIRITE                                                                           PORSULI lEIGHT    199.997",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "                  Alpha crys~als 298.15 to 665 1.                      Be~a    crystals 665 to 1230 1.",
+    "                  Gaaaa crys~als 1230 to 1800 1.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORUTIOII FROS THE ELBitEIITS",
+    "                                                                                                 GIBBS",
+    "TE.IlP.      (a;-a; 98 )/T        so",
+    "                                   T       -( G;-a;98 )/T        cop          BIITHlLPY       FREE BURGY      Log If"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "",
+    "entropy": "",
+    "negative_gibbs_function": "",
+    "heat_capacity": "",
+    "formation_enthalpy": "",
+    "formation_gibbs_energy": "",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 27,
+  "uncertainty_line_as_published": "",
+  "uncertainty_values": [],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 12 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 17, 32, 34, 37, 39, 41, 43, 49, 51, 55, 57, 88",
+      "detector_only": false
+    }
+  ]
+}
