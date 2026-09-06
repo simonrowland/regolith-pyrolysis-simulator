@@ -1,0 +1,153 @@
+{
+  "record_id": "cp-p043-15",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 49,
+  "page": 43,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SELECTED ELEMENTS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "TITANTIUM",
+  "formula_candidate": "Ti <•-crystal)",
+  "header_and_units_raw": "NAME AND FOIUIJLA    ENTROPY           A1            A2           A3            A4             A5     T rM~tt     Tan         A...H·\n                    J ·mor' ·K\"'                    (T)         (T-2,        (T~.&)          (T2)       K          K      kJ·•l\"'\n\n",
+  "source_text": "TITANTIUM                30.76 2.01595E+02 -1.4675E-01 1.97328E+06 -2.7691E+03           6.28E-05        298\nTi <•-crystal)            o. 10                                                                         1166",
+  "rows": [
+    {
+      "raw": "TITANTIUM                30.76 2.01595E+02 -1.4675E-01 1.97328E+06 -2.7691E+03           6.28E-05        298",
+      "tokens": [
+        {
+          "raw": "TITANTIUM",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 9
+        },
+        {
+          "raw": "30.76",
+          "value": 30.76,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 25,
+          "end_offset": 30
+        },
+        {
+          "raw": "2.01595E+02",
+          "value": 201.595,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 31,
+          "end_offset": 42
+        },
+        {
+          "raw": "-1.4675E-01",
+          "value": -0.14675,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 43,
+          "end_offset": 54
+        },
+        {
+          "raw": "1.97328E+06",
+          "value": 1973280.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 55,
+          "end_offset": 66
+        },
+        {
+          "raw": "-2.7691E+03",
+          "value": -2769.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 67,
+          "end_offset": 78
+        },
+        {
+          "raw": "6.28E-05",
+          "value": 6.28e-05,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 89,
+          "end_offset": 97
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 105,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "Ti <•-crystal)            o. 10                                                                         1166",
+      "tokens": [
+        {
+          "raw": "Ti",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 0,
+          "end_offset": 2
+        },
+        {
+          "raw": "<•-crystal)",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 3,
+          "end_offset": 14
+        },
+        {
+          "raw": "o.",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 26,
+          "end_offset": 28
+        },
+        {
+          "raw": "10",
+          "value": 10.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 29,
+          "end_offset": 31
+        },
+        {
+          "raw": "1166",
+          "value": 1166.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 104,
+          "end_offset": 108
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '-1.4675E-01 1.97328E+06'",
+    "entropy: unparsed printed OCR token 'o. 10'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A2', '-1.4675E-01 1.97328E+06'), (2, 'entropy', 'o. 10')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 55,
+  "source_line_end": 56
+}
