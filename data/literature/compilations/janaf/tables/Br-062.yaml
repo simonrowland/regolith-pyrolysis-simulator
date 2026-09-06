@@ -1,0 +1,1268 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Br-062.txt
+  source_sha256: bda950ea1f59a1befc2d3a83f2ba696403f0ba79d018a3636e2811149f15c694
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: Br-062
+  url: https://janaf.nist.gov/tables/Br-062.html
+  download_url: https://janaf.nist.gov/tables/Br-062.txt
+  index_entry:
+    formula: Br2Mo
+    name: Molybdenum Bromide
+    state: cr
+  title_as_published: Molybdenum Bromide (MoBr2)  |  Br2Mo1(cr)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 79.684
+      as_published: '79.684'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 124.683
+      as_published: '124.683'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 124.683
+      as_published: '124.683'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -202.924
+      as_published: '-202.924'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -186.189
+      as_published: '-186.189'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 32.62
+      as_published: '32.620'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 79.705
+      as_published: '79.705'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 125.176
+      as_published: '125.176'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 124.685
+      as_published: '124.685'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.147
+      as_published: '0.147'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -202.961
+      as_published: '-202.961'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -186.085
+      as_published: '-186.085'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 32.4
+      as_published: '32.400'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 80.751
+      as_published: '80.751'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 148.249
+      as_published: '148.249'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 127.824
+      as_published: '127.824'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 8.17
+      as_published: '8.170'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -231.874
+      as_published: '-231.874'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -174.412
+      as_published: '-174.412'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 22.776
+      as_published: '22.776'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 81.797
+      as_published: '81.797'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 166.381
+      as_published: '166.381'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 133.785
+      as_published: '133.785'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 16.298
+      as_published: '16.298'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -229.986
+      as_published: '-229.986'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -160.265
+      as_published: '-160.265'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 16.743
+      as_published: '16.743'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 82.843
+      as_published: '82.843'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 181.387
+      as_published: '181.387'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 140.504
+      as_published: '140.504'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 24.53
+      as_published: '24.530'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -228.091
+      as_published: '-228.091'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -146.499
+      as_published: '-146.499'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 12.754
+      as_published: '12.754'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 83.889
+      as_published: '83.889'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 194.235
+      as_published: '194.235'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 147.284
+      as_published: '147.284'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 32.866
+      as_published: '32.866'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -226.165
+      as_published: '-226.165'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -133.052
+      as_published: '-133.052'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 9.928
+      as_published: '9.928'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 84.935
+      as_published: '84.935'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 205.506
+      as_published: '205.506'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 153.871
+      as_published: '153.871'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 41.308
+      as_published: '41.308'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -224.197
+      as_published: '-224.197'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -119.884
+      as_published: '-119.884'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 7.828
+      as_published: '7.828'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 85.981
+      as_published: '85.981'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 215.57
+      as_published: '215.570'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 160.177
+      as_published: '160.177'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 49.853
+      as_published: '49.853'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -222.182
+      as_published: '-222.182'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -106.965
+      as_published: '-106.965'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 6.208
+      as_published: '6.208'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 87.027
+      as_published: '87.027'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 224.683
+      as_published: '224.683'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 166.179
+      as_published: '166.179'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 58.504
+      as_published: '58.504'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -220.118
+      as_published: '-220.118'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -94.273
+      as_published: '-94.273'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 4.924
+      as_published: '4.924'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1100'
+        column: T/K
+    heat_capacity:
+      value: 88.073
+      as_published: '88.073'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1100'
+        column: Cp°
+    entropy:
+      value: 233.027
+      as_published: '233.027'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 171.882
+      as_published: '171.882'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 67.259
+      as_published: '67.259'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -218.009
+      as_published: '-218.009'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -81.79
+      as_published: '-81.790'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 3.884
+      as_published: '3.884'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+  - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1200'
+        column: T/K
+    heat_capacity:
+      value: 89.119
+      as_published: '89.119'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1200'
+        column: Cp°
+    entropy:
+      value: 240.735
+      as_published: '240.735'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 177.303
+      as_published: '177.303'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 76.118
+      as_published: '76.118'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -215.86
+      as_published: '-215.860'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -69.501
+      as_published: '-69.501'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 3.025
+      as_published: '3.025'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1300'
+        column: T/K
+    heat_capacity:
+      value: 90.165
+      as_published: '90.165'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1300'
+        column: Cp°
+    entropy:
+      value: 247.909
+      as_published: '247.909'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 182.461
+      as_published: '182.461'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 85.083
+      as_published: '85.083'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -213.677
+      as_published: '-213.677'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -57.393
+      as_published: '-57.393'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 2.306
+      as_published: '2.306'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+  - temperature:
+      value: 1400.0
+      as_published: '1400'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1400'
+        column: T/K
+    heat_capacity:
+      value: 91.211
+      as_published: '91.211'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1400'
+        column: Cp°
+    entropy:
+      value: 254.63
+      as_published: '254.630'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 187.379
+      as_published: '187.379'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 94.152
+      as_published: '94.152'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -211.468
+      as_published: '-211.468'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -45.454
+      as_published: '-45.454'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.696
+      as_published: '1.696'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1400'
+        column: log Kf
+  - temperature:
+      value: 1500.0
+      as_published: '1500'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1500'
+        column: T/K
+    heat_capacity:
+      value: 92.257
+      as_published: '92.257'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1500'
+        column: Cp°
+    entropy:
+      value: 260.958
+      as_published: '260.958'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 192.075
+      as_published: '192.075'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 103.325
+      as_published: '103.325'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -209.238
+      as_published: '-209.238'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -33.674
+      as_published: '-33.674'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.173
+      as_published: '1.173'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1500'
+        column: log Kf
+  - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1600'
+        column: T/K
+    heat_capacity:
+      value: 93.303
+      as_published: '93.303'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1600'
+        column: Cp°
+    entropy:
+      value: 266.946
+      as_published: '266.946'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 196.569
+      as_published: '196.569'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 112.603
+      as_published: '112.603'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -206.997
+      as_published: '-206.997'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -22.043
+      as_published: '-22.043'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.72
+      as_published: '0.720'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1700'
+        column: T/K
+    heat_capacity:
+      value: 94.349
+      as_published: '94.349'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1700'
+        column: Cp°
+    entropy:
+      value: 272.634
+      as_published: '272.634'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 200.878
+      as_published: '200.878'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 121.986
+      as_published: '121.986'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -204.75
+      as_published: '-204.750'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -10.552
+      as_published: '-10.552'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.324
+      as_published: '0.324'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1800'
+        column: T/K
+    heat_capacity:
+      value: 95.395
+      as_published: '95.395'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1800'
+        column: Cp°
+    entropy:
+      value: 278.056
+      as_published: '278.056'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 205.016
+      as_published: '205.016'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 131.473
+      as_published: '131.473'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -202.508
+      as_published: '-202.508'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.807
+      as_published: '0.807'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.023
+      as_published: '-0.023'
+      locator:
+        table_id: Br-062
+        url: https://janaf.nist.gov/tables/Br-062.html
+        download_url: https://janaf.nist.gov/tables/Br-062.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+  parse_ambiguities: []

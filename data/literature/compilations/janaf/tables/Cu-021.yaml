@@ -1,0 +1,1640 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Cu-021.txt
+  source_sha256: 54af156f8efa686efa66648a60f8af2cd9cb843cf5767deec272415aa3eec4e2
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: Cu-021
+  url: https://janaf.nist.gov/tables/Cu-021.html
+  download_url: https://janaf.nist.gov/tables/Cu-021.txt
+  index_entry:
+    formula: Cu2O
+    name: Copper Oxide
+    state: cr,l
+  title_as_published: Copper Oxide (Cu2O)  |  Cu2O1(cr,l)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 0.0
+      as_published: '0'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '0'
+        column: T/K
+    heat_capacity:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '0'
+        column: Cp°
+    entropy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '0'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: INFINITE
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '0'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -12.6
+      as_published: '-12.600'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '0'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -168.952
+      as_published: '-168.952'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '0'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -168.952
+      as_published: '-168.952'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '0'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: INFINITE
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '0'
+        column: log Kf
+  - temperature:
+      value: 100.0
+      as_published: '100'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '100'
+        column: T/K
+    heat_capacity:
+      value: 39.499
+      as_published: '39.499'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '100'
+        column: Cp°
+    entropy:
+      value: 37.092
+      as_published: '37.092'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 141.51
+      as_published: '141.510'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -10.442
+      as_published: '-10.442'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -169.584
+      as_published: '-169.584'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -162.621
+      as_published: '-162.621'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 84.944
+      as_published: '84.944'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '100'
+        column: log Kf
+  - temperature:
+      value: 200.0
+      as_published: '200'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '200'
+        column: T/K
+    heat_capacity:
+      value: 53.619
+      as_published: '53.619'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '200'
+        column: Cp°
+    entropy:
+      value: 69.143
+      as_published: '69.143'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 97.826
+      as_published: '97.826'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -5.737
+      as_published: '-5.737'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -170.36
+      as_published: '-170.360'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -155.348
+      as_published: '-155.348'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 40.573
+      as_published: '40.573'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '200'
+        column: log Kf
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 62.543
+      as_published: '62.543'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 92.36
+      as_published: '92.360'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 92.36
+      as_published: '92.360'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -170.707
+      as_published: '-170.707'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -147.886
+      as_published: '-147.886'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 25.909
+      as_published: '25.909'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 62.664
+      as_published: '62.664'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 92.747
+      as_published: '92.747'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 92.361
+      as_published: '92.361'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.116
+      as_published: '0.116'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -170.709
+      as_published: '-170.709'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -147.745
+      as_published: '-147.745'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 25.725
+      as_published: '25.725'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 67.688
+      as_published: '67.688'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 111.531
+      as_published: '111.531'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 94.888
+      as_published: '94.888'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 6.657
+      as_published: '6.657'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -170.641
+      as_published: '-170.641'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -140.092
+      as_published: '-140.092'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 18.294
+      as_published: '18.294'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 70.922
+      as_published: '70.922'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 127.0
+      as_published: '127.000'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 99.809
+      as_published: '99.809'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 13.596
+      as_published: '13.596'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -170.363
+      as_published: '-170.363'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -132.484
+      as_published: '-132.484'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 13.84
+      as_published: '13.840'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 73.448
+      as_published: '73.448'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 140.161
+      as_published: '140.161'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 105.465
+      as_published: '105.465'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 20.818
+      as_published: '20.818'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -169.961
+      as_published: '-169.961'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -124.944
+      as_published: '-124.944'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 10.877
+      as_published: '10.877'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 75.645
+      as_published: '75.645'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 151.651
+      as_published: '151.651'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 111.259
+      as_published: '111.259'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 28.274
+      as_published: '28.274'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -169.479
+      as_published: '-169.479'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -117.478
+      as_published: '-117.478'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 8.766
+      as_published: '8.766'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 77.666
+      as_published: '77.666'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 161.886
+      as_published: '161.886'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 116.959
+      as_published: '116.959'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 35.941
+      as_published: '35.941'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -168.929
+      as_published: '-168.929'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -110.087
+      as_published: '-110.087'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 7.188
+      as_published: '7.188'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 79.493
+      as_published: '79.493'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 171.141
+      as_published: '171.141'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 122.473
+      as_published: '122.473'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 43.801
+      as_published: '43.801'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -168.325
+      as_published: '-168.325'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -102.767
+      as_published: '-102.767'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 5.964
+      as_published: '5.964'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 81.245
+      as_published: '81.245'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 179.606
+      as_published: '179.606'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 127.769
+      as_published: '127.769'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 51.837
+      as_published: '51.837'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -167.688
+      as_published: '-167.688'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -95.517
+      as_published: '-95.517'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 4.989
+      as_published: '4.989'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1100'
+        column: T/K
+    heat_capacity:
+      value: 83.385
+      as_published: '83.385'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1100'
+        column: Cp°
+    entropy:
+      value: 187.443
+      as_published: '187.443'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 132.842
+      as_published: '132.842'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 60.061
+      as_published: '60.061'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -167.029
+      as_published: '-167.029'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -88.331
+      as_published: '-88.331'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 4.194
+      as_published: '4.194'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+  - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1200'
+        column: T/K
+    heat_capacity:
+      value: 86.11
+      as_published: '86.110'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1200'
+        column: Cp°
+    entropy:
+      value: 194.812
+      as_published: '194.812'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 137.702
+      as_published: '137.702'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 68.532
+      as_published: '68.532'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -166.322
+      as_published: '-166.322'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -81.208
+      as_published: '-81.208'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 3.535
+      as_published: '3.535'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1300'
+        column: T/K
+    heat_capacity:
+      value: 89.173
+      as_published: '89.173'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1300'
+        column: Cp°
+    entropy:
+      value: 201.824
+      as_published: '201.824'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 142.367
+      as_published: '142.367'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 77.294
+      as_published: '77.294'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -165.608
+      as_published: '-165.608'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -74.144
+      as_published: '-74.144'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 2.979
+      as_published: '2.979'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+  - temperature:
+      value: 1400.0
+      as_published: '1400'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1400'
+        column: T/K
+    heat_capacity:
+      value: 92.489
+      as_published: '92.489'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1400'
+        column: Cp°
+    entropy:
+      value: 208.552
+      as_published: '208.552'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 146.855
+      as_published: '146.855'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 86.375
+      as_published: '86.375'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -191.165
+      as_published: '-191.165'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -66.321
+      as_published: '-66.321'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 2.474
+      as_published: '2.474'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1400'
+        column: log Kf
+  - temperature:
+      value: 1500.0
+      as_published: '1500'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1500'
+        column: T/K
+    heat_capacity:
+      value: 95.987
+      as_published: '95.987'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1500'
+        column: Cp°
+    entropy:
+      value: 215.052
+      as_published: '215.052'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 151.186
+      as_published: '151.186'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 95.798
+      as_published: '95.798'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -190.132
+      as_published: '-190.132'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -57.438
+      as_published: '-57.438'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 2.0
+      as_published: '2.000'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1500'
+        column: log Kf
+  - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1600'
+        column: T/K
+    heat_capacity:
+      value: 99.914
+      as_published: '99.914'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1600'
+        column: Cp°
+    entropy:
+      value: 264.163
+      as_published: '264.163'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 157.603
+      as_published: '157.603'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 170.497
+      as_published: '170.497'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -123.836
+      as_published: '-123.836'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -52.197
+      as_published: '-52.197'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.704
+      as_published: '1.704'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1700'
+        column: T/K
+    heat_capacity:
+      value: 99.914
+      as_published: '99.914'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1700'
+        column: Cp°
+    entropy:
+      value: 270.22
+      as_published: '270.220'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 164.051
+      as_published: '164.051'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 180.488
+      as_published: '180.488'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -122.259
+      as_published: '-122.259'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -47.768
+      as_published: '-47.768'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.468
+      as_published: '1.468'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1800'
+        column: T/K
+    heat_capacity:
+      value: 99.914
+      as_published: '99.914'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1800'
+        column: Cp°
+    entropy:
+      value: 275.931
+      as_published: '275.931'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 170.109
+      as_published: '170.109'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 190.48
+      as_published: '190.480'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -120.694
+      as_published: '-120.694'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -43.431
+      as_published: '-43.431'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.26
+      as_published: '1.260'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+  - temperature:
+      value: 1900.0
+      as_published: '1900'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1900'
+        column: T/K
+    heat_capacity:
+      value: 99.914
+      as_published: '99.914'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1900'
+        column: Cp°
+    entropy:
+      value: 281.333
+      as_published: '281.333'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 175.822
+      as_published: '175.822'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 200.471
+      as_published: '200.471'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -119.142
+      as_published: '-119.142'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -39.181
+      as_published: '-39.181'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.077
+      as_published: '1.077'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '1900'
+        column: log Kf
+  - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '2000'
+        column: T/K
+    heat_capacity:
+      value: 99.914
+      as_published: '99.914'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '2000'
+        column: Cp°
+    entropy:
+      value: 286.458
+      as_published: '286.458'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '2000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 181.227
+      as_published: '181.227'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '2000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 210.463
+      as_published: '210.463'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '2000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -117.6
+      as_published: '-117.600'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '2000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -35.013
+      as_published: '-35.013'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '2000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.914
+      as_published: '0.914'
+      locator:
+        table_id: Cu-021
+        url: https://janaf.nist.gov/tables/Cu-021.html
+        download_url: https://janaf.nist.gov/tables/Cu-021.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+  parse_ambiguities:
+  - line_number: 20
+    raw_line: "1516.700\t96.587\t216.118\t151.895\t97.406\tCRYSTAL <--> LIQUID"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cu-021
+      url: https://janaf.nist.gov/tables/Cu-021.html
+  - line_number: 22
+    raw_line: "1516.700\t99.914\t258.821\t151.895\t162.174\tTRANSITION"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cu-021
+      url: https://janaf.nist.gov/tables/Cu-021.html

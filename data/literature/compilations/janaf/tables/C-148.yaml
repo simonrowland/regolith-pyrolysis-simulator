@@ -1,0 +1,4724 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/C-148.txt
+  source_sha256: 6eaaa47df8d0799534cf1dc5fafeef8811668dbb92f81bc64debfd5ee9d367cc
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: C-148
+  url: https://janaf.nist.gov/tables/C-148.html
+  download_url: https://janaf.nist.gov/tables/C-148.txt
+  index_entry:
+    formula: C5
+    name: Carbon
+    state: g
+  title_as_published: Carbon (C5)  |  C5(g)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 0.0
+      as_published: '0'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '0'
+        column: T/K
+    heat_capacity:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '0'
+        column: Cp°
+    entropy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '0'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: INFINITE
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '0'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -11.914
+      as_published: '-11.914'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '0'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 972.398
+      as_published: '972.398'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '0'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 972.398
+      as_published: '972.398'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '0'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: INFINITE
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '0'
+        column: log Kf
+  - temperature:
+      value: 100.0
+      as_published: '100'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '100'
+        column: T/K
+    heat_capacity:
+      value: 30.26
+      as_published: '30.260'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '100'
+        column: Cp°
+    entropy:
+      value: 195.633
+      as_published: '195.633'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 285.525
+      as_published: '285.525'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -8.989
+      as_published: '-8.989'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 975.024
+      as_published: '975.024'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 955.937
+      as_published: '955.937'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -499.33
+      as_published: '-499.330'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '100'
+        column: log Kf
+  - temperature:
+      value: 200.0
+      as_published: '200'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '200'
+        column: T/K
+    heat_capacity:
+      value: 45.669
+      as_published: '45.669'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '200'
+        column: Cp°
+    entropy:
+      value: 220.67
+      as_published: '220.670'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 247.105
+      as_published: '247.105'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -5.287
+      as_published: '-5.287'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 977.094
+      as_published: '977.094'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 936.042
+      as_published: '936.042'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -244.469
+      as_published: '-244.469'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '200'
+        column: log Kf
+  - temperature:
+      value: 250.0
+      as_published: '250'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '250'
+        column: T/K
+    heat_capacity:
+      value: 54.253
+      as_published: '54.253'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '250'
+        column: Cp°
+    entropy:
+      value: 231.807
+      as_published: '231.807'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '250'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 242.941
+      as_published: '242.941'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '250'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -2.784
+      as_published: '-2.784'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '250'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 978.119
+      as_published: '978.119'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '250'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 925.66
+      as_published: '925.660'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '250'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -193.406
+      as_published: '-193.406'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '250'
+        column: log Kf
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 61.135
+      as_published: '61.135'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 241.972
+      as_published: '241.972'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 241.972
+      as_published: '241.972'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 979.056
+      as_published: '979.056'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 915.47
+      as_published: '915.470'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -160.387
+      as_published: '-160.387'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 61.372
+      as_published: '61.372'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 242.35
+      as_published: '242.350'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 241.973
+      as_published: '241.973'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.113
+      as_published: '0.113'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 979.09
+      as_published: '979.090'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 915.075
+      as_published: '915.075'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -159.329
+      as_published: '-159.329'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 350.0
+      as_published: '350'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '350'
+        column: T/K
+    heat_capacity:
+      value: 67.147
+      as_published: '67.147'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '350'
+        column: Cp°
+    entropy:
+      value: 252.26
+      as_published: '252.260'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '350'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 242.742
+      as_published: '242.742'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '350'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 3.331
+      as_published: '3.331'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '350'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 979.954
+      as_published: '979.954'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '350'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 904.336
+      as_published: '904.336'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '350'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -134.965
+      as_published: '-134.965'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '350'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 71.899
+      as_published: '71.899'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 261.546
+      as_published: '261.546'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 244.519
+      as_published: '244.519'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 6.811
+      as_published: '6.811'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 980.674
+      as_published: '980.674'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 893.482
+      as_published: '893.482'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -116.677
+      as_published: '-116.677'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 450.0
+      as_published: '450'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '450'
+        column: T/K
+    heat_capacity:
+      value: 75.903
+      as_published: '75.903'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '450'
+        column: Cp°
+    entropy:
+      value: 270.252
+      as_published: '270.252'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '450'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 246.899
+      as_published: '246.899'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '450'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 10.509
+      as_published: '10.509'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '450'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 981.231
+      as_published: '981.231'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '450'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 882.548
+      as_published: '882.548'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '450'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -102.444
+      as_published: '-102.444'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '450'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 79.347
+      as_published: '79.347'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 278.432
+      as_published: '278.432'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 249.648
+      as_published: '249.648'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 14.392
+      as_published: '14.392'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 981.622
+      as_published: '981.622'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 871.561
+      as_published: '871.561'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -91.051
+      as_published: '-91.051'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 85.013
+      as_published: '85.013'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 293.421
+      as_published: '293.421'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 255.718
+      as_published: '255.718'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 22.622
+      as_published: '22.622'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 981.961
+      as_published: '981.961'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 849.508
+      as_published: '849.508'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -73.956
+      as_published: '-73.956'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 89.478
+      as_published: '89.478'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 306.874
+      as_published: '306.874'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 262.081
+      as_published: '262.081'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 31.355
+      as_published: '31.355'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 981.829
+      as_published: '981.829'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 827.437
+      as_published: '827.437'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -61.744
+      as_published: '-61.744'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 93.049
+      as_published: '93.049'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 319.064
+      as_published: '319.064'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 268.454
+      as_published: '268.454'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 40.488
+      as_published: '40.488'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 981.357
+      as_published: '981.357'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 805.41
+      as_published: '805.410'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -52.588
+      as_published: '-52.588'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 95.926
+      as_published: '95.926'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 330.195
+      as_published: '330.195'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 274.705
+      as_published: '274.705'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 49.942
+      as_published: '49.942'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 980.638
+      as_published: '980.638'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 783.458
+      as_published: '783.458'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -45.471
+      as_published: '-45.471'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 98.259
+      as_published: '98.259'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 340.427
+      as_published: '340.427'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 280.772
+      as_published: '280.772'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 59.655
+      as_published: '59.655'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 979.736
+      as_published: '979.736'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 761.595
+      as_published: '761.595'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -39.782
+      as_published: '-39.782'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1100'
+        column: T/K
+    heat_capacity:
+      value: 100.164
+      as_published: '100.164'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1100'
+        column: Cp°
+    entropy:
+      value: 349.885
+      as_published: '349.885'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 286.631
+      as_published: '286.631'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 69.579
+      as_published: '69.579'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 978.691
+      as_published: '978.691'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 739.831
+      as_published: '739.831'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -35.132
+      as_published: '-35.132'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+  - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1200'
+        column: T/K
+    heat_capacity:
+      value: 101.731
+      as_published: '101.731'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1200'
+        column: Cp°
+    entropy:
+      value: 358.67
+      as_published: '358.670'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 292.273
+      as_published: '292.273'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 79.676
+      as_published: '79.676'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 977.532
+      as_published: '977.532'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 718.167
+      as_published: '718.167'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -31.261
+      as_published: '-31.261'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1300'
+        column: T/K
+    heat_capacity:
+      value: 103.029
+      as_published: '103.029'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1300'
+        column: Cp°
+    entropy:
+      value: 366.865
+      as_published: '366.865'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 297.699
+      as_published: '297.699'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 89.916
+      as_published: '89.916'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 976.277
+      as_published: '976.277'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 696.603
+      as_published: '696.603'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -27.99
+      as_published: '-27.990'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+  - temperature:
+      value: 1400.0
+      as_published: '1400'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1400'
+        column: T/K
+    heat_capacity:
+      value: 104.113
+      as_published: '104.113'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1400'
+        column: Cp°
+    entropy:
+      value: 374.541
+      as_published: '374.541'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 302.916
+      as_published: '302.916'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 100.275
+      as_published: '100.275'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 974.938
+      as_published: '974.938'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 675.14
+      as_published: '675.140'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -25.19
+      as_published: '-25.190'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1400'
+        column: log Kf
+  - temperature:
+      value: 1500.0
+      as_published: '1500'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1500'
+        column: T/K
+    heat_capacity:
+      value: 105.025
+      as_published: '105.025'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1500'
+        column: Cp°
+    entropy:
+      value: 381.756
+      as_published: '381.756'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 307.934
+      as_published: '307.934'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 110.733
+      as_published: '110.733'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 973.524
+      as_published: '973.524'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 653.774
+      as_published: '653.774'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -22.766
+      as_published: '-22.766'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1500'
+        column: log Kf
+  - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1600'
+        column: T/K
+    heat_capacity:
+      value: 105.798
+      as_published: '105.798'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1600'
+        column: Cp°
+    entropy:
+      value: 388.56
+      as_published: '388.560'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 312.763
+      as_published: '312.763'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 121.276
+      as_published: '121.276'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 972.041
+      as_published: '972.041'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 632.506
+      as_published: '632.506'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -20.649
+      as_published: '-20.649'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1700'
+        column: T/K
+    heat_capacity:
+      value: 106.457
+      as_published: '106.457'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1700'
+        column: Cp°
+    entropy:
+      value: 394.994
+      as_published: '394.994'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 317.412
+      as_published: '317.412'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 131.889
+      as_published: '131.889'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 970.494
+      as_published: '970.494'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 611.332
+      as_published: '611.332'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -18.784
+      as_published: '-18.784'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1800'
+        column: T/K
+    heat_capacity:
+      value: 107.023
+      as_published: '107.023'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1800'
+        column: Cp°
+    entropy:
+      value: 401.096
+      as_published: '401.096'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 321.893
+      as_published: '321.893'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 142.564
+      as_published: '142.564'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 968.885
+      as_published: '968.885'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 590.251
+      as_published: '590.251'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -17.129
+      as_published: '-17.129'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+  - temperature:
+      value: 1900.0
+      as_published: '1900'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1900'
+        column: T/K
+    heat_capacity:
+      value: 107.513
+      as_published: '107.513'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1900'
+        column: Cp°
+    entropy:
+      value: 406.895
+      as_published: '406.895'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 326.216
+      as_published: '326.216'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 153.291
+      as_published: '153.291'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 967.218
+      as_published: '967.218'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 569.261
+      as_published: '569.261'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -15.65
+      as_published: '-15.650'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '1900'
+        column: log Kf
+  - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2000'
+        column: T/K
+    heat_capacity:
+      value: 107.938
+      as_published: '107.938'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2000'
+        column: Cp°
+    entropy:
+      value: 412.421
+      as_published: '412.421'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 330.389
+      as_published: '330.389'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 164.064
+      as_published: '164.064'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 965.493
+      as_published: '965.493'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 548.36
+      as_published: '548.360'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -14.322
+      as_published: '-14.322'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+  - temperature:
+      value: 2100.0
+      as_published: '2100'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2100'
+        column: T/K
+    heat_capacity:
+      value: 108.31
+      as_published: '108.310'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2100'
+        column: Cp°
+    entropy:
+      value: 417.697
+      as_published: '417.697'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 334.422
+      as_published: '334.422'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 174.877
+      as_published: '174.877'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 963.713
+      as_published: '963.713'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 527.547
+      as_published: '527.547'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -13.122
+      as_published: '-13.122'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2100'
+        column: log Kf
+  - temperature:
+      value: 2200.0
+      as_published: '2200'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2200'
+        column: T/K
+    heat_capacity:
+      value: 108.637
+      as_published: '108.637'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2200'
+        column: Cp°
+    entropy:
+      value: 422.743
+      as_published: '422.743'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 338.323
+      as_published: '338.323'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 185.725
+      as_published: '185.725'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 961.877
+      as_published: '961.877'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 506.82
+      as_published: '506.820'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -12.033
+      as_published: '-12.033'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2200'
+        column: log Kf
+  - temperature:
+      value: 2300.0
+      as_published: '2300'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2300'
+        column: T/K
+    heat_capacity:
+      value: 108.925
+      as_published: '108.925'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2300'
+        column: Cp°
+    entropy:
+      value: 427.579
+      as_published: '427.579'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 342.099
+      as_published: '342.099'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 196.603
+      as_published: '196.603'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 959.988
+      as_published: '959.988'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 486.177
+      as_published: '486.177'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -11.041
+      as_published: '-11.041'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2300'
+        column: log Kf
+  - temperature:
+      value: 2400.0
+      as_published: '2400'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2400'
+        column: T/K
+    heat_capacity:
+      value: 109.181
+      as_published: '109.181'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2400'
+        column: Cp°
+    entropy:
+      value: 432.22
+      as_published: '432.220'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 345.758
+      as_published: '345.758'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 207.509
+      as_published: '207.509'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 958.045
+      as_published: '958.045'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 465.618
+      as_published: '465.618'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -10.134
+      as_published: '-10.134'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2400'
+        column: log Kf
+  - temperature:
+      value: 2500.0
+      as_published: '2500'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2500'
+        column: T/K
+    heat_capacity:
+      value: 109.409
+      as_published: '109.409'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2500'
+        column: Cp°
+    entropy:
+      value: 436.682
+      as_published: '436.682'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 349.306
+      as_published: '349.306'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 218.439
+      as_published: '218.439'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 956.049
+      as_published: '956.049'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 445.142
+      as_published: '445.142'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -9.301
+      as_published: '-9.301'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2500'
+        column: log Kf
+  - temperature:
+      value: 2600.0
+      as_published: '2600'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2600'
+        column: T/K
+    heat_capacity:
+      value: 109.613
+      as_published: '109.613'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2600'
+        column: Cp°
+    entropy:
+      value: 440.977
+      as_published: '440.977'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 352.75
+      as_published: '352.750'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 229.39
+      as_published: '229.390'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 954.001
+      as_published: '954.001'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 424.745
+      as_published: '424.745'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -8.533
+      as_published: '-8.533'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2600'
+        column: log Kf
+  - temperature:
+      value: 2700.0
+      as_published: '2700'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2700'
+        column: T/K
+    heat_capacity:
+      value: 109.796
+      as_published: '109.796'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2700'
+        column: Cp°
+    entropy:
+      value: 445.117
+      as_published: '445.117'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 356.095
+      as_published: '356.095'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 240.36
+      as_published: '240.360'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 951.9
+      as_published: '951.900'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 404.429
+      as_published: '404.429'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -7.824
+      as_published: '-7.824'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2700'
+        column: log Kf
+  - temperature:
+      value: 2800.0
+      as_published: '2800'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2800'
+        column: T/K
+    heat_capacity:
+      value: 109.96
+      as_published: '109.960'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2800'
+        column: Cp°
+    entropy:
+      value: 449.113
+      as_published: '449.113'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 359.346
+      as_published: '359.346'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 251.348
+      as_published: '251.348'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 949.748
+      as_published: '949.748'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 384.192
+      as_published: '384.192'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -7.167
+      as_published: '-7.167'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2800'
+        column: log Kf
+  - temperature:
+      value: 2900.0
+      as_published: '2900'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2900'
+        column: T/K
+    heat_capacity:
+      value: 110.109
+      as_published: '110.109'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2900'
+        column: Cp°
+    entropy:
+      value: 452.974
+      as_published: '452.974'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 362.508
+      as_published: '362.508'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 262.352
+      as_published: '262.352'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 947.544
+      as_published: '947.544'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 364.032
+      as_published: '364.032'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -6.557
+      as_published: '-6.557'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '2900'
+        column: log Kf
+  - temperature:
+      value: 3000.0
+      as_published: '3000'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3000'
+        column: T/K
+    heat_capacity:
+      value: 110.244
+      as_published: '110.244'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3000'
+        column: Cp°
+    entropy:
+      value: 456.71
+      as_published: '456.710'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 365.586
+      as_published: '365.586'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 273.37
+      as_published: '273.370'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 945.289
+      as_published: '945.289'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 343.949
+      as_published: '343.949'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -5.989
+      as_published: '-5.989'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3000'
+        column: log Kf
+  - temperature:
+      value: 3100.0
+      as_published: '3100'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3100'
+        column: T/K
+    heat_capacity:
+      value: 110.367
+      as_published: '110.367'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3100'
+        column: Cp°
+    entropy:
+      value: 460.327
+      as_published: '460.327'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 368.584
+      as_published: '368.584'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 284.4
+      as_published: '284.400'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 942.982
+      as_published: '942.982'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 323.942
+      as_published: '323.942'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -5.458
+      as_published: '-5.458'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3100'
+        column: log Kf
+  - temperature:
+      value: 3200.0
+      as_published: '3200'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3200'
+        column: T/K
+    heat_capacity:
+      value: 110.479
+      as_published: '110.479'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3200'
+        column: Cp°
+    entropy:
+      value: 463.832
+      as_published: '463.832'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 371.506
+      as_published: '371.506'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 295.443
+      as_published: '295.443'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 940.624
+      as_published: '940.624'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 304.011
+      as_published: '304.011'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.962
+      as_published: '-4.962'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3200'
+        column: log Kf
+  - temperature:
+      value: 3300.0
+      as_published: '3300'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3300'
+        column: T/K
+    heat_capacity:
+      value: 110.581
+      as_published: '110.581'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3300'
+        column: Cp°
+    entropy:
+      value: 467.234
+      as_published: '467.234'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 374.356
+      as_published: '374.356'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 306.496
+      as_published: '306.496'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 938.215
+      as_published: '938.215'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 284.154
+      as_published: '284.154'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.498
+      as_published: '-4.498'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3300'
+        column: log Kf
+  - temperature:
+      value: 3400.0
+      as_published: '3400'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3400'
+        column: T/K
+    heat_capacity:
+      value: 110.675
+      as_published: '110.675'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3400'
+        column: Cp°
+    entropy:
+      value: 470.536
+      as_published: '470.536'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 377.137
+      as_published: '377.137'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 317.559
+      as_published: '317.559'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 935.755
+      as_published: '935.755'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 264.371
+      as_published: '264.371'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.062
+      as_published: '-4.062'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3400'
+        column: log Kf
+  - temperature:
+      value: 3500.0
+      as_published: '3500'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3500'
+        column: T/K
+    heat_capacity:
+      value: 110.761
+      as_published: '110.761'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3500'
+        column: Cp°
+    entropy:
+      value: 473.746
+      as_published: '473.746'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 379.851
+      as_published: '379.851'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 328.631
+      as_published: '328.631'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 933.244
+      as_published: '933.244'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 244.66
+      as_published: '244.660'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.651
+      as_published: '-3.651'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3500'
+        column: log Kf
+  - temperature:
+      value: 3600.0
+      as_published: '3600'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3600'
+        column: T/K
+    heat_capacity:
+      value: 110.84
+      as_published: '110.840'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3600'
+        column: Cp°
+    entropy:
+      value: 476.867
+      as_published: '476.867'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 382.503
+      as_published: '382.503'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 339.711
+      as_published: '339.711'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 930.682
+      as_published: '930.682'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 225.023
+      as_published: '225.023'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.265
+      as_published: '-3.265'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3600'
+        column: log Kf
+  - temperature:
+      value: 3700.0
+      as_published: '3700'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3700'
+        column: T/K
+    heat_capacity:
+      value: 110.913
+      as_published: '110.913'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3700'
+        column: Cp°
+    entropy:
+      value: 479.905
+      as_published: '479.905'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 385.094
+      as_published: '385.094'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 350.798
+      as_published: '350.798'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 928.069
+      as_published: '928.069'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 205.457
+      as_published: '205.457'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.901
+      as_published: '-2.901'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3700'
+        column: log Kf
+  - temperature:
+      value: 3800.0
+      as_published: '3800'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3800'
+        column: T/K
+    heat_capacity:
+      value: 110.981
+      as_published: '110.981'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3800'
+        column: Cp°
+    entropy:
+      value: 482.864
+      as_published: '482.864'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 387.629
+      as_published: '387.629'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 361.893
+      as_published: '361.893'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 925.406
+      as_published: '925.406'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 185.962
+      as_published: '185.962'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.556
+      as_published: '-2.556'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3800'
+        column: log Kf
+  - temperature:
+      value: 3900.0
+      as_published: '3900'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3900'
+        column: T/K
+    heat_capacity:
+      value: 111.043
+      as_published: '111.043'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3900'
+        column: Cp°
+    entropy:
+      value: 485.747
+      as_published: '485.747'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 390.108
+      as_published: '390.108'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 372.994
+      as_published: '372.994'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 922.692
+      as_published: '922.692'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 166.539
+      as_published: '166.539'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.231
+      as_published: '-2.231'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '3900'
+        column: log Kf
+  - temperature:
+      value: 4000.0
+      as_published: '4000'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4000'
+        column: T/K
+    heat_capacity:
+      value: 111.101
+      as_published: '111.101'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4000'
+        column: Cp°
+    entropy:
+      value: 488.559
+      as_published: '488.559'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 392.534
+      as_published: '392.534'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 384.101
+      as_published: '384.101'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 919.927
+      as_published: '919.927'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 147.185
+      as_published: '147.185'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.922
+      as_published: '-1.922'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4000'
+        column: log Kf
+  - temperature:
+      value: 4100.0
+      as_published: '4100'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4100'
+        column: T/K
+    heat_capacity:
+      value: 111.155
+      as_published: '111.155'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4100'
+        column: Cp°
+    entropy:
+      value: 491.303
+      as_published: '491.303'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 394.91
+      as_published: '394.910'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 395.214
+      as_published: '395.214'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 917.111
+      as_published: '917.111'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 127.901
+      as_published: '127.901'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.629
+      as_published: '-1.629'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4100'
+        column: log Kf
+  - temperature:
+      value: 4200.0
+      as_published: '4200'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4200'
+        column: T/K
+    heat_capacity:
+      value: 111.206
+      as_published: '111.206'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4200'
+        column: Cp°
+    entropy:
+      value: 493.983
+      as_published: '493.983'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 397.237
+      as_published: '397.237'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 406.332
+      as_published: '406.332'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 914.245
+      as_published: '914.245'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 108.687
+      as_published: '108.687'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.352
+      as_published: '-1.352'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4200'
+        column: log Kf
+  - temperature:
+      value: 4300.0
+      as_published: '4300'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4300'
+        column: T/K
+    heat_capacity:
+      value: 111.252
+      as_published: '111.252'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4300'
+        column: Cp°
+    entropy:
+      value: 496.6
+      as_published: '496.600'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 399.517
+      as_published: '399.517'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 417.455
+      as_published: '417.455'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 911.328
+      as_published: '911.328'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 89.541
+      as_published: '89.541'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.088
+      as_published: '-1.088'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4300'
+        column: log Kf
+  - temperature:
+      value: 4400.0
+      as_published: '4400'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4400'
+        column: T/K
+    heat_capacity:
+      value: 111.296
+      as_published: '111.296'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4400'
+        column: Cp°
+    entropy:
+      value: 499.158
+      as_published: '499.158'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 401.753
+      as_published: '401.753'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 428.583
+      as_published: '428.583'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 908.361
+      as_published: '908.361'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 70.464
+      as_published: '70.464'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.837
+      as_published: '-0.837'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4400'
+        column: log Kf
+  - temperature:
+      value: 4500.0
+      as_published: '4500'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4500'
+        column: T/K
+    heat_capacity:
+      value: 111.337
+      as_published: '111.337'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4500'
+        column: Cp°
+    entropy:
+      value: 501.66
+      as_published: '501.660'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 403.945
+      as_published: '403.945'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 439.714
+      as_published: '439.714'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 905.343
+      as_published: '905.343'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 51.455
+      as_published: '51.455'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.597
+      as_published: '-0.597'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4500'
+        column: log Kf
+  - temperature:
+      value: 4600.0
+      as_published: '4600'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4600'
+        column: T/K
+    heat_capacity:
+      value: 111.376
+      as_published: '111.376'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4600'
+        column: Cp°
+    entropy:
+      value: 504.107
+      as_published: '504.107'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 406.096
+      as_published: '406.096'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 450.85
+      as_published: '450.850'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 902.275
+      as_published: '902.275'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 32.513
+      as_published: '32.513'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.369
+      as_published: '-0.369'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4600'
+        column: log Kf
+  - temperature:
+      value: 4700.0
+      as_published: '4700'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4700'
+        column: T/K
+    heat_capacity:
+      value: 111.412
+      as_published: '111.412'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4700'
+        column: Cp°
+    entropy:
+      value: 506.503
+      as_published: '506.503'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 408.207
+      as_published: '408.207'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 461.99
+      as_published: '461.990'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 899.156
+      as_published: '899.156'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 13.639
+      as_published: '13.639'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.152
+      as_published: '-0.152'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4700'
+        column: log Kf
+  - temperature:
+      value: 4800.0
+      as_published: '4800'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4800'
+        column: T/K
+    heat_capacity:
+      value: 111.446
+      as_published: '111.446'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4800'
+        column: Cp°
+    entropy:
+      value: 508.849
+      as_published: '508.849'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 410.279
+      as_published: '410.279'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 473.132
+      as_published: '473.132'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 895.987
+      as_published: '895.987'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5.168
+      as_published: '-5.168'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.056
+      as_published: '0.056'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4800'
+        column: log Kf
+  - temperature:
+      value: 4900.0
+      as_published: '4900'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4900'
+        column: T/K
+    heat_capacity:
+      value: 111.477
+      as_published: '111.477'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4900'
+        column: Cp°
+    entropy:
+      value: 511.147
+      as_published: '511.147'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 412.315
+      as_published: '412.315'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 484.279
+      as_published: '484.279'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 892.767
+      as_published: '892.767'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -23.909
+      as_published: '-23.909'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.255
+      as_published: '0.255'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '4900'
+        column: log Kf
+  - temperature:
+      value: 5000.0
+      as_published: '5000'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5000'
+        column: T/K
+    heat_capacity:
+      value: 111.507
+      as_published: '111.507'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5000'
+        column: Cp°
+    entropy:
+      value: 513.399
+      as_published: '513.399'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 414.314
+      as_published: '414.314'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 495.428
+      as_published: '495.428'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 889.496
+      as_published: '889.496'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -42.584
+      as_published: '-42.584'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.445
+      as_published: '0.445'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5000'
+        column: log Kf
+  - temperature:
+      value: 5100.0
+      as_published: '5100'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5100'
+        column: T/K
+    heat_capacity:
+      value: 111.536
+      as_published: '111.536'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5100'
+        column: Cp°
+    entropy:
+      value: 515.608
+      as_published: '515.608'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 416.278
+      as_published: '416.278'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 506.58
+      as_published: '506.580'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 886.176
+      as_published: '886.176'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -61.192
+      as_published: '-61.192'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.627
+      as_published: '0.627'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5100'
+        column: log Kf
+  - temperature:
+      value: 5200.0
+      as_published: '5200'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5200'
+        column: T/K
+    heat_capacity:
+      value: 111.562
+      as_published: '111.562'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5200'
+        column: Cp°
+    entropy:
+      value: 517.774
+      as_published: '517.774'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 418.209
+      as_published: '418.209'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 517.735
+      as_published: '517.735'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 882.804
+      as_published: '882.804'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -79.735
+      as_published: '-79.735'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.801
+      as_published: '0.801'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5200'
+        column: log Kf
+  - temperature:
+      value: 5300.0
+      as_published: '5300'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5300'
+        column: T/K
+    heat_capacity:
+      value: 111.587
+      as_published: '111.587'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5300'
+        column: Cp°
+    entropy:
+      value: 519.899
+      as_published: '519.899'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 420.108
+      as_published: '420.108'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 528.892
+      as_published: '528.892'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 879.383
+      as_published: '879.383'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -98.213
+      as_published: '-98.213'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.968
+      as_published: '0.968'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5300'
+        column: log Kf
+  - temperature:
+      value: 5400.0
+      as_published: '5400'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5400'
+        column: T/K
+    heat_capacity:
+      value: 111.611
+      as_published: '111.611'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5400'
+        column: Cp°
+    entropy:
+      value: 521.985
+      as_published: '521.985'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 421.976
+      as_published: '421.976'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 540.052
+      as_published: '540.052'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 875.91
+      as_published: '875.910'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -116.626
+      as_published: '-116.626'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.128
+      as_published: '1.128'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5400'
+        column: log Kf
+  - temperature:
+      value: 5500.0
+      as_published: '5500'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5500'
+        column: T/K
+    heat_capacity:
+      value: 111.634
+      as_published: '111.634'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5500'
+        column: Cp°
+    entropy:
+      value: 524.033
+      as_published: '524.033'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 423.813
+      as_published: '423.813'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 551.215
+      as_published: '551.215'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 872.388
+      as_published: '872.388'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -134.974
+      as_published: '-134.974'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.282
+      as_published: '1.282'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5500'
+        column: log Kf
+  - temperature:
+      value: 5600.0
+      as_published: '5600'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5600'
+        column: T/K
+    heat_capacity:
+      value: 111.655
+      as_published: '111.655'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5600'
+        column: Cp°
+    entropy:
+      value: 526.045
+      as_published: '526.045'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 425.62
+      as_published: '425.620'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 562.379
+      as_published: '562.379'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 868.815
+      as_published: '868.815'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -153.257
+      as_published: '-153.257'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.43
+      as_published: '1.430'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5600'
+        column: log Kf
+  - temperature:
+      value: 5700.0
+      as_published: '5700'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5700'
+        column: T/K
+    heat_capacity:
+      value: 111.676
+      as_published: '111.676'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5700'
+        column: Cp°
+    entropy:
+      value: 528.021
+      as_published: '528.021'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 427.399
+      as_published: '427.399'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 573.546
+      as_published: '573.546'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 865.191
+      as_published: '865.191'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -171.477
+      as_published: '-171.477'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.571
+      as_published: '1.571'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5700'
+        column: log Kf
+  - temperature:
+      value: 5800.0
+      as_published: '5800'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5800'
+        column: T/K
+    heat_capacity:
+      value: 111.695
+      as_published: '111.695'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5800'
+        column: Cp°
+    entropy:
+      value: 529.964
+      as_published: '529.964'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 429.151
+      as_published: '429.151'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 584.714
+      as_published: '584.714'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 861.517
+      as_published: '861.517'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -189.632
+      as_published: '-189.632'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.708
+      as_published: '1.708'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5800'
+        column: log Kf
+  - temperature:
+      value: 5900.0
+      as_published: '5900'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5900'
+        column: T/K
+    heat_capacity:
+      value: 111.713
+      as_published: '111.713'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5900'
+        column: Cp°
+    entropy:
+      value: 531.873
+      as_published: '531.873'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 430.876
+      as_published: '430.876'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 595.885
+      as_published: '595.885'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 857.793
+      as_published: '857.793'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -207.723
+      as_published: '-207.723'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.839
+      as_published: '1.839'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '5900'
+        column: log Kf
+  - temperature:
+      value: 6000.0
+      as_published: '6000'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '6000'
+        column: T/K
+    heat_capacity:
+      value: 111.73
+      as_published: '111.730'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '6000'
+        column: Cp°
+    entropy:
+      value: 533.751
+      as_published: '533.751'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '6000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 432.575
+      as_published: '432.575'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '6000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 607.057
+      as_published: '607.057'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '6000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 854.018
+      as_published: '854.018'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '6000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -225.751
+      as_published: '-225.751'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '6000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.965
+      as_published: '1.965'
+      locator:
+        table_id: C-148
+        url: https://janaf.nist.gov/tables/C-148.html
+        download_url: https://janaf.nist.gov/tables/C-148.txt
+        row_temperature_as_published: '6000'
+        column: log Kf
+  parse_ambiguities: []

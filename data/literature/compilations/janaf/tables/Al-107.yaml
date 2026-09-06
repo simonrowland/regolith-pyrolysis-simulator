@@ -1,0 +1,2300 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Al-107.txt
+  source_sha256: 51b5da7f97b2233c0da5bdae8a5e70e742c3573d8ab0c95f6b2e607edace3dbf
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: Al-107
+  url: https://janaf.nist.gov/tables/Al-107.html
+  download_url: https://janaf.nist.gov/tables/Al-107.txt
+  index_entry:
+    formula: Al3F14Na5
+    name: Chiolite
+    state: l
+  title_as_published: Chiolite (Na5Al3F14)  |  Al3F14Na5(l)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 0.0
+      as_published: '0'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '0'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '0'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '0'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '0'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '0'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '0'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '0'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '0'
+        column: log Kf
+  - temperature:
+      value: 100.0
+      as_published: '100'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '100'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '100'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '100'
+        column: log Kf
+  - temperature:
+      value: 200.0
+      as_published: '200'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '200'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '200'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '200'
+        column: log Kf
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 454.006
+      as_published: '454.006'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 532.124
+      as_published: '532.124'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 532.124
+      as_published: '532.124'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7497.408
+      as_published: '-7497.408'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -7130.832
+      as_published: '-7130.832'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1249.292
+      as_published: '1249.292'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 455.094
+      as_published: '455.094'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 534.935
+      as_published: '534.935'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 532.132
+      as_published: '532.132'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.841
+      as_published: '0.841'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7497.367
+      as_published: '-7497.367'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -7128.557
+      as_published: '-7128.557'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1241.192
+      as_published: '1241.192'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 499.57
+      as_published: '499.570'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 672.402
+      as_published: '672.402'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 550.572
+      as_published: '550.572'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 48.732
+      as_published: '48.732'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7507.644
+      as_published: '-7507.644'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -7004.995
+      as_published: '-7004.995'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 914.759
+      as_published: '914.759'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 525.092
+      as_published: '525.092'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 786.767
+      as_published: '786.767'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 586.704
+      as_published: '586.704'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 100.031
+      as_published: '100.031'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7503.309
+      as_published: '-7503.309'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -6879.797
+      as_published: '-6879.797'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 718.727
+      as_published: '718.727'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 542.665
+      as_published: '542.665'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 884.124
+      as_published: '884.124'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 628.363
+      as_published: '628.363'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 153.456
+      as_published: '153.456'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7497.486
+      as_published: '-7497.486'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -6755.621
+      as_published: '-6755.621'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 588.129
+      as_published: '588.129'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 1000.02
+      as_published: '1000.020'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 672.212
+      as_published: '672.212'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 229.465
+      as_published: '229.465'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7469.641
+      as_published: '-7469.641'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -6633.296
+      as_published: '-6633.296'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 494.983
+      as_published: '494.983'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 1130.062
+      as_published: '1130.062'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 721.496
+      as_published: '721.496'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 326.852
+      as_published: '326.852'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7421.008
+      as_published: '-7421.008'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -6517.144
+      as_published: '-6517.144'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 425.526
+      as_published: '425.526'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 1244.767
+      as_published: '1244.767'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 773.39
+      as_published: '773.390'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 424.239
+      as_published: '424.239'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7373.059
+      as_published: '-7373.059'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -6407.048
+      as_published: '-6407.048'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 371.855
+      as_published: '371.855'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 1347.374
+      as_published: '1347.374'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 825.748
+      as_published: '825.748'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 521.626
+      as_published: '521.626'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7357.686
+      as_published: '-7357.686'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -6299.969
+      as_published: '-6299.969'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 329.077
+      as_published: '329.077'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1200'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1200'
+        column: Cp°
+    entropy:
+      value: 1524.931
+      as_published: '1524.931'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 927.932
+      as_published: '927.932'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 716.399
+      as_published: '716.399'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7747.317
+      as_published: '-7747.317'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -6085.098
+      as_published: '-6085.098'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 264.877
+      as_published: '264.877'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1300'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1300'
+        column: Cp°
+    entropy:
+      value: 1602.882
+      as_published: '1602.882'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 976.893
+      as_published: '976.893'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 813.786
+      as_published: '813.786'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7696.233
+      as_published: '-7696.233'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5948.652
+      as_published: '-5948.652'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 239.02
+      as_published: '239.020'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+  - temperature:
+      value: 1400.0
+      as_published: '1400'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1400'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1400'
+        column: Cp°
+    entropy:
+      value: 1675.053
+      as_published: '1675.053'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1024.216
+      as_published: '1024.216'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 911.173
+      as_published: '911.173'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7645.3
+      as_published: '-7645.300'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5816.135
+      as_published: '-5816.135'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 217.003
+      as_published: '217.003'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1400'
+        column: log Kf
+  - temperature:
+      value: 1500.0
+      as_published: '1500'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1500'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1500'
+        column: Cp°
+    entropy:
+      value: 1742.243
+      as_published: '1742.243'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1069.87
+      as_published: '1069.870'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1008.56
+      as_published: '1008.560'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7594.505
+      as_published: '-7594.505'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5687.253
+      as_published: '-5687.253'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 198.048
+      as_published: '198.048'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1500'
+        column: log Kf
+  - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1600'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1600'
+        column: Cp°
+    entropy:
+      value: 1805.095
+      as_published: '1805.095'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1113.879
+      as_published: '1113.879'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1105.947
+      as_published: '1105.947'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7543.838
+      as_published: '-7543.838'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5561.756
+      as_published: '-5561.756'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 181.573
+      as_published: '181.573'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1700'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1700'
+        column: Cp°
+    entropy:
+      value: 1864.136
+      as_published: '1864.136'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1156.293
+      as_published: '1156.293'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1203.333
+      as_published: '1203.333'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7493.288
+      as_published: '-7493.288'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5439.424
+      as_published: '-5439.424'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 167.133
+      as_published: '167.133'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1800'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1800'
+        column: Cp°
+    entropy:
+      value: 1919.8
+      as_published: '1919.800'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1197.178
+      as_published: '1197.178'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1300.72
+      as_published: '1300.720'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7442.84
+      as_published: '-7442.840'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5320.064
+      as_published: '-5320.064'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 154.384
+      as_published: '154.384'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+  - temperature:
+      value: 1900.0
+      as_published: '1900'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1900'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1900'
+        column: Cp°
+    entropy:
+      value: 1972.455
+      as_published: '1972.455'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1236.609
+      as_published: '1236.609'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1398.107
+      as_published: '1398.107'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7392.479
+      as_published: '-7392.479'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5203.508
+      as_published: '-5203.508'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 143.054
+      as_published: '143.054'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '1900'
+        column: log Kf
+  - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2000'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2000'
+        column: Cp°
+    entropy:
+      value: 2022.408
+      as_published: '2022.408'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1274.661
+      as_published: '1274.661'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1495.494
+      as_published: '1495.494'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7342.185
+      as_published: '-7342.185'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -5089.599
+      as_published: '-5089.599'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 132.927
+      as_published: '132.927'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+  - temperature:
+      value: 2100.0
+      as_published: '2100'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2100'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2100'
+        column: Cp°
+    entropy:
+      value: 2069.923
+      as_published: '2069.923'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1311.408
+      as_published: '1311.408'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1592.88
+      as_published: '1592.880'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7291.938
+      as_published: '-7291.938'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4978.207
+      as_published: '-4978.207'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 123.826
+      as_published: '123.826'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2100'
+        column: log Kf
+  - temperature:
+      value: 2200.0
+      as_published: '2200'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2200'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2200'
+        column: Cp°
+    entropy:
+      value: 2115.227
+      as_published: '2115.227'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1346.924
+      as_published: '1346.924'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1690.267
+      as_published: '1690.267'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7241.715
+      as_published: '-7241.715'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4869.206
+      as_published: '-4869.206'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 115.61
+      as_published: '115.610'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2200'
+        column: log Kf
+  - temperature:
+      value: 2300.0
+      as_published: '2300'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2300'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2300'
+        column: Cp°
+    entropy:
+      value: 2158.517
+      as_published: '2158.517'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1381.276
+      as_published: '1381.276'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1787.654
+      as_published: '1787.654'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7191.493
+      as_published: '-7191.493'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4762.488
+      as_published: '-4762.488'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 108.16
+      as_published: '108.160'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2300'
+        column: log Kf
+  - temperature:
+      value: 2400.0
+      as_published: '2400'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2400'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2400'
+        column: Cp°
+    entropy:
+      value: 2199.965
+      as_published: '2199.965'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1414.531
+      as_published: '1414.531'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1885.041
+      as_published: '1885.041'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7141.249
+      as_published: '-7141.249'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4657.956
+      as_published: '-4657.956'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 101.378
+      as_published: '101.378'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2400'
+        column: log Kf
+  - temperature:
+      value: 2500.0
+      as_published: '2500'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2500'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2500'
+        column: Cp°
+    entropy:
+      value: 2239.72
+      as_published: '2239.720'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1446.749
+      as_published: '1446.749'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1982.428
+      as_published: '1982.428'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7090.962
+      as_published: '-7090.962'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4555.519
+      as_published: '-4555.519'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 95.182
+      as_published: '95.182'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2500'
+        column: log Kf
+  - temperature:
+      value: 2600.0
+      as_published: '2600'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2600'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2600'
+        column: Cp°
+    entropy:
+      value: 2277.916
+      as_published: '2277.916'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1477.987
+      as_published: '1477.987'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 2079.814
+      as_published: '2079.814'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7040.61
+      as_published: '-7040.610'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4455.095
+      as_published: '-4455.095'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 89.504
+      as_published: '89.504'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2600'
+        column: log Kf
+  - temperature:
+      value: 2700.0
+      as_published: '2700'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2700'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2700'
+        column: Cp°
+    entropy:
+      value: 2314.67
+      as_published: '2314.670'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1508.299
+      as_published: '1508.299'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 2177.201
+      as_published: '2177.201'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -6990.174
+      as_published: '-6990.174'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4356.609
+      as_published: '-4356.609'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 84.284
+      as_published: '84.284'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2700'
+        column: log Kf
+  - temperature:
+      value: 2800.0
+      as_published: '2800'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2800'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2800'
+        column: Cp°
+    entropy:
+      value: 2350.087
+      as_published: '2350.087'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1537.734
+      as_published: '1537.734'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 2274.588
+      as_published: '2274.588'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7821.342
+      as_published: '-7821.342'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4257.091
+      as_published: '-4257.091'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 79.417
+      as_published: '79.417'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2800'
+        column: log Kf
+  - temperature:
+      value: 2900.0
+      as_published: '2900'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2900'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2900'
+        column: Cp°
+    entropy:
+      value: 2384.261
+      as_published: '2384.261'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1566.339
+      as_published: '1566.339'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 2371.975
+      as_published: '2371.975'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7767.406
+      as_published: '-7767.406'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4130.747
+      as_published: '-4130.747'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 74.403
+      as_published: '74.403'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '2900'
+        column: log Kf
+  - temperature:
+      value: 3000.0
+      as_published: '3000'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '3000'
+        column: T/K
+    heat_capacity:
+      value: 973.868
+      as_published: '973.868'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '3000'
+        column: Cp°
+    entropy:
+      value: 2417.277
+      as_published: '2417.277'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '3000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 1594.157
+      as_published: '1594.157'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '3000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 2469.362
+      as_published: '2469.362'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '3000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -7713.346
+      as_published: '-7713.346'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '3000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4006.267
+      as_published: '-4006.267'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '3000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 69.755
+      as_published: '69.755'
+      locator:
+        table_id: Al-107
+        url: https://janaf.nist.gov/tables/Al-107.html
+        download_url: https://janaf.nist.gov/tables/Al-107.txt
+        row_temperature_as_published: '3000'
+        column: log Kf
+  parse_ambiguities:
+  - line_number: 11
+    raw_line: "650.000\t549.778\t927.848\t649.737\t180.772\tGLASS <--> LIQUID"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Al-107
+      url: https://janaf.nist.gov/tables/Al-107.html
+  - line_number: 12
+    raw_line: "650.000\t973.868\t927.848\t649.737\t180.772\tTRANSITION"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Al-107
+      url: https://janaf.nist.gov/tables/Al-107.html
+  - line_number: 17
+    raw_line: "1010.000\t973.868\t1357.064\t830.961\t531.365\tCRYSTAL <--> LIQUID"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Al-107
+      url: https://janaf.nist.gov/tables/Al-107.html
+  - line_number: 18
+    raw_line: "1100\t973.868\t1440.193\t877.455\t619.013\t7310.405  6196.490 294.247"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Al-107
+      url: https://janaf.nist.gov/tables/Al-107.html

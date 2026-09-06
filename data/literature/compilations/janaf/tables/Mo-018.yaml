@@ -1,0 +1,1916 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Mo-018.txt
+  source_sha256: dac0549166f65670ee02aca578d6ce27e5bf24357315dddd35ed1228133ed04c
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: Mo-018
+  url: https://janaf.nist.gov/tables/Mo-018.html
+  download_url: https://janaf.nist.gov/tables/Mo-018.txt
+  index_entry:
+    formula: MoS2
+    name: Molybdenum Sulfide
+    state: cr
+  title_as_published: Molybdenum Sulfide (MoS2)  |  Mo1S2(cr)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 0.0
+      as_published: '0'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '0'
+        column: T/K
+    heat_capacity:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '0'
+        column: Cp°
+    entropy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '0'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: INFINITE
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '0'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -10.579
+      as_published: '-10.579'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '0'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -273.314
+      as_published: '-273.314'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '0'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -273.314
+      as_published: '-273.314'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '0'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: INFINITE
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '0'
+        column: log Kf
+  - temperature:
+      value: 100.0
+      as_published: '100'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '100'
+        column: T/K
+    heat_capacity:
+      value: 24.05
+      as_published: '24.050'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '100'
+        column: Cp°
+    entropy:
+      value: 12.991
+      as_published: '12.991'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 110.098
+      as_published: '110.098'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -9.711
+      as_published: '-9.711'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -274.317
+      as_published: '-274.317'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -272.409
+      as_published: '-272.409'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 142.292
+      as_published: '142.292'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '100'
+        column: log Kf
+  - temperature:
+      value: 200.0
+      as_published: '200'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '200'
+        column: T/K
+    heat_capacity:
+      value: 51.84
+      as_published: '51.840'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '200'
+        column: Cp°
+    entropy:
+      value: 39.359
+      as_published: '39.359'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 68.08
+      as_published: '68.080'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -5.744
+      as_published: '-5.744'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -275.476
+      as_published: '-275.476'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -269.998
+      as_published: '-269.998'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 70.516
+      as_published: '70.516'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '200'
+        column: log Kf
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 63.555
+      as_published: '63.555'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 62.572
+      as_published: '62.572'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 62.572
+      as_published: '62.572'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -276.144
+      as_published: '-276.144'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -267.156
+      as_published: '-267.156'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 46.805
+      as_published: '46.805'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 63.68
+      as_published: '63.680'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 62.965
+      as_published: '62.965'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 62.573
+      as_published: '62.573'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.118
+      as_published: '0.118'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -276.155
+      as_published: '-276.155'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -267.1
+      as_published: '-267.100'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 46.506
+      as_published: '46.506'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 68.91
+      as_published: '68.910'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 82.099
+      as_published: '82.099'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 65.146
+      as_published: '65.146'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 6.781
+      as_published: '6.781'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -281.141
+      as_published: '-281.141'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -263.822
+      as_published: '-263.822'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 34.452
+      as_published: '34.452'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 71.756
+      as_published: '71.756'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 97.805
+      as_published: '97.805'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 70.155
+      as_published: '70.155'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 13.825
+      as_published: '13.825'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -284.502
+      as_published: '-284.502'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -259.125
+      as_published: '-259.125'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 27.071
+      as_published: '27.071'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 73.597
+      as_published: '73.597'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 111.057
+      as_published: '111.057'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 75.897
+      as_published: '75.897'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 21.096
+      as_published: '21.096'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -287.017
+      as_published: '-287.017'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -253.8
+      as_published: '-253.800'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 22.095
+      as_published: '22.095'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 75.019
+      as_published: '75.019'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 122.511
+      as_published: '122.511'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 81.756
+      as_published: '81.756'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 28.528
+      as_published: '28.528'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -288.951
+      as_published: '-288.951'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -248.105
+      as_published: '-248.105'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 18.514
+      as_published: '18.514'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 76.232
+      as_published: '76.232'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 132.61
+      as_published: '132.610'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 87.494
+      as_published: '87.494'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 36.092
+      as_published: '36.092'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -290.53
+      as_published: '-290.530'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -242.159
+      as_published: '-242.159'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 15.811
+      as_published: '15.811'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 77.278
+      as_published: '77.278'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 141.65
+      as_published: '141.650'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 93.018
+      as_published: '93.018'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 43.769
+      as_published: '43.769'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -398.134
+      as_published: '-398.134'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -233.867
+      as_published: '-233.867'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 13.573
+      as_published: '13.573'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 78.241
+      as_published: '78.241'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 149.842
+      as_published: '149.842'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 98.297
+      as_published: '98.297'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 51.545
+      as_published: '51.545'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -396.882
+      as_published: '-396.882'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -215.682
+      as_published: '-215.682'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 11.266
+      as_published: '11.266'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1100'
+        column: T/K
+    heat_capacity:
+      value: 79.119
+      as_published: '79.119'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1100'
+        column: Cp°
+    entropy:
+      value: 157.341
+      as_published: '157.341'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 103.329
+      as_published: '103.329'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 59.413
+      as_published: '59.413'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -395.62
+      as_published: '-395.620'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -197.623
+      as_published: '-197.623'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 9.384
+      as_published: '9.384'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+  - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1200'
+        column: T/K
+    heat_capacity:
+      value: 79.998
+      as_published: '79.998'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1200'
+        column: Cp°
+    entropy:
+      value: 164.263
+      as_published: '164.263'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 108.122
+      as_published: '108.122'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 67.37
+      as_published: '67.370'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -394.356
+      as_published: '-394.356'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -179.68
+      as_published: '-179.680'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 7.821
+      as_published: '7.821'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1300'
+        column: T/K
+    heat_capacity:
+      value: 80.835
+      as_published: '80.835'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1300'
+        column: Cp°
+    entropy:
+      value: 170.699
+      as_published: '170.699'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 112.691
+      as_published: '112.691'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 75.411
+      as_published: '75.411'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -393.101
+      as_published: '-393.101'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -161.841
+      as_published: '-161.841'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 6.503
+      as_published: '6.503'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+  - temperature:
+      value: 1400.0
+      as_published: '1400'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1400'
+        column: T/K
+    heat_capacity:
+      value: 81.672
+      as_published: '81.672'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1400'
+        column: Cp°
+    entropy:
+      value: 176.721
+      as_published: '176.721'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 117.052
+      as_published: '117.052'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 83.537
+      as_published: '83.537'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -391.861
+      as_published: '-391.861'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -144.098
+      as_published: '-144.098'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 5.376
+      as_published: '5.376'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1400'
+        column: log Kf
+  - temperature:
+      value: 1500.0
+      as_published: '1500'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1500'
+        column: T/K
+    heat_capacity:
+      value: 82.467
+      as_published: '82.467'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1500'
+        column: Cp°
+    entropy:
+      value: 182.383
+      as_published: '182.383'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 121.22
+      as_published: '121.220'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 91.744
+      as_published: '91.744'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -390.646
+      as_published: '-390.646'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -126.444
+      as_published: '-126.444'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 4.403
+      as_published: '4.403'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1500'
+        column: log Kf
+  - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1600'
+        column: T/K
+    heat_capacity:
+      value: 83.262
+      as_published: '83.262'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1600'
+        column: Cp°
+    entropy:
+      value: 187.73
+      as_published: '187.730'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 125.211
+      as_published: '125.211'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 100.03
+      as_published: '100.030'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -389.463
+      as_published: '-389.463'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -108.869
+      as_published: '-108.869'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 3.554
+      as_published: '3.554'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1700'
+        column: T/K
+    heat_capacity:
+      value: 84.057
+      as_published: '84.057'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1700'
+        column: Cp°
+    entropy:
+      value: 192.802
+      as_published: '192.802'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 129.039
+      as_published: '129.039'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 108.396
+      as_published: '108.396'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -388.317
+      as_published: '-388.317'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -91.367
+      as_published: '-91.367'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 2.807
+      as_published: '2.807'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1800'
+        column: T/K
+    heat_capacity:
+      value: 84.81
+      as_published: '84.810'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1800'
+        column: Cp°
+    entropy:
+      value: 197.628
+      as_published: '197.628'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 132.717
+      as_published: '132.717'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 116.839
+      as_published: '116.839'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -387.219
+      as_published: '-387.219'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -73.931
+      as_published: '-73.931'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 2.145
+      as_published: '2.145'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+  - temperature:
+      value: 1900.0
+      as_published: '1900'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1900'
+        column: T/K
+    heat_capacity:
+      value: 85.605
+      as_published: '85.605'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1900'
+        column: Cp°
+    entropy:
+      value: 202.235
+      as_published: '202.235'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 136.255
+      as_published: '136.255'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 125.361
+      as_published: '125.361'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -386.171
+      as_published: '-386.171'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -56.555
+      as_published: '-56.555'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.555
+      as_published: '1.555'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '1900'
+        column: log Kf
+  - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2000'
+        column: T/K
+    heat_capacity:
+      value: 86.358
+      as_published: '86.358'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2000'
+        column: Cp°
+    entropy:
+      value: 206.645
+      as_published: '206.645'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 139.665
+      as_published: '139.665'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 133.959
+      as_published: '133.959'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -385.182
+      as_published: '-385.182'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -39.233
+      as_published: '-39.233'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 1.025
+      as_published: '1.025'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+  - temperature:
+      value: 2100.0
+      as_published: '2100'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2100'
+        column: T/K
+    heat_capacity:
+      value: 87.111
+      as_published: '87.111'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2100'
+        column: Cp°
+    entropy:
+      value: 210.876
+      as_published: '210.876'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 142.956
+      as_published: '142.956'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 142.632
+      as_published: '142.632'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -384.261
+      as_published: '-384.261'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -21.958
+      as_published: '-21.958'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.546
+      as_published: '0.546'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2100'
+        column: log Kf
+  - temperature:
+      value: 2200.0
+      as_published: '2200'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2200'
+        column: T/K
+    heat_capacity:
+      value: 87.906
+      as_published: '87.906'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2200'
+        column: Cp°
+    entropy:
+      value: 214.947
+      as_published: '214.947'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 146.137
+      as_published: '146.137'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 151.383
+      as_published: '151.383'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -383.41
+      as_published: '-383.410'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -4.726
+      as_published: '-4.726'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.112
+      as_published: '0.112'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2200'
+        column: log Kf
+  - temperature:
+      value: 2300.0
+      as_published: '2300'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2300'
+        column: T/K
+    heat_capacity:
+      value: 88.659
+      as_published: '88.659'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2300'
+        column: Cp°
+    entropy:
+      value: 218.871
+      as_published: '218.871'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 149.214
+      as_published: '149.214'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 160.211
+      as_published: '160.211'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -382.64
+      as_published: '-382.640'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 12.469
+      as_published: '12.469'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.283
+      as_published: '-0.283'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2300'
+        column: log Kf
+  - temperature:
+      value: 2400.0
+      as_published: '2400'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2400'
+        column: T/K
+    heat_capacity:
+      value: 89.412
+      as_published: '89.412'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2400'
+        column: Cp°
+    entropy:
+      value: 222.66
+      as_published: '222.660'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 152.196
+      as_published: '152.196'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 169.115
+      as_published: '169.115'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -381.961
+      as_published: '-381.961'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 29.633
+      as_published: '29.633'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.645
+      as_published: '-0.645'
+      locator:
+        table_id: Mo-018
+        url: https://janaf.nist.gov/tables/Mo-018.html
+        download_url: https://janaf.nist.gov/tables/Mo-018.txt
+        row_temperature_as_published: '2400'
+        column: log Kf
+  parse_ambiguities: []

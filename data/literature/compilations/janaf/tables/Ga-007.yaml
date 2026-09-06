@@ -1,0 +1,4724 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Ga-007.txt
+  source_sha256: 5c2ebe9c57099ff6067aa34e65a401ba4744c6ddb1a72350019f5d88ccc00929
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: Ga-007
+  url: https://janaf.nist.gov/tables/Ga-007.html
+  download_url: https://janaf.nist.gov/tables/Ga-007.txt
+  index_entry:
+    formula: Ga
+    name: Gallium, Ion
+    state: g
+  title_as_published: Gallium, Ion  (Ga-)  |  Ga1-(g)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 0.0
+      as_published: '0'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '0'
+        column: T/K
+    heat_capacity:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '0'
+        column: Cp°
+    entropy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '0'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: INFINITE
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '0'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -8.265
+      as_published: '-8.265'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '0'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 242.025
+      as_published: '242.025'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '0'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '0'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '0'
+        column: log Kf
+  - temperature:
+      value: 100.0
+      as_published: '100'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '100'
+        column: T/K
+    heat_capacity:
+      value: 29.645
+      as_published: '29.645'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '100'
+        column: Cp°
+    entropy:
+      value: 143.11
+      as_published: '143.110'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 201.948
+      as_published: '201.948'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -5.884
+      as_published: '-5.884'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '100'
+        column: log Kf
+  - temperature:
+      value: 200.0
+      as_published: '200'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '200'
+        column: T/K
+    heat_capacity:
+      value: 30.076
+      as_published: '30.076'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '200'
+        column: Cp°
+    entropy:
+      value: 164.238
+      as_published: '164.238'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 178.41
+      as_published: '178.410'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -2.834
+      as_published: '-2.834'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '200'
+        column: log Kf
+  - temperature:
+      value: 250.0
+      as_published: '250'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '250'
+        column: T/K
+    heat_capacity:
+      value: 28.867
+      as_published: '28.867'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '250'
+        column: Cp°
+    entropy:
+      value: 170.824
+      as_published: '170.824'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '250'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 176.263
+      as_published: '176.263'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '250'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -1.36
+      as_published: '-1.360'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '250'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '250'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '250'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '250'
+        column: log Kf
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 27.618
+      as_published: '27.618'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 175.801
+      as_published: '175.801'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 175.801
+      as_published: '175.801'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 238.531
+      as_published: '238.531'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 204.547
+      as_published: '204.547'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -35.836
+      as_published: '-35.836'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 27.572
+      as_published: '27.572'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 175.972
+      as_published: '175.972'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 175.802
+      as_published: '175.802'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.051
+      as_published: '0.051'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 238.496
+      as_published: '238.496'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 204.336
+      as_published: '204.336'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -35.578
+      as_published: '-35.578'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 350.0
+      as_published: '350'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '350'
+        column: T/K
+    heat_capacity:
+      value: 26.407
+      as_published: '26.407'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '350'
+        column: Cp°
+    entropy:
+      value: 180.132
+      as_published: '180.132'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '350'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 176.133
+      as_published: '176.133'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '350'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1.4
+      as_published: '1.400'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '350'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 231.817
+      as_published: '231.817'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '350'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 199.597
+      as_published: '199.597'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '350'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -29.788
+      as_published: '-29.788'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '350'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 25.437
+      as_published: '25.437'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 183.593
+      as_published: '183.593'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 176.855
+      as_published: '176.855'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 2.695
+      as_published: '2.695'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 230.702
+      as_published: '230.702'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 195.07
+      as_published: '195.070'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -25.474
+      as_published: '-25.474'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 450.0
+      as_published: '450'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '450'
+        column: T/K
+    heat_capacity:
+      value: 24.656
+      as_published: '24.656'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '450'
+        column: Cp°
+    entropy:
+      value: 186.542
+      as_published: '186.542'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '450'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 177.772
+      as_published: '177.772'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '450'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 3.947
+      as_published: '3.947'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '450'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 229.562
+      as_published: '229.562'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '450'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 190.684
+      as_published: '190.684'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '450'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -22.134
+      as_published: '-22.134'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '450'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 24.034
+      as_published: '24.034'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 189.107
+      as_published: '189.107'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 178.78
+      as_published: '178.780'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 5.163
+      as_published: '5.163'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 228.395
+      as_published: '228.395'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 186.427
+      as_published: '186.427'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -19.476
+      as_published: '-19.476'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 23.155
+      as_published: '23.155'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 193.405
+      as_published: '193.405'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 180.872
+      as_published: '180.872'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 7.519
+      as_published: '7.519'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 225.996
+      as_published: '225.996'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 178.257
+      as_published: '178.257'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -15.519
+      as_published: '-15.519'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 22.612
+      as_published: '22.612'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 196.93
+      as_published: '196.930'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 182.922
+      as_published: '182.922'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 9.805
+      as_published: '9.805'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 223.542
+      as_published: '223.542'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 170.494
+      as_published: '170.494'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -12.722
+      as_published: '-12.722'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 22.287
+      as_published: '22.287'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 199.926
+      as_published: '199.926'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 184.865
+      as_published: '184.865'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 12.049
+      as_published: '12.049'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 221.05
+      as_published: '221.050'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 163.086
+      as_published: '163.086'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -10.648
+      as_published: '-10.648'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 22.106
+      as_published: '22.106'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 202.539
+      as_published: '202.539'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 186.687
+      as_published: '186.687'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 14.268
+      as_published: '14.268'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 218.533
+      as_published: '218.533'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 155.991
+      as_published: '155.991'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -9.053
+      as_published: '-9.053'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 22.021
+      as_published: '22.021'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 204.863
+      as_published: '204.863'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 188.39
+      as_published: '188.390'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 16.473
+      as_published: '16.473'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 216.003
+      as_published: '216.003'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 149.177
+      as_published: '149.177'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -7.792
+      as_published: '-7.792'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1100'
+        column: T/K
+    heat_capacity:
+      value: 21.998
+      as_published: '21.998'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1100'
+        column: Cp°
+    entropy:
+      value: 206.961
+      as_published: '206.961'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 189.985
+      as_published: '189.985'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 18.674
+      as_published: '18.674'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 213.469
+      as_published: '213.469'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 142.617
+      as_published: '142.617'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -6.772
+      as_published: '-6.772'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+  - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1200'
+        column: T/K
+    heat_capacity:
+      value: 22.012
+      as_published: '22.012'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1200'
+        column: Cp°
+    entropy:
+      value: 208.875
+      as_published: '208.875'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 191.48
+      as_published: '191.480'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 20.874
+      as_published: '20.874'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 210.933
+      as_published: '210.933'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 136.288
+      as_published: '136.288'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -5.932
+      as_published: '-5.932'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1300'
+        column: T/K
+    heat_capacity:
+      value: 22.049
+      as_published: '22.049'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1300'
+        column: Cp°
+    entropy:
+      value: 210.638
+      as_published: '210.638'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 192.887
+      as_published: '192.887'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 23.077
+      as_published: '23.077'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 208.401
+      as_published: '208.401'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 130.171
+      as_published: '130.171'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -5.23
+      as_published: '-5.230'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+  - temperature:
+      value: 1400.0
+      as_published: '1400'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1400'
+        column: T/K
+    heat_capacity:
+      value: 22.097
+      as_published: '22.097'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1400'
+        column: Cp°
+    entropy:
+      value: 212.274
+      as_published: '212.274'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 194.214
+      as_published: '194.214'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 25.284
+      as_published: '25.284'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 205.873
+      as_published: '205.873'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 124.248
+      as_published: '124.248'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.636
+      as_published: '-4.636'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1400'
+        column: log Kf
+  - temperature:
+      value: 1500.0
+      as_published: '1500'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1500'
+        column: T/K
+    heat_capacity:
+      value: 22.149
+      as_published: '22.149'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1500'
+        column: Cp°
+    entropy:
+      value: 213.801
+      as_published: '213.801'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 195.469
+      as_published: '195.469'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 27.497
+      as_published: '27.497'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 203.35
+      as_published: '203.350'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 118.505
+      as_published: '118.505'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.127
+      as_published: '-4.127'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1500'
+        column: log Kf
+  - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1600'
+        column: T/K
+    heat_capacity:
+      value: 22.199
+      as_published: '22.199'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1600'
+        column: Cp°
+    entropy:
+      value: 215.232
+      as_published: '215.232'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 196.66
+      as_published: '196.660'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 29.714
+      as_published: '29.714'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 200.832
+      as_published: '200.832'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 112.931
+      as_published: '112.931'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.687
+      as_published: '-3.687'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1700'
+        column: T/K
+    heat_capacity:
+      value: 22.246
+      as_published: '22.246'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1700'
+        column: Cp°
+    entropy:
+      value: 216.579
+      as_published: '216.579'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 197.793
+      as_published: '197.793'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 31.936
+      as_published: '31.936'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 198.318
+      as_published: '198.318'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 107.515
+      as_published: '107.515'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.304
+      as_published: '-3.304'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1800'
+        column: T/K
+    heat_capacity:
+      value: 22.287
+      as_published: '22.287'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1800'
+        column: Cp°
+    entropy:
+      value: 217.852
+      as_published: '217.852'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 198.872
+      as_published: '198.872'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 34.163
+      as_published: '34.163'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 195.81
+      as_published: '195.810'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 102.246
+      as_published: '102.246'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.967
+      as_published: '-2.967'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+  - temperature:
+      value: 1900.0
+      as_published: '1900'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1900'
+        column: T/K
+    heat_capacity:
+      value: 22.323
+      as_published: '22.323'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1900'
+        column: Cp°
+    entropy:
+      value: 219.058
+      as_published: '219.058'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 199.903
+      as_published: '199.903'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 36.394
+      as_published: '36.394'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 193.305
+      as_published: '193.305'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 97.116
+      as_published: '97.116'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.67
+      as_published: '-2.670'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '1900'
+        column: log Kf
+  - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2000'
+        column: T/K
+    heat_capacity:
+      value: 22.353
+      as_published: '22.353'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2000'
+        column: Cp°
+    entropy:
+      value: 220.203
+      as_published: '220.203'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 200.89
+      as_published: '200.890'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 38.627
+      as_published: '38.627'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 190.803
+      as_published: '190.803'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 92.118
+      as_published: '92.118'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.406
+      as_published: '-2.406'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+  - temperature:
+      value: 2100.0
+      as_published: '2100'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2100'
+        column: T/K
+    heat_capacity:
+      value: 22.377
+      as_published: '22.377'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2100'
+        column: Cp°
+    entropy:
+      value: 221.295
+      as_published: '221.295'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 201.836
+      as_published: '201.836'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 40.864
+      as_published: '40.864'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 188.304
+      as_published: '188.304'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 87.245
+      as_published: '87.245'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.17
+      as_published: '-2.170'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2100'
+        column: log Kf
+  - temperature:
+      value: 2200.0
+      as_published: '2200'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2200'
+        column: T/K
+    heat_capacity:
+      value: 22.395
+      as_published: '22.395'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2200'
+        column: Cp°
+    entropy:
+      value: 222.336
+      as_published: '222.336'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 202.744
+      as_published: '202.744'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 43.103
+      as_published: '43.103'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 185.807
+      as_published: '185.807'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 82.491
+      as_published: '82.491'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.959
+      as_published: '-1.959'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2200'
+        column: log Kf
+  - temperature:
+      value: 2300.0
+      as_published: '2300'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2300'
+        column: T/K
+    heat_capacity:
+      value: 22.408
+      as_published: '22.408'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2300'
+        column: Cp°
+    entropy:
+      value: 223.332
+      as_published: '223.332'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 203.618
+      as_published: '203.618'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 45.343
+      as_published: '45.343'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 183.312
+      as_published: '183.312'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 77.851
+      as_published: '77.851'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.768
+      as_published: '-1.768'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2300'
+        column: log Kf
+  - temperature:
+      value: 2400.0
+      as_published: '2400'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2400'
+        column: T/K
+    heat_capacity:
+      value: 22.417
+      as_published: '22.417'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2400'
+        column: Cp°
+    entropy:
+      value: 224.286
+      as_published: '224.286'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 204.459
+      as_published: '204.459'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 47.584
+      as_published: '47.584'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 180.818
+      as_published: '180.818'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 73.319
+      as_published: '73.319'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.596
+      as_published: '-1.596'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2400'
+        column: log Kf
+  - temperature:
+      value: 2500.0
+      as_published: '2500'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2500'
+        column: T/K
+    heat_capacity:
+      value: 22.422
+      as_published: '22.422'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2500'
+        column: Cp°
+    entropy:
+      value: 225.201
+      as_published: '225.201'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 205.27
+      as_published: '205.270'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 49.826
+      as_published: '49.826'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -80.261
+      as_published: '-80.261'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 71.339
+      as_published: '71.339'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.491
+      as_published: '-1.491'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2500'
+        column: log Kf
+  - temperature:
+      value: 2600.0
+      as_published: '2600'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2600'
+        column: T/K
+    heat_capacity:
+      value: 22.423
+      as_published: '22.423'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2600'
+        column: Cp°
+    entropy:
+      value: 226.08
+      as_published: '226.080'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 206.054
+      as_published: '206.054'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 52.068
+      as_published: '52.068'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -82.221
+      as_published: '-82.221'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 77.442
+      as_published: '77.442'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.556
+      as_published: '-1.556'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2600'
+        column: log Kf
+  - temperature:
+      value: 2700.0
+      as_published: '2700'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2700'
+        column: T/K
+    heat_capacity:
+      value: 22.422
+      as_published: '22.422'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2700'
+        column: Cp°
+    entropy:
+      value: 226.927
+      as_published: '226.927'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 206.812
+      as_published: '206.812'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 54.311
+      as_published: '54.311'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -84.177
+      as_published: '-84.177'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 83.62
+      as_published: '83.620'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.618
+      as_published: '-1.618'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2700'
+        column: log Kf
+  - temperature:
+      value: 2800.0
+      as_published: '2800'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2800'
+        column: T/K
+    heat_capacity:
+      value: 22.417
+      as_published: '22.417'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2800'
+        column: Cp°
+    entropy:
+      value: 227.742
+      as_published: '227.742'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 207.545
+      as_published: '207.545'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 56.553
+      as_published: '56.553'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -86.131
+      as_published: '-86.131'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 89.87
+      as_published: '89.870'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.677
+      as_published: '-1.677'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2800'
+        column: log Kf
+  - temperature:
+      value: 2900.0
+      as_published: '2900'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2900'
+        column: T/K
+    heat_capacity:
+      value: 22.41
+      as_published: '22.410'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2900'
+        column: Cp°
+    entropy:
+      value: 228.528
+      as_published: '228.528'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 208.255
+      as_published: '208.255'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 58.794
+      as_published: '58.794'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -88.082
+      as_published: '-88.082'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 96.19
+      as_published: '96.190'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.733
+      as_published: '-1.733'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '2900'
+        column: log Kf
+  - temperature:
+      value: 3000.0
+      as_published: '3000'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3000'
+        column: T/K
+    heat_capacity:
+      value: 22.402
+      as_published: '22.402'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3000'
+        column: Cp°
+    entropy:
+      value: 229.288
+      as_published: '229.288'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 208.943
+      as_published: '208.943'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 61.035
+      as_published: '61.035'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -90.032
+      as_published: '-90.032'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 102.578
+      as_published: '102.578'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.786
+      as_published: '-1.786'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3000'
+        column: log Kf
+  - temperature:
+      value: 3100.0
+      as_published: '3100'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3100'
+        column: T/K
+    heat_capacity:
+      value: 22.391
+      as_published: '22.391'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3100'
+        column: Cp°
+    entropy:
+      value: 230.022
+      as_published: '230.022'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 209.611
+      as_published: '209.611'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 63.274
+      as_published: '63.274'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -91.981
+      as_published: '-91.981'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 109.03
+      as_published: '109.030'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.837
+      as_published: '-1.837'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3100'
+        column: log Kf
+  - temperature:
+      value: 3200.0
+      as_published: '3200'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3200'
+        column: T/K
+    heat_capacity:
+      value: 22.379
+      as_published: '22.379'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3200'
+        column: Cp°
+    entropy:
+      value: 230.733
+      as_published: '230.733'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 210.26
+      as_published: '210.260'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 65.513
+      as_published: '65.513'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -93.929
+      as_published: '-93.929'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 115.545
+      as_published: '115.545'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.886
+      as_published: '-1.886'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3200'
+        column: log Kf
+  - temperature:
+      value: 3300.0
+      as_published: '3300'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3300'
+        column: T/K
+    heat_capacity:
+      value: 22.366
+      as_published: '22.366'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3300'
+        column: Cp°
+    entropy:
+      value: 231.422
+      as_published: '231.422'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 210.891
+      as_published: '210.891'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 67.75
+      as_published: '67.750'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -95.877
+      as_published: '-95.877'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 122.122
+      as_published: '122.122'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.933
+      as_published: '-1.933'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3300'
+        column: log Kf
+  - temperature:
+      value: 3400.0
+      as_published: '3400'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3400'
+        column: T/K
+    heat_capacity:
+      value: 22.351
+      as_published: '22.351'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3400'
+        column: Cp°
+    entropy:
+      value: 232.089
+      as_published: '232.089'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 211.505
+      as_published: '211.505'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 69.986
+      as_published: '69.986'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -97.825
+      as_published: '-97.825'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 128.757
+      as_published: '128.757'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -1.978
+      as_published: '-1.978'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3400'
+        column: log Kf
+  - temperature:
+      value: 3500.0
+      as_published: '3500'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3500'
+        column: T/K
+    heat_capacity:
+      value: 22.336
+      as_published: '22.336'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3500'
+        column: Cp°
+    entropy:
+      value: 232.737
+      as_published: '232.737'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 212.102
+      as_published: '212.102'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 72.22
+      as_published: '72.220'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -99.774
+      as_published: '-99.774'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 135.449
+      as_published: '135.449'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.021
+      as_published: '-2.021'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3500'
+        column: log Kf
+  - temperature:
+      value: 3600.0
+      as_published: '3600'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3600'
+        column: T/K
+    heat_capacity:
+      value: 22.32
+      as_published: '22.320'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3600'
+        column: Cp°
+    entropy:
+      value: 233.366
+      as_published: '233.366'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 212.684
+      as_published: '212.684'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 74.453
+      as_published: '74.453'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -101.723
+      as_published: '-101.723'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 142.198
+      as_published: '142.198'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.063
+      as_published: '-2.063'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3600'
+        column: log Kf
+  - temperature:
+      value: 3700.0
+      as_published: '3700'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3700'
+        column: T/K
+    heat_capacity:
+      value: 22.303
+      as_published: '22.303'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3700'
+        column: Cp°
+    entropy:
+      value: 233.977
+      as_published: '233.977'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 213.252
+      as_published: '213.252'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 76.684
+      as_published: '76.684'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -103.673
+      as_published: '-103.673'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 149.0
+      as_published: '149.000'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.104
+      as_published: '-2.104'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3700'
+        column: log Kf
+  - temperature:
+      value: 3800.0
+      as_published: '3800'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3800'
+        column: T/K
+    heat_capacity:
+      value: 22.286
+      as_published: '22.286'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3800'
+        column: Cp°
+    entropy:
+      value: 234.572
+      as_published: '234.572'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 213.805
+      as_published: '213.805'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 78.914
+      as_published: '78.914'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -105.624
+      as_published: '-105.624'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 155.855
+      as_published: '155.855'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.142
+      as_published: '-2.142'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3800'
+        column: log Kf
+  - temperature:
+      value: 3900.0
+      as_published: '3900'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3900'
+        column: T/K
+    heat_capacity:
+      value: 22.268
+      as_published: '22.268'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3900'
+        column: Cp°
+    entropy:
+      value: 235.15
+      as_published: '235.150'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 214.345
+      as_published: '214.345'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 81.141
+      as_published: '81.141'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -107.577
+      as_published: '-107.577'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 162.762
+      as_published: '162.762'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.18
+      as_published: '-2.180'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '3900'
+        column: log Kf
+  - temperature:
+      value: 4000.0
+      as_published: '4000'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4000'
+        column: T/K
+    heat_capacity:
+      value: 22.25
+      as_published: '22.250'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4000'
+        column: Cp°
+    entropy:
+      value: 235.714
+      as_published: '235.714'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 214.872
+      as_published: '214.872'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 83.367
+      as_published: '83.367'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -109.531
+      as_published: '-109.531'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 169.718
+      as_published: '169.718'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.216
+      as_published: '-2.216'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4000'
+        column: log Kf
+  - temperature:
+      value: 4100.0
+      as_published: '4100'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4100'
+        column: T/K
+    heat_capacity:
+      value: 22.232
+      as_published: '22.232'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4100'
+        column: Cp°
+    entropy:
+      value: 236.263
+      as_published: '236.263'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 215.387
+      as_published: '215.387'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 85.591
+      as_published: '85.591'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -111.488
+      as_published: '-111.488'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 176.724
+      as_published: '176.724'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.251
+      as_published: '-2.251'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4100'
+        column: log Kf
+  - temperature:
+      value: 4200.0
+      as_published: '4200'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4200'
+        column: T/K
+    heat_capacity:
+      value: 22.214
+      as_published: '22.214'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4200'
+        column: Cp°
+    entropy:
+      value: 236.799
+      as_published: '236.799'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 215.891
+      as_published: '215.891'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 87.814
+      as_published: '87.814'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -113.447
+      as_published: '-113.447'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 183.777
+      as_published: '183.777'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.286
+      as_published: '-2.286'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4200'
+        column: log Kf
+  - temperature:
+      value: 4300.0
+      as_published: '4300'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4300'
+        column: T/K
+    heat_capacity:
+      value: 22.195
+      as_published: '22.195'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4300'
+        column: Cp°
+    entropy:
+      value: 237.321
+      as_published: '237.321'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 216.383
+      as_published: '216.383'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 90.034
+      as_published: '90.034'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -115.408
+      as_published: '-115.408'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 190.877
+      as_published: '190.877'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.319
+      as_published: '-2.319'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4300'
+        column: log Kf
+  - temperature:
+      value: 4400.0
+      as_published: '4400'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4400'
+        column: T/K
+    heat_capacity:
+      value: 22.176
+      as_published: '22.176'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4400'
+        column: Cp°
+    entropy:
+      value: 237.831
+      as_published: '237.831'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 216.865
+      as_published: '216.865'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 92.253
+      as_published: '92.253'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -117.373
+      as_published: '-117.373'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 198.022
+      as_published: '198.022'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.351
+      as_published: '-2.351'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4400'
+        column: log Kf
+  - temperature:
+      value: 4500.0
+      as_published: '4500'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4500'
+        column: T/K
+    heat_capacity:
+      value: 22.158
+      as_published: '22.158'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4500'
+        column: Cp°
+    entropy:
+      value: 238.329
+      as_published: '238.329'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 217.336
+      as_published: '217.336'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 94.469
+      as_published: '94.469'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -119.341
+      as_published: '-119.341'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 205.213
+      as_published: '205.213'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.382
+      as_published: '-2.382'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4500'
+        column: log Kf
+  - temperature:
+      value: 4600.0
+      as_published: '4600'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4600'
+        column: T/K
+    heat_capacity:
+      value: 22.139
+      as_published: '22.139'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4600'
+        column: Cp°
+    entropy:
+      value: 238.816
+      as_published: '238.816'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 217.798
+      as_published: '217.798'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 96.684
+      as_published: '96.684'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -121.312
+      as_published: '-121.312'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 212.447
+      as_published: '212.447'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.412
+      as_published: '-2.412'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4600'
+        column: log Kf
+  - temperature:
+      value: 4700.0
+      as_published: '4700'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4700'
+        column: T/K
+    heat_capacity:
+      value: 22.12
+      as_published: '22.120'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4700'
+        column: Cp°
+    entropy:
+      value: 239.292
+      as_published: '239.292'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 218.25
+      as_published: '218.250'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 98.897
+      as_published: '98.897'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -123.288
+      as_published: '-123.288'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 219.724
+      as_published: '219.724'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.442
+      as_published: '-2.442'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4700'
+        column: log Kf
+  - temperature:
+      value: 4800.0
+      as_published: '4800'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4800'
+        column: T/K
+    heat_capacity:
+      value: 22.102
+      as_published: '22.102'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4800'
+        column: Cp°
+    entropy:
+      value: 239.757
+      as_published: '239.757'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 218.693
+      as_published: '218.693'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 101.108
+      as_published: '101.108'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -125.267
+      as_published: '-125.267'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 227.043
+      as_published: '227.043'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.471
+      as_published: '-2.471'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4800'
+        column: log Kf
+  - temperature:
+      value: 4900.0
+      as_published: '4900'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4900'
+        column: T/K
+    heat_capacity:
+      value: 22.083
+      as_published: '22.083'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4900'
+        column: Cp°
+    entropy:
+      value: 240.213
+      as_published: '240.213'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 219.128
+      as_published: '219.128'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 103.318
+      as_published: '103.318'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -127.252
+      as_published: '-127.252'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 234.403
+      as_published: '234.403'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.499
+      as_published: '-2.499'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '4900'
+        column: log Kf
+  - temperature:
+      value: 5000.0
+      as_published: '5000'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5000'
+        column: T/K
+    heat_capacity:
+      value: 22.065
+      as_published: '22.065'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5000'
+        column: Cp°
+    entropy:
+      value: 240.659
+      as_published: '240.659'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 219.554
+      as_published: '219.554'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 105.525
+      as_published: '105.525'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -129.241
+      as_published: '-129.241'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 241.804
+      as_published: '241.804'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.526
+      as_published: '-2.526'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5000'
+        column: log Kf
+  - temperature:
+      value: 5100.0
+      as_published: '5100'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5100'
+        column: T/K
+    heat_capacity:
+      value: 22.047
+      as_published: '22.047'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5100'
+        column: Cp°
+    entropy:
+      value: 241.096
+      as_published: '241.096'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 219.972
+      as_published: '219.972'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 107.731
+      as_published: '107.731'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -131.236
+      as_published: '-131.236'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 249.245
+      as_published: '249.245'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.553
+      as_published: '-2.553'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5100'
+        column: log Kf
+  - temperature:
+      value: 5200.0
+      as_published: '5200'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5200'
+        column: T/K
+    heat_capacity:
+      value: 22.029
+      as_published: '22.029'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5200'
+        column: Cp°
+    entropy:
+      value: 241.524
+      as_published: '241.524'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 220.382
+      as_published: '220.382'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 109.934
+      as_published: '109.934'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -133.236
+      as_published: '-133.236'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 256.724
+      as_published: '256.724'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.579
+      as_published: '-2.579'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5200'
+        column: log Kf
+  - temperature:
+      value: 5300.0
+      as_published: '5300'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5300'
+        column: T/K
+    heat_capacity:
+      value: 22.011
+      as_published: '22.011'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5300'
+        column: Cp°
+    entropy:
+      value: 241.943
+      as_published: '241.943'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 220.785
+      as_published: '220.785'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 112.136
+      as_published: '112.136'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -135.243
+      as_published: '-135.243'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 264.243
+      as_published: '264.243'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.604
+      as_published: '-2.604'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5300'
+        column: log Kf
+  - temperature:
+      value: 5400.0
+      as_published: '5400'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5400'
+        column: T/K
+    heat_capacity:
+      value: 21.993
+      as_published: '21.993'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5400'
+        column: Cp°
+    entropy:
+      value: 242.354
+      as_published: '242.354'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 221.181
+      as_published: '221.181'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 114.336
+      as_published: '114.336'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -137.256
+      as_published: '-137.256'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 271.799
+      as_published: '271.799'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.629
+      as_published: '-2.629'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5400'
+        column: log Kf
+  - temperature:
+      value: 5500.0
+      as_published: '5500'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5500'
+        column: T/K
+    heat_capacity:
+      value: 21.976
+      as_published: '21.976'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5500'
+        column: Cp°
+    entropy:
+      value: 242.758
+      as_published: '242.758'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 221.57
+      as_published: '221.570'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 116.535
+      as_published: '116.535'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -139.277
+      as_published: '-139.277'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 279.393
+      as_published: '279.393'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.653
+      as_published: '-2.653'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5500'
+        column: log Kf
+  - temperature:
+      value: 5600.0
+      as_published: '5600'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5600'
+        column: T/K
+    heat_capacity:
+      value: 21.958
+      as_published: '21.958'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5600'
+        column: Cp°
+    entropy:
+      value: 243.154
+      as_published: '243.154'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 221.951
+      as_published: '221.951'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 118.732
+      as_published: '118.732'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -141.305
+      as_published: '-141.305'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 287.023
+      as_published: '287.023'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.677
+      as_published: '-2.677'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5600'
+        column: log Kf
+  - temperature:
+      value: 5700.0
+      as_published: '5700'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5700'
+        column: T/K
+    heat_capacity:
+      value: 21.941
+      as_published: '21.941'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5700'
+        column: Cp°
+    entropy:
+      value: 243.542
+      as_published: '243.542'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 222.327
+      as_published: '222.327'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 120.927
+      as_published: '120.927'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -143.341
+      as_published: '-143.341'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 294.69
+      as_published: '294.690'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.701
+      as_published: '-2.701'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5700'
+        column: log Kf
+  - temperature:
+      value: 5800.0
+      as_published: '5800'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5800'
+        column: T/K
+    heat_capacity:
+      value: 21.924
+      as_published: '21.924'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5800'
+        column: Cp°
+    entropy:
+      value: 243.924
+      as_published: '243.924'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 222.696
+      as_published: '222.696'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 123.12
+      as_published: '123.120'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -145.385
+      as_published: '-145.385'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 302.393
+      as_published: '302.393'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.723
+      as_published: '-2.723'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5800'
+        column: log Kf
+  - temperature:
+      value: 5900.0
+      as_published: '5900'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5900'
+        column: T/K
+    heat_capacity:
+      value: 21.908
+      as_published: '21.908'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5900'
+        column: Cp°
+    entropy:
+      value: 244.298
+      as_published: '244.298'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 223.059
+      as_published: '223.059'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 125.311
+      as_published: '125.311'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -147.438
+      as_published: '-147.438'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 310.131
+      as_published: '310.131'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.746
+      as_published: '-2.746'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '5900'
+        column: log Kf
+  - temperature:
+      value: 6000.0
+      as_published: '6000'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '6000'
+        column: T/K
+    heat_capacity:
+      value: 21.891
+      as_published: '21.891'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '6000'
+        column: Cp°
+    entropy:
+      value: 244.666
+      as_published: '244.666'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '6000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 223.416
+      as_published: '223.416'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '6000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 127.501
+      as_published: '127.501'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '6000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -149.501
+      as_published: '-149.501'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '6000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 317.903
+      as_published: '317.903'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '6000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.768
+      as_published: '-2.768'
+      locator:
+        table_id: Ga-007
+        url: https://janaf.nist.gov/tables/Ga-007.html
+        download_url: https://janaf.nist.gov/tables/Ga-007.txt
+        row_temperature_as_published: '6000'
+        column: log Kf
+  parse_ambiguities: []

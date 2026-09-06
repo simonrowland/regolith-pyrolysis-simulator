@@ -1,0 +1,4724 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Hf-007.txt
+  source_sha256: be18c6088b55925ab2f4a6605fac482308902f917758ca4adbbf9e1813544bd1
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: Hf-007
+  url: https://janaf.nist.gov/tables/Hf-007.html
+  download_url: https://janaf.nist.gov/tables/Hf-007.txt
+  index_entry:
+    formula: Hf
+    name: Hafnium, Ion
+    state: g
+  title_as_published: Hafnium, Ion (Hf+)  |  Hf1+(g)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 0.0
+      as_published: '0'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '0'
+        column: T/K
+    heat_capacity:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '0'
+        column: Cp°
+    entropy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '0'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: INFINITE
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '0'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -6.197
+      as_published: '-6.197'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '0'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1272.397
+      as_published: '1272.397'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '0'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '0'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '0'
+        column: log Kf
+  - temperature:
+      value: 100.0
+      as_published: '100'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '100'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '100'
+        column: Cp°
+    entropy:
+      value: 162.333
+      as_published: '162.333'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 203.521
+      as_published: '203.521'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -4.119
+      as_published: '-4.119'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '100'
+        column: log Kf
+  - temperature:
+      value: 200.0
+      as_published: '200'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '200'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '200'
+        column: Cp°
+    entropy:
+      value: 176.741
+      as_published: '176.741'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 186.942
+      as_published: '186.942'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -2.04
+      as_published: '-2.040'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '200'
+        column: log Kf
+  - temperature:
+      value: 250.0
+      as_published: '250'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '250'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '250'
+        column: Cp°
+    entropy:
+      value: 181.379
+      as_published: '181.379'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '250'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 185.382
+      as_published: '185.382'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '250'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: -1.001
+      as_published: '-1.001'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '250'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '250'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '250'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '250'
+        column: log Kf
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 185.04
+      as_published: '185.040'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 185.04
+      as_published: '185.040'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1278.95
+      as_published: '1278.950'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1230.512
+      as_published: '1230.512'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -215.581
+      as_published: '-215.581'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 185.169
+      as_published: '185.169'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 185.041
+      as_published: '185.041'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.038
+      as_published: '0.038'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1278.979
+      as_published: '1278.979'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1230.212
+      as_published: '1230.212'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -214.199
+      as_published: '-214.199'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 350.0
+      as_published: '350'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '350'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '350'
+        column: Cp°
+    entropy:
+      value: 188.373
+      as_published: '188.373'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '350'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 185.294
+      as_published: '185.294'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '350'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1.078
+      as_published: '1.078'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '350'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1279.758
+      as_published: '1279.758'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '350'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1222.022
+      as_published: '1222.022'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '350'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -182.377
+      as_published: '-182.377'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '350'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 191.149
+      as_published: '191.149'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 185.856
+      as_published: '185.856'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 2.117
+      as_published: '2.117'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1280.512
+      as_published: '1280.512'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1213.722
+      as_published: '1213.722'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -158.496
+      as_published: '-158.496'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 450.0
+      as_published: '450'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '450'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '450'
+        column: Cp°
+    entropy:
+      value: 193.597
+      as_published: '193.597'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '450'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 186.583
+      as_published: '186.583'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '450'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 3.156
+      as_published: '3.156'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '450'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1281.241
+      as_published: '1281.241'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '450'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1205.329
+      as_published: '1205.329'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '450'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -139.911
+      as_published: '-139.911'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '450'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 195.787
+      as_published: '195.787'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 187.396
+      as_published: '187.396'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 4.196
+      as_published: '4.196'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1281.946
+      as_published: '1281.946'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1196.857
+      as_published: '1196.857'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -125.035
+      as_published: '-125.035'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 199.577
+      as_published: '199.577'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 189.12
+      as_published: '189.120'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 6.274
+      as_published: '6.274'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1283.29
+      as_published: '1283.290'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1179.711
+      as_published: '1179.711'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -102.703
+      as_published: '-102.703'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 202.781
+      as_published: '202.781'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 190.848
+      as_published: '190.848'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 8.353
+      as_published: '8.353'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1284.545
+      as_published: '1284.545'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1162.347
+      as_published: '1162.347'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -86.735
+      as_published: '-86.735'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 205.556
+      as_published: '205.556'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 192.517
+      as_published: '192.517'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 10.431
+      as_published: '10.431'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1285.716
+      as_published: '1285.716'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1144.81
+      as_published: '1144.810'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -74.748
+      as_published: '-74.748'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 208.005
+      as_published: '208.005'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 194.105
+      as_published: '194.105'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 12.51
+      as_published: '12.510'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1286.802
+      as_published: '1286.802'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1127.13
+      as_published: '1127.130'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -65.417
+      as_published: '-65.417'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 20.786
+      as_published: '20.786'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 210.195
+      as_published: '210.195'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 195.606
+      as_published: '195.606'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 14.589
+      as_published: '14.589'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1287.806
+      as_published: '1287.806'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1109.334
+      as_published: '1109.334'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -57.946
+      as_published: '-57.946'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1100'
+        column: T/K
+    heat_capacity:
+      value: 20.787
+      as_published: '20.787'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1100'
+        column: Cp°
+    entropy:
+      value: 212.176
+      as_published: '212.176'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 197.024
+      as_published: '197.024'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 16.667
+      as_published: '16.667'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1288.729
+      as_published: '1288.729'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1091.442
+      as_published: '1091.442'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -51.828
+      as_published: '-51.828'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+  - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1200'
+        column: T/K
+    heat_capacity:
+      value: 20.789
+      as_published: '20.789'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1200'
+        column: Cp°
+    entropy:
+      value: 213.985
+      as_published: '213.985'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 198.363
+      as_published: '198.363'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 18.746
+      as_published: '18.746'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1289.569
+      as_published: '1289.569'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1073.469
+      as_published: '1073.469'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -46.727
+      as_published: '-46.727'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1300'
+        column: T/K
+    heat_capacity:
+      value: 20.794
+      as_published: '20.794'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1300'
+        column: Cp°
+    entropy:
+      value: 215.649
+      as_published: '215.649'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 199.629
+      as_published: '199.629'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 20.825
+      as_published: '20.825'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1290.329
+      as_published: '1290.329'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1055.429
+      as_published: '1055.429'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -42.408
+      as_published: '-42.408'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+  - temperature:
+      value: 1400.0
+      as_published: '1400'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1400'
+        column: T/K
+    heat_capacity:
+      value: 20.804
+      as_published: '20.804'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1400'
+        column: Cp°
+    entropy:
+      value: 217.19
+      as_published: '217.190'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 200.829
+      as_published: '200.829'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 22.905
+      as_published: '22.905'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1291.016
+      as_published: '1291.016'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1037.334
+      as_published: '1037.334'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -38.703
+      as_published: '-38.703'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1400'
+        column: log Kf
+  - temperature:
+      value: 1500.0
+      as_published: '1500'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1500'
+        column: T/K
+    heat_capacity:
+      value: 20.823
+      as_published: '20.823'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1500'
+        column: Cp°
+    entropy:
+      value: 218.626
+      as_published: '218.626'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 201.968
+      as_published: '201.968'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 24.986
+      as_published: '24.986'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1291.635
+      as_published: '1291.635'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1019.192
+      as_published: '1019.192'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -35.491
+      as_published: '-35.491'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1500'
+        column: log Kf
+  - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1600'
+        column: T/K
+    heat_capacity:
+      value: 20.857
+      as_published: '20.857'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1600'
+        column: Cp°
+    entropy:
+      value: 219.971
+      as_published: '219.971'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 203.052
+      as_published: '203.052'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 27.07
+      as_published: '27.070'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1292.186
+      as_published: '1292.186'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1001.01
+      as_published: '1001.010'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -32.68
+      as_published: '-32.680'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1700'
+        column: T/K
+    heat_capacity:
+      value: 20.91
+      as_published: '20.910'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1700'
+        column: Cp°
+    entropy:
+      value: 221.237
+      as_published: '221.237'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 204.085
+      as_published: '204.085'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 29.158
+      as_published: '29.158'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1292.671
+      as_published: '1292.671'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 982.797
+      as_published: '982.797'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -30.198
+      as_published: '-30.198'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1800'
+        column: T/K
+    heat_capacity:
+      value: 20.991
+      as_published: '20.991'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1800'
+        column: Cp°
+    entropy:
+      value: 222.434
+      as_published: '222.434'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 205.071
+      as_published: '205.071'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 31.253
+      as_published: '31.253'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1293.092
+      as_published: '1293.092'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 964.556
+      as_published: '964.556'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -27.991
+      as_published: '-27.991'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+  - temperature:
+      value: 1900.0
+      as_published: '1900'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1900'
+        column: T/K
+    heat_capacity:
+      value: 21.107
+      as_published: '21.107'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1900'
+        column: Cp°
+    entropy:
+      value: 223.572
+      as_published: '223.572'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 206.015
+      as_published: '206.015'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 33.358
+      as_published: '33.358'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1293.454
+      as_published: '1293.454'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 946.294
+      as_published: '946.294'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -26.015
+      as_published: '-26.015'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '1900'
+        column: log Kf
+  - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2000'
+        column: T/K
+    heat_capacity:
+      value: 21.264
+      as_published: '21.264'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2000'
+        column: Cp°
+    entropy:
+      value: 224.658
+      as_published: '224.658'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 206.92
+      as_published: '206.920'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 35.476
+      as_published: '35.476'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1293.759
+      as_published: '1293.759'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 928.015
+      as_published: '928.015'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -24.237
+      as_published: '-24.237'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+  - temperature:
+      value: 2100.0
+      as_published: '2100'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2100'
+        column: T/K
+    heat_capacity:
+      value: 21.472
+      as_published: '21.472'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2100'
+        column: Cp°
+    entropy:
+      value: 225.701
+      as_published: '225.701'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 207.79
+      as_published: '207.790'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 37.612
+      as_published: '37.612'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1288.363
+      as_published: '1288.363'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 909.85
+      as_published: '909.850'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -22.631
+      as_published: '-22.631'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2100'
+        column: log Kf
+  - temperature:
+      value: 2200.0
+      as_published: '2200'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2200'
+        column: T/K
+    heat_capacity:
+      value: 21.737
+      as_published: '21.737'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2200'
+        column: Cp°
+    entropy:
+      value: 226.705
+      as_published: '226.705'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 208.627
+      as_published: '208.627'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 39.772
+      as_published: '39.772'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1289.117
+      as_published: '1289.117'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 891.808
+      as_published: '891.808'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -21.174
+      as_published: '-21.174'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2200'
+        column: log Kf
+  - temperature:
+      value: 2300.0
+      as_published: '2300'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2300'
+        column: T/K
+    heat_capacity:
+      value: 22.065
+      as_published: '22.065'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2300'
+        column: Cp°
+    entropy:
+      value: 227.679
+      as_published: '227.679'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 209.434
+      as_published: '209.434'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 41.962
+      as_published: '41.962'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1289.808
+      as_published: '1289.808'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 873.733
+      as_published: '873.733'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -19.843
+      as_published: '-19.843'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2300'
+        column: log Kf
+  - temperature:
+      value: 2400.0
+      as_published: '2400'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2400'
+        column: T/K
+    heat_capacity:
+      value: 22.462
+      as_published: '22.462'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2400'
+        column: Cp°
+    entropy:
+      value: 228.626
+      as_published: '228.626'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 210.214
+      as_published: '210.214'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 44.187
+      as_published: '44.187'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1290.444
+      as_published: '1290.444'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 855.629
+      as_published: '855.629'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -18.622
+      as_published: '-18.622'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2400'
+        column: log Kf
+  - temperature:
+      value: 2500.0
+      as_published: '2500'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2500'
+        column: T/K
+    heat_capacity:
+      value: 22.931
+      as_published: '22.931'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2500'
+        column: Cp°
+    entropy:
+      value: 229.552
+      as_published: '229.552'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 210.97
+      as_published: '210.970'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 46.456
+      as_published: '46.456'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1290.946
+      as_published: '1290.946'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 837.501
+      as_published: '837.501'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -17.499
+      as_published: '-17.499'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2500'
+        column: log Kf
+  - temperature:
+      value: 2600.0
+      as_published: '2600'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2600'
+        column: T/K
+    heat_capacity:
+      value: 23.477
+      as_published: '23.477'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2600'
+        column: Cp°
+    entropy:
+      value: 230.462
+      as_published: '230.462'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 211.702
+      as_published: '211.702'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 48.776
+      as_published: '48.776'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1262.291
+      as_published: '1262.291'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 820.523
+      as_published: '820.523'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -16.485
+      as_published: '-16.485'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2600'
+        column: log Kf
+  - temperature:
+      value: 2700.0
+      as_published: '2700'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2700'
+        column: T/K
+    heat_capacity:
+      value: 24.1
+      as_published: '24.100'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2700'
+        column: Cp°
+    entropy:
+      value: 231.359
+      as_published: '231.359'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 212.413
+      as_published: '212.413'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 51.154
+      as_published: '51.154'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1262.982
+      as_published: '1262.982'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 803.519
+      as_published: '803.519'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -15.545
+      as_published: '-15.545'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2700'
+        column: log Kf
+  - temperature:
+      value: 2800.0
+      as_published: '2800'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2800'
+        column: T/K
+    heat_capacity:
+      value: 24.8
+      as_published: '24.800'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2800'
+        column: Cp°
+    entropy:
+      value: 232.248
+      as_published: '232.248'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 213.106
+      as_published: '213.106'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 53.599
+      as_published: '53.599'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1263.739
+      as_published: '1263.739'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 786.488
+      as_published: '786.488'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -14.672
+      as_published: '-14.672'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2800'
+        column: log Kf
+  - temperature:
+      value: 2900.0
+      as_published: '2900'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2900'
+        column: T/K
+    heat_capacity:
+      value: 25.576
+      as_published: '25.576'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2900'
+        column: Cp°
+    entropy:
+      value: 233.132
+      as_published: '233.132'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 213.781
+      as_published: '213.781'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 56.117
+      as_published: '56.117'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1264.571
+      as_published: '1264.571'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 769.429
+      as_published: '769.429'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -13.859
+      as_published: '-13.859'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '2900'
+        column: log Kf
+  - temperature:
+      value: 3000.0
+      as_published: '3000'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3000'
+        column: T/K
+    heat_capacity:
+      value: 26.424
+      as_published: '26.424'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3000'
+        column: Cp°
+    entropy:
+      value: 234.013
+      as_published: '234.013'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 214.441
+      as_published: '214.441'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 58.716
+      as_published: '58.716'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1265.483
+      as_published: '1265.483'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 752.34
+      as_published: '752.340'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -13.099
+      as_published: '-13.099'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3000'
+        column: log Kf
+  - temperature:
+      value: 3100.0
+      as_published: '3100'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3100'
+        column: T/K
+    heat_capacity:
+      value: 27.341
+      as_published: '27.341'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3100'
+        column: Cp°
+    entropy:
+      value: 234.894
+      as_published: '234.894'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 215.086
+      as_published: '215.086'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 61.404
+      as_published: '61.404'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1266.484
+      as_published: '1266.484'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 735.219
+      as_published: '735.219'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -12.388
+      as_published: '-12.388'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3100'
+        column: log Kf
+  - temperature:
+      value: 3200.0
+      as_published: '3200'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3200'
+        column: T/K
+    heat_capacity:
+      value: 28.32
+      as_published: '28.320'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3200'
+        column: Cp°
+    entropy:
+      value: 235.778
+      as_published: '235.778'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 215.719
+      as_published: '215.719'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 64.187
+      as_published: '64.187'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1267.579
+      as_published: '1267.579'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 718.064
+      as_published: '718.064'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -11.721
+      as_published: '-11.721'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3200'
+        column: log Kf
+  - temperature:
+      value: 3300.0
+      as_published: '3300'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3300'
+        column: T/K
+    heat_capacity:
+      value: 29.355
+      as_published: '29.355'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3300'
+        column: Cp°
+    entropy:
+      value: 236.665
+      as_published: '236.665'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 216.34
+      as_published: '216.340'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 67.07
+      as_published: '67.070'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1268.776
+      as_published: '1268.776'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 700.873
+      as_published: '700.873'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -11.094
+      as_published: '-11.094'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3300'
+        column: log Kf
+  - temperature:
+      value: 3400.0
+      as_published: '3400'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3400'
+        column: T/K
+    heat_capacity:
+      value: 30.437
+      as_published: '30.437'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3400'
+        column: Cp°
+    entropy:
+      value: 237.557
+      as_published: '237.557'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 216.951
+      as_published: '216.951'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 70.059
+      as_published: '70.059'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1270.078
+      as_published: '1270.078'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 683.645
+      as_published: '683.645'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -10.503
+      as_published: '-10.503'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3400'
+        column: log Kf
+  - temperature:
+      value: 3500.0
+      as_published: '3500'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3500'
+        column: T/K
+    heat_capacity:
+      value: 31.559
+      as_published: '31.559'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3500'
+        column: Cp°
+    entropy:
+      value: 238.455
+      as_published: '238.455'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 217.553
+      as_published: '217.553'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 73.159
+      as_published: '73.159'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1271.49
+      as_published: '1271.490'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 666.376
+      as_published: '666.376'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -9.945
+      as_published: '-9.945'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3500'
+        column: log Kf
+  - temperature:
+      value: 3600.0
+      as_published: '3600'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3600'
+        column: T/K
+    heat_capacity:
+      value: 32.711
+      as_published: '32.711'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3600'
+        column: Cp°
+    entropy:
+      value: 239.36
+      as_published: '239.360'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 218.146
+      as_published: '218.146'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 76.372
+      as_published: '76.372'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1273.017
+      as_published: '1273.017'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 649.066
+      as_published: '649.066'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -9.418
+      as_published: '-9.418'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3600'
+        column: log Kf
+  - temperature:
+      value: 3700.0
+      as_published: '3700'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3700'
+        column: T/K
+    heat_capacity:
+      value: 33.883
+      as_published: '33.883'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3700'
+        column: Cp°
+    entropy:
+      value: 240.273
+      as_published: '240.273'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 218.732
+      as_published: '218.732'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 79.702
+      as_published: '79.702'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1274.659
+      as_published: '1274.659'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 631.712
+      as_published: '631.712'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -8.918
+      as_published: '-8.918'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3700'
+        column: log Kf
+  - temperature:
+      value: 3800.0
+      as_published: '3800'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3800'
+        column: T/K
+    heat_capacity:
+      value: 35.066
+      as_published: '35.066'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3800'
+        column: Cp°
+    entropy:
+      value: 241.192
+      as_published: '241.192'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 219.311
+      as_published: '219.311'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 83.149
+      as_published: '83.149'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1276.42
+      as_published: '1276.420'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 614.312
+      as_published: '614.312'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -8.444
+      as_published: '-8.444'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3800'
+        column: log Kf
+  - temperature:
+      value: 3900.0
+      as_published: '3900'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3900'
+        column: T/K
+    heat_capacity:
+      value: 36.249
+      as_published: '36.249'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3900'
+        column: Cp°
+    entropy:
+      value: 242.118
+      as_published: '242.118'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 219.884
+      as_published: '219.884'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 86.715
+      as_published: '86.715'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1278.298
+      as_published: '1278.298'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 596.863
+      as_published: '596.863'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -7.994
+      as_published: '-7.994'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '3900'
+        column: log Kf
+  - temperature:
+      value: 4000.0
+      as_published: '4000'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4000'
+        column: T/K
+    heat_capacity:
+      value: 37.424
+      as_published: '37.424'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4000'
+        column: Cp°
+    entropy:
+      value: 243.051
+      as_published: '243.051'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 220.451
+      as_published: '220.451'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 90.399
+      as_published: '90.399'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1280.295
+      as_published: '1280.295'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 579.366
+      as_published: '579.366'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -7.566
+      as_published: '-7.566'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4000'
+        column: log Kf
+  - temperature:
+      value: 4100.0
+      as_published: '4100'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4100'
+        column: T/K
+    heat_capacity:
+      value: 38.58
+      as_published: '38.580'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4100'
+        column: Cp°
+    entropy:
+      value: 243.989
+      as_published: '243.989'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 221.014
+      as_published: '221.014'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 94.199
+      as_published: '94.199'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1282.409
+      as_published: '1282.409'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 561.816
+      as_published: '561.816'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -7.158
+      as_published: '-7.158'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4100'
+        column: log Kf
+  - temperature:
+      value: 4200.0
+      as_published: '4200'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4200'
+        column: T/K
+    heat_capacity:
+      value: 39.71
+      as_published: '39.710'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4200'
+        column: Cp°
+    entropy:
+      value: 244.932
+      as_published: '244.932'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 221.572
+      as_published: '221.572'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 98.114
+      as_published: '98.114'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1284.636
+      as_published: '1284.636'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 544.214
+      as_published: '544.214'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -6.768
+      as_published: '-6.768'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4200'
+        column: log Kf
+  - temperature:
+      value: 4300.0
+      as_published: '4300'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4300'
+        column: T/K
+    heat_capacity:
+      value: 40.805
+      as_published: '40.805'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4300'
+        column: Cp°
+    entropy:
+      value: 245.88
+      as_published: '245.880'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 222.126
+      as_published: '222.126'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 102.14
+      as_published: '102.140'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1286.975
+      as_published: '1286.975'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 526.558
+      as_published: '526.558'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -6.396
+      as_published: '-6.396'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4300'
+        column: log Kf
+  - temperature:
+      value: 4400.0
+      as_published: '4400'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4400'
+        column: T/K
+    heat_capacity:
+      value: 41.857
+      as_published: '41.857'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4400'
+        column: Cp°
+    entropy:
+      value: 246.83
+      as_published: '246.830'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 222.677
+      as_published: '222.677'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 106.273
+      as_published: '106.273'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1289.422
+      as_published: '1289.422'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 508.846
+      as_published: '508.846'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -6.041
+      as_published: '-6.041'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4400'
+        column: log Kf
+  - temperature:
+      value: 4500.0
+      as_published: '4500'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4500'
+        column: T/K
+    heat_capacity:
+      value: 42.862
+      as_published: '42.862'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4500'
+        column: Cp°
+    entropy:
+      value: 247.782
+      as_published: '247.782'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 223.224
+      as_published: '223.224'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 110.51
+      as_published: '110.510'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1291.971
+      as_published: '1291.971'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 491.077
+      as_published: '491.077'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -5.7
+      as_published: '-5.700'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4500'
+        column: log Kf
+  - temperature:
+      value: 4600.0
+      as_published: '4600'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4600'
+        column: T/K
+    heat_capacity:
+      value: 43.812
+      as_published: '43.812'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4600'
+        column: Cp°
+    entropy:
+      value: 248.734
+      as_published: '248.734'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 223.768
+      as_published: '223.768'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 114.844
+      as_published: '114.844'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1294.618
+      as_published: '1294.618'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 473.25
+      as_published: '473.250'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -5.374
+      as_published: '-5.374'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4600'
+        column: log Kf
+  - temperature:
+      value: 4700.0
+      as_published: '4700'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4700'
+        column: T/K
+    heat_capacity:
+      value: 44.704
+      as_published: '44.704'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4700'
+        column: Cp°
+    entropy:
+      value: 249.686
+      as_published: '249.686'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 224.31
+      as_published: '224.310'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 119.27
+      as_published: '119.270'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1297.358
+      as_published: '1297.358'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 455.365
+      as_published: '455.365'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -5.061
+      as_published: '-5.061'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4700'
+        column: log Kf
+  - temperature:
+      value: 4800.0
+      as_published: '4800'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4800'
+        column: T/K
+    heat_capacity:
+      value: 45.534
+      as_published: '45.534'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4800'
+        column: Cp°
+    entropy:
+      value: 250.636
+      as_published: '250.636'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 224.848
+      as_published: '224.848'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 123.783
+      as_published: '123.783'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1300.183
+      as_published: '1300.183'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 437.42
+      as_published: '437.420'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.76
+      as_published: '-4.760'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4800'
+        column: log Kf
+  - temperature:
+      value: 4900.0
+      as_published: '4900'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4900'
+        column: T/K
+    heat_capacity:
+      value: 46.299
+      as_published: '46.299'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4900'
+        column: Cp°
+    entropy:
+      value: 251.583
+      as_published: '251.583'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 225.384
+      as_published: '225.384'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 128.375
+      as_published: '128.375'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 1303.088
+      as_published: '1303.088'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 419.416
+      as_published: '419.416'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.471
+      as_published: '-4.471'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '4900'
+        column: log Kf
+  - temperature:
+      value: 5000.0
+      as_published: '5000'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5000'
+        column: T/K
+    heat_capacity:
+      value: 46.999
+      as_published: '46.999'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5000'
+        column: Cp°
+    entropy:
+      value: 252.526
+      as_published: '252.526'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 225.918
+      as_published: '225.918'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 133.04
+      as_published: '133.040'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 745.848
+      as_published: '745.848'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 405.438
+      as_published: '405.438'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.236
+      as_published: '-4.236'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5000'
+        column: log Kf
+  - temperature:
+      value: 5100.0
+      as_published: '5100'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5100'
+        column: T/K
+    heat_capacity:
+      value: 47.631
+      as_published: '47.631'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5100'
+        column: Cp°
+    entropy:
+      value: 253.463
+      as_published: '253.463'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 226.449
+      as_published: '226.449'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 137.772
+      as_published: '137.772'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 748.821
+      as_published: '748.821'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 398.601
+      as_published: '398.601'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -4.083
+      as_published: '-4.083'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5100'
+        column: log Kf
+  - temperature:
+      value: 5200.0
+      as_published: '5200'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5200'
+        column: T/K
+    heat_capacity:
+      value: 48.197
+      as_published: '48.197'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5200'
+        column: Cp°
+    entropy:
+      value: 254.393
+      as_published: '254.393'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 226.977
+      as_published: '226.977'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 142.564
+      as_published: '142.564'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 751.81
+      as_published: '751.810'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 391.704
+      as_published: '391.704'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.935
+      as_published: '-3.935'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5200'
+        column: log Kf
+  - temperature:
+      value: 5300.0
+      as_published: '5300'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5300'
+        column: T/K
+    heat_capacity:
+      value: 48.696
+      as_published: '48.696'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5300'
+        column: Cp°
+    entropy:
+      value: 255.316
+      as_published: '255.316'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 227.503
+      as_published: '227.503'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 147.409
+      as_published: '147.409'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 754.807
+      as_published: '754.807'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 384.751
+      as_published: '384.751'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.792
+      as_published: '-3.792'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5300'
+        column: log Kf
+  - temperature:
+      value: 5400.0
+      as_published: '5400'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5400'
+        column: T/K
+    heat_capacity:
+      value: 49.13
+      as_published: '49.130'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5400'
+        column: Cp°
+    entropy:
+      value: 256.231
+      as_published: '256.231'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 228.027
+      as_published: '228.027'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 152.301
+      as_published: '152.301'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 757.804
+      as_published: '757.804'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 377.74
+      as_published: '377.740'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.654
+      as_published: '-3.654'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5400'
+        column: log Kf
+  - temperature:
+      value: 5500.0
+      as_published: '5500'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5500'
+        column: T/K
+    heat_capacity:
+      value: 49.501
+      as_published: '49.501'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5500'
+        column: Cp°
+    entropy:
+      value: 257.136
+      as_published: '257.136'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 228.548
+      as_published: '228.548'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 157.233
+      as_published: '157.233'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 760.795
+      as_published: '760.795'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 370.675
+      as_published: '370.675'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.52
+      as_published: '-3.520'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5500'
+        column: log Kf
+  - temperature:
+      value: 5600.0
+      as_published: '5600'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5600'
+        column: T/K
+    heat_capacity:
+      value: 49.811
+      as_published: '49.811'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5600'
+        column: Cp°
+    entropy:
+      value: 258.03
+      as_published: '258.030'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 229.066
+      as_published: '229.066'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 162.199
+      as_published: '162.199'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 763.772
+      as_published: '763.772'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 363.555
+      as_published: '363.555'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.391
+      as_published: '-3.391'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5600'
+        column: log Kf
+  - temperature:
+      value: 5700.0
+      as_published: '5700'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5700'
+        column: T/K
+    heat_capacity:
+      value: 50.063
+      as_published: '50.063'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5700'
+        column: Cp°
+    entropy:
+      value: 258.914
+      as_published: '258.914'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 229.582
+      as_published: '229.582'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 167.194
+      as_published: '167.194'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 766.73
+      as_published: '766.730'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 356.382
+      as_published: '356.382'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.266
+      as_published: '-3.266'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5700'
+        column: log Kf
+  - temperature:
+      value: 5800.0
+      as_published: '5800'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5800'
+        column: T/K
+    heat_capacity:
+      value: 50.26
+      as_published: '50.260'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5800'
+        column: Cp°
+    entropy:
+      value: 259.787
+      as_published: '259.787'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 230.095
+      as_published: '230.095'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 172.21
+      as_published: '172.210'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 769.662
+      as_published: '769.662'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 349.157
+      as_published: '349.157'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.144
+      as_published: '-3.144'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5800'
+        column: log Kf
+  - temperature:
+      value: 5900.0
+      as_published: '5900'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5900'
+        column: T/K
+    heat_capacity:
+      value: 50.405
+      as_published: '50.405'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5900'
+        column: Cp°
+    entropy:
+      value: 260.647
+      as_published: '260.647'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 230.606
+      as_published: '230.606'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 177.244
+      as_published: '177.244'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 772.562
+      as_published: '772.562'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 341.882
+      as_published: '341.882'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -3.027
+      as_published: '-3.027'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '5900'
+        column: log Kf
+  - temperature:
+      value: 6000.0
+      as_published: '6000'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '6000'
+        column: T/K
+    heat_capacity:
+      value: 50.502
+      as_published: '50.502'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '6000'
+        column: Cp°
+    entropy:
+      value: 261.495
+      as_published: '261.495'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '6000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 231.114
+      as_published: '231.114'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '6000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 182.29
+      as_published: '182.290'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '6000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 775.424
+      as_published: '775.424'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '6000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 334.558
+      as_published: '334.558'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '6000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -2.913
+      as_published: '-2.913'
+      locator:
+        table_id: Hf-007
+        url: https://janaf.nist.gov/tables/Hf-007.html
+        download_url: https://janaf.nist.gov/tables/Hf-007.txt
+        row_temperature_as_published: '6000'
+        column: log Kf
+  parse_ambiguities: []

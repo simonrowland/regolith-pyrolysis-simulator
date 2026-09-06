@@ -1,0 +1,908 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Cl-106.txt
+  source_sha256: 594cacb72c41507b080606c393109cce925e855bf4a5f694de20dd8809c18d67
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: Cl-106
+  url: https://janaf.nist.gov/tables/Cl-106.html
+  download_url: https://janaf.nist.gov/tables/Cl-106.txt
+  index_entry:
+    formula: Cl2O2W
+    name: Tungsten Chloride Oxide
+    state: cr
+  title_as_published: Tungsten Chloride Oxide (WO2Cl2)  |  Cl2O2W1(cr)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 0.0
+      as_published: '0'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '0'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '0'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '0'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '0'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '0'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '0'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '0'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '0'
+        column: log Kf
+  - temperature:
+      value: 100.0
+      as_published: '100'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '100'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '100'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '100'
+        column: log Kf
+  - temperature:
+      value: 200.0
+      as_published: '200'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '200'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '200'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '200'
+        column: log Kf
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 104.408
+      as_published: '104.408'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 200.832
+      as_published: '200.832'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 200.832
+      as_published: '200.832'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -780.316
+      as_published: '-780.316'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -702.781
+      as_published: '-702.781'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 123.124
+      as_published: '123.124'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 104.6
+      as_published: '104.600'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 201.478
+      as_published: '201.478'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 200.834
+      as_published: '200.834'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.193
+      as_published: '0.193'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -780.285
+      as_published: '-780.285'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -702.3
+      as_published: '-702.300'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 122.281
+      as_published: '122.281'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 115.06
+      as_published: '115.060'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 233.003
+      as_published: '233.003'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 205.062
+      as_published: '205.062'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 11.176
+      as_published: '11.176'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -778.207
+      as_published: '-778.207'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -676.597
+      as_published: '-676.597'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 88.354
+      as_published: '88.354'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 125.52
+      as_published: '125.520'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 259.809
+      as_published: '259.809'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 213.391
+      as_published: '213.391'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 23.209
+      as_published: '23.209'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -775.319
+      as_published: '-775.319'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -651.511
+      as_published: '-651.511'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 68.063
+      as_published: '68.063'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 135.562
+      as_published: '135.562'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 283.597
+      as_published: '283.597'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 223.145
+      as_published: '223.145'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 36.272
+      as_published: '36.272'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -771.605
+      as_published: '-771.605'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -627.085
+      as_published: '-627.085'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 54.593
+      as_published: '54.593'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 144.557
+      as_published: '144.557'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 305.202
+      as_published: '305.202'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 233.347
+      as_published: '233.347'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 50.298
+      as_published: '50.298'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -767.106
+      as_published: '-767.106'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -603.344
+      as_published: '-603.344'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 45.022
+      as_published: '45.022'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 151.042
+      as_published: '151.042'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 324.947
+      as_published: '324.947'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 243.581
+      as_published: '243.581'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 65.092
+      as_published: '65.092'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -761.993
+      as_published: '-761.993'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -580.292
+      as_published: '-580.292'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 37.889
+      as_published: '37.889'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 155.854
+      as_published: '155.854'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 343.031
+      as_published: '343.031'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 253.641
+      as_published: '253.641'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 80.451
+      as_published: '80.451'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -756.449
+      as_published: '-756.449'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -557.909
+      as_published: '-557.909'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 32.38
+      as_published: '32.380'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 158.992
+      as_published: '158.992'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 359.629
+      as_published: '359.629'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 263.422
+      as_published: '263.422'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 96.207
+      as_published: '96.207'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -750.625
+      as_published: '-750.625'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: -536.159
+      as_published: '-536.159'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 28.006
+      as_published: '28.006'
+      locator:
+        table_id: Cl-106
+        url: https://janaf.nist.gov/tables/Cl-106.html
+        download_url: https://janaf.nist.gov/tables/Cl-106.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  parse_ambiguities: []

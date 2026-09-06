@@ -1,0 +1,2156 @@
+schema_version: literature_compilation.v1
+source_id: nist-janaf-4th
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  database: NIST Standard Reference Database 13
+  doi: 10.18434/T42S31
+  url: https://janaf.nist.gov/
+  last_data_update: 1998
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+extraction:
+  method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
+  date: '2026-09-06'
+  user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
+    client)
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Zr-003.txt
+  source_sha256: 8ee190a6c03a31168c83bd75638571095dd808b668fa27144190eff7ca7b2b05
+  review_status: machine_transcribed_unreviewed
+table:
+  table_id: Zr-003
+  url: https://janaf.nist.gov/tables/Zr-003.html
+  download_url: https://janaf.nist.gov/tables/Zr-003.txt
+  index_entry:
+    formula: Zr
+    name: Zirconium, Beta
+    state: cr
+  title_as_published: Zirconium, Beta (Zr)  |  Zr1(cr)
+  standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  units_as_published:
+    temperature: K
+    heat_capacity: J K^-1 mol^-1
+    entropy: J K^-1 mol^-1
+    negative_gibbs_enthalpy_function: J K^-1 mol^-1
+    enthalpy_increment: kJ mol^-1
+    formation_enthalpy: kJ mol^-1
+    formation_gibbs_energy: kJ mol^-1
+    log10_formation_equilibrium_constant: dimensionless
+  values:
+  - temperature:
+      value: 0.0
+      as_published: '0'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '0'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '0'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '0'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '0'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '0'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '0'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '0'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '0'
+        column: log Kf
+  - temperature:
+      value: 100.0
+      as_published: '100'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '100'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '100'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '100'
+        column: log Kf
+  - temperature:
+      value: 200.0
+      as_published: '200'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '200'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '200'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '200'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '200'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '200'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '200'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '200'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '200'
+        column: log Kf
+  - temperature:
+      value: 250.0
+      as_published: '250'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '250'
+        column: T/K
+    heat_capacity:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '250'
+        column: Cp°
+    entropy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '250'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '250'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '250'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '250'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '250'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: null
+      as_published: ''
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '250'
+        column: log Kf
+  - temperature:
+      value: 298.15
+      as_published: '298.15'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '298.15'
+        column: T/K
+    heat_capacity:
+      value: 25.202
+      as_published: '25.202'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '298.15'
+        column: Cp°
+    entropy:
+      value: 43.192
+      as_published: '43.192'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '298.15'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 43.192
+      as_published: '43.192'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '298.15'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '298.15'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.81
+      as_published: '4.810'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 3.521
+      as_published: '3.521'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '298.15'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.617
+      as_published: '-0.617'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '298.15'
+        column: log Kf
+  - temperature:
+      value: 300.0
+      as_published: '300'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '300'
+        column: T/K
+    heat_capacity:
+      value: 25.218
+      as_published: '25.218'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '300'
+        column: Cp°
+    entropy:
+      value: 43.348
+      as_published: '43.348'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 43.193
+      as_published: '43.193'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 0.047
+      as_published: '0.047'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.81
+      as_published: '4.810'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 3.513
+      as_published: '3.513'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.612
+      as_published: '-0.612'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '300'
+        column: log Kf
+  - temperature:
+      value: 350.0
+      as_published: '350'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '350'
+        column: T/K
+    heat_capacity:
+      value: 25.587
+      as_published: '25.587'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '350'
+        column: Cp°
+    entropy:
+      value: 47.264
+      as_published: '47.264'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '350'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 43.501
+      as_published: '43.501'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '350'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 1.317
+      as_published: '1.317'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '350'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.809
+      as_published: '4.809'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '350'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 3.297
+      as_published: '3.297'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '350'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.492
+      as_published: '-0.492'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '350'
+        column: log Kf
+  - temperature:
+      value: 400.0
+      as_published: '400'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '400'
+        column: T/K
+    heat_capacity:
+      value: 25.935
+      as_published: '25.935'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '400'
+        column: Cp°
+    entropy:
+      value: 50.703
+      as_published: '50.703'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 44.191
+      as_published: '44.191'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 2.605
+      as_published: '2.605'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.809
+      as_published: '4.809'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 3.081
+      as_published: '3.081'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.402
+      as_published: '-0.402'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '400'
+        column: log Kf
+  - temperature:
+      value: 450.0
+      as_published: '450'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '450'
+        column: T/K
+    heat_capacity:
+      value: 26.238
+      as_published: '26.238'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '450'
+        column: Cp°
+    entropy:
+      value: 53.775
+      as_published: '53.775'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '450'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 45.088
+      as_published: '45.088'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '450'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 3.909
+      as_published: '3.909'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '450'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.808
+      as_published: '4.808'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '450'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 2.865
+      as_published: '2.865'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '450'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.333
+      as_published: '-0.333'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '450'
+        column: log Kf
+  - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '500'
+        column: T/K
+    heat_capacity:
+      value: 26.564
+      as_published: '26.564'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '500'
+        column: Cp°
+    entropy:
+      value: 56.557
+      as_published: '56.557'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 46.098
+      as_published: '46.098'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 5.229
+      as_published: '5.229'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.808
+      as_published: '4.808'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 2.649
+      as_published: '2.649'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.277
+      as_published: '-0.277'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '600'
+        column: T/K
+    heat_capacity:
+      value: 27.281
+      as_published: '27.281'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '600'
+        column: Cp°
+    entropy:
+      value: 61.462
+      as_published: '61.462'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 48.261
+      as_published: '48.261'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 7.921
+      as_published: '7.921'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.809
+      as_published: '4.809'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 2.217
+      as_published: '2.217'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.193
+      as_published: '-0.193'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+  - temperature:
+      value: 700.0
+      as_published: '700'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '700'
+        column: T/K
+    heat_capacity:
+      value: 28.053
+      as_published: '28.053'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '700'
+        column: Cp°
+    entropy:
+      value: 65.724
+      as_published: '65.724'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 50.457
+      as_published: '50.457'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 10.687
+      as_published: '10.687'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.808
+      as_published: '4.808'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1.785
+      as_published: '1.785'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.133
+      as_published: '-0.133'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '700'
+        column: log Kf
+  - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '800'
+        column: T/K
+    heat_capacity:
+      value: 28.966
+      as_published: '28.966'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '800'
+        column: Cp°
+    entropy:
+      value: 69.535
+      as_published: '69.535'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 52.608
+      as_published: '52.608'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 13.542
+      as_published: '13.542'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.813
+      as_published: '4.813'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1.353
+      as_published: '1.353'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.088
+      as_published: '-0.088'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+  - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '900'
+        column: T/K
+    heat_capacity:
+      value: 28.473
+      as_published: '28.473'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '900'
+        column: Cp°
+    entropy:
+      value: 72.916
+      as_published: '72.916'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 54.681
+      as_published: '54.681'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 16.412
+      as_published: '16.412'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.736
+      as_published: '4.736'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.923
+      as_published: '0.923'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.054
+      as_published: '-0.054'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+  - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1000'
+        column: T/K
+    heat_capacity:
+      value: 28.238
+      as_published: '28.238'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1000'
+        column: Cp°
+    entropy:
+      value: 75.902
+      as_published: '75.902'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 56.656
+      as_published: '56.656'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 19.245
+      as_published: '19.245'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.513
+      as_published: '4.513'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.511
+      as_published: '0.511'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.027
+      as_published: '-0.027'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+  - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1100'
+        column: T/K
+    heat_capacity:
+      value: 28.26
+      as_published: '28.260'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1100'
+        column: Cp°
+    entropy:
+      value: 78.592
+      as_published: '78.592'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 58.53
+      as_published: '58.530'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 22.068
+      as_published: '22.068'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 4.164
+      as_published: '4.164'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.126
+      as_published: '0.126'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.006
+      as_published: '-0.006'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1300'
+        column: T/K
+    heat_capacity:
+      value: 28.879
+      as_published: '28.879'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1300'
+        column: Cp°
+    entropy:
+      value: 83.356
+      as_published: '83.356'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 61.992
+      as_published: '61.992'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 27.774
+      as_published: '27.774'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+  - temperature:
+      value: 1400.0
+      as_published: '1400'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1400'
+        column: T/K
+    heat_capacity:
+      value: 29.353
+      as_published: '29.353'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1400'
+        column: Cp°
+    entropy:
+      value: 85.513
+      as_published: '85.513'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 63.596
+      as_published: '63.596'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 30.684
+      as_published: '30.684'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1400'
+        column: log Kf
+  - temperature:
+      value: 1500.0
+      as_published: '1500'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1500'
+        column: T/K
+    heat_capacity:
+      value: 29.934
+      as_published: '29.934'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1500'
+        column: Cp°
+    entropy:
+      value: 87.558
+      as_published: '87.558'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 65.126
+      as_published: '65.126'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 33.648
+      as_published: '33.648'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1500'
+        column: log Kf
+  - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1600'
+        column: T/K
+    heat_capacity:
+      value: 30.621
+      as_published: '30.621'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1600'
+        column: Cp°
+    entropy:
+      value: 89.511
+      as_published: '89.511'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 66.589
+      as_published: '66.589'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 36.675
+      as_published: '36.675'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1700'
+        column: T/K
+    heat_capacity:
+      value: 31.414
+      as_published: '31.414'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1700'
+        column: Cp°
+    entropy:
+      value: 91.39
+      as_published: '91.390'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1700'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 67.993
+      as_published: '67.993'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1700'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 39.776
+      as_published: '39.776'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1700'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1700'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1700'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1800'
+        column: T/K
+    heat_capacity:
+      value: 32.314
+      as_published: '32.314'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1800'
+        column: Cp°
+    entropy:
+      value: 93.211
+      as_published: '93.211'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1800'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 69.344
+      as_published: '69.344'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1800'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 42.961
+      as_published: '42.961'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1800'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1800'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1800'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+  - temperature:
+      value: 1900.0
+      as_published: '1900'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1900'
+        column: T/K
+    heat_capacity:
+      value: 33.32
+      as_published: '33.320'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1900'
+        column: Cp°
+    entropy:
+      value: 94.985
+      as_published: '94.985'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1900'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 70.647
+      as_published: '70.647'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1900'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 46.242
+      as_published: '46.242'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1900'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1900'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1900'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '1900'
+        column: log Kf
+  - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2000'
+        column: T/K
+    heat_capacity:
+      value: 34.433
+      as_published: '34.433'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2000'
+        column: Cp°
+    entropy:
+      value: 96.722
+      as_published: '96.722'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2000'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 71.907
+      as_published: '71.907'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2000'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 49.629
+      as_published: '49.629'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2000'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2000'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2000'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+  - temperature:
+      value: 2100.0
+      as_published: '2100'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2100'
+        column: T/K
+    heat_capacity:
+      value: 35.652
+      as_published: '35.652'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2100'
+        column: Cp°
+    entropy:
+      value: 98.431
+      as_published: '98.431'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2100'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 73.13
+      as_published: '73.130'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2100'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 53.132
+      as_published: '53.132'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2100'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2100'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2100'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2100'
+        column: log Kf
+  - temperature:
+      value: 2300.0
+      as_published: '2300'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2300'
+        column: T/K
+    heat_capacity:
+      value: 38.409
+      as_published: '38.409'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2300'
+        column: Cp°
+    entropy:
+      value: 101.794
+      as_published: '101.794'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2300'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 75.476
+      as_published: '75.476'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2300'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 60.531
+      as_published: '60.531'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2300'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -21.738
+      as_published: '-21.738'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2300'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 1.759
+      as_published: '1.759'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2300'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.04
+      as_published: '-0.040'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2300'
+        column: log Kf
+  - temperature:
+      value: 2400.0
+      as_published: '2400'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2400'
+        column: T/K
+    heat_capacity:
+      value: 39.947
+      as_published: '39.947'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2400'
+        column: Cp°
+    entropy:
+      value: 103.461
+      as_published: '103.461'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2400'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 76.608
+      as_published: '76.608'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2400'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 64.448
+      as_published: '64.448'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2400'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -22.005
+      as_published: '-22.005'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2400'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 2.786
+      as_published: '2.786'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2400'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.061
+      as_published: '-0.061'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2400'
+        column: log Kf
+  - temperature:
+      value: 2500.0
+      as_published: '2500'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2500'
+        column: T/K
+    heat_capacity:
+      value: 41.591
+      as_published: '41.591'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2500'
+        column: Cp°
+    entropy:
+      value: 105.125
+      as_published: '105.125'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2500'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 77.715
+      as_published: '77.715'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2500'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 68.524
+      as_published: '68.524'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2500'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -22.113
+      as_published: '-22.113'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2500'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 3.822
+      as_published: '3.822'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2500'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.08
+      as_published: '-0.080'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2500'
+        column: log Kf
+  - temperature:
+      value: 2600.0
+      as_published: '2600'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2600'
+        column: T/K
+    heat_capacity:
+      value: 43.342
+      as_published: '43.342'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2600'
+        column: Cp°
+    entropy:
+      value: 106.79
+      as_published: '106.790'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2600'
+        column: S°
+    negative_gibbs_enthalpy_function:
+      value: 78.801
+      as_published: '78.801'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2600'
+        column: -[G°-H°(Tr)]/T
+    enthalpy_increment:
+      value: 72.77
+      as_published: '72.770'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2600'
+        column: H-H°(Tr)
+    formation_enthalpy:
+      value: -22.052
+      as_published: '-22.052'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2600'
+        column: ΔfH°
+    formation_gibbs_energy:
+      value: 4.859
+      as_published: '4.859'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2600'
+        column: ΔfG°
+    log10_formation_equilibrium_constant:
+      value: -0.098
+      as_published: '-0.098'
+      locator:
+        table_id: Zr-003
+        url: https://janaf.nist.gov/tables/Zr-003.html
+        download_url: https://janaf.nist.gov/tables/Zr-003.txt
+        row_temperature_as_published: '2600'
+        column: log Kf
+  parse_ambiguities:
+  - line_number: 19
+    raw_line: "1135.000\t28.329\t79.478\t59.163\t23.058\tALPHA <--> BETA"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Zr-003
+      url: https://janaf.nist.gov/tables/Zr-003.html
+  - line_number: 20
+    raw_line: "1200\t28.511\t81.060\t60.306\t24.905\t0. 0. 0."
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Zr-003
+      url: https://janaf.nist.gov/tables/Zr-003.html
+  - line_number: 30
+    raw_line: "2125.000\t35.973\t98.854\t73.430\t54.027\tBETA <--> LIQUID"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Zr-003
+      url: https://janaf.nist.gov/tables/Zr-003.html
+  - line_number: 31
+    raw_line: "2200\t36.977\t100.119\t74.318\t56.763\t21.323 0.746  0.018"
+    reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Zr-003
+      url: https://janaf.nist.gov/tables/Zr-003.html
